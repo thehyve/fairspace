@@ -17,6 +17,7 @@ import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
@@ -29,6 +30,9 @@ public class CollectionsService {
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
+        if (isBlank(collection.getConnectionString())) {
+            collection.setConnectionString("");
+        }
         validateFields(collection);
 
         if (collection.getDescription() == null) {
@@ -116,13 +120,14 @@ public class CollectionsService {
                 throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
             }
 
-            validate(patch.getType() == null || patch.getType().equals(collection.getType()),
-                    "Cannot change collection's type");
-
             var oldLocation = collection.getLocation();
             if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
                 ensureLocationIsNotUsed(patch.getLocation());
                 collection.setLocation(patch.getLocation());
+            }
+
+            if (patch.getConnectionString() != null) {
+                collection.setConnectionString(patch.getConnectionString());
             }
 
             if (patch.getName() != null) {
@@ -146,7 +151,7 @@ public class CollectionsService {
         validate(isLocationValid(collection.getLocation()), "Invalid location");
         validate(isNotEmpty(collection.getName()), "Field name must be set");
         validate(collection.getName().length() <= 128, "Field name must contain no more than 128 characters");
-        validate(collection.getType() != null, "Field type must be set");
+        validate(collection.getConnectionString() != null, "Field type must be set");
     }
 
     private Collection addPermissionsToObject(Collection c) {

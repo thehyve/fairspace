@@ -1,8 +1,7 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import LinkedDataDropdown from '../LinkedDataDropdown';
-import {MessageDisplay} from '../../../common';
+import {LinkedDataDropdown} from '../LinkedDataDropdown';
 import Dropdown from '../values/Dropdown';
 
 describe('LinkedDataDropdown', () => {
@@ -13,7 +12,7 @@ describe('LinkedDataDropdown', () => {
     it('calls fetchItems with the given types', () => {
         const mockFetchItems = jest.fn(() => Promise.resolve({items: []}));
 
-        const wrapper = shallow(<LinkedDataDropdown debounce={0} property={property} fetchItems={mockFetchItems} />);
+        const wrapper = shallow(<LinkedDataDropdown debounce={0} types={['http://workspace.ci.fairway.app/vocabulary/PersonConsent']} fetchItems={mockFetchItems} />);
 
         const dropdown = wrapper.find(Dropdown);
 

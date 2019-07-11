@@ -1,17 +1,14 @@
 import React from 'react';
 
 import LinkedDataPage from '../common/LinkedDataPage';
-import MetadataEntityContainer from './MetadataEntityContainer';
-import MetadataEntityHeaderContainer from "./MetadataEntityHeaderContainer";
+import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '../common';
 import MetadataBreadcrumbsContextProvider from "./MetadataBreadcrumbsContextProvider";
 
-export default ({subject}) => {
-    return (
-        <MetadataBreadcrumbsContextProvider>
-            <LinkedDataPage>
-                <MetadataEntityHeaderContainer subject={subject} />
-                <MetadataEntityContainer subject={subject} />
-            </LinkedDataPage>
-        </MetadataBreadcrumbsContextProvider>
-    );
-};
+export default ({subject}) => (
+    <MetadataBreadcrumbsContextProvider>
+        <LinkedDataPage>
+            <LinkedDataEntityHeader subject={subject} />
+            <LinkedDataEntityFormContainer subject={subject} />
+        </LinkedDataPage>
+    </MetadataBreadcrumbsContextProvider>
+);

@@ -206,4 +206,26 @@ describe('vocabularyUtils', () => {
             expect(stringProperty.multiLine).toBe(false);
         });
     });
+
+    describe('getNamespaces', () => {
+        it('should return a full list of namespaces', () => {
+            const namespaces = vocabulary.getNamespaces();
+
+            expect(namespaces.length).toEqual(2);
+            expect(namespaces[0]).toEqual({
+                id: "http://fairspace.io/ontology#Namespace1",
+                label: "Namespace1",
+                prefix: "ns1",
+                namespace: "http://namespace1#",
+                isDefault: true
+            });
+            expect(namespaces[1].isDefault).toBe(false);
+        });
+        it('should apply a filter to the namespaces if given', () => {
+            const namespaces = vocabulary.getNamespaces(n => n[constants.SHACL_NAME][0]["@value"] === "Namespace2");
+
+            expect(namespaces.length).toEqual(1);
+            expect(namespaces[0].label).toEqual("Namespace2");
+        });
+    });
 });

@@ -1,11 +1,11 @@
 import React from "react";
 import ReferringValue from "../common/values/ReferringValue";
-import VocabularyDropdownWithAdditionContainer from "./VocabularyDropdownWithAdditionContainer";
 import {getInputComponent} from "../common/values/LinkedDataValueComponentFactory";
-import VocabularyDropdownContainer from "./VocabularyDropdownContainer";
 import {VOCABULARY_PATH} from "../../../constants";
+import LinkedDataDropdown from "../common/LinkedDataDropdown";
+import LinkedDataDropdownWithAddition from "../common/LinkedDataDropdownWithAddition";
 
-const defaultAddComponent = property => (property.allowAdditionOfEntities ? VocabularyDropdownWithAdditionContainer : VocabularyDropdownContainer);
+const defaultAddComponent = property => (property.allowAdditionOfEntities ? LinkedDataDropdownWithAddition : LinkedDataDropdown);
 const referringValue = props => <ReferringValue {...props} editorPath={VOCABULARY_PATH} />;
 
 export default {

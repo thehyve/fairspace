@@ -1,6 +1,5 @@
 import React, {useState, useContext} from 'react';
 import {connect} from "react-redux";
-import {withRouter} from 'react-router-dom';
 import {withStyles} from '@material-ui/core/styles';
 
 import styles from './Layout.styles';
@@ -92,4 +91,4 @@ const mapStateToProps = state => {
     };
 };
 
-export default withRouter(connect(mapStateToProps)(withStyles(styles)(Layout)));
+export default connect(mapStateToProps)(withStyles(styles)(Layout));

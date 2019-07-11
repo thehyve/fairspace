@@ -20,6 +20,9 @@ workspace:
       enabled: true
       pullPolicy: IfNotPresent
 
+services:
+  jupyterhub: https://jupyter.workspace.ci.fairway.app
+
 pluto:
   image:
     pullPolicy: Always
@@ -43,27 +46,3 @@ saturn:
 mercury:
   image:
     pullPolicy: Always
-
-# Specific settings for JupyterHub subchart
-jupyterhub:
-  rbac:
-    enabled: true
-  auth:
-      custom:
-          config:
-              client_id: workspace-ci-pluto
-              client_secret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-              openid_url: https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/
-              session_url: https://workspace.ci.fairway.app/api/v1/account/tokens
-  singleuser:
-    image:
-      pullPolicy: Always
-    extraEnv:
-      WORKSPACE_URL: https://storage.workspace.ci.fairway.app
-  hub:
-    image:
-      pullPolicy: Always
-    extraEnv:
-      JUPYTERHUB_CRYPT_KEY: 61efcb6349da848c361e13c0edfac1486d636ef89a2b7cbba610e83d8a332026
-  proxy:
-      secretToken: "7a437e0359eca81661e82836965bf2b5dc07db4ff10b7686cb18762e601799d9"

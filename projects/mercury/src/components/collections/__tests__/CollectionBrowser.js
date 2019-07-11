@@ -98,20 +98,9 @@ describe('loading state', () => {
     });
 
     it('is loading as long as the collections are pending', () => {
-        store = mockStore({
-            ...defaultState,
-            cache: {
-                collections: {
-                    ...defaultState.cache.collections,
-                    pending: true
-                },
-                users: defaultState.cache.users
-            },
-        });
+        const wrapper = shallow(<CollectionBrowser loading />);
 
-        const node = shallow(<CollectionBrowserContainer store={store} />);
-
-        expect(node.prop('loading')).toEqual(true);
+        expect(wrapper.find(LoadingInlay).length).toBe(1);
     });
 });
 
@@ -122,23 +111,9 @@ describe('error state', () => {
         expect(wrapper.find(MessageDisplay).length).toBe(1);
     });
 
-    it('is in error state when the collections fetching failed', () => {
-        store = mockStore({
-            ...defaultState,
-            cache: {
-                collections: {
-                    ...defaultState.cache.collections,
-                    error: new Error('Test')
-                },
-                users: {
-                    ...defaultState.cache.users,
-                    error: false
-                }
-            },
-        });
+    it('is in error state when user fetching failed', () => {
+        const wrapper = shallow(<CollectionBrowser error="some error" />);
 
-        const node = shallow(<CollectionBrowserContainer store={store} />);
-
-        expect(node.prop('error')).toEqual(new Error('Test'));
+        expect(wrapper.find(MessageDisplay).length).toBe(1);
     });
 });

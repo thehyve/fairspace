@@ -1,17 +1,14 @@
 import React from 'react';
 
 import LinkedDataPage from '../common/LinkedDataPage';
-import VocabularyEntityHeaderContainer from './VocabularyEntityHeaderContainer';
-import VocabularyEntityContainer from './VocabularyEntityContainer';
+import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '../common';
 import VocabularyBreadcrumbsContextProvider from "./VocabularyBreadcrumbsContextProvider";
 
-export default ({subject}) => {
-    return (
-        <VocabularyBreadcrumbsContextProvider>
-            <LinkedDataPage>
-                <VocabularyEntityHeaderContainer subject={subject} />
-                <VocabularyEntityContainer subject={subject} />
-            </LinkedDataPage>
-        </VocabularyBreadcrumbsContextProvider>
-    );
-};
+export default ({subject}) => (
+    <VocabularyBreadcrumbsContextProvider>
+        <LinkedDataPage>
+            <LinkedDataEntityHeader subject={subject} />
+            <LinkedDataEntityFormContainer subject={subject} />
+        </LinkedDataPage>
+    </VocabularyBreadcrumbsContextProvider>
+);

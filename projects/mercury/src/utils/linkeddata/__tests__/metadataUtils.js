@@ -448,7 +448,7 @@ describe('Metadata Utils', () => {
             expect(getNamespacedIri('http://prefix#blabla', namespaces)).toEqual('http://prefix#blabla');
         });
         it('should handle missing iri or namespaces', () => {
-            expect(getNamespacedIri(undefined, namespaces)).toBe(undefined);
+            expect(getNamespacedIri(undefined, namespaces)).toBe('');
             expect(getNamespacedIri('http://prefix/blabla')).toEqual('http://prefix/blabla');
         });
         it('should shorten a uri with any of the prefixes if multiple namespaces apply', () => {

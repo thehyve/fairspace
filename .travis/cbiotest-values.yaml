@@ -38,28 +38,3 @@ saturn:
   image:
     image: fairspace.azurecr.io/fairspace/saturn
     pullPolicy: Always
-
-# Specific settings for JupyterHub subchart
-jupyterhub:
-  rbac:
-    enabled: false
-  auth:
-      custom:
-          config:
-              client_id: workspace-test-pluto
-              client_secret: baf559f1-1926-44c2-95c9-b635639918b0
-              openid_url: https://cbioportal-fairspace.thehyve.net:8443/auth/realms/cbio/protocol/openid-connect/
-              session_url: https://workspace.cbiotest.fairway.app/api/v1/account/tokens
-  singleuser:
-    image:
-      name: fairspace.azurecr.io/fairspace/jupyterhub-singleuser
-      tag: 0.5.3-SNAPSHOT-simple
-    extraEnv:
-      WORKSPACE_URL: https://workspace.cbiotest.fairway.app
-  hub:
-    image:
-      name: fairspace.azurecr.io/fairspace/jupyterhub-hub
-    extraEnv:
-      JUPYTERHUB_CRYPT_KEY: 347947239749dbea93432379223064342aa5754843349978ef78978954397836
-  proxy:
-      secretToken: "505043750470347507534554340b45754037a4840482308908e985805208093a"

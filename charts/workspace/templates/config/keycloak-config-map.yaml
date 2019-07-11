@@ -10,6 +10,5 @@ metadata:
 data:
   redirect.urls: |-
     {{ template "workspace.url" . }}/*
-    {{ template "jupyterhub.url" $ }}/*
     {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}/*
 {{- end -}}

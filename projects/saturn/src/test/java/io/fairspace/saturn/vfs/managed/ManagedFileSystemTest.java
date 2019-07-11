@@ -72,14 +72,6 @@ public class ManagedFileSystemTest {
     }
 
     @Test
-    public void statRoot() throws IOException {
-        assertEquals("", fs.stat("").getPath());
-        assertTrue(fs.stat("").isDirectory());
-        assertNull(fs.stat("").getIri());
-    }
-
-
-    @Test
     public void statCollection() throws IOException {
         assertEquals("coll", fs.stat("coll").getPath());
         assertTrue(fs.stat("coll").isDirectory());
@@ -371,13 +363,5 @@ public class ManagedFileSystemTest {
 
         assertEquals(0, fs.list("coll").size());
         assertEquals(2, fs.list("newLocation").size());
-    }
-
-    @Test
-    public void isCollection() {
-        assertTrue(ManagedFileSystem.isCollection("coll"));
-        assertFalse(ManagedFileSystem.isCollection(""));
-        assertFalse(ManagedFileSystem.isCollection("coll/dir"));
-        assertFalse(ManagedFileSystem.isCollection("coll/dir/subdir"));
     }
 }

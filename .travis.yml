@@ -70,8 +70,6 @@ jobs:
       - .travis/build.sh projects/saturn
       - .travis/build.sh projects/mercury
       - .travis/build.sh projects/pluto
-      - .travis/build.sh projects/jupyterhub-hub
-      - travis_wait 60 .travis/build.sh projects/jupyterhub-singleuser
       - export SANITIZED_BRANCH=$(echo $TRAVIS_BRANCH | sed 's/\//_/g')
       - export SPOTBUGS_OUTPUTDIR="${SANITIZED_BRANCH}/${TRAVIS_BUILD_NUMBER}"
       - "if [ -f projects/pluto/app/build/reports/spotbugs/main.html ] ; then gsutil cp projects/pluto/app/build/reports/spotbugs/main.html gs://fairspace-spotbugs/${SPOTBUGS_OUTPUTDIR}/pluto-output.html ; fi"

@@ -34,6 +34,10 @@ repositories {
     maven {
         url "http://dl.bintray.com/milton/Milton"
     }
+    
+    maven {
+        url "https://raw.githubusercontent.com/DICE-UNC/DICE-Maven/master/releases"
+    }
 }
 
 dependencies {
@@ -50,6 +54,7 @@ dependencies {
     implementation 'org.topbraid:shacl:1.0.1'
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.11.1'
     implementation 'com.io-informatics.oss:jackson-jsonld:0.1.1'
+    implementation 'org.irods.jargon:jargon-core:4.3.0.1-RELEASE'
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
