@@ -109,7 +109,7 @@ const mapStateToProps = (state) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
     const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
     const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
-    const combineLinkedDataForSubject = (subject) => getCombinedMetadataForSubject(state, subject);
+    const combineLinkedDataForSubject = (subject, fallbackType) => getCombinedMetadataForSubject(state, subject, fallbackType);
     const getLinkedDataSearchResults = () => getMetadataSearchResults(state);
 
     return {
