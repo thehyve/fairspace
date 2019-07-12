@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -23,6 +24,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -68,6 +70,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                     .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                     .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                     .size(stat.getObjSize())
+                    .customProperties(Map.of(
+                            FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
+                    ))
                     .build();
         } catch (JargonException e) {
             throw new IOException(e);
@@ -95,6 +100,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                         .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                         .size(stat.getObjSize())
+                        .customProperties(Map.of(
+                                FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
+                        ))
                         .build());
             }
             return result;

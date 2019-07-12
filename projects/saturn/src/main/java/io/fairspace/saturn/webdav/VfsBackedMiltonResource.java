@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileSystemException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,12 +34,20 @@ public abstract class VfsBackedMiltonResource implements
     private static final QName ISREADONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
     private static final PropertyMetaData ISREADONLY_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, Boolean.class);
 
+    private static final List<QName> DEFAULT_PROPERTIES = List.of(IRI_PROPERTY, ISREADONLY_PROPERTY);
+
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
+    protected final MiltonMapPropertySource propertySource;
 
     VfsBackedMiltonResource(VirtualFileSystem fs, FileInfo info) {
+        this(fs, info, new MiltonMapPropertySource<>(info.getCustomProperties()));
+    }
+
+    VfsBackedMiltonResource(VirtualFileSystem fs, FileInfo info, MiltonMapPropertySource propertySource) {
         this.fs = fs;
         this.info = info;
+        this.propertySource = propertySource;
     }
 
     @Override
@@ -127,12 +136,10 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public Object getProperty(QName name) {
-        if (name.equals(IRI_PROPERTY)) {
-            return info.getIri();
-        }
-        if (name.equals(ISREADONLY_PROPERTY)) {
-            return info.isReadOnly();
-        }
+        if (name.equals(IRI_PROPERTY)) return info.getIri();
+        if (name.equals(ISREADONLY_PROPERTY)) return info.isReadOnly();
+        if (propertySource.hasProperty(name)) return propertySource.getProperty(name);
+
         return null;
     }
 
@@ -143,18 +150,18 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
-        if (name.equals(IRI_PROPERTY)) {
-            return IRI_PROPERTY_META;
-        }
-        if (name.equals(ISREADONLY_PROPERTY)) {
-            return ISREADONLY_PROPERTY_META;
-        }
+        if (name.equals(IRI_PROPERTY)) return IRI_PROPERTY_META;
+        if (name.equals(ISREADONLY_PROPERTY)) return ISREADONLY_PROPERTY_META;
+        if (propertySource.hasProperty(name)) return propertySource.getPropertyMeta(String.class);
+
         return null;
     }
 
     @Override
     public List<QName> getAllPropertyNames() {
-        return List.of(IRI_PROPERTY, ISREADONLY_PROPERTY);
+        ArrayList<QName> qNames = new ArrayList<>(DEFAULT_PROPERTIES);
+        qNames.addAll(propertySource.getPropertyNames());
+        return qNames;
     }
 
     void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {

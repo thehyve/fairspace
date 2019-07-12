@@ -17,6 +17,8 @@ import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +32,8 @@ import java.util.Map;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
@@ -63,6 +67,13 @@ public class WebDAVIT {
     @Before
     public void before() {
         var rdf = connect(createTxnMem());
+
+        rdf.load(
+                createDefaultModel()
+                    .add(createResource(defaultUser.getURI()), RDFS.label, "current-user")
+                    .add(createResource(anotherUser.getURI()), RDFS.label, "another-user")
+        );
+
         var eventBus = new EventBus();
 
         permissions = new PermissionsServiceImpl(rdf, () -> currentUser, userService, mailService);
