@@ -86,8 +86,6 @@ public class IRODSVirtualFileSystemTest {
         stat1.setCreatedAt(new Date());
         stat1.setModifiedAt(new Date());
 
-        when(ao.retrieveObjectStatForPath(eq("/zone/home/newpath"))).thenReturn(stat2);
-
         stat2.setDataId(234);
 
         when(aof.getDataTransferOperations(any())).thenReturn(dto);
