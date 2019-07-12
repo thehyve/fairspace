@@ -1,13 +1,12 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import {FormControl, FormGroup, FormHelperText, FormLabel} from '@material-ui/core';
-
-import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
 import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
 import LinkedDataRelationTable from "./LinkedDataRelationTable";
 import {TOOLTIP_ENTER_DELAY} from "../../../constants";
 import GenericTooltip from "../../common/GenericTooltip";
 import Iri from "../../common/Iri";
+import LinkedDataContext from "../LinkedDataContext";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -23,7 +22,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || allowedValues;
 
 const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
-    const {editorPath, componentFactory: {readOnlyComponent, editComponent, addComponent}} = useContext(LinkedDataValuesContext);
+    const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, values, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = errors && errors.length > 0;
@@ -37,8 +36,8 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
     const disableEditing = !property.isEditable || disallowEditingOfExistingValues(property);
-    const editInputComponent = disableEditing ? readOnlyComponent() : editComponent(property);
-    const addInputComponent = addComponent(property);
+    const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
+    const addInputComponent = valueComponentFactory.addComponent(property);
 
     const labelTooltip = <><Iri iri={path} /><div style={{marginTop: 4}}>{description}</div></>;
 

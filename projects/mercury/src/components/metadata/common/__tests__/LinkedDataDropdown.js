@@ -5,10 +5,6 @@ import {LinkedDataDropdown} from '../LinkedDataDropdown';
 import Dropdown from '../values/Dropdown';
 
 describe('LinkedDataDropdown', () => {
-    const property = {
-        className: 'http://workspace.ci.fairway.app/vocabulary/PersonConsent'
-    };
-
     it('calls fetchItems with the given types', () => {
         const mockFetchItems = jest.fn(() => Promise.resolve({items: []}));
 
@@ -22,5 +18,4 @@ describe('LinkedDataDropdown', () => {
                 .toEqual(['http://workspace.ci.fairway.app/vocabulary/PersonConsent']);
         });
     });
-
 });

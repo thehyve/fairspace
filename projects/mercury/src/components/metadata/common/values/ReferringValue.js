@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import Switch from "@material-ui/core/Switch";
 import DateTime from "../../../common/DateTime";
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI} from "../../../../constants";
 import Iri from "../../../common/Iri";
+import LinkedDataContext from "../../LinkedDataContext";
 
-const ReferringValue = ({property, entry, editorPath}) => {
+export const ReferringValue = ({property, entry, editorPath}) => {
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
@@ -34,4 +35,10 @@ const ReferringValue = ({property, entry, editorPath}) => {
     return displayValue;
 };
 
-export default ReferringValue;
+const ContextualReferringValue = props => {
+    const {editorPath} = useContext(LinkedDataContext);
+
+    return <ReferringValue {...props} editorPath={editorPath} />;
+};
+
+export default ContextualReferringValue;

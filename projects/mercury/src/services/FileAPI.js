@@ -119,7 +119,7 @@ class FileAPI {
     /**
      * It creates a full download like to the path provided
      */
-    getDownloadLink = (path = '') => this.client().getFileDownloadLink(path, defaultOptions);
+    getDownloadLink = (path = '') => Config.get().urls.download + path;
 
     /**
      * Deletes the file given by path

@@ -1,16 +1,22 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
+
 import InputWithAddition from "./values/InputWithAddition";
 import LinkedDataDropdown from "./LinkedDataDropdown";
 import LinkedDataContext from "../LinkedDataContext";
 
-const LinkedDataDropdownWithAddition = props => {
-    const {shapesPending, shapesError, determineShapeForTypes, getEmptyLinkedData, createLinkedDataEntity, requireIdentifier} = useContext(LinkedDataContext);
+const LinkedDataDropdownWithAddition = ({property, onChange}) => {
+    const {
+        shapesPending, shapesError, determineShapeForTypes,
+        getEmptyLinkedData, createLinkedDataEntity, requireIdentifier,
+        onEntityCreationError,
+    } = useContext(LinkedDataContext);
 
-    const shape = (!shapesPending && !shapesError) ? determineShapeForTypes([props.property.className]) : {};
+    const shape = (!shapesPending && !shapesError) ? determineShapeForTypes([property.className]) : {};
     const emptyData = getEmptyLinkedData(shape);
+
     const onCreate = (formKey, _, subject) => {
-        const type = props.property.className;
+        const type = property.className;
         return createLinkedDataEntity(formKey, subject, type);
     };
 
@@ -19,14 +25,15 @@ const LinkedDataDropdownWithAddition = props => {
             shape={shape}
             emptyData={emptyData}
             onCreate={onCreate}
+            onEntityCreationError={onEntityCreationError}
             error={shapesError}
             pending={shapesPending}
-            onChange={props.onChange}
+            onChange={onChange}
             requireIdentifier={requireIdentifier}
         >
             <LinkedDataDropdown
-                property={props.property}
-                onChange={props.onChange}
+                property={property}
+                onChange={onChange}
             />
         </InputWithAddition>
     );
