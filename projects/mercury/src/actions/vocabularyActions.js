@@ -19,7 +19,7 @@ export const submitVocabularyChangesFromState = (subject) => (dispatch, getState
     const metaVocabulary = getMetaVocabulary(getState());
     return dispatch({
         type: actionTypes.UPDATE_VOCABULARY,
-        payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
+        payload: VocabularyAPI.updateEntity(subject, null, values, metaVocabulary),
         meta: {
             subject,
             formKey
@@ -42,14 +42,14 @@ export const createVocabularyEntityFromState = (formKey, providedSubject, type) 
     }
 
     return dispatch({
-        type: actionTypes.CREATE_VOCABULARY_ENTITY,
+        type: actionTypes.UPDATE_VOCABULARY,
         payload: VocabularyAPI.get({subject})
             .then((meta) => {
                 if (meta.length) {
                     throw Error(`Vocabulary entity already exists: ${subject}`);
                 }
             })
-            .then(() => VocabularyAPI.createEntity(subject, type, values, metaVocabulary))
+            .then(() => VocabularyAPI.updateEntity(subject, type, values, metaVocabulary))
             .then(() => ({subject, type, values})),
         meta: {
             subject,
@@ -77,28 +77,4 @@ const fetchMetaVocabulary = createErrorHandlingPromiseAction(() => ({
 export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
     fetchMetaVocabulary,
     state => (state && state.cache && state.cache.metaVocabulary)
-);
-
-const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => ({
-    type: actionTypes.FETCH_VOCABULARY_ENTITIES,
-    payload: VocabularyAPI.getEntitiesByType(type),
-    meta: {
-        type
-    }
-}));
-
-const fetchAllVocabularyEntities = createErrorHandlingPromiseAction(dispatch => ({
-    type: actionTypes.FETCH_ALL_VOCABULARY_ENTITIES,
-    payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(() => VocabularyAPI.getAllCatalogEntities())
-}));
-
-export const fetchVocabularyEntitiesIfNeeded = type => dispatchIfNeeded(
-    () => fetchVocabularyEntitiesByType(type),
-    state => (state && state.cache && state.cache.vocabularyEntitiesByType ? state.cache.vocabularyEntitiesByType[type] : undefined)
-);
-
-export const fetchAllVocabularyEntitiesIfNeeded = () => dispatchIfNeeded(
-    () => fetchAllVocabularyEntities(),
-    state => (state && state.cache ? state.cache.allVocabularyEntities : undefined)
 );

@@ -3,6 +3,7 @@ import {MetadataAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {getVocabulary} from "../reducers/cache/vocabularyReducers";
 import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
+import {getFirstPredicateValue} from "../utils/linkeddata/jsonLdUtils";
 
 export const invalidateMetadata = subject => ({
     type: actionTypes.INVALIDATE_FETCH_METADATA,
@@ -17,8 +18,8 @@ export const submitMetadataChangesFromState = (subject, defaultType) => (dispatc
     return dispatch({
         type: actionTypes.UPDATE_METADATA,
         payload: MetadataAPI.get({subject})
-            .then((meta) => (meta.length ? meta[0]['@type'][0] : defaultType))
-            .then((type) => MetadataAPI.createEntity(subject, type, values, vocabulary)),
+            .then((meta) => (meta.length ? getFirstPredicateValue(meta[0], '@type', defaultType) : defaultType))
+            .then((type) => MetadataAPI.updateEntity(subject, type, values, vocabulary)),
         meta: {
             subject,
             formKey
@@ -38,7 +39,7 @@ export const createMetadataEntityFromState = (formKey, subject, type) => (dispat
                     throw Error(`Entity already exists: ${subject}`);
                 }
             })
-            .then(() => MetadataAPI.createEntity(subject, type, values, vocabulary))
+            .then(() => MetadataAPI.updateEntity(subject, type, values, vocabulary))
             .then(() => ({subject, type, values})),
         meta: {
             subject,

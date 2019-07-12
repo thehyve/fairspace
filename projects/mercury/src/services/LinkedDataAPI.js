@@ -50,9 +50,9 @@ class LinkedDataAPI {
     }
 
     /**
-     * Creates a new entity
-     * @param subject   Single URI representing the subject to update
-     * @param type
+     * Updates or creates a new entity
+     * @param subject    Single URI representing the subject to update
+     * @param type       Entity type. Can be null for existing entities
      * @param properties An object with each key is the iri of the predicate to update
      * and the value is the array of values
      * Each value is an object on its own with one of the following keys
@@ -62,38 +62,18 @@ class LinkedDataAPI {
      * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
      * @returns {*}
      */
-    createEntity(subject, type, properties, vocabulary) {
-        if (!subject || !properties) {
-            return Promise.reject(Error("No subject or properties given"));
-        }
-
-        const initialValuesJsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
-
-        return this.patch([...initialValuesJsonLd, {'@id': subject, '@type': type}])
-            .then(failOnHttpError("Failure when creating entity"));
-    }
-
-    /**
-     * Update values for all given properties
-     * @param subject   Single URI representing the subject to update
-     * @param properties An object with each key is the iri of the predicate to update
-     * and the value is the array of values
-     * Each value is an object on its own with one of the following keys
-     *   id: referencing another resource
-     *   value: referencing a literal value
-     * If both keys are specified, the id is stored and the literal value is ignored
-     * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
-     * @returns {*}
-     */
-    updateEntity(subject, properties, vocabulary) {
+    updateEntity(subject, type, properties, vocabulary) {
         if (!subject || !properties) {
             return Promise.reject(Error("No subject or properties given"));
         }
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
+        if (type) {
+            jsonLd.push({'@id': subject, '@type': type});
+        }
 
         return this.patch(jsonLd)
-            .then(failOnHttpError("Failure when updating metadata"));
+            .then(failOnHttpError("Failure when updating entity"));
     }
 
     /**

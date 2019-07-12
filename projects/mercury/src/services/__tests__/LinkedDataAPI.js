@@ -39,6 +39,7 @@ it('stores metadata as jsonld', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.updateEntity(
         'http://thehyve.nl',
+        'http://examle.com/Company',
         {
             hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}]
         },
@@ -51,6 +52,10 @@ it('stores metadata as jsonld', () => {
             {'@value': 'John Snow'},
             {'@value': 'Ygritte'}
         ]
+    },
+    {
+        '@id': 'http://thehyve.nl',
+        '@type': 'http://examle.com/Company',
     }];
     expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
 });
@@ -59,6 +64,7 @@ it('stores metadata as jsonld (Full entity)', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.updateEntity(
         'http://thehyve.nl',
+        'http://examle.com/Company',
         {
             hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
             hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
@@ -80,6 +86,10 @@ it('stores metadata as jsonld (Full entity)', () => {
                 {'@value': 'John Sand'},
                 {'@value': 'Ettirgy'}
             ]
+        },
+        {
+            '@id': 'http://thehyve.nl',
+            '@type': 'http://examle.com/Company',
         }
     ];
     expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
