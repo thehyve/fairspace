@@ -31,7 +31,7 @@ const LinkedDataMetadataProvider = ({
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
 
-    const submitLinkedDataChanges = (formKey) => submitMetadataChanges(formKey)
+    const submitLinkedDataChanges = (formKey, type) => submitMetadataChanges(formKey, type)
         .then(() => fetchMetadataBySubject(formKey));
 
     const getPropertiesForLinkedData = ({linkedData, isEntityEditable = true}) => propertiesToShow(linkedData)
@@ -111,7 +111,7 @@ const mapStateToProps = (state) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
     const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
     const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
-    const combineLinkedDataForSubject = (subject) => getCombinedMetadataForSubject(state, subject);
+    const combineLinkedDataForSubject = (subject, defaultType) => getCombinedMetadataForSubject(state, subject, defaultType);
     const getLinkedDataSearchResults = () => getMetadataSearchResults(state);
 
     return {

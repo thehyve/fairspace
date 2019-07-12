@@ -82,8 +82,6 @@ export const linkedDataFormChangesReducerPerForm = (state = initialState, action
  */
 export const linkedDataFormSubmissionReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.CREATE_VOCABULARY_ENTITY_PENDING:
-        case actionTypes.CREATE_METADATA_ENTITY_PENDING:
         case actionTypes.UPDATE_METADATA_PENDING:
         case actionTypes.UPDATE_VOCABULARY_PENDING:
             return {
@@ -91,8 +89,6 @@ export const linkedDataFormSubmissionReducerPerForm = (state = initialState, act
                 error: false,
                 pending: true
             };
-        case actionTypes.CREATE_VOCABULARY_ENTITY_FULFILLED:
-        case actionTypes.CREATE_METADATA_ENTITY_FULFILLED:
         case actionTypes.UPDATE_METADATA_FULFILLED:
         case actionTypes.UPDATE_VOCABULARY_FULFILLED:
             return {
@@ -100,8 +96,6 @@ export const linkedDataFormSubmissionReducerPerForm = (state = initialState, act
                 updates: {},
                 pending: false
             };
-        case actionTypes.CREATE_VOCABULARY_ENTITY_REJECTED:
-        case actionTypes.CREATE_METADATA_ENTITY_REJECTED:
         case actionTypes.UPDATE_METADATA_REJECTED:
         case actionTypes.UPDATE_VOCABULARY_REJECTED:
             return {

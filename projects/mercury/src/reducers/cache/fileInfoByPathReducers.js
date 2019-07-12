@@ -10,7 +10,7 @@ export default (state = {}, action) => {
         case actionTypes.STAT_FILE_FULFILLED:
             return {
                 ...state,
-                [action.meta.path]: {data: action.payload.props.iri}
+                [action.meta.path]: {data: action.payload}
             };
         case actionTypes.STAT_FILE_REJECTED:
             return {

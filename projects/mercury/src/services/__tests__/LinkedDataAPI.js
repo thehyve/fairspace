@@ -42,7 +42,8 @@ it('stores metadata as jsonld', () => {
         {
             hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}]
         },
-        vocabularyUtils([])
+        vocabularyUtils([]),
+        'http://examle.com/Company'
     );
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = [{
@@ -51,6 +52,10 @@ it('stores metadata as jsonld', () => {
             {'@value': 'John Snow'},
             {'@value': 'Ygritte'}
         ]
+    },
+    {
+        '@id': 'http://thehyve.nl',
+        '@type': 'http://examle.com/Company',
     }];
     expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
 });
@@ -63,7 +68,8 @@ it('stores metadata as jsonld (Full entity)', () => {
             hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
             hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
         },
-        vocabularyUtils([])
+        vocabularyUtils([]),
+        'http://examle.com/Company'
     );
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = [
@@ -80,6 +86,10 @@ it('stores metadata as jsonld (Full entity)', () => {
                 {'@value': 'John Sand'},
                 {'@value': 'Ettirgy'}
             ]
+        },
+        {
+            '@id': 'http://thehyve.nl',
+            '@type': 'http://examle.com/Company',
         }
     ];
     expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
