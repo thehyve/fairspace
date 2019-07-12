@@ -105,7 +105,6 @@ const LinkedDataVocabularyProvider = ({
                 getClassesInCatalog,
                 searchLinkedData: searchVocabularyDispatch,
                 getSearchEntities,
-                getEntityRelativeUrl: (id) => `${VOCABULARY_PATH}?iri=` + encodeURIComponent(id),
                 onEntityCreationError,
                 typeRender,
                 editorPath: VOCABULARY_PATH,

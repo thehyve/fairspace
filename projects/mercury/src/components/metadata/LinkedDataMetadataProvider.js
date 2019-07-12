@@ -93,7 +93,6 @@ const LinkedDataMetadataProvider = ({
                 getClassesInCatalog,
                 searchLinkedData: searchMetadataDispatch,
                 getSearchEntities,
-                getEntityRelativeUrl: (id) => `${METADATA_PATH}?iri=` + encodeURIComponent(id),
                 onEntityCreationError,
                 typeRender,
                 editorPath: METADATA_PATH,
