@@ -1,7 +1,7 @@
 import React from 'react';
+import {mount} from "enzyme";
 import ContextualReferringValue, {ReferringValue} from "../ReferringValue";
 import LinkedDataLink from "../../LinkedDataLink";
-import {mount, shallow} from "enzyme";
 import LinkedDataContext from "../../../LinkedDataContext";
 
 describe('ReferringValue', () => {
@@ -74,5 +74,5 @@ describe('ReferringValue', () => {
         const referringValue = wrapper.find(ReferringValue);
         expect(referringValue.length).toEqual(1);
         expect(referringValue.prop("editorPath")).toEqual(editorPath);
-    })
+    });
 });

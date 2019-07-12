@@ -1,5 +1,4 @@
 import React from 'react';
-import {LinkedDataMetadataProviderContainer, LinkedDataVocabularyProviderContainer} from './LinkedDataContext';
 import LinkedDataVocabularyProvider from './LinkedDataVocabularyProvider';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
 import BreadcrumbsContext from '../common/breadcrumbs/BreadcrumbsContext';
