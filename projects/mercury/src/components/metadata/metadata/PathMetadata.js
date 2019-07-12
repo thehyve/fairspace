@@ -3,6 +3,7 @@ import React from "react";
 import MessageDisplay from "../../common/MessageDisplay";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {statFile} from "../../../actions/fileActions";
+import {EXTERNAL_DIRECTORY_URI, EXTERNAL_FILE_URI} from "../../../constants";
 
 export class PathMetadata extends React.Component {
     componentDidMount() {
@@ -34,7 +35,7 @@ export class PathMetadata extends React.Component {
         return (
             <LinkedDataEntityFormContainer
                 subject={subject}
-                defaultType={type === 'directory' ? "http://fairspace.io/ontology#ExternalDirectory" : "http://fairspace.io/ontology#ExternalFile"}
+                defaultType={type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
                 {...otherProps}
             />
         );
