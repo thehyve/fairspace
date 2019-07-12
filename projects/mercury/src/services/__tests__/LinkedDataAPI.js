@@ -39,11 +39,11 @@ it('stores metadata as jsonld', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.updateEntity(
         'http://thehyve.nl',
-        'http://examle.com/Company',
         {
             hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}]
         },
-        vocabularyUtils([])
+        vocabularyUtils([]),
+        'http://examle.com/Company'
     );
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = [{
@@ -64,12 +64,12 @@ it('stores metadata as jsonld (Full entity)', () => {
     window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.updateEntity(
         'http://thehyve.nl',
-        'http://examle.com/Company',
         {
             hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
             hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
         },
-        vocabularyUtils([])
+        vocabularyUtils([]),
+        'http://examle.com/Company'
     );
     expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
     const expected = [
