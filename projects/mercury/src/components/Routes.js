@@ -6,14 +6,13 @@ import Home from "./Home";
 import Collections from "./collections/CollectionsPage";
 import Notebooks from "./Notebooks";
 import MetadataEntityPage from "./metadata/metadata/MetadataEntityPage";
-import MetadataListPage from "./metadata/metadata/MetadataListPage";
 import FilesPage from "./file/FilesPage";
 import logout from "../services/logout";
 import SearchPage from './search/SearchPage';
-import VocabularyListPage from "./metadata/vocabulary/VocabularyListPage";
 import VocabularyEntityPage from "./metadata/vocabulary/VocabularyEntityPage";
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from './metadata/LinkedDataWrapper';
+import LinkedDataListPage from './metadata/common/LinkedDataListPage';
 
 const routes = () => (
     <>
@@ -47,7 +46,7 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                const component = iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <MetadataListPage />;
+                const component = iriParam ? <MetadataEntityPage subject={decodeURIComponent(iriParam)} /> : <LinkedDataListPage />;
                 return (
                     <MetadataWrapper location={location}>
                         {component}
@@ -69,7 +68,7 @@ const routes = () => (
                 // React-router seems not to be able to directly match query parameters.
                 // For that reason, we parse the query string ourselves
                 const iriParam = queryString.parse(location.search).iri;
-                const component = iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <VocabularyListPage />;
+                const component = iriParam ? <VocabularyEntityPage subject={decodeURIComponent(iriParam)} /> : <LinkedDataListPage />;
 
                 return (
                     <VocabularyWrapper location={location}>
