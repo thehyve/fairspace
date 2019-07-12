@@ -14,6 +14,7 @@ import ErrorDialog from "../common/ErrorDialog";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataContext from './LinkedDataContext';
 import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
+import {validateValuesAgainstShape} from '../../utils/validationUtils';
 
 const useFormData = (formKey) => {
     if (!formKey) {
@@ -32,7 +33,7 @@ const useFormData = (formKey) => {
 
     const isUpdating = useSelector(state => isLinkedDataFormPending(state, formKey));
 
-    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges, getEmptyLinkedData} = useContext(LinkedDataContext);
 
     const onSubmit = () => {
         submitLinkedDataChanges((formKey))
@@ -64,6 +65,12 @@ const useFormData = (formKey) => {
 
     const errors = useSelector(state => getLinkedDataFormValidations(state, formKey));
 
+    const anyRequiredPropertiesNotSatisfied = (shape) => {
+        const propertiesWithNoChanges = getEmptyLinkedData(shape);
+
+        return propertiesWithNoChanges.some(p => validateValuesAgainstShape({...p, values: updates[p.key] || p.values}).length > 0);
+    };
+
     const extendPropertiesWithChanges = (properties) => propertiesToShow(properties)
         .filter(p => p.isEditable || p.values.length)
         .map(p => ({
@@ -77,6 +84,7 @@ const useFormData = (formKey) => {
         onSubmit,
         isUpdating,
         submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,
+        anyRequiredPropertiesNotSatisfied,
         onAdd,
         onChange,
         onDelete,

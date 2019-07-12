@@ -32,6 +32,11 @@ export const iriValidation = (values) => {
     return null;
 };
 
+/**
+ * It adds the given value the the given array if the value is defined (truthy)
+ * @param {Array} arr
+ * @param {string} value to add to array
+ */
 export const pushNonEmpty = (arr, value) => (value ? [...arr, value] : arr);
 
 export const maxCountValidation = (maxCount, values) => ((values && values.length > maxCount)
