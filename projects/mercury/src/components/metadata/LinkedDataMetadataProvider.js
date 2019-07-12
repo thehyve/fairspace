@@ -21,6 +21,7 @@ import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
 import {USABLE_IN_METADATA_URI, METADATA_PATH, VOCABULARY_PATH} from "../../constants";
 import Iri from "../common/Iri";
 import LinkedDataLink from "./common/LinkedDataLink";
+import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject, submitMetadataChanges,
@@ -92,9 +93,10 @@ const LinkedDataMetadataProvider = ({
                 getClassesInCatalog,
                 searchLinkedData: searchMetadataDispatch,
                 getSearchEntities,
-                getEntityRelativeUrl: (id) => `${METADATA_PATH}?iri=` + encodeURIComponent(id),
                 onEntityCreationError,
                 typeRender,
+                editorPath: METADATA_PATH,
+                valueComponentFactory
             }}
         >
             {children}

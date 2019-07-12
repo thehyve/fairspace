@@ -7,6 +7,9 @@ import TimeValue from "./TimeValue";
 import SwitchValue from "./SwitchValue";
 import ResourceValue from "./ResourceValue";
 import EnumerationDropdown from "./EnumerationDropdown";
+import LinkedDataDropdownWithAddition from "../LinkedDataDropdownWithAddition";
+import LinkedDataDropdown from "../LinkedDataDropdown";
+import ReferringValue from "./ReferringValue";
 
 export const getInputComponent = (property) => {
     // If the property has a restricted set of allowed values
@@ -48,4 +51,12 @@ export const getInputComponent = (property) => {
         default:
             return undefined;
     }
+};
+
+const defaultAddComponent = property => (property.allowAdditionOfEntities ? LinkedDataDropdownWithAddition : LinkedDataDropdown);
+
+export default {
+    editComponent: property => getInputComponent(property) || ReferringValue,
+    addComponent: property => getInputComponent(property) || defaultAddComponent(property),
+    readOnlyComponent: () => ReferringValue
 };

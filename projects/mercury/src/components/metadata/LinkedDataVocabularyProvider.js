@@ -27,6 +27,7 @@ import {getFirstPredicateValue, getFirstPredicateId} from "../../utils/linkeddat
 import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../constants";
 import Config from "../../services/Config/Config";
+import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, submitVocabularyChanges,
@@ -104,9 +105,10 @@ const LinkedDataVocabularyProvider = ({
                 getClassesInCatalog,
                 searchLinkedData: searchVocabularyDispatch,
                 getSearchEntities,
-                getEntityRelativeUrl: (id) => `${VOCABULARY_PATH}?iri=` + encodeURIComponent(id),
                 onEntityCreationError,
                 typeRender,
+                editorPath: VOCABULARY_PATH,
+                valueComponentFactory
             }}
         >
             {children}

@@ -1,12 +1,11 @@
 import React, {useContext} from 'react';
 import {withRouter} from 'react-router-dom';
 import {
-    Checkbox, FormControl, Input, ListItemText,
-    MenuItem, Paper, Select, TableFooter, TablePagination,
-    TableRow, withStyles
+    Checkbox, FormControl, Input, ListItemText, MenuItem, Paper, Select, TableFooter, TablePagination, TableRow,
+    withStyles
 } from "@material-ui/core";
 
-import {SearchBar, MessageDisplay, LoadingInlay} from "../../common";
+import {LoadingInlay, MessageDisplay, SearchBar} from "../../common";
 import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
 import useLinkedDataSearch from '../UseLinkedDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
@@ -19,6 +18,8 @@ const styles = theme => ({
     }
 });
 
+const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id)
+
 const LinkedDataListPage = ({classes, history}) => {
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
@@ -28,7 +29,7 @@ const LinkedDataListPage = ({classes, history}) => {
     } = useLinkedDataSearch(true);
 
     const {
-        requireIdentifier, getEntityRelativeUrl, createLinkedDataEntity,
+        requireIdentifier, editorPath, createLinkedDataEntity,
         onEntityCreationError, hasEditRight, typeRender
     } = useContext(LinkedDataContext);
 
@@ -72,7 +73,7 @@ const LinkedDataListPage = ({classes, history}) => {
                     hasHighlights={hasHighlights}
                     footerRender={footerRender}
                     typeRender={typeRender}
-                    onOpen={(id) => history.push(getEntityRelativeUrl(id))}
+                    onOpen={(id) => history.push(getEntityRelativeUrl(editorPath, id))}
                 />
             );
         }
@@ -112,7 +113,7 @@ const LinkedDataListPage = ({classes, history}) => {
                         requireIdentifie={requireIdentifier}
                         create={
                             (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
-                                .then(() => history.push(getEntityRelativeUrl(id)))
+                                .then(() => history.push(getEntityRelativeUrl(editorPath, id)))
                         }
                         onEntityCreationError={onEntityCreationError}
                     >
