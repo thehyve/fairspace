@@ -1,7 +1,7 @@
 import React from 'react';
 
-import LinkedDataPage from '../common/LinkedDataPage';
-import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '../common';
+import LinkedDataPage from './LinkedDataPage';
+import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '.';
 
 export default ({subject}) => (
     <LinkedDataPage>
