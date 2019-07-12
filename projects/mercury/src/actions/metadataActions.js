@@ -9,7 +9,7 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const submitMetadataChangesFromState = (subject, fallbackType) => (dispatch, getState) => {
+export const submitMetadataChangesFromState = (subject, defaultType) => (dispatch, getState) => {
     // For metadata changes, the subject iri is used as form key
     const formKey = subject;
     const values = getLinkedDataFormUpdates(getState(), formKey);
@@ -17,7 +17,7 @@ export const submitMetadataChangesFromState = (subject, fallbackType) => (dispat
     return dispatch({
         type: actionTypes.UPDATE_METADATA,
         payload: MetadataAPI.get({subject})
-            .then((meta) => (meta.length ? meta[0]['@type'][0] : fallbackType))
+            .then((meta) => (meta.length ? meta[0]['@type'][0] : defaultType))
             .then((type) => MetadataAPI.createEntity(subject, type, values, vocabulary)),
         meta: {
             subject,

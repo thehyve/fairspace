@@ -34,7 +34,7 @@ export class PathMetadata extends React.Component {
         return (
             <LinkedDataEntityFormContainer
                 subject={subject}
-                fallbackType={type === 'directory' ? "http://fairspace.io/ontology#ExternalDirectory" : "http://fairspace.io/ontology#ExternalFile"}
+                defaultType={type === 'directory' ? "http://fairspace.io/ontology#ExternalDirectory" : "http://fairspace.io/ontology#ExternalFile"}
                 {...otherProps}
             />
         );

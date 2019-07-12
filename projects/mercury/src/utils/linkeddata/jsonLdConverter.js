@@ -138,7 +138,7 @@ const generatePropertiesForMetadata = (vocabulary, metadataItem, types, property
  * @param subject           Subject to fromJsonLd the metadata for. If not provided, the metadata is expected to contain
  *                          information on a single entity
  * @param vocabulary        vocabularyUtils object describing the vocabulary
- * @param fallbackType      fallback type to use when no metadata is found
+ * @param defaultType      fallback type to use when no metadata is found
  * @returns [Any] A promise resolving in an array with metadata. Each element will look like this:
  * {
  *      key: "http://fairspace.io/ontology#description",
@@ -149,7 +149,7 @@ const generatePropertiesForMetadata = (vocabulary, metadataItem, types, property
  *      ]
  *  }
  */
-export const fromJsonLd = (expandedMetadata, subject, vocabulary, fallbackType = null) => {
+export const fromJsonLd = (expandedMetadata, subject, vocabulary, defaultType = null) => {
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
         console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
         return [];
@@ -165,7 +165,7 @@ export const fromJsonLd = (expandedMetadata, subject, vocabulary, fallbackType =
     }
 
     // Determine properties allowed for the given type
-    const types = metadataItem['@type'] || (fallbackType && [fallbackType]);
+    const types = metadataItem['@type'] || (defaultType && [defaultType]);
     if (!Array.isArray(types)) {
         console.warn("Can not fromJsonLd metadata without a type or that is not expanded");
         return [];

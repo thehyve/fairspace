@@ -29,15 +29,15 @@ export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, default
  * Returns an object representing the metadata for the given subject
  * @param state
  * @param subject
- * @param fallbackType
+ * @param defaultType
  * @see {Vocabulary.fromJsonLd}
  * @returns {*}
  */
-export const getCombinedMetadataForSubject = (state, subject, fallbackType) => {
+export const getCombinedMetadataForSubject = (state, subject, defaultType) => {
     const {cache: {jsonLdBySubject}} = state;
     if (jsonLdBySubject && jsonLdBySubject[subject] && !jsonLdBySubject[subject].pending && !jsonLdBySubject[subject].error) {
         const vocabulary = getVocabulary(state);
-        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary, fallbackType);
+        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary, defaultType);
     }
 
     return [];

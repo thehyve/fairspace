@@ -10,7 +10,7 @@ import LinkedDataContext from './LinkedDataContext';
  * @param {string} subject
  * @param {boolean} isEntityEditable
  */
-const useLinkedData = (subject, fallbackType, isEntityEditable) => {
+const useLinkedData = (subject, defaultType, isEntityEditable) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
@@ -30,7 +30,7 @@ const useLinkedData = (subject, fallbackType, isEntityEditable) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedDataForSubject = combineLinkedDataForSubject(subject, fallbackType);
+    const linkedDataForSubject = combineLinkedDataForSubject(subject, defaultType);
 
     const {label, description} = getTypeInfoForLinkedData(linkedDataForSubject);
 
