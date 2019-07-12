@@ -157,7 +157,6 @@ fs:ExternalFileShape a fs:ClassShape ;
     sh:description "A single file." ;
     sh:name "External File" ;
     sh:targetClass fs:ExternalFile ;
-    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
     fs:fixedShape true ;
     fs:systemProperties
@@ -171,7 +170,6 @@ fs:ExternalDirectoryShape a fs:ClassShape ;
     sh:description "A directory containing multiple files." ;
     sh:name "External Directory" ;
     sh:targetClass fs:ExternalDirectory ;
-    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     fs:systemProperties

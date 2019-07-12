@@ -35,7 +35,7 @@ const useFormData = (formKey, fallbackType) => {
     const {submitLinkedDataChanges} = useContext(LinkedDataContext);
 
     const onSubmit = () => {
-        submitLinkedDataChanges(formKey)
+        submitLinkedDataChanges(formKey, fallbackType)
             .catch(e => {
                 if (e.details) {
                     ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, formKey), e.message);

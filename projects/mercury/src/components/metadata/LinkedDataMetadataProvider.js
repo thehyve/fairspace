@@ -30,7 +30,7 @@ const LinkedDataMetadataProvider = ({
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
 
-    const submitLinkedDataChanges = (formKey) => submitMetadataChanges(formKey)
+    const submitLinkedDataChanges = (formKey, type) => submitMetadataChanges(formKey, type)
         .then(() => fetchMetadataBySubject(formKey));
 
     const getPropertiesForLinkedData = ({linkedData, isEntityEditable = true}) => propertiesToShow(linkedData)

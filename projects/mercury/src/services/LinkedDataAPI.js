@@ -52,6 +52,7 @@ class LinkedDataAPI {
     /**
      * Creates a new entity
      * @param subject   Single URI representing the subject to update
+     * @param type
      * @param properties An object with each key is the iri of the predicate to update
      * and the value is the array of values
      * Each value is an object on its own with one of the following keys
