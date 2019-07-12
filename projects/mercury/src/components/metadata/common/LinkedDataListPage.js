@@ -21,8 +21,10 @@ const styles = theme => ({
 
 const LinkedDataListPage = ({classes, history}) => {
     const {
-        query, types, shapes, size, page, shapesLoading, loading, error, onSearchChange,
-        onTypesChange, onPageChange, onSizeChange, allTypes, entities, total, hasHighlights,
+        query, setQuery, selectedTypes, setSelectedTypes,
+        size, setSize, page, setPage,
+        shapes, shapesLoading, searchPending, error,
+        availableTypes, entities, total, hasHighlights,
     } = useLinkedDataSearch(true);
 
     const {
@@ -32,7 +34,7 @@ const LinkedDataListPage = ({classes, history}) => {
 
     const renderTypeClass = ({targetClass, label}) => (
         <MenuItem key={targetClass} value={targetClass}>
-            <Checkbox checked={types.includes(targetClass)} />
+            <Checkbox checked={selectedTypes.includes(targetClass)} />
             <ListItemText primary={label} secondary={targetClass} />
         </MenuItem>
     );
@@ -46,15 +48,15 @@ const LinkedDataListPage = ({classes, history}) => {
                     colSpan={colSpan}
                     count={count}
                     page={page}
-                    onChangePage={(_, p) => onPageChange(p)}
-                    onChangeRowsPerPage={(e) => onSizeChange(e.target.value)}
+                    onChangePage={(_, p) => setPage(p)}
+                    onChangeRowsPerPage={(e) => setSize(e.target.value)}
                 />
             </TableRow>
         </TableFooter>
     );
 
     const ListBody = () => {
-        if (loading) {
+        if (searchPending) {
             return <LoadingInlay />;
         }
 
@@ -78,7 +80,7 @@ const LinkedDataListPage = ({classes, history}) => {
         return <MessageDisplay message={query && query !== '*' ? 'No results found' : 'The metadata is empty'} isError={false} />;
     };
 
-    const getTypeLabel = (type) => allTypes.find(({targetClass}) => targetClass === type).label;
+    const getTypeLabel = (type) => availableTypes.find(({targetClass}) => targetClass === type).label;
 
     return (
         <>
@@ -87,18 +89,18 @@ const LinkedDataListPage = ({classes, history}) => {
                 <SearchBar
                     placeholder="Search"
                     disableUnderline
-                    onSearchChange={onSearchChange}
+                    onSearchChange={setQuery}
                 />
                 <FormControl className={classes.typeSelect}>
                     <Select
                         multiple
                         displayEmpty
-                        value={types}
-                        onChange={e => onTypesChange(e.target.value)}
+                        value={selectedTypes}
+                        onChange={e => setSelectedTypes(e.target.value)}
                         input={<Input id="select-multiple-checkbox" />}
                         renderValue={selected => (selected.length === 0 ? '[All types]' : selected.map(getTypeLabel).join(', '))}
                     >
-                        {allTypes.map(renderTypeClass)}
+                        {availableTypes.map(renderTypeClass)}
                     </Select>
                 </FormControl>
             </Paper>
