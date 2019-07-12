@@ -26,8 +26,17 @@ import Iri from "../common/Iri";
 import {ErrorDialog} from "../common";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataLink from "./common/LinkedDataLink";
+import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
+import StringValue from "./common/values/StringValue";
+import ReferringValue from "./common/values/ReferringValue";
 
-const LinkedDataContext = React.createContext({});
+const LinkedDataContext = React.createContext({
+    valueComponentFactory: {
+        addComponent: () => StringValue,
+        editComponent: () => StringValue,
+        readOnlyComponent: () => ReferringValue
+    }
+});
 
 const onEntityCreationError = (e, id) => {
     if (e.details) {
@@ -113,9 +122,10 @@ const LinkedDataVocabularyProvider = ({
                 getClassesInCatalog,
                 searchLinkedData: searchVocabularyDispatch,
                 getSearchEntities,
-                getEntityRelativeUrl: (id) => `${VOCABULARY_PATH}?iri=` + encodeURIComponent(id),
                 onEntityCreationError,
                 typeRender,
+                editorPath: VOCABULARY_PATH,
+                valueComponentFactory
             }}
         >
             {children}
@@ -193,9 +203,10 @@ const LinkedDataMetadataProvider = ({
                 getClassesInCatalog,
                 searchLinkedData: searchMetadataDispatch,
                 getSearchEntities,
-                getEntityRelativeUrl: (id) => `${METADATA_PATH}?iri=` + encodeURIComponent(id),
                 onEntityCreationError,
                 typeRender,
+                editorPath: METADATA_PATH,
+                valueComponentFactory
             }}
         >
             {children}

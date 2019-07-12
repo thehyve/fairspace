@@ -1,6 +1,8 @@
 import React from 'react';
-import ReferringValue from "../ReferringValue";
+import ContextualReferringValue, {ReferringValue} from "../ReferringValue";
 import LinkedDataLink from "../../LinkedDataLink";
+import {mount, shallow} from "enzyme";
+import LinkedDataContext from "../../../LinkedDataContext";
 
 describe('ReferringValue', () => {
     it('should render an external link directly', () => {
@@ -58,4 +60,19 @@ describe('ReferringValue', () => {
             property, entry, editorPath
         })).toEqual('My resource');
     });
+
+    it('should use the editorPath from the context', () => {
+        const property = {isExternalLink: true};
+        const entry = {
+            id: 'https://my-resource',
+            label: 'My resource'
+        };
+
+        const editorPath = '/editor';
+
+        const wrapper = mount(<LinkedDataContext.Provider value={{editorPath}}><ContextualReferringValue property={property} entry={entry} />)</LinkedDataContext.Provider>);
+        const referringValue = wrapper.find(ReferringValue);
+        expect(referringValue.length).toEqual(1);
+        expect(referringValue.prop("editorPath")).toEqual(editorPath);
+    })
 });
