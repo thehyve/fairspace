@@ -52,7 +52,6 @@ class LinkedDataAPI {
     /**
      * Updates or creates a new entity
      * @param subject    Single URI representing the subject to update
-     * @param type       Entity type. Can be null for existing entities
      * @param properties An object with each key is the iri of the predicate to update
      * and the value is the array of values
      * Each value is an object on its own with one of the following keys
@@ -60,9 +59,10 @@ class LinkedDataAPI {
      *   value: referencing a literal value
      * If both keys are specified, the id is stored and the literal value is ignored
      * @param vocabulary The {vocabularyUtils} object containing the shapes for this metadata entity
+     * @param type       Entity type. Can be null for existing entities
      * @returns {*}
      */
-    updateEntity(subject, type, properties, vocabulary) {
+    updateEntity(subject, properties, vocabulary, type = null) {
         if (!subject || !properties) {
             return Promise.reject(Error("No subject or properties given"));
         }

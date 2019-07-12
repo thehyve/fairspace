@@ -19,7 +19,7 @@ export const submitVocabularyChangesFromState = (subject) => (dispatch, getState
     const metaVocabulary = getMetaVocabulary(getState());
     return dispatch({
         type: actionTypes.UPDATE_VOCABULARY,
-        payload: VocabularyAPI.updateEntity(subject, null, values, metaVocabulary),
+        payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
         meta: {
             subject,
             formKey
@@ -49,7 +49,7 @@ export const createVocabularyEntityFromState = (formKey, providedSubject, type) 
                     throw Error(`Vocabulary entity already exists: ${subject}`);
                 }
             })
-            .then(() => VocabularyAPI.updateEntity(subject, type, values, metaVocabulary))
+            .then(() => VocabularyAPI.updateEntity(subject, values, metaVocabulary, type))
             .then(() => ({subject, type, values})),
         meta: {
             subject,

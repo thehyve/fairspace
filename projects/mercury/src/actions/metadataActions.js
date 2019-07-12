@@ -19,7 +19,7 @@ export const submitMetadataChangesFromState = (subject, defaultType) => (dispatc
         type: actionTypes.UPDATE_METADATA,
         payload: MetadataAPI.get({subject})
             .then((meta) => (meta.length ? getFirstPredicateValue(meta[0], '@type', defaultType) : defaultType))
-            .then((type) => MetadataAPI.updateEntity(subject, type, values, vocabulary)),
+            .then((type) => MetadataAPI.updateEntity(subject, values, vocabulary, type)),
         meta: {
             subject,
             formKey
@@ -39,7 +39,7 @@ export const createMetadataEntityFromState = (formKey, subject, type) => (dispat
                     throw Error(`Entity already exists: ${subject}`);
                 }
             })
-            .then(() => MetadataAPI.updateEntity(subject, type, values, vocabulary))
+            .then(() => MetadataAPI.updateEntity(subject, values, vocabulary, type))
             .then(() => ({subject, type, values})),
         meta: {
             subject,
