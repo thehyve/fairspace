@@ -11,7 +11,7 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         shapesError, getSearchEntities
     } = useContext(LinkedDataContext);
 
-    const [types, setTypes] = useState([]);
+    const [selectedTypes, setSelectedTypes] = useState([]);
     const [query, setQuery] = useState(null);
     const [size, setSize] = useState(SEARCH_DEFAULT_SIZE);
     const [page, setPage] = useState(0);
@@ -32,9 +32,9 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         const getTypes = () => {
             const classesInCatalog = getClassesInCatalog();
 
-            const shapes = types.length === 0 ? classesInCatalog : classesInCatalog.filter(c => {
+            const shapes = selectedTypes.length === 0 ? classesInCatalog : classesInCatalog.filter(c => {
                 const targetClass = getFirstPredicateId(c, SHACL_TARGET_CLASS);
-                return types.includes(targetClass);
+                return selectedTypes.includes(targetClass);
             });
 
             return shapes.map(c => getFirstPredicateId(c, SHACL_TARGET_CLASS));
@@ -44,7 +44,7 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
 
         // Due to current setup of how vocabulary/meta-vocab is being store, getClassesInCatalog can't be added as dependency
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [query, types, size, page, searchLinkedData]);
+    }, [query, selectedTypes, size, page, searchLinkedData]);
 
     const shapes = getClassesInCatalog();
 
@@ -56,7 +56,7 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         }
     }, [shapes, doInitialFetch, initialFetchDone, searchLinkedData]);
 
-    const allTypes = shapes.map(type => {
+    const availableTypes = shapes.map(type => {
         const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
         const label = getLabel(type);
         return {targetClass, label};
@@ -64,18 +64,20 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
 
     return {
         query,
-        types,
-        shapes,
-        allTypes,
+        selectedTypes,
         size,
         page,
-        loading: searchPending,
+        setQuery,
+        setSelectedTypes,
+        setPage,
+        setSize,
+
+        availableTypes,
+        shapes,
         shapesLoading,
+
+        searchPending,
         error: shapesError || searchError,
-        onSearchChange: setQuery,
-        onTypesChange: setTypes,
-        onPageChange: setPage,
-        onSizeChange: setSize,
         entities,
         total,
         hasHighlights,
