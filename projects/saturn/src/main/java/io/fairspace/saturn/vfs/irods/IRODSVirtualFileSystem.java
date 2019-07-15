@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                 var dst = getIrodsPath(to);
                 getDataTransferOperations(fromAccount).copy(src, fromAccount.getDefaultStorageResource(), dst, null, null);
             } else {
-                throw new IOException("Copying files between different iRODS accounts is not implemented yet");
+                throw new FileSystemException("Copying files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -155,7 +156,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
             if (fromAccount.equals(toAccount)) {
                 getDataTransferOperations(fromAccount).move(getIrodsPath(from), getIrodsPath(to));
             } else {
-                throw new IOException("Moving files between different iRODS accounts is not implemented yet");
+                throw new FileSystemException("Moving files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
