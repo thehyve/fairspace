@@ -23,8 +23,7 @@ import {getPathInfoFromParams} from "../../utils/fileUtils";
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
-        const {fetchMetadata, invalidateMetadata} = this.props;
-        invalidateMetadata(collection.iri);
+        const {fetchMetadata} = this.props;
         fetchMetadata(collection.iri);
 
         // If the location of a collection has changed, the URI where it
@@ -134,7 +133,6 @@ function pathHierarchy(fullPath) {
 
 InformationDrawer.propTypes = {
     fetchMetadata: PropTypes.func,
-    invalidateMetadata: PropTypes.func,
     updateCollection: PropTypes.func,
     deleteCollection: PropTypes.func,
     fetchCollectionsIfNeeded: PropTypes.func,
@@ -160,7 +158,6 @@ const mapStateToProps = ({cache: {collections},
 
 const mapDispatchToProps = {
     fetchMetadata: metadataActions.fetchMetadataBySubjectIfNeeded,
-    invalidateMetadata: metadataActions.invalidateMetadata,
 
     updateCollection: collectionActions.updateCollection,
     deleteCollection: collectionActions.deleteCollection,
