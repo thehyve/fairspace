@@ -22,6 +22,7 @@ public class FS {
     public static final Resource User = createResource(USER_URI);
 
     public static final String OWNED_BY_LOCAL_PART = "ownedBy";
+    public static final String CHECKSUM_LOCAL_PART = "checksum";
 
     public static final String CREATED_BY_LOCAL_PART = "createdBy";
     public static final String CREATED_BY_URI = NS + CREATED_BY_LOCAL_PART;
