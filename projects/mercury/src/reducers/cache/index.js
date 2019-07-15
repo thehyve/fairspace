@@ -4,7 +4,6 @@ import vocabulary from "./vocabularyReducers";
 import metaVocabulary from "./metaVocabularyReducers";
 import collections from "./collectionReducers";
 import filesByPath from "./filesByPathReducers";
-import fileInfoByPath from "./fileInfoByPathReducers";
 
 export default combineReducers({
     jsonLdBySubject,
@@ -13,6 +12,5 @@ export default combineReducers({
 
     metaVocabulary,
     collections,
-    filesByPath,
-    fileInfoByPath
+    filesByPath
 });
