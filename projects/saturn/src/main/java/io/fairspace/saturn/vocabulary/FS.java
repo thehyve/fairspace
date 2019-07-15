@@ -21,13 +21,17 @@ public class FS {
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 
-    public static final String CREATED_BY_URI = NS + "createdBy";
+    public static final String OWNED_BY_LOCAL_PART = "ownedBy";
+
+    public static final String CREATED_BY_LOCAL_PART = "createdBy";
+    public static final String CREATED_BY_URI = NS + CREATED_BY_LOCAL_PART;
     public static final Property createdBy = createProperty(CREATED_BY_URI);
 
     public static final String DATE_CREATED_URI = NS + "dateCreated";
     public static final Property dateCreated = createProperty(DATE_CREATED_URI);
 
-    public static final String MODIFIED_BY_URI = NS + "modifiedBy";
+    public static final String MODIFIED_BY_LOCAL_PART = "modifiedBy";
+    public static final String MODIFIED_BY_URI = NS + MODIFIED_BY_LOCAL_PART;
     public static final Property modifiedBy = createProperty(MODIFIED_BY_URI);
 
     public static final String DATE_MODIFIED_URI = NS + "dateModified";

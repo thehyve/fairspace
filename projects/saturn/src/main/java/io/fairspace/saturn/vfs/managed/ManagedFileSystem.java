@@ -23,6 +23,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
@@ -167,6 +168,10 @@ public class ManagedFileSystem extends BaseFileSystem {
                 .isDirectory(row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
+                .customProperties(Map.of(
+                        "createdBy", row.getLiteral("createdByName").getString(),
+                        "modifiedBy", row.getLiteral("modifiedByName").getString()
+                ))
                 .build();
     }
     private void copyOrMove(boolean move, String from, String to) throws IOException {
