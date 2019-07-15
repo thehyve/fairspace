@@ -17,14 +17,6 @@ export default (state = {}, action) => {
                 ...state,
                 [action.meta.path]: {error: action.payload || true}
             };
-        case actionTypes.INVALIDATE_STAT_FILE:
-            return {
-                ...state,
-                [action.meta.path]: {
-                    ...state[action.meta.path],
-                    invalidated: true
-                }
-            };
         default:
             return state;
     }

@@ -39,7 +39,6 @@ export const STAT_FILE                              = 'STAT_FILE';
 export const STAT_FILE_PENDING                      = 'STAT_FILE_PENDING';
 export const STAT_FILE_FULFILLED                    = 'STAT_FILE_FULFILLED';
 export const STAT_FILE_REJECTED                     = 'STAT_FILE_REJECTED';
-export const INVALIDATE_STAT_FILE                   = 'INVALIDATE_STAT_FILE';
 export const FETCH_FILES                            = 'FETCH_FILES';
 export const FETCH_FILES_PENDING                    = 'FETCH_FILES_PENDING';
 export const FETCH_FILES_FULFILLED                  = 'FETCH_FILES_FULFILLED';

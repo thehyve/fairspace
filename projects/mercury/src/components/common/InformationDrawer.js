@@ -71,6 +71,8 @@ export class InformationDrawer extends React.Component {
         const {classes, collection, loading} = this.props;
         const {users} = this.context;
 
+        const getUsernameByIri = iri => getDisplayName(getUserObject(users, iri));
+
         if (!collection) {
             return <Typography variant="h6">Please select a collection..</Typography>;
         }
@@ -87,9 +89,9 @@ export class InformationDrawer extends React.Component {
                     loading={loading}
                     collectionProps={{
                         dateCreated: collection.dateCreated,
-                        createdBy: collection.createdBy ? getDisplayName(getUserObject(users, collection.createdBy)) : '',
+                        createdBy: collection.createdBy ? getUsernameByIri(collection.createdBy) : '',
                         dateModified: collection.dateModified,
-                        modifiedBy: collection.modifiedBy ? getDisplayName(getUserObject(users, collection.modifiedBy)) : '',
+                        modifiedBy: collection.modifiedBy ? getUsernameByIri(collection.modifiedBy) : '',
                     }}
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
