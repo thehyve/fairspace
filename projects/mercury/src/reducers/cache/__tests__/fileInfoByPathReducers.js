@@ -44,6 +44,24 @@ describe('Subject by path reducers', () => {
         const filePath = "/coll/dir/file.txt";
 
         const state = {
+            '/other/coll': {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            },
+            '/coll': {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            },
+            '/coll/dir': {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            },
             [filePath]: {
                 pending: false,
                 error: false,
@@ -84,16 +102,30 @@ describe('Subject by path reducers', () => {
             expect(reducer(state, action)[filePath].invalidated).toBe(true);
         });
 
-        it('should invalidate file entries that do not exist yet', () => {
+        it('should not invalidate file entries that do not exist yet', () => {
             const action = {
                 type: actionTypes.DELETE_FILES_FULFILLED,
                 meta: {
                     paths: ['/coll/dir/file.txt']
                 }
             };
-            expect(reducer({}, action)[filePath].invalidated).toBe(true);
+            expect(reducer({}, action)).toEqual({});
         });
 
+        it('should recursively invalidate directories', () => {
+            const action = {
+                type: actionTypes.DELETE_FILES_FULFILLED,
+                meta: {
+                    paths: ['/coll']
+                }
+            };
+
+            const newState = reducer(state, action);
+            expect(newState['/coll'].invalidated).toBe(true);
+            expect(newState['/coll/dir'].invalidated).toBe(true);
+            expect(newState['/coll/dir/file.txt'].invalidated).toBe(true);
+            expect(newState['/other/coll'].invalidated).toBe(false);
+        });
     });
 
 });
