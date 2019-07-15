@@ -7,6 +7,7 @@ import CollectionEditor from "./CollectionEditor";
 import ConfirmationDialog from './ConfirmationDialog';
 import {PermissionProvider} from "../permissions/PermissionContext";
 import PermissionsCard from "../permissions/PermissionsCard";
+import TechnicalMetadata from "../metadata/metadata/TechnicalMetadata";
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
@@ -105,6 +106,8 @@ class CollectionDetails extends React.Component {
                         <Typography component="p">
                             {collection.description}
                         </Typography>
+
+                        {this.props.collectionProps ? <TechnicalMetadata fileProps={this.props.collectionProps} /> : undefined }
                     </CardContent>
                 </Card>
 

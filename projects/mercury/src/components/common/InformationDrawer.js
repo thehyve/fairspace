@@ -1,12 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    ExpansionPanel,
-    ExpansionPanelDetails,
-    ExpansionPanelSummary,
-    Paper,
-    Typography,
-    withStyles
+    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid, Paper, Typography, withStyles
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
@@ -20,6 +15,13 @@ import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../../utils/fileUtils";
+import TechnicalPathMetadata from "../metadata/metadata/TechnicalPathMetadata";
+import {findById} from "../../utils/genericUtils";
+import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
+import UsersContext from "../permissions/UsersContext";
+import getDisplayName from "../../utils/userUtils";
+
+const getUserObject = (users, iri) => findById(users, getLocalPart(iri));
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
@@ -64,10 +66,11 @@ export class InformationDrawer extends React.Component {
         }
 
         return Promise.resolve();
-    }
+    };
 
     render() {
         const {classes, collection, loading} = this.props;
+        const {users} = this.context;
 
         if (!collection) {
             return <Typography variant="h6">Please select a collection..</Typography>;
@@ -83,6 +86,12 @@ export class InformationDrawer extends React.Component {
                     onUpdateCollection={this.handleUpdateCollection}
                     onCollectionDelete={this.handleCollectionDelete}
                     loading={loading}
+                    collectionProps={{
+                        dateCreated: collection.dateCreated,
+                        createdBy: collection.createdBy ? getDisplayName(getUserObject(users, collection.createdBy)) : '',
+                        dateModified: collection.dateModified,
+                        modifiedBy: collection.modifiedBy ? getDisplayName(getUserObject(users, collection.modifiedBy)) : '',
+                    }}
                 />
                 <Paper style={{padding: 20, marginTop: 10}}>
                     <LinkedDataEntityFormContainer
@@ -107,11 +116,18 @@ export class InformationDrawer extends React.Component {
                                 </Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <PathMetadata
-                                    path={path}
-                                    isEditable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
-                                    style={{width: '100%'}}
-                                />
+                                <Grid container>
+                                    <Grid item xs={12}>
+                                        <TechnicalPathMetadata path={path} />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <PathMetadata
+                                            path={path}
+                                            isEditable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
+                                            style={{width: '100%'}}
+                                        />
+                                    </Grid>
+                                </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
                     ))
@@ -130,6 +146,8 @@ function pathHierarchy(fullPath) {
     }
     return paths.reverse();
 }
+
+InformationDrawer.contextType = UsersContext;
 
 InformationDrawer.propTypes = {
     fetchMetadata: PropTypes.func,
