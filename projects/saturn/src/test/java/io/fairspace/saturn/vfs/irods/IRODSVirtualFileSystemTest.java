@@ -3,6 +3,7 @@ package io.fairspace.saturn.vfs.irods;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.vfs.FileInfo;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
@@ -20,6 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.*;
@@ -85,6 +87,7 @@ public class IRODSVirtualFileSystemTest {
         stat1.setDataId(123);
         stat1.setCreatedAt(new Date());
         stat1.setModifiedAt(new Date());
+        stat1.setOwnerName("owner1");
 
         stat2.setDataId(234);
 
@@ -95,7 +98,6 @@ public class IRODSVirtualFileSystemTest {
 
     @Test
     public void testStatCollection() throws IOException {
-        assertNotNull(vfs.stat("rods"));
         assertNull(vfs.stat("unknown"));
         verifyZeroInteractions(fs);
     }
@@ -111,6 +113,12 @@ public class IRODSVirtualFileSystemTest {
                         account.getUserName().equals("user") &&
                         account.getPassword().equals("password") &&
                         account.getHomeDirectory().equals("/zone/home")));
+    }
+
+    @Test
+    public void testStatFileContainsOwner() throws IOException {
+        var file = vfs.stat("rods/path");
+        assertEquals(Map.of("ownedBy", "owner1"), file.getCustomProperties());
     }
 
     @Test
