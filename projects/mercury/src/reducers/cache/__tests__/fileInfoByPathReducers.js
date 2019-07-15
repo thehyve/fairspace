@@ -39,4 +39,92 @@ describe('Subject by path reducers', () => {
             }
         });
     });
+
+    describe('invalidation', () => {
+        const filePath = "/coll/dir/file.txt";
+
+        const state = {
+            '/other/coll': {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            },
+            '/coll': {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            },
+            '/coll/dir': {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            },
+            [filePath]: {
+                pending: false,
+                error: false,
+                invalidated: false,
+                data: []
+            }
+        };
+
+        it('should invalidate files when renaming them', () => {
+            const action = {
+                type: actionTypes.RENAME_FILE_FULFILLED,
+                meta: {
+                    path: '/coll/dir',
+                    currentFilename: 'file.txt',
+                    newFilename: 'test.txt'
+                }
+            };
+            expect(reducer(state, action)[filePath].invalidated).toBe(true);
+        });
+
+        it('should invalidate files when deleting them', () => {
+            const action = {
+                type: actionTypes.DELETE_FILES_FULFILLED,
+                meta: {
+                    paths: ['/coll/dir/file.txt']
+                }
+            };
+            expect(reducer(state, action)[filePath].invalidated).toBe(true);
+        });
+
+        it('should invalidate files when pasting them somewhere else', () => {
+            const action = {
+                type: actionTypes.CLIPBOARD_PASTE_FULFILLED,
+                meta: {
+                    filenames: ['/coll/dir/file.txt']
+                }
+            };
+            expect(reducer(state, action)[filePath].invalidated).toBe(true);
+        });
+
+        it('should not invalidate file entries that do not exist yet', () => {
+            const action = {
+                type: actionTypes.DELETE_FILES_FULFILLED,
+                meta: {
+                    paths: ['/coll/dir/file.txt']
+                }
+            };
+            expect(reducer({}, action)).toEqual({});
+        });
+
+        it('should recursively invalidate directories', () => {
+            const action = {
+                type: actionTypes.DELETE_FILES_FULFILLED,
+                meta: {
+                    paths: ['/coll']
+                }
+            };
+
+            const newState = reducer(state, action);
+            expect(newState['/coll'].invalidated).toBe(true);
+            expect(newState['/coll/dir'].invalidated).toBe(true);
+            expect(newState['/coll/dir/file.txt'].invalidated).toBe(true);
+            expect(newState['/other/coll'].invalidated).toBe(false);
+        });
+    });
 });
