@@ -107,7 +107,7 @@ class CollectionDetails extends React.Component {
                             {collection.description}
                         </Typography>
 
-                        {this.props.collectionProps ? <TechnicalMetadata fileProps={this.props.collectionProps} /> : undefined }
+                        {this.props.collectionProps && <TechnicalMetadata fileProps={this.props.collectionProps} /> }
                     </CardContent>
                 </Card>
 
