@@ -53,4 +53,16 @@ public class MiltonMapPropertySourceTest {
         assertNull(propertySource.getProperty(new QName("other-ns", "property1")));
         assertNull(propertySource.getProperty(new QName("ns", "property3")));
     }
+
+    @Test
+    public void testGetPropertyMeta() {
+        MiltonMapPropertySource<String> propertySource = new MiltonMapPropertySource<>("ns");
+        propertySource.put("property1", "value1");
+        propertySource.put("property2", null);
+
+        assertEquals(String.class, propertySource.getPropertyMeta(new QName("ns", "property1")).getValueType());
+        assertNull(propertySource.getPropertyMeta(new QName("ns", "property2")));
+        assertNull(propertySource.getProperty(new QName("other-ns", "property1")));
+        assertNull(propertySource.getProperty(new QName("ns", "property3")));
+    }
 }

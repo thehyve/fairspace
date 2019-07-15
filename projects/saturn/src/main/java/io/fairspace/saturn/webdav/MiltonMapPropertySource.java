@@ -48,8 +48,11 @@ public class MiltonMapPropertySource<T> {
         return name.getNamespaceURI().equals(namespace) && propertySource.containsKey(name.getLocalPart());
     }
 
-    public PropertySource.PropertyMetaData getPropertyMeta(Class<T> clazz) {
-        return new PropertySource.PropertyMetaData(PropertySource.PropertyAccessibility.READ_ONLY, clazz);
+    public PropertySource.PropertyMetaData getPropertyMeta(QName name) {
+        var value = getProperty(name);
+
+        if(value == null) return null;
+        return new PropertySource.PropertyMetaData(PropertySource.PropertyAccessibility.READ_ONLY, value.getClass());
     }
 
     public T getProperty(QName name) {

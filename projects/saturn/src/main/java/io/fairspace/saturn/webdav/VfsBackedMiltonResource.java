@@ -138,9 +138,8 @@ public abstract class VfsBackedMiltonResource implements
     public Object getProperty(QName name) {
         if (name.equals(IRI_PROPERTY)) return info.getIri();
         if (name.equals(ISREADONLY_PROPERTY)) return info.isReadOnly();
-        if (propertySource.hasProperty(name)) return propertySource.getProperty(name);
 
-        return null;
+        return propertySource.getProperty(name);
     }
 
     @Override
@@ -152,9 +151,8 @@ public abstract class VfsBackedMiltonResource implements
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
         if (name.equals(IRI_PROPERTY)) return IRI_PROPERTY_META;
         if (name.equals(ISREADONLY_PROPERTY)) return ISREADONLY_PROPERTY_META;
-        if (propertySource.hasProperty(name)) return propertySource.getPropertyMeta(String.class);
 
-        return null;
+        return propertySource.getPropertyMeta(name);
     }
 
     @Override
