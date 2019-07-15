@@ -17,7 +17,21 @@ export default (state = {}, action) => {
                 ...state,
                 [action.meta.path]: {error: action.payload || true}
             };
+        case actionTypes.INVALIDATE_STAT_FILE:
+            return {
+                ...state,
+                [action.meta.path]: {
+                    ...state[action.meta.path],
+                    invalidated: true
+                }
+            };
         default:
             return state;
     }
 };
+
+export const getFileInfoByPath = (state, path) => (state.cache.fileInfoByPath && state.cache.fileInfoByPath[path] && state.cache.fileInfoByPath[path].data) || {};
+
+export const hasFileInfoErrorByPath = (state, path) => (state.cache.fileInfoByPath && state.cache.fileInfoByPath[path] && state.cache.fileInfoByPath[path].error);
+
+export const isFileInfoByPathPending = (state, path) => (state.cache.fileInfoByPath && state.cache.fileInfoByPath[path] && state.cache.fileInfoByPath[path].pending);
