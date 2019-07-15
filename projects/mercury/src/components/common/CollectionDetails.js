@@ -7,7 +7,7 @@ import CollectionEditor from "./CollectionEditor";
 import ConfirmationDialog from './ConfirmationDialog';
 import {PermissionProvider} from "../permissions/PermissionContext";
 import PermissionsCard from "../permissions/PermissionsCard";
-import TechnicalMetadata from "../metadata/metadata/TechnicalMetadata";
+import TechnicalMetadata from "../file/TechnicalMetadata";
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',

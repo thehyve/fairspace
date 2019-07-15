@@ -7,10 +7,13 @@ import {
     getFileInfoByPath, hasFileInfoErrorByPath, isFileInfoByPathPending
 } from "../../../reducers/cache/fileInfoByPathReducers";
 import {statFileIfNeeded} from "../../../actions/fileActions";
+import {Grid} from "@material-ui/core";
+import TechnicalMetadata from "../../file/TechnicalMetadata";
 
 const PathMetadata = ({
     statFile,
     subject,
+    fileProps,
     path,
     type,
     error,
@@ -29,11 +32,28 @@ const PathMetadata = ({
         return (<div>No metadata found</div>);
     }
     return (
-        <LinkedDataEntityFormContainer
-            subject={subject}
-            defaultType={type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
-            {...otherProps}
-        />
+        <Grid container>
+            <Grid item xs={12}>
+                <TechnicalMetadata
+                    fileProps={{
+                        dateCreated: fileProps.creationdate,
+                        createdBy: fileProps.createdBy,
+                        dateModified: fileProps.getlastmodified,
+                        modifiedBy: fileProps.modifiedBy,
+                        ownedBy: fileProps.ownedBy,
+                        fileSize: parseInt(fileProps.getcontentlength, 10),
+                        checksum: fileProps.checksum
+                    }}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <LinkedDataEntityFormContainer
+                    subject={fileProps.iri}
+                    defaultType={type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
+                    {...otherProps}
+                />
+            </Grid>
+        </Grid>
     );
 };
 
@@ -43,6 +63,7 @@ const mapStateToProps = (state, {path}) => {
     return {
         loading: isFileInfoByPathPending(state, path),
         error: hasFileInfoErrorByPath(state, path),
+        fileProps: data && data.props,
         subject: data && data.props && data.props.iri,
         type: data && data.type
     };

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid, Paper, Typography, withStyles
+    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Paper, Typography, withStyles
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
@@ -15,7 +15,6 @@ import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../../utils/fileUtils";
-import TechnicalPathMetadata from "../metadata/metadata/TechnicalPathMetadata";
 import {findById} from "../../utils/genericUtils";
 import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
 import UsersContext from "../permissions/UsersContext";
@@ -116,18 +115,11 @@ export class InformationDrawer extends React.Component {
                                 </Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <Grid container>
-                                    <Grid item xs={12}>
-                                        <TechnicalPathMetadata path={path} />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <PathMetadata
-                                            path={path}
-                                            isEditable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
-                                            style={{width: '100%'}}
-                                        />
-                                    </Grid>
-                                </Grid>
+                                <PathMetadata
+                                    path={path}
+                                    isEditable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
+                                    style={{width: '100%'}}
+                                />
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
                     ))

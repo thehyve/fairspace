@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import {Table, TableBody, TableCell, TableRow} from "@material-ui/core";
 import filesize from "filesize";
-import DateTime from "../../common/DateTime";
+import DateTime from "../common/DateTime";
 
 const TechnicalMetadata = ({fileProps}) => (
     <Table>
