@@ -35,8 +35,8 @@ export class PathMetadata extends React.Component {
         }
         return (
             <LinkedDataEntityFormContainer
-                subject={this.state.stat.props.iri}
-                defaultType={this.state.stat.type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
+                subject={stat.props.iri}
+                defaultType={stat.type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
                 {...this.props}
             />
         );
