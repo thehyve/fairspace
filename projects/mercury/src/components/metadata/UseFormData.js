@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {
     getLinkedDataFormUpdates, getLinkedDataFormValidations,
-    hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors, isLinkedDataFormPending
+    hasLinkedDataFormValidationErrors, isLinkedDataFormPending
 } from "../../reducers/linkedDataFormReducers";
 import {
     addLinkedDataValue, deleteLinkedDataValue,
@@ -25,8 +25,6 @@ const useFormData = (formKey, defaultType) => {
     useEffect(() => {
         dispatch(initializeLinkedDataForm(formKey));
     }, [formKey, dispatch]);
-
-    const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
 
     const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, formKey));
 
