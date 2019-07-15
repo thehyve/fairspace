@@ -1,11 +1,14 @@
 import React from 'react';
-
-import LinkedDataPage from './LinkedDataPage';
+import {Paper} from "@material-ui/core";
 import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '.';
+import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
 
 export default ({subject}) => (
-    <LinkedDataPage>
-        <LinkedDataEntityHeader subject={subject} />
-        <LinkedDataEntityFormContainer subject={subject} />
-    </LinkedDataPage>
+    <>
+        <BreadCrumbs />
+        <Paper style={{maxWidth: 800, padding: 20}}>
+            <LinkedDataEntityHeader subject={subject} />
+            <LinkedDataEntityFormContainer subject={subject} />
+        </Paper>
+    </>
 );
