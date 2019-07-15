@@ -51,6 +51,10 @@ export default (state = {}, action) => {
                 state,
                 ...action.meta.filenames
             );
+        case actionTypes.UPDATE_COLLECTION_FULFILLED:
+            return invalidateFiles(state, `/${action.meta.oldLocation}`);
+        case actionTypes.DELETE_COLLECTION_FULFILLED:
+            return invalidateFiles(state, `/${action.meta.location}`);
         default:
             return state;
     }
