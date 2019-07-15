@@ -76,7 +76,7 @@ const useFormData = (formKey, defaultType) => {
         extendPropertiesWithChanges,
         onSubmit,
         isUpdating,
-        submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,
+        submitDisabled: isUpdating || hasFormValidationErrors,
         onAdd,
         onChange,
         onDelete,
