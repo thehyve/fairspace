@@ -2,7 +2,16 @@ import * as actionTypes from "../../actions/actionTypes";
 import {joinPaths} from "../../utils/fileUtils";
 
 export const invalidateFiles = (state, ...paths) => {
-    const newPathsState = paths.map(path => ({
+    // We should invalidate all keys that are equal to
+    // or are descendants of any given path. This makes
+    // sure that we invalidate for example subdirectories
+    // of deleted directories as well.
+    const keysToInvalidate = Object.keys(state)
+        .filter(key => paths.find(
+            path => key.startsWith(path)
+        ));
+
+    const newPathsState = keysToInvalidate.map(path => ({
         [path]: {
             ...state[path],
             invalidated: true
