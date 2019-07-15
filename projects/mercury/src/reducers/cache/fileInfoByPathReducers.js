@@ -45,7 +45,7 @@ export default (state = {}, action) => {
                 joinPaths(action.meta.path, action.meta.newFilename)
             );
         case actionTypes.DELETE_FILES_FULFILLED:
-            return invalidateFiles(state, action.meta.paths);
+            return invalidateFiles(state, ...action.meta.paths);
         case actionTypes.CLIPBOARD_PASTE_FULFILLED:
             return invalidateFiles(
                 state,
