@@ -1,12 +1,4 @@
-import {useEffect, useState} from "react";
-import {useDispatch, useSelector} from 'react-redux';
-
-import {getLinkedDataFormUpdates, hasLinkedDataFormUpdates} from "../../reducers/linkedDataFormReducers";
-import {
-    addLinkedDataValue, clearLinkedDataForm, deleteLinkedDataValue, initializeLinkedDataForm, updateLinkedDataValue,
-    validateLinkedDataProperty
-} from "../../actions/linkedDataFormActions";
-import {generateUuid} from "../../utils/linkeddata/metadataUtils";
+import {useState} from "react";
 
 /**
  * This hook is concerned about storing form state for linked data
@@ -14,33 +6,33 @@ import {generateUuid} from "../../utils/linkeddata/metadataUtils";
  * @returns {{valuesWithUpdates: any, updateValue: updateValue, hasFormUpdates: any, deleteValue: deleteValue, updates: any, addValue: addValue}}
  */
 const useFormData = (values) => {
-    const [formKey] = useState(generateUuid());
-    const dispatch = useDispatch();
+    const [updates, setUpdates] = useState({});
 
-    useEffect(() => {
-        dispatch(initializeLinkedDataForm(formKey));
-    }, [formKey, dispatch]);
-
-    const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
+    const hasFormUpdates = Object.keys(updates).length > 0;
+    const valuesWithUpdates = {...values, ...updates};
 
     const addValue = (property, value) => {
-        dispatch(addLinkedDataValue(formKey, property, value));
+        setUpdates({
+            ...updates,
+            [property.key]: [...valuesWithUpdates[property.key], value]
+        });
     };
 
     const updateValue = (property, value, index) => {
-        dispatch(updateLinkedDataValue(formKey, property, value, index));
-        dispatch(validateLinkedDataProperty(formKey, property));
+        setUpdates({
+            ...updates,
+            [property.key]: valuesWithUpdates[property.key].map((el, idx) => ((idx === index) ? value : el))
+        });
     };
 
     const deleteValue = (property, index) => {
-        dispatch(deleteLinkedDataValue(formKey, property, index));
-        dispatch(validateLinkedDataProperty(formKey, property));
+        setUpdates({
+            ...updates,
+            [property.key]: valuesWithUpdates[property.key].filter((el, idx) => idx !== index)
+        });
     };
 
-    const clearForm = () => dispatch(clearLinkedDataForm(formKey));
-
-    const updates = useSelector(state => getLinkedDataFormUpdates(state, formKey));
-    const valuesWithUpdates = {...values, ...updates};
+    const clearForm = () => setUpdates({});
 
     return {
         addValue,

@@ -17,9 +17,8 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
     const values = getValuesFromProperties(properties);
 
     const {
-        addValue, updateValue, deleteValue,
-        updates, hasFormUpdates, valuesWithUpdates,
-        clearForm
+        addValue, updateValue, deleteValue, clearForm,
+        updates, hasFormUpdates, valuesWithUpdates
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(

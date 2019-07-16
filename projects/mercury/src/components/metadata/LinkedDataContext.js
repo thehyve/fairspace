@@ -1,8 +1,4 @@
 import React from 'react';
-
-import {partitionErrors} from "../../utils/linkeddata/metadataUtils";
-import {ErrorDialog} from "../common";
-import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import StringValue from "./common/values/StringValue";
 
 const LinkedDataContext = React.createContext({
@@ -12,7 +8,5 @@ const LinkedDataContext = React.createContext({
         readOnlyComponent: () => StringValue
     }
 });
-
-
 
 export default LinkedDataContext;
