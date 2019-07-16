@@ -153,8 +153,7 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
-fs:UserShape a sh:NodeShape ;
-    sh:closed true ; 
+fs:UserShape a fs:ClassShape ;
     sh:description "Description for fs:User" ;
     sh:name "User" ;
     sh:targetClass fs:User ;
