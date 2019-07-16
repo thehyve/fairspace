@@ -58,20 +58,12 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     }
 
     /**
-     * Deletes the statements in the database, based on the combination of subject, predicate and object
-     * <p>
-     * If any of the fields is null, that field is not included to filter statements to delete. For example, if only
-     * subject is given and predicate and object are null, then all statements with the given subject will be deleted.
-     * <p>
-     * If the set of triples matching the provided wildcard includes any protected triple (e.g. with a predicate marked
-     * as fs:machineOnly) a ValidationException will be thrown.
+     * Marks an entity as deleted
      *
-     * @param subject   Subject URI to filter the delete query on
-     * @param predicate Predicate URI to filter the delete query on. Must not be a machineOnly predicate
-     * @param object    Object URI to filter the delete query on. Literal values are not supported
+     * @param subject   Subject URI to mark as deleted
      */
-    void delete(String subject, String predicate, String object) {
-        commit("Delete metadata", rdf, () -> delete(get(subject, predicate, object, false)));
+    void softDelete(Resource subject) {
+        commit("Mark <" + subject + "> as delteda", rdf, () -> lifeCycleManager.softDelete(subject));
     }
 
     /**

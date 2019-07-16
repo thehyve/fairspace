@@ -96,7 +96,7 @@ public class ChangeableMetadataServiceTest {
     public void softDelete() {
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
-        api.softDelete(S1.getURI());
+        api.softDelete(S1);
 
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateDeleted));
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.deletedBy));
@@ -109,7 +109,7 @@ public class ChangeableMetadataServiceTest {
         var resource = createResource("http://example.com/123");
         executeWrite(ds, () -> ds.getDefaultModel().add(resource, RDF.type, FS.File));
 
-        api.softDelete(resource.getURI());
+        api.softDelete(resource);
 
         assertFalse(ds.getDefaultModel().contains(resource, FS.dateDeleted));
         assertFalse(ds.getDefaultModel().contains(resource, FS.deletedBy));

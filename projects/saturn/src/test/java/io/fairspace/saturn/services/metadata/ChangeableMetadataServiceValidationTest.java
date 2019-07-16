@@ -107,7 +107,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void testSoftDeleteShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
-        api.softDelete(S1.getURI());
+        api.softDelete(S1);
 
         Model model = ds.getNamedModel(GRAPH);
         assertFalse(model.contains(LBL_STMT1));

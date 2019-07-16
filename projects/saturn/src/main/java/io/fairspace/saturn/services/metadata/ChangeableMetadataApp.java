@@ -12,6 +12,7 @@ import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.saturn.util.ValidationUtils.validateContentType;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -45,8 +46,9 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                 if (JSON_LD_HEADER_STRING.equals(req.contentType())) {
                     api.delete(fromJsonLD(req.body(), baseURI));
                 } else {
-                    validateIRI(req.queryParams("subject"));
-                    api.softDelete(req.queryParams("subject"));
+                    var subject = req.queryParams("subject");
+                    validateIRI(subject);
+                    api.softDelete(createResource(subject));
                 }
                 return "";
             });
