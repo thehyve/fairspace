@@ -30,7 +30,7 @@ const LinkedDataListPage = ({classes, history}) => {
 
     const {
         requireIdentifier, editorPath,
-        onEntityCreationError, hasEditRight, typeRender
+        hasEditRight, typeRender
     } = useContext(LinkedDataContext);
 
     const renderTypeClass = ({targetClass, label}) => (
@@ -112,7 +112,6 @@ const LinkedDataListPage = ({classes, history}) => {
                         shapes={shapes}
                         requireIdentifier={requireIdentifier}
                         onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}
-                        onEntityCreationError={onEntityCreationError}
                     >
                         <ListBody />
                     </LinkedDataCreator>

@@ -11,6 +11,7 @@ import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
+import useFormSubmission from "../useFormSubmission";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -46,23 +47,21 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         return namespace.value + localPart;
     };
 
-    const {createLinkedDataEntity, onEntityCreationError} = useContext(LinkedDataContext);
-    const [isUpdating, setUpdating] = useState(false);
+    const {createLinkedDataEntity} = useContext(LinkedDataContext);
+
+    const {isUpdating, submitForm} = useFormSubmission(
+        () => createLinkedDataEntity(getIdentifier(), updates, type)
+            .then(result => {
+                onCreate(result);
+            }),
+        getIdentifier()
+    );
+
 
     const createEntity = (event) => {
         if (event) event.stopPropagation();
 
-        setUpdating(true);
-
-        createLinkedDataEntity(getIdentifier(), updates, type)
-            .then(result => {
-                onCreate(result);
-                closeDialog();
-            })
-            .catch(e => {
-                setUpdating(false);
-                onEntityCreationError(e, getIdentifier())
-            });
+        submitForm();
     };
 
     const renderDialogContent = () => {

@@ -17,7 +17,7 @@ import {emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
 import {getLabel, getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
-import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
+import LinkedDataContext from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI, VOCABULARY_PATH} from "../../constants";
 import Iri from "../common/Iri";
 import LinkedDataLink from "./common/LinkedDataLink";
@@ -104,8 +104,7 @@ const LinkedDataMetadataProvider = ({
                 // Generic methods without reference to shapes
                 valueComponentFactory,
                 getSearchEntities,
-                typeRender,
-                onEntityCreationError
+                typeRender
             }}
         >
             {children}

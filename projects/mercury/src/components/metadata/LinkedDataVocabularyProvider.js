@@ -21,7 +21,7 @@ import {
 } from "../../utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
-import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
+import LinkedDataContext from './LinkedDataContext';
 import {SHACL_TARGET_CLASS, USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import Config from "../../services/Config/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
@@ -115,7 +115,6 @@ const LinkedDataVocabularyProvider = ({
                 valueComponentFactory,
                 getSearchEntities,
                 typeRender,
-                onEntityCreationError,
             }}
         >
             {children}

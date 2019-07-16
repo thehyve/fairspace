@@ -1,16 +1,16 @@
-import React, {useContext, useState} from "react";
+import React, {useContext} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid} from "@material-ui/core";
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
-import {getValuesFromProperties, partitionErrors} from "../../../utils/linkeddata/metadataUtils";
+import {getValuesFromProperties} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataContext from "../LinkedDataContext";
-import ErrorDialog from "../../common/ErrorDialog";
-import ValidationErrorsDisplay from "./ValidationErrorsDisplay";
+import useFormSubmission from "../useFormSubmission";
 
 const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable = true, ...otherProps}) => {
+    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
     const {properties, linkedDataLoading, linkedDataError} = useLinkedData(subject, defaultType, isEditable);
 
     const visibleProperties = properties.filter(p => p.isEditable || p.values.length);
@@ -22,27 +22,11 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
         clearForm
     } = useFormData(values);
 
-    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
-    const [isUpdating, setUpdating] = useState(false);
-
-    const reset = () => {
-        clearForm();
-    };
-
-    const submitForm = () => {
-        setUpdating(true);
-
-        submitLinkedDataChanges(subject, updates, defaultType)
-            .then(() => reset())
-            .catch(e => {
-                if (e.details) {
-                    ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, subject), e.message);
-                } else {
-                    ErrorDialog.showError(e, `Error while updating entity.\n${e.message}`);
-                }
-            })
-            .then(() => setUpdating(false));
-    };
+    const {isUpdating, submitForm} = useFormSubmission(
+        () => submitLinkedDataChanges(subject, updates, defaultType)
+            .then(() => clearForm()),
+        subject
+    );
 
     let footer;
 

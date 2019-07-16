@@ -8,8 +8,7 @@ import LinkedDataContext from "../LinkedDataContext";
 const LinkedDataDropdownWithAddition = ({property, onChange}) => {
     const {
         shapesPending, shapesError, determineShapeForTypes,
-        getEmptyLinkedData, requireIdentifier,
-        onEntityCreationError,
+        getEmptyLinkedData, requireIdentifier
     } = useContext(LinkedDataContext);
 
     const shape = (!shapesPending && !shapesError) ? determineShapeForTypes([property.className]) : {};
@@ -20,7 +19,6 @@ const LinkedDataDropdownWithAddition = ({property, onChange}) => {
             shape={shape}
             type={property.className}
             emptyData={emptyData}
-            onEntityCreationError={onEntityCreationError}
             error={shapesError}
             pending={shapesPending}
             onChange={onChange}
