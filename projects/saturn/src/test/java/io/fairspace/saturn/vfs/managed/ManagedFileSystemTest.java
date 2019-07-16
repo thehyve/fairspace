@@ -9,6 +9,7 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
@@ -31,6 +33,7 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
+import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
@@ -50,6 +53,13 @@ public class ManagedFileSystemTest {
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);
+
+        rdf.load(ModelFactory.createDefaultModel().add(
+                createResource("http://example.com/user"),
+                RDFS.label,
+                "user"
+        ));
+
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
 
@@ -90,6 +100,13 @@ public class ManagedFileSystemTest {
     @Test
     public void statNonExisting() throws IOException {
         assertNull(fs.stat("coll/aaa"));
+    }
+
+    @Test
+    public void statContainsCreatorAndModifier() throws IOException {
+        fs.mkdir("coll/aaa");
+        var stat = fs.stat("coll/aaa");
+        assertEquals(Map.of("createdBy", "user", "modifiedBy", "user"), stat.getCustomProperties());
     }
 
     @Test

@@ -18,6 +18,15 @@ const updateMetadataReducer = (state = defaultState, action) => {
                     invalidated: true
                 }
             };
+        case actionTypes.UPDATE_COLLECTION_FULFILLED:
+            return {
+                ...state,
+                [action.meta.id]: {
+                    ...state[action.meta.id],
+                    invalidated: true
+                }
+            };
+
         default:
             return state;
     }
@@ -29,14 +38,15 @@ export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, default
  * Returns an object representing the metadata for the given subject
  * @param state
  * @param subject
+ * @param defaultType
  * @see {Vocabulary.fromJsonLd}
  * @returns {*}
  */
-export const getCombinedMetadataForSubject = (state, subject) => {
+export const getCombinedMetadataForSubject = (state, subject, defaultType) => {
     const {cache: {jsonLdBySubject}} = state;
     if (jsonLdBySubject && jsonLdBySubject[subject] && !jsonLdBySubject[subject].pending && !jsonLdBySubject[subject].error) {
         const vocabulary = getVocabulary(state);
-        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary);
+        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary, defaultType);
     }
 
     return [];

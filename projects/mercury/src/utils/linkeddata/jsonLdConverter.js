@@ -138,6 +138,7 @@ const generatePropertiesForMetadata = (vocabulary, metadataItem, types, property
  * @param subject           Subject to fromJsonLd the metadata for. If not provided, the metadata is expected to contain
  *                          information on a single entity
  * @param vocabulary        vocabularyUtils object describing the vocabulary
+ * @param defaultType      fallback type to use when no metadata is found
  * @returns [Any] A promise resolving in an array with metadata. Each element will look like this:
  * {
  *      key: "http://fairspace.io/ontology#description",
@@ -148,7 +149,7 @@ const generatePropertiesForMetadata = (vocabulary, metadataItem, types, property
  *      ]
  *  }
  */
-export const fromJsonLd = (expandedMetadata, subject, vocabulary) => {
+export const fromJsonLd = (expandedMetadata, subject, vocabulary, defaultType = null) => {
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
         console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
         return [];
@@ -156,20 +157,19 @@ export const fromJsonLd = (expandedMetadata, subject, vocabulary) => {
 
     // If no subject is provided, use the first (and only) entry in the metadata
     const sub = subject || expandedMetadata[0]['@id'];
-    const metadataItem = subject ? expandedMetadata.find(item => item['@id'] === sub) : expandedMetadata[0];
+    const metadataItem = (subject ? expandedMetadata.find(item => item['@id'] === sub) : expandedMetadata[0]) || {};
 
     if (!metadataItem) {
         console.warn(`The given subject ${sub} is unknown`);
         return [];
     }
 
-    if (!Array.isArray(metadataItem['@type'])) {
+    // Determine properties allowed for the given type
+    const types = metadataItem['@type'] || (defaultType && [defaultType]);
+    if (!Array.isArray(types)) {
         console.warn("Can not fromJsonLd metadata without a type or that is not expanded");
         return [];
     }
-
-    // Determine properties allowed for the given type
-    const types = metadataItem['@type'];
     const propertyShapes = vocabulary.determinePropertyShapesForTypes(types);
     return generatePropertiesForMetadata(vocabulary, metadataItem, types, propertyShapes, expandedMetadata);
 };

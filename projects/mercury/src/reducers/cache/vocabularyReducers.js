@@ -10,7 +10,6 @@ const fetchVocabularyReducer = promiseReducerFactory(actionTypes.FETCH_VOCABULAR
 const updateVocabularyReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.UPDATE_VOCABULARY_FULFILLED:
-        case actionTypes.CREATE_VOCABULARY_ENTITY_FULFILLED:
             return {
                 ...state,
                 invalidated: true

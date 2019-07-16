@@ -4,7 +4,7 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
-import org.apache.jena.rdfconnection.RDFConnection;
+import io.fairspace.saturn.vocabulary.FS;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -21,30 +21,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
 
     private final IRODSFileSystem fs;
-    private final RDFConnection rdf;
 
-    public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) throws JargonException {
-        this(collections, rdf, IRODSFileSystem.instance());
+    public IRODSVirtualFileSystem(CollectionsService collections) throws JargonException {
+        this(collections, IRODSFileSystem.instance());
     }
 
-    IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf, IRODSFileSystem fs) {
+    IRODSVirtualFileSystem(CollectionsService collections, IRODSFileSystem fs) {
         super(collections);
 
-        this.rdf = rdf;
         this.fs = fs;
     }
 
@@ -68,6 +65,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                     .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                     .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                     .size(stat.getObjSize())
+                    .customProperties(Map.of(
+                            FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
+                    ))
                     .build();
         } catch (JargonException e) {
             throw new IOException(e);
@@ -95,6 +95,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                         .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                         .size(stat.getObjSize())
+                        .customProperties(Map.of(
+                                FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
+                        ))
                         .build());
             }
             return result;
@@ -137,9 +140,8 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                 var src = getIrodsPath(from);
                 var dst = getIrodsPath(to);
                 getDataTransferOperations(fromAccount).copy(src, fromAccount.getDefaultStorageResource(), dst, null, null);
-                copyMetadata(src, dst, getAccessObject(fromAccount), fromAccount);
             } else {
-                throw new IOException("Copying files between different iRODS accounts is not implemented yet");
+                throw new FileSystemException("Copying files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -154,7 +156,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
             if (fromAccount.equals(toAccount)) {
                 getDataTransferOperations(fromAccount).move(getIrodsPath(from), getIrodsPath(to));
             } else {
-                throw new IOException("Moving files between different iRODS accounts is not implemented yet");
+                throw new FileSystemException("Moving files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -173,26 +175,6 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
         } catch (JargonException e) {
             throw new IOException(e);
         }
-    }
-
-    // TODO: improve performance
-    private void copyMetadata(String src, String dst, CollectionAndDataObjectListAndSearchAO accessObject, IRODSAccount account) throws JargonException {
-        var srcStat = accessObject.retrieveObjectStatForPath(src);
-        var dstStat = accessObject.retrieveObjectStatForPath(dst);
-
-        commit("Copy iRODS files" , rdf, () -> {
-            copyMetadata(getIri(account, srcStat), getIri(account, dstStat));
-
-            if (srcStat.isSomeTypeOfCollection()) {
-                for (var child: accessObject.listDataObjectsAndCollectionsUnderPath(srcStat)) {
-                    copyMetadata(child.getFormattedAbsolutePath(), dst + '/' +  child.getPathOrName(), accessObject, account);
-                }
-            }
-        });
-    }
-
-    private void copyMetadata(String fromIri, String toIri) {
-        rdf.update(storedQuery("copy_metadata", createURI(fromIri), createURI(toIri)));
     }
 
     private IRODSFile getFile(String path) throws IOException {

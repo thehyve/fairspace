@@ -2,7 +2,15 @@ import {useContext, useEffect, useCallback} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
 
-const useLinkedData = (subject, isEntityEditable) => {
+/**
+ * This custom hook is a helper for many Linked Data functions, such as fetching, searching and transforming/parsing metadata.
+ * It is agnostic about the difference between metadata, vocabular and metavocabulary.
+ * The contextual logic is being provided by {@link LinkedDataContext}
+ *
+ * @param {string} subject
+ * @param {boolean} isEntityEditable
+ */
+const useLinkedData = (subject, defaultType, isEntityEditable) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
@@ -10,7 +18,7 @@ const useLinkedData = (subject, isEntityEditable) => {
     const {
         shapesLoading, shapesError, fetchLinkedDataForSubject,
         getPropertiesForLinkedData, isLinkedDataLoading, hasLinkedDataErrorForSubject,
-        combineLinkedDataForSubject, getTypeInfoForLinkedData,
+        combineLinkedDataForSubject, getTypeInfoForLinkedData
     } = useContext(LinkedDataContext);
 
     // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
@@ -22,7 +30,7 @@ const useLinkedData = (subject, isEntityEditable) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedDataForSubject = combineLinkedDataForSubject(subject);
+    const linkedDataForSubject = combineLinkedDataForSubject(subject, defaultType);
 
     const {label, description} = getTypeInfoForLinkedData(linkedDataForSubject);
 
@@ -34,6 +42,8 @@ const useLinkedData = (subject, isEntityEditable) => {
         error = 'No metadata found for this subject';
     }
 
+    const properties = getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEntityEditable});
+
     return {
         linkedDataLoading,
         linkedDataError: error,
@@ -41,7 +51,7 @@ const useLinkedData = (subject, isEntityEditable) => {
         typeLabel: label,
         typeDescription: description,
         updateLinkedData,
-        properties: getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEntityEditable})
+        properties
     };
 };
 

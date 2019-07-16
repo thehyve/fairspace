@@ -3,11 +3,7 @@ package io.fairspace.saturn.vfs.irods;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.vocabulary.RDFS;
+import io.fairspace.saturn.vfs.FileInfo;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
@@ -25,11 +21,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -62,10 +56,6 @@ public class IRODSVirtualFileSystemTest {
 
     private final ObjStat stat2 = new ObjStat();
 
-    private final Dataset ds = createTxnMem();
-
-    private final RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-
     private IRODSVirtualFileSystem vfs;
 
 
@@ -97,19 +87,17 @@ public class IRODSVirtualFileSystemTest {
         stat1.setDataId(123);
         stat1.setCreatedAt(new Date());
         stat1.setModifiedAt(new Date());
-
-        when(ao.retrieveObjectStatForPath(eq("/zone/home/newpath"))).thenReturn(stat2);
+        stat1.setOwnerName("owner1");
 
         stat2.setDataId(234);
 
         when(aof.getDataTransferOperations(any())).thenReturn(dto);
 
-        vfs = new IRODSVirtualFileSystem(collections, rdf, fs);
+        vfs = new IRODSVirtualFileSystem(collections, fs);
     }
 
     @Test
     public void testStatCollection() throws IOException {
-        assertNotNull(vfs.stat("rods"));
         assertNull(vfs.stat("unknown"));
         verifyZeroInteractions(fs);
     }
@@ -125,6 +113,12 @@ public class IRODSVirtualFileSystemTest {
                         account.getUserName().equals("user") &&
                         account.getPassword().equals("password") &&
                         account.getHomeDirectory().equals("/zone/home")));
+    }
+
+    @Test
+    public void testStatFileContainsOwner() throws IOException {
+        var file = vfs.stat("rods/path");
+        assertEquals(Map.of("ownedBy", "owner1"), file.getCustomProperties());
     }
 
     @Test
@@ -155,17 +149,6 @@ public class IRODSVirtualFileSystemTest {
         vfs.copy("rods/path", "rods/newpath");
 
         verify(dto).copy("/zone/home/path", "", "/zone/home/newpath", null, null);
-    }
-
-    @Test
-    public void testMetadataCopying() throws IOException {
-        ds.getDefaultModel()
-                .add(createResource("irods://host.com#" + stat1.getDataId()), RDFS.comment, createStringLiteral("Comment"));
-
-        vfs.copy("rods/path", "rods/newpath");
-
-        assertTrue(ds.getDefaultModel().contains(createResource("irods://host.com#" + stat1.getDataId()), RDFS.comment, createStringLiteral("Comment")));
-        assertTrue(ds.getDefaultModel().contains(createResource("irods://host.com#" + stat2.getDataId()), RDFS.comment, createStringLiteral("Comment")));
     }
 
     @Test

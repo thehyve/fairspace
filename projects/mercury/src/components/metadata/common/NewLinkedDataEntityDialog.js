@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext} from "react";
 import PropTypes from 'prop-types';
 import {
     Button, Dialog, DialogActions,
@@ -9,16 +9,16 @@ import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../util
 import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
-import useNewEntity from '../UseNewEntity';
 import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
+import LinkedDataContext from "../LinkedDataContext";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate}) => {
     const [formKey, setFormKey] = useState(generateUuid());
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
 
-    const {properties} = useNewEntity(shape);
+    const {getEmptyLinkedData} = useContext(LinkedDataContext);
     const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey);
 
     useEffect(() => {
@@ -52,7 +52,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const renderDialogContent = () => {
         const form = (
             <LinkedDataEntityForm
-                properties={extendPropertiesWithChanges(properties)}
+                properties={extendPropertiesWithChanges(getEmptyLinkedData(shape))}
                 onAdd={onAdd}
                 onChange={onChange}
                 onDelete={onDelete}

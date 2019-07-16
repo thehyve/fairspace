@@ -12,3 +12,4 @@ export {default as RenameButton} from './buttons/RenameButton';
 export {default as CreateDirectoryButton} from './buttons/CreateDirectoryButton';
 export {default as UploadButton} from './buttons/UploadButton';
 export {default as ProgressButton} from './buttons/ProgressButton';
+export {default as SearchBar} from './SearchBar';

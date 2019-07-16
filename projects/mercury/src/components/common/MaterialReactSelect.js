@@ -6,7 +6,6 @@ import AsyncSelect from 'react-select/async';
 import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -155,17 +154,9 @@ function MultiValue(props) {
     );
 }
 
-function Menu(props) {
-    return (
-        <Paper className={props.selectProps.classes.paper} {...props.innerProps}>
-            {props.children}
-        </Paper>
-    );
-}
 
 const components = {
     Control,
-    Menu,
     MultiValue,
     NoOptionsMessage,
     Option,
@@ -182,11 +173,11 @@ const materialReactSelect = (props) => {
             ...base,
             color: theme.palette.text.primary,
         }),
-        menuPortal: base => ({
+        menu: base => ({
             ...base,
-            zIndex: 9999
-        }),
-
+            minWidth: '100%',
+            width: 'auto',
+        })
     };
 
     const SelectComponent = props.async ? AsyncSelect : Select;
@@ -194,9 +185,9 @@ const materialReactSelect = (props) => {
     return (
         <SelectComponent
             classes={classes}
-            menuPortalTarget={document.body}
             styles={selectStyles}
             components={components}
+            menuPlacement="auto"
 
             textFieldProps={{
                 label: props.label,
