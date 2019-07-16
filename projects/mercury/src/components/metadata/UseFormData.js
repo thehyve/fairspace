@@ -15,7 +15,7 @@ import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import LinkedDataContext from './LinkedDataContext';
 import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
 
-const useFormData = (formKey, defaultType) => {
+const useFormData = (formKey, isNewEntity, defaultType) => {
     if (!formKey) {
         throw new Error('Please provide a valid form key.');
     }
@@ -76,7 +76,7 @@ const useFormData = (formKey, defaultType) => {
         extendPropertiesWithChanges,
         onSubmit,
         isUpdating,
-        submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,
+        submitDisabled: isUpdating || !(hasFormUpdates || isNewEntity) || hasFormValidationErrors,
         onAdd,
         onChange,
         onDelete,

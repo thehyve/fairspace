@@ -19,7 +19,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const [namespace, setNamespace] = useState(null);
 
     const {getEmptyLinkedData} = useContext(LinkedDataContext);
-    const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey);
+    const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey, true);
 
     useEffect(() => {
         setFormKey(generateUuid());

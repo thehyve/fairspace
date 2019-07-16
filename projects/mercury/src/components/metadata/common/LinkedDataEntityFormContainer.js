@@ -11,7 +11,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
     const {
         extendPropertiesWithChanges, onSubmit, submitDisabled,
         onAdd, onChange, onDelete, isUpdating
-    } = useFormData(subject, defaultType);
+    } = useFormData(subject, false, defaultType);
 
     let footer;
 
