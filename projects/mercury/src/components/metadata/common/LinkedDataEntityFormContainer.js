@@ -29,6 +29,10 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
         );
     }
 
+    const visibleProperties = isEditable
+        ? extendPropertiesWithChanges(properties)
+        : properties.filter(p => p.values.length);
+
     return (
         <Grid container>
             <Grid item xs={12}>
@@ -36,7 +40,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
                     {...otherProps}
                     error={linkedDataError}
                     loading={linkedDataLoading}
-                    properties={isEditable ? extendPropertiesWithChanges(properties) : properties}
+                    properties={visibleProperties}
                     onAdd={onAdd}
                     onChange={onChange}
                     onDelete={onDelete}
