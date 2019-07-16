@@ -25,7 +25,7 @@ export const createVocabularyEntity = (providedSubject, values, metaVocabulary, 
         || getFirstPredicateProperty(values, SHACL_NAMESPACE, 'id');
 
     if (!subject) {
-        return Promise.reject(new Error("Invalid metadata identifier given"));
+        throw new Error("Invalid metadata identifier given");
     }
 
     return {

@@ -9,6 +9,7 @@ import {compareBy, comparing} from "../../../utils/genericUtils";
 export const LinkedDataEntityForm = ({
     properties = [],
     values = {},
+    validations = {},
     error = false,
     loading = false,
     onChange = () => {},
@@ -40,6 +41,7 @@ export const LinkedDataEntityForm = ({
                             <LinkedDataProperty
                                 property={p}
                                 values={values[p.key]}
+                                validations={validations[p.key]}
                                 onAdd={(value) => onAdd(p, value)}
                                 onChange={(value, index) => onChange(p, value, index)}
                                 onDelete={(index) => onDelete(p, index)}
@@ -60,7 +62,8 @@ LinkedDataEntityForm.propTypes = {
 
     loading: PropTypes.bool,
     properties: PropTypes.array,
-    values: PropTypes.object
+    values: PropTypes.object,
+    validations: PropTypes.object
 };
 
 export default LinkedDataEntityForm;

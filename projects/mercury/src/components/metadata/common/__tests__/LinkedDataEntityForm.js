@@ -32,7 +32,7 @@ describe('LinkedDataEntityForm', () => {
             }
         ],
         'my-property': []
-    }
+    };
 
     beforeAll(() => {
         window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}));

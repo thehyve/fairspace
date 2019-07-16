@@ -25,7 +25,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const {
         addValue, updateValue, deleteValue,
-        updates, valuesWithUpdates
+        updates, valuesWithUpdates,
+
+        validateAll, allErrors: validations, isValid
     } = useFormData(values);
 
     const closeDialog = (e) => {
@@ -57,11 +59,11 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getIdentifier()
     );
 
-
     const createEntity = (event) => {
         if (event) event.stopPropagation();
 
-        submitForm();
+        const hasErrors = validateAll(visibleProperties);
+        if (!hasErrors) submitForm();
     };
 
     const renderDialogContent = () => {
@@ -69,6 +71,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             <LinkedDataEntityForm
                 properties={visibleProperties}
                 values={valuesWithUpdates}
+                validations={validations}
                 onAdd={addValue}
                 onChange={updateValue}
                 onDelete={deleteValue}
@@ -125,7 +128,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 <Button
                     onClick={createEntity}
                     color="primary"
-                    disabled={!canCreate() || isUpdating}
+                    disabled={!canCreate() || isUpdating || !isValid}
                 >
                     {isUpdating ? <CircularProgress /> : 'Create' }
                 </Button>

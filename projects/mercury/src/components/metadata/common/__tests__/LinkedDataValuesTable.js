@@ -48,7 +48,7 @@ describe('LinkedDataValuesTable elements', () => {
     });
 
     it('should hide the header if requested', () => {
-        const wrapper = shallow(<LinkedDataValuesTable showHeader={false} property={defaultProperty} values={defaultValues}/>);
+        const wrapper = shallow(<LinkedDataValuesTable showHeader={false} property={defaultProperty} values={defaultValues} />);
         expect(wrapper.find(TableHead).length).toEqual(0);
     });
 
@@ -57,7 +57,7 @@ describe('LinkedDataValuesTable elements', () => {
             ...defaultProperty,
             isEditable: true
         };
-        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues}/>);
+        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} />);
         expect(wrapper.find(TableHead).find(TableCell).length).toEqual(1);
         expect(wrapper.find(TableBody).find(TableRow).first().find(Button).length).toEqual(1);
     });

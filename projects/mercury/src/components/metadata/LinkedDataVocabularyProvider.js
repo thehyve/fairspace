@@ -36,7 +36,7 @@ const LinkedDataVocabularyProvider = ({
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
 
-    const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value)
+    const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values) => submitChanges(subject, values, metaVocabulary)
         .then(fetchMetadataVocabulary);
 

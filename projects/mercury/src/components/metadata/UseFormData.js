@@ -1,4 +1,5 @@
 import {useState} from "react";
+import useValidation from "./useValidation";
 
 /**
  * This hook is concerned about storing form state for linked data
@@ -8,41 +9,52 @@ import {useState} from "react";
 const useFormData = (values) => {
     const [updates, setUpdates] = useState({});
 
+    const validation = useValidation();
+
     const hasFormUpdates = Object.keys(updates).length > 0;
     const valuesWithUpdates = {...values, ...updates};
 
-    const addValue = (property, value) => {
+    const save = (property, newValue) => {
         setUpdates({
             ...updates,
-            [property.key]: [...valuesWithUpdates[property.key], value]
+            [property.key]: newValue
         });
+        validation.validateProperty(property, newValue);
+    };
+
+    const addValue = (property, value) => {
+        const newValue = [...valuesWithUpdates[property.key], value];
+        save(property, newValue);
     };
 
     const updateValue = (property, value, index) => {
-        setUpdates({
-            ...updates,
-            [property.key]: valuesWithUpdates[property.key].map((el, idx) => ((idx === index) ? value : el))
-        });
+        const newValue = valuesWithUpdates[property.key].map((el, idx) => ((idx === index) ? value : el));
+        save(property, newValue);
     };
 
     const deleteValue = (property, index) => {
-        setUpdates({
-            ...updates,
-            [property.key]: valuesWithUpdates[property.key].filter((el, idx) => idx !== index)
-        });
+        const newValue = valuesWithUpdates[property.key].filter((el, idx) => idx !== index);
+        save(property, newValue);
     };
 
     const clearForm = () => setUpdates({});
+
+    const validateAll = properties => !!properties.map(p => validation.validateProperty(p, valuesWithUpdates[p.key])).find(v => v);
 
     return {
         addValue,
         updateValue,
         deleteValue,
+        clearForm,
 
         hasFormUpdates,
         updates,
         valuesWithUpdates,
-        clearForm
+
+        validateAll,
+        validateProperty: validation.validateProperty,
+        allErrors: validation.allErrors,
+        isValid: validation.isValid
     };
 };
 

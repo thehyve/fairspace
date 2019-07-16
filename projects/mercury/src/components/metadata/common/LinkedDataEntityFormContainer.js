@@ -18,7 +18,9 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
 
     const {
         addValue, updateValue, deleteValue, clearForm,
-        updates, hasFormUpdates, valuesWithUpdates
+        updates, hasFormUpdates, valuesWithUpdates,
+
+        validateAll, allErrors: validations, isValid
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
@@ -27,6 +29,12 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
         subject
     );
 
+    const validateAndSubmit = () => {
+        const hasErrors = validateAll(visibleProperties);
+
+        if (!hasErrors) submitForm();
+    };
+
     let footer;
 
     if (isUpdating) {
@@ -34,9 +42,9 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
     } else if (isEditable) {
         footer = (
             <Button
-                onClick={submitForm}
+                onClick={validateAndSubmit}
                 color="primary"
-                disabled={!hasFormUpdates}
+                disabled={!hasFormUpdates || !isValid}
             >
                 Update
             </Button>
@@ -52,6 +60,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
                     loading={linkedDataLoading}
                     properties={visibleProperties}
                     values={valuesWithUpdates}
+                    validations={validations}
                     onAdd={addValue}
                     onChange={updateValue}
                     onDelete={deleteValue}
