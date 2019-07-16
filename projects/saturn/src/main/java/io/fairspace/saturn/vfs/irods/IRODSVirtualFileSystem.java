@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
+import io.fairspace.saturn.vocabulary.FS;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -20,8 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
@@ -62,6 +65,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                     .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                     .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                     .size(stat.getObjSize())
+                    .customProperties(Map.of(
+                            FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
+                    ))
                     .build();
         } catch (JargonException e) {
             throw new IOException(e);
@@ -89,6 +95,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                         .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                         .size(stat.getObjSize())
+                        .customProperties(Map.of(
+                                FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
+                        ))
                         .build());
             }
             return result;
@@ -132,7 +141,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                 var dst = getIrodsPath(to);
                 getDataTransferOperations(fromAccount).copy(src, fromAccount.getDefaultStorageResource(), dst, null, null);
             } else {
-                throw new IOException("Copying files between different iRODS accounts is not implemented yet");
+                throw new FileSystemException("Copying files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);
@@ -147,7 +156,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
             if (fromAccount.equals(toAccount)) {
                 getDataTransferOperations(fromAccount).move(getIrodsPath(from), getIrodsPath(to));
             } else {
-                throw new IOException("Moving files between different iRODS accounts is not implemented yet");
+                throw new FileSystemException("Moving files between different iRODS accounts is not implemented yet");
             }
         } catch (JargonException e) {
             throw new IOException(e);

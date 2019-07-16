@@ -48,23 +48,31 @@ const LinkedDataMetadataProvider = ({
         <LinkedDataContext.Provider
             value={{
                 ...otherProps,
+
+                // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataBySubject,
-                getEmptyLinkedData,
-                submitLinkedDataChanges,
                 createLinkedDataEntity: createMetadataEntity,
+                searchLinkedData: searchMetadataDispatch,
+                submitLinkedDataChanges,
+
+                // Fixed properties
+                hasEditRight: true,
+                requireIdentifier: true,
+                editorPath: METADATA_PATH,
                 namespaces,
+
+                // Get information from shapes
+                getEmptyLinkedData,
                 getPropertiesForLinkedData,
                 getDescendants: vocabulary.getDescendants,
                 determineShapeForTypes: vocabulary.determineShapeForTypes,
-                hasEditRight: true,
                 getTypeInfoForLinkedData,
-                requireIdentifier: true,
                 getClassesInCatalog,
-                searchLinkedData: searchMetadataDispatch,
+
+                // Generic methods without reference to shapes
                 getSearchResults: getLinkedDataSearchResults,
-                onEntityCreationError,
-                editorPath: METADATA_PATH,
-                valueComponentFactory
+                valueComponentFactory,
+                onEntityCreationError
             }}
         >
             {children}

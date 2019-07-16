@@ -60,23 +60,31 @@ const LinkedDataVocabularyProvider = ({
         <LinkedDataContext.Provider
             value={{
                 ...otherProps,
+
+                // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataVocabulary,
-                getEmptyLinkedData,
-                submitLinkedDataChanges,
                 createLinkedDataEntity: createVocabularyEntity,
+                searchLinkedData: searchVocabularyDispatch,
+                submitLinkedDataChanges,
+
+                // Fixed properties
                 namespaces,
+                requireIdentifier: false,
+                hasEditRight: isDataSteward(authorizations, Config.get()),
+                editorPath: VOCABULARY_PATH,
+
+                // Methods based on shapes
+                getEmptyLinkedData,
                 getPropertiesForLinkedData,
                 getDescendants: metaVocabulary.getDescendants,
                 determineShapeForTypes: metaVocabulary.determineShapeForTypes,
-                hasEditRight: isDataSteward(authorizations, Config.get()),
                 getTypeInfoForLinkedData,
-                requireIdentifier: false,
                 getClassesInCatalog,
-                searchLinkedData: searchVocabularyDispatch,
+
+                // Generic methods without reference to shapes
                 getSearchResults: getLinkedDataSearchResults,
+                valueComponentFactory,
                 onEntityCreationError,
-                editorPath: VOCABULARY_PATH,
-                valueComponentFactory
             }}
         >
             {children}

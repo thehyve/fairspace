@@ -1,9 +1,21 @@
 # Returns file info
 # 0 - path
 PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?iri ?path ?isDirectory ?size ?created ?modified ?createdBy ?modifiedBy
-WHERE { ?iri fs:filePath %1$s; fs:fileSize ?size; fs:dateCreated ?created; fs:dateModified ?modified; fs:createdBy ?createdBy; fs:modifiedBy ?modifiedBy.
-BIND(%1$s as ?path)
-BIND (EXISTS {?iri ?a fs:Directory} as ?isDirectory)
-FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted } }
+SELECT ?iri ?path ?isDirectory ?size ?created ?modified ?createdBy ?modifiedBy ?createdByName ?modifiedByName
+WHERE {
+    ?iri fs:filePath %1$s;
+         fs:fileSize ?size;
+         fs:dateCreated ?created;
+         fs:dateModified ?modified;
+         fs:createdBy ?createdBy;
+         fs:modifiedBy ?modifiedBy.
+
+    ?createdBy rdfs:label ?createdByName .
+    ?modifiedBy rdfs:label ?modifiedByName .
+
+    BIND(%1$s as ?path)
+    BIND (EXISTS {?iri ?a fs:Directory} as ?isDirectory)
+    FILTER NOT EXISTS { ?iri fs:dateDeleted ?dateDeleted }
+}

@@ -8,7 +8,6 @@ export {default as LinkedDataInputFieldsTable} from "./LinkedDataInputFieldsTabl
 export {default as LinkedDataLink} from "./LinkedDataLink";
 export {default as LinkedDataList} from "./LinkedDataList";
 export {default as LinkedDataListPage} from "./LinkedDataListPage";
-export {default as LinkedDataPage} from "./LinkedDataPage";
 export {default as LinkedDataProperty} from "./LinkedDataProperty";
 export {default as LinkedDataRelationTable} from "./LinkedDataRelationTable";
 export {default as LinkedDataShapeChooserDialog} from "./LinkedDataShapeChooserDialog";
