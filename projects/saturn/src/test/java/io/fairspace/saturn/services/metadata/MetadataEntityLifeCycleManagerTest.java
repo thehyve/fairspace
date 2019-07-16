@@ -1,11 +1,15 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +23,10 @@ import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -36,18 +43,20 @@ public class MetadataEntityLifeCycleManagerTest {
 
     private Node graph = NodeFactory.createURI("http://graph");
     private Node user = NodeFactory.createURI("http://user");
-    private Resource userResource = ResourceFactory.createResource("http://user");
+    private Resource userResource = createResource("http://user");
 
-    private Resource resource = ResourceFactory.createResource("http://resource");
+    private Resource resource = createResource("http://resource");
     private Property property = ResourceFactory.createProperty("http://property");
-    private Resource otherResource = ResourceFactory.createResource("http://resource2");
+    private Resource otherResource = createResource("http://resource2");
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         ds = createTxnMem();
         model = ds.getNamedModel(graph.getURI());
 
-        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
+        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+        initVocabularies(rdf);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
     }
 
     @Test
@@ -105,7 +114,7 @@ public class MetadataEntityLifeCycleManagerTest {
     public void testStorageOfBlankNodes() {
         // Try to add the information about the resource
         Model delta = ModelFactory.createDefaultModel();
-        delta.add(ResourceFactory.createResource(), property, "test");
+        delta.add(createResource(), property, "test");
 
         lifeCycleManager.updateLifecycleMetadata(delta);
 
@@ -140,5 +149,21 @@ public class MetadataEntityLifeCycleManagerTest {
         verifyZeroInteractions(permissionsService);
     }
 
+    @Test
+    public void testSoftDelete() {
+        model.add(resource, RDFS.label, createStringLiteral("label"));
+        lifeCycleManager.softDelete(resource);
 
+        assertTrue(model.contains(resource, FS.dateDeleted));
+        assertTrue(model.contains(resource, FS.deletedBy, createResource(user.getURI())));
+    }
+
+    @Test
+    public void testSoftDeleteDoesNotDeleteSystemEntities() {
+        model.add(resource, RDF.type, FS.File);
+        lifeCycleManager.softDelete(resource);
+
+        assertFalse(model.contains(resource, FS.dateDeleted));
+        assertFalse(model.contains(resource, FS.deletedBy, createResource(user.getURI())));
+    }
 }

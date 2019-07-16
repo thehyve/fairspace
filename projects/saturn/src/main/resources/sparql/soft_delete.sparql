@@ -2,16 +2,19 @@
 #
 # 0 - iri
 # 1 - deletedBy
-# 2 - vocabulary graph
+# 2 - target graph
+# 3 - vocabulary graph
 
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 
 INSERT {
-  %1$s fs:dateDeleted ?date;
-  fs:deletedBy %2$s;
+  GRAPH %3$s {
+    %1$s fs:dateDeleted ?date;
+    fs:deletedBy %2$s;
+  }
 }
 WHERE {
   BIND (NOW() as ?date)
-  FILTER(NOT EXISTS {%1$s a ?class . GRAPH %3$s {?shape sh:targetClass ?class; fs:machineOnly true . }})
+  FILTER(NOT EXISTS {GRAPH %3$s { %1$s a ?class } GRAPH %4$s {?shape sh:targetClass ?class; fs:machineOnly true . }})
 }

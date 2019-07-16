@@ -74,7 +74,7 @@ class MetadataEntityLifeCycleManager {
     }
 
     void softDelete(Resource resource) {
-        rdf.update(storedQuery("soft_delete", resource, userIriSupplier.get(), vocabulary));
+        rdf.update(storedQuery("soft_delete", resource, userIriSupplier.get(), graph, vocabulary));
     }
 
     /**
