@@ -84,12 +84,17 @@ export class InformationDrawer extends React.Component {
                     onCollectionDelete={this.handleCollectionDelete}
                     loading={loading}
                 />
-                <Paper style={{padding: 20, marginTop: 10}}>
-                    <LinkedDataEntityFormContainer
-                        subject={collection.iri}
-                        isEditable={isMetaDataEditable}
-                    />
-                </Paper>
+                <ExpansionPanel defaultExpanded>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography>Metadata for {collection.name}</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <LinkedDataEntityFormContainer
+                            subject={collection.iri}
+                            isEditable={isMetaDataEditable}
+                        />
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
                 {
                     this.props.paths.map(path => (
                         <ExpansionPanel
@@ -102,8 +107,7 @@ export class InformationDrawer extends React.Component {
                                 <Typography
                                     className={classes.heading}
                                 >
-                                    {'Metadata for '}
-                                    {relativePath(path)}
+                                    Metadata for {relativePath(path)}
                                 </Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
