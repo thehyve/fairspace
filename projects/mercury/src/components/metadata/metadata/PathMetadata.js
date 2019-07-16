@@ -33,7 +33,7 @@ const PathMetadata = ({
     }
     return (
         <Grid container>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{marginBottom: 8}}>
                 <TechnicalMetadata
                     fileProps={{
                         dateCreated: fileProps.creationdate,
