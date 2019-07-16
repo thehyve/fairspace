@@ -223,6 +223,7 @@ fs:fixedShapeShape a fs:DatatypePropertyShape ;
 fs:singleLineShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path dash:singleLine ;
+    sh:maxCount 1 ; 
     sh:name "Single line input (for string only)" ;
     sh:description "Restricts the input field for this string field to a single line." .
 

@@ -5,14 +5,15 @@ import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
@@ -26,14 +27,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
 
-    /**
-     * Keep a cache of the inverse properties during a transaction, in order to avoid
-     * too many lookups. As many properties do not have an inverse, this map stores
-     * an Optional. An empty optional indicates that we know there is no inverse for this
-     * property. A missing value indicates that we do not know whether there is an inverse
-     * for this prperty
-     */
-    private final Map<String, Optional<Property>> inverseCache = new HashMap<>();
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
         this(rdf, graph, vocabulary, 0, lifeCycleManager, validator);
@@ -113,10 +106,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         modelToRemove.remove(unchanged);
         modelToAdd.remove(unchanged);
         modelToAdd.removeAll(null, null, NIL);
-
-        // Clear inverse cache before applying inference
-        // to ensure we retrieve the latest data
-        inverseCache.clear();
 
         var vocabularyModel = rdf.fetch(vocabulary.getURI());
 
