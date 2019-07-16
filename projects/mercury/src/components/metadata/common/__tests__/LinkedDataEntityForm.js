@@ -12,24 +12,27 @@ describe('LinkedDataEntityForm', () => {
     const defaultMetadata = [{
         key: "@type",
         label: "",
-        values: [
-            {
-                id: "http://fairspace.io/ontology#BiologicalSample",
-                label: "Biological Sample"
-            }
-        ],
         maxValuesCount: 1,
         machineOnly: false,
         multiLine: false
     }, {
         key: 'my-property',
         label: "",
-        values: [],
         datatype: STRING_URI,
         maxValuesCount: 1,
         machineOnly: false,
         multiLine: false
     }];
+
+    const defaultValues = {
+        '@type': [
+            {
+                id: "http://fairspace.io/ontology#BiologicalSample",
+                label: "Biological Sample"
+            }
+        ],
+        'my-property': []
+    }
 
     beforeAll(() => {
         window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}));
@@ -48,21 +51,26 @@ describe('LinkedDataEntityForm', () => {
             {
                 key: "http://fairspace.io/ontology#createdBy",
                 label: "Creator",
-                values: [
-                    {
-                        id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
-                        label: "John"
-                    }
-                ],
                 range: "http://fairspace.io/ontology#User",
                 maxValuesCount: 0,
                 machineOnly: true,
                 multiLine: false
             }
         ];
+
+        const values = {
+            "http://fairspace.io/ontology#createdBy": [
+                {
+                    id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
+                    label: "John"
+                }
+            ]
+        };
+
         const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
         const wrapper = shallow(<LinkedDataEntityForm
             properties={metadata}
+            values={values}
             subject={subject}
         />);
         expect(wrapper.find(List).children().length).toBe(1);
@@ -75,6 +83,7 @@ describe('LinkedDataEntityForm', () => {
 
         const wrapper = shallow(<LinkedDataEntityForm
             properties={defaultMetadata}
+            values={defaultValues}
             subject={collection.iri}
         />);
 
@@ -88,6 +97,7 @@ describe('LinkedDataEntityForm', () => {
 
         const wrapper = shallow(<LinkedDataEntityForm
             properties={defaultMetadata}
+            values={defaultValues}
             subject={collection.iri}
             error="Testing error"
         />);
@@ -102,13 +112,7 @@ describe('LinkedDataEntityForm', () => {
                 {
                     key: "http://fairspace.io/ontology#AAA",
                     label: "AAA",
-                    order: 100,
-                    values: [
-                        {
-                            id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
-                            label: "John"
-                        }
-                    ],
+                    order: 100
                 },
                 {
                     key: "http://fairspace.io/ontology#BBB",
@@ -117,9 +121,19 @@ describe('LinkedDataEntityForm', () => {
                 }
 
             ];
+
+            const values = {
+                "http://fairspace.io/ontology#AAA": [
+                    {
+                        id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
+                        label: "John"
+                    }
+                ]
+            };
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
             const wrapper = shallow(<LinkedDataEntityForm
                 properties={metadata}
+                values={values}
                 subject={subject}
             />);
 
@@ -133,23 +147,26 @@ describe('LinkedDataEntityForm', () => {
                 {
                     key: "http://fairspace.io/ontology#AAA",
                     label: "AAA",
-                    values: [
-                        {
-                            id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
-                            label: "John"
-                        }
-                    ],
                 },
                 {
                     key: "http://fairspace.io/ontology#BBB",
                     label: "BBB",
                     order: 90
                 }
-
             ];
+
+            const values = {
+                "http://fairspace.io/ontology#AAA": [
+                    {
+                        id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd",
+                        label: "John"
+                    }
+                ]
+            };
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
             const wrapper = shallow(<LinkedDataEntityForm
                 properties={metadata}
+                values={values}
                 subject={subject}
             />);
 

@@ -1,45 +1,44 @@
 import React from 'react';
 import {connect} from 'react-redux';
-
 // Actions
 import {
-    createVocabularyEntityFromState, fetchMetadataVocabularyIfNeeded,
-    fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState
+    createVocabularyEntity, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChanges
 } from "../../actions/vocabularyActions";
 import {searchVocabulary} from "../../actions/searchActions";
-
 // Reducers
 import {
-    getMetaVocabulary, getVocabulary, hasMetaVocabularyError,
-    hasVocabularyError, isMetaVocabularyPending, isVocabularyPending
+    getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
+    isVocabularyPending
 } from "../../reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
 import {getVocabularySearchResults} from "../../reducers/searchReducers";
-
 // Utils
 import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
 import {isDataSteward} from "../../utils/userUtils";
-import {propertiesToShow, getTypeInfo, getLabel} from "../../utils/linkeddata/metadataUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
-import {getFirstPredicateValue, getFirstPredicateId} from "../../utils/linkeddata/jsonLdUtils";
-
+import {getLabel, getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {
+    extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
+} from "../../utils/linkeddata/vocabularyUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
-import {USABLE_IN_VOCABULARY_URI, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../constants";
+import {SHACL_TARGET_CLASS, USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import Config from "../../services/Config/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataVocabularyProvider = ({
-    children, fetchMetaVocabulary, fetchMetadataVocabulary, submitVocabularyChanges,
-    metaVocabulary, vocabulary, authorizations, createVocabularyEntity,
+    children, fetchMetaVocabulary, fetchMetadataVocabulary, submitChanges,
+    metaVocabulary, vocabulary, authorizations, createEntity,
     getLinkedDataSearchResults, searchVocabularyDispatch, ...otherProps
 }) => {
     fetchMetaVocabulary();
+    fetchMetadataVocabulary();
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
 
-    const submitLinkedDataChanges = (formKey) => submitVocabularyChanges(formKey)
-        .then(() => fetchMetadataVocabulary());
+    const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value)
+    const submitLinkedDataChanges = (subject, values) => submitChanges(subject, values, metaVocabulary)
+        .then(fetchMetadataVocabulary);
 
     const getPropertiesForLinkedData = ({linkedData, subject, isEntityEditable = true}) => {
         const shape = vocabulary.get(subject);
@@ -94,8 +93,8 @@ const LinkedDataVocabularyProvider = ({
 
                 // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataVocabulary,
-                createLinkedDataEntity: createVocabularyEntity,
                 searchLinkedData: searchVocabularyDispatch,
+                createLinkedDataEntity,
                 submitLinkedDataChanges,
 
                 // Fixed properties
@@ -152,8 +151,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     fetchMetaVocabulary: fetchMetaVocabularyIfNeeded,
     fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
-    submitVocabularyChanges: submitVocabularyChangesFromState,
-    createVocabularyEntity: createVocabularyEntityFromState,
+    submitChanges: submitVocabularyChanges,
+    createEntity: createVocabularyEntity,
     searchVocabularyDispatch: searchVocabulary,
 };
 

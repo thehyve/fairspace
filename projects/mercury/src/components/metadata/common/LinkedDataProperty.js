@@ -21,10 +21,10 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({property, values = [], onAdd, onChange, onDelete}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
-    const {key, values, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
+    const {key, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = errors && errors.length > 0;
 
     // Do not show an add component if no multiples are allowed
@@ -61,6 +61,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                     property.isRelationShape ? (
                         <LinkedDataRelationTable
                             property={property}
+                            values={values}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onDelete={onDelete}
@@ -70,6 +71,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                     ) : (
                         <LinkedDataInputFieldsTable
                             property={property}
+                            values={values}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onChange={onChange}

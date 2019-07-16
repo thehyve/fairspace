@@ -12,7 +12,7 @@ import {isGenericIriResource, isRelationShape} from "../../../utils/linkeddata/v
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
-export const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addComponent, editorPath, history}) => {
+export const LinkedDataRelationTable = ({property, values, onDelete, onAdd, canAdd, addComponent, editorPath, history}) => {
     // Determine the columns to show. If no important property shapes are defined, only
     // the URI will be shown
     let columnDefinitions;
@@ -56,6 +56,7 @@ export const LinkedDataRelationTable = ({property, onDelete, onAdd, canAdd, addC
             onDelete={onDelete}
             columnDefinitions={columnDefinitions}
             property={property}
+            values={values}
             showHeader={property.values && property.values.length > 0}
             canAdd={canAdd}
             addComponent={addComponent}

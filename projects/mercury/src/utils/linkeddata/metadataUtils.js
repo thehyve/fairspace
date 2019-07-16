@@ -263,6 +263,17 @@ export const simplifyUriPredicates = jsonLd => (
         ) : {});
 
 /**
+ * Returns an object with the values for the given properties, with the predicate as key
+ * @param properties
+ * @returns {*}
+ */
+export const getValuesFromProperties = properties => properties.reduce(
+    (acc, curr) => (
+        {...acc, [curr.key]: curr.values}
+    ), {}
+);
+
+/**
  * Normalize an internal metadata resource by converting the values or iris into a single object
  *
  * The output of this method is comparable to the results provided by elasticsearch

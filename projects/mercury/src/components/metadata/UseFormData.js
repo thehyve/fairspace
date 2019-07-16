@@ -1,25 +1,20 @@
-import {useContext, useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getLinkedDataFormUpdates, hasLinkedDataFormUpdates} from "../../reducers/linkedDataFormReducers";
 import {
-    getLinkedDataFormUpdates, getLinkedDataFormValidations,
-    hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors, isLinkedDataFormPending
-} from "../../reducers/linkedDataFormReducers";
-import {
-    addLinkedDataValue, deleteLinkedDataValue,
-    updateLinkedDataValue, validateLinkedDataProperty,
-    initializeLinkedDataForm
+    addLinkedDataValue, clearLinkedDataForm, deleteLinkedDataValue, initializeLinkedDataForm, updateLinkedDataValue,
+    validateLinkedDataProperty
 } from "../../actions/linkedDataFormActions";
-import ErrorDialog from "../common/ErrorDialog";
-import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
-import LinkedDataContext from './LinkedDataContext';
-import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
+import {generateUuid} from "../../utils/linkeddata/metadataUtils";
 
-const useFormData = (formKey, defaultType) => {
-    if (!formKey) {
-        throw new Error('Please provide a valid form key.');
-    }
-
+/**
+ * This hook is concerned about storing form state for linked data
+ * @param values
+ * @returns {{valuesWithUpdates: any, updateValue: updateValue, hasFormUpdates: any, deleteValue: deleteValue, updates: any, addValue: addValue}}
+ */
+const useFormData = (values) => {
+    const [formKey] = useState(generateUuid());
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -28,58 +23,34 @@ const useFormData = (formKey, defaultType) => {
 
     const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
 
-    const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, formKey));
-
-    const isUpdating = useSelector(state => isLinkedDataFormPending(state, formKey));
-
-    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
-
-    const onSubmit = () => {
-        submitLinkedDataChanges(formKey, defaultType)
-            .catch(e => {
-                if (e.details) {
-                    ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, formKey), e.message);
-                } else {
-                    ErrorDialog.showError(e, `Error while updating entity.\n${e.message}`);
-                }
-            });
-    };
-
-    const onAdd = (property, value) => {
+    const addValue = (property, value) => {
         dispatch(addLinkedDataValue(formKey, property, value));
-        dispatch(validateLinkedDataProperty(formKey, property));
     };
 
-    const onChange = (property, value, index) => {
+    const updateValue = (property, value, index) => {
         dispatch(updateLinkedDataValue(formKey, property, value, index));
         dispatch(validateLinkedDataProperty(formKey, property));
     };
 
-    const onDelete = (property, index) => {
+    const deleteValue = (property, index) => {
         dispatch(deleteLinkedDataValue(formKey, property, index));
         dispatch(validateLinkedDataProperty(formKey, property));
     };
 
+    const clearForm = () => dispatch(clearLinkedDataForm(formKey));
+
     const updates = useSelector(state => getLinkedDataFormUpdates(state, formKey));
-
-    const errors = useSelector(state => getLinkedDataFormValidations(state, formKey));
-
-    const extendPropertiesWithChanges = (properties) => propertiesToShow(properties)
-        .filter(p => p.isEditable || p.values.length)
-        .map(p => ({
-            ...p,
-            values: updates[p.key] || p.values,
-            errors: errors[p.key]
-        }));
+    const valuesWithUpdates = {...values, ...updates};
 
     return {
-        extendPropertiesWithChanges,
-        onSubmit,
-        isUpdating,
-        submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,
-        onAdd,
-        onChange,
-        onDelete,
+        addValue,
+        updateValue,
+        deleteValue,
+
+        hasFormUpdates,
+        updates,
+        valuesWithUpdates,
+        clearForm
     };
 };
 

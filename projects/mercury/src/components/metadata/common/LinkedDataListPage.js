@@ -18,7 +18,7 @@ const styles = theme => ({
     }
 });
 
-const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id)
+const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
 const LinkedDataListPage = ({classes, history}) => {
     const {
@@ -29,7 +29,7 @@ const LinkedDataListPage = ({classes, history}) => {
     } = useLinkedDataSearch(true);
 
     const {
-        requireIdentifier, editorPath, createLinkedDataEntity,
+        requireIdentifier, editorPath,
         onEntityCreationError, hasEditRight, typeRender
     } = useContext(LinkedDataContext);
 
@@ -110,11 +110,8 @@ const LinkedDataListPage = ({classes, history}) => {
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
                         shapes={shapes}
-                        requireIdentifie={requireIdentifier}
-                        create={
-                            (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
-                                .then(() => history.push(getEntityRelativeUrl(editorPath, id)))
-                        }
+                        requireIdentifier={requireIdentifier}
+                        onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}
                         onEntityCreationError={onEntityCreationError}
                     >
                         <ListBody />

@@ -29,6 +29,11 @@ export const initializeLinkedDataForm = (formKey) => ({
     formKey
 });
 
+export const clearLinkedDataForm = (formKey) => ({
+    type: actionTypes.CLEAR_LINKEDDATA_FORM,
+    formKey
+});
+
 export const validateLinkedDataProperty = (formKey, property) => (dispatch, getState) => {
     const formUpdates = getLinkedDataFormUpdates(getState(), formKey);
     const values = formUpdates[property.key];

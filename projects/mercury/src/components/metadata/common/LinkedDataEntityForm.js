@@ -7,7 +7,13 @@ import LinkedDataProperty from "./LinkedDataProperty";
 import {compareBy, comparing} from "../../../utils/genericUtils";
 
 export const LinkedDataEntityForm = ({
-    properties, error, loading, onChange, onAdd, onDelete
+    properties = [],
+    values = {},
+    error = false,
+    loading = false,
+    onChange = () => {},
+    onAdd = () => {},
+    onDelete = () => {}
 }) => {
     if (error) {
         return <MessageDisplay message={error} />;
@@ -33,8 +39,9 @@ export const LinkedDataEntityForm = ({
                         >
                             <LinkedDataProperty
                                 property={p}
-                                onChange={(value, index) => onChange(p, value, index)}
+                                values={values[p.key]}
                                 onAdd={(value) => onAdd(p, value)}
+                                onChange={(value, index) => onChange(p, value, index)}
                                 onDelete={(index) => onDelete(p, index)}
                             />
                         </ListItem>
@@ -53,14 +60,7 @@ LinkedDataEntityForm.propTypes = {
 
     loading: PropTypes.bool,
     properties: PropTypes.array,
-};
-
-LinkedDataEntityForm.defaultProps = {
-    onAdd: () => {},
-    onChange: () => {},
-    onDelete: () => {},
-
-    properties: []
+    values: PropTypes.object
 };
 
 export default LinkedDataEntityForm;

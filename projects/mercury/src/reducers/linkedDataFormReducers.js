@@ -41,6 +41,7 @@ const generateStateWithNewValues = (state, propertyKey, updatedValues) => ({
 export const linkedDataFormChangesReducerPerForm = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.INITIALIZE_LINKEDDATA_FORM:
+        case actionTypes.CLEAR_LINKEDDATA_FORM:
             return initialState;
         case actionTypes.ADD_LINKEDDATA_VALUE:
             return generateStateWithNewValues(
@@ -73,40 +74,6 @@ export const linkedDataFormChangesReducerPerForm = (state = initialState, action
     }
 };
 
-/**
- * Reducers the state for the metadata form submissions, for a single subject
- *
- * @param state
- * @param action
- * @returns {*}
- */
-export const linkedDataFormSubmissionReducerPerForm = (state = initialState, action) => {
-    switch (action.type) {
-        case actionTypes.UPDATE_METADATA_PENDING:
-        case actionTypes.UPDATE_VOCABULARY_PENDING:
-            return {
-                ...state,
-                error: false,
-                pending: true
-            };
-        case actionTypes.UPDATE_METADATA_FULFILLED:
-        case actionTypes.UPDATE_VOCABULARY_FULFILLED:
-            return {
-                ...state,
-                updates: {},
-                pending: false
-            };
-        case actionTypes.UPDATE_METADATA_REJECTED:
-        case actionTypes.UPDATE_VOCABULARY_REJECTED:
-            return {
-                ...state,
-                error: true,
-                pending: false
-            };
-        default:
-            return state;
-    }
-};
 
 // We need two different reducers, as the normal actions have the formKey
 // in the action.formKey property, whereas the promise actions have the formKey
@@ -116,10 +83,6 @@ export default reduceReducers(
         action => action && action.formKey,
         action => action.formKey
     )(linkedDataFormChangesReducerPerForm),
-    createByKey(
-        action => action && action.meta && action.meta.formKey,
-        action => action.meta.formKey
-    )(linkedDataFormSubmissionReducerPerForm)
 );
 
 
