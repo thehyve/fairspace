@@ -63,7 +63,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     void softDelete(Resource subject) {
-        commit("Mark <" + subject + "> as delteda", rdf, () -> lifeCycleManager.softDelete(subject));
+        commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject));
     }
 
     /**
