@@ -1,0 +1,17 @@
+# Marks an entity as deleted
+#
+# 0 - iri
+# 1 - deletedBy
+# 2 - vocabulary graph
+
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+INSERT {
+  %1$s fs:dateDeleted ?date;
+  fs:deletedBy %2$s;
+}
+WHERE {
+  BIND (NOW() as ?date)
+  FILTER(NOT EXISTS {%1$s a ?class . GRAPH %3$s {?shape sh:targetClass ?class; fs:machineOnly true . }})
+}

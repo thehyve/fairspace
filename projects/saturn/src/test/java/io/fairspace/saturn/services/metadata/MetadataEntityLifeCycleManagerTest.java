@@ -4,11 +4,7 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +18,7 @@ import java.util.Set;
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -50,7 +47,7 @@ public class MetadataEntityLifeCycleManagerTest {
         ds = createTxnMem();
         model = ds.getNamedModel(graph.getURI());
 
-        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, () -> user, permissionsService);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
     }
 
     @Test
@@ -128,7 +125,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
     @Test
     public void testMissingPermissionsService() {
-        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, () -> user);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, VOCABULARY_GRAPH_URI, () -> user);
 
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
@@ -142,4 +139,6 @@ public class MetadataEntityLifeCycleManagerTest {
         // Ensure any permissions are ignored
         verifyZeroInteractions(permissionsService);
     }
+
+
 }

@@ -1,29 +1,31 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.vocabulary.FS;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceTest {
@@ -36,17 +38,19 @@ public class ChangeableMetadataServiceTest {
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
 
+    private static final Node USER = createURI("http://localhost/iri/U1");
 
     private Dataset ds = createTxnMem();
     private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
     private ChangeableMetadataService api;
 
-    @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
 
     @Before
     public void setUp() {
-        api = new ChangeableMetadataService(rdf, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
+        initVocabularies(rdf);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, () -> USER);
+        api = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
     }
 
     @Test
@@ -60,10 +64,11 @@ public class ChangeableMetadataServiceTest {
     }
 
     @Test
-    public void testPutHandlesLifecycleForEntitities() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+    public void testPutHandlesLifecycleForEntities() {
+        Model delta = createDefaultModel().add(STMT1);
         api.put(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateCreated));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.createdBy));;
     }
 
 
@@ -88,17 +93,26 @@ public class ChangeableMetadataServiceTest {
     }
 
     @Test
-    public void delete() {
+    public void softDelete() {
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
-        api.delete(S1.getURI(), null, null);
+        api.softDelete(S1.getURI());
 
-        assertFalse(ds.getDefaultModel().contains(STMT1));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateDeleted));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.deletedBy));
+        assertTrue(ds.getDefaultModel().contains(STMT1));
         assertTrue(ds.getDefaultModel().contains(STMT2));
+    }
 
-        api.delete(null, P1.getURI(), null);
+    @Test
+    public void softDeleteProtectsMachineOnlyEntities() {
+        var resource = createResource("http://example.com/123");
+        executeWrite(ds, () -> ds.getDefaultModel().add(resource, RDF.type, FS.File));
 
-        assertTrue(ds.getDefaultModel().isEmpty());
+        api.softDelete(resource.getURI());
+
+        assertFalse(ds.getDefaultModel().contains(resource, FS.dateDeleted));
+        assertFalse(ds.getDefaultModel().contains(resource, FS.deletedBy));
     }
 
     @Test
@@ -139,9 +153,10 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPatchHandlesLifecycleForEntities() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        Model delta = createDefaultModel().add(STMT1);
         api.patch(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateCreated));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.createdBy));
     }
 
     @Test

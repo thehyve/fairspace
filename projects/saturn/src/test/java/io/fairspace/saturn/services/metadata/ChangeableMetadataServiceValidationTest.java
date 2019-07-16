@@ -104,10 +104,10 @@ public class ChangeableMetadataServiceValidationTest {
     }
 
     @Test
-    public void testDeleteShouldSucceedOnValidationSuccess() {
+    public void testSoftDeleteShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
-        api.delete(S1.getURI(), null, null);
+        api.softDelete(S1.getURI());
 
         Model model = ds.getNamedModel(GRAPH);
         assertFalse(model.contains(LBL_STMT1));
@@ -116,7 +116,7 @@ public class ChangeableMetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void deleteShouldFailOnMachineOnValidationFailure() {
         produceValidationError();
-        api.delete(S1.getURI(), P1.getURI(), S2.getURI());
+        api.delete(createDefaultModel().add(S1, P1, S2));
     }
 
     @Test
