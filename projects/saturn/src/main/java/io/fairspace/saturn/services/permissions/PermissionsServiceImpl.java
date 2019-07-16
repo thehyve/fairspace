@@ -19,6 +19,7 @@ import org.apache.jena.vocabulary.RDFS;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.partition;
@@ -41,25 +42,26 @@ public class PermissionsServiceImpl implements PermissionsService {
     private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final RDFConnection rdf;
+    private final Supplier<Node> userIriSupplier;
     private final UserService userService;
     private final MailService mailService;
 
     @Override
     public void createResource(Node resource) {
-        rdf.update(storedQuery("permissions_create_resource", resource, userService.getCurrentUser().getIri()));
+        rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
     }
 
     @Override
     public void createResources(Collection<Resource> resources) {
         Model resourcePermissions = createDefaultModel();
-        Resource user = ResourceFactory.createResource(userService.getCurrentUser().getIri().getURI());
+        Resource user = ResourceFactory.createResource(userIriSupplier.get().getURI());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         rdf.load(PERMISSIONS_GRAPH, resourcePermissions);
     }
 
     @Override
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = userService.getCurrentUser().getIri();
+        var managingUser = userIriSupplier.get();
 
         commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
             ensureAccess(resource, Access.Manage);
@@ -129,7 +131,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -164,7 +166,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         getPermissionsForAuthorities(authorities.keySet()).forEach((authority, access) -> {
             if (access.compareTo(requestedAccess) < 0) {
                 throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                        userService.getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), authorities.get(authority).iterator().next());
+                        userIriSupplier.get(), requestedAccess.name().toLowerCase()), authorities.get(authority).iterator().next());
             }
         });
     }
@@ -176,7 +178,7 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
-        rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userService.getCurrentUser().getIri()),
+        rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userIriSupplier.get()),
                 row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
         return result;
     }
@@ -260,7 +262,7 @@ public class PermissionsServiceImpl implements PermissionsService {
                                 (isCollection(resource)
                                         ? "collection " + getLabel(resource)
                                         : "resource " + getLabel(resource) + " (" + resource.getURI() + ")") +
-                                " was set to " + access + " by " + userService.getCurrentUser().getName() + ".");
+                                " was set to " + access + " by " + userService.getUser(userIriSupplier.get()).getName() + ".");
                         mailService.send(msg);
                     } catch (Exception e) {
                         log.error("Error sending an email", e);

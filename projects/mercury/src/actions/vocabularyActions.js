@@ -3,7 +3,7 @@ import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {getMetaVocabulary} from "../reducers/cache/vocabularyReducers";
 import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
-import {SHACL_PATH, SHACL_TARGET_CLASS} from "../constants";
+import {SHACL_PATH, SHACL_TARGET_CLASS, SHACL_NAMESPACE} from "../constants";
 import {getFirstPredicateProperty} from "../utils/linkeddata/jsonLdUtils";
 
 export const invalidateMetadata = subject => ({
@@ -12,13 +12,17 @@ export const invalidateMetadata = subject => ({
 });
 
 export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
-    const values = getLinkedDataFormUpdates(getState(), subject);
+    // For vocabulary changes, the subject iri is used as form key
+    const formKey = subject;
+
+    const values = getLinkedDataFormUpdates(getState(), formKey);
     const metaVocabulary = getMetaVocabulary(getState());
     return dispatch({
         type: actionTypes.UPDATE_VOCABULARY,
         payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
         meta: {
-            subject
+            subject,
+            formKey
         }
     });
 };
@@ -28,25 +32,29 @@ export const createVocabularyEntityFromState = (formKey, providedSubject, type) 
     const metaVocabulary = getMetaVocabulary(getState());
 
     // Infer subject from sh:targetClass or sh:path if no explicit subject is given
-    const subject = providedSubject || getFirstPredicateProperty(values, SHACL_PATH, 'id') || getFirstPredicateProperty(values, SHACL_TARGET_CLASS, 'id');
+    const subject = providedSubject
+        || getFirstPredicateProperty(values, SHACL_PATH, 'id')
+        || getFirstPredicateProperty(values, SHACL_TARGET_CLASS, 'id')
+        || getFirstPredicateProperty(values, SHACL_NAMESPACE, 'id');
 
     if (!subject) {
         return Promise.reject(new Error("Invalid metadata identifier given"));
     }
 
     return dispatch({
-        type: actionTypes.CREATE_VOCABULARY_ENTITY,
+        type: actionTypes.UPDATE_VOCABULARY,
         payload: VocabularyAPI.get({subject})
             .then((meta) => {
                 if (meta.length) {
                     throw Error(`Vocabulary entity already exists: ${subject}`);
                 }
             })
-            .then(() => VocabularyAPI.createEntity(subject, type, values, metaVocabulary))
+            .then(() => VocabularyAPI.updateEntity(subject, values, metaVocabulary, type))
             .then(() => ({subject, type, values})),
         meta: {
             subject,
-            type
+            type,
+            formKey
         }
     });
 };
@@ -69,28 +77,4 @@ const fetchMetaVocabulary = createErrorHandlingPromiseAction(() => ({
 export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
     fetchMetaVocabulary,
     state => (state && state.cache && state.cache.metaVocabulary)
-);
-
-const fetchVocabularyEntitiesByType = createErrorHandlingPromiseAction(type => ({
-    type: actionTypes.FETCH_VOCABULARY_ENTITIES,
-    payload: VocabularyAPI.getEntitiesByType(type),
-    meta: {
-        type
-    }
-}));
-
-const fetchAllVocabularyEntities = createErrorHandlingPromiseAction(dispatch => ({
-    type: actionTypes.FETCH_ALL_VOCABULARY_ENTITIES,
-    payload: dispatch(fetchMetadataVocabularyIfNeeded())
-        .then(() => VocabularyAPI.getAllCatalogEntities())
-}));
-
-export const fetchVocabularyEntitiesIfNeeded = type => dispatchIfNeeded(
-    () => fetchVocabularyEntitiesByType(type),
-    state => (state && state.cache && state.cache.vocabularyEntitiesByType ? state.cache.vocabularyEntitiesByType[type] : undefined)
-);
-
-export const fetchAllVocabularyEntitiesIfNeeded = () => dispatchIfNeeded(
-    () => fetchAllVocabularyEntities(),
-    state => (state && state.cache ? state.cache.allVocabularyEntities : undefined)
 );

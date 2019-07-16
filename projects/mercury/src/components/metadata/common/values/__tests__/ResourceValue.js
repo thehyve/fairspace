@@ -35,5 +35,4 @@ describe('ResourceValue', () => {
 
         expect(iriValue.prop('localPart')).toEqual('http://test');
     });
-
 });

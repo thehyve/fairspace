@@ -1,45 +1,38 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import Button from "@material-ui/core/Button";
-import Icon from "@material-ui/core/Icon";
-import Grid from "@material-ui/core/Grid";
+import {Button, Icon, Grid} from "@material-ui/core";
+
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
 import MessageDisplay from "../../../common/MessageDisplay";
 import {normalizeMetadataResource, simplifyUriPredicates} from "../../../../utils/linkeddata/metadataUtils";
 
-class InputWithAddition extends React.Component {
-    state = {
-        adding: false,
-    };
+const InputWithAddition = ({
+    children, onChange, onCreate, onEntityCreationError,
+    pending, error, shape, emptyData, requireIdentifier = true
+}) => {
+    const [adding, setAdding] = useState(false);
 
-    handleAdd = () => {
-        this.setState({adding: true});
-    };
+    const handleCloseDialog = () => setAdding(false);
 
-    handleCloseDialog = () => {
-        this.setState({adding: false});
-    };
-
-    handleEntityCreation = (formKey, shape, id) => {
-        const {property, fetchEntities, onChange, onCreate, onError} = this.props;
-
-        onCreate(formKey, shape, id)
+    const handleEntityCreation = (formKey, s, id) => {
+        onCreate(formKey, s, id)
             .then(({value}) => {
                 const otherEntry = simplifyUriPredicates(normalizeMetadataResource(value.values));
-                this.handleCloseDialog();
-                fetchEntities(property.className);
+                handleCloseDialog();
                 onChange({id: value.subject, otherEntry});
             })
-            .catch(e => onError(e, id));
-    }
+            .catch(e => {
+                onEntityCreationError(e, id);
+            });
+    };
 
-    renderAddFunctionality() {
-        if (this.props.pending) {
+    const renderAddFunctionality = () => {
+        if (pending) {
             return <LoadingInlay />;
         }
 
-        if (this.props.error) {
+        if (error) {
             return <MessageDisplay />;
         }
 
@@ -49,52 +42,44 @@ class InputWithAddition extends React.Component {
                     variant="text"
                     aria-label="Add"
                     title="Add a new"
-                    onClick={this.handleAdd}
+                    onClick={() => setAdding(true)}
                 >
                     <Icon>add</Icon>
                 </Button>
 
-                <NewLinkedDataEntityDialog
-                    open={this.state.adding}
-                    shape={this.props.shape}
-                    linkedData={this.props.emptyData}
-                    onCreate={this.handleEntityCreation}
-                    onClose={this.handleCloseDialog}
-                    requireIdentifier={this.props.requireIdentifier}
-                />
+                {adding && (
+                    <NewLinkedDataEntityDialog
+                        shape={shape}
+                        linkedData={emptyData}
+                        onCreate={handleEntityCreation}
+                        onClose={handleCloseDialog}
+                        requireIdentifier={requireIdentifier}
+                    />
+                )}
             </>
         );
-    }
+    };
 
-    render() {
-        return (
-            <Grid container justify="space-between" spacing={8}>
-                <Grid item xs={10}>
-                    {this.props.children}
-                </Grid>
-                <Grid item xs={2}>
-                    {this.renderAddFunctionality()}
-                </Grid>
+    return (
+        <Grid container justify="space-between" spacing={8}>
+            <Grid item xs={10}>
+                {children}
             </Grid>
-        );
-    }
-}
+            <Grid item xs={2}>
+                {renderAddFunctionality()}
+            </Grid>
+        </Grid>
+    );
+};
 
 InputWithAddition.propTypes = {
     shape: PropTypes.object.isRequired,
     emptyData: PropTypes.array.isRequired,
-    property: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
-    fetchEntities: PropTypes.func.isRequired,
     requireIdentifier: PropTypes.bool,
-
     error: PropTypes.bool,
     pending: PropTypes.bool
-};
-
-InputWithAddition.defaultProps = {
-    requireIdentifier: true
 };
 
 export default InputWithAddition;

@@ -5,7 +5,6 @@ import {List, ListItem} from '@material-ui/core';
 import {MessageDisplay, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 import {compareBy, comparing} from "../../../utils/genericUtils";
-import {hasValue} from "../../../utils/linkeddata/metadataUtils";
 
 export const LinkedDataEntityForm = ({
     properties, error, loading, onChange, onAdd, onDelete
@@ -24,7 +23,6 @@ export const LinkedDataEntityForm = ({
                 properties
                     .sort(comparing(
                         compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
-                        compareBy(hasValue, false),
                         compareBy('label')
                     ))
                     .map(p => (

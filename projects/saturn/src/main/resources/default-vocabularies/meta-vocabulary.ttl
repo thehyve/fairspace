@@ -21,7 +21,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:property [
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
-        sh:maxLength 128 ;
+        dash:singleLine true ;
         sh:minCount 1 ;
         sh:path sh:name ;
         sh:name "Class name" ;
@@ -54,15 +54,8 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:path sh:description ;
         sh:name "Class description" ;
         sh:order 2
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:maxCount 1 ;
-        sh:path fs:showInCatalog ;
-        sh:name "Show in catalog" ;
-        sh:description "This will allow user to create new instances of this class which show up in the metadata browser."
     ] ;
-    sh:not fs:ShapeIsAClosedShape ; 
-    fs:showInCatalog true ;
+    sh:not fs:ShapeIsAClosedShape ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -90,7 +83,6 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         sh:name "Show as external link" ;
         sh:description "If this flag is set to true, a link to a IRI for this property will not be loaded in the metadata editor"
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:ExternalIRIPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -106,14 +98,13 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:ImportantPropertyShape,
         fs:PathShape,
         fs:DatatypeShape,
+        fs:singleLineShape,
     [
-
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
         sh:maxCount 1 ;
         sh:name "Maximum length (for string only)"
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:DatatypePropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -140,7 +131,6 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         ] ;
         sh:order 3 
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:ControlledVocabularyPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -167,7 +157,6 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:order 3
     ] ;
-    fs:showInCatalog true ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -176,25 +165,44 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
     sh:closed true ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:fixedShape ) ;
-    fs:showInCatalog true ;
-    sh:property fs:PropertyNameShape ;
-    sh:property [
-      sh:name "Prefix" ;
-      sh:maxLength 24 ;
-      sh:minCount 1 ; 
-      sh:maxCount 1 ; 
-      sh:datatype xsd:string ;
-      sh:path sh:prefix 
-    ] ;
-    sh:property [
-      sh:name "Namespace IRI" ;
-      sh:minCount 1 ; 
-      sh:maxCount 1 ; 
-      sh:nodeKind sh:IRI ;
-      fs:externalLink true ; 
-      sh:path sh:namespace 
-    ] .
+    sh:ignoredProperties <ignoredPropertiesCollection> ;
+    sh:property
+        fs:PropertyNameShape,
+        [
+          sh:name "Prefix" ;
+          sh:maxLength 24 ;
+          sh:minCount 1 ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:string ;
+          dash:singleLine true ;
+          sh:path sh:prefix
+        ] ,
+        [
+          sh:name "Namespace IRI" ;
+          sh:minCount 1 ;
+          sh:maxCount 1 ;
+          sh:nodeKind sh:IRI ;
+          fs:externalLink true ;
+          sh:path sh:namespace
+        ] ,
+        [
+          sh:name "Use in metadata" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:usableInMetadata
+        ] ,
+        [
+          sh:name "Use in vocabulary" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:usableInVocabulary
+        ] ,
+        [
+          sh:name "Default namespace" ;
+          sh:maxCount 1 ;
+          sh:datatype xsd:boolean ;
+          sh:path fs:defaultNamespace
+        ] .
 
 fs:inverseRelationShape a fs:RelationShape ;
     fs:inverseRelation fs:inverseRelationShape ;
@@ -211,6 +219,13 @@ fs:fixedShapeShape a fs:DatatypePropertyShape ;
     fs:machineOnly true ; 
     sh:name "Fixed shape" ;
     sh:description "If this is true, a user can not make changes to this shape definition." .
+
+fs:singleLineShape a fs:DatatypePropertyShape ;
+    sh:datatype xsd:boolean ;
+    sh:path dash:singleLine ;
+    sh:maxCount 1 ; 
+    sh:name "Single line input (for string only)" ;
+    sh:description "Restricts the input field for this string field to a single line." .
 
 fs:machineOnlyShape a fs:DatatypePropertyShape ; 
     sh:datatype xsd:boolean ;
@@ -242,7 +257,7 @@ fs:PathShape a sh:PropertyShape ;
 fs:PropertyNameShape a sh:PropertyShape ;
   sh:datatype xsd:string ;
   sh:maxCount 1 ;
-  sh:maxLength 128 ;
+  dash:singleLine true ;
   sh:minCount 1 ;
   sh:path sh:name ;
   sh:name "Property name" ;
@@ -303,6 +318,7 @@ fs:RelationShape rdfs:subClassOf sh:PropertyShape .
 # Definition for property shape, used to render a table with properties
 sh:PropertyShape
     sh:targetClass sh:PropertyShape ;
+    fs:machineOnly true ;
     sh:property
         fs:PropertyNameShape,
         fs:DescriptionShape,
@@ -310,6 +326,7 @@ sh:PropertyShape
         [
             sh:path sh:datatype ;
             sh:name "Datatype" ;
+            sh:nodeKind sh:IRI ;
             fs:importantProperty true ;
             sh:order 2
         ] .

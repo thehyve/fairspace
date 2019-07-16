@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.Config;
-import io.fairspace.saturn.auth.SecurityUtil;
+import io.fairspace.saturn.auth.UserInfo;
 import io.fairspace.saturn.commits.CommitMessages;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
@@ -15,8 +15,10 @@ import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.elasticsearch.client.Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
@@ -30,8 +32,8 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config) throws IOException {
-        var restoreNeeded = !config.datasetPath.exists();
+    public static Dataset connect(Config.Jena config, Supplier<UserInfo> userInfoSupplier) throws IOException {
+        var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
         var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
@@ -49,10 +51,14 @@ public class SaturnDatasetFactory {
         }
 
         // Add transaction log
-        dsg = new TxnLogDatasetGraph(dsg, txnLog, SecurityUtil::userInfo, CommitMessages::getCommitMessage);
+        dsg = new TxnLogDatasetGraph(dsg, txnLog, userInfoSupplier, CommitMessages::getCommitMessage);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);
+    }
+
+    protected static boolean isRestoreNeeded(File datasetPath) {
+        return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
     private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex) throws UnknownHostException {

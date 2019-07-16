@@ -1,10 +1,12 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import PropTypes from "prop-types";
-import {FormControl, FormGroup, FormHelperText, FormLabel, Typography} from '@material-ui/core';
-
-import {LinkedDataValuesContext} from "./LinkedDataValuesContext";
+import {FormControl, FormGroup, FormHelperText, FormLabel} from '@material-ui/core';
 import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
 import LinkedDataRelationTable from "./LinkedDataRelationTable";
+import {TOOLTIP_ENTER_DELAY} from "../../../constants";
+import GenericTooltip from "../../common/GenericTooltip";
+import Iri from "../../common/Iri";
+import LinkedDataContext from "../LinkedDataContext";
 
 /**
      * Checks whether the configuration of this property disallowed editing of existing values
@@ -20,8 +22,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || allowedValues;
 
 const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
-    const [hoveredAllProperty, setHoveredAllProperty] = useState(false);
-    const {readOnlyComponent, editComponent, addComponent} = useContext(LinkedDataValuesContext);
+    const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, values, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = errors && errors.length > 0;
@@ -35,14 +36,13 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
     const disableEditing = !property.isEditable || disallowEditingOfExistingValues(property);
-    const editInputComponent = disableEditing ? readOnlyComponent() : editComponent(property);
-    const addInputComponent = addComponent(property);
-    const pathVisibility = hoveredAllProperty ? 'visible' : 'hidden';
+    const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
+    const addInputComponent = valueComponentFactory.addComponent(property);
+
+    const labelTooltip = <><Iri iri={path} /><div style={{marginTop: 4}}>{description}</div></>;
 
     return (
         <FormControl
-            onMouseEnter={() => setHoveredAllProperty(true)}
-            onMouseLeave={() => setHoveredAllProperty(false)}
             required={minValuesCount > 0}
             error={hasErrors}
             component="fieldset"
@@ -51,12 +51,11 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                 margin: 4,
             }}
         >
-            <FormLabel component="legend">
-                {label}
-            </FormLabel>
-            <Typography variant="caption" color="textSecondary" style={{visibility: pathVisibility, textAlign: 'right'}}>
-                {path}
-            </Typography>
+            <GenericTooltip interactive leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
+                <FormLabel component="legend">
+                    {label}
+                </FormLabel>
+            </GenericTooltip>
             <FormGroup>
                 {
                     property.isRelationShape ? (
@@ -66,6 +65,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                             onAdd={onAdd}
                             onDelete={onDelete}
                             addComponent={addInputComponent}
+                            editorPath={editorPath}
                         />
                     ) : (
                         <LinkedDataInputFieldsTable
@@ -81,10 +81,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                     )
                 }
             </FormGroup>
-            <FormHelperText color="primary">
-                {hasErrors ? errors.map(e => `${e}. `) : null}
-                {!hasErrors && hoveredAllProperty ? description : null}
-            </FormHelperText>
+            {hasErrors ? <FormHelperText color="primary">{errors.map(e => `${e}. `)}</FormHelperText> : null}
         </FormControl>
     );
 };

@@ -1,0 +1,58 @@
+import React, {useContext, useEffect, useState} from 'react';
+import PermissionAPI from "../../services/PermissionAPI";
+import getDisplayName from "../../utils/userUtils";
+import UsersContext from "./UsersContext";
+
+const PermissionContext = React.createContext({});
+
+export const PermissionProvider = ({iri, children}) => {
+    const {users} = useContext(UsersContext);
+    const [permissions, setPermissions] = useState([]);
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const extendWithUsernames = rawPermissions => rawPermissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
+
+    const refresh = () => {
+        let didCancel = false;
+
+        const fetchData = async () => {
+            setLoading(true);
+
+            try {
+                const fetchedPermissions = await PermissionAPI.getPermissions(iri, false);
+                if (!didCancel) {
+                    setPermissions(extendWithUsernames(fetchedPermissions));
+                    setLoading(false);
+                }
+            } catch (e) {
+                if (!didCancel) {
+                    setError(e);
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchData();
+
+        return () => { didCancel = true; };
+    };
+
+    // Refresh the permissions whenever the iri changes
+    useEffect(refresh, [iri]);
+
+    return (
+        <PermissionContext.Provider
+            value={{
+                permissions,
+                error,
+                loading,
+                refresh
+            }}
+        >
+            {children}
+        </PermissionContext.Provider>
+    );
+};
+
+export default PermissionContext;

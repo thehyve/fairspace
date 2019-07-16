@@ -1,20 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    ExpansionPanel,
-    ExpansionPanelDetails,
-    ExpansionPanelSummary,
-    Paper,
-    Typography,
-    withStyles
-} from '@material-ui/core';
+import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography, withStyles} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
-import MetadataEntityContainer from "../metadata/metadata/MetadataEntityContainer";
+import LinkedDataEntityFormContainer from "../metadata/common/LinkedDataEntityFormContainer";
 import PathMetadata from "../metadata/metadata/PathMetadata";
 import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
@@ -23,8 +16,7 @@ import {getPathInfoFromParams} from "../../utils/fileUtils";
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
-        const {fetchMetadata, invalidateMetadata} = this.props;
-        invalidateMetadata(collection.iri);
+        const {fetchMetadata} = this.props;
         fetchMetadata(collection.iri);
 
         // If the location of a collection has changed, the URI where it
@@ -47,10 +39,11 @@ export class InformationDrawer extends React.Component {
     }
 
     handleUpdateCollection = (name, description, location) => {
+        const oldLocation = this.props.collection.location;
         // TODO: validation should be part of the child component
-        if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== this.props.collection.location)
+        if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== oldLocation)
             && (name !== '') && (location !== '')) {
-            return this.props.updateCollection(this.props.collection.iri, name, description, location)
+            return this.props.updateCollection(this.props.collection.iri, name, description, location, oldLocation)
                 .then(() => {
                     // TODO: no need to clone object, just use the id in the handleDetailsChange
                     const locationChanged = this.props.collection.location !== location;
@@ -84,12 +77,17 @@ export class InformationDrawer extends React.Component {
                     onCollectionDelete={this.handleCollectionDelete}
                     loading={loading}
                 />
-                <Paper style={{padding: 20, marginTop: 10}}>
-                    <MetadataEntityContainer
-                        subject={collection.iri}
-                        isEditable={isMetaDataEditable}
-                    />
-                </Paper>
+                <ExpansionPanel defaultExpanded>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography>Metadata for {collection.name}</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <LinkedDataEntityFormContainer
+                            subject={collection.iri}
+                            isEditable={isMetaDataEditable}
+                        />
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
                 {
                     this.props.paths.map(path => (
                         <ExpansionPanel
@@ -102,8 +100,7 @@ export class InformationDrawer extends React.Component {
                                 <Typography
                                     className={classes.heading}
                                 >
-                                    {'Metadata for '}
-                                    {relativePath(path)}
+                                    Metadata for {relativePath(path)}
                                 </Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
@@ -133,7 +130,6 @@ function pathHierarchy(fullPath) {
 
 InformationDrawer.propTypes = {
     fetchMetadata: PropTypes.func,
-    invalidateMetadata: PropTypes.func,
     updateCollection: PropTypes.func,
     deleteCollection: PropTypes.func,
     fetchCollectionsIfNeeded: PropTypes.func,
@@ -143,7 +139,7 @@ InformationDrawer.propTypes = {
     loading: PropTypes.bool
 };
 
-const mapStateToProps = ({cache: {collections, users},
+const mapStateToProps = ({cache: {collections},
     collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {
     const {match: {params}} = ownProps;
     const {collectionLocation, openedPath} = getPathInfoFromParams(params);
@@ -153,13 +149,12 @@ const mapStateToProps = ({cache: {collections, users},
     return {
         collection,
         paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
-        loading: users.pending
+        loading: collections.pending
     };
 };
 
 const mapDispatchToProps = {
     fetchMetadata: metadataActions.fetchMetadataBySubjectIfNeeded,
-    invalidateMetadata: metadataActions.invalidateMetadata,
 
     updateCollection: collectionActions.updateCollection,
     deleteCollection: collectionActions.deleteCollection,

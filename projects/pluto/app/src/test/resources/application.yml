@@ -3,11 +3,6 @@ app:
     pluto: v1
   domain: http://fake-origin
 
-frontend:
-  urls:
-    jupyter: https://jupyterhub.someplace
-    cbioportal: https://external-url
-
 security:
   oidc:
     clientId: web_app

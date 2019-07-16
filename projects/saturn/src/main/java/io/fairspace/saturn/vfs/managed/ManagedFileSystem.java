@@ -2,19 +2,16 @@ package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
-import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
-import io.fairspace.saturn.vfs.VirtualFileSystem;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 
@@ -26,55 +23,38 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
-import static java.time.Instant.ofEpochMilli;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
-public class ManagedFileSystem implements VirtualFileSystem {
-    private static final FileInfo ROOT = FileInfo.builder().path("")
-            .readOnly(false)
-            .isDirectory(true)
-            .created(ofEpochMilli(0))
-            .modified(ofEpochMilli(0))
-            .build();
+public class ManagedFileSystem extends BaseFileSystem {
+    public static final String TYPE = "";
+
     private final RDFConnection rdf;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
-    private final CollectionsService collections;
-    private final PermissionsService permissions;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus, PermissionsService permissions) {
+    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
+        super(collections);
         this.rdf = rdf;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
-        this.collections = collections;
-        this.permissions = permissions;
         eventBus.register(this);
     }
 
     @Override
-    public FileInfo stat(String path) throws IOException {
-        if (path.isEmpty()) {
-            return ROOT;
-        }
-
-        if (isCollection(path)) {
-            return ofNullable(collections.getByLocation(path))
-                    .map(ManagedFileSystem::fileInfo)
-                    .orElse(null);
-        }
-
+    protected FileInfo statRegularFile(String path) throws IOException {
         return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo)
                 .map(fileInfo -> {
-                    var access = permissions.getPermission(createURI(fileInfo.getIri()));
+                    var collection = collections.getByLocation(splitPath(path)[0]);
+                    if (collection == null) {
+                        return null;
+                    }
+                    var access = collection.getAccess();
                     if (!access.canRead()) {
                         return null;
                     }
@@ -85,38 +65,20 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public List<FileInfo> list(String path) throws IOException {
-        if (path.isEmpty()) {
-            return collections.list()
-                    .stream()
-                    .map(ManagedFileSystem::fileInfo)
-                    .collect(toList());
+    protected List<FileInfo> listCollectionOrDirectory(String path) throws IOException {
+        var collectionLocation = splitPath(path)[0];
+        var collection = collections.getByLocation(collectionLocation);
+        if (collection == null) {
+            throw new AccessDeniedException("User has no access to collection " + collectionLocation);
         }
-
+        var readOnly = !collection.canWrite();
         var files = select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo);
-        var nodes = files.stream()
-                .map(FileInfo::getIri)
-                .map(NodeFactory::createURI)
-                .collect(toList());
-        var filePermissions = permissions.getPermissions(nodes);
-
-        return files.stream()
-                .map(fileInfo -> {
-                    var access = filePermissions.get(createURI(fileInfo.getIri()));
-                    if (!access.canRead()) {
-                        return null;
-                    }
-                    fileInfo.setReadOnly(!access.canWrite());
-                    return fileInfo;
-                })
-                .filter(Objects::nonNull)
-                .collect(toList());
+        files.forEach(f -> f.setReadOnly(readOnly));
+        return files;
     }
 
     @Override
-    public void mkdir(String path) throws IOException {
-        ensureValidPath(path);
-
+    protected void doMkdir(String path) throws IOException {
         commit("Create directory " + path, rdf, () -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
@@ -124,9 +86,7 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void create(String path, InputStream in) throws IOException {
-        ensureValidPath(path);
-
+    protected void doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
         commit("Create file " + path, rdf, () -> {
@@ -163,19 +123,17 @@ public class ManagedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void copy(String from, String to) throws IOException {
+    protected void doCopy(String from, String to) throws IOException {
         copyOrMove(false, from, to);
     }
 
     @Override
-    public void move(String from, String to) throws IOException {
+    protected void doMove(String from, String to) throws IOException {
         copyOrMove(true, from, to);
     }
 
     @Override
-    public void delete(String path) throws IOException {
-        ensureValidPath(path);
-
+    public void doDelete(String path) throws IOException {
         commit("Delete " + path, rdf, () -> {
             var info = stat(path);
             if (info == null) {
@@ -207,32 +165,18 @@ public class ManagedFileSystem implements VirtualFileSystem {
                 .iri(row.getResource("iri").getURI())
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
-                .isDirectory(!row.getLiteral("isDirectory").getBoolean())
+                .isDirectory(row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
+                .customProperties(Map.of(
+                        "createdBy", row.getLiteral("createdByName").getString(),
+                        "modifiedBy", row.getLiteral("modifiedByName").getString()
+                ))
                 .build();
     }
-
-    private static FileInfo fileInfo(Collection collection) {
-        return FileInfo.builder()
-                .iri(collection.getIri().getURI())
-                .path(collection.getLocation())
-                .size(0)
-                .isDirectory(true)
-                .created(collection.getDateCreated())
-                .modified(collection.getDateCreated())
-                .readOnly(!collection.getAccess().canWrite())
-                .build();
-    }
-
-    static boolean isCollection(String path) {
-        return !path.isEmpty() && splitPath(path).length == 1;
-    }
-
     private void copyOrMove(boolean move, String from, String to) throws IOException {
         var verb = move ? "move" : "copy";
-        ensureValidPath(from);
-        ensureValidPath(to);
+
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
@@ -248,15 +192,6 @@ public class ManagedFileSystem implements VirtualFileSystem {
         }
         if (stat(parentPath(path)).isReadOnly()) {
             throw new IOException("Target path is read-only");
-        }
-    }
-
-    private static void ensureValidPath(String path) throws IOException {
-        if (path.isEmpty()) {
-            throw new AccessDeniedException("File operations on the root directory are not allowed");
-        }
-        if (isCollection(path)) {
-            throw new AccessDeniedException("Use Collections API for operations on collections");
         }
     }
 

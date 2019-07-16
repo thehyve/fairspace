@@ -7,5 +7,5 @@ export default function getDisplayName(user) {
     return fullName || user.firstName || user.lastName || user.email || user.username || user.id;
 }
 
-export const isDataSteward = (authorizations, config) => authorizations.includes(config.roles.dataSteward);
-export const isCoordinator = (authorizations, config) => authorizations.includes(config.roles.coordinator);
+export const isDataSteward = (authorizations, config) => authorizations && authorizations.includes(config.roles.dataSteward);
+export const isCoordinator = (authorizations, config) => authorizations && authorizations.includes(config.roles.coordinator);

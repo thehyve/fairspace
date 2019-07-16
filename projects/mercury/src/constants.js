@@ -4,11 +4,14 @@ export const COPY = 'COPY';
 export const PATH_SEPARATOR = '/';
 
 // UI
+export const LEFT_MENU_EXPANSION_DELAY = 500;
 export const MAIN_CONTENT_WIDTH = '55%';
 export const SIDE_PANEL_WIDTH = '45%';
 export const MAIN_CONTENT_MAX_HEIGHT = '65vh';
+export const COLLECTIONS_PATH = '/collections';
 export const METADATA_PATH = '/metadata';
 export const VOCABULARY_PATH = '/vocabulary';
+export const TOOLTIP_ENTER_DELAY = 350;
 
 
 // Search
@@ -53,6 +56,7 @@ export const SHACL_NAMESPACE = SHACL_NS + 'namespace';
 export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
+export const DASH_SINGLE_LINE = DASH_NS + 'singleLine';
 
 export const STRING_URI = XMLSCHEMA_NS + 'string';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';
@@ -64,10 +68,11 @@ export const LONG_URI = XMLSCHEMA_NS + 'long';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
-export const SHOW_IN_CATALOG_URI = FAIRSPACE_NS + 'showInCatalog';
 export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
 export const FILE_URI = FAIRSPACE_NS + 'File';
 export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';
+export const EXTERNAL_FILE_URI = FAIRSPACE_NS + 'ExternalFile';
+export const EXTERNAL_DIRECTORY_URI = FAIRSPACE_NS + 'ExternalDirectory';
 export const FILE_PATH_URI = FAIRSPACE_NS + 'filePath';
 export const DATE_DELETED_URI = FAIRSPACE_NS + 'dateDeleted';
 export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';
@@ -76,5 +81,8 @@ export const EXTERNAL_LINK_URI = FAIRSPACE_NS + 'externalLink';
 export const SYSTEM_PROPERTIES_URI = FAIRSPACE_NS + 'systemProperties';
 export const RELATION_SHAPE_URI = FAIRSPACE_NS + 'RelationShape';
 export const IMPORTANT_PROPERTY_URI = FAIRSPACE_NS + 'importantProperty';
+export const DEFAULT_NAMESPACE_URI = FAIRSPACE_NS + 'defaultNamespace';
+export const USABLE_IN_METADATA_URI = FAIRSPACE_NS + 'usableInMetadata';
+export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

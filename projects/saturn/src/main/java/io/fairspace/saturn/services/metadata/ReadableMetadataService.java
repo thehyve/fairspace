@@ -5,6 +5,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.limit;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -15,6 +16,11 @@ class ReadableMetadataService {
     protected final RDFConnection rdf;
     protected final Node graph;
     protected final Node vocabulary;
+    protected final long tripleLimit;
+
+    public ReadableMetadataService(RDFConnection rdf, Node graph, Node vocabulary) {
+        this(rdf, graph, vocabulary, 0);
+    }
 
     /**
      * Returns a model with statements from the metadata database, based on the given selection criteria
@@ -30,34 +36,47 @@ class ReadableMetadataService {
      * @return
      */
     Model get(String subject, String predicate, String object, boolean withObjectProperties) {
-        var query = withObjectProperties ? "select_by_mask_with_important_properties" : "select_by_mask";
-        return rdf.queryConstruct(storedQuery(query, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary));
+        var queryTemplate = withObjectProperties ? "select_by_mask_with_important_properties" : "select_by_mask";
+
+        var query = storedQuery(queryTemplate, graph, asURI(subject), asURI(predicate), asURI(object), vocabulary);
+
+        return runWithLimit(query);
     }
 
     /**
      * Returns a model with all fairspace metadata entities for the given type
      *
      * The method returns the type and the label (if present) for all entities that match
-     * the given type if the type is marked as fs:showInCatalog in the vocabulary.
+     * the given type if the type is not marked as fs:machineOnly in the vocabulary.
      *
-     * If the type is not marked as fs:showInCatalog, the resulting model will be empty
+     * If the type is marked as fs:machineOnly, the resulting model will be empty
      *
-     * If the type is null, all entities for which the type is marked as fs:showInCatalog in
+     * If the type is null, all entities for which the type is not marked as fs:machineOnly in
      * the vocabulary will be returned.
      *
      * @param type  URI for the type to filter the list of entities on
-     * @param filterOnCatalog If set to true, only entities marked as `fs:showInCatalog` will be returned
+     * @param filterOnCatalog If set to true, only entities not marked as `fs:machineOnly` will be returned
      * @return
      */
     Model getByType(String type, boolean filterOnCatalog) {
         String queryName = filterOnCatalog ? "catalog_entities_by_type" : "entities_by_type";
+        String query = storedQuery(queryName, graph, vocabulary, asURI(type));
 
-        return rdf.queryConstruct(storedQuery(
-                queryName,
-                graph,
-                vocabulary,
-                asURI(type)
-        ));
+        return runWithLimit(query);
+    }
+
+    private Model runWithLimit(String query) {
+        if (tripleLimit > 0) {
+            Model model = rdf.queryConstruct(limit(query, tripleLimit + 1));
+
+            if (model.size() > tripleLimit) {
+                throw new TooManyTriplesException();
+            }
+
+            return model;
+        } else {
+            return rdf.queryConstruct(query);
+        }
     }
 
     protected static Node asURI(String uri) {

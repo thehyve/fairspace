@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
@@ -27,7 +28,6 @@ import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
-import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
@@ -56,6 +56,10 @@ public class SparqlUtils {
             params[i] = param;
         }
         return format(template, (Object[]) params);
+    }
+
+    public static String limit(String inputQuery, long limit) {
+        return String.format("%s\nLIMIT %d", inputQuery, limit);
     }
 
     private static Node toSerializableNode(Object value) {
@@ -127,8 +131,14 @@ public class SparqlUtils {
         return values;
     }
 
+    public static <T> Set<T> selectDistinct(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+        var values = new HashSet<T>();
+        rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
+        return values;
+    }
+
     public static <T> Optional<T> selectSingle(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
-        var values = select(rdf, query, valueExtractor);
+        var values = selectDistinct(rdf, query, valueExtractor);
         if (values.size() > 1) {
             throw new IllegalStateException("Too many values: " + values.size());
         }

@@ -19,6 +19,24 @@ export function findById(itemList, itemId) {
  */
 export const flattenShallow = array => [].concat(...array);
 
+/**
+ * Joins the given array elements with an optional separator.
+ *
+ * This method would typically be used to join an array of Jsx components into an array,
+ * as the default join method will not work with those
+ *
+ * @param items
+ * @param separator
+ * @returns {*[]}
+ */
+export const joinWithSeparator = (items = [], separator) => {
+    return items.reduce((prev, curr) => {
+        if (!prev || prev.length === 0) return [curr];
+        if (separator) return [...prev, separator, curr];
+        return [...prev, curr];
+    }, []);
+};
+
 //* *********************************
 //* COMPARISION
 //* *********************************
@@ -41,3 +59,9 @@ export function compareBy(valueExtractor, ascending = true) {
 export function comparing(...comparators) {
     return comparators.reduce((c1, c2) => (x, y) => c1(x, y) || c2(x, y));
 }
+
+/**
+ * Returns true if the given value is truthy or zero or false
+ * @param value
+ */
+export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;

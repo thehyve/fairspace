@@ -1,8 +1,9 @@
 import {connect} from 'react-redux';
 import React from "react";
 import MessageDisplay from "../../common/MessageDisplay";
-import MetadataEntityContainer from "./MetadataEntityContainer";
+import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {statFile} from "../../../actions/fileActions";
+import {EXTERNAL_DIRECTORY_URI, EXTERNAL_FILE_URI} from "../../../constants";
 
 export class PathMetadata extends React.Component {
     componentDidMount() {
@@ -21,7 +22,7 @@ export class PathMetadata extends React.Component {
     render() {
         // putting dispatch here to avoid it being passed down to children
         const {
-            subject, error, loading, ...otherProps
+            subject, type, error, loading, ...otherProps
         } = this.props;
 
         if (error) {
@@ -32,8 +33,9 @@ export class PathMetadata extends React.Component {
             return (<div>No metadata found</div>);
         }
         return (
-            <MetadataEntityContainer
+            <LinkedDataEntityFormContainer
                 subject={subject}
+                defaultType={type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
                 {...otherProps}
             />
         );
@@ -41,19 +43,20 @@ export class PathMetadata extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const subjectByPath = {...state.cache.subjectByPath};
-    const subject = subjectByPath && subjectByPath[ownProps.path];
+    const fileInfoByPath = {...state.cache.fileInfoByPath};
+    const subject = fileInfoByPath && fileInfoByPath[ownProps.path];
 
     // If there is no subject by path (not even pending)
     // some error occurred.
     if (!subject) {
-        return { };
+        return {};
     }
 
     return {
         loading: subject.pending,
         error: subject.error,
-        subject: subject.data
+        subject: subject.data && subject.data.props.iri,
+        type: subject.data && subject.data.type
     };
 };
 

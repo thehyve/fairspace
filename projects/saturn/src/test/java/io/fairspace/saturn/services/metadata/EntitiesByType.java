@@ -17,7 +17,6 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.sparqlunit.SparqlUnit.given;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,14 +54,12 @@ public class EntitiesByType {
                 .add(CLASS_2, RDFS.subClassOf, CLASS_1)
                 .add(CLASS_3, RDFS.subClassOf, CLASS_2)
                 .add(CLASS_SHAPE_1, SH.targetClass, CLASS_1)
-                .add(CLASS_SHAPE_1, FS.showInCatalog, createTypedLiteral(true))
                 .add(CLASS_SHAPE_2, SH.targetClass, CLASS_2)
-                .add(CLASS_SHAPE_2, FS.showInCatalog, createTypedLiteral(false))
+                .addLiteral(CLASS_SHAPE_2, FS.machineOnly, true)
                 .add(CLASS_SHAPE_3, SH.targetClass, CLASS_3)
-                .add(CLASS_SHAPE_3, FS.showInCatalog, createTypedLiteral(true))
                 .add(CLASS_SHAPE_4, SH.targetClass, CLASS_4)
-                .add(CLASS_SHAPE_4, FS.showInCatalog, createTypedLiteral(true))
-                .add(CLASS_SHAPE_5, SH.targetClass, CLASS_5);
+                .add(CLASS_SHAPE_5, SH.targetClass, CLASS_5)
+                .addLiteral(CLASS_SHAPE_5, FS.machineOnly, true);
 
         ds.getNamedModel(GRAPH.getURI())
                 .add(ENTITY_1, RDF.type, CLASS_1)
@@ -77,7 +74,7 @@ public class EntitiesByType {
     public void testListAllCatalogEntities() {
         given(ds).testConstruct(storedQuery("catalog_entities_by_type", GRAPH, VOCABULARY, null),
                 model -> {
-                    assertEquals("All entities whose shapes have fs:showInCatalog should be returned",
+                    assertEquals("All entities whose shapes don't have fs:machineOnly should be returned",
                             Set.of(ENTITY_1, ENTITY_3, ENTITY_4),
                             model.listSubjects().toSet());
                     assertTrue("The result should include labels when possible", model.contains(ENTITY_1, RDFS.label));

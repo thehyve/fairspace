@@ -5,10 +5,10 @@ import {STRING_URI} from "../../../../constants";
 import LinkedDataProperty from "../LinkedDataProperty";
 import LinkedDataRelationTable from "../LinkedDataRelationTable";
 import LinkedDataInputFieldsTable from "../LinkedDataInputFieldsTable";
-import {LinkedDataValuesContext} from "../LinkedDataValuesContext";
+import LinkedDataContext from "../../LinkedDataContext";
 import NumberValue from "../values/NumberValue";
-import StringValue from "../values/StringValue";
 import SwitchValue from "../values/SwitchValue";
+import ReferringValue from "../values/ReferringValue";
 
 const defaultProperty = {
     key: 'description',
@@ -66,12 +66,12 @@ describe('LinkedDataProperty elements', () => {
     describe('inputComponents', () => {
         const valueComponentFactory = {
             addComponent: () => NumberValue,
-            editComponent: () => StringValue,
+            editComponent: () => ReferringValue,
             readOnlyComponent: () => SwitchValue
         };
 
         const renderTable = property => {
-            const wrapper = mount(<LinkedDataValuesContext.Provider value={valueComponentFactory}><LinkedDataProperty property={property} /></LinkedDataValuesContext.Provider>);
+            const wrapper = mount(<LinkedDataContext.Provider value={{editorPath: '/metadata', valueComponentFactory}}><LinkedDataProperty property={property} /></LinkedDataContext.Provider>);
             const table = wrapper.find(LinkedDataInputFieldsTable);
             expect(table.length).toEqual(1);
             return table;
@@ -92,7 +92,7 @@ describe('LinkedDataProperty elements', () => {
                     ...defaultProperty,
                     isRelationShape: false
                 }).prop("editComponent")
-            ).toEqual(StringValue);
+            ).toEqual(ReferringValue);
         });
 
         it('should render a read-only component for non editable shapes', () => {
@@ -125,7 +125,7 @@ describe('LinkedDataProperty elements', () => {
             ).toEqual(SwitchValue);
         });
 
-        it('should render a read-only component for controlled vocabulary shapes', () => {
+        it('should render a read-only component for controlled shapes', () => {
             expect(
                 renderTable({
                     ...defaultProperty,

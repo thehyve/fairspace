@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import static io.fairspace.saturn.services.ModelUtils.JSON_LD_HEADER_STRING;
 import static io.fairspace.saturn.services.ModelUtils.toJsonLD;
+import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static spark.Spark.get;
 import static spark.Spark.path;
@@ -34,6 +36,7 @@ public class ReadableMetadataApp extends BaseApp {
                 res.type(JSONLD.getLang().getHeaderString());
                 return toJsonLD(api.getByType(req.queryParams("type"), req.queryParams().contains("catalog")));
             });
+            exception(TooManyTriplesException.class, exceptionHandler(SC_BAD_REQUEST, "Your query returned too many results"));
         });
     }
 

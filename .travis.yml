@@ -3,7 +3,7 @@ dist: xenial
 language: java
 
 jdk:
-- oraclejdk11
+- openjdk11
 
 env:
   global:
@@ -70,8 +70,6 @@ jobs:
       - .travis/build.sh projects/saturn
       - .travis/build.sh projects/mercury
       - .travis/build.sh projects/pluto
-      - .travis/build.sh projects/jupyterhub-hub
-      - travis_wait 60 .travis/build.sh projects/jupyterhub-singleuser
       - export SANITIZED_BRANCH=$(echo $TRAVIS_BRANCH | sed 's/\//_/g')
       - export SPOTBUGS_OUTPUTDIR="${SANITIZED_BRANCH}/${TRAVIS_BUILD_NUMBER}"
       - "if [ -f projects/pluto/app/build/reports/spotbugs/main.html ] ; then gsutil cp projects/pluto/app/build/reports/spotbugs/main.html gs://fairspace-spotbugs/${SPOTBUGS_OUTPUTDIR}/pluto-output.html ; fi"
@@ -101,7 +99,7 @@ jobs:
 notifications:
   slack:
     rooms:
-     - secure: "xujLTGH8Vsmm3HDs02/utkTjhV+X4PY0FLOPdDUg0A38RZRgtQ+TeKerZmVBivK958e1KzsL/wPhTdeOHm7DJnanvWs1Jkw3mgbrHcaiagGjBdaEW8F30f2nsIibGWGDqzUZd5ifXYSugLNpJSpdFkVOseuWhUyTwjwrb4Ec/U/D24YvZUwX/kfi/waly57iFkxIkhq2XwcvtJtEDAzsKPhfwL67giV0flbGvCRL4xkvHERSr/HsXJ+V2NCaJ/qiSm8NkWq5gsrIIRkAA3mBSDs5Uq1ozAEI/DxN752O/OReghvjd249AEhzqJ0Ezyu0BjX3kYR1bP3gKB2/wOrLv069tAchY+KQF2F6Jh3AzGAEh0x5ARMsOxDkJybz5nXwMoYwsUjN9zGo8j9egbzkkxoVTK+MOf34jaSn7UBwAT239MaXB4Er1srJEZRqIzXVH0qwc/lC1QYX0fA89a5GdFjyN7EhfdlsvIp93nn8sjgj9iYsqS3yQboGBOSou1sboR8U/RsjPQowOkqMv8XIcjTUodirKNiRSdo5Wf+nGl4fgc3AS7rJcRaPLpbAvJZtXJzi4tutbU293q2k+bfvXbNz8R4IG7R4+MGdMWeSWDd9A0UBHgQkpXkb8Oxzr7PDAyDvhVEI5KewVy1PnV7dMCeRzSASjXTfPNnYpgBMw3E="
+     - secure: "d7qU4xOhiwy19tI+BrE5PGZLKf8yVlv0QWkBiQ+M4g0UO8Ge4a+ZrYP33ZF0lgsfMM0jRaxnLjT9wge0om3uDTwnGKJejAi+AWCU83c3IwLsaIMFhk22vMFXB46U8tUxt4hKsvQFCURKSMTILPUGBqnn18Nf9Yy+4/o43aSwVbvR4sQ4RSdC/+hn/FSQSqY7RHutyhC7DiVDnwKCNYE1I7YU1vEnLawKKS97qJ6tXgE9GQJuupDUy4RC9U5bPIVK0fBbmWv37qWowZ8sNqY/QvzJ9xwXW6NS9eON91VqalNU+pvV0soExMTAnW5oj302WDlYM5mGKNLd3E/gq0jHxQvI4M/oNMZvqZmPI7pyEEjhazN3RdnUqj1fDpNSED4zsC38h0LDK7CEJcTDk4QEDWthlFxz4CaUsKblr5dZBxX6g2PkOhZk8k/PSLORNtcuDH/2X/IFv2Oegy5tOlcEOH/QY6HYW0ayJMV3WtLUN4MivdT00EQs10Fk1Zc6oSM1jpEcYq7lSj3PiXyXsM9Yong2Y1nORAe81CWosIUXit6SdVcWM0ztNEmGk8ViZZqntEsYg975Fr5XB8fnfhRRpbjME5M6UubriIsQbb1XvEtsCiWVP/P/HZV4cTjJHpLkp4Iv2ZPTEggzUUXDdQuo0kzuktqVnx2ulhKEMNueF7c="
     template:
      - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch}"
      - "Latest commit: %{commit_message} - by %{author}"

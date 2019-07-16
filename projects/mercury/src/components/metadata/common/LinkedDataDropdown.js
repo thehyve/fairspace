@@ -1,79 +1,89 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {PropTypes} from 'prop-types';
 
-import searchAPI from "../../../services/SearchAPI";
-import {linkLabel, propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
-import {LoadingInlay, MessageDisplay} from "../../common";
+import searchAPI, {SORT_ALPHABETICALLY} from "../../../services/SearchAPI";
+import {propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
+import Iri from "../../common/Iri";
+import LinkedDataContext from "../LinkedDataContext";
+import {LoadingInlay, MessageDisplay} from "../../common";
 
-class LinkedDataDropdown extends React.Component {
-    state = {
-        fetchedItems: null,
-        error: null
-    }
+export const LinkedDataDropdown = ({property, fetchItems, types, debounce, ...otherProps}) => {
+    let fetchRequest = null;
 
-    mounted = true;
-
-    componentDidMount() {
-        const {property, fetchItems, types} = this.props;
-        const typesToFetch = Array.isArray(types) && types.length > 0 ? types : [property.className];
-
-        fetchItems({types: typesToFetch, size: SEARCH_DROPDOWN_DEFAULT_SIZE})
-            .then(({items}) => {
-                if (this.mounted) {
-                    this.setState({fetchedItems: items});
-                }
-            })
-            .catch(e => {
-                if (this.mounted) {
-                    this.setState({error: e, fetchedItems: []});
-                }
-            });
-    }
-
-    componentWillUnmount() {
-        this.mounted = false;
-    }
-
-    render() {
-        const {property, ...otherProps} = this.props;
-        const {fetchedItems, error} = this.state;
-
-        if (error) {
-            return <MessageDisplay withIcon={false} message={error.message} />;
-        }
-
-        if (!fetchedItems) {
-            return <LoadingInlay />;
-        }
-
-        const options = fetchedItems
-            .map(metadataItem => {
+    const search = query => fetchItems({types, size: SEARCH_DROPDOWN_DEFAULT_SIZE, query})
+        .then(
+            ({items}) => items.map(metadataItem => {
                 const {id, label, name} = metadataItem;
-                const disabled = propertyContainsValueOrId(property, undefined, id);
-                const displayLabel = (label && label[0]) || (name && name[0]) || linkLabel(id, true);
+                const displayLabel = (label && label[0]) || (name && name[0]) || <Iri iri={id} />;
 
                 return {
-                    disabled,
                     label: displayLabel,
                     id,
                     otherEntry: metadataItem
                 };
-            });
+            })
+        );
 
-        return <Dropdown {...otherProps} options={options} />;
-    }
-}
+    const debouncedSearch = (query) => {
+        if (fetchRequest) {
+            clearTimeout(fetchRequest);
+        }
 
-LinkedDataDropdown.defaultProps = {
-    fetchItems: (types, size) => searchAPI().searchLinkedData(types, size)
+        return new Promise((resolve, reject) => {
+            if (fetchRequest) {
+                clearTimeout(fetchRequest);
+            }
+
+            fetchRequest = setTimeout(() => {
+                search(query)
+                    .then(resolve)
+                    .catch(reject);
+            }, debounce);
+        });
+    };
+
+    return (
+        <Dropdown
+            {...otherProps}
+            async
+            loadOptions={debouncedSearch}
+            isOptionDisabled={option => propertyContainsValueOrId(property, undefined, option.id)}
+        />
+    );
 };
 
 LinkedDataDropdown.propTypes = {
     fetchItems: PropTypes.func,
     property: PropTypes.object.isRequired,
-    types: PropTypes.arrayOf(PropTypes.string)
+    types: PropTypes.arrayOf(PropTypes.string).isRequired,
+    debounce: PropTypes.number
 };
 
-export default LinkedDataDropdown;
+LinkedDataDropdown.defaultProps = {
+    fetchItems: ({types, size, query}) => searchAPI().searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY}),
+    debounce: 300
+};
+
+export default props => {
+    const {getDescendants, shapesLoading, shapesError} = useContext(LinkedDataContext);
+
+    if (shapesError) {
+        return <MessageDisplay withIcon={false} message="Unable to fetch options" />;
+    }
+
+    if (shapesLoading) {
+        return <LoadingInlay />;
+    }
+
+    const {className} = props.property;
+    const types = [className, ...getDescendants(className)];
+
+    return (
+        <LinkedDataDropdown
+            types={types}
+            {...props}
+        />
+    );
+};

@@ -10,6 +10,7 @@
 @prefix osiris: <http://osiris.fairspace.io/ontology#> .
 @prefix icdo3: <http://icdo3.fairspace.io/ontology#> .
 @prefix fhir: <http://hl7.org/fhir/STU3/> .
+@prefix dash: <http://datashapes.org/dash#> .
 
 ########################
 ###   User Shapes    ###
@@ -33,7 +34,7 @@ fs:CollectionShape sh:property
     sh:name "Person" ;
     sh:targetClass foaf:Person ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <AdministrativeGenderShape>,
         <ageOfDeathShape>,
@@ -49,7 +50,7 @@ fs:CollectionShape sh:property
     sh:name "Person Consent" ;
     sh:targetClass <PersonConsent> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <isProjectConsentShape>,
         <authorizesShape>,
@@ -63,7 +64,7 @@ fs:CollectionShape sh:property
     sh:name "Research Project" ;
     sh:targetClass <ResearchProject> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <projectCodeShape>,
         <investigationNatureShape>,
@@ -79,7 +80,7 @@ fs:CollectionShape sh:property
     sh:name "Tumor Pathology Event" ;
     sh:targetClass osiris:TumorPathologyEvent ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <EventTypeShape>,
         <EventStartDateShape>,
@@ -97,7 +98,7 @@ fs:CollectionShape sh:property
     sh:name "Biological Sample" ;
     sh:targetClass osiris:BiologicalSample ; 
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <collectDateShape>,
         <tumorCellularityShape>,
@@ -113,7 +114,7 @@ fs:CollectionShape sh:property
     sh:name "Analysis" ;
     sh:targetClass <Analysis> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
+    
     sh:property
         <analysisCodeShape>,
         <analyticPipelineCodeShape>,
@@ -129,7 +130,6 @@ fs:CollectionShape sh:property
     sh:name "Master of widgets" ;
     sh:targetClass <WidgetMaster> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:showInCatalog true ;
     sh:property
         <relatesToWidgetShape>,
         <dateWidgetShape>,
@@ -232,7 +232,7 @@ fs:CollectionShape sh:property
     sh:description "Specific project code." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <projectCode> .
      
 <investigationNatureShape> a fs:ControlledVocabularyPropertyShape ;
@@ -250,7 +250,7 @@ fs:CollectionShape sh:property
     sh:name "Project Manager" ;
     sh:description "Project manager" ;
     sh:datatype xsd:string ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <projectManager> .
      
 <AdministrativeGenderShape> a fs:ControlledVocabularyPropertyShape ;
@@ -277,7 +277,7 @@ fs:CollectionShape sh:property
     sh:description "The identifier of the patient" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <patientIdentifier> .
      
 <EventTypeShape> a fs:ControlledVocabularyPropertyShape ;
@@ -331,7 +331,7 @@ fs:CollectionShape sh:property
     sh:description "The analysis run identifier" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <analysisCode> .
      
 <analyticPipelineCodeShape> a fs:DatatypePropertyShape ;
@@ -339,7 +339,7 @@ fs:CollectionShape sh:property
     sh:description "Identifier of the pipeline used into the analysis (unique in the center)" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     sh:path <analyticPipelineCode> .
      
 <numberOfBreakPointsShape> a fs:DatatypePropertyShape ;

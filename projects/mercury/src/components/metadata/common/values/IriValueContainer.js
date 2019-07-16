@@ -1,41 +1,53 @@
-import React from "react";
-import {connect} from "react-redux";
+import React, {useContext} from "react";
 import PropTypes from 'prop-types';
 import {Grid} from "@material-ui/core";
 import MaterialReactSelect from "../../../common/MaterialReactSelect";
 import BaseInputValue from "./BaseInputValue";
-import {getVocabulary} from "../../../../reducers/cache/vocabularyReducers";
+import LinkedDataContext from "../../LinkedDataContext";
 
-const noNamespace = {
+export const noNamespace = {
     id: '',
     label: '(no namespace)',
     value: ''
 };
 
-export const IriValue = props => {
+export const IriValue = ({
+    namespace,
+    namespaces = [],
+    localPart = '',
+    onNamespaceChange = () => {},
+    onLocalPartChange = () => {}
+}) => {
     const namespaceOptions = [
         noNamespace,
-        ...props.namespaces.map(namespace => ({
-            id: namespace.id,
-            label: namespace.label,
-            value: namespace.namespace
+        ...namespaces.map(n => ({
+            id: n.id,
+            label: n.label,
+            value: n.namespace,
+            isDefault: n.isDefault
         }))
     ];
+
+    const defaultNamespace = namespaceOptions.find(n => n.isDefault) || noNamespace;
+
+    if (!namespace) {
+        onNamespaceChange(defaultNamespace);
+    }
 
     return (
         <Grid container justify="space-between" spacing={8}>
             <Grid item xs={4}>
                 <MaterialReactSelect
                     options={namespaceOptions}
-                    value={props.namespace || noNamespace}
-                    onChange={props.onNamespaceChange}
+                    value={namespace || defaultNamespace}
+                    onChange={onNamespaceChange}
                 />
             </Grid>
             <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
                 <BaseInputValue
                     property={{}}
-                    entry={{value: props.localPart}}
-                    onChange={e => props.onLocalPartChange(e.value)}
+                    entry={{value: localPart}}
+                    onChange={e => onLocalPartChange(e.value)}
                     type="url"
                 />
             </Grid>
@@ -57,12 +69,7 @@ IriValue.propTypes = {
     )
 };
 
-IriValue.defaultProps = {
-    namespaces: []
+export default props => {
+    const {namespaces} = useContext(LinkedDataContext);
+    return <IriValue namespaces={namespaces} {...props} />;
 };
-
-const mapStateToProps = state => ({
-    namespaces: getVocabulary(state).getNamespaces()
-});
-
-export default connect(mapStateToProps)(IriValue);

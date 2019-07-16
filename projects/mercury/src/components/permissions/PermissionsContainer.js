@@ -1,29 +1,35 @@
-import {connect} from 'react-redux';
+import React, {useContext, useState} from "react";
+
 import PermissionsViewer from "./PermissionsViewer";
-import {alterPermission as alterPermissionActions, fetchPermissionsIfNeeded} from "../../actions/permissionsActions";
+import PermissionContext from "./PermissionContext";
+import PermissionAPI from "../../services/PermissionAPI";
+import UserContext from '../../UserContext';
+import UsersContext from './UsersContext';
 
-const mapStateToProps = (state, ownProps) => {
-    const {
-        account: {user},
-        cache: {users, permissionsByIri},
-        ui: {pending: {alterPermission}}
-    } = state;
+export default (props) => {
+    const {permissions, loading: permissionsLoading, error: permissionsError, refresh} = useContext(PermissionContext);
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
+    const {usersLoading, usersError} = useContext(UsersContext);
+    const [altering, setAltering] = useState(false);
 
-    const collectionPermission = permissionsByIri[ownProps.iri] || {pending: true};
-
-    return {
-        loading: user.pending || users.pending || collectionPermission.pending,
-        altering: alterPermission,
-        error: user.error || users.error || collectionPermission.error,
-        currentUser: user.data,
-        permissions: collectionPermission.data,
-        users: users.data
+    const alterPermission = (userIri, resourceIri, access) => {
+        setAltering(true);
+        return PermissionAPI
+            .alterPermission(userIri, resourceIri, access)
+            .then(refresh)
+            .catch(e => {console.error("Error altering permission", e);})
+            .finally(() => setAltering(false));
     };
-};
 
-const mapDispatchToProps = {
-    alterPermission: alterPermissionActions,
-    fetchPermissionsIfNeeded
+    return (
+        <PermissionsViewer
+            loading={permissionsLoading || currentUserLoading || usersLoading}
+            error={permissionsError || currentUserError || usersError}
+            altering={altering}
+            permissions={permissions}
+            alterPermission={alterPermission}
+            currentUser={currentUser}
+            {...props}
+        />
+    );
 };
-
-export default connect(mapStateToProps, mapDispatchToProps)(PermissionsViewer);

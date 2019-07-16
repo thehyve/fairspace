@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -37,6 +37,11 @@ const styles = theme => ({
     },
     singleValue: {
         fontSize: 16,
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        maxWidth: 'calc(100% - 40px)',
+        position: 'absolute'
     },
     placeholder: {
         position: 'absolute',
@@ -49,6 +54,7 @@ const styles = theme => ({
         marginTop: theme.spacing.unit,
         left: 0,
         right: 0,
+        minWidth: 300
     },
     divider: {
         height: theme.spacing.unit * 2,
@@ -89,31 +95,17 @@ function Control(props) {
     );
 }
 
-function blockEvent(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    if ((event.target.tagName !== 'A') || !('href' in event.target)) {
-        return;
-    }
-    if (event.target.target) {
-        window.open(event.target.href, event.target.target);
-    } else {
-        window.location.href = event.target.href;
-    }
-}
-
 function Option(props) {
     return (
         <MenuItem
             buttonRef={props.innerRef}
             selected={props.isFocused}
             component="div"
+            disabled={props.isDisabled}
             style={{
                 fontWeight: props.isSelected ? 500 : 400,
             }}
             {...props.innerProps}
-            disabled={!!props.data.disabled}
-            onClick={props.data.disabled ? blockEvent : props.innerProps.onClick}
         >
             {props.children}
         </MenuItem>
@@ -162,17 +154,9 @@ function MultiValue(props) {
     );
 }
 
-function Menu(props) {
-    return (
-        <Paper className={props.selectProps.classes.paper} {...props.innerProps}>
-            {props.children}
-        </Paper>
-    );
-}
 
 const components = {
     Control,
-    Menu,
     MultiValue,
     NoOptionsMessage,
     Option,
@@ -189,37 +173,55 @@ const materialReactSelect = (props) => {
             ...base,
             color: theme.palette.text.primary,
         }),
+        menu: base => ({
+            ...base,
+            minWidth: '100%',
+            width: 'auto',
+        })
     };
 
+    const SelectComponent = props.async ? AsyncSelect : Select;
+
     return (
-        <Select
+        <SelectComponent
             classes={classes}
             styles={selectStyles}
-            options={props.options}
             components={components}
-            value={props.value}
-            onChange={props.onChange}
-            noOptionsMessage={props.noOptionsMessage}
-            placeholder={props.placeholder}
+            menuPlacement="auto"
+
             textFieldProps={{
                 label: props.label,
                 InputLabelProps: {
                     shrink: true,
-                },
+                }
             }}
+
+            options={props.options}
+            value={props.value}
+            onChange={props.onChange}
+            noOptionsMessage={props.noOptionsMessage}
+            placeholder={props.placeholder}
+
+            loadOptions={props.loadOptions}
+            isOptionDisabled={props.isOptionDisabled}
+            defaultOptions={!props.options}
         />
     );
 };
 
-const selectType = {disabled: PropTypes.bool, lavel: PropTypes.string, value: PropTypes.string};
+const selectType = {disabled: PropTypes.bool, label: PropTypes.string, value: PropTypes.string};
 
 materialReactSelect.propTypes = {
-    options: PropTypes.arrayOf(PropTypes.shape(selectType)).isRequired,
+    options: PropTypes.arrayOf(PropTypes.shape(selectType)),
     value: PropTypes.shape(selectType),
     placeholder: PropTypes.string,
     classes: PropTypes.shape(),
     onChange: PropTypes.func.isRequired,
     label: PropTypes.string,
+
+    async: PropTypes.bool,
+    loadOptions: PropTypes.func,
+    isOptionDisabled: PropTypes.func
 };
 
 materialReactSelect.defaultProps = {
@@ -227,6 +229,8 @@ materialReactSelect.defaultProps = {
     label: '',
     value: null,
     classes: null,
+    async: false,
+    isOptionDisabled: option => option.disabled
 };
 
 export default withStyles(styles, {withTheme: true})(materialReactSelect);

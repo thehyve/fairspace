@@ -21,13 +21,17 @@ public class FS {
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 
-    public static final String CREATED_BY_URI = NS + "createdBy";
+    public static final String OWNED_BY_LOCAL_PART = "ownedBy";
+
+    public static final String CREATED_BY_LOCAL_PART = "createdBy";
+    public static final String CREATED_BY_URI = NS + CREATED_BY_LOCAL_PART;
     public static final Property createdBy = createProperty(CREATED_BY_URI);
 
     public static final String DATE_CREATED_URI = NS + "dateCreated";
     public static final Property dateCreated = createProperty(DATE_CREATED_URI);
 
-    public static final String MODIFIED_BY_URI = NS + "modifiedBy";
+    public static final String MODIFIED_BY_LOCAL_PART = "modifiedBy";
+    public static final String MODIFIED_BY_URI = NS + MODIFIED_BY_LOCAL_PART;
     public static final Property modifiedBy = createProperty(MODIFIED_BY_URI);
 
     public static final String DATE_MODIFIED_URI = NS + "dateModified";
@@ -51,8 +55,8 @@ public class FS {
     public static final String MD5_URI = NS + "md5";
     public static final Property md5 = createProperty(MD5_URI);
 
-    public static final String COLLECTION_TYPE_URI = NS + "collectionType";
-    public static final Property collectionType = createProperty(COLLECTION_TYPE_URI);
+    public static final String CONNECTION_STRING_URI = NS + "connectionString";
+    public static final Property connectionString = createProperty(CONNECTION_STRING_URI);
 
     public static final String MACHINE_ONLY_URI = NS + "machineOnly";
     public static final Property machineOnly = createProperty(MACHINE_ONLY_URI);
@@ -90,10 +94,13 @@ public class FS {
     public static final String INVERSE_RELATION_URI = NS + "inverseRelation";
     public static final Property inverseRelation = createProperty(INVERSE_RELATION_URI);
 
-    public static final String SHOW_IN_CATALOG_URI = NS + "showInCatalog";
-    public static final Property showInCatalog = createProperty(SHOW_IN_CATALOG_URI);
-
     public static final String IMPORTANT_PROPERTY_URI = NS + "importantProperty";
     public static final Property importantProperty = createProperty(IMPORTANT_PROPERTY_URI);
+
+    public static final String ERROR_URI = NS + "error";
+    public static final String ERROR_STATUS_URI = NS + "errorStatus";
+    public static final String ERROR_MESSAGE_URI = NS + "errorMessage";
+    public static final String ERROR_DETAILS_URI = NS + "errorDetails";
+
 }
 

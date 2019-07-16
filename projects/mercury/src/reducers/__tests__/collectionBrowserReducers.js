@@ -84,7 +84,7 @@ describe('Collection browser reducers', () => {
         });
     });
 
-    it('should deselects a path correctly after deleting a file', () => {
+    it('should deselect all paths after deleting multiple files', () => {
         const state = {
             addingCollection: false,
             deletingCollection: false,
@@ -94,18 +94,19 @@ describe('Collection browser reducers', () => {
 
         expect(
             reducer(state, {
-                type: actionTypes.DELETE_FILE_FULFILLED,
+                type: actionTypes.DELETE_FILES_FULFILLED,
                 meta: {
-                    path: '/some_collection/dir1'
+                    paths: ['/some_collection/dir1']
                 }
             })
         ).toEqual({
             addingCollection: false,
             deletingCollection: false,
             selectedCollectionLocation: null,
-            selectedPaths: ['/some_collection/dir2', '/some_collection/dir3', '/some_collection/dir4']
+            selectedPaths: []
         });
     });
+
 
     it('should deselects a collection on after successful deletion', () => {
         const state = {

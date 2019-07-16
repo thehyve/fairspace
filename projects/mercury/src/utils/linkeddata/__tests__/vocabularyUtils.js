@@ -148,7 +148,24 @@ describe('vocabularyUtils', () => {
             expect(isRelationShape({})).toBe(false);
         });
     });
-    
+
+    describe('getClassesInCatalog', () => {
+        const shapesIdsInCatalog = vocabulary.getClassesInCatalog().map(c => c['@id']);
+
+        it('should return classes without machineOnly predicate', () => {
+            expect(shapesIdsInCatalog).toEqual(expect.arrayContaining(['http://fairspace.io/ontology#UserShape']));
+        });
+
+        it('should not return properties', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#commentShape']));
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.schema.org/creatorShape']));
+        });
+
+        it('should not return classes with machineOnly predicate', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#CollectionShape']));
+        });
+    });
+
     describe('Class hierarchy (subclasses and descendants)', () => {
         const type = 'http://www.w3.org/ns/shacl#PropertyShape';
         const subClasses = ["http://fairspace.io/ontology#ControlledVocabularyPropertyShape", "http://fairspace.io/ontology#DatatypePropertyShape"];
@@ -170,6 +187,45 @@ describe('vocabularyUtils', () => {
                 expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subcSubClasess]));
                 expect(classHierarchy).not.toEqual(expect.arrayContaining(["http://fairspace.io/ontology#File"]));
             });
+        });
+    });
+
+    describe('generatePropertyEntry', () => {
+        it('should mark non-single-line properties as multiline', () => {
+            const stringProperty = vocabulary.generatePropertyEntry('', {
+                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+                [constants.DASH_SINGLE_LINE]: [{'@value': false}]
+            });
+            expect(stringProperty.multiLine).toBe(true);
+        });
+        it('should mark single-line properties as not multiline', () => {
+            const stringProperty = vocabulary.generatePropertyEntry('', {
+                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+                [constants.DASH_SINGLE_LINE]: [{'@value': true}]
+            });
+            expect(stringProperty.multiLine).toBe(false);
+        });
+    });
+
+    describe('getNamespaces', () => {
+        it('should return a full list of namespaces', () => {
+            const namespaces = vocabulary.getNamespaces();
+
+            expect(namespaces.length).toEqual(2);
+            expect(namespaces[0]).toEqual({
+                id: "http://fairspace.io/ontology#Namespace1",
+                label: "Namespace1",
+                prefix: "ns1",
+                namespace: "http://namespace1#",
+                isDefault: true
+            });
+            expect(namespaces[1].isDefault).toBe(false);
+        });
+        it('should apply a filter to the namespaces if given', () => {
+            const namespaces = vocabulary.getNamespaces(n => n[constants.SHACL_NAME][0]["@value"] === "Namespace2");
+
+            expect(namespaces.length).toEqual(1);
+            expect(namespaces[0].label).toEqual("Namespace2");
         });
     });
 });

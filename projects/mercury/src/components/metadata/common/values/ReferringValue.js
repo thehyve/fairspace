@@ -1,26 +1,20 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import Switch from "@material-ui/core/Switch";
 import DateTime from "../../../common/DateTime";
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI} from "../../../../constants";
+import Iri from "../../../common/Iri";
+import LinkedDataContext from "../../LinkedDataContext";
 
-function linkLabel(link) {
-    return link
-        && (link.toString().includes('#')
-            ? link.substring(link.lastIndexOf('#') + 1)
-            : link.substring(link.lastIndexOf('/') + 1));
-}
-
-const ReferringValue = ({property, entry, editorPath}) => {
-
+export const ReferringValue = ({property, entry, editorPath}) => {
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
                 return <DateTime value={value.value} absolute />;
             case BOOLEAN_URI:
-                return <Switch checked={value.value} readOnly/>;
+                return <Switch checked={value.value} readOnly />;
             default:
-                return value.label || value.value || linkLabel(value.id) || '';
+                return value.label || value.value || <Iri iri={value.id} />;
         }
     }
 
@@ -30,7 +24,7 @@ const ReferringValue = ({property, entry, editorPath}) => {
         // External links should be represented by a direct link to the URI itself
         // Other iri entities should be opened in the metadata/vocabulary editor
         return property.isExternalLink
-            ? <a href={entry.id}>{displayValue}</a>
+            ? <a href={entry.id}>{entry.id}</a>
             : (
                 <LinkedDataLink editorPath={editorPath} uri={entry.id}>
                     {displayValue}
@@ -41,4 +35,10 @@ const ReferringValue = ({property, entry, editorPath}) => {
     return displayValue;
 };
 
-export default ReferringValue;
+const ContextualReferringValue = props => {
+    const {editorPath} = useContext(LinkedDataContext);
+
+    return <ReferringValue {...props} editorPath={editorPath} />;
+};
+
+export default ContextualReferringValue;

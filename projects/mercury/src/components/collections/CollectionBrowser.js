@@ -1,22 +1,18 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
-import {connect} from 'react-redux';
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
 
 import {
-    ErrorDialog, MessageDisplay,
-    CollectionEditor,
+    ErrorDialog, MessageDisplay, CollectionEditor,
     LoadingInlay, LoadingOverlay
 } from "../common";
 import CollectionList from "./CollectionList";
-import * as collectionBrowserActions from "../../actions/collectionBrowserActions";
-import * as collectionActions from "../../actions/collectionActions";
 import {findById} from "../../utils/genericUtils";
 import {getCollectionAbsolutePath} from '../../utils/collectionUtils';
 import Config from "../../services/Config/Config";
+import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
 
-class CollectionBrowser extends React.Component {
+export class CollectionBrowser extends React.Component {
     state = {
         addingNewCollection: false
     };
@@ -40,8 +36,8 @@ class CollectionBrowser extends React.Component {
         this.props.history.push(getCollectionAbsolutePath(collection.location));
     }
 
-    handleAddCollection = (name, description, location, type) => {
-        this.props.addCollection(name, description, type, location)
+    handleAddCollection = (name, description, location, connectionString) => {
+        this.props.addCollection(name, description, connectionString, location)
             .then(this.props.fetchCollectionsIfNeeded)
             .then(() => this.setState({addingNewCollection: false}))
             .catch(err => {
@@ -55,10 +51,10 @@ class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {users, collections, addingCollection, deletingCollection} = this.props;
+        const {collections, addingCollection, deletingCollection, users} = this.props;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, col.createdBy);
+            col.creatorObj = findById(users, getLocalPart(col.createdBy));
         });
 
         return (
@@ -83,15 +79,15 @@ class CollectionBrowser extends React.Component {
     }
 
     render() {
-        const {loading, error} = this.props;
+        const {loading, error, currentUserError, currentUserLoading, usersLoading, usersError} = this.props;
 
-        if (error) {
+        if (error || usersError || currentUserError) {
             return <MessageDisplay message="An error occurred while loading collections" />;
         }
 
         return (
             <>
-                {loading ? <LoadingInlay /> : this.renderCollectionList()}
+                {loading || usersLoading || currentUserLoading ? <LoadingInlay /> : this.renderCollectionList()}
                 <Button
                     variant="text"
                     aria-label="Add"
@@ -105,20 +101,9 @@ class CollectionBrowser extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    user: state.account.user.data,
-    loading: state.cache.collections.pending || state.account.user.pending || state.cache.users.pending,
-    error: state.cache.collections.error || state.account.user.error || state.cache.users.error,
-    collections: state.cache.collections.data,
-    users: state.cache.users.data,
-    selectedCollectionLocation: state.collectionBrowser.selectedCollectionLocation,
-    addingCollection: state.collectionBrowser.addingCollection,
-    deletingCollection: state.collectionBrowser.deletingCollection
-});
-
-const mapDispatchToProps = {
-    ...collectionActions,
-    ...collectionBrowserActions
+CollectionBrowser.defaultProps = {
+    fetchCollectionsIfNeeded: () => {},
+    collections: []
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CollectionBrowser));
+export default CollectionBrowser;

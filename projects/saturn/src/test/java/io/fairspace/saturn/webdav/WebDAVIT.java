@@ -10,13 +10,15 @@ import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,12 +28,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WebDAVIT {
@@ -63,18 +67,24 @@ public class WebDAVIT {
     @Before
     public void before() {
         var rdf = connect(createTxnMem());
-        var eventBus = new EventBus();
-        when(userService.getCurrentUser()).thenAnswer(invocation -> new User() {{ setIri(currentUser); }});
 
-        permissions = new PermissionsServiceImpl(rdf, userService, mailService);
+        rdf.load(
+                createDefaultModel()
+                    .add(createResource(defaultUser.getURI()), RDFS.label, "current-user")
+                    .add(createResource(anotherUser.getURI()), RDFS.label, "another-user")
+        );
+
+        var eventBus = new EventBus();
+
+        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, userService, mailService);
         collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
         var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
-        fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus, permissions);
-        milton = new MiltonWebDAVServlet("/webdav/", fs);
+        fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
+        milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)));
         var coll = new Collection();
         coll.setName("My Collection");
         coll.setLocation("coll1");
-        coll.setType("LOCAL");
+        coll.setConnectionString("");
         collections.create(coll);
         collectionIRI = coll.getIri();
 
@@ -343,6 +353,7 @@ public class WebDAVIT {
 
     @Test
     public void testWritingWithoutPermissions() throws ServletException, IOException {
+        permissions.setPermission(collectionIRI, anotherUser, Access.Read);
         req.setMethod("PUT");
         req.setRequestURL("http://localhost/webdav/coll1/file.ext");
 
@@ -426,7 +437,7 @@ public class WebDAVIT {
         var newCollection = new Collection();
         newCollection.setName("Collection 2");
         newCollection.setLocation("coll2");
-        newCollection.setType("LOCAL");
+        newCollection.setConnectionString("");
         collections.create(newCollection);
         var newCollectionIRI = newCollection.getIri();
 

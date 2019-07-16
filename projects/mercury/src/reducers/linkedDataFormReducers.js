@@ -127,6 +127,8 @@ export const getLinkedDataFormUpdates = (state, formKey) => (state.linkedDataFor
 
 export const hasLinkedDataFormUpdates = (state, formKey) => !!(Object.keys(getLinkedDataFormUpdates(state, formKey)).length > 0);
 
+export const isLinkedDataFormPending = (state, formKey) => state.linkedDataForm[formKey] && state.linkedDataForm[formKey].pending;
+
 export const getLinkedDataFormValidations = (state, formKey) => (state.linkedDataForm[formKey] && state.linkedDataForm[formKey].validations) || {};
 
 export const hasLinkedDataFormValidationErrors = (state, formKey) => !!Object.values(getLinkedDataFormValidations(state, formKey)).find(v => v.length > 0);

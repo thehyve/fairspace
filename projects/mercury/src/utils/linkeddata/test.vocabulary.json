@@ -44,6 +44,11 @@
         "@id": "http://fairspace.io/ontology#listShape"
       }
     ],
+    "http://fairspace.io/ontology#machineOnly": [
+      {
+        "@value": true
+      }
+    ],
     "http://www.w3.org/ns/shacl#targetClass": [
       {
         "@id": "http://fairspace.io/ontology#Collection"
@@ -301,5 +306,24 @@
         "@id": "http://fairspace.io/ontology#DatatypePropertyShape"
       }
     ]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#Namespace1",
+    "@type": [
+      "http://www.w3.org/ns/shacl#PrefixDeclaration"
+    ],
+    "http://www.w3.org/ns/shacl#name": [{"@value":  "Namespace1"}],
+    "http://www.w3.org/ns/shacl#prefix":  [{"@value":  "ns1"}],
+    "http://www.w3.org/ns/shacl#namespace":  [{"@id":  "http://namespace1#"}],
+    "http://fairspace.io/ontology#defaultNamespace": [{"@value":  true}]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#Namespace2",
+    "@type": [
+      "http://www.w3.org/ns/shacl#PrefixDeclaration"
+    ],
+    "http://www.w3.org/ns/shacl#name": [{"@value":  "Namespace2"}],
+    "http://www.w3.org/ns/shacl#prefix":  [{"@value":  "ns2"}],
+    "http://www.w3.org/ns/shacl#namespace":  [{"@id":  "http://namespace2#"}]
   }
 ]

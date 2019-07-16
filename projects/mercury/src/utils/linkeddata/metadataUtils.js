@@ -2,6 +2,7 @@ import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {isNonEmptyValue} from '../genericUtils';
 
 /**
  * Returns the local part of the given uri
@@ -23,17 +24,20 @@ export const getLocalPart = uri => (
  * @returns {*}
  */
 export function linkLabel(uri, shortenExternalUris = false) {
-    const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
-    const url = new URL(uri);
+    try {
+        const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
+        const url = new URL(uri);
 
-    // Local uris are treated separately, as we know its
-    // structure
-    if (url.hostname === window.location.hostname) {
-        const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
-        if (foundInfix) {
-            return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+        // Local uris are treated separately, as we know its
+        // structure
+        if (url.hostname === window.location.hostname) {
+            const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
+            if (foundInfix) {
+                return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+            }
         }
-    }
+        // eslint-disable-next-line no-empty
+    } catch (e) {}
 
     return shortenExternalUris ? getLocalPart(uri) : uri;
 }
@@ -198,6 +202,22 @@ export const url2iri = (iri) => {
 };
 
 /**
+ * Generates a namespaced iri, if the given iri is part of any of the namespaces
+ * @param iri
+ * @param namespaces
+ * @returns {string|*}
+ */
+export const getNamespacedIri = (iri, namespaces) => {
+    if (!iri) return '';
+
+    if (!namespaces) return iri;
+
+    const namespace = namespaces.find(n => iri.startsWith(n.namespace));
+
+    return namespace ? iri.replace(namespace.namespace, namespace.prefix + ':') : iri;
+};
+
+/**
  * Groups the validation errors of the same subject into a single array and the other array is the other errors
  * @returns {Object}
  */
@@ -205,12 +225,6 @@ export const partitionErrors = (errors, subject) => {
     const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
     return {entityErrors, otherErrors};
 };
-
-/**
- * Returns true if the given value is truthy or zero or false
- * @param value
- */
-export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
 
 /**
  * Returns true if the either given value or id (or both) are part of the property values.

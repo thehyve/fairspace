@@ -13,10 +13,6 @@ server:
       enabled: false
   max-http-header-size: 65535
 
-frontend:
-  urls: {}
-  roles: {}
-
 spring:
   application:
     name: Pluto
@@ -38,7 +34,11 @@ security:
     scope: openid
     required-authority: user-workspace
 
-  # Specify urls for security configuration. There are
+  # Specify urls for security configuration.
+  # URLs with permitAll do not require any authentication
+  # URLs with needAuthentication are allowed to be accessed by any user. They are needed
+  #      to show an error message if the user is not allowed to access the workspace
+  # URLs with needAuthorization need an authorized user.
   urls:
     permitAll:
     - /actuator/health
@@ -49,11 +49,19 @@ security:
     - /authorize
     - /api/${app.apiVersion.pluto}/account/tokens
     needsAuthentication:
-    - /api/${app.apiVersion.pluto}/account/name
-    - /*
+    - /
+    - /static/*
+    - /config/*
+    - /metadata/*
+    - /iri/*
+    - /collections/*
+    - /vocabulary/*
+    - /notebooks/*
+    - "*.js"
+    - /api/${app.apiVersion.pluto}/account/*
+    - /api/${app.apiVersion.pluto}/workspace/*
     needsAuthorization:
-    - /api/${app.apiVersion.pluto}/account/authorizations
-    - /api/*
+    - /*
 
 workspace:
   name: Workspace

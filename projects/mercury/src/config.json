@@ -6,6 +6,7 @@
     "collections": "/api/v1/collections/",
     "permissions": "/api/v1/permissions/",
     "files": "/webdav/v1",
+    "download": "/webdav/v1",
     "metadata": {
       "statements": "/api/v1/metadata/",
       "entities": "/api/v1/metadata/entities/"
@@ -25,12 +26,12 @@
     "log": "error"
   },
   "externalConfigurationFiles": [
-    "/api/v1/workspace/config"
+    "/config/config.json"
   ],
   "roles": {
+    "user": "",
     "dataSteward": "",
     "coordinator": ""
   },
   "enableExperimentalFeatures": false
-
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
+import {IconButton} from "@material-ui/core";
+
 import {FileOperations} from "../FileOperations";
 
 describe('FileOperations', () => {
@@ -40,23 +42,39 @@ describe('FileOperations', () => {
                 expect(fetchFilesIfNeeded.mock.calls[0][0]).toEqual('opened/Path');
             });
     });
-});
 
-describe('handleCreateDirectory', () => {
-    it('should return false for 405 error', () => {
-        const createDirectory = jest.fn(() => Promise.reject(new Error({response: {status: 405}})));
-        const instance = shallow(
-            <FileOperations
-                selectedPaths={[]}
-                createDirectory={createDirectory}
-                classes={{}}
-                getDownloadLink={() => {}}
-            />
-        ).instance();
+    it('should disable all buttons on file operation', () => {
+        const wrapper = shallow(<FileOperations
+            classes={{}}
+            paste={() => Promise.resolve()}
+            fetchFilesIfNeeded={() => {}}
+            getDownloadLink={() => {}}
+        />);
 
-        instance.handleCreateDirectory()
-            .then(result => {
-                expect(result).toEqual(false);
+        wrapper.instance().handlePaste({stopPropagation: () => {}});
+
+        wrapper.find(IconButton)
+            .forEach(b => {
+                expect(b.props().disabled).toBe(true);
+            });
+    });
+
+    it('should enable all buttons after successful file operation', () => {
+        const wrapper = shallow(<FileOperations
+            classes={{}}
+            paste={() => Promise.resolve()}
+            fetchFilesIfNeeded={() => {}}
+            getDownloadLink={() => {}}
+        />);
+
+        return wrapper.instance().handlePaste({stopPropagation: () => {}})
+            .then(() => {
+                wrapper.find(IconButton)
+                    .not('[download]')
+                    .forEach(b => {
+                        expect(b.props().disabled).toBe(false);
+                    });
             });
     });
 });
+

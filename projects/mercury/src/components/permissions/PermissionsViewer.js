@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     List, ListItem, ListItemSecondaryAction,
     ListItemText, IconButton, Menu, Button
@@ -14,91 +14,59 @@ import AlterPermissionContainer from "./AlterPermissionContainer";
 import getDisplayName from "../../utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../../utils/permissionUtils';
 
-class PermissionsViewer extends React.Component {
-    state = {
-        showPermissionDialog: false,
-        showConfirmDeleteDialog: false,
-        selectedPermission: null
+const PermissionsViewer = ({
+    permissions, error, loading, altering, iri,
+    alterPermission, canManage, currentUser
+}) => {
+    const [showPermissionDialog, setShowPermissionDialog] = useState(false);
+    const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
+    const [selectedPermission, setSelectedPermission] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleAlterPermission = ({user, access}) => {
+        setShowPermissionDialog(true);
+        setSelectedPermission({user, access});
+        setAnchorEl(null);
     };
 
-    componentDidMount() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
-    componentDidUpdate() {
-        const {iri, fetchPermissionsIfNeeded} = this.props;
-
-        if (iri) {
-            fetchPermissionsIfNeeded(iri);
-        }
-    }
-
-    handleAlterPermission = ({user, access}) => {
-        this.setState({
-            showPermissionDialog: true,
-            selectedPermission: {user, access},
-            anchorEl: null
-        });
+    const handleShareWithDialogClose = () => {
+        setShowPermissionDialog(false);
+        setSelectedPermission(null);
     };
 
-    handleShareWithDialogClose = () => {
-        this.setState({
-            showPermissionDialog: false,
-            selectedPermission: null,
-        });
+    const handleRemoveCollaborator = ({user, access}) => {
+        setShowConfirmDeleteDialog(true);
+        setSelectedPermission({user, access});
+        setAnchorEl(null);
     };
 
-    handleRemoveCollaborator = ({user, access}) => {
-        this.setState({
-            selectedPermission: {user, access},
-            showConfirmDeleteDialog: true,
-            anchorEl: null
-        });
+    const handleCloseConfirmDeleteDialog = () => {
+        setShowConfirmDeleteDialog(false);
     };
 
-    handleDeleteCollaborator = () => {
-        const {iri, alterPermission} = this.props;
-        const {selectedPermission} = this.state;
-
+    const handleDeleteCollaborator = () => {
         if (selectedPermission) {
             alterPermission(selectedPermission.user, iri, 'None');
-            this.handleCloseConfirmDeleteDialog();
+            handleCloseConfirmDeleteDialog();
         }
     };
 
-    handleCloseConfirmDeleteDialog = () => {
-        this.setState({showConfirmDeleteDialog: false});
+    const handleMenuClick = (event, permission) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedPermission(permission);
     };
 
-    handleMenuClick = (event, permission) => {
-        this.setState({
-            anchorEl: event.currentTarget,
-            selectedPermission: permission
-        });
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedPermission(null);
     };
 
-    handleMenuClose = () => {
-        this.setState({
-            anchorEl: null,
-            selectedPermission: null
-        });
-    };
-
-    renderCollaboratorList(permissions) {
-        const {users, canManage, currentUser} = this.props;
-        const {anchorEl, selectedPermission} = this.state;
-
+    const renderCollaboratorList = () => {
         const selectedPermissionKey = selectedPermission
             ? selectedPermission.access + selectedPermission.user
             : null;
 
-        const permissionsWithUserNames = permissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
-
-        return sortPermissions(permissionsWithUserNames)
+        return sortPermissions(permissions)
             .map((permission) => {
                 const key = permission.access + permission.user;
                 return (
@@ -108,7 +76,7 @@ class PermissionsViewer extends React.Component {
                         <ListItemText primary={permission.userName} secondary={permission.access} />
                         <ListItemSecondaryAction>
                             <IconButton
-                                onClick={e => this.handleMenuClick(e, permission)}
+                                onClick={e => handleMenuClick(e, permission)}
                                 disabled={!canAlterPermission(canManage, permission, currentUser)}
                             >
                                 <MoreIcon />
@@ -117,15 +85,15 @@ class PermissionsViewer extends React.Component {
                                 id="more-menu"
                                 anchorEl={anchorEl}
                                 open={Boolean(anchorEl) && key === selectedPermissionKey}
-                                onClose={this.handleMenuClose}
+                                onClose={handleMenuClose}
                             >
                                 <MenuItem
-                                    onClick={() => this.handleAlterPermission(permission)}
+                                    onClick={() => handleAlterPermission(permission)}
                                 >
                                     Change access
                                 </MenuItem>
                                 <MenuItem
-                                    onClick={() => this.handleRemoveCollaborator(permission)}
+                                    onClick={() => handleRemoveCollaborator(permission)}
                                 >
                                     Delete
                                 </MenuItem>
@@ -134,49 +102,38 @@ class PermissionsViewer extends React.Component {
                     </ListItem>
                 );
             });
-    }
-
-    renderUserList = (permissions) => {
-        const {canManage} = this.props;
-
-        const addButton = canManage ? (
-            <Button
-                variant="text"
-                title="Add a collaborator"
-                aria-label="Add"
-                onClick={() => this.handleAlterPermission({})}
-                disabled={!canManage}
-            >
-                Add
-            </Button>
-        ) : null;
-
-        return (
-            <List dense disablePadding>
-                {this.renderCollaboratorList(permissions)}
-                {addButton}
-            </List>
-        );
     };
 
-    renderPermissionDialog = () => {
-        const {iri, currentUser} = this.props;
-        const {selectedPermission, showPermissionDialog} = this.state;
+    const renderUserList = () => (
+        <List dense disablePadding>
+            {renderCollaboratorList(permissions)}
+            {canManage && (
+                <Button
+                    variant="text"
+                    title="Add a collaborator"
+                    aria-label="Add"
+                    onClick={() => handleAlterPermission({})}
+                    disabled={!canManage}
+                >
+                    Add
+                </Button>
+            )}
+        </List>
+    );
 
-        return (
-            <AlterPermissionContainer
-                open={showPermissionDialog}
-                onClose={this.handleShareWithDialogClose}
-                user={selectedPermission && selectedPermission.user}
-                access={selectedPermission && selectedPermission.access}
-                iri={iri}
-                currentUser={currentUser}
-            />
-        );
-    };
+    const renderPermissionDialog = () => (
+        <AlterPermissionContainer
+            open={showPermissionDialog}
+            alterPermission={alterPermission}
+            onClose={handleShareWithDialogClose}
+            user={selectedPermission && selectedPermission.user}
+            access={selectedPermission && selectedPermission.access}
+            iri={iri}
+            currentUser={currentUser}
+        />
+    );
 
-    renderConfirmationDialog = () => {
-        const {selectedPermission, showConfirmDeleteDialog} = this.state;
+    const renderConfirmationDialog = () => {
         const fullName = selectedPermission && getDisplayName(selectedPermission.user);
         const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
 
@@ -185,34 +142,34 @@ class PermissionsViewer extends React.Component {
                 open={showConfirmDeleteDialog}
                 title="Confirmation"
                 content={content}
-                onAgree={this.handleDeleteCollaborator}
-                onDisagree={this.handleCloseConfirmDeleteDialog}
-                onClose={this.handleCloseConfirmDeleteDialog}
+                onAgree={handleDeleteCollaborator}
+                onDisagree={handleCloseConfirmDeleteDialog}
+                onClose={handleCloseConfirmDeleteDialog}
             />
         );
     };
 
-    render() {
-        const {permissions, error, loading, altering} = this.props;
-
-        if (error) {
-            return (<MessageDisplay message="An error occurred loading permissions" />);
-        } if (loading) {
-            return (<LoadingInlay />);
-        } if (altering) {
-            return (<LoadingOverlay loading />);
-        } if (!permissions) {
-            return (<div>No permission found</div>);
-        }
-
-        return (
-            <>
-                {this.renderPermissionDialog()}
-                {this.renderConfirmationDialog()}
-                {this.renderUserList(permissions)}
-            </>
-        );
+    if (error) {
+        return (<MessageDisplay message="An error occurred loading permissions" />);
+    } if (loading) {
+        return (<LoadingInlay />);
+    } if (altering) {
+        return (<LoadingOverlay loading />);
+    } if (!permissions) {
+        return (<div>No permission found</div>);
     }
-}
+
+    return (
+        <>
+            {renderPermissionDialog()}
+            {renderConfirmationDialog()}
+            {renderUserList()}
+        </>
+    );
+};
+
+PermissionsViewer.defaultProps = {
+    renderPermissionsDialog: () => {}
+};
 
 export default PermissionsViewer;

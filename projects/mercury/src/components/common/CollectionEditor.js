@@ -6,10 +6,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Select from "@material-ui/core/Select/Select";
-import MenuItem from "@material-ui/core/MenuItem/MenuItem";
-import FormControl from "@material-ui/core/FormControl/FormControl";
-import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 
 class CollectionEditor extends React.Component {
     static NON_SAFE_CHARACTERS_REGEX = /[^a-z0-9_-]+/gi;
@@ -20,7 +16,7 @@ class CollectionEditor extends React.Component {
         editing: true,
         name: this.props.name || '',
         description: this.props.description || '',
-        type: this.props.type || 'LOCAL_FILE',
+        connectionString: this.props.connectionString || '',
         location: this.props.location || ''
     };
 
@@ -30,7 +26,7 @@ class CollectionEditor extends React.Component {
         }
 
         if (this.props.onSave) {
-            this.props.onSave(this.state.name, this.state.description, this.state.location, this.state.type);
+            this.props.onSave(this.state.name, this.state.description, this.state.location, this.state.connectionString);
         }
     }
 
@@ -128,23 +124,17 @@ class CollectionEditor extends React.Component {
                         fullWidth
                         required
                     />
-                    {this.props.editType
-                        ? (
-                            <FormControl>
-                                <InputLabel>Type</InputLabel>
-                                <Select
-                                    name="type"
-                                    value={this.state.type}
-                                    onChange={(event) => this.handleInputChange('type', event.target.value)}
-                                >
-                                    <MenuItem value="LOCAL_FILE">On Premise</MenuItem>
-                                    <MenuItem value="AZURE_BLOB_STORAGE">Azure Blob Storage</MenuItem>
-                                    <MenuItem value="S3_BUCKET">Amazon S3 Bucket</MenuItem>
-                                    <MenuItem value="GOOGLE_CLOUD_BUCKET">Google Cloud Bucket</MenuItem>
-                                </Select>
-                            </FormControl>
-                        )
-                        : null}
+                    <TextField
+                        margin="dense"
+                        id="connectionString"
+                        label="Connection string"
+                        helperText="Provider-specific connection string, keep blank for managed collections"
+                        value={this.state.connectionString}
+                        name="connectionString"
+                        onChange={(event) => this.handleInputChange('connectionString', event.target.value)}
+                        fullWidth
+                        required
+                    />
 
                 </DialogContent>
                 <DialogActions>

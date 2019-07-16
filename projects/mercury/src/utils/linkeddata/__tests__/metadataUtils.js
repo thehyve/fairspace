@@ -3,10 +3,10 @@ import nodeCrypto from "crypto";
 import {
     generateUuid,
     getLabel,
-    getLocalPart,
+    getLocalPart, getNamespacedIri,
     getTypeInfo,
     hasValue,
-    isNonEmptyValue, linkLabel,
+    linkLabel,
     normalizeMetadataResource,
     partitionErrors,
     propertiesToShow,
@@ -39,6 +39,12 @@ describe('Metadata Utils', () => {
             expect(linkLabel('http://example.com/path', true)).toEqual('path');
             expect(linkLabel('http://example.com/path#hash', false)).toEqual('http://example.com/path#hash');
             expect(linkLabel('http://example.com/path#hash', true)).toEqual('hash');
+        });
+
+        it('fails gracefully when an invalid URI is given', () => {
+            expect(linkLabel('_path', true)).toEqual('_path');
+            expect(linkLabel('_path', false)).toEqual('_path');
+            expect(linkLabel('_path')).toEqual('_path');
         });
     });
 
@@ -263,19 +269,6 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('isNonEmptyValue', () => {
-        it('Returns true for the given values', () => {
-            const values = ['something', 0, 9999, ' ', true, false, -999, {}, []];
-
-            values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
-        });
-        it('Returns false for the given values', () => {
-            const values = [undefined, null, '', NaN, "", ``];
-
-            values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
-        });
-    });
-
     describe('partitionErrors', () => {
         it('returns 2 arrays one for errors of the given subjects other is the rest of errors', () => {
             const errorsSub1 = [
@@ -426,6 +419,40 @@ describe('Metadata Utils', () => {
         it('should return the domain if no path or hash is present', () => {
             expect(getLocalPart('http://iri')).toEqual('iri');
             expect(getLocalPart('http://some.very.long.domain')).toEqual('some.very.long.domain');
+        });
+    });
+
+    describe('getNamespacedIri', () => {
+        const namespaces = [
+            {
+                namespace: 'http://prefix/',
+                prefix: 'pr'
+            },
+            {
+                namespace: 'http://multiple/',
+                prefix: 'm1'
+            },
+            {
+                namespace: 'http://multiple/',
+                prefix: 'm2'
+            }
+        ];
+        it('should shorten the iri if a namespace exists', () => {
+            expect(getNamespacedIri('http://prefix/blabla', namespaces)).toEqual('pr:blabla');
+            expect(getNamespacedIri('http://prefix/blabla/additional/paths#test', namespaces)).toEqual('pr:blabla/additional/paths#test');
+            expect(getNamespacedIri('http://prefix/', namespaces)).toEqual('pr:');
+        });
+        it('should return the iri itself if no namespace is found', () => {
+            expect(getNamespacedIri('http://other/blabla', namespaces)).toEqual('http://other/blabla');
+            expect(getNamespacedIri('https://prefix/blabla', namespaces)).toEqual('https://prefix/blabla');
+            expect(getNamespacedIri('http://prefix#blabla', namespaces)).toEqual('http://prefix#blabla');
+        });
+        it('should handle missing iri or namespaces', () => {
+            expect(getNamespacedIri(undefined, namespaces)).toBe('');
+            expect(getNamespacedIri('http://prefix/blabla')).toEqual('http://prefix/blabla');
+        });
+        it('should shorten a uri with any of the prefixes if multiple namespaces apply', () => {
+            expect(getNamespacedIri('http://multiple/123', namespaces)).toEqual(expect.stringContaining(":123"));
         });
     });
 });

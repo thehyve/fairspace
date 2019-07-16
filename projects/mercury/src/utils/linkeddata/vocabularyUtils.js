@@ -90,20 +90,26 @@ export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditabl
 
 export const vocabularyUtils = (vocabulary = []) => {
     /**
-     * Returns a list of classes marked as fairspace entities
+     * Returns a list of classes marked as fairspace entities.
+     *
+     * This is a list of entities that is not marked as machine-only, but does contain a targetClass predicate
      */
-    const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateValue(entry, constants.SHOW_IN_CATALOG_URI));
+    const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) && !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI));
 
     /**
      * Returns a list of classes marked as fairspace entities
+     * @param namespaceFilter   Optional filter function on the jsonLD representation of the namespaces. By defaults passes everything
+     * @returns {{isDefault: *, prefix: *, namespace: *, id: *, label: *}[]}
      */
-    const getNamespaces = () => vocabulary
+    const getNamespaces = (namespaceFilter = () => true) => vocabulary
         .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
+        .filter(namespaceFilter)
         .map(namespace => ({
             id: namespace['@id'],
             label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
             prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
-            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE)
+            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE),
+            isDefault: getFirstPredicateValue(namespace, constants.DEFAULT_NAMESPACE_URI, false)
         }));
 
     /**
@@ -200,7 +206,7 @@ export const vocabularyUtils = (vocabulary = []) => {
     const generatePropertyEntry = (predicate, shape) => {
         const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
-        const multiLine = datatype === constants.STRING_URI && getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH, 1000) > 255;
+        const multiLine = datatype === constants.STRING_URI && !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false);
         const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
         const path = getFirstPredicateId(shape, constants.SHACL_PATH);
         const shapeIsRelationShape = isRelationShape(shape);

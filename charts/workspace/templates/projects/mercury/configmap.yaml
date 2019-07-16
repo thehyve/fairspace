@@ -11,8 +11,16 @@ data:
   config.json: |-
     {
       "urls": {
-        "storage": "{{ .Values.mercury.urls.storage }}"
-      }
+        "download": "{{ template "workspace.url" . }}/zuul/webdav/v1",
+        "files": "{{ template "storage.url" . }}/webdav/v1"
+        {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
+        {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
+      },
+      "roles": {
+        "user": "user-{{ template "workspace.name" . }}",
+        "dataSteward": "datasteward-{{ template "workspace.name" . }}",
+        "coordinator": "coordinator-{{ template "workspace.name" . }}"
+      },
       "enableExperimentalFeatures": {{ .Values.workspace.enableExperimentalFeatures }}
     }
 

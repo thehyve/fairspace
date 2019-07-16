@@ -1,8 +1,6 @@
 /* eslint-disable no-multi-spaces */
 
 // Account
-export const FETCH_USER                             = 'FETCH_USER';
-export const FETCH_USERS                            = 'FETCH_USERS';
 export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
 
 // Clipboard
@@ -48,8 +46,9 @@ export const FETCH_FILES_REJECTED                   = 'FETCH_FILES_REJECTED';
 export const INVALIDATE_FETCH_FILES                 = 'INVALIDATE_FETCH_FILES';
 export const RENAME_FILE                            = 'RENAME_FILE';
 export const RENAME_FILE_FULFILLED                  = 'RENAME_FILE_FULFILLED';
-export const DELETE_FILE                            = 'DELETE_FILE';
-export const DELETE_FILE_FULFILLED                  = 'DELETE_FILE_FULFILLED';
+export const DELETE_FILES                           = 'DELETE_FILES';
+export const DELETE_FILES_FULFILLED                 = 'DELETE_FILES_FULFILLED';
+export const DELETE_FILES_REJECTED                  = 'DELETE_FILES_REJECTED';
 export const UPLOAD_FILES                           = 'UPLOAD_FILES';
 export const UPLOAD_FILES_FULFILLED                 = 'UPLOAD_FILES_FULFILLED';
 export const CREATE_DIRECTORY                       = 'CREATE_DIRECTORY';
@@ -66,12 +65,6 @@ export const UPDATE_METADATA_PENDING                = UPDATE_METADATA + '_PENDIN
 export const UPDATE_METADATA_FULFILLED              = UPDATE_METADATA + '_FULFILLED';
 export const UPDATE_METADATA_REJECTED               = UPDATE_METADATA + '_REJECTED';
 export const COMBINE_METADATA                       = 'COMBINE_METADATA';
-export const FETCH_METADATA_ENTITIES                = 'FETCH_METADATA_ENTITIES';
-export const FETCH_ALL_METADATA_ENTITIES            = 'FETCH_ALL_METADATA_ENTITIES';
-export const CREATE_METADATA_ENTITY                 = 'CREATE_METADATA_ENTITY';
-export const CREATE_METADATA_ENTITY_PENDING         = 'CREATE_METADATA_ENTITY_PENDING';
-export const CREATE_METADATA_ENTITY_FULFILLED       = 'CREATE_METADATA_ENTITY_FULFILLED';
-export const CREATE_METADATA_ENTITY_REJECTED        = 'CREATE_METADATA_ENTITY_REJECTED';
 
 // Vocabulary
 export const FETCH_VOCABULARY                       = 'FETCH_VOCABULARY';
@@ -80,19 +73,6 @@ export const UPDATE_VOCABULARY                      = 'UPDATE_VOCABULARY';
 export const UPDATE_VOCABULARY_PENDING              = UPDATE_VOCABULARY + '_PENDING';
 export const UPDATE_VOCABULARY_FULFILLED            = UPDATE_VOCABULARY + '_FULFILLED';
 export const UPDATE_VOCABULARY_REJECTED             = UPDATE_VOCABULARY + '_REJECTED';
-export const CREATE_VOCABULARY_ENTITY               = 'CREATE_VOCABULARY_ENTITY';
-export const CREATE_VOCABULARY_ENTITY_PENDING       = 'CREATE_VOCABULARY_ENTITY_PENDING';
-export const CREATE_VOCABULARY_ENTITY_FULFILLED     = 'CREATE_VOCABULARY_ENTITY_FULFILLED';
-export const CREATE_VOCABULARY_ENTITY_REJECTED      = 'CREATE_VOCABULARY_ENTITY_REJECTED';
-export const FETCH_VOCABULARY_ENTITIES              = 'FETCH_VOCABULARY_ENTITIES';
-export const FETCH_ALL_VOCABULARY_ENTITIES          = 'FETCH_ALL_VOCABULARY_ENTITIES';
-
-// Permissions
-export const FETCH_PERMISSIONS                      = 'FETCH_PERMISSIONS';
-export const ALTER_PERMISSION                       = 'ALTER_PERMISSION';
-export const ALTER_PERMISSION_PENDING               = 'ALTER_PERMISSION_PENDING';
-export const ALTER_PERMISSION_FULFILLED             = 'ALTER_PERMISSION_FULFILLED';
-export const ALTER_PERMISSION_REJECTED              = 'ALTER_PERMISSION_REJECTED';
 
 // Workspace
 export const FETCH_WORKSPACE                        = 'FETCH_WORKSPACE';

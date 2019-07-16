@@ -7,46 +7,55 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
+@prefix dash: <http://datashapes.org/dash#> .
 
 ########################
 ### Fixed Namespaces ###
 ########################
 
 fs:FOAF-Namespace a sh:PrefixDeclaration ;
-   sh:name "Friend of a friend (FOAF)" ;
+   sh:name "foaf: (Friend of a friend)" ;
    sh:prefix "foaf" ;
    fs:fixedShape true ;
+   fs:usableInVocabulary true ;
    sh:namespace <http://xmlns.com/foaf/0.1/> .
 
 fs:RDF-Namespace a sh:PrefixDeclaration ;
-   sh:name "RDF" ;
+   sh:name "rdf: " ;
    sh:prefix "rdf" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 fs:RDFS-Namespace a sh:PrefixDeclaration ;
-   sh:name "RDF Schema (RDFS)" ;
+   sh:name "rdfs: (RDF Schema)" ;
    sh:prefix "rdfs" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2000/01/rdf-schema#> .
 
 fs:XSD-Namespace a sh:PrefixDeclaration ;
-   sh:name "XSD" ; 
+   sh:name "xsd: (XML Schema Definition)" ; 
    sh:prefix "xsd" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2001/XMLSchema#> .
 
 fs:Schema-Namespace a sh:PrefixDeclaration ;
-   sh:name "schema.org" ; 
+   sh:name "schema: (schema.org)" ; 
    sh:prefix "schema" ;
    fs:fixedShape true ;
+   fs:usableInVocabulary true ;
    sh:namespace <http://schema.org/> .
 
 fs:Fairspace-Namespace a sh:PrefixDeclaration ;
-   sh:name "Fairspace (global)" ; 
+   sh:name "fs: (Fairspace global)" ; 
    sh:prefix "fs" ;
    fs:fixedShape true ;
    sh:namespace <http://fairspace.io/ontology#> .
+
+fs:Shacl-Namespace a sh:PrefixDeclaration ;
+  sh:name "sh: (SHACL)" ;
+  sh:prefix "sh" ;
+  fs:fixedShape true ;
+  sh:namespace <http://www.w3.org/ns/shacl#> .
 
 ########################
 ###   Fixed Shapes   ###
@@ -57,7 +66,8 @@ fs:Fairspace-Namespace a sh:PrefixDeclaration ;
 fs:FileShape a fs:ClassShape ;
     sh:description "A single file." ;
     sh:name "File" ;
-    sh:targetClass fs:File ; 
+    sh:targetClass fs:File ;
+    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
     fs:fixedShape true ;
     fs:systemProperties 
@@ -88,7 +98,8 @@ fs:FileShape a fs:ClassShape ;
 fs:DirectoryShape a fs:ClassShape ;
     sh:description "A directory containing multiple files." ;
     sh:name "Directory" ;
-    sh:targetClass fs:Directory ; 
+    sh:targetClass fs:Directory ;
+    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     fs:systemProperties 
@@ -115,10 +126,12 @@ fs:DirectoryShape a fs:ClassShape ;
 fs:CollectionShape a fs:ClassShape ;
     sh:description "Collection of files with associated metadata and access rules." ;
     sh:name "Collection" ;
-    sh:targetClass fs:Collection ; 
+    sh:targetClass fs:Collection ;
+    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:collectionType ) ;
     fs:fixedShape true ;
-    fs:systemProperties 
+    fs:systemProperties
+        fs:connectionString,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -129,6 +142,7 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape ;
     sh:property
+        fs:connectionString,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -139,11 +153,38 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
+fs:ExternalFileShape a fs:ClassShape ;
+    sh:description "A single file." ;
+    sh:name "External File" ;
+    sh:targetClass fs:ExternalFile ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
+    fs:fixedShape true ;
+    fs:systemProperties
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:labelShape,
+        fs:commentShape .
+
+fs:ExternalDirectoryShape a fs:ClassShape ;
+    sh:description "A directory containing multiple files." ;
+    sh:name "External Directory" ;
+    sh:targetClass fs:ExternalDirectory ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:fixedShape true ;
+    fs:systemProperties
+        fs:labelShape,
+        fs:commentShape ;
+    sh:property
+        fs:labelShape,
+        fs:commentShape .
+
 fs:UserShape a sh:NodeShape ;
     sh:closed true ; 
     sh:description "Description for fs:User" ;
     sh:name "User" ;
-    sh:targetClass fs:User ; 
+    sh:targetClass fs:User ;
+    fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     sh:property
@@ -172,7 +213,7 @@ fs:labelShape a fs:DatatypePropertyShape ;
     sh:description "Human readable label for this resource." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:maxLength 128 ;
+    dash:singleLine true ;
     fs:fixedShape true ;
     fs:importantProperty true ;
     sh:path rdfs:label . 
@@ -210,7 +251,16 @@ fs:dateDeletedShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     fs:fixedShape true ;
-    sh:path fs:dateDeleted . 
+    sh:path fs:dateDeleted .
+
+fs:connectionString a fs:DatatypePropertyShape ;
+    sh:maxCount 1 ;
+    sh:name "Connection string" ;
+    sh:datatype xsd:string ;
+    sh:description "Connection string" ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:connectionString .
 
 fs:filePathShape a fs:DatatypePropertyShape ; 
     sh:maxCount 1 ;

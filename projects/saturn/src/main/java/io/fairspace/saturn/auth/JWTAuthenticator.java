@@ -13,10 +13,10 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 class JWTAuthenticator {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String USERNAME_CLAIM = "preferred_username";
     private static final String FULLNAME_CLAIM = "name";
@@ -30,13 +30,8 @@ class JWTAuthenticator {
         this.jwtProcessor = jwtProcessor;
     }
 
-    public UserInfo getUserInfo(HttpServletRequest request) {
-        var storedUserInfo = (UserInfo) request.getAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE);
-        if (storedUserInfo != null) {
-            return storedUserInfo;
-        }
-
-        var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
+    UserInfo getUserInfo(HttpServletRequest request) {
+        var authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             return null;
@@ -53,7 +48,7 @@ class JWTAuthenticator {
 
         var claims = claimsSet.getClaims();
 
-        var userInfo = new UserInfo(
+        return new UserInfo(
                 getStringClaim(claims, SUBJECT_CLAIM),
                 getStringClaim(claims, USERNAME_CLAIM),
                 getStringClaim(claims, FULLNAME_CLAIM),
@@ -62,9 +57,6 @@ class JWTAuthenticator {
                         .stream()
                         .map(Object::toString)
                         .collect(toSet()));
-
-        request.setAttribute(SecurityUtil.USER_INFO_REQUEST_ATTRIBUTE, userInfo);
-        return userInfo;
     }
 
     private static String getStringClaim(Map<String, ?> claims, String key) {

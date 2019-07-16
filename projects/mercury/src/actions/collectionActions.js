@@ -16,16 +16,16 @@ export const fetchCollectionsIfNeeded = () => dispatchIfNeeded(
     state => (state && state.cache ? state.cache.collections : undefined)
 );
 
-export const addCollection = (name, description, type, location) => ({
+export const addCollection = (name, description, connectionString, location) => ({
     type: actionTypes.ADD_COLLECTION,
-    payload: CollectionAPI.addCollection(name, description, type, location),
+    payload: CollectionAPI.addCollection(name, description, connectionString, location),
 });
 
-export const updateCollection = (id, name, description, location) => ({
+export const updateCollection = (id, name, description, location, previousLocation) => ({
     type: actionTypes.UPDATE_COLLECTION,
     payload: CollectionAPI.updateCollection(id, name, description, location),
     meta: {
-        id, name, description
+        id, name, description, location, previousLocation
     }
 });
 

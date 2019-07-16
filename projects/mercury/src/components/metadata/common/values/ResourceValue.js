@@ -7,7 +7,9 @@ class ResourceValue extends React.Component {
         namespace: undefined
     };
 
-    handleLocalPartChange = (value) => this.props.onChange({id: this.state.namespace.value + value});
+    handleLocalPartChange = (value) => this.props.onChange({
+        id: this.state.namespace ? this.state.namespace.value + value : value
+    });
 
     handleNamespaceChange = namespace => this.setState({namespace});
 

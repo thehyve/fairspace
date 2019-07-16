@@ -1,14 +1,16 @@
-import React, {useState} from 'react';
+import React, {useContext} from 'react';
+import {withRouter} from 'react-router-dom';
 import {
-    withStyles, Paper, Select, MenuItem, FormControl,
-    Checkbox, ListItemText, Input, TableFooter, TablePagination, TableRow
+    Checkbox, FormControl, Input, ListItemText, MenuItem, Paper, Select, TableFooter, TablePagination, TableRow,
+    withStyles
 } from "@material-ui/core";
 
-import SearchBar from "../../common/SearchBar";
-import BreadCrumbs from "../../common/BreadCrumbs";
-import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {SHACL_TARGET_CLASS, SEARCH_DEFAULT_SIZE} from "../../../constants";
-import {getLabel} from "../../../utils/linkeddata/metadataUtils";
+import {LoadingInlay, MessageDisplay, SearchBar} from "../../common";
+import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
+import useLinkedDataSearch from '../UseLinkedDataSearch';
+import LinkedDataCreator from "./LinkedDataCreator";
+import LinkedDataList from './LinkedDataList';
+import LinkedDataContext from '../LinkedDataContext';
 
 const styles = theme => ({
     typeSelect: {
@@ -16,56 +18,27 @@ const styles = theme => ({
     }
 });
 
-const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSearch}) => {
-    const [types, setTypes] = useState([]);
-    const [query, setQuery] = useState('');
-    const [size, setSize] = useState(SEARCH_DEFAULT_SIZE);
-    const [page, setPage] = useState(0);
+const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id)
 
-    const getSearchState = () => ({
-        types,
-        query,
-        size,
-        page
-    });
+const LinkedDataListPage = ({classes, history}) => {
+    const {
+        query, setQuery, selectedTypes, setSelectedTypes,
+        size, setSize, page, setPage,
+        shapes, shapesLoading, searchPending, error,
+        availableTypes, entities, total, hasHighlights,
+    } = useLinkedDataSearch(true);
 
-    const allTypes = classesInCatalog.map(type => {
-        const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
-        const label = getLabel(type);
-        return {targetClass, label};
-    });
-
-    const getTypeLabel = (type) => allTypes.find(({targetClass}) => targetClass === type).label;
+    const {
+        requireIdentifier, editorPath, createLinkedDataEntity,
+        onEntityCreationError, hasEditRight, typeRender
+    } = useContext(LinkedDataContext);
 
     const renderTypeClass = ({targetClass, label}) => (
         <MenuItem key={targetClass} value={targetClass}>
-            <Checkbox checked={types.includes(targetClass)} />
+            <Checkbox checked={selectedTypes.includes(targetClass)} />
             <ListItemText primary={label} secondary={targetClass} />
         </MenuItem>
     );
-
-    const onSearchChange = (q) => {
-        setQuery(q);
-        setPage(0); // reset page to start from first page
-        performSearch({...getSearchState(), page: 0, query: q});
-    };
-
-    const onTypesChange = (t) => {
-        setTypes(t);
-        performSearch({...getSearchState(), types: t});
-    };
-
-    const onPageChange = (_, p) => {
-        setPage(p);
-        performSearch({...getSearchState(), page: p});
-    };
-
-    const onSizeChange = (e) => {
-        const s = e.target.value;
-        setSize(s);
-        setPage(0); // reset page to start from first page
-        performSearch({...getSearchState(), page: 0, size: s});
-    };
 
     const footerRender = ({count, colSpan}) => (
         <TableFooter>
@@ -76,12 +49,39 @@ const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSea
                     colSpan={colSpan}
                     count={count}
                     page={page}
-                    onChangePage={onPageChange}
-                    onChangeRowsPerPage={onSizeChange}
+                    onChangePage={(_, p) => setPage(p)}
+                    onChangeRowsPerPage={(e) => setSize(e.target.value)}
                 />
             </TableRow>
         </TableFooter>
     );
+
+    const ListBody = () => {
+        if (searchPending) {
+            return <LoadingInlay />;
+        }
+
+        if (error) {
+            return <MessageDisplay message={error.message || 'An error occurred while loading metadata'} />;
+        }
+
+        if (entities && entities.length > 0) {
+            return (
+                <LinkedDataList
+                    items={entities}
+                    total={total}
+                    hasHighlights={hasHighlights}
+                    footerRender={footerRender}
+                    typeRender={typeRender}
+                    onOpen={(id) => history.push(getEntityRelativeUrl(editorPath, id))}
+                />
+            );
+        }
+
+        return <MessageDisplay message={query && query !== '*' ? 'No results found' : 'The metadata is empty'} isError={false} />;
+    };
+
+    const getTypeLabel = (type) => availableTypes.find(({targetClass}) => targetClass === type).label;
 
     return (
         <>
@@ -90,25 +90,40 @@ const LinkedDataListPage = ({classes, listRenderer, classesInCatalog, performSea
                 <SearchBar
                     placeholder="Search"
                     disableUnderline
-                    onSearchChange={onSearchChange}
+                    onSearchChange={setQuery}
                 />
                 <FormControl className={classes.typeSelect}>
                     <Select
                         multiple
                         displayEmpty
-                        value={types}
-                        onChange={e => onTypesChange(e.target.value)}
+                        value={selectedTypes}
+                        onChange={e => setSelectedTypes(e.target.value)}
                         input={<Input id="select-multiple-checkbox" />}
-                        renderValue={selected => (selected.length === 0 ? '[All types]'
-                            : selected.map(getTypeLabel).join(', '))}
+                        renderValue={selected => (selected.length === 0 ? '[All types]' : selected.map(getTypeLabel).join(', '))}
                     >
-                        {allTypes.map(renderTypeClass)}
+                        {availableTypes.map(renderTypeClass)}
                     </Select>
                 </FormControl>
             </Paper>
-            {listRenderer(footerRender)}
+            {
+                hasEditRight ? (
+                    <LinkedDataCreator
+                        shapesLoading={shapesLoading}
+                        shapes={shapes}
+                        requireIdentifie={requireIdentifier}
+                        create={
+                            (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
+                                .then(() => history.push(getEntityRelativeUrl(editorPath, id)))
+                        }
+                        onEntityCreationError={onEntityCreationError}
+                    >
+                        <ListBody />
+                    </LinkedDataCreator>
+                ) : <ListBody />
+            }
+
         </>
     );
 };
 
-export default withStyles(styles)(LinkedDataListPage);
+export default withRouter(withStyles(styles)(LinkedDataListPage));
