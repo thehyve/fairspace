@@ -62,7 +62,7 @@ public class UserServiceTest {
         });
         mockServer.start();
 
-        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users", refreshInterval, new DAO(rdf, null), false);
+        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users", refreshInterval, new DAO(rdf, null));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void userInformationForKnownUsersIsReturnedImmediatelyEvenIfStaled() throws InterruptedException {
+    public void userInformationIsRefreshedWhenOnAuthorizedIsCalled() throws InterruptedException {
         var iri = userService.getUserIri(keycloakUser.getId());
 
         userService.getUser(iri);
@@ -98,26 +98,15 @@ public class UserServiceTest {
 
         keycloakUsers = List.of(alteredKeycloakUser); // Modify users
 
-        var user =  userService.getUser(iri); // Triggers refreshing but returns immediately
+        var user =  userService.getUser(iri);
 
         assertEquals(keycloakUser.getEmail(), user.getEmail()); // The returned user is not refreshed
-    }
 
-    @Test
-    public void userInformationGetsRefreshedEventually() throws InterruptedException {
-        var iri = userService.getUserIri(keycloakUser.getId());
-
-        userService.getUser(iri);
-
-        Thread.sleep(2 * refreshInterval); // User information gets staled
-
-        keycloakUsers = List.of(alteredKeycloakUser); // Modify users
-
-        userService.getUser(iri); // Triggers refreshing but returns immediately
+        userService.onAuthorized(keycloakUser.getId()); // Triggers refreshing
 
         Thread.sleep(100); // Refreshing is taking place
 
-        var user =  userService.getUser(iri); // Must be refreshed now
+        user =  userService.getUser(iri); // Must be refreshed now
 
         assertEquals(alteredKeycloakUser.getEmail(), user.getEmail());
 

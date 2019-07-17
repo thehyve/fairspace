@@ -32,28 +32,22 @@ public class UserService {
     private final DAO dao;
     private final Map<Node, User> usersByIri = new ConcurrentHashMap<>();
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
-    private final boolean authorizationRequired;
     private final long refreshInterval;
     private volatile long lastRefreshTime;
 
-    public UserService(String usersEndpoint, long refreshInterval, DAO dao, boolean authorizationRequired) {
+    public UserService(String usersEndpoint, long refreshInterval, DAO dao) {
         this.usersEndpoint = usersEndpoint;
         this.dao = dao;
-        this.authorizationRequired = authorizationRequired;
         this.refreshInterval = refreshInterval;
     }
 
     public void onAuthorized(String userId) {
-        getUser(getUserIri(userId));
+        refreshCacheAsync();
     }
 
     public User getUser(Node iri) {
-        var authorization = authorizationHeader();
-
         if (!usersByIri.containsKey(iri)) {
-            refreshCacheNow(authorization); // Blocking
-        } else if (isRefreshNeeded()) {
-            refreshCacheAsync(authorization); // Schedules refreshing but returns immediately
+            refreshCacheNow(authorizationHeader());
         }
 
         return usersByIri.get(iri);
@@ -64,9 +58,6 @@ public class UserService {
     }
 
     private void refreshCacheNow(String authorization) {
-        if (authorizationRequired && authorization == null) {
-            return;
-        }
         var users = fetchUsers(authorization);
         var updated = users
                 .stream()
@@ -78,12 +69,15 @@ public class UserService {
         lastRefreshTime = currentTimeMillis();
     }
 
-    private void refreshCacheAsync(String authorization) {
-        executor.submit(() -> {
-            if (isRefreshNeeded()) { // still needed?
-                refreshCacheNow(authorization);
-            }
-        });
+    private void refreshCacheAsync() {
+        if (isRefreshNeeded()) {
+            var authorization = authorizationHeader();
+            executor.submit(() -> {
+                if (isRefreshNeeded()) { // still needed?
+                    refreshCacheNow(authorization);
+                }
+            });
+        }
     }
 
     private List<User> fetchUsers(String authorization) {
