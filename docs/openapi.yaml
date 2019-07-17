@@ -209,7 +209,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Delete metadata
-      description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, all triples that match the parameters (subject, predicate, object) will be deleted.
+      description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, the subject specified in the subject parameter will be marked as deleted. Please note that the subject will still exist in the database.
       operationId: deleteMetadata
       tags:
         - metadata
@@ -217,20 +217,6 @@ paths:
         - name: subject
           in: query
           description: The subject to filter on
-          required: false
-          schema:
-            type: string
-            format: iri
-        - name: predicate
-          in: query
-          description: The predicate to filter on
-          required: false
-          schema:
-            type: string
-            format: iri
-        - name: object
-          in: query
-          description: The object to filter on
           required: false
           schema:
             type: string
@@ -548,7 +534,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Delete vocabulary entries
-      description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, all triples that match the parameters (subject, predicate, object) will be deleted.
+      description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, the subject specified in the subject parameter will be marked as deleted. Please note that the subject will still exist in the database.
       operationId: deleteVocabulary
       tags:
         - vocabulary
@@ -556,20 +542,6 @@ paths:
         - name: subject
           in: query
           description: The subject to filter on
-          required: false
-          schema:
-            type: string
-            format: iri
-        - name: predicate
-          in: query
-          description: The predicate to filter on
-          required: false
-          schema:
-            type: string
-            format: iri
-        - name: object
-          in: query
-          description: The object to filter on
           required: false
           schema:
             type: string
