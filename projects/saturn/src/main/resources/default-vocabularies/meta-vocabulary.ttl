@@ -170,6 +170,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
         fs:PropertyNameShape,
         [
           sh:name "Prefix" ;
+          sh:description "A short name to make full IRIs within this namespace more readable: e.g. foaf" ;
           sh:maxLength 24 ;
           sh:minCount 1 ;
           sh:maxCount 1 ;
@@ -179,26 +180,32 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
         ] ,
         [
           sh:name "Namespace IRI" ;
+          sh:description "The part of a namespace to abbreviate using the prefix, this is expected to end with '#' or '/' sign: e.g. http://xmlns.com/foaf/0.1/" ;
           sh:minCount 1 ;
           sh:maxCount 1 ;
           sh:nodeKind sh:IRI ;
           fs:externalLink true ;
-          sh:path sh:namespace
+          sh:path sh:namespace ;
+          sh:pattern "[#/]$" ;
+          sh:message "Namespace IRI is expected to end with either '#' or '/' sign."
         ] ,
         [
           sh:name "Use in metadata" ;
+          sh:description "If true, this namespace is presented to users in the metadata application, to easily create new resources within this namespace." ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:usableInMetadata
         ] ,
         [
           sh:name "Use in vocabulary" ;
+          sh:description "If true, this namespace is presented to users in the vocabulary application, to define new terms within this namespace." ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:usableInVocabulary
         ] ,
         [
           sh:name "Default namespace" ;
+          sh:description "When a user creates a new resource, a default namespace will be selected automatically" ; 
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:defaultNamespace
@@ -223,6 +230,7 @@ fs:fixedShapeShape a fs:DatatypePropertyShape ;
 fs:singleLineShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path dash:singleLine ;
+    sh:maxCount 1 ; 
     sh:name "Single line input (for string only)" ;
     sh:description "Restricts the input field for this string field to a single line." .
 
@@ -259,7 +267,7 @@ fs:PropertyNameShape a sh:PropertyShape ;
   dash:singleLine true ;
   sh:minCount 1 ;
   sh:path sh:name ;
-  sh:name "Property name" ;
+  sh:name "Name" ;
   fs:importantProperty true ;
   sh:order 1 .
 

@@ -1,12 +1,23 @@
 import React from "react";
-import {ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from "@material-ui/core";
+import {
+    ListItemText, Paper, Table, TableBody, TableCell, TableFooter, TableHead, TablePagination, TableRow, withStyles
+} from "@material-ui/core";
 import styles from './LinkedDataList.styles';
 import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {TOOLTIP_ENTER_DELAY} from "../../../constants";
 import IriTooltip from "../../common/IriTooltip";
 import Iri from "../../common/Iri";
 
-const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, typeRender, footerRender}) => {
+const LinkedDataList = ({
+    entities = [],
+    total,
+    page, setPage,
+    size, setSize,
+    hasHighlights,
+    onOpen,
+    classes,
+    typeRender
+}) => {
     const renderRow = (entry) => {
         const {id, primaryText, secondaryText, highlights} = entry;
 
@@ -53,9 +64,21 @@ const LinkedDataList = ({items = [], total, hasHighlights, onOpen, classes, type
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {items.map(renderRow)}
+                    {entities.map(renderRow)}
                 </TableBody>
-                {footerRender({count: total, colSpan: hasHighlights ? 4 : 3})}
+                <TableFooter>
+                    <TableRow>
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            rowsPerPage={size}
+                            colSpan={hasHighlights ? 4 : 3}
+                            count={total}
+                            page={page}
+                            onChangePage={(_, p) => setPage(p)}
+                            onChangeRowsPerPage={(e) => setSize(e.target.value)}
+                        />
+                    </TableRow>
+                </TableFooter>
             </Table>
         </Paper>
     );

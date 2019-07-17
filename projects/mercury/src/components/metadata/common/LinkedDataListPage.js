@@ -1,15 +1,11 @@
 import React, {useContext} from 'react';
 import {withRouter} from 'react-router-dom';
-import {
-    Checkbox, FormControl, Input, ListItemText, MenuItem, Paper, Select, TableFooter, TablePagination, TableRow,
-    withStyles
-} from "@material-ui/core";
+import {Checkbox, FormControl, Input, ListItemText, MenuItem, Paper, Select, withStyles} from "@material-ui/core";
 
 import {LoadingInlay, MessageDisplay, SearchBar} from "../../common";
 import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
 import useLinkedDataSearch from '../UseLinkedDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
-import LinkedDataList from './LinkedDataList';
 import LinkedDataContext from '../LinkedDataContext';
 
 const styles = theme => ({
@@ -18,19 +14,19 @@ const styles = theme => ({
     }
 });
 
-const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id)
+const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
-const LinkedDataListPage = ({classes, history}) => {
+const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) => {
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
         size, setSize, page, setPage,
         shapes, shapesLoading, searchPending, error,
-        availableTypes, entities, total, hasHighlights,
+        availableTypes, items, total, hasHighlights,
     } = useLinkedDataSearch(true);
 
     const {
         requireIdentifier, editorPath, createLinkedDataEntity,
-        onEntityCreationError, hasEditRight, typeRender
+        onEntityCreationError, hasEditRight
     } = useContext(LinkedDataContext);
 
     const renderTypeClass = ({targetClass, label}) => (
@@ -38,22 +34,6 @@ const LinkedDataListPage = ({classes, history}) => {
             <Checkbox checked={selectedTypes.includes(targetClass)} />
             <ListItemText primary={label} secondary={targetClass} />
         </MenuItem>
-    );
-
-    const footerRender = ({count, colSpan}) => (
-        <TableFooter>
-            <TableRow>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    rowsPerPage={size}
-                    colSpan={colSpan}
-                    count={count}
-                    page={page}
-                    onChangePage={(_, p) => setPage(p)}
-                    onChangeRowsPerPage={(e) => setSize(e.target.value)}
-                />
-            </TableRow>
-        </TableFooter>
     );
 
     const ListBody = () => {
@@ -65,14 +45,16 @@ const LinkedDataListPage = ({classes, history}) => {
             return <MessageDisplay message={error.message || 'An error occurred while loading metadata'} />;
         }
 
-        if (entities && entities.length > 0) {
+        if (items && items.length > 0) {
             return (
-                <LinkedDataList
-                    items={entities}
+                <ListComponent
+                    items={items}
                     total={total}
                     hasHighlights={hasHighlights}
-                    footerRender={footerRender}
-                    typeRender={typeRender}
+                    size={size}
+                    setSize={setSize}
+                    page={page}
+                    setPage={setPage}
                     onOpen={(id) => history.push(getEntityRelativeUrl(editorPath, id))}
                 />
             );
@@ -110,7 +92,7 @@ const LinkedDataListPage = ({classes, history}) => {
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
                         shapes={shapes}
-                        requireIdentifie={requireIdentifier}
+                        requireIdentifier={requireIdentifier}
                         create={
                             (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
                                 .then(() => history.push(getEntityRelativeUrl(editorPath, id)))

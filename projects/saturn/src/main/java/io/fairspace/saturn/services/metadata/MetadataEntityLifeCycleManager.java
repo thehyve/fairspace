@@ -25,6 +25,7 @@ public
 class MetadataEntityLifeCycleManager {
     private final RDFConnection rdf;
     private final Node graph;
+    private final Node vocabulary;
     private final Supplier<Node> userIriSupplier;
     private final PermissionsService permissionsService;
 
@@ -34,8 +35,8 @@ class MetadataEntityLifeCycleManager {
      * @param graph
      * @param userIriSupplier
      */
-    public MetadataEntityLifeCycleManager(RDFConnection rdf, Node graph, Supplier<Node> userIriSupplier) {
-        this(rdf, graph, userIriSupplier, null);
+    public MetadataEntityLifeCycleManager(RDFConnection rdf, Node graph, Node vocabulary, Supplier<Node> userIriSupplier) {
+        this(rdf, graph, vocabulary, userIriSupplier, null);
     }
 
     /**
@@ -70,6 +71,10 @@ class MetadataEntityLifeCycleManager {
                 permissionsService.createResources(newEntities);
             }
         }
+    }
+
+    void softDelete(Resource resource) {
+        rdf.update(storedQuery("soft_delete", resource, userIriSupplier.get(), graph, vocabulary));
     }
 
     /**

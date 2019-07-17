@@ -18,6 +18,15 @@ const updateMetadataReducer = (state = defaultState, action) => {
                     invalidated: true
                 }
             };
+        case actionTypes.UPDATE_COLLECTION_FULFILLED:
+            return {
+                ...state,
+                [action.meta.id]: {
+                    ...state[action.meta.id],
+                    invalidated: true
+                }
+            };
+
         default:
             return state;
     }
