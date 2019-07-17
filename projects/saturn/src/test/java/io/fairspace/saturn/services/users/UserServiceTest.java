@@ -25,7 +25,7 @@ public class UserServiceTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    private static final int refreshInterval = 1000;
+    private static final int refreshInterval = 50;
 
     private HttpServer mockServer;
 
