@@ -1,31 +1,29 @@
 import React from 'react';
 import {connect} from 'react-redux';
-
 // Actions
 import {
-    createVocabularyEntityFromState, fetchMetadataVocabularyIfNeeded,
-    fetchMetaVocabularyIfNeeded, submitVocabularyChangesFromState
+    createVocabularyEntityFromState, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded,
+    submitVocabularyChangesFromState
 } from "../../actions/vocabularyActions";
 import {searchVocabulary} from "../../actions/searchActions";
-
 // Reducers
 import {
-    getMetaVocabulary, getVocabulary, hasMetaVocabularyError,
-    hasVocabularyError, isMetaVocabularyPending, isVocabularyPending
+    getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
+    isVocabularyPending
 } from "../../reducers/cache/vocabularyReducers";
 import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
 import {getVocabularySearchResults} from "../../reducers/searchReducers";
-
 // Utils
 import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
 import {isDataSteward} from "../../utils/userUtils";
-import {propertiesToShow, getTypeInfo, getLabel} from "../../utils/linkeddata/metadataUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../../utils/linkeddata/vocabularyUtils";
-import {getFirstPredicateValue, getFirstPredicateId} from "../../utils/linkeddata/jsonLdUtils";
-
+import {getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {
+    extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
+} from "../../utils/linkeddata/vocabularyUtils";
+import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
-import {USABLE_IN_VOCABULARY_URI, SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../constants";
+import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import Config from "../../services/Config/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
@@ -58,35 +56,6 @@ const LinkedDataVocabularyProvider = ({
 
     const getClassesInCatalog = () => metaVocabulary.getClassesInCatalog();
 
-    const getSearchEntities = () => {
-        const {items, pending, error, total} = getLinkedDataSearchResults();
-
-        const entities = items.map(({id, name, description, type, highlights}) => {
-            const shape = metaVocabulary.determineShapeForTypes(type) || {};
-            const typeLabel = getLabel(shape, true);
-            const typeUrl = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
-
-            return {
-                id,
-                primaryText: name,
-                secondaryText: description,
-                typeLabel,
-                typeUrl,
-                highlights
-            };
-        });
-
-        return {
-            searchPending: pending,
-            searchError: error,
-            entities,
-            total,
-            hasHighlights: entities.some(({highlights}) => highlights.length > 0),
-        };
-    };
-
-    const typeRender = (entry) => <a href={entry.typeUrl}> {entry.typeLabel} </a>;
-
     return (
         <LinkedDataContext.Provider
             value={{
@@ -113,9 +82,8 @@ const LinkedDataVocabularyProvider = ({
                 getClassesInCatalog,
 
                 // Generic methods without reference to shapes
+                getSearchResults: getLinkedDataSearchResults,
                 valueComponentFactory,
-                getSearchEntities,
-                typeRender,
                 onEntityCreationError,
             }}
         >
