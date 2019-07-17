@@ -26,6 +26,7 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
@@ -50,7 +51,7 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(CONFIG.users.endpoint, CONFIG.users.synchronizationInterval, new DAO(rdf, null), CONFIG.auth.enabled);
+        var userService = new UserService(CONFIG.users.endpoint, TimeUnit.SECONDS.toMillis(CONFIG.users.synchronizationInterval), new DAO(rdf, null), CONFIG.auth.enabled);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
         var mailService = new MailService(CONFIG.mail);
 
@@ -91,7 +92,7 @@ public class App {
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
         var apiPathPrefix = "/api/" + API_VERSION;
-        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator);
+        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo.getUserId()));
 
         FusekiServer.create()
                 .securityHandler(securityHandler)

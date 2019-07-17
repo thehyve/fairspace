@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +25,7 @@ public class UserServiceTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    private static final int refreshInterval = 1;
+    private static final int refreshInterval = 1000;
 
     private HttpServer mockServer;
 
@@ -83,22 +82,42 @@ public class UserServiceTest {
 
         userService.getUser(iri);
 
-        Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Saving might take some time
+        Thread.sleep(2 * refreshInterval); // Saving might take some time
 
         assertTrue(ds.getDefaultModel().containsResource(createResource(iri.getURI())));
     }
 
+
     @Test
-    public void userInformationGetRefreshed() throws InterruptedException {
+    public void userInformationForKnownUsersIsReturnedImmediatelyEvenIfStaled() throws InterruptedException {
         var iri = userService.getUserIri(keycloakUser.getId());
 
         userService.getUser(iri);
 
-        keycloakUsers = List.of(alteredKeycloakUser);
+        Thread.sleep(2 * refreshInterval); // User information gets staled
 
-        Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Refreshing might take some time
+        keycloakUsers = List.of(alteredKeycloakUser); // Modify users
 
-        var user =  userService.getUser(iri);
+        var user =  userService.getUser(iri); // Triggers refreshing but returns immediately
+
+        assertEquals(keycloakUser.getEmail(), user.getEmail()); // The returned user is not refreshed
+    }
+
+    @Test
+    public void userInformationGetsRefreshedEventually() throws InterruptedException {
+        var iri = userService.getUserIri(keycloakUser.getId());
+
+        userService.getUser(iri);
+
+        Thread.sleep(2 * refreshInterval); // User information gets staled
+
+        keycloakUsers = List.of(alteredKeycloakUser); // Modify users
+
+        userService.getUser(iri); // Triggers refreshing but returns immediately
+
+        Thread.sleep(100); // Refreshing is taking place
+
+        var user =  userService.getUser(iri); // Must be refreshed now
 
         assertEquals(alteredKeycloakUser.getEmail(), user.getEmail());
 
