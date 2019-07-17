@@ -14,13 +14,11 @@ import {
 import {getMetadataSearchResults} from "../../reducers/searchReducers";
 // Utils
 import {emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
-import {getLabel, getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext from './LinkedDataContext';
-import {METADATA_PATH, USABLE_IN_METADATA_URI, VOCABULARY_PATH} from "../../constants";
-import Iri from "../common/Iri";
-import LinkedDataLink from "./common/LinkedDataLink";
+import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataMetadataProvider = ({
@@ -46,35 +44,6 @@ const LinkedDataMetadataProvider = ({
     const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
 
     const getClassesInCatalog = () => vocabulary.getClassesInCatalog();
-
-    const getSearchEntities = () => {
-        const {items, total, pending, error} = getLinkedDataSearchResults();
-
-        const entities = items.map(({id, label, comment, type, highlights}) => {
-            const shape = vocabulary.determineShapeForTypes(type);
-            const typeLabel = getLabel(shape, true);
-            const shapeUrl = shape['@id'];
-
-            return {
-                id,
-                primaryText: (label && label[0]) || <Iri iri={id} />,
-                secondaryText: (comment && comment[0]),
-                typeLabel,
-                shapeUrl,
-                highlights
-            };
-        });
-
-        return {
-            searchPending: pending,
-            searchError: error,
-            entities,
-            total,
-            hasHighlights: entities.some(({highlights}) => highlights.length > 0),
-        };
-    };
-
-    const typeRender = (entry) => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>;
 
     return (
         <LinkedDataContext.Provider
@@ -102,9 +71,8 @@ const LinkedDataMetadataProvider = ({
                 getClassesInCatalog,
 
                 // Generic methods without reference to shapes
-                valueComponentFactory,
-                getSearchEntities,
-                typeRender
+                getSearchResults: getLinkedDataSearchResults,
+                valueComponentFactory
             }}
         >
             {children}

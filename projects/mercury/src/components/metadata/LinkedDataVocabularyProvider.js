@@ -15,14 +15,14 @@ import {getVocabularySearchResults} from "../../reducers/searchReducers";
 // Utils
 import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
 import {isDataSteward} from "../../utils/userUtils";
-import {getLabel, getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
 } from "../../utils/linkeddata/vocabularyUtils";
-import {getFirstPredicateId, getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
+import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext from './LinkedDataContext';
-import {SHACL_TARGET_CLASS, USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
+import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import Config from "../../services/Config/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
@@ -57,35 +57,6 @@ const LinkedDataVocabularyProvider = ({
 
     const getClassesInCatalog = () => metaVocabulary.getClassesInCatalog();
 
-    const getSearchEntities = () => {
-        const {items, pending, error, total} = getLinkedDataSearchResults();
-
-        const entities = items.map(({id, name, description, type, highlights}) => {
-            const shape = metaVocabulary.determineShapeForTypes(type) || {};
-            const typeLabel = getLabel(shape, true);
-            const typeUrl = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
-
-            return {
-                id,
-                primaryText: name,
-                secondaryText: description,
-                typeLabel,
-                typeUrl,
-                highlights
-            };
-        });
-
-        return {
-            searchPending: pending,
-            searchError: error,
-            entities,
-            total,
-            hasHighlights: entities.some(({highlights}) => highlights.length > 0),
-        };
-    };
-
-    const typeRender = (entry) => <a href={entry.typeUrl}> {entry.typeLabel} </a>;
-
     return (
         <LinkedDataContext.Provider
             value={{
@@ -112,9 +83,8 @@ const LinkedDataVocabularyProvider = ({
                 getClassesInCatalog,
 
                 // Generic methods without reference to shapes
+                getSearchResults: getLinkedDataSearchResults,
                 valueComponentFactory,
-                getSearchEntities,
-                typeRender,
             }}
         >
             {children}

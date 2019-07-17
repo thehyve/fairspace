@@ -8,7 +8,7 @@ import {getLabel} from "../../utils/linkeddata/metadataUtils";
 const useLinkedDataSearch = (doInitialFetch = false) => {
     const {
         getClassesInCatalog, searchLinkedData, shapesLoading,
-        shapesError, getSearchEntities
+        shapesError, getSearchResults
     } = useContext(LinkedDataContext);
 
     const [selectedTypes, setSelectedTypes] = useState([]);
@@ -17,7 +17,7 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
     const [page, setPage] = useState(0);
     const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-    const {searchPending, searchError, entities, total, hasHighlights} = getSearchEntities();
+    const {pending, error, items, total} = getSearchResults();
 
     // reset page to start from first page when query or size changes
     useEffect(() => {
@@ -76,11 +76,11 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         shapes,
         shapesLoading,
 
-        searchPending,
-        error: shapesError || searchError,
-        entities,
+        searchPending: pending,
+        error: shapesError || error,
+        items,
         total,
-        hasHighlights,
+        hasHighlights: items.some(({highlights}) => highlights.length > 0),
     };
 };
 
