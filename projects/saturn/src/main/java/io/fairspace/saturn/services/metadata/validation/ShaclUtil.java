@@ -8,6 +8,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.topbraid.shacl.arq.SHACLFunctions;
 import org.topbraid.shacl.engine.ShapesGraph;
 import org.topbraid.shacl.engine.filters.ExcludeMetaShapesFilter;
@@ -33,6 +34,7 @@ public class ShaclUtil {
                 model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, obj, RDF.type, null)));
             }
         });
+        model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, null, RDFS.subClassOf, null)));
     }
 
     public static void getViolations(ValidationEngine validationEngine, ViolationHandler violationHandler) {
