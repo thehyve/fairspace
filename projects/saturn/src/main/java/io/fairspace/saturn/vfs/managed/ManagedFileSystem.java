@@ -7,6 +7,7 @@ import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -168,12 +170,23 @@ public class ManagedFileSystem extends BaseFileSystem {
                 .isDirectory(row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
-                .customProperties(Map.of(
-                        "createdBy", row.getLiteral("createdByName").getString(),
-                        "modifiedBy", row.getLiteral("modifiedByName").getString()
-                ))
+                .customProperties(generateCustomProperties(row))
                 .build();
     }
+
+    private Map<String, String> generateCustomProperties(QuerySolution row) {
+        var properties = new HashMap<String, String>();
+
+        properties.put(FS.CREATED_BY_LOCAL_PART, row.getLiteral("createdByName").getString());
+        properties.put(FS.MODIFIED_BY_LOCAL_PART, row.getLiteral("modifiedByName").getString());
+
+        if(row.getLiteral("md5") != null) {
+            properties.put(FS.CHECKSUM_LOCAL_PART, row.getLiteral("md5").getString());
+        }
+
+        return properties;
+    }
+
     private void copyOrMove(boolean move, String from, String to) throws IOException {
         var verb = move ? "move" : "copy";
 

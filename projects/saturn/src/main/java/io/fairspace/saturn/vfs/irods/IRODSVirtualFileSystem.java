@@ -5,6 +5,7 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
+import org.apache.commons.lang.StringUtils;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -23,6 +24,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.FileSystemException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,9 +67,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                     .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                     .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                     .size(stat.getObjSize())
-                    .customProperties(Map.of(
-                            FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
-                    ))
+                    .customProperties(getCustomProperties(stat))
                     .build();
         } catch (JargonException e) {
             throw new IOException(e);
@@ -95,9 +95,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
                         .created(ofEpochMilli(stat.getCreatedAt().getTime()))
                         .modified(ofEpochMilli(stat.getModifiedAt().getTime()))
                         .size(stat.getObjSize())
-                        .customProperties(Map.of(
-                                FS.OWNED_BY_LOCAL_PART, stat.getOwnerName()
-                        ))
+                        .customProperties(getCustomProperties(stat))
                         .build());
             }
             return result;
@@ -249,5 +247,15 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
         } catch (Exception e) {
             throw new IOException(e);
         }
+    }
+
+    private HashMap<String, String> getCustomProperties(ObjStat stat) {
+        var properties = new HashMap<String, String>();
+        properties.put(FS.OWNED_BY_LOCAL_PART, stat.getOwnerName());
+
+        if(StringUtils.isNotEmpty(stat.getChecksum())) {
+            properties.put(FS.CHECKSUM_LOCAL_PART, stat.getChecksum());
+        }
+        return properties;
     }
 }

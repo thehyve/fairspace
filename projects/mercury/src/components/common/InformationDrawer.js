@@ -13,6 +13,12 @@ import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../../utils/fileUtils";
+import {findById} from "../../utils/genericUtils";
+import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
+import UsersContext from "../permissions/UsersContext";
+import getDisplayName from "../../utils/userUtils";
+
+const getUserObject = (users, iri) => findById(users, getLocalPart(iri));
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {
@@ -57,10 +63,13 @@ export class InformationDrawer extends React.Component {
         }
 
         return Promise.resolve();
-    }
+    };
 
     render() {
         const {classes, collection, loading} = this.props;
+        const {users} = this.context;
+
+        const getUsernameByIri = iri => getDisplayName(getUserObject(users, iri));
 
         if (!collection) {
             return <Typography variant="h6">Please select a collection..</Typography>;
@@ -76,6 +85,12 @@ export class InformationDrawer extends React.Component {
                     onUpdateCollection={this.handleUpdateCollection}
                     onCollectionDelete={this.handleCollectionDelete}
                     loading={loading}
+                    collectionProps={{
+                        dateCreated: collection.dateCreated,
+                        createdBy: collection.createdBy ? getUsernameByIri(collection.createdBy) : '',
+                        dateModified: collection.dateModified,
+                        modifiedBy: collection.modifiedBy ? getUsernameByIri(collection.modifiedBy) : '',
+                    }}
                 />
                 <ExpansionPanel defaultExpanded>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -127,6 +142,8 @@ function pathHierarchy(fullPath) {
     }
     return paths.reverse();
 }
+
+InformationDrawer.contextType = UsersContext;
 
 InformationDrawer.propTypes = {
     fetchMetadata: PropTypes.func,
