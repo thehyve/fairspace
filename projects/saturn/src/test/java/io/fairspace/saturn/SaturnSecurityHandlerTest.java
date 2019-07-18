@@ -19,11 +19,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,6 +37,8 @@ public class SaturnSecurityHandlerTest {
     private HttpServletResponse response;
     @Mock
     private Handler nextHandler;
+    @Mock
+    private Consumer<UserInfo> onAuthorized;
 
     private StringWriter writer;
 
@@ -45,7 +46,7 @@ public class SaturnSecurityHandlerTest {
 
     @Before
     public void before() throws IOException {
-        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator);
+        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator, onAuthorized);
         handler.setHandler(nextHandler);
 
         writer = new StringWriter();
@@ -140,11 +141,12 @@ public class SaturnSecurityHandlerTest {
 
     private void verifyAuthenticated(boolean success) {
         verifyIfRequestWasPassedToNextHandler(success);
+        verify(onAuthorized, times(success ? 1 : 0)).accept(any());
     }
 
     private void verifyIfRequestWasPassedToNextHandler(boolean success) {
         try {
-            verify(nextHandler, times(success ? 1 : 0)).handle(any(), any(), any(), any()); // Called in super.handle
+            verify(nextHandler, times(success ? 1 : 0)).handle(any(), any(), any(), any());
         } catch (Exception e) {
             fail();
         }
