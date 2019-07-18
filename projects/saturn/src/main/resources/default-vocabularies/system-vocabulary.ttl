@@ -179,8 +179,7 @@ fs:ExternalDirectoryShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
-fs:UserShape a sh:NodeShape ;
-    sh:closed true ; 
+fs:UserShape a fs:ClassShape ;
     sh:description "Description for fs:User" ;
     sh:name "User" ;
     sh:targetClass fs:User ;
@@ -302,7 +301,7 @@ fs:userEmailShape a fs:DatatypePropertyShape ;
 
 ## Relation Shapes
 
-fs:createdByShape a fs:RelationShape ;
+fs:createdByShape a sh:PropertyShape ;
     sh:name "Created By" ;
     sh:description "User that created this resource." ;
     sh:class fs:User ; 
@@ -311,7 +310,7 @@ fs:createdByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:createdBy .
 
-fs:modifiedByShape a fs:RelationShape ; 
+fs:modifiedByShape a sh:PropertyShape ;
     sh:name "Last Modified By" ;
     sh:description "User that last modified this resource." ;
     sh:class fs:User ; 
@@ -320,7 +319,7 @@ fs:modifiedByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:modifiedBy .
 
-fs:deletedByShape a fs:RelationShape ; 
+fs:deletedByShape a sh:PropertyShape ;
     sh:name "Deleted By" ;
     sh:description "User that deleted this resource." ;
     sh:class fs:User ; 
