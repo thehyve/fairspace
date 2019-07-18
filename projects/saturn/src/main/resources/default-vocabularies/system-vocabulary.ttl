@@ -159,6 +159,7 @@ fs:ExternalFileShape a fs:ClassShape ;
     sh:targetClass fs:ExternalFile ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
     fs:fixedShape true ;
+    fs:machineOnly true ;
     fs:systemProperties
         fs:labelShape,
         fs:commentShape ;
@@ -172,6 +173,7 @@ fs:ExternalDirectoryShape a fs:ClassShape ;
     sh:targetClass fs:ExternalDirectory ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
+    fs:machineOnly true ;
     fs:systemProperties
         fs:labelShape,
         fs:commentShape ;
