@@ -22,24 +22,26 @@ const useFormData = (values) => {
         validation.validateProperty(property, newValue);
     };
 
+    const current = key => valuesWithUpdates[key] || [];
+
     const addValue = (property, value) => {
-        const newValue = [...valuesWithUpdates[property.key], value];
+        const newValue = [...current(property.key), value];
         save(property, newValue);
     };
 
     const updateValue = (property, value, index) => {
-        const newValue = valuesWithUpdates[property.key].map((el, idx) => ((idx === index) ? value : el));
+        const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
         save(property, newValue);
     };
 
     const deleteValue = (property, index) => {
-        const newValue = valuesWithUpdates[property.key].filter((el, idx) => idx !== index);
+        const newValue = current(property.key).filter((el, idx) => idx !== index);
         save(property, newValue);
     };
 
     const clearForm = () => setUpdates({});
 
-    const validateAll = properties => !!properties.map(p => validation.validateProperty(p, valuesWithUpdates[p.key])).find(v => v);
+    const validateAll = properties => !!properties.map(p => validation.validateProperty(p, current(p.key))).find(v => v);
 
     return {
         addValue,

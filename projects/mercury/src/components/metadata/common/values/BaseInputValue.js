@@ -37,7 +37,7 @@ class BaseInputValue extends React.Component {
     }
 
     render() {
-        const {entry, property, style, ...otherProps} = this.props;
+        const {entry, property, currentValues, style, ...otherProps} = this.props;
 
         return (
             <TextField

@@ -72,6 +72,7 @@ const LinkedDataProperty = ({property, values = [], validations = [], onAdd, onC
                         <LinkedDataInputFieldsTable
                             property={property}
                             values={values}
+                            validations={validations}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onChange={onChange}

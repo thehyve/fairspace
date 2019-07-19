@@ -5,6 +5,7 @@ import {List, ListItem} from '@material-ui/core';
 import {MessageDisplay, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 import {compareBy, comparing} from "../../../utils/genericUtils";
+import {shouldPropertyBeHidden} from "../../../utils/linkeddata/metadataUtils";
 
 export const LinkedDataEntityForm = ({
     properties = [],
@@ -24,10 +25,13 @@ export const LinkedDataEntityForm = ({
         return <LoadingInlay />;
     }
 
+    const primaryType = values['@type'] && values['@type'][0] && values['@type'][0].id;
+
     return (
         <List dense>
             {
                 properties
+                    .filter(p => !shouldPropertyBeHidden(p.key, primaryType))
                     .sort(comparing(
                         compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
                         compareBy('label')

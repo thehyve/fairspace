@@ -17,4 +17,4 @@ Dropdown.propTypes = {
     options: PropTypes.array
 };
 
-export default (Dropdown);
+export default Dropdown;

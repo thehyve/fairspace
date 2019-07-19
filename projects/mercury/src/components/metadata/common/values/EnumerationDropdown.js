@@ -1,14 +1,14 @@
 import React from 'react';
 
 import Dropdown from "./Dropdown";
-import {getLabel, propertyContainsValueOrId} from "../../../../utils/linkeddata/metadataUtils";
+import {getLabel, valuesContainsValueOrId} from "../../../../utils/linkeddata/metadataUtils";
 
-function EnumerationDropdown({property, ...otherProps}) {
+function EnumerationDropdown({property, currentValues, ...otherProps}) {
     const options = property.allowedValues.map((entity) => {
         const id = entity['@id'];
         const value = entity['@value'];
         const label = getLabel(entity) || value;
-        const disabled = propertyContainsValueOrId(property, value, id);
+        const disabled = valuesContainsValueOrId(currentValues, value, id);
 
         return {
             disabled,

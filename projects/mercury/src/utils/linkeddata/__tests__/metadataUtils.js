@@ -1,20 +1,9 @@
 import nodeCrypto from "crypto";
 
 import {
-    generateUuid,
-    getLabel,
-    getLocalPart, getNamespacedIri,
-    getTypeInfo,
-    hasValue,
-    linkLabel,
-    normalizeMetadataResource,
-    partitionErrors,
-    propertiesToShow,
-    propertyContainsValueOrId,
-    relativeLink,
-    shouldPropertyBeHidden,
-    simplifyUriPredicates,
-    url2iri
+    generateUuid, getLabel, getLocalPart, getNamespacedIri, getTypeInfo, hasValue, linkLabel, normalizeMetadataResource,
+    partitionErrors, propertiesToShow, relativeLink, shouldPropertyBeHidden,
+    simplifyUriPredicates, url2iri, valuesContainsValueOrId
 } from "../metadataUtils";
 import * as constants from "../../../constants";
 import {normalizeJsonLdResource} from "../jsonLdUtils";
@@ -216,56 +205,31 @@ describe('Metadata Utils', () => {
     });
 
     describe('getTypeInfo', () => {
-        const generateMetadataWithType = (typeData) => [{
-            key: '@type',
-            values: [typeData]
-        }];
-
         const vocabulary = {
-            determineShapeForTypes: (typeIris) => ({[constants.SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}]})
+            determineShapeForTypes: (typeIris) => ({
+                [constants.SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}],
+                [constants.SHACL_NAME]: [{'@value': 'Name'}],
+                [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
+            })
         };
 
         it('retrieves information on the type of the entity', () => {
-            const metadata = generateMetadataWithType({
-                id: 'http://example.com/123',
-                label: 'some-label',
-                comment: 'some-comment'
-            });
+            const metadata = {
+                '@type': [{
+                    '@id': 'http://example.com/123'
+                }]
+            };
 
             expect(getTypeInfo(metadata, vocabulary)).toEqual({
-                label: 'some-label',
-                description: 'some-comment'
+                label: 'Name',
+                description: 'Description'
             });
         });
 
-        it('ignores missing comment', () => {
-            const metadata = generateMetadataWithType({
-                id: 'http://example.com/123',
-                label: 'some-label'
-            });
-
-            expect(getTypeInfo(metadata, vocabulary)).toEqual({
-                label: 'some-label',
-                description: ''
-            });
-        });
-
-        it('ignores missing label', () => {
-            const metadata = generateMetadataWithType({
-                id: 'http://example.com/123',
-                comment: 'some-comment'
-            });
-
-            expect(getTypeInfo(metadata, vocabulary)).toEqual({
-                description: 'some-comment',
-                label: ''
-            });
-        });
-
-        it('returns undefined if type is not present', () => {
+        it('returns empty object if type is not present', () => {
             const metadata = [];
 
-            expect(getTypeInfo(metadata, vocabulary)).toEqual({description: '', label: ''});
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({});
         });
     });
 
@@ -305,34 +269,32 @@ describe('Metadata Utils', () => {
         });
     });
 
-    describe('propertyContainsValueOrId', () => {
-        const property = {
-            values: [
-                {value: 'first value'},
-                {value: '321'},
-                {id: '1234'},
-                {value: 'other value'},
-                {id: 'some-id-555', value: 'with given value'}
-            ]
-        };
+    describe('valuesContainsValueOrId', () => {
+        const values = [
+            {value: 'first value'},
+            {value: '321'},
+            {id: '1234'},
+            {value: 'other value'},
+            {id: 'some-id-555', value: 'with given value'}
+        ];
 
         it('should returns true for the given values', () => {
-            expect(propertyContainsValueOrId(property, 'first value')).toBe(true);
-            expect(propertyContainsValueOrId(property, '321', 99)).toBe(true);
-            expect(propertyContainsValueOrId(property, '321')).toBe(true);
-            expect(propertyContainsValueOrId(property, null, '1234')).toBe(true);
-            expect(propertyContainsValueOrId(property, 'other value')).toBe(true);
-            expect(propertyContainsValueOrId(property, 'with given value', 'some-id-555')).toBe(true);
+            expect(valuesContainsValueOrId(values, 'first value')).toBe(true);
+            expect(valuesContainsValueOrId(values, '321', 99)).toBe(true);
+            expect(valuesContainsValueOrId(values, '321')).toBe(true);
+            expect(valuesContainsValueOrId(values, null, '1234')).toBe(true);
+            expect(valuesContainsValueOrId(values, 'other value')).toBe(true);
+            expect(valuesContainsValueOrId(values, 'with given value', 'some-id-555')).toBe(true);
         });
 
         it('should returns false for the given values', () => {
-            expect(propertyContainsValueOrId(property, null, '')).toBe(false);
-            expect(propertyContainsValueOrId(property, 321)).toBe(false);
-            expect(propertyContainsValueOrId(property, undefined, '12345')).toBe(false);
-            expect(propertyContainsValueOrId(property, undefined, 'other value')).toBe(false);
-            expect(propertyContainsValueOrId(property, 'some value value', 'other-id')).toBe(false);
-            expect(propertyContainsValueOrId({}, 'with given value', 'some-id-555')).toBe(false);
-            expect(propertyContainsValueOrId({}, undefined, null)).toBe(false);
+            expect(valuesContainsValueOrId(values, null, '')).toBe(false);
+            expect(valuesContainsValueOrId(values, 321)).toBe(false);
+            expect(valuesContainsValueOrId(values, undefined, '12345')).toBe(false);
+            expect(valuesContainsValueOrId(values, undefined, 'other value')).toBe(false);
+            expect(valuesContainsValueOrId(values, 'some value value', 'other-id')).toBe(false);
+            expect(valuesContainsValueOrId([], 'with given value', 'some-id-555')).toBe(false);
+            expect(valuesContainsValueOrId([], undefined, null)).toBe(false);
         });
     });
 

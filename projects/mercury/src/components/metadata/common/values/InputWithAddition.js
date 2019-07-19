@@ -9,7 +9,7 @@ import {normalizeMetadataResource, simplifyUriPredicates} from "../../../../util
 
 const InputWithAddition = ({
     children, onChange,
-    pending, error, shape, emptyData, requireIdentifier = true
+    pending, error, shape, requireIdentifier = true
 }) => {
     const [adding, setAdding] = useState(false);
 
@@ -44,7 +44,6 @@ const InputWithAddition = ({
                 {adding && (
                     <NewLinkedDataEntityDialog
                         shape={shape}
-                        linkedData={emptyData}
                         onCreate={onCreate}
                         onClose={handleCloseDialog}
                         requireIdentifier={requireIdentifier}
@@ -68,7 +67,6 @@ const InputWithAddition = ({
 
 InputWithAddition.propTypes = {
     shape: PropTypes.object.isRequired,
-    emptyData: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     requireIdentifier: PropTypes.bool,
     error: PropTypes.bool,
