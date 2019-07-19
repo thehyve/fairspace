@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -9,7 +8,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
-import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -18,12 +16,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.Arrays;
 
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -32,6 +33,8 @@ public class ShaclValidatorTest {
     private static final Model EMPTY = createDefaultModel();
     private static final Resource resource1 = createResource("http://example.com/123");
     private static final Resource resource2 = createResource("http://example.com/234");
+    private static final Resource closedClass = createResource("http://example.com/ClosedClass");
+    private static final Resource closedClassShape = createResource("http://example.com/ClosedClassShape");
 
     private Dataset ds = DatasetFactory.create();
     private RDFConnection rdf = new RDFConnectionLocal(ds);
@@ -40,10 +43,17 @@ public class ShaclValidatorTest {
     @Mock
     private ViolationHandler violationHandler;
 
+
     @Before
     public void setUp() {
         initVocabularies(rdf);
-        validator = new ShaclValidator(rdf, Quad.defaultGraphIRI, Vocabularies.VOCABULARY_GRAPH_URI);
+
+        ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI())
+                .add(closedClassShape, RDF.type, FS.ClassShape)
+                .add(closedClassShape, SH.targetClass, closedClass)
+                .add(closedClassShape, createProperty(SH.NS + "closed"), createTypedLiteral(true));
+
+        validator = new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI);
 
         doAnswer(invocation -> {
             System.err.println(Arrays.toString(invocation.getArguments()));
@@ -90,7 +100,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithUnknownProperty() {
         validator.validate(EMPTY, createDefaultModel()
-                        .add(resource1, RDF.type, FS.User)
+                        .add(resource1, RDF.type, closedClass)
                         .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123)),
                 violationHandler);
 
@@ -156,9 +166,9 @@ public class ShaclValidatorTest {
         // If the update contains a blank node, it should be validated solely with the
         // information from the update, as there can not be any triple in the database
         // already that references this blank node
-        Resource blankNode = createResource();
-        Model model = createDefaultModel()
-                .add(blankNode, RDF.type, FS.User)
+        var blankNode = createResource();
+        var model = createDefaultModel()
+                .add(blankNode, RDF.type, closedClass)
                 .add(blankNode, FS.md5, "test");
 
         validator.validate(EMPTY, model, violationHandler);

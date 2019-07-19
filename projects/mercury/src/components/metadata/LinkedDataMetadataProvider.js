@@ -19,7 +19,7 @@ import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataMetadataProvider = ({
-    children, fetchMetadataVocabulary, fetchMetadataBySubject, submitChanges,
+    children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
     vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch,
     getLinkedDataForSubject,
     ...otherProps
@@ -27,7 +27,7 @@ const LinkedDataMetadataProvider = ({
     fetchMetadataVocabulary();
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
-    const submitLinkedDataChanges = (subject, values, defaultType) => submitChanges(subject, values, vocabulary, defaultType)
+    const submitLinkedDataChanges = (subject, values, defaultType) => dispatchSubmitMetadataChanges(subject, values, vocabulary, defaultType)
         .then(() => fetchMetadataBySubject(subject));
 
     const extendProperties = ({properties, isEntityEditable = true}) => properties
@@ -103,7 +103,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
     fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
-    submitChanges: submitMetadataChanges,
+    dispatchSubmitMetadataChanges: submitMetadataChanges,
     createEntity: createMetadataEntity,
     searchMetadataDispatch: searchMetadata,
 };

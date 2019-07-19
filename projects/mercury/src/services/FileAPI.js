@@ -11,23 +11,12 @@ const defaultOptions = {withCredentials: true};
 const includeDetails = {...defaultOptions, details: true};
 
 axios.interceptors.request.use((config) => {
-    if (config.method === 'propfind') {
+    // For stat requests we want to retrieve all available webdav properties
+    // We can only distinguish between a directory listing and a stat request
+    // based on the Depth header send to the backend.
+    if (config.method === 'propfind' && config.headers.Depth === 0) {
         config.headers['content-type'] = 'application/xml';
-        config.data = `
-<propfind xmlns:d="DAV:" xmlns:fs="http://fairspace.io/ontology#">
-   <d:prop>
-      <fs:iri />
-   </d:prop>
-   <d:prop>
-      <d:resourcetype />
-   </d:prop>
-   <d:prop>
-      <d:getlastmodified />
-   </d:prop>
-   <d:prop>
-      <d:getcontentlength />
-   </d:prop>
-</propfind>`;
+        config.data = `<propfind><allprop /></propfind>`;
     }
     return config;
 }, (error) => Promise.reject(error));
@@ -51,8 +40,7 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path) {
-        return this.client().getDirectoryContents(path, includeDetails)
-            .then(result => result.data)
+        return this.client().getDirectoryContents(path, defaultOptions)
             .then(files => files.sort(comparing(compareBy('type'), compareBy('filename'))));
     }
 

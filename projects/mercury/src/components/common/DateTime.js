@@ -1,31 +1,22 @@
-import React from 'react';
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+});
 
-class DateTime extends React.Component {
-    optionsDate = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    }
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: 'numeric'
+});
 
-    optionsTime = {
-        hour: 'numeric',
-        minute: 'numeric'
-    }
+const formatDateTime = (date) => {
+    const today = new Date();
+    const isToday = (today.toDateString() === date.toDateString());
+    return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
+};
 
-    dateFormatter = new Intl.DateTimeFormat('en-US', this.optionsDate);
-
-    timeFormatter = new Intl.DateTimeFormat('en-US', this.optionsTime);
-
-    formatDateTime = (date) => {
-        const today = new Date();
-        const isToday = (today.toDateString() === date.toDateString());
-        return isToday ? this.timeFormatter.format(date) : this.dateFormatter.format(date);
-    }
-
-    render() {
-        const {value} = this.props;
-        return this.formatDateTime(new Date(value));
-    }
-}
+const DateTime = ({value}) => {
+    return formatDateTime(new Date(value));
+};
 
 export default DateTime;

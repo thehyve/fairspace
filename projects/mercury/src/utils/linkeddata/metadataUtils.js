@@ -115,6 +115,12 @@ export const shouldPropertyBeHidden = (key, domain) => {
         case consts.DELETED_BY_URI:
             return true;
         case consts.LABEL_URI:
+        case consts.DATE_CREATED_URI:
+        case consts.CREATED_BY_URI:
+        case consts.DATE_MODIFIED_URI:
+        case consts.MODIFIED_BY_URI:
+        case consts.FILE_SIZE_URI:
+        case consts.MD5_URI:
             return isManaged;
         case consts.COMMENT_URI:
             return isCollection;

@@ -163,19 +163,19 @@ describe('Metadata Utils', () => {
                 key: "@type",
                 values: [{id: "http://fairspace.io/ontology#Collection", comment: "A specific collection in Fairspace."}]
             }, {
-                key: "http://fairspace.io/ontology#createdBy",
+                key: "http://fairspace.io/ontology#otherProp",
                 values: [{id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd"}]
             }, {
-                key: "http://fairspace.io/ontology#dateCreated",
+                key: "http://fairspace.io/ontology#additionalDate",
                 values: [{value: "2019-03-18T13:06:22.62Z"}]
             }];
 
             const expected = [
                 {
-                    key: "http://fairspace.io/ontology#createdBy",
+                    key: "http://fairspace.io/ontology#otherProp",
                     values: [{id: "http://fairspace.io/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd"}]
                 }, {
-                    key: "http://fairspace.io/ontology#dateCreated",
+                    key: "http://fairspace.io/ontology#additionalDate",
                     values: [{value: "2019-03-18T13:06:22.62Z"}]
                 }];
 
