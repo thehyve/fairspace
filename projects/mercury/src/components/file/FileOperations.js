@@ -205,6 +205,7 @@ export class FileOperations extends React.Component {
                         <ProgressButton active={op === Operations.MKDIR}>
                             <CreateDirectoryButton
                                 onCreate={name => this.handleCreateDirectory(name)}
+                                disabled={isWritingDisabled || busy}
                             >
                                 <IconButton
                                     aria-label="Create directory"
@@ -218,6 +219,7 @@ export class FileOperations extends React.Component {
                         <ProgressButton active={op === Operations.UPLOAD}>
                             <UploadButton
                                 onUpload={files => this.handleUpload(files)}
+                                disabled={isWritingDisabled || busy}
                             >
                                 <IconButton
                                     title="Upload"
