@@ -27,7 +27,7 @@ import Config from "../../services/Config/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataVocabularyProvider = ({
-    children, fetchMetaVocabulary, fetchMetadataVocabulary, submitChanges,
+    children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
     metaVocabulary, vocabulary, authorizations, createEntity,
     getLinkedDataSearchResults, searchVocabularyDispatch, ...otherProps
 }) => {
@@ -37,7 +37,7 @@ const LinkedDataVocabularyProvider = ({
     const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
-    const submitLinkedDataChanges = (subject, values) => submitChanges(subject, values, metaVocabulary)
+    const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary)
         .then(fetchMetadataVocabulary);
 
     const getPropertiesForLinkedData = ({linkedData, subject, isEntityEditable = true}) => {
@@ -120,7 +120,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     fetchMetaVocabulary: fetchMetaVocabularyIfNeeded,
     fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
-    submitChanges: submitVocabularyChanges,
+    dispatchSubmitVocabularyChanges: submitVocabularyChanges,
     createEntity: createVocabularyEntity,
     searchVocabularyDispatch: searchVocabulary,
 };
