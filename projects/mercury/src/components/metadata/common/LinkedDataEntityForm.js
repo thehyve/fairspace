@@ -5,7 +5,7 @@ import {List, ListItem} from '@material-ui/core';
 import {MessageDisplay, LoadingInlay} from "../../common";
 import LinkedDataProperty from "./LinkedDataProperty";
 import {compareBy, comparing} from "../../../utils/genericUtils";
-import {shouldPropertyBeHidden} from "../../../utils/linkeddata/metadataUtils";
+import {hasValue, shouldPropertyBeHidden} from "../../../utils/linkeddata/metadataUtils";
 
 export const LinkedDataEntityForm = ({
     properties = [],
@@ -31,7 +31,11 @@ export const LinkedDataEntityForm = ({
         <List dense>
             {
                 properties
-                    .filter(p => !shouldPropertyBeHidden(p.key, primaryType))
+                    // Some properties are always hidden (e.g. @type) or hidden based on the type of entity (e.g. label for collection)
+                    // Properties are also hidden when it is not editable and there is no value
+                    .filter(p => !shouldPropertyBeHidden(p.key, primaryType) && (p.isEditable || hasValue(values[p.key])))
+
+                    // Properties are sorted based on the sh:order property, or by its label otherwise
                     .sort(comparing(
                         compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
                         compareBy('label')

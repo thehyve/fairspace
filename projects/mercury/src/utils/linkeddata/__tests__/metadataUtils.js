@@ -299,11 +299,10 @@ describe('Metadata Utils', () => {
     });
 
     describe('hasValue', () => {
-        it('should return false if no value is present', () => expect(hasValue({})).toBe(false));
-        it('should return false if values list is empty', () => expect(hasValue({values: []})).toBe(false));
-        it('should return false if only an empty string is is present', () => expect(hasValue({values: [{value: ""}]})).toBe(false));
-        it('should return true if an id is present', () => expect(hasValue({values: [{id: "http://a"}]})).toBe(true));
-        it('should return true if a non-empty value is present', () => expect(hasValue({values: [{value: "label"}]})).toBe(true));
+        it('should return false if values list is empty', () => expect(hasValue([])).toBe(false));
+        it('should return false if only an empty string is is present', () => expect(hasValue([{value: ""}])).toBe(false));
+        it('should return true if an id is present', () => expect(hasValue([{id: "http://a"}])).toBe(true));
+        it('should return true if a non-empty value is present', () => expect(hasValue([{value: "label"}])).toBe(true));
     });
 
     describe('simplifyUriPredicates', () => {
