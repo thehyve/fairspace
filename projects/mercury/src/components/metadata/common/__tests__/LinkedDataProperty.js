@@ -14,15 +14,17 @@ const defaultProperty = {
     key: 'description',
     datatype: STRING_URI,
     label: 'Description',
-    values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     maxValuesCount: 4,
     isEditable: true,
     isRelationShape: true
 };
 
+const defaultValues = [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}];
+
+
 describe('LinkedDataProperty elements', () => {
     it('shows a table with relations for relationShapes', () => {
-        const wrapper = shallow(<LinkedDataProperty property={defaultProperty} />);
+        const wrapper = shallow(<LinkedDataProperty property={defaultProperty} values={defaultValues} />);
         const table = wrapper.find(LinkedDataRelationTable);
         expect(table.length).toEqual(1);
         expect(table.prop("property")).toEqual(defaultProperty);
@@ -34,7 +36,7 @@ describe('LinkedDataProperty elements', () => {
             isRelationShape: false
         };
 
-        const wrapper = shallow(<LinkedDataProperty property={property} />);
+        const wrapper = shallow(<LinkedDataProperty property={property} values={defaultValues} />);
         const table = wrapper.find(LinkedDataInputFieldsTable);
         expect(table.length).toEqual(1);
         expect(table.prop("property")).toEqual(property);
@@ -42,7 +44,7 @@ describe('LinkedDataProperty elements', () => {
 
     describe('canAdd', () => {
         const verifyCanAdd = (property, expectedCanAdd) => {
-            const wrapper = shallow(<LinkedDataProperty property={property} />);
+            const wrapper = shallow(<LinkedDataProperty property={property} values={defaultValues} />);
             const table = wrapper.find(LinkedDataRelationTable);
             expect(table.length).toEqual(1);
             expect(table.prop("canAdd")).toBe(expectedCanAdd);

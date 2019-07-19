@@ -25,8 +25,8 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
     } = useLinkedDataSearch(true);
 
     const {
-        requireIdentifier, editorPath, createLinkedDataEntity,
-        onEntityCreationError, hasEditRight
+        requireIdentifier, editorPath,
+        hasEditRight
     } = useContext(LinkedDataContext);
 
     const renderTypeClass = ({targetClass, label}) => (
@@ -93,11 +93,7 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
                         shapesLoading={shapesLoading}
                         shapes={shapes}
                         requireIdentifier={requireIdentifier}
-                        create={
-                            (formKey, id, type) => createLinkedDataEntity(formKey, id, type)
-                                .then(() => history.push(getEntityRelativeUrl(editorPath, id)))
-                        }
-                        onEntityCreationError={onEntityCreationError}
+                        onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}
                     >
                         <ListBody />
                     </LinkedDataCreator>

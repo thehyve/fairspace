@@ -1,85 +1,60 @@
-import {useContext, useEffect} from "react";
-import {useDispatch, useSelector} from 'react-redux';
+import {useState} from "react";
+import useValidation from "./useValidation";
 
-import {
-    getLinkedDataFormUpdates, getLinkedDataFormValidations,
-    hasLinkedDataFormUpdates, hasLinkedDataFormValidationErrors, isLinkedDataFormPending
-} from "../../reducers/linkedDataFormReducers";
-import {
-    addLinkedDataValue, deleteLinkedDataValue,
-    updateLinkedDataValue, validateLinkedDataProperty,
-    initializeLinkedDataForm
-} from "../../actions/linkedDataFormActions";
-import ErrorDialog from "../common/ErrorDialog";
-import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
-import LinkedDataContext from './LinkedDataContext';
-import {propertiesToShow, partitionErrors} from "../../utils/linkeddata/metadataUtils";
+/**
+ * This hook is concerned about storing form state for linked data
+ * @param values
+ * @returns {{valuesWithUpdates: any, updateValue: updateValue, hasFormUpdates: any, deleteValue: deleteValue, updates: any, addValue: addValue}}
+ */
+const useFormData = (values) => {
+    const [updates, setUpdates] = useState({});
 
-const useFormData = (formKey, defaultType) => {
-    if (!formKey) {
-        throw new Error('Please provide a valid form key.');
-    }
+    const {validateProperty, allErrors, isValid} = useValidation();
 
-    const dispatch = useDispatch();
+    const hasFormUpdates = Object.keys(updates).length > 0;
+    const valuesWithUpdates = {...values, ...updates};
 
-    useEffect(() => {
-        dispatch(initializeLinkedDataForm(formKey));
-    }, [formKey, dispatch]);
-
-    const hasFormUpdates = useSelector(state => hasLinkedDataFormUpdates(state, formKey));
-
-    const hasFormValidationErrors = useSelector(state => hasLinkedDataFormValidationErrors(state, formKey));
-
-    const isUpdating = useSelector(state => isLinkedDataFormPending(state, formKey));
-
-    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
-
-    const onSubmit = () => {
-        submitLinkedDataChanges(formKey, defaultType)
-            .catch(e => {
-                if (e.details) {
-                    ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, formKey), e.message);
-                } else {
-                    ErrorDialog.showError(e, `Error while updating entity.\n${e.message}`);
-                }
-            });
+    const save = (property, newValue) => {
+        setUpdates({
+            ...updates,
+            [property.key]: newValue
+        });
+        validateProperty(property, newValue);
     };
 
-    const onAdd = (property, value) => {
-        dispatch(addLinkedDataValue(formKey, property, value));
-        dispatch(validateLinkedDataProperty(formKey, property));
+    const addValue = (property, value) => {
+        const newValue = [...valuesWithUpdates[property.key], value];
+        save(property, newValue);
     };
 
-    const onChange = (property, value, index) => {
-        dispatch(updateLinkedDataValue(formKey, property, value, index));
-        dispatch(validateLinkedDataProperty(formKey, property));
+    const updateValue = (property, value, index) => {
+        const newValue = valuesWithUpdates[property.key].map((el, idx) => ((idx === index) ? value : el));
+        save(property, newValue);
     };
 
-    const onDelete = (property, index) => {
-        dispatch(deleteLinkedDataValue(formKey, property, index));
-        dispatch(validateLinkedDataProperty(formKey, property));
+    const deleteValue = (property, index) => {
+        const newValue = valuesWithUpdates[property.key].filter((el, idx) => idx !== index);
+        save(property, newValue);
     };
 
-    const updates = useSelector(state => getLinkedDataFormUpdates(state, formKey));
+    const clearForm = () => setUpdates({});
 
-    const errors = useSelector(state => getLinkedDataFormValidations(state, formKey));
-
-    const extendPropertiesWithChanges = (properties) => propertiesToShow(properties)
-        .filter(p => p.isEditable || p.values.length)
-        .map(p => ({
-            ...p,
-            values: updates[p.key] || p.values,
-            errors: errors[p.key]
-        }));
+    const validateAll = properties => !!properties.map(p => validateProperty(p, valuesWithUpdates[p.key])).find(v => v);
 
     return {
-        extendPropertiesWithChanges,
-        onSubmit,
-        isUpdating,
-        submitDisabled: isUpdating || !hasFormUpdates || hasFormValidationErrors,
-        onAdd,
-        onChange,
-        onDelete,
+        addValue,
+        updateValue,
+        deleteValue,
+        clearForm,
+
+        hasFormUpdates,
+        updates,
+        valuesWithUpdates,
+
+        validateAll,
+        validateProperty,
+        allErrors,
+        isValid
     };
 };
 

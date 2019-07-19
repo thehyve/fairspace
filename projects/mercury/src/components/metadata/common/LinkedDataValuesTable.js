@@ -15,7 +15,7 @@ const styles = {
     }
 };
 
-export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
+export const LinkedDataValuesTable = ({classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
@@ -33,7 +33,7 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onO
                     </TableHead>
                 ) : undefined}
             <TableBody>
-                {property.values.map((entry, idx) => rowDecorator(entry, (
+                {values.map((entry, idx) => rowDecorator(entry, (
                     <TableRow
                         onMouseEnter={() => setHoveredIndex(idx)}
                         onMouseLeave={() => setHoveredIndex(null)}
@@ -102,6 +102,7 @@ LinkedDataValuesTable.propTypes = {
         })
     ),
     property: PropTypes.object,
+    values: PropTypes.array,
 
     classes: PropTypes.object
 };
@@ -113,7 +114,8 @@ LinkedDataValuesTable.defaultProps = {
     showHeader: true,
     canAdd: true,
     columnDefinitions: [],
-    classes: {}
+    classes: {},
+    values: []
 };
 
 export default withStyles(styles)(LinkedDataValuesTable);

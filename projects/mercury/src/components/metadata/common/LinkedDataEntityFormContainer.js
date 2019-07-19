@@ -1,17 +1,39 @@
-import React from "react";
+import React, {useContext} from "react";
 import PropTypes from "prop-types";
-import {Button, Grid, CircularProgress} from "@material-ui/core";
+import {Button, CircularProgress, Grid} from "@material-ui/core";
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
+import {getValuesFromProperties} from "../../../utils/linkeddata/metadataUtils";
+import LinkedDataContext from "../LinkedDataContext";
+import useFormSubmission from "../useFormSubmission";
 
 const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable = true, ...otherProps}) => {
+    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
     const {properties, linkedDataLoading, linkedDataError} = useLinkedData(subject, defaultType, isEditable);
+
+    const visibleProperties = properties.filter(p => p.isEditable || p.values.length);
+    const values = getValuesFromProperties(properties);
+
     const {
-        extendPropertiesWithChanges, onSubmit, submitDisabled,
-        onAdd, onChange, onDelete, isUpdating
-    } = useFormData(subject, defaultType);
+        addValue, updateValue, deleteValue, clearForm,
+        updates, hasFormUpdates, valuesWithUpdates,
+
+        validateAll, allErrors: validations, isValid
+    } = useFormData(values);
+
+    const {isUpdating, submitForm} = useFormSubmission(
+        () => submitLinkedDataChanges(subject, updates, defaultType)
+            .then(() => clearForm()),
+        subject
+    );
+
+    const validateAndSubmit = () => {
+        const hasErrors = validateAll(visibleProperties);
+
+        if (!hasErrors) submitForm();
+    };
 
     let footer;
 
@@ -20,18 +42,14 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
     } else if (isEditable) {
         footer = (
             <Button
-                onClick={onSubmit}
+                onClick={validateAndSubmit}
                 color="primary"
-                disabled={submitDisabled}
+                disabled={!hasFormUpdates || !isValid}
             >
                 Update
             </Button>
         );
     }
-
-    const visibleProperties = isEditable
-        ? extendPropertiesWithChanges(properties)
-        : properties.filter(p => p.values.length);
 
     return (
         <Grid container>
@@ -41,9 +59,11 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
                     error={linkedDataError}
                     loading={linkedDataLoading}
                     properties={visibleProperties}
-                    onAdd={onAdd}
-                    onChange={onChange}
-                    onDelete={onDelete}
+                    values={valuesWithUpdates}
+                    validations={validations}
+                    onAdd={addValue}
+                    onChange={updateValue}
+                    onDelete={deleteValue}
                 />
             </Grid>
             {footer && <Grid item>{footer}</Grid>}
