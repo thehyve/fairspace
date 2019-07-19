@@ -118,12 +118,12 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
  * @param expandedMetadata
  * @param subject
  * @param defaultType
- * @returns {Array|*|{}}
+ * @returns {*|{}}
  */
 export const getJsonLdForSubject = (expandedMetadata, subject, defaultType) => {
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
         console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
-        return [];
+        return {};
     }
 
     // If no subject is provided, use the first (and only) entry in the metadata

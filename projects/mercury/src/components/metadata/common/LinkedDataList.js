@@ -10,9 +10,9 @@ import Iri from "../../common/Iri";
 
 const LinkedDataList = ({
     entities = [],
-    total,
-    page, setPage,
-    size, setSize,
+    total = 0,
+    page = 0, setPage,
+    size = 0, setSize,
     hasHighlights,
     onOpen,
     classes,

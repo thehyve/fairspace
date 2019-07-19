@@ -9,18 +9,23 @@ import {fromJsonLd, getJsonLdForSubject} from "../../utils/linkeddata/jsonLdConv
  * The contextual logic is being provided by {@link LinkedDataContext}
  *
  * @param {string} subject
- * @param {boolean} isEntityEditable
+ * @param {string} defaultType
  */
-const useLinkedData = (subject, defaultType) => {
+export const useLinkedData = (subject, defaultType, context = {}) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
 
     const {
-        shapes, shapesLoading, shapesError, fetchLinkedDataForSubject,
-        isLinkedDataLoading, hasLinkedDataErrorForSubject,
-        getLinkedDataForSubject, getTypeInfoForLinkedData
-    } = useContext(LinkedDataContext);
+        shapes,
+        shapesLoading = false,
+        shapesError = false,
+        fetchLinkedDataForSubject = () => {},
+        isLinkedDataLoading = () => false,
+        hasLinkedDataErrorForSubject = () => false,
+        getLinkedDataForSubject = () => {},
+        getTypeInfoForLinkedData = () => {}
+    } = context;
 
     // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
     const updateLinkedData = useCallback(() => {
@@ -67,4 +72,5 @@ const useLinkedData = (subject, defaultType) => {
     };
 };
 
-export default useLinkedData;
+// Export a custom hook attached to the context by default
+export default (subject, defaultType) => useLinkedData(subject, defaultType, useContext(LinkedDataContext));
