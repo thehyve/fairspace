@@ -67,3 +67,9 @@ export const statFile = createErrorHandlingPromiseAction((path) => ({
     payload: FileAPI.stat(path),
     meta: {path}
 }));
+
+
+export const statFileIfNeeded = path => dispatchIfNeeded(
+    () => statFile(path),
+    state => state.cache.fileInfoByPath[path]
+);

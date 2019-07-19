@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.Context.currentRequest;
@@ -27,13 +28,16 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private final String workspaceUserRole;
     private final String sparqlRole;
     private final String dataStewardRole;
+    private final Consumer<UserInfo> onAuthorized;
 
     /**
      * @param apiPrefix
      * @param authenticator Authenticator returning a UserInfo for an incoming request
+     * @param onAuthorized An optional callback, called on successful authorization
      */
-    SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, UserInfo> authenticator) {
+    SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, UserInfo> authenticator, Consumer<UserInfo> onAuthorized) {
         this.authenticator = authenticator;
+        this.onAuthorized = onAuthorized;
         this.healthResource = apiPrefix + "/health/";
         this.sparqlResource = apiPrefix + "/rdf/";
         this.vocabularyResource = apiPrefix + "/vocabulary/";
@@ -80,6 +84,10 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
                     && RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod())
                     && !authorities.contains(dataStewardRole)) {
                 return "Only data stewards can edit the vocabulary";
+            }
+
+            if (onAuthorized != null) {
+                onAuthorized.accept(userInfo);
             }
         }
 

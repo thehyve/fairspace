@@ -1,38 +1,37 @@
 import React from 'react';
 import {connect} from 'react-redux';
-
 // Actions
 import {fetchMetadataVocabularyIfNeeded} from "../../actions/vocabularyActions";
-import {createMetadataEntityFromState, fetchMetadataBySubjectIfNeeded, submitMetadataChangesFromState} from "../../actions/metadataActions";
+import {
+    createMetadataEntity, fetchMetadataBySubjectIfNeeded, submitMetadataChanges
+} from "../../actions/metadataActions";
 import {searchMetadata} from "../../actions/searchActions";
-
 // Reducers
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {
+    getCombinedMetadataForSubject, hasMetadataError, isMetadataPending
+} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {getMetadataSearchResults} from "../../reducers/searchReducers";
-
 // Utils
 import {emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
-import {propertiesToShow, getTypeInfo, getLabel} from "../../utils/linkeddata/metadataUtils";
+import {getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
-
 // Other
-import LinkedDataContext, {onEntityCreationError} from './LinkedDataContext';
-import {USABLE_IN_METADATA_URI, METADATA_PATH, VOCABULARY_PATH} from "../../constants";
-import Iri from "../common/Iri";
-import LinkedDataLink from "./common/LinkedDataLink";
+import LinkedDataContext from './LinkedDataContext';
+import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataMetadataProvider = ({
-    children, fetchMetadataVocabulary, fetchMetadataBySubject, submitMetadataChanges,
-    vocabulary, createMetadataEntity, getLinkedDataSearchResults, searchMetadataDispatch, ...otherProps
+    children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
+    vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch, ...otherProps
 }) => {
     fetchMetadataVocabulary();
 
     const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
 
-    const submitLinkedDataChanges = (formKey, type) => submitMetadataChanges(formKey, type)
-        .then(() => fetchMetadataBySubject(formKey));
+    const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
+    const submitLinkedDataChanges = (subject, values, defaultType) => dispatchSubmitMetadataChanges(subject, values, vocabulary, defaultType)
+        .then(() => fetchMetadataBySubject(subject));
 
     const getPropertiesForLinkedData = ({linkedData, isEntityEditable = true}) => propertiesToShow(linkedData)
         .map(p => ({
@@ -46,35 +45,6 @@ const LinkedDataMetadataProvider = ({
 
     const getClassesInCatalog = () => vocabulary.getClassesInCatalog();
 
-    const getSearchEntities = () => {
-        const {items, total, pending, error} = getLinkedDataSearchResults();
-
-        const entities = items.map(({id, label, comment, type, highlights}) => {
-            const shape = vocabulary.determineShapeForTypes(type);
-            const typeLabel = getLabel(shape, true);
-            const shapeUrl = shape['@id'];
-
-            return {
-                id,
-                primaryText: (label && label[0]) || <Iri iri={id} />,
-                secondaryText: (comment && comment[0]),
-                typeLabel,
-                shapeUrl,
-                highlights
-            };
-        });
-
-        return {
-            searchPending: pending,
-            searchError: error,
-            entities,
-            total,
-            hasHighlights: entities.some(({highlights}) => highlights.length > 0),
-        };
-    };
-
-    const typeRender = (entry) => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>;
-
     return (
         <LinkedDataContext.Provider
             value={{
@@ -82,8 +52,8 @@ const LinkedDataMetadataProvider = ({
 
                 // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataBySubject,
-                createLinkedDataEntity: createMetadataEntity,
                 searchLinkedData: searchMetadataDispatch,
+                createLinkedDataEntity,
                 submitLinkedDataChanges,
 
                 // Fixed properties
@@ -101,10 +71,8 @@ const LinkedDataMetadataProvider = ({
                 getClassesInCatalog,
 
                 // Generic methods without reference to shapes
-                valueComponentFactory,
-                getSearchEntities,
-                typeRender,
-                onEntityCreationError
+                getSearchResults: getLinkedDataSearchResults,
+                valueComponentFactory
             }}
         >
             {children}
@@ -136,8 +104,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
     fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
-    submitMetadataChanges: submitMetadataChangesFromState,
-    createMetadataEntity: createMetadataEntityFromState,
+    dispatchSubmitMetadataChanges: submitMetadataChanges,
+    createEntity: createMetadataEntity,
     searchMetadataDispatch: searchMetadata,
 };
 

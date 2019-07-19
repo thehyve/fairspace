@@ -100,6 +100,7 @@ export const VOCABULARY_SEARCH_REJECTED             = 'VOCABULARY_SEARCH_REJECTE
 
 // Metadata editing
 export const INITIALIZE_LINKEDDATA_FORM             = 'INITIALIZE_LINKEDDATA_FORM';
+export const CLEAR_LINKEDDATA_FORM                  = 'CLEAR_LINKEDDATA_FORM';
 export const ADD_LINKEDDATA_VALUE                   = 'ADD_LINKEDDATA_VALUE';
 export const UPDATE_LINKEDDATA_VALUE                = 'UPDATE_LINKEDDATA_VALUE';
 export const DELETE_LINKEDDATA_VALUE                = 'DELETE_LINKEDDATA_VALUE';

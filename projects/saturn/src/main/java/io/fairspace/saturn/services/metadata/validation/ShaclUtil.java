@@ -5,7 +5,10 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.MultiUnion;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -18,7 +21,6 @@ import org.topbraid.shacl.validation.ValidationEngineFactory;
 import org.topbraid.shacl.vocabulary.SH;
 import org.topbraid.shacl.vocabulary.TOSH;
 import org.topbraid.spin.arq.ARQFactory;
-import org.topbraid.spin.util.JenaUtil;
 
 import java.net.URI;
 import java.util.UUID;
@@ -26,22 +28,24 @@ import java.util.UUID;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.topbraid.spin.util.JenaUtil.getAllInstances;
+import static org.topbraid.spin.util.JenaUtil.getStringProperty;
 
 public class ShaclUtil {
     static void addObjectTypes(Model model, Node dataGraph, RDFConnection rdf) {
-        model.listObjects().forEachRemaining(obj -> {
-            if (obj.isURIResource() && !((Resource)obj).hasProperty(RDF.type)) {
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, obj, RDF.type, null)));
-            }
-        });
+        model.listObjects()
+                .filterKeep(RDFNode::isResource)
+                .mapWith(RDFNode::asResource)
+                .toSet()
+                .forEach(obj -> model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, obj, RDF.type, null))));
         model.add(rdf.queryConstruct(storedQuery("select_by_mask", dataGraph, null, RDFS.subClassOf, null)));
     }
 
     public static void getViolations(ValidationEngine validationEngine, ViolationHandler violationHandler) {
-         JenaUtil.getAllInstances(SH.ValidationResult.inModel(validationEngine.getReport().getModel()))
+         getAllInstances(SH.ValidationResult.inModel(validationEngine.getReport().getModel()))
                 .forEach(shResult -> {
                     if (shResult.hasProperty(SH.resultSeverity, SH.Violation)) {
-                        var message = JenaUtil.getStringProperty(shResult, SH.resultMessage);
+                        var message = getStringProperty(shResult, SH.resultMessage);
                         var root = shResult.getPropertyResourceValue(SH.focusNode);
                         var path = ofNullable(shResult.getPropertyResourceValue(SH.resultPath)).map(res -> createProperty(res.getURI())).orElse(null);
                         var value = ofNullable(shResult.getProperty(SH.value)).map(Statement::getObject).orElse(null);

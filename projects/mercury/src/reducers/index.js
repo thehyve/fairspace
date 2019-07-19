@@ -6,7 +6,6 @@ import clipboard from "./clipboardReducers";
 import workspace from './workspaceReducers';
 import ui from "./uiReducers";
 import {collectionsSearchReducer, metadataSearchReducer, vocabularySearchReducer} from './searchReducers';
-import linkedDataForm from './linkedDataFormReducers';
 
 export default combineReducers({
     account,
@@ -17,6 +16,5 @@ export default combineReducers({
     ui,
     collectionSearch: collectionsSearchReducer,
     metadataSearch: metadataSearchReducer,
-    vocabularySearch: vocabularySearchReducer,
-    linkedDataForm
+    vocabularySearch: vocabularySearchReducer
 });

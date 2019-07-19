@@ -26,6 +26,7 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
@@ -50,7 +51,7 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(CONFIG.users.endpoint, CONFIG.users.synchronizationInterval, new DAO(rdf, null), CONFIG.auth.enabled);
+        var userService = new UserService(CONFIG.users.endpoint, TimeUnit.SECONDS.toMillis(CONFIG.users.synchronizationInterval), new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
         var mailService = new MailService(CONFIG.mail);
 
@@ -61,7 +62,7 @@ public class App {
                 ManagedFileSystem.TYPE, new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus),
                 IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(collections)));
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, userIriSupplier, permissions);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissions);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(SYSTEM_VOCABULARY),
@@ -78,7 +79,7 @@ public class App {
                 new MetadataAndVocabularyConsistencyValidator(rdf),
                 new InverseForUsedPropertiesValidator(rdf)
         );
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, userIriSupplier);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
 
         var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
@@ -91,7 +92,7 @@ public class App {
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
         var apiPathPrefix = "/api/" + API_VERSION;
-        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator);
+        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo.getUserId()));
 
         FusekiServer.create()
                 .securityHandler(securityHandler)
