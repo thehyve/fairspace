@@ -1,29 +1,34 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, {useContext, useState} from "react";
 import PropTypes from 'prop-types';
-import {
-    Button, Dialog, DialogActions,
-    DialogContent, DialogTitle, Typography
-} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, CircularProgress} from "@material-ui/core";
 
-import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../utils/linkeddata/metadataUtils";
-import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
+import {
+    generateUuid, getLabel, getValuesFromProperties, isValidLinkedDataIdentifier
+} from "../../../utils/linkeddata/metadataUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
+import useFormSubmission from "../useFormSubmission";
 
-const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate}) => {
-    const [formKey, setFormKey] = useState(generateUuid());
+const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
 
     const {getEmptyLinkedData} = useContext(LinkedDataContext);
-    const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey);
 
-    useEffect(() => {
-        setFormKey(generateUuid());
-    }, []);
+    const visibleProperties = getEmptyLinkedData(shape).filter(p => p.isEditable || p.values.length);
+    const values = getValuesFromProperties(visibleProperties);
+    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
+
+    const {
+        addValue, updateValue, deleteValue,
+        updates, valuesWithUpdates,
+
+        validateAll, allErrors: validations, isValid
+    } = useFormData(values);
 
     const closeDialog = (e) => {
         if (e) e.stopPropagation();
@@ -44,18 +49,32 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         return namespace.value + localPart;
     };
 
-    const createEntity = (e) => {
-        if (e) e.stopPropagation();
-        onCreate(formKey, shape, getIdentifier());
+    const {createLinkedDataEntity} = useContext(LinkedDataContext);
+
+    const {isUpdating, submitForm} = useFormSubmission(
+        () => createLinkedDataEntity(getIdentifier(), updates, type)
+            .then(result => {
+                onCreate(result);
+            }),
+        getIdentifier()
+    );
+
+    const createEntity = (event) => {
+        if (event) event.stopPropagation();
+
+        const hasErrors = validateAll(visibleProperties);
+        if (!hasErrors) submitForm();
     };
 
     const renderDialogContent = () => {
         const form = (
             <LinkedDataEntityForm
-                properties={extendPropertiesWithChanges(getEmptyLinkedData(shape))}
-                onAdd={onAdd}
-                onChange={onChange}
-                onDelete={onDelete}
+                properties={visibleProperties}
+                values={valuesWithUpdates}
+                validations={validations}
+                onAdd={addValue}
+                onChange={updateValue}
+                onDelete={deleteValue}
                 key="form"
             />
         );
@@ -109,9 +128,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 <Button
                     onClick={createEntity}
                     color="primary"
-                    disabled={!canCreate() || submitDisabled}
+                    disabled={!canCreate() || isUpdating || !isValid}
                 >
-                    Create
+                    {isUpdating ? <CircularProgress /> : 'Create' }
                 </Button>
             </DialogActions>
         </Dialog>

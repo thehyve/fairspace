@@ -18,7 +18,7 @@ data:
       maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
       elasticSearch:
         enabled: {{ .Values.workspace.elasticsearch.enabled }}
-        required: false
+        required: true
         settings:
           hostToPortMapping:
             {{ template "workspace.elasticsearch.transporthost" . }}: {{ .Values.workspace.elasticsearch.transportport }}

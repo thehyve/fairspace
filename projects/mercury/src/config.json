@@ -1,8 +1,7 @@
 {
   "urls": {
     "logout": "/logout",
-    "userInfo": "/api/v1/account/user",
-    "authorizations": "/api/v1/account/authorizations",
+    "userInfo": "/api/v1/account",
     "collections": "/api/v1/collections/",
     "permissions": "/api/v1/permissions/",
     "files": "/webdav/v1",

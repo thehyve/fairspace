@@ -1,5 +1,7 @@
-import {connect} from 'react-redux';
 import React, {useEffect} from "react";
+import {connect} from 'react-redux';
+import {Grid} from "@material-ui/core";
+
 import MessageDisplay from "../../common/MessageDisplay";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {EXTERNAL_DIRECTORY_URI, EXTERNAL_FILE_URI} from "../../../constants";
@@ -7,8 +9,8 @@ import {
     getFileInfoByPath, hasFileInfoErrorByPath, isFileInfoByPathPending
 } from "../../../reducers/cache/fileInfoByPathReducers";
 import {statFileIfNeeded} from "../../../actions/fileActions";
-import {Grid} from "@material-ui/core";
 import TechnicalMetadata from "../../file/TechnicalMetadata";
+import {isNonEmptyValue} from "../../../utils/genericUtils";
 
 const PathMetadata = ({
     statFile,
@@ -41,7 +43,7 @@ const PathMetadata = ({
                         dateModified: fileProps.getlastmodified,
                         modifiedBy: fileProps.modifiedBy,
                         ownedBy: fileProps.ownedBy,
-                        fileSize: parseInt(fileProps.getcontentlength, 10),
+                        fileSize: isNonEmptyValue(fileProps.getcontentlength) ? parseInt(fileProps.getcontentlength, 10) : undefined,
                         checksum: fileProps.checksum
                     }}
                 />

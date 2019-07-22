@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -15,4 +17,5 @@ public class UserInfo {
     private String fullName;
     private String firstName;
     private String lastName;
+    private List<String> authorizations;
 }
