@@ -8,13 +8,10 @@ import {
 import {searchMetadata} from "../../actions/searchActions";
 // Reducers
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../../reducers/cache/vocabularyReducers";
-import {
-    getCombinedMetadataForSubject, hasMetadataError, isMetadataPending
-} from "../../reducers/cache/jsonLdBySubjectReducers";
+import {getMetadataForSubject, hasMetadataError, isMetadataPending} from "../../reducers/cache/jsonLdBySubjectReducers";
 import {getMetadataSearchResults} from "../../reducers/searchReducers";
 // Utils
-import {emptyLinkedData} from "../../utils/linkeddata/jsonLdConverter";
-import {getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {getTypeInfo} from "../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext from './LinkedDataContext';
@@ -23,17 +20,17 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 
 const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
-    vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch, ...otherProps
+    vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch,
+    getLinkedDataForSubject,
+    ...otherProps
 }) => {
     fetchMetadataVocabulary();
-
-    const getEmptyLinkedData = (shape) => emptyLinkedData(vocabulary, shape);
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values, defaultType) => dispatchSubmitMetadataChanges(subject, values, vocabulary, defaultType)
         .then(() => fetchMetadataBySubject(subject));
 
-    const getPropertiesForLinkedData = ({linkedData, isEntityEditable = true}) => propertiesToShow(linkedData)
+    const extendProperties = ({properties, isEntityEditable = true}) => properties
         .map(p => ({
             ...p,
             isEditable: isEntityEditable && !p.machineOnly
@@ -55,6 +52,7 @@ const LinkedDataMetadataProvider = ({
                 searchLinkedData: searchMetadataDispatch,
                 createLinkedDataEntity,
                 submitLinkedDataChanges,
+                getLinkedDataForSubject,
 
                 // Fixed properties
                 hasEditRight: true,
@@ -63,16 +61,17 @@ const LinkedDataMetadataProvider = ({
                 namespaces,
 
                 // Get information from shapes
-                getEmptyLinkedData,
-                getPropertiesForLinkedData,
                 getDescendants: vocabulary.getDescendants,
                 determineShapeForTypes: vocabulary.determineShapeForTypes,
                 getTypeInfoForLinkedData,
                 getClassesInCatalog,
 
                 // Generic methods without reference to shapes
+                extendProperties,
                 getSearchResults: getLinkedDataSearchResults,
-                valueComponentFactory
+                valueComponentFactory,
+
+                shapes: vocabulary
             }}
         >
             {children}
@@ -87,7 +86,7 @@ const mapStateToProps = (state) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
     const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
     const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
-    const combineLinkedDataForSubject = (subject, defaultType) => getCombinedMetadataForSubject(state, subject, defaultType);
+    const getLinkedDataForSubject = subject => getMetadataForSubject(state, subject);
     const getLinkedDataSearchResults = () => getMetadataSearchResults(state);
 
     return {
@@ -96,7 +95,7 @@ const mapStateToProps = (state) => {
         shapesError,
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
-        combineLinkedDataForSubject,
+        getLinkedDataForSubject,
         getLinkedDataSearchResults,
     };
 };

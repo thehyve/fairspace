@@ -1,7 +1,7 @@
 import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {getFirstPredicateValue} from "./jsonLdUtils";
 import {isNonEmptyValue} from '../genericUtils';
 
 /**
@@ -141,18 +141,19 @@ export const propertiesToShow = (properties = []) => {
 
 /**
  * Creates a textual description of the type for the given metadata item
- * @param metadata
+ * @param linkedData    A single-subject jsonLd structure
  * @param vocabulary
  * @returns {{label: string, description: string}} object containing the type label and description
  */
-export const getTypeInfo = (metadata, vocabulary) => {
-    const typeProp = metadata && metadata.find(prop => prop.key === '@type');
-    const types = (typeProp && typeProp.values) || [];
-    const shape = vocabulary.determineShapeForTypes(types.map(t => t.id));
-    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-    const {label = '', comment: description = ''} = types.find(t => t.id === type) || {};
+export const getTypeInfo = (linkedDataItem, vocabulary) => {
+    const types = (linkedDataItem && linkedDataItem['@type']);
 
-    return {label, description};
+    if (!types) {
+        return {};
+    }
+
+    const shape = vocabulary.determineShapeForTypes(types);
+    return {label: getFirstPredicateValue(shape, consts.SHACL_NAME), description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION)};
 };
 
 /**
@@ -234,24 +235,35 @@ export const partitionErrors = (errors, subject) => {
 
 /**
  * Returns true if the either given value or id (or both) are part of the property values.
- * @param {object} property
+ * @param {array} values
  * @param {string} value
  * @param {string} id
  */
-export const propertyContainsValueOrId = (property, value, id) => {
-    if (!Array.isArray(property.values) || property.values.length === 0 || (!value && !id)) {
+export const valuesContainsValueOrId = (values, value, id) => {
+    if (!Array.isArray(values) || values.length === 0 || (!value && !id)) {
         return false;
     }
 
-    return property.values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
+    return values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
 };
 
 /**
- * Returns true if the given property have one or more non-empty values
- * @param property
+ * Returns true if the given list of values has one or more non-empty values
+ * @param values
  * @returns {boolean}
  */
-export const hasValue = property => !!(property.values && Array.isArray(property.values) && property.values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+export const hasValue = values => !!(values && Array.isArray(values) && values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+
+/**
+ * Returns true if the given entry can be deleted for the property specified
+ * @param property
+ * @param entry
+ * @returns {boolean}
+ */
+export const canDelete = (property, entry) => {
+    const isSystemProperty = property.systemProperties && property.systemProperties.includes(entry.id);
+    return property.isEditable && !isSystemProperty;
+};
 
 /**
  * Simplify the keys of the given object by converting the URIs into its local paths
@@ -267,17 +279,6 @@ export const simplifyUriPredicates = jsonLd => (
             {},
             ...Object.keys(jsonLd).map(key => ({[getLocalPart(key)]: jsonLd[key]}))
         ) : {});
-
-/**
- * Returns an object with the values for the given properties, with the predicate as key
- * @param properties
- * @returns {*}
- */
-export const getValuesFromProperties = properties => properties.reduce(
-    (acc, curr) => (
-        {...acc, [curr.key]: curr.values}
-    ), {}
-);
 
 /**
  * Normalize an internal metadata resource by converting the values or iris into a single object

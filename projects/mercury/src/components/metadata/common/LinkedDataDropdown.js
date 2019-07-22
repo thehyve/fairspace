@@ -2,14 +2,14 @@ import React, {useContext} from 'react';
 import {PropTypes} from 'prop-types';
 
 import searchAPI, {SORT_ALPHABETICALLY} from "../../../services/SearchAPI";
-import {propertyContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
+import {valuesContainsValueOrId} from "../../../utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../../constants";
 import Iri from "../../common/Iri";
 import LinkedDataContext from "../LinkedDataContext";
 import {LoadingInlay, MessageDisplay} from "../../common";
 
-export const LinkedDataDropdown = ({property, fetchItems, types, debounce, ...otherProps}) => {
+export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
     let fetchRequest = null;
 
     const search = query => fetchItems({types, size: SEARCH_DROPDOWN_DEFAULT_SIZE, query})
@@ -49,7 +49,7 @@ export const LinkedDataDropdown = ({property, fetchItems, types, debounce, ...ot
             {...otherProps}
             async
             loadOptions={debouncedSearch}
-            isOptionDisabled={option => propertyContainsValueOrId(property, undefined, option.id)}
+            isOptionDisabled={option => valuesContainsValueOrId(currentValues, undefined, option.id)}
         />
     );
 };

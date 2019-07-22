@@ -1,313 +1,176 @@
 import * as constants from "../../../constants";
-import {emptyLinkedData, fromJsonLd, normalizeTypes, toJsonLd} from "../jsonLdConverter";
+import {fromJsonLd, normalizeTypes, toJsonLd} from "../jsonLdConverter";
 import {vocabularyUtils} from "../vocabularyUtils";
-import vocabularyJsonLd from "../test.vocabulary";
 
 describe('jsonLdConverter', () => {
     describe('fromJsonLd', () => {
-        const vocabulary = vocabularyUtils(vocabularyJsonLd);
         const subject = 'http://fairspace.com/iri/collections/1';
 
-        describe('vocabulary information', () => {
-            it('returns the type in a proper format', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection']
-                }];
+        const propertyShapes = [
+            {
+                '@id': 'http://labelShape',
+                [constants.SHACL_PATH]: [{'@id': constants.LABEL_URI}],
+            },
+            {
+                '@id': 'http://commentShape',
+                [constants.SHACL_PATH]: [{'@id': constants.COMMENT_URI}],
+            },
+            {
+                '@id': 'http://collectionShape',
+                [constants.SHACL_PATH]: [{'@id': constants.COLLECTION_URI}],
+            },
+            {
+                '@id': 'http://listShape',
+                [constants.SHACL_PATH]: [{'@id': 'http://list'}],
+                [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}],
+            }
 
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.map(el => el.values)).toContainEqual([{
-                    comment: "Collection of files with associated metadata and access rules.",
-                    id: "http://fairspace.io/ontology#Collection",
-                    label: "Collection"
-                }]);
-            });
+        ];
 
-            it('looks up labels in vocabulary properly', () => {
-                const metadata = [{
+        it('should return values for each predicate', () => {
+            const metadata = {
+                '@id': subject,
+                '@type': ['http://fairspace.io/ontology#Collection'],
+                [constants.COMMENT_URI]: [
+                    {'@value': 'My first collection'},
+                    {'@value': 'Some more info'}
+                ]
+            };
+
+            const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
+
+            expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual(
+                ['My first collection', 'Some more info']
+            );
+        });
+
+        describe('sorting', () => {
+            it('should return references sorted on the other label', () => {
+                const metadata = {
                     '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://www.w3.org/2000/01/rdf-schema#comment': [
-                        {
-                            '@value': 'My first collection'
-                        },
-                        {
-                            '@value': 'Some more info'
-                        }
+                    [constants.COLLECTION_URI]: [
+                        {'@id': 'http://a'},
+                        {'@id': 'http://b'}
                     ]
-                }];
+                };
 
-                const result = fromJsonLd(metadata, subject, vocabulary);
+                const allMetadata = [
+                    {
+                        '@id': 'http://a',
+                        [constants.LABEL_URI]: [{'@value': 'ZZZ'}]
+                    },
+                    {
+                        '@id': 'http://b',
+                        [constants.LABEL_URI]: [{'@value': 'AAA'}]
+                    }
+                ];
 
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
-                expect(result.map(entry => entry.label)).toEqual(
-                    expect.arrayContaining(['Creator', 'Description', 'Files in this collection', 'Label', 'List', 'Type'])
+                const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
+
+                expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.id)).toEqual(
+                    ['http://b', 'http://a']
                 );
             });
 
-            it('returns nothing without type', () => {
-                const metadata = [{
-                    '@id': subject,
-                    'http://www.w3.org/2000/01/rdf-schema#label': {'@value': 'Collection 1'}
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result).toEqual([]);
-            });
-
-            it('returns an empty array when no properties are set', () => {
-                const metadata = [{
-                    '@id': subject,
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result).toEqual([]);
-            });
-        });
-
-        describe('property values', () => {
-            it('returns values in vocabulary properly', () => {
-                const metadata = [{
+            it('should return values sorted', () => {
+                const metadata = {
                     '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://www.w3.org/2000/01/rdf-schema#label': [{'@value': 'Collection 1'}]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
-                expect(result[0].label).toEqual("Label");
-                expect(result[0].values.length).toEqual(1);
-                expect(result[0].values[0].value).toEqual('Collection 1');
-            });
-
-            it('return values if multiple types have been specified', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection', 'http://fairspace.io/ontology#Dataset'],
-                    'http://www.w3.org/2000/01/rdf-schema#label': [{'@value': 'Collection 1'}],
-                    'http://www.schema.org/creator': [{'@value': 'John Snow'}]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#label");
-                expect(result[0].label).toEqual("Label");
-                expect(result[0].values.length).toEqual(1);
-                expect(result[0].values[0].value).toEqual('Collection 1');
-                expect(result[1].key).toEqual("http://www.schema.org/creator");
-                expect(result[1].label).toEqual("Creator");
-                expect(result[1].values.length).toEqual(1);
-                expect(result[1].values[0].value).toEqual('John Snow');
-            });
-
-            it('returns multiple values for one predicate in vocabulary properly', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://www.w3.org/2000/01/rdf-schema#comment': [
+                    [constants.COMMENT_URI]: [
                         {
-                            '@value': 'My first collection'
+                            '@value': 'ZZZZ'
                         },
                         {
-                            '@value': 'Some more info'
+                            '@value': 'AAAA'
                         }
                     ]
-                }];
+                };
 
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual("http://www.w3.org/2000/01/rdf-schema#comment");
-                expect(result[0].values.length).toEqual(2);
-                expect(result[0].values[0].value).toEqual('My first collection');
-                expect(result[0].values[1].value).toEqual('Some more info');
-            });
+                const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-            it('sorts values for a (set) predicate', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://www.w3.org/2000/01/rdf-schema#comment': [
-                        {
-                            '@value': 'Some more info'
-                        },
-                        {
-                            '@value': 'My first collection'
-                        }
-                    ]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].values[0].value).toEqual('My first collection');
-                expect(result[0].values[1].value).toEqual('Some more info');
-            });
-        });
-
-        describe('returned properties', () => {
-            it('returns all properties specified in the vocabulary', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection']
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-
-                expect(result.length).toEqual(6);
-                expect(result.map(entry => entry.key)).toEqual(
-                    expect.arrayContaining([
-                        "@type",
-                        "http://fairspace.io/ontology#hasFile",
-                        "http://fairspace.io/ontology#list",
-                        "http://www.schema.org/creator",
-                        "http://www.w3.org/2000/01/rdf-schema#comment",
-                        "http://www.w3.org/2000/01/rdf-schema#label"
-                    ])
+                expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual(
+                    ['AAAA', 'ZZZZ']
                 );
             });
 
-            it('only returns properties present in the vocabulary', () => {
-                const metadata = [{
+            it('should not sort rdf lists', () => {
+                const metadata = {
                     '@id': subject,
                     '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://fairspace.io/ontology#non-existing': [
-                        {
-                            '@value': 'My first collection'
-                        }
-                    ]
-                }];
+                    'http://list': [{
+                        '@list': [
+                            {'@value': 'ZZZ'},
+                            {'@value': 'AAA'}
+                        ]
+                    }]
+                };
 
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.map(property => property.key)).not.toContain('http://fairspace.io/ontology#non-existing');
-            });
+                const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-            it('does not return properties not allowed for a specific type', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://schema.org/Creator': [
-                        {
-                            '@value': 'Ygritte'
-                        }
-                    ]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.map(property => property.key)).not.toContain('http://schema.org/Creator');
+                expect(valuesByPredicate['http://list'].map(v => v.value)).toEqual(
+                    ['ZZZ', 'AAA']
+                );
             });
         });
 
-        describe('multiple entities', () => {
-            const metadata = [
+        it('should parse rdf lists correctly', () => {
+            const metadata = {
+                '@id': subject,
+                '@type': ['http://fairspace.io/ontology#Collection'],
+                'http://list': [{
+                    '@list': [
+                        {'@value': 'My first collection'},
+                        {'@value': 'Some more info'}
+                    ]
+                }]
+            };
+
+            const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
+
+            expect(valuesByPredicate['http://list'].map(v => v.value)).toEqual(
+                ['My first collection', 'Some more info']
+            );
+        });
+        it('should ignore properties for which no shape is given', () => {
+            const metadata = {
+                '@id': subject,
+                '@type': ['http://fairspace.io/ontology#Collection'],
+                'http://not-existing': [
+                    {'@value': 'My first collection'},
+                    {'@value': 'Some more info'}
+                ]
+            };
+
+            expect(fromJsonLd(metadata, propertyShapes)).toEqual({});
+        });
+
+        it('should return information about the other entry for reference', () => {
+            const metadata = {
+                '@id': subject,
+                '@type': ['http://fairspace.io/ontology#Collection'],
+                [constants.COLLECTION_URI]: [
+                    {'@id': 'http://a'},
+                    {'@id': 'http://b'}
+                ]
+            };
+
+            const allMetadata = [
                 {
-                    '@id': 'http://fairspace.com/iri/collections/1/dir',
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    "http://fairspace.io/ontology#hasFile": [
-                        {
-                            "@id": "http://fairspace.com/iri/files/2"
-                        },
-                        {
-                            "@id": "http://fairspace.com/iri/files/3"
-                        }
-                    ]
+                    '@id': 'http://a',
+                    [constants.LABEL_URI]: [{'@value': 'AAA'}]
                 },
                 {
-                    '@id': 'http://fairspace.com/iri/files/2',
-                    '@type': ['http://fairspace.io/ontology#File'],
-                    "http://www.w3.org/2000/01/rdf-schema#label": [{"@value": "File 2"}]
+                    '@id': 'http://b',
+                    [constants.LABEL_URI]: [{'@value': 'BBB'}]
                 }
             ];
 
-            it('returns nothing if multiple nodes are given but no subject', () => {
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toEqual(0);
-            });
+            const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
-            it('includes label of associated nodes if given', () => {
-                const result = fromJsonLd(metadata, 'http://fairspace.com/iri/collections/1/dir', vocabulary);
-
-                expect(result[0].key).toEqual("http://fairspace.io/ontology#hasFile");
-                expect(result[0].values.length).toEqual(2);
-                expect(result[0].values[0].id).toEqual('http://fairspace.com/iri/files/2');
-                expect(result[0].values[0].otherEntry.label).toEqual(["File 2"]);
-                expect(result[0].values[1].id).toEqual('http://fairspace.com/iri/files/3');
-                expect(result[0].values[1].otherEntry).toEqual({});
-            });
-        });
-
-        describe('support for rdf:List', () => {
-            it('fromJsonLd returns isRdfList correctly', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://fairspace.io/ontology#list': [{
-                        '@list': [{"@value": "abc"}, {"@value": "def"}, {"@value": "ghi"}]
-                    }]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(2);
-                expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
-                expect(result[0].isRdfList).toEqual(true);
-                expect(result[1].isRdfList).toEqual(false);
-            });
-
-            it('returns list values as arrays', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://fairspace.io/ontology#list': [{
-                        '@list': [{"@value": "abc"}, {"@value": "def"}, {"@value": "ghi"}]
-                    }]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
-                expect(result[0].values.map(v => v.value)).toEqual(["abc", "def", "ghi"]);
-            });
-
-            it('returns concatenates multiple lists', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://fairspace.io/ontology#list': [
-                        {
-                            '@list': [{"@value": "abc"}, {"@value": "def"}]
-                        },
-                        {
-                            '@list': [{"@value": "ghi"}, {"@value": "jkl"}]
-                        },
-                    ]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].key).toEqual('http://fairspace.io/ontology#list');
-                expect(result[0].values.map(v => v.value)).toEqual(["abc", "def", "ghi", "jkl"]);
-            });
-
-            it('does not sort values for a rdf:list predicate', () => {
-                const metadata = [{
-                    '@id': subject,
-                    '@type': ['http://fairspace.io/ontology#Collection'],
-                    'http://fairspace.io/ontology#list': [
-                        {
-                            '@list': [{"@value": "jkl"}, {"@value": "abc"}]
-                        },
-                        {
-                            '@list': [{"@value": "ghi"}, {"@value": "def"}]
-                        },
-                    ]
-                }];
-
-                const result = fromJsonLd(metadata, subject, vocabulary);
-                expect(result.length).toBeGreaterThan(1);
-                expect(result[0].values.map(v => v.value)).toEqual(["jkl", "abc", "ghi", "def"]);
-            });
+            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.otherEntry)).toEqual(
+                [{'@id': 'http://a', "label": ['AAA']}, {'@id': 'http://b', "label": ['BBB']}]
+            );
         });
     });
 
@@ -434,39 +297,6 @@ describe('jsonLdConverter', () => {
             };
 
             expect(jsonLd).toEqual(expected);
-        });
-    });
-
-    describe('empty linked data object', () => {
-        const vocabulary = vocabularyUtils(vocabularyJsonLd);
-
-        it('returns all properties without values', () => {
-            const shape = vocabulary.determineShapeForTypes(['http://fairspace.io/ontology#Collection']);
-            const result = emptyLinkedData(vocabulary, shape);
-
-            expect(result.length).toEqual(6);
-
-            expect(result[0].values).toEqual([]);
-            expect(result[1].values).toEqual([]);
-            expect(result[2].values).toEqual([]);
-            expect(result[3].values).toEqual([]);
-            expect(result[4].values).toEqual([]);
-        });
-
-        it('returns the type property with value', () => {
-            const shape = vocabulary.determineShapeForTypes(['http://fairspace.io/ontology#Collection']);
-            const result = emptyLinkedData(vocabulary, shape);
-
-            expect(result.length).toEqual(6);
-            expect(result[5].values.map(el => el.id)).toEqual(['http://fairspace.io/ontology#Collection']);
-        });
-
-        it('returns nothing for an invalid shape', () => {
-            expect(emptyLinkedData(vocabulary)).toEqual([]);
-        });
-
-        it('returns nothing for an invalid vocabulary', () => {
-            expect(emptyLinkedData(vocabulary)).toEqual([]);
         });
     });
 

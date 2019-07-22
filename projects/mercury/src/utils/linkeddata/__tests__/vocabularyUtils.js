@@ -1,13 +1,10 @@
 import {
-    extendPropertiesWithVocabularyEditingInfo,
-    getMaxCount,
-    getSystemProperties,
-    isGenericIriResource,
-    isRdfList, isRelationShape,
-    vocabularyUtils,
+    extendPropertiesWithVocabularyEditingInfo, getMaxCount, getSystemProperties, isGenericIriResource, isRdfList,
+    isRelationShape, vocabularyUtils,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from '../test.vocabulary.json';
 import * as constants from "../../../constants";
+import {getFirstPredicateId} from "../jsonLdUtils";
 
 const vocabulary = vocabularyUtils(vocabularyJsonLd);
 describe('vocabularyUtils', () => {
@@ -130,11 +127,6 @@ describe('vocabularyUtils', () => {
             const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
             expect(extendedProperties[2].systemProperties).toEqual(systemProperties);
         });
-
-        it('should set deletable flag for values for SHACL_PROPERTY', () => {
-            const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
-            expect(extendedProperties[2].values).toEqual([{id: 'http://custom', isDeletable: true}, {id: 'http://fixed', isDeletable: false}]);
-        });
     });
 
     describe('isRelationShape', () => {
@@ -190,23 +182,6 @@ describe('vocabularyUtils', () => {
         });
     });
 
-    describe('generatePropertyEntry', () => {
-        it('should mark non-single-line properties as multiline', () => {
-            const stringProperty = vocabulary.generatePropertyEntry('', {
-                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
-                [constants.DASH_SINGLE_LINE]: [{'@value': false}]
-            });
-            expect(stringProperty.multiLine).toBe(true);
-        });
-        it('should mark single-line properties as not multiline', () => {
-            const stringProperty = vocabulary.generatePropertyEntry('', {
-                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
-                [constants.DASH_SINGLE_LINE]: [{'@value': true}]
-            });
-            expect(stringProperty.multiLine).toBe(false);
-        });
-    });
-
     describe('getNamespaces', () => {
         it('should return a full list of namespaces', () => {
             const namespaces = vocabulary.getNamespaces();
@@ -226,6 +201,46 @@ describe('vocabularyUtils', () => {
 
             expect(namespaces.length).toEqual(1);
             expect(namespaces[0].label).toEqual("Namespace2");
+        });
+    });
+
+    describe('getProperties', () => {
+        it('returns all properties specified in the vocabulary', () => {
+            const propertyShapes = vocabulary.determinePropertyShapesForTypes([constants.COLLECTION_URI]);
+            const result = vocabulary.getProperties(propertyShapes);
+
+            expect(result.length).toBeGreaterThan(propertyShapes.length);
+            expect(result.map(entry => entry.key)).toEqual(
+                expect.arrayContaining(propertyShapes.map(propertyShape => getFirstPredicateId(propertyShape, constants.SHACL_PATH)))
+            );
+        });
+
+        it('returns the type property', () => {
+            const propertyShapes = vocabulary.determinePropertyShapesForTypes([constants.COLLECTION_URI]);
+            const result = vocabulary.getProperties(propertyShapes);
+            const typeProperty = result.filter(p => p.key === '@type');
+
+            expect(typeProperty.length).toBeGreaterThan(0);
+            expect(typeProperty[0].label).toEqual('Type');
+        });
+
+        it('should use dash:singleLine to determine multiLine status', () => {
+            const propertyShapes = [
+                {
+                    [constants.SHACL_PATH]: [{'@id': constants.LABEL_URI}],
+                    [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+                    [constants.DASH_SINGLE_LINE]: [{'@value': true}]
+                },
+                {
+                    [constants.SHACL_PATH]: [{'@id': constants.COMMENT_URI}],
+                    [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
+                    [constants.DASH_SINGLE_LINE]: [{'@value': false}]
+                }
+            ];
+
+            const result = vocabulary.getProperties(propertyShapes);
+            expect(result.find(p => p.key === constants.LABEL_URI).multiLine).toBe(false);
+            expect(result.find(p => p.key === constants.COMMENT_URI).multiLine).toBe(true);
         });
     });
 });

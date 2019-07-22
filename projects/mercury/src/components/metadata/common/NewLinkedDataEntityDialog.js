@@ -1,10 +1,10 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import PropTypes from 'prop-types';
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, CircularProgress} from "@material-ui/core";
-
 import {
-    generateUuid, getLabel, getValuesFromProperties, isValidLinkedDataIdentifier
-} from "../../../utils/linkeddata/metadataUtils";
+    Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
+} from "@material-ui/core";
+
+import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../utils/linkeddata/metadataUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
@@ -16,24 +16,6 @@ import useFormSubmission from "../useFormSubmission";
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
-
-    const {getEmptyLinkedData} = useContext(LinkedDataContext);
-
-    const visibleProperties = getEmptyLinkedData(shape).filter(p => p.isEditable || p.values.length);
-    const values = getValuesFromProperties(visibleProperties);
-    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-
-    const {
-        addValue, updateValue, deleteValue,
-        updates, valuesWithUpdates,
-
-        validateAll, allErrors: validations, isValid
-    } = useFormData(values);
-
-    const closeDialog = (e) => {
-        if (e) e.stopPropagation();
-        onClose();
-    };
 
     const getIdentifier = () => {
         // If no localPart is specified, treat the identifier as not being entered
@@ -49,7 +31,26 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         return namespace.value + localPart;
     };
 
-    const {createLinkedDataEntity} = useContext(LinkedDataContext);
+    const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
+    const properties = shapes.getPropertiesForNodeShape(shape);
+    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
+    const values = {};
+
+    // Apply context-specific logic to the properties and filter on visibility
+    const extendedProperties = extendProperties({properties, isEntityEditable: true});
+
+    const {
+        addValue, updateValue, deleteValue,
+        updates, valuesWithUpdates,
+
+        validateAll, validationErrors, isValid
+    } = useFormData(values);
+
+    // Store the type to create in the form to ensure it is known
+    // and will be stored
+    useEffect(() => {
+        addValue('@type', {id: type});
+    });
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), updates, type)
@@ -62,16 +63,21 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const createEntity = (event) => {
         if (event) event.stopPropagation();
 
-        const hasErrors = validateAll(visibleProperties);
+        const hasErrors = validateAll(extendedProperties);
         if (!hasErrors) submitForm();
+    };
+
+    const closeDialog = (e) => {
+        if (e) e.stopPropagation();
+        onClose();
     };
 
     const renderDialogContent = () => {
         const form = (
             <LinkedDataEntityForm
-                properties={visibleProperties}
+                properties={extendedProperties}
                 values={valuesWithUpdates}
-                validations={validations}
+                validationErrors={validationErrors}
                 onAdd={addValue}
                 onChange={updateValue}
                 onDelete={deleteValue}

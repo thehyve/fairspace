@@ -9,7 +9,7 @@ import useValidation from "./useValidation";
 const useFormData = (values) => {
     const [updates, setUpdates] = useState({});
 
-    const {validateProperty, allErrors, isValid} = useValidation();
+    const {validateProperty, validationErrors, isValid} = useValidation();
 
     const hasFormUpdates = Object.keys(updates).length > 0;
     const valuesWithUpdates = {...values, ...updates};
@@ -22,24 +22,26 @@ const useFormData = (values) => {
         validateProperty(property, newValue);
     };
 
+    const current = key => valuesWithUpdates[key] || [];
+
     const addValue = (property, value) => {
-        const newValue = [...valuesWithUpdates[property.key], value];
+        const newValue = [...current(property.key), value];
         save(property, newValue);
     };
 
     const updateValue = (property, value, index) => {
-        const newValue = valuesWithUpdates[property.key].map((el, idx) => ((idx === index) ? value : el));
+        const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
         save(property, newValue);
     };
 
     const deleteValue = (property, index) => {
-        const newValue = valuesWithUpdates[property.key].filter((el, idx) => idx !== index);
+        const newValue = current(property.key).filter((el, idx) => idx !== index);
         save(property, newValue);
     };
 
     const clearForm = () => setUpdates({});
 
-    const validateAll = properties => !!properties.map(p => validateProperty(p, valuesWithUpdates[p.key])).find(v => v);
+    const validateAll = properties => !!properties.map(p => validateProperty(p, current(p.key))).find(v => v);
 
     return {
         addValue,
@@ -53,7 +55,7 @@ const useFormData = (values) => {
 
         validateAll,
         validateProperty,
-        allErrors,
+        validationErrors,
         isValid
     };
 };

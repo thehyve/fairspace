@@ -1,6 +1,13 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
 
+const TYPE_PROPERTY = {
+    key: '@type',
+    label: 'Type',
+    maxValuesCount: 1,
+    machineOnly: true,
+};
+
 /**
  * Checks whether the given shape describes an RDF list
  * @param propertyShape
@@ -20,7 +27,7 @@ export const isGenericIriResource = (propertyShape) => getFirstPredicateId(prope
  * @param propertyShape
  * @returns {boolean}
  */
-export const isRelationShape = shape => Array.isArray(shape['@type']) && shape['@type'].includes(constants.RELATION_SHAPE_URI);
+export const isRelationShape = propertyShape => Array.isArray(propertyShape['@type']) && propertyShape['@type'].includes(constants.RELATION_SHAPE_URI);
 
 /**
  * Returns the maxCount value for the given shape
@@ -29,26 +36,27 @@ export const isRelationShape = shape => Array.isArray(shape['@type']) && shape['
  * they (mostly) support only a single list. However, our UI and validation should
  * treat it as if multiple values are allowed.
  *
- * @param shape
+ * @param propertyShape
  * @returns {number}
  */
-export const getMaxCount = shape => (isRdfList(shape) ? 0 : getFirstPredicateValue(shape, constants.SHACL_MAX_COUNT));
+export const getMaxCount = propertyShape => (isRdfList(propertyShape) ? 0 : getFirstPredicateValue(propertyShape, constants.SHACL_MAX_COUNT));
 
 /**
  * Checks whether the given shape represents an external link (specified by fs:externalLink)
  * @param propertyShape
  * @returns {boolean}
  */
-const isExternalLink = (propertyShape) => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
+const isExternalLink = propertyShape => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
 
 /**
  * Checks whether the given list of properties represents a fixed shape, as defined by FS:fixedShape
  */
-export const isFixedShape = shape => getFirstPredicateValue(shape, constants.FIXED_SHAPE_URI, false);
+export const isFixedShape = classShape => getFirstPredicateValue(classShape, constants.FIXED_SHAPE_URI, false);
 
 /**
- * Returns a list of system properties defined for the given shape */
-export const getSystemProperties = shape => (shape && shape[constants.SYSTEM_PROPERTIES_URI] && shape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
+ * Returns a list of system properties defined for the given shape
+ */
+export const getSystemProperties = classShape => (classShape && classShape[constants.SYSTEM_PROPERTIES_URI] && classShape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
 
 /**
  * Extends the list of properties with information for vocabulary editing
@@ -72,13 +80,8 @@ export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditabl
     .map(p => {
         // For fixed shapes, return the list of system properties for the SHACL_PROPERTY definition
         if (isFixed && p.key === constants.SHACL_PROPERTY) {
-            const isSystemProperty = entry => systemProperties && systemProperties.includes(entry.id);
-            const isPropertyEditable = isEditable && !p.machineOnly;
-            const canDelete = entry => isPropertyEditable && !isSystemProperty(entry);
-
-            // Add a flag to each value whether it can be deleted
-            const values = p.values && p.values.map(v => ({...v, isDeletable: canDelete(v)}));
-            return {...p, values, isEditable: isPropertyEditable, systemProperties};
+            // Add systemProperties for determining which entry can be deleted
+            return {...p, isEditable: isEditable && !p.machineOnly, systemProperties};
         }
 
         // In all other cases, if the shape is fixed, the property must not be editable
@@ -198,7 +201,6 @@ export const vocabularyUtils = (vocabulary = []) => {
     /**
      * Generates a list entry for a single property
      * @param predicate
-     * @param values
      * @param shape
      * @returns {{key: string, label: string, datatype: string, className: string, maxValuesCount: number, machineOnly: boolean, multiLine: boolean}}
      * @private
@@ -236,6 +238,45 @@ export const vocabularyUtils = (vocabulary = []) => {
     };
 
     /**
+     * Converts the propertyshapes into a list of properties to be used for form building
+     *
+     * Please note that only the metadata for the first subject will be used
+     *
+     * @param propertyShapes    List of propertyshapes that apply to a certain entity
+     * @returns {array}         A list of properties that can be used to show a form. The format is similar to this
+     * {
+     *      key: "http://fairspace.io/ontology#description",
+     *      label: "Description",
+     *      ...
+     *  }
+     * @see {generatePropertyEntry}
+     */
+    const getProperties = (propertyShapes) => {
+        if (!propertyShapes) {
+            return [];
+        }
+
+        const properties = propertyShapes
+            .map(shape => {
+                const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
+                return generatePropertyEntry(predicateUri, shape);
+            });
+
+        return [...properties, TYPE_PROPERTY];
+    };
+
+    /**
+     * Returns a list of properties for a certain shape to be used for form building
+     * @param nodeShape
+     * @returns {Array}
+     * @see {getProperties}
+     */
+    const getPropertiesForNodeShape = (nodeShape) => {
+        const propertyShapes = determinePropertyShapesForNodeShape(nodeShape);
+        return getProperties(propertyShapes, vocabulary);
+    };
+
+    /**
      * @returns {array}     The vocabulary in json-ld format
      */
     const getRaw = () => vocabulary;
@@ -267,12 +308,16 @@ export const vocabularyUtils = (vocabulary = []) => {
         determineShapeForTypes,
         determinePropertyShapesForTypes,
         determinePropertyShapesForNodeShape,
-        generatePropertyEntry,
+
+        getProperties,
+        getPropertiesForNodeShape,
+
         getRaw,
         getLabelForPredicate,
         getClassesInCatalog,
         getNamespaces,
         getChildSubclasses,
-        getDescendants
+        getDescendants,
+
     });
 };

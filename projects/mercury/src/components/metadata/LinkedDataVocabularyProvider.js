@@ -12,9 +12,8 @@ import {
 } from "../../reducers/cache/vocabularyReducers";
 import {getVocabularySearchResults} from "../../reducers/searchReducers";
 // Utils
-import {emptyLinkedData, fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
 import {isDataSteward} from "../../utils/userUtils";
-import {getTypeInfo, propertiesToShow} from "../../utils/linkeddata/metadataUtils";
+import {getTypeInfo} from "../../utils/linkeddata/metadataUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
 } from "../../utils/linkeddata/vocabularyUtils";
@@ -36,17 +35,15 @@ const LinkedDataVocabularyProvider = ({
 
     const {currentUser} = useContext(UserContext);
 
-    const getEmptyLinkedData = (shape) => emptyLinkedData(metaVocabulary, shape);
-
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary)
         .then(fetchMetadataVocabulary);
 
-    const getPropertiesForLinkedData = ({linkedData, subject, isEntityEditable = true}) => {
+    const extendProperties = ({properties, isEntityEditable = true, subject}) => {
         const shape = vocabulary.get(subject);
 
         return extendPropertiesWithVocabularyEditingInfo({
-            properties: propertiesToShow(linkedData),
+            properties,
             isFixed: isFixedShape(shape),
             systemProperties: getSystemProperties(shape),
             isEditable: isEntityEditable && isDataSteward(authorizations, Config.get())
@@ -59,6 +56,8 @@ const LinkedDataVocabularyProvider = ({
 
     const getClassesInCatalog = () => metaVocabulary.getClassesInCatalog();
 
+    const getLinkedDataForSubject = () => vocabulary.getRaw();
+
     return (
         <LinkedDataContext.Provider
             value={{
@@ -69,6 +68,7 @@ const LinkedDataVocabularyProvider = ({
                 searchLinkedData: searchVocabularyDispatch,
                 createLinkedDataEntity,
                 submitLinkedDataChanges,
+                getLinkedDataForSubject,
 
                 // Fixed properties
                 namespaces,
@@ -77,16 +77,17 @@ const LinkedDataVocabularyProvider = ({
                 editorPath: VOCABULARY_PATH,
 
                 // Methods based on shapes
-                getEmptyLinkedData,
-                getPropertiesForLinkedData,
                 getDescendants: metaVocabulary.getDescendants,
                 determineShapeForTypes: metaVocabulary.determineShapeForTypes,
                 getTypeInfoForLinkedData,
                 getClassesInCatalog,
 
                 // Generic methods without reference to shapes
+                extendProperties,
                 getSearchResults: getLinkedDataSearchResults,
                 valueComponentFactory,
+
+                shapes: metaVocabulary
             }}
         >
             {children}
@@ -102,7 +103,6 @@ const mapStateToProps = (state) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
     const isLinkedDataLoading = () => isVocabularyPending(state);
     const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
-    const combineLinkedDataForSubject = (subject) => fromJsonLd(vocabulary.getRaw(), subject, metaVocabulary);
     const getLinkedDataSearchResults = () => getVocabularySearchResults(state);
 
     return {
@@ -112,7 +112,6 @@ const mapStateToProps = (state) => {
         shapesError,
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
-        combineLinkedDataForSubject,
         getLinkedDataSearchResults,
     };
 };
