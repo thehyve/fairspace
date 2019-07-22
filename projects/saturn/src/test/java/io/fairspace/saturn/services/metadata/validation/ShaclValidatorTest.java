@@ -70,8 +70,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithNoType() {
-        var model = createDefaultModel()
-                .add(resource1, RDFS.label, createTypedLiteral(123));
+        var model = modelOf(resource1, RDFS.label, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
         verifyZeroInteractions(violationHandler);
@@ -79,10 +78,10 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithInvalidProperties() {
-        var model = createDefaultModel()
-                .add(resource1, RDF.type, FS.User)
-                .add(resource1, RDFS.label, createTypedLiteral(123))
-                .add(resource1, RDFS.comment, createTypedLiteral(123));
+        var model = modelOf(
+                resource1, RDF.type, FS.User,
+                resource1, RDFS.label, createTypedLiteral(123),
+                resource1, RDFS.comment, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
                 vocabulary, violationHandler);
 
@@ -101,9 +100,9 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithUnknownProperty() {
-        var model = createDefaultModel()
-                .add(resource1, RDF.type, closedClass)
-                .add(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
+        var model = modelOf(
+                resource1, RDF.type, closedClass,
+                resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
                 vocabulary, violationHandler);
 
@@ -115,8 +114,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceMissingRequiredProperty() {
-        var model = createDefaultModel()
-                .add(resource1, RDF.type, FS.File);
+        var model = modelOf(resource1, RDF.type, FS.File);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
                 vocabulary, violationHandler);
 
@@ -189,9 +187,9 @@ public class ShaclValidatorTest {
                 createResource(), RDF.type, FS.Collection);
 
         var blankNode = createResource();
-        var toAdd = createDefaultModel()
-                .add(blankNode, RDF.type, FS.User)
-                .add(blankNode, RDFS.label, createTypedLiteral("My label"));
+        var toAdd = modelOf(
+                blankNode, RDF.type, FS.User,
+                blankNode, RDFS.label, createTypedLiteral("My label"));
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
 

@@ -4,7 +4,6 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 
@@ -38,8 +37,6 @@ public class PermissionCheckingValidatorTest {
 
     private PermissionCheckingValidator validator;
 
-    private Model model = createDefaultModel();
-
     @Before
     public void setUp() {
         validator = new PermissionCheckingValidator(permissions);
@@ -55,7 +52,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noWritePermissionCausesAFailure() {
-        model.add(STATEMENT);
+        var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
         doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
@@ -65,7 +62,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void itShouldCheckPermissionsForSubject() {
-        model.add(STATEMENT);
+        var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);

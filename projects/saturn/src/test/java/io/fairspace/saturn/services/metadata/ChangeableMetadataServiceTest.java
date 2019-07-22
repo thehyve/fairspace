@@ -55,7 +55,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPutWillAddStatements() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
 
         api.put(delta);
 
@@ -65,7 +65,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPutHandlesLifecycleForEntitities() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
         api.put(delta);
         verify(lifeCycleManager).updateLifecycleMetadata(argThat(delta::isIsomorphicWith));
     }
@@ -79,7 +79,7 @@ public class ChangeableMetadataServiceTest {
         executeWrite(ds, () -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
 
         // Put new statements
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
         api.put(delta);
 
         // Now ensure that the existing triples are still there
@@ -95,7 +95,7 @@ public class ChangeableMetadataServiceTest {
     public void deleteModel() {
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
-        api.delete(createDefaultModel().add(STMT1));
+        api.delete(modelOf(STMT1));
 
         assertFalse(ds.getDefaultModel().contains(STMT1));
         assertTrue(ds.getDefaultModel().contains(STMT2));
@@ -109,7 +109,7 @@ public class ChangeableMetadataServiceTest {
         Statement newStmt2 = createStatement(S2, P1, S1);
         Statement newStmt3 = createStatement(S1, P2, S3);
 
-        api.patch(createDefaultModel().add(newStmt1).add(newStmt2).add(newStmt3));
+        api.patch(modelOf(newStmt1, newStmt2, newStmt3));
         assertTrue(ds.getDefaultModel().contains(newStmt1));
         assertTrue(ds.getDefaultModel().contains(newStmt2));
         assertTrue(ds.getDefaultModel().contains(newStmt3));
@@ -129,7 +129,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPatchHandlesLifecycleForEntities() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
         api.patch(delta);
         verify(lifeCycleManager).updateLifecycleMetadata(argThat(delta::isIsomorphicWith));
     }
@@ -149,7 +149,7 @@ public class ChangeableMetadataServiceTest {
         assertTrue(ds.getDefaultModel().contains(S1, gaveConsent, S2));
         assertTrue(ds.getDefaultModel().contains(S2, isConsentOf, S1));
 
-        api.delete(createDefaultModel().add(S2, isConsentOf, S1));
+        api.delete(modelOf(S2, isConsentOf, S1));
 
         assertFalse(ds.getDefaultModel().contains(S1, gaveConsent, S2));
         assertFalse(ds.getDefaultModel().contains(S2, isConsentOf, S1));

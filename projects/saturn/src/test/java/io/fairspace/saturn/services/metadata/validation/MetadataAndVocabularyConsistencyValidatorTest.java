@@ -21,7 +21,6 @@ import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 
@@ -153,8 +152,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateMaxLength() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.maxLength, createTypedLiteral(2));
+        var constraints = modelOf(PROPERTY_SHAPE, SH.maxLength, createTypedLiteral(2));
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("12"));
 

@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -59,7 +60,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testPutShouldSucceedOnValidationSuccess() {
-        api.put(createDefaultModel().add(LBL_STMT1));
+        api.put(modelOf(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
         assertTrue(model.contains(LBL_STMT1));
@@ -83,7 +84,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testPatchShouldSucceedOnValidationSuccess() {
-        api.patch(createDefaultModel().add(LBL_STMT1));
+        api.patch(modelOf(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
         assertTrue(model.contains(LBL_STMT1));
@@ -98,7 +99,7 @@ public class ChangeableMetadataServiceValidationTest {
     @Test
     public void patchShouldNotValidateExistingTriples() {
         ds.getNamedModel(GRAPH).add(STMT1);
-        api.patch(createDefaultModel().add(STMT1));
+        api.patch(modelOf(STMT1));
 
         verify(validator).validate(any(), any(), argThat(Model::isEmpty), argThat(Model::isEmpty), any(), any());
     }
@@ -116,14 +117,14 @@ public class ChangeableMetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void deleteShouldFailOnMachineOnValidationFailure() {
         produceValidationError();
-        api.delete(createDefaultModel().add(S1, P1, S2));
+        api.delete(modelOf(S1, P1, S2));
     }
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
-        api.delete(createDefaultModel().add(LBL_STMT1));
+        api.delete(modelOf(LBL_STMT1));
 
         Model model = ds.getNamedModel(GRAPH);
         assertFalse(model.contains(LBL_STMT1));
