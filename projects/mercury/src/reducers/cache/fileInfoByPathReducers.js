@@ -8,7 +8,7 @@ export const invalidateFiles = (state, ...paths) => {
     // of deleted directories as well.
     const keysToInvalidate = Object.keys(state)
         .filter(key => paths.find(
-            path => key.startsWith(path)
+            path => (path === key) || key.startsWith(path + '/')
         ));
 
     const newPathsState = keysToInvalidate.map(path => ({
