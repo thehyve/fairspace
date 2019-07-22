@@ -20,7 +20,7 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
         size, setSize, page, setPage,
-        shapes, shapesLoading, searchPending, error,
+        shapes, shapesLoading, shapesError, searchPending, searchError,
         availableTypes, items, total, hasHighlights,
     } = useLinkedDataSearch(true);
 
@@ -37,12 +37,16 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
     );
 
     const ListBody = () => {
-        if (searchPending) {
+        if (shapesLoading || searchPending) {
             return <LoadingInlay />;
         }
 
-        if (error) {
-            return <MessageDisplay message={error.message || 'An error occurred while loading metadata'} />;
+        if (shapesError) {
+            return <MessageDisplay message={shapesError.message || 'An error occurred while loading the shapes'} />;
+        }
+
+        if (searchError) {
+            return <MessageDisplay message={searchError.message || 'An error occurred while loading metadata'} />;
         }
 
         if (items && items.length > 0) {
@@ -91,6 +95,7 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
                 hasEditRight ? (
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
+                        shapesError={shapesError}
                         shapes={shapes}
                         requireIdentifier={requireIdentifier}
                         onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}

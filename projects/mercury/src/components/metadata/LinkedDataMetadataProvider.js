@@ -21,10 +21,12 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
     vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch,
-    getLinkedDataForSubject,
+    getLinkedDataForSubject, shapesError,
     ...otherProps
 }) => {
-    fetchMetadataVocabulary();
+    if (!shapesError) {
+        fetchMetadataVocabulary();
+    }
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values, defaultType) => dispatchSubmitMetadataChanges(subject, values, vocabulary, defaultType)
@@ -71,7 +73,8 @@ const LinkedDataMetadataProvider = ({
                 getSearchResults: getLinkedDataSearchResults,
                 valueComponentFactory,
 
-                shapes: vocabulary
+                shapes: vocabulary,
+                shapesError
             }}
         >
             {children}

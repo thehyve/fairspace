@@ -7,8 +7,8 @@ import {getLabel} from "../../utils/linkeddata/metadataUtils";
 
 const useLinkedDataSearch = (doInitialFetch = false) => {
     const {
-        getClassesInCatalog, searchLinkedData, shapesLoading,
-        shapesError, getSearchResults
+        getClassesInCatalog, searchLinkedData, getSearchResults,
+        shapesLoading, shapesError
     } = useContext(LinkedDataContext);
 
     const [selectedTypes, setSelectedTypes] = useState([]);
@@ -72,12 +72,14 @@ const useLinkedDataSearch = (doInitialFetch = false) => {
         setPage,
         setSize,
 
+        shapesLoading,
+        shapesError,
+
         availableTypes,
         shapes,
-        shapesLoading,
 
         searchPending: pending,
-        error: shapesError || error,
+        searchError: error,
         items,
         total,
         hasHighlights: items.some(({highlights}) => highlights.length > 0),
