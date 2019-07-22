@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
 import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
@@ -38,12 +37,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         var machineOnlyPropertyShape = createResource();
         var regularPropertyShape1 = createResource();
         var regularPropertyShape2 = createResource();
-        validator = new ProtectMachineOnlyPredicatesValidator(modelOf(
-                machineOnlyPropertyShape, SH.path, MACHINE_ONLY_PROPERTY,
-                machineOnlyPropertyShape, FS.machineOnly, createTypedLiteral(true),
-                regularPropertyShape1, SH.path, P1,
-                regularPropertyShape2, SH.path, P2,
-                regularPropertyShape2, FS.machineOnly, createTypedLiteral(false))
+        validator = new ProtectMachineOnlyPredicatesValidator(
         );
     }
 

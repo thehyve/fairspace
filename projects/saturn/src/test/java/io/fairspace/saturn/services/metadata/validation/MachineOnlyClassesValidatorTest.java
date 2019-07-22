@@ -12,9 +12,7 @@ import org.topbraid.shacl.vocabulary.SH;
 
 import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,10 +23,10 @@ public class MachineOnlyClassesValidatorTest {
     private static final Resource regularClassShape = createResource("http://example.com/RegularShape");
     private static final Resource machineOnlyInstance = createResource("http://example.com/123");
     private static final Resource regularInstance = createResource("http://example.com/345");
-    private static final Model vocabulary = createDefaultModel()
-            .add(regularClassShape, SH.targetClass, regularClass)
-            .add(machineOnlyClassShape, SH.targetClass, machineOnlyClass)
-            .addLiteral(machineOnlyClassShape, FS.machineOnly, true);
+    private static final Model vocabulary = modelOf(
+            regularClassShape, SH.targetClass, regularClass,
+            machineOnlyClassShape, SH.targetClass, machineOnlyClass,
+            machineOnlyClassShape, FS.machineOnly, createTypedLiteral(true));
 
     private MachineOnlyClassesValidator validator = new MachineOnlyClassesValidator();
 
@@ -68,5 +66,4 @@ public class MachineOnlyClassesValidatorTest {
 
         verifyZeroInteractions(violationHandler);
     }
-
 }
