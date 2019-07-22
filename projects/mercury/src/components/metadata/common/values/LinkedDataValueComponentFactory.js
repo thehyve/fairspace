@@ -10,6 +10,7 @@ import EnumerationDropdown from "./EnumerationDropdown";
 import LinkedDataDropdownWithAddition from "../LinkedDataDropdownWithAddition";
 import LinkedDataDropdown from "../LinkedDataDropdown";
 import ReferringValue from "./ReferringValue";
+import ExternalLinkValue from "./ExternalLinkValue";
 
 export const getInputComponent = (property) => {
     // If the property has a restricted set of allowed values
@@ -25,9 +26,11 @@ export const getInputComponent = (property) => {
     }
 
     // If this class refers to a generic IRI, let the user
-    // enter the iri in a textbox
+    // enter the iri in a textbox. There are 2 flavors:
+    //   - an external link shows just a textbox (ExternalLinkValue
+    //   - a normal generic iri shows a textbox with the option to select a namespace (ResourceValue)
     if (property.isGenericIriResource) {
-        return ResourceValue;
+        return property.isExternalLink ? ExternalLinkValue : ResourceValue;
     }
 
     // The datatype determines the type of input element
