@@ -9,7 +9,7 @@ import useValidation from "./useValidation";
 const useFormData = (values) => {
     const [updates, setUpdates] = useState({});
 
-    const {validateProperty, allErrors, isValid} = useValidation();
+    const {validateProperty, validationErrors, isValid} = useValidation();
 
     const hasFormUpdates = Object.keys(updates).length > 0;
     const valuesWithUpdates = {...values, ...updates};
@@ -55,7 +55,7 @@ const useFormData = (values) => {
 
         validateAll,
         validateProperty,
-        allErrors,
+        validationErrors,
         isValid
     };
 };

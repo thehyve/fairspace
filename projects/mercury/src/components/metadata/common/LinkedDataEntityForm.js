@@ -10,7 +10,7 @@ import {hasValue, shouldPropertyBeHidden} from "../../../utils/linkeddata/metada
 export const LinkedDataEntityForm = ({
     properties = [],
     values = {},
-    validations = {},
+    validationErrors = {},
     error = false,
     loading = false,
     onChange = () => {},
@@ -49,7 +49,7 @@ export const LinkedDataEntityForm = ({
                             <LinkedDataProperty
                                 property={p}
                                 values={values[p.key]}
-                                validations={validations[p.key]}
+                                validationErrors={validationErrors[p.key]}
                                 onAdd={(value) => onAdd(p, value)}
                                 onChange={(value, index) => onChange(p, value, index)}
                                 onDelete={(index) => onDelete(p, index)}
@@ -71,7 +71,7 @@ LinkedDataEntityForm.propTypes = {
     loading: PropTypes.bool,
     properties: PropTypes.array,
     values: PropTypes.object,
-    validations: PropTypes.object
+    validationErrors: PropTypes.object
 };
 
 export default LinkedDataEntityForm;

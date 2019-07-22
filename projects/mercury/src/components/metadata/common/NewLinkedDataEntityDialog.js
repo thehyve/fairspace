@@ -43,7 +43,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         addValue, updateValue, deleteValue,
         updates, valuesWithUpdates,
 
-        validateAll, allErrors: validations, isValid
+        validateAll, validationErrors, isValid
     } = useFormData(values);
 
     // Store the type to create in the form to ensure it is known
@@ -77,7 +77,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             <LinkedDataEntityForm
                 properties={extendedProperties}
                 values={valuesWithUpdates}
-                validations={validations}
+                validationErrors={validationErrors}
                 onAdd={addValue}
                 onChange={updateValue}
                 onDelete={deleteValue}
