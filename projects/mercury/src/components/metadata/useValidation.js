@@ -32,7 +32,7 @@ const useValidation = () => {
     return {
         validateProperty,
 
-        allErrors: errors,
+        validationErrors: errors,
         isValid: !Object.values(errors).find(hasValidationError)
     };
 };

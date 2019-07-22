@@ -16,7 +16,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEdi
         addValue, updateValue, deleteValue, clearForm,
         updates, hasFormUpdates, valuesWithUpdates,
 
-        validateAll, allErrors: validations, isValid
+        validateAll, validationErrors, isValid
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
@@ -59,7 +59,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEdi
                     loading={linkedDataLoading}
                     properties={extendedProperties}
                     values={valuesWithUpdates}
-                    validations={validations}
+                    validationErrors={validationErrors}
                     onAdd={addValue}
                     onChange={updateValue}
                     onDelete={deleteValue}

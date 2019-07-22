@@ -126,11 +126,9 @@ export const getJsonLdForSubject = (expandedMetadata, subject, defaultType) => {
         return {};
     }
 
-    // If no subject is provided, use the first (and only) entry in the metadata
-    const sub = subject || expandedMetadata[0]['@id'];
-    const metadataItem = (subject ? expandedMetadata.find(item => item['@id'] === sub) : expandedMetadata[0]) || {};
+    const metadataItem = expandedMetadata.find(item => item['@id'] === subject) || {};
 
-    if (!metadataItem['@type']) {
+    if (!metadataItem['@type'] && defaultType) {
         metadataItem['@type'] = [defaultType];
     }
 
