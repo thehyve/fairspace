@@ -21,11 +21,11 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, values = [], validations = [], onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
-    const hasErrors = validations && validations.length > 0;
+    const hasErrors = validationErrors && validationErrors.length > 0;
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
@@ -72,6 +72,7 @@ const LinkedDataProperty = ({property, values = [], validations = [], onAdd, onC
                         <LinkedDataInputFieldsTable
                             property={property}
                             values={values}
+                            validationErrors={validationErrors}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onChange={onChange}
@@ -83,7 +84,7 @@ const LinkedDataProperty = ({property, values = [], validations = [], onAdd, onC
                     )
                 }
             </FormGroup>
-            {hasErrors ? <FormHelperText color="primary">{validations.map(e => `${e}. `)}</FormHelperText> : null}
+            {hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
         </FormControl>
     );
 };

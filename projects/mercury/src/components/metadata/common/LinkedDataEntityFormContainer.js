@@ -5,22 +5,18 @@ import {Button, CircularProgress, Grid} from "@material-ui/core";
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
-import {getValuesFromProperties} from "../../../utils/linkeddata/metadataUtils";
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../useFormSubmission";
 
-const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable = true, ...otherProps}) => {
-    const {submitLinkedDataChanges} = useContext(LinkedDataContext);
-    const {properties, linkedDataLoading, linkedDataError} = useLinkedData(subject, defaultType, isEditable);
-
-    const visibleProperties = properties.filter(p => p.isEditable || p.values.length);
-    const values = getValuesFromProperties(properties);
+const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEditable = true, ...otherProps}) => {
+    const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
+    const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject, defaultType);
 
     const {
         addValue, updateValue, deleteValue, clearForm,
         updates, hasFormUpdates, valuesWithUpdates,
 
-        validateAll, allErrors: validations, isValid
+        validateAll, validationErrors, isValid
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
@@ -29,8 +25,11 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
         subject
     );
 
+    // Apply context-specific logic to the properties and filter on visibility
+    const extendedProperties = extendProperties({properties, subject, isEntityEditable});
+
     const validateAndSubmit = () => {
-        const hasErrors = validateAll(visibleProperties);
+        const hasErrors = validateAll(extendedProperties);
 
         if (!hasErrors) submitForm();
     };
@@ -39,7 +38,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
 
     if (isUpdating) {
         footer = <CircularProgress />;
-    } else if (isEditable) {
+    } else if (isEntityEditable) {
         footer = (
             <Button
                 onClick={validateAndSubmit}
@@ -58,9 +57,9 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEditable 
                     {...otherProps}
                     error={linkedDataError}
                     loading={linkedDataLoading}
-                    properties={visibleProperties}
+                    properties={extendedProperties}
                     values={valuesWithUpdates}
-                    validations={validations}
+                    validationErrors={validationErrors}
                     onAdd={addValue}
                     onChange={updateValue}
                     onDelete={deleteValue}

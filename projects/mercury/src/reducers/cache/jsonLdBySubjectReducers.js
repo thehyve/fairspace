@@ -1,8 +1,6 @@
 import reduceReducers from 'reduce-reducers';
 import {promiseReducerFactory} from "../../utils/redux";
 import * as actionTypes from "../../actions/actionTypes";
-import {getVocabulary} from "./vocabularyReducers";
-import {fromJsonLd} from "../../utils/linkeddata/jsonLdConverter";
 
 const defaultState = {};
 
@@ -39,14 +37,12 @@ export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, default
  * @param state
  * @param subject
  * @param defaultType
- * @see {Vocabulary.fromJsonLd}
  * @returns {*}
  */
-export const getCombinedMetadataForSubject = (state, subject, defaultType) => {
+export const getMetadataForSubject = (state, subject) => {
     const {cache: {jsonLdBySubject}} = state;
     if (jsonLdBySubject && jsonLdBySubject[subject] && !jsonLdBySubject[subject].pending && !jsonLdBySubject[subject].error) {
-        const vocabulary = getVocabulary(state);
-        return fromJsonLd(jsonLdBySubject[subject].data, subject, vocabulary, defaultType);
+        return jsonLdBySubject[subject].data || [];
     }
 
     return [];

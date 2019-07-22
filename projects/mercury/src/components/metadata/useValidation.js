@@ -3,6 +3,13 @@ import {validateValuesAgainstShape} from "../../utils/validationUtils";
 
 export const hasValidationError = errors => errors && Array.isArray(errors) && errors.length > 0;
 
+/**
+ * This hook keeps track of validation errors for a form. It contains a method to
+ * validate a property value against its shape. If the value does not validate, an error is
+ * stored within this hooks state.
+ *
+ * @returns {{validateProperty: (function(*, *=): boolean), allErrors: {}, isValid: boolean}}
+ */
 const useValidation = () => {
     const [errors, setErrors] = useState({});
 
@@ -25,7 +32,7 @@ const useValidation = () => {
     return {
         validateProperty,
 
-        allErrors: errors,
+        validationErrors: errors,
         isValid: !Object.values(errors).find(hasValidationError)
     };
 };
