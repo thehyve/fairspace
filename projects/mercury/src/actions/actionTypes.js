@@ -1,8 +1,5 @@
 /* eslint-disable no-multi-spaces */
 
-// Account
-export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
-
 // Clipboard
 export const CLIPBOARD_CUT                          = 'CLIPBOARD_CUT';
 export const CLIPBOARD_COPY                         = 'CLIPBOARD_COPY';

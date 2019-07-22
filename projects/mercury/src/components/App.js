@@ -4,14 +4,12 @@ import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
-
-import {fetchAuthorizations} from "../actions/accountActions";
 import {fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
 import Config from "../services/Config/Config";
 import theme from './App.theme';
 import Layout from "./common/Layout/Layout";
-import {LoadingInlay, ErrorDialog} from './common';
+import {ErrorDialog, LoadingInlay} from './common';
 import {UserProvider} from '../UserContext';
 import {UsersProvider} from "./permissions/UsersContext";
 
@@ -34,7 +32,6 @@ class App extends React.Component {
 
         Config.init()
             .then(() => {
-                this.store.dispatch(fetchAuthorizations());
                 this.store.dispatch(fetchWorkspace());
 
                 if (this.cancellable.setState) {

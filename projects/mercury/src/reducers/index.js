@@ -1,5 +1,4 @@
 import {combineReducers} from 'redux';
-import account from './account';
 import cache from './cache';
 import collectionBrowser from "./collectionBrowserReducers";
 import clipboard from "./clipboardReducers";
@@ -8,7 +7,6 @@ import ui from "./uiReducers";
 import {collectionsSearchReducer, metadataSearchReducer, vocabularySearchReducer} from './searchReducers';
 
 export default combineReducers({
-    account,
     cache,
     collectionBrowser,
     workspace,
