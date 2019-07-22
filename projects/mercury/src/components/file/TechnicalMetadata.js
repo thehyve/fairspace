@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import {Table, TableBody, TableCell, TableRow} from "@material-ui/core";
 import filesize from "filesize";
 import DateTime from "../common/DateTime";
+import {isNonEmptyValue} from "../../utils/genericUtils";
 
 const TechnicalMetadata = ({fileProps}) => (
     <Table>
@@ -19,7 +20,7 @@ const TechnicalMetadata = ({fileProps}) => (
                     <TableCell><DateTime value={fileProps.dateModified} />{fileProps.modifiedBy ? ' by ' + fileProps.modifiedBy : ''}</TableCell>
                 </TableRow>
             )}
-            {fileProps.fileSize && (
+            {isNonEmptyValue(fileProps.fileSize) && (
                 <TableRow>
                     <TableCell>Filesize</TableCell>
                     <TableCell>{filesize(fileProps.fileSize)}</TableCell>
