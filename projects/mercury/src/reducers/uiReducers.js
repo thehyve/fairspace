@@ -6,7 +6,6 @@ const defaultState = {
 
 const ui = (state = defaultState, action) => {
     switch (action.type) {
-        case actionTypes.FETCH_AUTHORIZATIONS + "_REJECTED":
         case actionTypes.FETCH_WORKSPACE + "_REJECTED":
             // If a call has failed with a 401 status, the user
             // will be redirected to the login page. During the redirect

@@ -18,7 +18,6 @@ workspace:
   configurationScripts:
     keycloak:
       enabled: true
-      image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.1
       pullPolicy: IfNotPresent
 
 services:
@@ -26,9 +25,6 @@ services:
 
 # Specific settings for Pluto
 pluto:
-  keycloak:
-    baseUrl: https://keycloak.hyperspace.demo.fairway.app
-    realm: demo
   tracing:
     enabled: false
 
