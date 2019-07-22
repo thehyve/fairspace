@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
@@ -187,6 +187,6 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     }
 
     private void validateNewConstraints(Model constraints) {
-        validator.validate(model, model.union(constraints), EMPTY, constraints, vocabulary, violationHandler);
+        validator.validate(model, model.union(constraints), EMPTY_MODEL, constraints, vocabulary, violationHandler);
     }
 }

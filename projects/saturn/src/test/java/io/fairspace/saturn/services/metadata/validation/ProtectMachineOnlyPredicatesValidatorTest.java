@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -59,7 +59,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S1, P2, S2,
         S2, P2, S1);
 
-        validator.validate(EMPTY, testModel, testModel, EMPTY, EMPTY, violationHandler);
+        validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 
@@ -78,7 +78,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S1, P2, S3,
         S3, P2, S2);
 
-        validator.validate(EMPTY, EMPTY, EMPTY, testModel, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
 
         verify(violationHandler).onViolation("The given model contains a machine-only predicate",
                 createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
@@ -86,7 +86,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        validator.validate(EMPTY, EMPTY, EMPTY, EMPTY, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, SYSTEM_VOCABULARY, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 

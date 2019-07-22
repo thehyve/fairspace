@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.vocabulary.Inference.getInferredStatements;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -52,7 +52,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> update(EMPTY, model));
+        commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
     }
 
     /**
@@ -72,7 +72,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> update(model, EMPTY));
+        commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
     }
 
     /**

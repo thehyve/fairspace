@@ -10,7 +10,7 @@ import org.apache.jena.sparql.graph.GraphZero;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 public class ModelUtils {
-    public static final Model EMPTY = new ModelCom(GraphZero.instance());
+    public static final Model EMPTY_MODEL = new ModelCom(GraphZero.instance());
 
     public static Model modelOf(Statement... statements) {
         return createDefaultModel().add(statements);

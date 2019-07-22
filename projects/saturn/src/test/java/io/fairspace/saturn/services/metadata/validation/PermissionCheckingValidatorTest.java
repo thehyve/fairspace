@@ -15,7 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.Set;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
@@ -47,7 +47,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        validator.validate(EMPTY, EMPTY, EMPTY, EMPTY, null, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
 
         verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
         verifyZeroInteractions(violationHandler);
@@ -59,7 +59,7 @@ public class PermissionCheckingValidatorTest {
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
         doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
-        validator.validate(EMPTY, model, EMPTY, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
         verify(violationHandler).onViolation("Cannot modify read-only resource", STATEMENT.getSubject(), null, null);
     }
 
@@ -68,7 +68,7 @@ public class PermissionCheckingValidatorTest {
         model.add(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        validator.validate(EMPTY, model, EMPTY, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
         verify(permissions).ensureAccess(nodes, Access.Write);

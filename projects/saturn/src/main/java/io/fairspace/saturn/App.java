@@ -65,7 +65,7 @@ public class App {
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissions);
 
         var metadataValidator = new ComposedValidator(
-                new MachineOnlyClassesValidator(SYSTEM_VOCABULARY),
+                new MachineOnlyClassesValidator(),
                 new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY),
                 new PermissionCheckingValidator(permissions),
                 new ShaclValidator());

@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
@@ -48,7 +48,7 @@ public class InverseForUsedPropertiesValidatorTest {
                 PROPERTY_SHAPE2, SH.path, PROPERTY2,
                 PROPERTY_SHAPE1, FS.inverseRelation, PROPERTY_SHAPE2,
                 PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1);
-        validator.validate(EMPTY, model, EMPTY, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -74,7 +74,7 @@ public class InverseForUsedPropertiesValidatorTest {
                 PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1);
 
 
-        validator.validate(EMPTY, toAdd, EMPTY, toAdd, null, violationHandler);
+        validator.validate(EMPTY_MODEL, toAdd, EMPTY_MODEL, toAdd, null, violationHandler);
 
         verify(violationHandler).onViolation("Cannot set fs:inverseRelation for a property that has been used already", createStatement(PROPERTY_SHAPE1, FS.inverseRelation, PROPERTY_SHAPE2));
         verify(violationHandler).onViolation("Cannot set fs:inverseRelation for a property that has been used already", createStatement(PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1));
@@ -107,7 +107,7 @@ public class InverseForUsedPropertiesValidatorTest {
                 PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1
         );
 
-        validator.validate(vocabulary, vocabulary.difference(toDelete), toDelete, EMPTY, null, violationHandler);
+        validator.validate(vocabulary, vocabulary.difference(toDelete), toDelete, EMPTY_MODEL, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
