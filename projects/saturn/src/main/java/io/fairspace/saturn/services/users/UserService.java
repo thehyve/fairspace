@@ -58,12 +58,14 @@ public class UserService {
     }
 
     private void refreshCacheNow(String authorization) {
+        log.debug("Refreshing user cache");
         var users = fetchUsers(authorization);
         var updated = users
                 .stream()
                 .filter(user -> !user.equals(usersByIri.put(user.getIri(), user)))
                 .collect(toList());
         if (!updated.isEmpty()) {
+            log.debug("Updating user cache with {} users", updated.size());
             commit("Update user information", dao, () -> updated.forEach(dao::write));
         }
         lastRefreshTime = currentTimeMillis();
@@ -92,6 +94,7 @@ public class UserService {
             var response = request.send();
             if (response.getStatus() == SC_OK) {
                 List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {});
+                log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
                 return keycloakUsers
                         .stream()
                         .map(keycloakUser -> {

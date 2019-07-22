@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {connect} from 'react-redux';
 // Actions
 import {
@@ -10,7 +10,6 @@ import {
     getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
     isVocabularyPending
 } from "../../reducers/cache/vocabularyReducers";
-import {getAuthorizations} from "../../reducers/account/authorizationsReducers";
 import {getVocabularySearchResults} from "../../reducers/searchReducers";
 // Utils
 import {isDataSteward} from "../../utils/userUtils";
@@ -24,6 +23,7 @@ import LinkedDataContext from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import Config from "../../services/Config/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
+import UserContext from "../../UserContext";
 
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
@@ -32,6 +32,8 @@ const LinkedDataVocabularyProvider = ({
 }) => {
     fetchMetaVocabulary();
     fetchMetadataVocabulary();
+
+    const {currentUser} = useContext(UserContext);
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary)
@@ -71,7 +73,7 @@ const LinkedDataVocabularyProvider = ({
                 // Fixed properties
                 namespaces,
                 requireIdentifier: false,
-                hasEditRight: isDataSteward(authorizations, Config.get()),
+                hasEditRight: isDataSteward(currentUser.authorizations, Config.get()),
                 editorPath: VOCABULARY_PATH,
 
                 // Methods based on shapes
@@ -99,7 +101,6 @@ const mapStateToProps = (state) => {
     const metaVocabulary = getMetaVocabulary(state);
     const vocabulary = getVocabulary(state);
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
-    const authorizations = getAuthorizations(state);
     const isLinkedDataLoading = () => isVocabularyPending(state);
     const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
     const getLinkedDataSearchResults = () => getVocabularySearchResults(state);
@@ -109,7 +110,6 @@ const mapStateToProps = (state) => {
         metaVocabulary,
         vocabulary,
         shapesError,
-        authorizations,
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
         getLinkedDataSearchResults,

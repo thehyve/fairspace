@@ -251,6 +251,7 @@ fs:fixedShapeShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path fs:fixedShape ;
     fs:machineOnly true ; 
+    sh:maxCount 1 ;
     sh:name "Fixed shape" ;
     sh:description "If this is true, a user can not make changes to this shape definition." .
 

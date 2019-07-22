@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-import static nl.fairspace.pluto.app.config.Urls.AUTHORIZATIONS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.EXCHANGE_TOKENS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
 import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_DETAILS_PATH;
@@ -38,26 +35,13 @@ public class NoAuthResource {
     WorkspaceDetails workspaceDetails;
 
     /**
-     * GET  /authorization : return a map with authorizations for the current user
-     *
-     * Please note that this call requires the "user-workspace" authorization and
-     * will return a 403 otherwise
-     *
-     * @return a map with authorizations for the current user.
-     */
-    @GetMapping(AUTHORIZATIONS_PATH)
-    public List<String> getAuthorizations() throws ParseException {
-        return Collections.emptyList();
-    }
-
-    /**
      * GET  /name : returns the name of the user currently logged in
      *
      * @return the login if the user is authenticated
      */
     @GetMapping(USERINFO_PATH)
     public UserInfo getUser() {
-        return new UserInfo("0", "mock-user", "Mock User", "Mock", "User");
+        return new UserInfo("0", "mock-user", "Mock User", "Mock", "User", Collections.emptyList());
     }
 
     /**

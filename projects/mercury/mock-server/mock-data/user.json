@@ -3,5 +3,6 @@
   "username":"test-workspace-ci",
   "firstName":"John",
   "lastName":"Snow",
-  "fullName":"John Snow"
+  "fullName":"John Snow",
+  "authorizations": ["user-workspace", "datasteward", "ROLE_USER"]
 }
