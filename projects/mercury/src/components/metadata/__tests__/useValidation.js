@@ -28,7 +28,7 @@ describe('useValidation', () => {
         });
 
         expect(validation.isValid).toBe(false);
-        expect(validation.allErrors.a).toBeTruthy();
+        expect(validation.validationErrors.a).toBeTruthy();
     });
 
     it('should override state on second validation', () => {

@@ -89,7 +89,7 @@ describe('useFormData', () => {
                 formData.addValue(propertyB, {value: 'more-than-5-characters'});
             });
 
-            expect(Object.keys(formData.allErrors)).toEqual(["http://b"]);
+            expect(Object.keys(formData.validationErrors)).toEqual(["http://b"]);
         });
 
         it('should validate data upon updating', () => {
@@ -97,7 +97,7 @@ describe('useFormData', () => {
                 formData.updateValue(propertyB, {value: 'more-than-5-characters'}, 0);
             });
 
-            expect(Object.keys(formData.allErrors)).toEqual(["http://b"]);
+            expect(Object.keys(formData.validationErrors)).toEqual(["http://b"]);
         });
 
         it('should validate data upon deletion', () => {
@@ -105,7 +105,7 @@ describe('useFormData', () => {
                 formData.deleteValue(propertyA, 0);
             });
 
-            expect(Object.keys(formData.allErrors)).toEqual(["http://a"]);
+            expect(Object.keys(formData.validationErrors)).toEqual(["http://a"]);
         });
     });
 });
