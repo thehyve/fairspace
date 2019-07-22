@@ -2,9 +2,15 @@ import {useState} from "react";
 import useValidation from "./useValidation";
 
 /**
- * This hook is concerned about storing form state for linked data
+ * This hook is concerned about storing form state. It is given an initial set of values
+ * and stores a separate list with updates to those values.
+ *
+ * Updates to the values are validated using the {useValidation} hook. The methods and data from
+ * that hook are exposed as well.
+ *
  * @param values
  * @returns {{valuesWithUpdates: any, updateValue: updateValue, hasFormUpdates: any, deleteValue: deleteValue, updates: any, addValue: addValue}}
+ * @see {useValidation}
  */
 const useFormData = (values) => {
     const [updates, setUpdates] = useState({});

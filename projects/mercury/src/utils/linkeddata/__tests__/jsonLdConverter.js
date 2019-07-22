@@ -1,5 +1,5 @@
 import * as constants from "../../../constants";
-import {fromJsonLd, normalizeTypes, toJsonLd} from "../jsonLdConverter";
+import {fromJsonLd, getJsonLdForSubject, normalizeTypes, toJsonLd} from "../jsonLdConverter";
 import {vocabularyUtils} from "../vocabularyUtils";
 
 describe('jsonLdConverter', () => {
@@ -171,6 +171,52 @@ describe('jsonLdConverter', () => {
             expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.otherEntry)).toEqual(
                 [{'@id': 'http://a', "label": ['AAA']}, {'@id': 'http://b', "label": ['BBB']}]
             );
+        });
+    });
+
+    describe('getJsonLdForSubject', () => {
+        it('should return jsonLd for a single subject', () => {
+            const metadata = [
+                {
+                    '@id': 'http://subject',
+                    '@type': ['http://my-type'],
+                    'http://label': [{'@value': 'label'}]
+                },
+                {
+                    '@id': 'http://other'
+                }
+            ];
+
+            expect(getJsonLdForSubject(metadata, 'http://subject')).toEqual(metadata[0]);
+        });
+
+        it('should return nothing if the subject is not found', () => {
+            const metadata = [
+                {
+                    '@id': 'http://subject',
+                    '@type': ['http://my-type'],
+                    'http://label': [{'@value': 'label'}]
+                }
+            ];
+
+            expect(getJsonLdForSubject(metadata, 'http://other-subject', 'http://default-type')).toEqual({
+                '@type': ['http://default-type']
+            });
+        });
+
+        it('should add a default type if no type is given', () => {
+            const metadata = [
+                {
+                    '@id': 'http://no-type',
+                    'http://label': [{'@value': 'label'}]
+                }
+            ];
+
+            expect(getJsonLdForSubject(metadata, 'http://no-type', 'http://default-type')).toEqual({
+                '@id': 'http://no-type',
+                '@type': ['http://default-type'],
+                'http://label': [{'@value': 'label'}]
+            });
         });
     });
 
