@@ -2,13 +2,14 @@ import React, {useState} from 'react';
 import {
     Table, TableHead, TableRow, TableCell,
     TableBody, Typography, Icon,
-    withStyles, Paper, Grid, Checkbox, TableSortLabel
+    withStyles, Paper, Grid, Checkbox, TableSortLabel, TablePagination
 } from "@material-ui/core";
 import filesize from 'filesize';
 
 import {DateTime} from "../common";
 import styles from './FileList.styles';
 import useSorting from "../common/useSorting";
+import usePagination from "../common/usePagination";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
@@ -32,6 +33,7 @@ const FileList = ({
     };
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns);
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!files || files.length === 0 || files[0] === null) {
         return (
@@ -96,8 +98,8 @@ const FileList = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {orderedItems.map((file) => {
-                        const item = file.item;
+                    {pagedItems.map((file) => {
+                        const {item} = file;
                         const checkboxVisibility = hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
 
                         return (
@@ -141,6 +143,15 @@ const FileList = ({
                     })}
                 </TableBody>
             </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={files.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={(e, p) => setPage(p)}
+                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+            />
         </Paper>
     );
 };

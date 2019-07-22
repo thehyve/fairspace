@@ -1,5 +1,4 @@
 import {useState} from "react";
-import PropTypes from "prop-types";
 import {compareBy} from "../../utils/genericUtils";
 
 /**
@@ -7,6 +6,7 @@ import {compareBy} from "../../utils/genericUtils";
  * the fields are the same, and as such always return a stable order
  * @param array
  * @param cmp
+ * @param ascending
  * @returns {*}
  */
 const stableSort = (array, cmp, ascending = true) => {
@@ -55,11 +55,6 @@ const useSorting = (items, columns) => {
 
         orderedItems
     };
-};
-
-useSorting.propTypes = {
-    items: PropTypes.array,
-    columns: PropTypes.object
 };
 
 export default useSorting;

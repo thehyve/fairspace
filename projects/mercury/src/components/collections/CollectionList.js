@@ -1,10 +1,11 @@
 import React from 'react';
-import {Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, withStyles} from "@material-ui/core";
+import {Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TablePagination, withStyles} from "@material-ui/core";
 
 import {DateTime} from "../common";
 import styles from './CollectionList.styles';
 import getDisplayName from "../../utils/userUtils";
 import useSorting from "../common/useSorting";
+import usePagination from "../common/usePagination";
 
 const CollectionList = (props) => {
     const {
@@ -36,6 +37,7 @@ const CollectionList = (props) => {
     };
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, columns);
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!collections || collections.length === 0) {
         return "No collections";
@@ -62,7 +64,7 @@ const CollectionList = (props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {orderedItems.map((collection) => {
+                    {pagedItems.map((collection) => {
                         const selected = selectedCollectionLocation && (collection.location === selectedCollectionLocation);
 
                         return (
@@ -87,6 +89,15 @@ const CollectionList = (props) => {
                     })}
                 </TableBody>
             </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={collections.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={(e, p) => setPage(p)}
+                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+            />
         </Paper>
     );
 };
