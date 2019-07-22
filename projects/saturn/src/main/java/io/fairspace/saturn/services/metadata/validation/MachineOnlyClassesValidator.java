@@ -20,11 +20,11 @@ public class MachineOnlyClassesValidator implements MetadataRequestValidator {
     }
 
     @Override
-    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         machineOnlyClasses.forEach(moc -> {
-            modelToAdd.listStatements(null, RDF.type, moc)
+            added.listStatements(null, RDF.type, moc)
                     .forEachRemaining(statement -> violationHandler.onViolation("Trying to create a machine-only entity", statement));
-            modelToRemove.listStatements(null, RDF.type, moc)
+            removed.listStatements(null, RDF.type, moc)
                     .forEachRemaining(statement -> violationHandler.onViolation("Trying to change type of a machine-only entity", statement));
         });
     }

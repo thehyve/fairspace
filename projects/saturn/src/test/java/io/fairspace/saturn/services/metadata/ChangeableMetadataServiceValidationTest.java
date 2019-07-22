@@ -74,11 +74,11 @@ public class ChangeableMetadataServiceValidationTest {
 
     private void produceValidationError() {
         doAnswer(invocation -> {
-            ViolationHandler handler = invocation.getArgument(2);
+            ViolationHandler handler = invocation.getArgument(5);
             handler.onViolation("ERROR", createResource(), null, null);
 
             return null;
-        }).when(validator).validate(any(), any(), any());
+        }).when(validator).validate(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ChangeableMetadataServiceValidationTest {
         ds.getNamedModel(GRAPH).add(STMT1);
         api.patch(createDefaultModel().add(STMT1));
 
-        verify(validator).validate(argThat(Model::isEmpty), argThat(Model::isEmpty), any());
+        verify(validator).validate(any(), any(), argThat(Model::isEmpty), argThat(Model::isEmpty), any(), any());
     }
 
     @Test

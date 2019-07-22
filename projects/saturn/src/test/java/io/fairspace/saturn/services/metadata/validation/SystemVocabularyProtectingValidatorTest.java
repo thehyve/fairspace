@@ -8,7 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -23,10 +24,7 @@ public class SystemVocabularyProtectingValidatorTest {
     @Test
     public void itShouldNotBePossibleToDeleteStatementsFromTheSystemVocabulary() {
         var stmt = createStatement(createResource(FS.NS + "FileShape"), RDF.type, createResource(FS.NS + "ClassShape"));
-        validator.validate(
-                createDefaultModel().add(stmt),
-                createDefaultModel(),
-                violationHandler);
+        validator.validate(modelOf(stmt), EMPTY, modelOf(stmt), EMPTY, EMPTY, violationHandler);
 
 
         verify(violationHandler).onViolation("Cannot remove a statement from the system vocabulary", stmt);
@@ -34,22 +32,16 @@ public class SystemVocabularyProtectingValidatorTest {
 
     @Test
     public void itShouldBePossibleToAddNewShapes() {
-        var stmt = createStatement(createResource("http://example.com/NewShape"), SH.property, createResource(FS.NS + "ClassShape"));
-        validator.validate(
-                createDefaultModel(),
-                createDefaultModel().add(stmt),
-                violationHandler);
+        var model = modelOf(createResource("http://example.com/NewShape"), SH.property, createResource(FS.NS + "ClassShape"));
+        validator.validate(EMPTY, model, EMPTY, model, EMPTY, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void itShouldBePossibleToAddNewPropertiesToSystemShapes() {
-        var stmt = createStatement(createResource(FS.NS + "FileShape"), SH.property, createProperty("http://example.com/property"));
-        validator.validate(
-                createDefaultModel(),
-                createDefaultModel().add(stmt),
-                violationHandler);
+        var model = modelOf(createResource(FS.NS + "FileShape"), SH.property, createProperty("http://example.com/property"));
+        validator.validate(EMPTY, model, EMPTY, model, EMPTY, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -57,10 +49,8 @@ public class SystemVocabularyProtectingValidatorTest {
     @Test
     public void itShouldNotBePossibleToAddArbitraryStatementsToTheSystemVocabulary() {
         var stmt = createStatement(createResource(FS.NS + "FileShape"), createProperty(FS.NS + "custom"), createStringLiteral("blah"));
-        validator.validate(
-                createDefaultModel(),
-                createDefaultModel().add(stmt),
-                violationHandler);
+        var model = modelOf(stmt);
+        validator.validate(EMPTY, model, EMPTY, model, EMPTY, violationHandler);
 
         verify(violationHandler).onViolation("Cannot add a statement modifying a shape from the system vocabulary", stmt);
     }

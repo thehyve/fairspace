@@ -7,6 +7,8 @@ import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.vocabulary.FOAF;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -23,6 +26,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -63,7 +67,7 @@ public class ChangeableMetadataServiceTest {
     public void testPutHandlesLifecycleForEntitities() {
         Model delta = createDefaultModel().add(STMT1).add(STMT2);
         api.put(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(argThat(delta::isIsomorphicWith));
     }
 
 
@@ -127,24 +131,27 @@ public class ChangeableMetadataServiceTest {
     public void testPatchHandlesLifecycleForEntities() {
         Model delta = createDefaultModel().add(STMT1).add(STMT2);
         api.patch(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(argThat(delta::isIsomorphicWith));
     }
 
     @Test
     public void testInference() {
         initVocabularies(rdf);
+        ds.getDefaultModel()
+                .add(S1, RDF.type, FOAF.Person)
+                .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));
 
-        var provideMaterial = createProperty(generateVocabularyIri("providesMaterial").getURI());
-        var derivesFrom = createProperty(generateVocabularyIri("derivesFrom").getURI());
+        var gaveConsent = createProperty(generateVocabularyIri("gaveConsent").getURI());
+        var isConsentOf = createProperty(generateVocabularyIri("isConsentOf").getURI());
 
-        api.put(createDefaultModel().add(S1, provideMaterial, S2));
+        api.put(modelOf(S1, gaveConsent, S2));
 
-        assertTrue(ds.getDefaultModel().contains(S1, provideMaterial, S2));
-        assertTrue(ds.getDefaultModel().contains(S2, derivesFrom, S1));
+        assertTrue(ds.getDefaultModel().contains(S1, gaveConsent, S2));
+        assertTrue(ds.getDefaultModel().contains(S2, isConsentOf, S1));
 
-        api.delete(createDefaultModel().add(S2, derivesFrom, S1));
+        api.delete(createDefaultModel().add(S2, isConsentOf, S1));
 
-        assertFalse(ds.getDefaultModel().contains(S1, provideMaterial, S2));
-        assertFalse(ds.getDefaultModel().contains(S2, derivesFrom, S1));
+        assertFalse(ds.getDefaultModel().contains(S1, gaveConsent, S2));
+        assertFalse(ds.getDefaultModel().contains(S2, isConsentOf, S1));
     }
 }

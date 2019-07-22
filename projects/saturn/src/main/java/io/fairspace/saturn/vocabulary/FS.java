@@ -98,6 +98,9 @@ public class FS {
     public static final String IMPORTANT_PROPERTY_URI = NS + "importantProperty";
     public static final Property importantProperty = createProperty(IMPORTANT_PROPERTY_URI);
 
+    public static final String DOMAIN_INCLUDES_URI = NS + "domainIncludes";
+    public static final Property domainIncludes = createProperty(DOMAIN_INCLUDES_URI);
+
     public static final String ERROR_URI = NS + "error";
     public static final String ERROR_STATUS_URI = NS + "errorStatus";
     public static final String ERROR_MESSAGE_URI = NS + "errorMessage";

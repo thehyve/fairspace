@@ -68,13 +68,13 @@ public class App {
                 new MachineOnlyClassesValidator(SYSTEM_VOCABULARY),
                 new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY),
                 new PermissionCheckingValidator(permissions),
-                new ShaclValidator(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI));
+                new ShaclValidator());
 
         var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, CONFIG.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(META_VOCABULARY),
-                new ShaclValidator(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI),
+                new ShaclValidator(),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(rdf),
                 new InverseForUsedPropertiesValidator(rdf)

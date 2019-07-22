@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
+import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataAndVocabularyConsistencyValidatorTest {
     private static final String NS = "http://example.com/";
-    private static final Model EMPTY = createDefaultModel();
+
     private static final Resource TARGET_CLASS = createResource(NS + "TestClass");
     private static final Resource TARGET_CLASS_SHAPE = createResource();
     private static final Resource ENTITY1 = createResource();
@@ -61,95 +63,90 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateDataType() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.datatype, XSD.xint);
+        var constraints = modelOf(PROPERTY_SHAPE, SH.datatype, XSD.xint);
         model.add(ENTITY1, PROPERTY, createTypedLiteral(123));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(false));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation(any(), any(), any(), any());
     }
 
     @Test
     public void testValidateClass() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.class_, CLASS1);
+        var constraints = modelOf(PROPERTY_SHAPE, SH.class_, CLASS1);
 
         model.add(ENTITY1, PROPERTY, ENTITY2)
          .add(ENTITY2, RDF.type, CLASS1);
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
 
         model.add(ENTITY1, PROPERTY, ENTITY3)
                 .add(ENTITY3, RDF.type, CLASS2);
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation("Value needs to have class http://example.com/Class1", ENTITY1, PROPERTY, ENTITY3);
     }
 
     @Test
     public void testValidateMinCount() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.minCount, createTypedLiteral(2));
+        var constraints = modelOf(PROPERTY_SHAPE, SH.minCount, createTypedLiteral(2));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation(any(), any(), any(), any());
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(1));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler, times(2)).onViolation(any(), any(), any(), any());
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(2));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void testValidateMaxCount() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.maxCount, createTypedLiteral(1));
+        var constraints = modelOf(PROPERTY_SHAPE, SH.maxCount, createTypedLiteral(1));
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(1));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(2));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation(any(), any(), any(), any());
     }
 
     @Test
     public void testValidateMinLength() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.minLength, createTypedLiteral(2));
+        var constraints = modelOf(PROPERTY_SHAPE, SH.minLength, createTypedLiteral(2));
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("12"));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("1"));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation(any(), any(), any(), any());
     }
@@ -161,32 +158,35 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("12"));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("123"));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation(any(), any(), any(), any());
     }
 
     @Test
     public void testValidateIn() {
-        var constraints = createDefaultModel()
-                .add(PROPERTY_SHAPE, SH.in, vocabulary.createList(createStringLiteral("a"), createStringLiteral("b")));
+        var constraints = modelOf(PROPERTY_SHAPE, SH.in, vocabulary.createList(createStringLiteral("a"), createStringLiteral("b")));
 
         model.add(ENTITY1, PROPERTY, createStringLiteral("a"));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verifyZeroInteractions(violationHandler);
 
         model.add(ENTITY1, PROPERTY, createStringLiteral("c"));
 
-        validator.validate(EMPTY, constraints, violationHandler);
+        validateNewConstraints(constraints);
 
         verify(violationHandler).onViolation(any(), any(), any(), any());
+    }
+
+    private void validateNewConstraints(Model constraints) {
+        validator.validate(model, model.union(constraints), EMPTY, constraints, vocabulary, violationHandler);
     }
 }

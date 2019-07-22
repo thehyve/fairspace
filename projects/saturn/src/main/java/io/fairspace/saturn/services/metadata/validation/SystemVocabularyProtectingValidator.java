@@ -11,15 +11,15 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
  */
 public class SystemVocabularyProtectingValidator implements MetadataRequestValidator {
     @Override
-    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
-        for (var it = modelToRemove.listStatements(); it.hasNext(); ) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+        for (var it = removed.listStatements(); it.hasNext(); ) {
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement)) {
                 violationHandler.onViolation("Cannot remove a statement from the system vocabulary", statement);
             }
         }
 
-        for (var it = modelToAdd.listStatements(); it.hasNext(); ) {
+        for (var it = added.listStatements(); it.hasNext(); ) {
             var statement = it.nextStatement();
             if (SYSTEM_VOCABULARY.contains(statement.getSubject(), null, (RDFNode) null)
                     && !statement.getPredicate().equals(SH.property)) {

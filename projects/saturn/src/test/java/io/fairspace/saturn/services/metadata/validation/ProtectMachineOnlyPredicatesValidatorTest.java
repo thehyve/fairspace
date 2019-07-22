@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -12,7 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.topbraid.shacl.vocabulary.SH;
 
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY;
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -37,47 +38,47 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         var machineOnlyPropertyShape = createResource();
         var regularPropertyShape1 = createResource();
         var regularPropertyShape2 = createResource();
-        validator = new ProtectMachineOnlyPredicatesValidator(createDefaultModel()
-                .add(machineOnlyPropertyShape, SH.path, MACHINE_ONLY_PROPERTY)
-                .add(machineOnlyPropertyShape, FS.machineOnly, createTypedLiteral(true))
-                .add(regularPropertyShape1, SH.path, P1)
-                .add(regularPropertyShape2, SH.path, P2)
-                .add(regularPropertyShape2, FS.machineOnly, createTypedLiteral(false))
+        validator = new ProtectMachineOnlyPredicatesValidator(modelOf(
+                machineOnlyPropertyShape, SH.path, MACHINE_ONLY_PROPERTY,
+                machineOnlyPropertyShape, FS.machineOnly, createTypedLiteral(true),
+                regularPropertyShape1, SH.path, P1,
+                regularPropertyShape2, SH.path, P2,
+                regularPropertyShape2, FS.machineOnly, createTypedLiteral(false))
         );
     }
 
     @Test
     public void testContainsMachineOnlyPredicates() {
-        // An empty model should pass
-        Model testModel = createDefaultModel();
 
+        var testModel = modelOf(
         // A machine-only property may be used as subject or object
-        testModel.add(P1, RDF.type, RDF.Property);
-        testModel.add(MACHINE_ONLY_PROPERTY, RDF.value, P1);
+        P1, RDF.type, RDF.Property,
+        MACHINE_ONLY_PROPERTY, RDF.value, P1,
 
         // Other statements are allowed as well
-        testModel.add(S1, P2, S2);
-        testModel.add(S2, P2, S1);
+        S1, P2, S2,
+        S2, P2, S1);
 
-        validator.validate(testModel, createDefaultModel(), violationHandler);
+        validator.validate(EMPTY, testModel, testModel, EMPTY, EMPTY, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void testHasMachineOnlyPredicatesRecognizesMachineOnlyStatements() {
         // Create a model that contains one machine only statement between several non-machine-only
-        Model testModel = createDefaultModel();
-        testModel.add(S1, P2, S2);
-        testModel.add(S2, P2, S1);
-        testModel.add(S3, P2, S1);
+        var testModel = modelOf(
+        S1, P2, S2,
+        S2, P2, S1,
+        S3, P2, S1,
 
-        testModel.add(S3, MACHINE_ONLY_PROPERTY, S1);
+        S3, RDF.type, FS.File,
+        S3, MACHINE_ONLY_PROPERTY, S1,
 
-        testModel.add(S2, P2, S3);
-        testModel.add(S1, P2, S3);
-        testModel.add(S3, P2, S2);
+        S2, P2, S3,
+        S1, P2, S3,
+        S3, P2, S2);
 
-        validator.validate(testModel, createDefaultModel(), violationHandler);
+        validator.validate(EMPTY, EMPTY, EMPTY, testModel, SYSTEM_VOCABULARY, violationHandler);
 
         verify(violationHandler).onViolation("The given model contains a machine-only predicate",
                 createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
@@ -85,7 +86,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        validator.validate(createDefaultModel(), createDefaultModel(), violationHandler);
+        validator.validate(EMPTY, EMPTY, EMPTY, EMPTY, SYSTEM_VOCABULARY, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 

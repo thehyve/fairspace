@@ -5,8 +5,8 @@ import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.fairspace.saturn.services.ModelUtils.JSON_LD_HEADER_STRING;
-import static io.fairspace.saturn.services.ModelUtils.fromJsonLD;
+import static io.fairspace.saturn.services.JsonLDUtils.JSON_LD_HEADER_STRING;
+import static io.fairspace.saturn.services.JsonLDUtils.fromJsonLD;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.saturn.util.ValidationUtils.validateContentType;

@@ -14,11 +14,11 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     private final PermissionsService permissions;
 
     @Override
-    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         try {
-            permissions.ensureAccess(modelToRemove
+            permissions.ensureAccess(removed
                             .listSubjects()
-                            .andThen(modelToAdd.listSubjects())
+                            .andThen(added.listSubjects())
                             .filterKeep(Resource::isURIResource)
                             .mapWith(FrontsNode::asNode)
                             .toSet(),
