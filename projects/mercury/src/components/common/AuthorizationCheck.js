@@ -1,14 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from "prop-types";
-import {connect} from 'react-redux';
 import Typography from "@material-ui/core/Typography";
-import {withRouter} from "react-router-dom";
 import LoadingInlay from './LoadingInlay';
-import {
-    getAuthorizations,
-    hasAuthorizationsError,
-    isAuthorizationsPending
-} from "../../reducers/account/authorizationsReducers";
+import UserContext from "../../UserContext";
 
 /**
  * This component performs an authorization check for the current user
@@ -16,7 +10,7 @@ import {
  *
  * @see config.json
  */
-function AuthorizationCheck(props) {
+export const AuthorizationCheck = props => {
     /**
      * Check whether the given array contains the authorization that is asked for
      * @param data
@@ -87,10 +81,16 @@ AuthorizationCheck.propTypes = {
     transformError: PropTypes.func
 };
 
-const mapStateToProps = state => ({
-    pending: isAuthorizationsPending(state),
-    error: hasAuthorizationsError(state),
-    authorizations: getAuthorizations(state)
-});
+const ContextualAuthorizationCheck = props => {
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
+    return (
+        <AuthorizationCheck
+            authorizations={currentUser.authorizations}
+            pending={currentUserLoading}
+            error={currentUserError}
+            {...props}
+        />
+    );
+};
 
-export default withRouter(connect(mapStateToProps)(AuthorizationCheck));
+export default ContextualAuthorizationCheck;

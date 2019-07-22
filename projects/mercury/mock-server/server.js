@@ -19,8 +19,7 @@ app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.
 app.get('/config/config.json', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-config.json`));
 
 // Account API
-app.get('/api/v1/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
-app.get('/api/v1/account/authorizations', (req, res) => res.send(['user-workspace', 'datasteward', 'ROLE_USER']));
+app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
 
 // Workspace API
 app.get('/api/v1/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
