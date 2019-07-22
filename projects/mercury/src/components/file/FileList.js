@@ -32,7 +32,7 @@ const FileList = ({
         }
     };
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!files || files.length === 0 || files[0] === null) {

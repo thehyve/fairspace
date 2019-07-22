@@ -41,12 +41,12 @@ let sorting;
 
 beforeEach(() => {
     testHook(() => {
-        sorting = useSorting(items, columns);
+        sorting = useSorting(items, columns, 'label');
     });
 });
 
 describe('useSorting custom hook', () => {
-    it('should initialize by sorting the first column', () => {
+    it('should initialize by sorting the provided column', () => {
         expect(sorting.orderAscending).toBe(true);
         expect(sorting.orderBy).toEqual('label');
     });

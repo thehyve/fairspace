@@ -14,13 +14,13 @@ const stableSort = (array, cmp, ascending = true) => {
         return array;
     }
 
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
+    const arrayWithIndices = array.map((el, index) => [el, index]);
+    arrayWithIndices.sort((a, b) => {
         const order = cmp(a[0], b[0]);
         if (order !== 0) return order;
         return ascending ? a[1] - b[1] : b[1] - a[1];
     });
-    return stabilizedThis.map(el => el[0]);
+    return arrayWithIndices.map(el => el[0]);
 };
 
 /**
@@ -31,12 +31,13 @@ const stableSort = (array, cmp, ascending = true) => {
  *                      valueExtractor: either a function for extracting the value to sort on from an item,
  *                                      or a property name for extracting the value from the item.
  *                                      It is passed to the {compareBy} function
+ * @param initialOrderBy    Initial column to order on
  * @returns {{toggleSort: toggleSort, orderAscending: boolean, orderBy: any, orderedItems: *}}
  * @see {compareBy}
  */
-const useSorting = (items, columns) => {
+const useSorting = (items, columns, initialOrderBy) => {
     const [orderAscending, setOrderAscending] = useState(true);
-    const [orderBy, setOrderBy] = useState(Object.entries(columns)[0][0]);
+    const [orderBy, setOrderBy] = useState(initialOrderBy);
 
     const orderedItems = stableSort(items, compareBy(columns[orderBy].valueExtractor, orderAscending), orderAscending)
     const toggleSort = column => {
