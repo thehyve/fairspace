@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import {Button, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 import TableFooter from "@material-ui/core/TableFooter";
+import {canDelete} from "../../../utils/linkeddata/metadataUtils";
 
 const styles = {
     buttonColumn: {
@@ -15,10 +16,9 @@ const styles = {
     }
 };
 
-export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
+export const LinkedDataValuesTable = ({classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
-    const isDeletable = entry => !('isDeletable' in entry) || entry.isDeletable;
     const showRowDividers = property.maxValuesCount !== 1;
 
     return (
@@ -33,7 +33,7 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onO
                     </TableHead>
                 ) : undefined}
             <TableBody>
-                {property.values.map((entry, idx) => rowDecorator(entry, (
+                {values.map((entry, idx) => rowDecorator(entry, (
                     <TableRow
                         onMouseEnter={() => setHoveredIndex(idx)}
                         onMouseLeave={() => setHoveredIndex(null)}
@@ -45,7 +45,7 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onO
                         {property.isEditable
                             ? (
                                 <TableCell className={classes.buttonColumn}>{
-                                    isDeletable(entry)
+                                    canDelete(property, entry)
                                         ? (
                                             <Button
                                                 size="small"
@@ -72,6 +72,7 @@ export const LinkedDataValuesTable = ({classes, property, columnDefinitions, onO
                         <TableCell colSpan={columnDefinitions.length}>
                             <AddComponent
                                 property={property}
+                                currentValues={values}
                                 placeholder=""
                                 onChange={onAdd}
                                 aria-labelledby={labelId}
@@ -102,6 +103,7 @@ LinkedDataValuesTable.propTypes = {
         })
     ),
     property: PropTypes.object,
+    values: PropTypes.array,
 
     classes: PropTypes.object
 };
@@ -113,7 +115,8 @@ LinkedDataValuesTable.defaultProps = {
     showHeader: true,
     canAdd: true,
     columnDefinitions: [],
-    classes: {}
+    classes: {},
+    values: []
 };
 
 export default withStyles(styles)(LinkedDataValuesTable);

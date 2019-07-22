@@ -1,34 +1,21 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import PropTypes from 'prop-types';
 import {
-    Button, Dialog, DialogActions,
-    DialogContent, DialogTitle, Typography
+    Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
 } from "@material-ui/core";
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../../utils/linkeddata/metadataUtils";
-import {getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "../../../utils/linkeddata/jsonLdUtils";
 import * as consts from "../../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
+import useFormSubmission from "../useFormSubmission";
 
-const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate}) => {
-    const [formKey, setFormKey] = useState(generateUuid());
+const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
-
-    const {getEmptyLinkedData} = useContext(LinkedDataContext);
-    const {extendPropertiesWithChanges, onAdd, onChange, onDelete, submitDisabled} = useFormData(formKey);
-
-    useEffect(() => {
-        setFormKey(generateUuid());
-    }, []);
-
-    const closeDialog = (e) => {
-        if (e) e.stopPropagation();
-        onClose();
-    };
 
     const getIdentifier = () => {
         // If no localPart is specified, treat the identifier as not being entered
@@ -44,18 +31,56 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         return namespace.value + localPart;
     };
 
-    const createEntity = (e) => {
+    const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
+    const properties = shapes.getPropertiesForNodeShape(shape);
+    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
+    const values = {};
+
+    // Apply context-specific logic to the properties and filter on visibility
+    const extendedProperties = extendProperties({properties, isEntityEditable: true});
+
+    const {
+        addValue, updateValue, deleteValue,
+        updates, valuesWithUpdates,
+
+        validateAll, validationErrors, isValid
+    } = useFormData(values);
+
+    // Store the type to create in the form to ensure it is known
+    // and will be stored
+    useEffect(() => {
+        addValue('@type', {id: type});
+    });
+
+    const {isUpdating, submitForm} = useFormSubmission(
+        () => createLinkedDataEntity(getIdentifier(), updates, type)
+            .then(result => {
+                onCreate(result);
+            }),
+        getIdentifier()
+    );
+
+    const createEntity = (event) => {
+        if (event) event.stopPropagation();
+
+        const hasErrors = validateAll(extendedProperties);
+        if (!hasErrors) submitForm();
+    };
+
+    const closeDialog = (e) => {
         if (e) e.stopPropagation();
-        onCreate(formKey, shape, getIdentifier());
+        onClose();
     };
 
     const renderDialogContent = () => {
         const form = (
             <LinkedDataEntityForm
-                properties={extendPropertiesWithChanges(getEmptyLinkedData(shape))}
-                onAdd={onAdd}
-                onChange={onChange}
-                onDelete={onDelete}
+                properties={extendedProperties}
+                values={valuesWithUpdates}
+                validationErrors={validationErrors}
+                onAdd={addValue}
+                onChange={updateValue}
+                onDelete={deleteValue}
                 key="form"
             />
         );
@@ -109,9 +134,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 <Button
                     onClick={createEntity}
                     color="primary"
-                    disabled={!canCreate() || submitDisabled}
+                    disabled={!canCreate() || isUpdating || !isValid}
                 >
-                    Create
+                    {isUpdating ? <CircularProgress /> : 'Create' }
                 </Button>
             </DialogActions>
         </Dialog>

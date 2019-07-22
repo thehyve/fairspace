@@ -88,20 +88,6 @@ public class ChangeableMetadataServiceTest {
     }
 
     @Test
-    public void delete() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
-
-        api.delete(S1.getURI(), null, null);
-
-        assertFalse(ds.getDefaultModel().contains(STMT1));
-        assertTrue(ds.getDefaultModel().contains(STMT2));
-
-        api.delete(null, P1.getURI(), null);
-
-        assertTrue(ds.getDefaultModel().isEmpty());
-    }
-
-    @Test
     public void deleteModel() {
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 

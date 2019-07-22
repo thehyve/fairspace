@@ -5,8 +5,6 @@ import {Button} from "@material-ui/core";
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
 import {LoadingOverlay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
-import {getFirstPredicateId} from "../../../utils/linkeddata/jsonLdUtils";
-import {SHACL_TARGET_CLASS} from "../../../constants";
 
 class LinkedDataCreator extends React.Component {
     static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
@@ -39,26 +37,13 @@ class LinkedDataCreator extends React.Component {
 
     closeDialog = (e) => {
         if (e) e.stopPropagation();
-        this.setState({creationState: false});
-    };
-
-    handleEntityCreation = (formKey, shape, id) => {
-        this.setState({creatingMetadataEntity: true});
-
-        const {create, onEntityCreationError} = this.props;
-        const type = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
-
-        create(formKey, id, type)
-            .catch(e => onEntityCreationError(e, id))
-            .finally(() => {
-                if (!this.unMounted) {
-                    this.setState({creatingMetadataEntity: false});
-                }
-            });
+        if (!this.unMounted) {
+            this.setState({creationState: false});
+        }
     };
 
     render() {
-        const {children, shapesLoading, shapes, requireIdentifier} = this.props;
+        const {children, shapesLoading, shapes, requireIdentifier, onCreate} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
 
         return (
@@ -85,8 +70,8 @@ class LinkedDataCreator extends React.Component {
                 {creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY && (
                     <NewLinkedDataEntityDialog
                         shape={shape}
-                        onCreate={this.handleEntityCreation}
                         onClose={this.closeDialog}
+                        onCreate={onCreate}
                         requireIdentifier={requireIdentifier}
                     />
                 )}
@@ -100,13 +85,14 @@ class LinkedDataCreator extends React.Component {
 }
 
 LinkedDataCreator.propTypes = {
-    create: PropTypes.func.isRequired,
     shapes: PropTypes.array,
     requireIdentifier: PropTypes.bool,
+    onCreate: PropTypes.func
 };
 
 LinkedDataCreator.defaultProps = {
-    requireIdentifier: true
+    requireIdentifier: true,
+    onCreate: () => {}
 };
 
 export default LinkedDataCreator;

@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileSystemException;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class CompoundFileSystem extends BaseFileSystem {
         if (fileSystemByPath(from, false).equals(fileSystemByPath(to, true))) {
             fileSystemByPath(from, true).copy(from, to);
         } else {
-            throw new IOException("Copying files between collections of different types is not implemented yet");
+            throw new FileSystemException("Copying files between collections of different types is not implemented yet");
         }
     }
 
@@ -75,7 +76,7 @@ public class CompoundFileSystem extends BaseFileSystem {
         if (fileSystemByPath(from, true).equals(fileSystemByPath(to, true))) {
             fileSystemByPath(from, true).move(from, to);
         } else {
-            throw new IOException("Moving files between collections of different types is not implemented yet");
+            throw new FileSystemException("Moving files between collections of different types is not implemented yet");
         }
     }
 

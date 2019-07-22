@@ -1,8 +1,5 @@
 /* eslint-disable no-multi-spaces */
 
-// Account
-export const FETCH_AUTHORIZATIONS                   = 'FETCH_AUTHORIZATIONS';
-
 // Clipboard
 export const CLIPBOARD_CUT                          = 'CLIPBOARD_CUT';
 export const CLIPBOARD_COPY                         = 'CLIPBOARD_COPY';
@@ -39,7 +36,6 @@ export const STAT_FILE                              = 'STAT_FILE';
 export const STAT_FILE_PENDING                      = 'STAT_FILE_PENDING';
 export const STAT_FILE_FULFILLED                    = 'STAT_FILE_FULFILLED';
 export const STAT_FILE_REJECTED                     = 'STAT_FILE_REJECTED';
-export const INVALIDATE_STAT_FILE                   = 'INVALIDATE_STAT_FILE';
 export const FETCH_FILES                            = 'FETCH_FILES';
 export const FETCH_FILES_PENDING                    = 'FETCH_FILES_PENDING';
 export const FETCH_FILES_FULFILLED                  = 'FETCH_FILES_FULFILLED';
@@ -101,6 +97,7 @@ export const VOCABULARY_SEARCH_REJECTED             = 'VOCABULARY_SEARCH_REJECTE
 
 // Metadata editing
 export const INITIALIZE_LINKEDDATA_FORM             = 'INITIALIZE_LINKEDDATA_FORM';
+export const CLEAR_LINKEDDATA_FORM                  = 'CLEAR_LINKEDDATA_FORM';
 export const ADD_LINKEDDATA_VALUE                   = 'ADD_LINKEDDATA_VALUE';
 export const UPDATE_LINKEDDATA_VALUE                = 'UPDATE_LINKEDDATA_VALUE';
 export const DELETE_LINKEDDATA_VALUE                = 'DELETE_LINKEDDATA_VALUE';

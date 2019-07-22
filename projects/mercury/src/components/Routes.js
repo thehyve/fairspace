@@ -10,14 +10,15 @@ import logout from "../services/logout";
 import SearchPage from './search/SearchPage';
 import {createMetadataIri, createVocabularyIri} from "../utils/linkeddata/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from './metadata/LinkedDataWrapper';
-import LinkedDataListPage from './metadata/common/LinkedDataListPage';
 import LinkedDataEntityPage from "./metadata/common/LinkedDataEntityPage";
+import MetadataListPage from "./metadata/MetadataListPage";
+import VocabularyListPage from "./metadata/VocabularyListPage";
 
-const linkedDataPageComponent = location => {
+const linkedDataPageComponent = (location, ListPage) => {
     // React-router seems not to be able to directly match query parameters.
     // For that reason, we parse the query string ourselves
     const iriParam = queryString.parse(location.search).iri;
-    return iriParam ? <LinkedDataEntityPage subject={decodeURIComponent(iriParam)} /> : <LinkedDataListPage />;
+    return iriParam ? <LinkedDataEntityPage subject={decodeURIComponent(iriParam)} /> : <ListPage />;
 };
 
 const routes = () => (
@@ -50,7 +51,7 @@ const routes = () => (
             exact
             render={({location}) => (
                 <MetadataWrapper location={location}>
-                    {linkedDataPageComponent(location)}
+                    {linkedDataPageComponent(location, MetadataListPage)}
                 </MetadataWrapper>
             )}
         />
@@ -66,7 +67,7 @@ const routes = () => (
             exact
             render={({location}) => (
                 <VocabularyWrapper location={location}>
-                    {linkedDataPageComponent(location)}
+                    {linkedDataPageComponent(location, VocabularyListPage)}
                 </VocabularyWrapper>
             )}
         />

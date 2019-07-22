@@ -21,11 +21,11 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
-    const {key, values, errors, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
-    const hasErrors = errors && errors.length > 0;
+    const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
+    const hasErrors = validationErrors && validationErrors.length > 0;
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
@@ -61,6 +61,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                     property.isRelationShape ? (
                         <LinkedDataRelationTable
                             property={property}
+                            values={values}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onDelete={onDelete}
@@ -70,6 +71,8 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                     ) : (
                         <LinkedDataInputFieldsTable
                             property={property}
+                            values={values}
+                            validationErrors={validationErrors}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onChange={onChange}
@@ -81,7 +84,7 @@ const LinkedDataProperty = ({property, onAdd, onChange, onDelete}) => {
                     )
                 }
             </FormGroup>
-            {hasErrors ? <FormHelperText color="primary">{errors.map(e => `${e}. `)}</FormHelperText> : null}
+            {hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
         </FormControl>
     );
 };

@@ -1,9 +1,7 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../utils/redux";
 import {MetaVocabularyAPI, VocabularyAPI} from "../services/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
-import {getMetaVocabulary} from "../reducers/cache/vocabularyReducers";
-import {getLinkedDataFormUpdates} from "../reducers/linkedDataFormReducers";
-import {SHACL_PATH, SHACL_TARGET_CLASS, SHACL_NAMESPACE} from "../constants";
+import {SHACL_NAMESPACE, SHACL_PATH, SHACL_TARGET_CLASS} from "../constants";
 import {getFirstPredicateProperty} from "../utils/linkeddata/jsonLdUtils";
 
 export const invalidateMetadata = subject => ({
@@ -11,26 +9,15 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const submitVocabularyChangesFromState = (subject) => (dispatch, getState) => {
-    // For vocabulary changes, the subject iri is used as form key
-    const formKey = subject;
+export const submitVocabularyChanges = (subject, values, metaVocabulary) => ({
+    type: actionTypes.UPDATE_VOCABULARY,
+    payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
+    meta: {
+        subject
+    }
+});
 
-    const values = getLinkedDataFormUpdates(getState(), formKey);
-    const metaVocabulary = getMetaVocabulary(getState());
-    return dispatch({
-        type: actionTypes.UPDATE_VOCABULARY,
-        payload: VocabularyAPI.updateEntity(subject, values, metaVocabulary),
-        meta: {
-            subject,
-            formKey
-        }
-    });
-};
-
-export const createVocabularyEntityFromState = (formKey, providedSubject, type) => (dispatch, getState) => {
-    const values = getLinkedDataFormUpdates(getState(), formKey);
-    const metaVocabulary = getMetaVocabulary(getState());
-
+export const createVocabularyEntity = (providedSubject, values, metaVocabulary, type) => {
     // Infer subject from sh:targetClass or sh:path if no explicit subject is given
     const subject = providedSubject
         || getFirstPredicateProperty(values, SHACL_PATH, 'id')
@@ -38,10 +25,10 @@ export const createVocabularyEntityFromState = (formKey, providedSubject, type) 
         || getFirstPredicateProperty(values, SHACL_NAMESPACE, 'id');
 
     if (!subject) {
-        return Promise.reject(new Error("Invalid metadata identifier given"));
+        throw new Error("Invalid metadata identifier given");
     }
 
-    return dispatch({
+    return {
         type: actionTypes.UPDATE_VOCABULARY,
         payload: VocabularyAPI.get({subject})
             .then((meta) => {
@@ -53,10 +40,9 @@ export const createVocabularyEntityFromState = (formKey, providedSubject, type) 
             .then(() => ({subject, type, values})),
         meta: {
             subject,
-            type,
-            formKey
+            type
         }
-    });
+    };
 };
 
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({

@@ -10,14 +10,19 @@ const defaultProperty = {
     key: 'description',
     datatype: STRING_URI,
     label: 'Description',
-    values: [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}],
     maxValuesCount: 4,
     isEditable: true
 };
 
+const defaultValues = [
+    {value: 'More info'},
+    {value: 'My first collection'},
+    {value: 'My second collection'}
+];
+
 describe('LinkedDataValuesTable elements', () => {
     it('should show a row for all provided values', () => {
-        const wrapper = shallow(<LinkedDataValuesTable property={defaultProperty} />);
+        const wrapper = shallow(<LinkedDataValuesTable property={defaultProperty} values={defaultValues} />);
         const rows = wrapper.find(TableBody).find(TableRow);
         expect(rows.length).toEqual(3);
     });
@@ -26,6 +31,7 @@ describe('LinkedDataValuesTable elements', () => {
         const wrapper = shallow(
             <LinkedDataValuesTable
                 property={{...defaultProperty, isEditable: false}}
+                values={defaultValues}
                 columnDefinitions={[
                     {id: 'a', label: 'first', getValue: entry => entry.value},
                     {id: 'b', label: 'second', getValue: () => 'constant'},
@@ -42,7 +48,7 @@ describe('LinkedDataValuesTable elements', () => {
     });
 
     it('should hide the header if requested', () => {
-        const wrapper = shallow(<LinkedDataValuesTable showHeader={false} property={defaultProperty} />);
+        const wrapper = shallow(<LinkedDataValuesTable showHeader={false} property={defaultProperty} values={defaultValues} />);
         expect(wrapper.find(TableHead).length).toEqual(0);
     });
 
@@ -51,13 +57,13 @@ describe('LinkedDataValuesTable elements', () => {
             ...defaultProperty,
             isEditable: true
         };
-        const wrapper = shallow(<LinkedDataValuesTable property={property} />);
+        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} />);
         expect(wrapper.find(TableHead).find(TableCell).length).toEqual(1);
         expect(wrapper.find(TableBody).find(TableRow).first().find(Button).length).toEqual(1);
     });
 
     it('should show an add input field when adding is allowed', () => {
-        const wrapper = shallow(<LinkedDataValuesTable property={defaultProperty} canAdd addComponent={StringValue} />);
+        const wrapper = shallow(<LinkedDataValuesTable property={defaultProperty} values={defaultValues} canAdd addComponent={StringValue} />);
         expect(wrapper.find(TableFooter).find(TableCell).length).toEqual(2);
         expect(wrapper.find(TableFooter).find(TableCell).first().find(StringValue).length).toEqual(1);
     });

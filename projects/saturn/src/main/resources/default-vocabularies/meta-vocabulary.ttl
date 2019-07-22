@@ -24,6 +24,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         dash:singleLine true ;
         sh:minCount 1 ;
         sh:path sh:name ;
+        fs:importantProperty true ;
         sh:name "Class name" ;
         sh:order 1
     ], [
@@ -34,7 +35,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:path sh:property ;
         sh:name "Properties" ; 
         sh:description "List of all properties and relations for this class." ;
-        fs:showAsTable true ;
+        fs:inverseRelation fs:domainIncludes ;
         sh:order 3
     ], [
         # This nodeKind restriction could be replaced by something like
@@ -45,6 +46,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:targetClass ; 
         sh:name "Target class" ;
+        fs:importantProperty true ;
         sh:description "IRI of the class this shape constrains." ;
         sh:order 0
     ], [
@@ -53,6 +55,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:path sh:description ;
         sh:name "Class description" ;
+        fs:importantProperty true ;
         sh:order 2
     ] ;
     sh:not fs:ShapeIsAClosedShape ;
@@ -70,6 +73,7 @@ fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:domainIncludes,
     [
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -99,6 +103,7 @@ fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
         fs:PathShape,
         fs:DatatypeShape,
         fs:singleLineShape,
+        fs:domainIncludes,
     [
         sh:datatype xsd:integer ;
         sh:path sh:maxLength ;
@@ -119,6 +124,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
+        fs:domainIncludes,
     [
         sh:path sh:in ;
         sh:maxCount 1 ;
@@ -145,6 +151,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:MaxCountShape, 
         fs:DescriptionShape,
         fs:PathShape,
+        fs:domainIncludes,
     [
         # This nodeKind restriction could be replaced by something like
         # sh:class fs:Class. Currently that restriction will limit our
@@ -157,6 +164,15 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:order 3
     ] ;
+    sh:and (
+      [
+        # Additional validation for relations as we currently do not support
+        # linking more than 2 classes through a single relation. This fails
+        # in table redering and in the search box. Could be fixed later. 
+        sh:path fs:domainIncludes ;
+        sh:maxCount 1 ; 
+      ]
+    ) ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -170,6 +186,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
         fs:PropertyNameShape,
         [
           sh:name "Prefix" ;
+          sh:description "A short name to make full IRIs within this namespace more readable: e.g. foaf" ;
           sh:maxLength 24 ;
           sh:minCount 1 ;
           sh:maxCount 1 ;
@@ -179,26 +196,32 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
         ] ,
         [
           sh:name "Namespace IRI" ;
+          sh:description "The part of a namespace to abbreviate using the prefix, this is expected to end with '#' or '/' sign: e.g. http://xmlns.com/foaf/0.1/" ;
           sh:minCount 1 ;
           sh:maxCount 1 ;
           sh:nodeKind sh:IRI ;
           fs:externalLink true ;
-          sh:path sh:namespace
+          sh:path sh:namespace ;
+          sh:pattern "[#/]$" ;
+          sh:message "Namespace IRI is expected to end with either '#' or '/' sign."
         ] ,
         [
           sh:name "Use in metadata" ;
+          sh:description "If true, this namespace is presented to users in the metadata application, to easily create new resources within this namespace." ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:usableInMetadata
         ] ,
         [
           sh:name "Use in vocabulary" ;
+          sh:description "If true, this namespace is presented to users in the vocabulary application, to define new terms within this namespace." ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:usableInVocabulary
         ] ,
         [
           sh:name "Default namespace" ;
+          sh:description "When a user creates a new resource, a default namespace will be selected automatically" ; 
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:defaultNamespace
@@ -213,16 +236,29 @@ fs:inverseRelationShape a fs:RelationShape ;
     sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
     sh:path fs:inverseRelation . 
 
+fs:domainIncludes a fs:RelationShape ;
+    fs:inverseRelation [
+        a sh:PropertyShape ;
+        sh:path sh:property 
+        ] ;
+    sh:path fs:domainIncludes ;
+    sh:class fs:ClassShape ;
+    sh:order 3 ;
+    sh:name "Domain Includes" ;
+    sh:description "All class shapes that include this property." .
+
 fs:fixedShapeShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path fs:fixedShape ;
     fs:machineOnly true ; 
+    sh:maxCount 1 ;
     sh:name "Fixed shape" ;
     sh:description "If this is true, a user can not make changes to this shape definition." .
 
 fs:singleLineShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path dash:singleLine ;
+    sh:maxCount 1 ; 
     sh:name "Single line input (for string only)" ;
     sh:description "Restricts the input field for this string field to a single line." .
 
@@ -259,7 +295,7 @@ fs:PropertyNameShape a sh:PropertyShape ;
   dash:singleLine true ;
   sh:minCount 1 ;
   sh:path sh:name ;
-  sh:name "Property name" ;
+  sh:name "Name" ;
   fs:importantProperty true ;
   sh:order 1 .
 

@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {connect} from "react-redux";
 import {withStyles} from '@material-ui/core/styles';
 
@@ -9,7 +9,6 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
 import Config from "../../../services/Config/Config";
-import {isAuthorizationsPending} from "../../../reducers/account/authorizationsReducers";
 import {isWorkspacePending} from "../../../reducers/workspaceReducers";
 import {isRedirectingForLogin} from "../../../reducers/uiReducers";
 import {LoadingInlay} from "../index";
@@ -84,7 +83,7 @@ const mapStateToProps = state => {
     const {name, version} = {...state.workspace.data};
 
     return {
-        pending: isAuthorizationsPending(state) || isWorkspacePending(state) || isRedirectingForLogin(state),
+        pending: isWorkspacePending(state) || isRedirectingForLogin(state),
         menuExpanded: state.ui.menuExpanded,
         workspaceName: name,
         version

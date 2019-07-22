@@ -23,7 +23,7 @@ class DateTimeValue extends React.Component {
     }
 
     render() {
-        const {entry, property, ...otherProps} = this.props;
+        const {entry, property, currentValues, ...otherProps} = this.props;
 
         return (
             <DateTimePicker

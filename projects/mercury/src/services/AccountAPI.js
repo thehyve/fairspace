@@ -12,15 +12,6 @@ class AccountAPI {
             .then(response => response.json())
             .then(user => ({...user, iri: createMetadataIri(user.id)}));
     }
-
-    getAuthorizations() {
-        return fetch(Config.get().urls.authorizations, {
-            method: 'GET',
-            credentials: 'same-origin'
-        })
-            .then(failOnHttpError("Failure when retrieving authorizations"))
-            .then(response => response.json());
-    }
 }
 
 export default new AccountAPI();

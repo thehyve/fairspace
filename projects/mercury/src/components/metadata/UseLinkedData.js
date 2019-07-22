@@ -1,6 +1,7 @@
-import {useContext, useEffect, useCallback} from 'react';
+import {useCallback, useContext, useEffect} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
+import {fromJsonLd, getJsonLdForSubject} from "../../utils/linkeddata/jsonLdConverter";
 
 /**
  * This custom hook is a helper for many Linked Data functions, such as fetching, searching and transforming/parsing metadata.
@@ -8,18 +9,23 @@ import LinkedDataContext from './LinkedDataContext';
  * The contextual logic is being provided by {@link LinkedDataContext}
  *
  * @param {string} subject
- * @param {boolean} isEntityEditable
+ * @param {string} defaultType
  */
-const useLinkedData = (subject, defaultType, isEntityEditable) => {
+export const useLinkedData = (subject, defaultType, context = {}) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
 
     const {
-        shapesLoading, shapesError, fetchLinkedDataForSubject,
-        getPropertiesForLinkedData, isLinkedDataLoading, hasLinkedDataErrorForSubject,
-        combineLinkedDataForSubject, getTypeInfoForLinkedData
-    } = useContext(LinkedDataContext);
+        shapes,
+        shapesLoading = false,
+        shapesError = false,
+        fetchLinkedDataForSubject = () => {},
+        isLinkedDataLoading = () => false,
+        hasLinkedDataErrorForSubject = () => false,
+        getLinkedDataForSubject = () => {},
+        getTypeInfoForLinkedData = () => {}
+    } = context;
 
     // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
     const updateLinkedData = useCallback(() => {
@@ -30,29 +36,41 @@ const useLinkedData = (subject, defaultType, isEntityEditable) => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedDataForSubject = combineLinkedDataForSubject(subject, defaultType);
+    const linkedData = getLinkedDataForSubject(subject);
+    let properties = [];
+    let values = {};
+    let typeInfo = {};
 
-    const {label, description} = getTypeInfoForLinkedData(linkedDataForSubject);
+    if (linkedData) {
+        const linkedDataItem = getJsonLdForSubject(linkedData, subject, defaultType);
+        typeInfo = getTypeInfoForLinkedData(linkedDataItem);
+
+        if (!Array.isArray(linkedDataItem['@type'])) {
+            console.warn("Can not get values from metadata without a type or that is not expanded");
+        } else {
+            const propertyShapes = shapes.determinePropertyShapesForTypes(linkedDataItem['@type']);
+            properties = shapes.getProperties(propertyShapes);
+            values = fromJsonLd(linkedDataItem, propertyShapes, linkedData, shapes);
+        }
+    }
 
     const linkedDataLoading = shapesLoading || isLinkedDataLoading(subject);
 
     let error = shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '';
 
-    if (!linkedDataLoading && !(linkedDataForSubject && linkedDataForSubject.length > 0)) {
+    if (!linkedDataLoading && !(properties && properties.length > 0)) {
         error = 'No metadata found for this subject';
     }
-
-    const properties = getPropertiesForLinkedData({linkedData: linkedDataForSubject, subject, isEntityEditable});
 
     return {
         linkedDataLoading,
         linkedDataError: error,
-        linkedDataForSubject,
-        typeLabel: label,
-        typeDescription: description,
-        updateLinkedData,
-        properties
+        properties,
+        values,
+        typeInfo,
+        updateLinkedData
     };
 };
 
-export default useLinkedData;
+// Export a custom hook attached to the context by default
+export default (subject, defaultType) => useLinkedData(subject, defaultType, useContext(LinkedDataContext));

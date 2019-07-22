@@ -131,7 +131,7 @@ fs:CollectionShape a fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:collectionType ) ;
     fs:fixedShape true ;
     fs:systemProperties
-        fs:connectionStringShape,
+        fs:connectionString,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -142,7 +142,7 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape ;
     sh:property
-        fs:connectionStringShape,
+        fs:connectionString,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -159,6 +159,7 @@ fs:ExternalFileShape a fs:ClassShape ;
     sh:targetClass fs:ExternalFile ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
     fs:fixedShape true ;
+    fs:machineOnly true ;
     fs:systemProperties
         fs:labelShape,
         fs:commentShape ;
@@ -172,6 +173,7 @@ fs:ExternalDirectoryShape a fs:ClassShape ;
     sh:targetClass fs:ExternalDirectory ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
+    fs:machineOnly true ;
     fs:systemProperties
         fs:labelShape,
         fs:commentShape ;
@@ -179,8 +181,7 @@ fs:ExternalDirectoryShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
-fs:UserShape a sh:NodeShape ;
-    sh:closed true ; 
+fs:UserShape a fs:ClassShape ;
     sh:description "Description for fs:User" ;
     sh:name "User" ;
     sh:targetClass fs:User ;
@@ -253,15 +254,14 @@ fs:dateDeletedShape a fs:DatatypePropertyShape ;
     fs:fixedShape true ;
     sh:path fs:dateDeleted .
 
-fs:connectionStringShape a fs:DatatypePropertyShape ;
+fs:connectionString a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
-    sh:minCount 0 ;
     sh:name "Connection string" ;
     sh:datatype xsd:string ;
     sh:description "Connection string" ;
     fs:machineOnly true ;
     fs:fixedShape true ;
-    sh:path fs:filePath .
+    sh:path fs:connectionString .
 
 fs:filePathShape a fs:DatatypePropertyShape ; 
     sh:maxCount 1 ;
@@ -303,7 +303,7 @@ fs:userEmailShape a fs:DatatypePropertyShape ;
 
 ## Relation Shapes
 
-fs:createdByShape a fs:RelationShape ;
+fs:createdByShape a sh:PropertyShape ;
     sh:name "Created By" ;
     sh:description "User that created this resource." ;
     sh:class fs:User ; 
@@ -312,7 +312,7 @@ fs:createdByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:createdBy .
 
-fs:modifiedByShape a fs:RelationShape ; 
+fs:modifiedByShape a sh:PropertyShape ;
     sh:name "Last Modified By" ;
     sh:description "User that last modified this resource." ;
     sh:class fs:User ; 
@@ -321,7 +321,7 @@ fs:modifiedByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:modifiedBy .
 
-fs:deletedByShape a fs:RelationShape ; 
+fs:deletedByShape a sh:PropertyShape ;
     sh:name "Deleted By" ;
     sh:description "User that deleted this resource." ;
     sh:class fs:User ; 

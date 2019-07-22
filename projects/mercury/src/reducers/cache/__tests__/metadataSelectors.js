@@ -1,60 +1,14 @@
-import {getCombinedMetadataForSubject, hasMetadataError, isMetadataPending} from "../jsonLdBySubjectReducers";
-import vocabularyJsonLd from '../../../utils/linkeddata/test.vocabulary.json';
+import {getMetadataForSubject, hasMetadataError, isMetadataPending} from "../jsonLdBySubjectReducers";
 
 describe('retrieving metadata from state', () => {
     const subject = 'http://subject';
 
-    it('combines metadata with the vocabulary', () => {
-        const state = {
-            cache: {
-                vocabulary: {
-                    data: vocabularyJsonLd
-                },
-                jsonLdBySubject: {
-                    [subject]: {
-                        data: [{
-                            '@id': subject,
-                            '@type': ['http://fairspace.io/ontology#Collection']
-                        }]
-                    }
-                }
-            }
-        };
-
-        expect(getCombinedMetadataForSubject(state, subject).length).toEqual(6);
-    });
-
-    it('does not fail on missing vocabulary', () => {
-        const state = {
-            cache: {
-                jsonLdBySubject: {
-                    [subject]: {
-                        data: [{
-                            '@id': subject,
-                            '@type': ['http://fairspace.io/ontology#Collection']
-                        }]
-                    }
-                }
-            }
-        };
-
-        // Without a vocabulary, only the type information should be returned
-        const metadata = getCombinedMetadataForSubject(state, subject);
-        expect(metadata.length).toEqual(1);
-        expect(metadata[0].key).toEqual('@type');
-    });
-
-    it('does not fail on missing metadata', () => {
-        const state = {
-            cache: {
-                vocabulary: {
-                    data: vocabularyJsonLd
-                }
-            }
-        };
-
-        expect(getCombinedMetadataForSubject(state, subject).length).toEqual(0);
-    });
+    it('returns metadata in cache if present', () => expect(getMetadataForSubject({cache: {jsonLdBySubject: {[subject]: {data: 'my-data'}}}}, subject)).toEqual('my-data'));
+    it('returns nothing while loading metadata', () => expect(getMetadataForSubject({cache: {jsonLdBySubject: {[subject]: {pending: true}}}}, subject)).toEqual([]));
+    it('returns nothing on metadata error', () => expect(getMetadataForSubject({cache: {jsonLdBySubject: {[subject]: {error: true}}}}, subject)).toEqual([]));
+    it('returns nothing with unknown subject', () => expect(getMetadataForSubject({cache: {jsonLdBySubject: {other: {pending: false}}}}, subject)).toEqual([]));
+    it('returns nothing when no metadata is stored at all', () => expect(getMetadataForSubject({cache: {}}, subject)).toEqual([]));
+    it('returns nothing with missing data for subject', () => expect(getMetadataForSubject({cache: {jsonLdBySubject: {[subject]: {}}}}, subject)).toEqual([]));
 });
 
 describe('isMetadataPending', () => {

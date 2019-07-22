@@ -126,6 +126,36 @@ describe('Subject by path reducers', () => {
             expect(newState['/coll/dir/file.txt'].invalidated).toBe(true);
             expect(newState['/other/coll'].invalidated).toBe(false);
         });
-    });
 
+        it('should recursively invalidate everything inside a collection when moving it', () => {
+            const action = {
+                type: actionTypes.UPDATE_COLLECTION_FULFILLED,
+                meta: {
+                    oldLocation: 'coll'
+                }
+            };
+
+            const newState = reducer(state, action);
+            expect(newState['/coll'].invalidated).toBe(true);
+            expect(newState['/coll/dir'].invalidated).toBe(true);
+            expect(newState['/coll/dir/file.txt'].invalidated).toBe(true);
+            expect(newState['/other/coll'].invalidated).toBe(false);
+        });
+
+        it('should recursively invalidate everything inside a collection when deleting it', () => {
+            const action = {
+                type: actionTypes.DELETE_COLLECTION_FULFILLED,
+                meta: {
+                    location: 'coll'
+                }
+            };
+
+            const newState = reducer(state, action);
+            expect(newState['/coll'].invalidated).toBe(true);
+            expect(newState['/coll/dir'].invalidated).toBe(true);
+            expect(newState['/coll/dir/file.txt'].invalidated).toBe(true);
+            expect(newState['/other/coll'].invalidated).toBe(false);
+        });
+
+    });
 });

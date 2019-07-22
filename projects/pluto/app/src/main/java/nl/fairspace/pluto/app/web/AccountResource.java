@@ -8,22 +8,18 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.oidc_auth.config.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.FIRSTNAME_CLAIM;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.LASTNAME_CLAIM;
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.SUBJECT_CLAIM;
-import static nl.fairspace.pluto.app.config.Urls.AUTHORIZATIONS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.EXCHANGE_TOKENS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
 
@@ -36,25 +32,6 @@ import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
 public class AccountResource {
     @Autowired(required = false)
     OAuthAuthenticationToken token;
-
-    /**
-     * GET  /authorization : return a map with authorizations for the current user
-     *
-     * Please note that this call requires the "user-workspace" authorization and
-     * will return a 403 otherwise
-     *
-     * @return a map with authorizations for the current user.
-     */
-    @GetMapping(AUTHORIZATIONS_PATH)
-    public List<String> getAuthorizations() throws ParseException {
-        log.trace("REST request to retrieve authorizations");
-        if(token == null) {
-            log.warn("No token found in account/authorizations call");
-            return Collections.emptyList();
-        }
-
-        return token.getAuthorities();
-    }
 
     /**
      * GET  /name : returns the name of the user currently logged in
@@ -73,7 +50,8 @@ public class AccountResource {
                     token.getUsername(),
                     token.getFullName(),
                     token.getStringClaim(FIRSTNAME_CLAIM),
-                    token.getStringClaim(LASTNAME_CLAIM)
+                    token.getStringClaim(LASTNAME_CLAIM),
+                    token.getAuthorities()
             );
         }
     }
