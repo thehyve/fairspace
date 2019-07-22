@@ -4,7 +4,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -27,19 +26,10 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
 
 
-    private ProtectMachineOnlyPredicatesValidator validator;
+    private final ProtectMachineOnlyPredicatesValidator validator = new ProtectMachineOnlyPredicatesValidator();
 
     @Mock
     private ViolationHandler violationHandler;
-
-    @Before
-    public void setUp() {
-        var machineOnlyPropertyShape = createResource();
-        var regularPropertyShape1 = createResource();
-        var regularPropertyShape2 = createResource();
-        validator = new ProtectMachineOnlyPredicatesValidator(
-        );
-    }
 
     @Test
     public void testContainsMachineOnlyPredicates() {
