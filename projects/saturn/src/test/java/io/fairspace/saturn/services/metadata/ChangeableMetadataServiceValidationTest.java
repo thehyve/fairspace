@@ -226,5 +226,36 @@ public class ChangeableMetadataServiceValidationTest {
                 isomorphic(ds.getNamedModel(VOCABULARY)),
                 any());
     }
+
+    @Test
+    public void validatedModelsContainListElements() {
+        var node1 = createResource();
+        var node2 = createResource();
+        var node3 = createResource();
+        var modelWithList = modelOf(
+                resource1, property1, node1,
+                node1, RDF.first, createTypedLiteral(1),
+                node1, RDF.rest, node2,
+                node2, RDF.first, createTypedLiteral(2),
+                node2, RDF.rest, node3,
+                node3, RDF.first, resource2,
+                resource2, RDF.type, class2,
+                node3, RDF.rest, RDF.nil,
+                resource2, RDF.type, class2);
+
+        ds.replaceNamedModel(GRAPH, modelWithList);
+
+        var toAdd = modelOf(resource1, property2, resource2);
+
+        api.put(toAdd);
+
+        verify(validator).validate(
+                isomorphic(modelWithList),
+                isomorphic(modelWithList.union(toAdd)),
+                isomorphic(EMPTY_MODEL),
+                isomorphic(toAdd),
+                isomorphic(ds.getNamedModel(VOCABULARY)),
+                any());
+    }
 }
 
