@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static io.fairspace.saturn.util.ModelUtils.modelOf;
@@ -26,7 +27,6 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,7 +67,7 @@ public class ChangeableMetadataServiceTest {
     public void testPutHandlesLifecycleForEntitities() {
         var delta = modelOf(STMT1, STMT2);
         api.put(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(argThat(delta::isIsomorphicWith));
+        verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
     }
 
 
@@ -131,7 +131,7 @@ public class ChangeableMetadataServiceTest {
     public void testPatchHandlesLifecycleForEntities() {
         var delta = modelOf(STMT1, STMT2);
         api.patch(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(argThat(delta::isIsomorphicWith));
+        verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
     }
 
     @Test
