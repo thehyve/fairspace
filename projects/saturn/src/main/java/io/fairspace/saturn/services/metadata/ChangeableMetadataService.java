@@ -17,7 +17,6 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -111,39 +110,59 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         addInferredStatements(modelToAdd, vocabularyModel);
         addInferredStatements(modelToRemove, vocabularyModel);
 
-        normalizeAndValidate(modelToRemove, modelToAdd, vocabularyModel);
+        sanitizeAndValidate(modelToRemove, modelToAdd, vocabularyModel);
 
         persist(modelToRemove, modelToAdd);
     }
 
-    private void normalizeAndValidate(Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
-        var unchanged = modelToRemove.intersection(modelToAdd);
-        modelToRemove.remove(unchanged);
-        modelToAdd.remove(unchanged);
+    private void sanitizeAndValidate(Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
+        var before = affectedModelSubSet(modelToRemove, modelToAdd);
+        sanitize(before, modelToRemove, modelToAdd);
+        var after = resultingModelSubset(before, modelToRemove, modelToAdd);
+        validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
+    }
 
+    /**
+     * @return a model containing all triples describing the affected resources
+     */
+    private Model affectedModelSubSet(Model modelToRemove, Model modelToAdd) {
         var affectedResources = modelToRemove.listSubjects()
                 .andThen(modelToAdd.listSubjects())
                 .toSet();
 
-        var before = affectedModelSubSet(affectedResources);
+        var model = createDefaultModel();
+        affectedResources.forEach(r -> {
+            if(r.isURIResource()) {
+                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_object_types", graph, r, null, null)));
+            }
+        });
+        return model;
+    }
 
+    private void sanitize(Model before, Model modelToRemove, Model modelToAdd) {
+        var unchanged = modelToRemove.intersection(modelToAdd);
+        modelToRemove.remove(unchanged);
+        modelToAdd.remove(unchanged);
+
+        // remove existing statements from modelToAdd
         if (!modelToAdd.isEmpty()) {
             modelToAdd.remove(before);
         }
 
+        // remove non-existing statements from modelToRemove
         for (var it = modelToRemove.listStatements(); it.hasNext(); ) {
             if (!before.contains(it.nextStatement())) {
                 it.remove();
             }
         }
+    }
 
-        addObjectTypes(before);
+    private Model resultingModelSubset(Model before, Model modelToRemove, Model modelToAdd) {
         var after = before.difference(modelToRemove).union(modelToAdd);
         var deletedTypeStatements = modelToRemove.listStatements(null, RDF.type, (RDFNode) null).toModel();
         addObjectTypes(after);
         after.remove(deletedTypeStatements);
-
-        validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
+        return after;
     }
 
     private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
@@ -178,26 +197,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         model.add(inferredToAdd);
     }
 
-    /**
-     * @param affectedResources
-     * @return a model containing all triples describing the affected resources
-     */
-    private Model affectedModelSubSet(Set<Resource> affectedResources) {
-        var model = createDefaultModel();
-        affectedResources.forEach(r -> {
-            if(r.isURIResource()) {
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_object_types", graph, r, null, null)));
-            }
-        });
-        return model;
-    }
-
-    private List<Quad> toQuads(Model model) {
-        return model.listStatements()
-                .mapWith(s -> new Quad(graph, s.asTriple()))
-                .toList();
-    }
-
     private void addSubjectTypes(Model model) {
         model.listSubjects()
                 .filterDrop(subj -> subj.hasProperty(RDF.type))
@@ -212,5 +211,11 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                 .toSet()
                 .forEach(obj -> model.add(get(obj.getURI(), RDF.type.getURI(), null, false)));
         model.add(get(null, RDFS.subClassOf.getURI(), null, false));
+    }
+
+    private List<Quad> toQuads(Model model) {
+        return model.listStatements()
+                .mapWith(s -> new Quad(graph, s.asTriple()))
+                .toList();
     }
 }

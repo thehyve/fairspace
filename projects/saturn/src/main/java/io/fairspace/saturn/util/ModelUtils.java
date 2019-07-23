@@ -10,12 +10,24 @@ import org.apache.jena.sparql.graph.GraphZero;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 public class ModelUtils {
+    /**
+     * An immutable empty model
+     */
     public static final Model EMPTY_MODEL = new ModelCom(GraphZero.instance());
 
+    /**
+     *
+     * @param statements
+     * @return A mutable model initialized with statements
+     */
     public static Model modelOf(Statement... statements) {
         return createDefaultModel().add(statements);
     }
 
+    /**
+     * @param nodes
+     * @return A mutable model consisting of statements produced by splitting nodes into triples
+     */
     public static Model modelOf(RDFNode... nodes) {
         if (nodes.length % 3 != 0) {
             throw new IllegalArgumentException("nodes");
