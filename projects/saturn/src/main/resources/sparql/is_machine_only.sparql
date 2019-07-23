@@ -1,3 +1,9 @@
+# Checks whether an entity is machine only
+#
+# 0 - iri
+# 1 - graph
+# 2 - vocabulary
+
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 

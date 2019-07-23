@@ -1,3 +1,8 @@
+# Checks whether an entity exists and not marked as delted yet
+#
+# 0 - iri
+# 1 - graph
+
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 
