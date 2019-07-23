@@ -1,12 +1,14 @@
 import React from 'react';
-import {Grid, Typography, Chip, Tooltip, Divider} from "@material-ui/core";
+import {Chip, Divider, Grid, Tooltip, Typography} from "@material-ui/core";
 
 import useLinkedData from '../UseLinkedData';
 import Iri from "../../common/Iri";
 import IriTooltip from "../../common/IriTooltip";
+import CollectionBrowserLink from "./CollectionBrowserLink";
+import {FILE_PATH_URI} from "../../../constants";
 
 const LinkedDataEntityHeader = ({subject}) => {
-    const {linkedDataError, typeInfo} = useLinkedData(subject);
+    const {linkedDataError, values, typeInfo} = useLinkedData(subject);
 
     return !linkedDataError && (
         <>
@@ -19,6 +21,11 @@ const LinkedDataEntityHeader = ({subject}) => {
                     </Typography>
                 </Grid>
                 <Grid item>
+                    <CollectionBrowserLink
+                        type={typeInfo.typeIri}
+                        filePath={values[FILE_PATH_URI]}
+                    />
+
                     <Tooltip
                         title={(
                             <Typography
