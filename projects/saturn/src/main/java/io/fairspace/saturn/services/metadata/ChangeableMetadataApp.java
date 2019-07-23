@@ -9,8 +9,7 @@ import static io.fairspace.saturn.services.JsonLDUtils.JSON_LD_HEADER_STRING;
 import static io.fairspace.saturn.services.JsonLDUtils.fromJsonLD;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.saturn.util.ValidationUtils.validateContentType;
-import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+import static io.fairspace.saturn.util.ValidationUtils.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
@@ -47,8 +46,12 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                     api.delete(fromJsonLD(req.body(), baseURI));
                 } else {
                     var subject = req.queryParams("subject");
+                    validate(subject != null, "Parameter \"subject\" is required");
                     validateIRI(subject);
-                    api.softDelete(createResource(subject));
+                    if (!api.softDelete(createResource(subject))) {
+                        return null;
+                    }
+
                 }
                 return "";
             });

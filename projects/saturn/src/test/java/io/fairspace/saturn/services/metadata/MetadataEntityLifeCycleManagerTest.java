@@ -152,18 +152,30 @@ public class MetadataEntityLifeCycleManagerTest {
     @Test
     public void testSoftDelete() {
         model.add(resource, RDFS.label, createStringLiteral("label"));
-        lifeCycleManager.softDelete(resource);
+
+        assertTrue(lifeCycleManager.softDelete(resource));
 
         assertTrue(model.contains(resource, FS.dateDeleted));
         assertTrue(model.contains(resource, FS.deletedBy, createResource(user.getURI())));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSoftDeleteDoesNotDeleteSystemEntities() {
         model.add(resource, RDF.type, FS.File);
-        lifeCycleManager.softDelete(resource);
 
-        assertFalse(model.contains(resource, FS.dateDeleted));
-        assertFalse(model.contains(resource, FS.deletedBy, createResource(user.getURI())));
+        lifeCycleManager.softDelete(resource);
+    }
+
+    @Test
+    public void testSoftDeleteFailsWhenCalledTwice() {
+        model.add(resource, RDFS.label, createStringLiteral("label"));
+
+        assertTrue(lifeCycleManager.softDelete(resource));
+        assertFalse(lifeCycleManager.softDelete(resource));
+    }
+
+    @Test
+    public void testSoftDeleteFailsWhenCalledForNonExistingResource() {
+        assertFalse(lifeCycleManager.softDelete(resource));
     }
 }

@@ -13,7 +13,7 @@ public class ValidationUtils {
     }
 
     public static void validateIRI(String iri) {
-        validate(iri != null && !checkIRI(iri), "Invalid IRI: " + iri);
+        validate(!checkIRI(iri), "Invalid IRI: " + iri);
     }
 
     public static void validateContentType(Request request, String contentType) {
