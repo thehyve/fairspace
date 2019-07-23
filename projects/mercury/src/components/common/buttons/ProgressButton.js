@@ -2,14 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-const ProgressButton = ({active, children}) => (active ? (
-    <CircularProgress
-        style={{
-            alignSelf: 'center',
-            margin: 10,
-        }}
-        size={28}
-    />
+const ProgressButton = ({active, children, size = 28}) => (active ? (
+    <div style={{display: 'inline-flex', margin: 10}}>
+        <CircularProgress
+            style={{
+                alignSelf: 'center',
+            }}
+            size={size}
+        />
+    </div>
 ) : children);
 
 ProgressButton.propTypes = {

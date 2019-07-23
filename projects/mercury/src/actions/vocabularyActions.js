@@ -45,6 +45,14 @@ export const createVocabularyEntity = (providedSubject, values, metaVocabulary, 
     };
 };
 
+export const deleteVocabularyEntity = (subject) => ({
+    type: actionTypes.DELETE_VOCABULARY,
+    payload: VocabularyAPI.delete(subject),
+    meta: {
+        subject
+    }
+});
+
 const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
     type: actionTypes.FETCH_VOCABULARY,
     payload: VocabularyAPI.get()
