@@ -5,24 +5,28 @@ import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
 import org.apache.jena.sparql.modify.request.UpdateDataDelete;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.fairspace.saturn.vocabulary.Inference.applyInference;
+import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.vocabulary.Inference.getInferredStatements;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class ChangeableMetadataService extends ReadableMetadataService {
     static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
-    private static final Model EMPTY = createDefaultModel();
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
@@ -47,7 +51,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> update(EMPTY, model));
+        commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
     }
 
     /**
@@ -67,7 +71,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> update(model, EMPTY));
+        commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
     }
 
     /**
@@ -96,31 +100,83 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                 }
             });
 
-            update(toDelete, model);
+            update(toDelete, model.removeAll(null, null, NIL));
         });
     }
 
     private void update(Model modelToRemove, Model modelToAdd) {
-        // Exclude statements already present in the database from validation
+        var vocabularyModel = rdf.fetch(vocabulary.getURI());
+
+        addInferredStatements(modelToAdd, vocabularyModel);
+        addInferredStatements(modelToRemove, vocabularyModel);
+
+        sanitizeAndValidate(modelToRemove, modelToAdd, vocabularyModel);
+
+        persist(modelToRemove, modelToAdd);
+    }
+
+    private void sanitizeAndValidate(Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
+        var before = affectedModelSubSet(modelToRemove, modelToAdd);
+        sanitize(before, modelToRemove, modelToAdd);
+        var after = resultingModelSubset(before, modelToRemove, modelToAdd);
+        validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
+    }
+
+    /**
+     * @return a model containing all triples describing the affected resources
+     */
+    private Model affectedModelSubSet(Model modelToRemove, Model modelToAdd) {
+        var affectedResources = modelToRemove.listSubjects()
+                .andThen(modelToAdd.listSubjects())
+                .toSet();
+
+        var model = createDefaultModel();
+        affectedResources.forEach(r -> {
+            if(r.isURIResource()) {
+                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_object_types", graph, r, null, null)));
+            }
+        });
+        return model;
+    }
+
+    private void sanitize(Model before, Model modelToRemove, Model modelToAdd) {
         var unchanged = modelToRemove.intersection(modelToAdd);
         modelToRemove.remove(unchanged);
         modelToAdd.remove(unchanged);
-        modelToAdd.removeAll(null, null, NIL);
 
-        var vocabularyModel = rdf.fetch(vocabulary.getURI());
+        // remove existing statements from modelToAdd
+        if (!modelToAdd.isEmpty()) {
+            modelToAdd.remove(before);
+        }
 
-        applyInference(vocabularyModel, modelToRemove);
-        applyInference(vocabularyModel, modelToAdd);
+        // remove non-existing statements from modelToRemove
+        for (var it = modelToRemove.listStatements(); it.hasNext(); ) {
+            if (!before.contains(it.nextStatement())) {
+                it.remove();
+            }
+        }
+    }
 
+    private Model resultingModelSubset(Model before, Model modelToRemove, Model modelToAdd) {
+        var after = before.difference(modelToRemove).union(modelToAdd);
+        var deletedTypeStatements = modelToRemove.listStatements(null, RDF.type, (RDFNode) null).toModel();
+        addObjectTypes(after);
+        after.remove(deletedTypeStatements);
+        return after;
+    }
+
+    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
         var violations = new LinkedHashSet<Violation>();
-        validator.validate(modelToRemove, modelToAdd,
-                (message, subject, predicate, object) ->
+        validator.validate(before, after, modelToRemove, modelToAdd,
+                vocabularyModel, (message, subject, predicate, object) ->
                         violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
         }
+    }
 
+    private void persist(Model modelToRemove, Model modelToAdd) {
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove))));
 
         // Store information on the lifecycle of the entities
@@ -128,6 +184,33 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         // Store the actual update
         rdf.load(graph.getURI(), modelToAdd);
+    }
+
+    private void addInferredStatements(Model model, Model vocabularyModel) {
+        if (model.isEmpty()) {
+            return;
+        }
+
+        var modelWithTypes = createDefaultModel().add(model);
+        addSubjectTypes(modelWithTypes);
+        var inferredToAdd = getInferredStatements(vocabularyModel, modelWithTypes);
+        model.add(inferredToAdd);
+    }
+
+    private void addSubjectTypes(Model model) {
+        model.listSubjects()
+                .filterDrop(subj -> subj.hasProperty(RDF.type))
+                .forEachRemaining(subj -> model.add(get(subj.getURI(), RDF.type.getURI(), null, false)));
+    }
+
+    private void addObjectTypes(Model model) {
+        model.listObjects()
+                .filterKeep(RDFNode::isResource)
+                .mapWith(RDFNode::asResource)
+                .filterDrop(obj -> obj.hasProperty(RDF.type))
+                .toSet()
+                .forEach(obj -> model.add(get(obj.getURI(), RDF.type.getURI(), null, false)));
+        model.add(get(null, RDFS.subClassOf.getURI(), null, false));
     }
 
     private List<Quad> toQuads(Model model) {

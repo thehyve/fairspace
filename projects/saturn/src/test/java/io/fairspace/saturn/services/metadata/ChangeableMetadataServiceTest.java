@@ -7,14 +7,18 @@ import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.vocabulary.FOAF;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
+import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -51,7 +55,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPutWillAddStatements() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
 
         api.put(delta);
 
@@ -61,9 +65,9 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPutHandlesLifecycleForEntitities() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
         api.put(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
     }
 
 
@@ -75,7 +79,7 @@ public class ChangeableMetadataServiceTest {
         executeWrite(ds, () -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
 
         // Put new statements
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
         api.put(delta);
 
         // Now ensure that the existing triples are still there
@@ -91,7 +95,7 @@ public class ChangeableMetadataServiceTest {
     public void deleteModel() {
         executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
-        api.delete(createDefaultModel().add(STMT1));
+        api.delete(modelOf(STMT1));
 
         assertFalse(ds.getDefaultModel().contains(STMT1));
         assertTrue(ds.getDefaultModel().contains(STMT2));
@@ -105,7 +109,7 @@ public class ChangeableMetadataServiceTest {
         Statement newStmt2 = createStatement(S2, P1, S1);
         Statement newStmt3 = createStatement(S1, P2, S3);
 
-        api.patch(createDefaultModel().add(newStmt1).add(newStmt2).add(newStmt3));
+        api.patch(modelOf(newStmt1, newStmt2, newStmt3));
         assertTrue(ds.getDefaultModel().contains(newStmt1));
         assertTrue(ds.getDefaultModel().contains(newStmt2));
         assertTrue(ds.getDefaultModel().contains(newStmt3));
@@ -125,26 +129,29 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testPatchHandlesLifecycleForEntities() {
-        Model delta = createDefaultModel().add(STMT1).add(STMT2);
+        var delta = modelOf(STMT1, STMT2);
         api.patch(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(delta);
+        verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
     }
 
     @Test
     public void testInference() {
         initVocabularies(rdf);
+        ds.getDefaultModel()
+                .add(S1, RDF.type, FOAF.Person)
+                .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));
 
-        var provideMaterial = createProperty(generateVocabularyIri("providesMaterial").getURI());
-        var derivesFrom = createProperty(generateVocabularyIri("derivesFrom").getURI());
+        var gaveConsent = createProperty(generateVocabularyIri("gaveConsent").getURI());
+        var isConsentOf = createProperty(generateVocabularyIri("isConsentOf").getURI());
 
-        api.put(createDefaultModel().add(S1, provideMaterial, S2));
+        api.put(modelOf(S1, gaveConsent, S2));
 
-        assertTrue(ds.getDefaultModel().contains(S1, provideMaterial, S2));
-        assertTrue(ds.getDefaultModel().contains(S2, derivesFrom, S1));
+        assertTrue(ds.getDefaultModel().contains(S1, gaveConsent, S2));
+        assertTrue(ds.getDefaultModel().contains(S2, isConsentOf, S1));
 
-        api.delete(createDefaultModel().add(S2, derivesFrom, S1));
+        api.delete(modelOf(S2, isConsentOf, S1));
 
-        assertFalse(ds.getDefaultModel().contains(S1, provideMaterial, S2));
-        assertFalse(ds.getDefaultModel().contains(S2, derivesFrom, S1));
+        assertFalse(ds.getDefaultModel().contains(S1, gaveConsent, S2));
+        assertFalse(ds.getDefaultModel().contains(S2, isConsentOf, S1));
     }
 }

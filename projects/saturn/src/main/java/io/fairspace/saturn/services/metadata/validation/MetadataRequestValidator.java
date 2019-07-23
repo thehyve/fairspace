@@ -4,5 +4,5 @@ import org.apache.jena.rdf.model.Model;
 
 @FunctionalInterface
 public interface MetadataRequestValidator {
-    void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler);
+    void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler);
 }
