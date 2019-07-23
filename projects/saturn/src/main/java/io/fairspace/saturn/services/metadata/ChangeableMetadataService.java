@@ -133,7 +133,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         var model = createDefaultModel();
         affectedResources.forEach(r -> {
             if(r.isURIResource()) {
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_object_types", graph, r, null, null)));
+                model.add(rdf.queryConstruct(storedQuery("get_resource_closure", graph, r)));
             }
         });
         return model;
