@@ -1,87 +1,68 @@
-import React from "react";
+import React, {useState} from "react";
 import PropTypes from "prop-types";
 import {Button} from "@material-ui/core";
 
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import {LoadingOverlay} from "../../common";
 import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
+import useIsMounted from "../../../utils/useIsMounted";
 
-class LinkedDataCreator extends React.Component {
-    static CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
+const CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
+const CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
 
-    static CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
+const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requireIdentifier, onCreate}) => {
+    const [shape, setShape] = useState();
+    const [creationState, setCreationState] = useState();
+    const isMounted = useIsMounted();
 
-    state = {
-        shape: null,
-        creationState: null
-    };
-
-    unMounted = false;
-
-    componentWillUnmount() {
-        this.unMounted = true;
-    }
-
-    startCreating = (e) => {
+    const startCreating = e => {
         e.stopPropagation();
 
-        this.setState({creationState: LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE});
+        setCreationState(CREATION_STATE_CHOOSE_SHAPE);
     };
 
-    chooseShape = (shape) => {
-        this.setState({
-            shape,
-            creationState: LinkedDataCreator.CREATION_STATE_CREATE_ENTITY
-        });
+    const chooseShape = chosenShape => {
+        setShape(chosenShape);
+        setCreationState(CREATION_STATE_CREATE_ENTITY);
     };
 
-    closeDialog = (e) => {
+    const closeDialog = e => {
         if (e) e.stopPropagation();
-        if (!this.unMounted) {
-            this.setState({creationState: false});
-        }
+        if (isMounted()) setCreationState();
     };
 
-    render() {
-        const {children, shapesLoading, shapesError, shapes, requireIdentifier, onCreate} = this.props;
-        const {creationState, shape, creatingMetadataEntity} = this.state;
+    return (
+        <>
+            <Button
+                variant="contained"
+                color="primary"
+                aria-label="Add"
+                title="Create a new metadata entity"
+                onClick={startCreating}
+                style={{margin: '10px 0'}}
+                disabled={shapesLoading || shapesError || !shapes}
+            >
+                Create
+            </Button>
 
-        return (
-            <>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    aria-label="Add"
-                    title="Create a new metadata entity"
-                    onClick={this.startCreating}
-                    style={{margin: '10px 0'}}
-                    disabled={shapesLoading || shapesError || !shapes}
-                >
-                    Create
-                </Button>
+            <LinkedDataShapeChooserDialog
+                open={creationState === CREATION_STATE_CHOOSE_SHAPE}
+                shapes={shapes}
+                onChooseShape={chooseShape}
+                onClose={closeDialog}
+            />
 
-                <LinkedDataShapeChooserDialog
-                    open={creationState === LinkedDataCreator.CREATION_STATE_CHOOSE_SHAPE}
-                    shapes={shapes}
-                    onChooseShape={this.chooseShape}
-                    onClose={this.closeDialog}
+            {creationState === CREATION_STATE_CREATE_ENTITY && (
+                <NewLinkedDataEntityDialog
+                    shape={shape}
+                    onClose={closeDialog}
+                    onCreate={onCreate}
+                    requireIdentifier={requireIdentifier}
                 />
+            )}
 
-                {creationState === LinkedDataCreator.CREATION_STATE_CREATE_ENTITY && (
-                    <NewLinkedDataEntityDialog
-                        shape={shape}
-                        onClose={this.closeDialog}
-                        onCreate={onCreate}
-                        requireIdentifier={requireIdentifier}
-                    />
-                )}
-
-                {children}
-
-                <LoadingOverlay loading={creatingMetadataEntity} />
-            </>
-        );
-    }
+            {children}
+        </>
+    );
 }
 
 LinkedDataCreator.propTypes = {
