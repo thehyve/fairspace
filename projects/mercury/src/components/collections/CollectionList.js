@@ -1,18 +1,43 @@
 import React from 'react';
-import {
-    Table, TableHead, TableRow, TableCell,
-    TableBody, withStyles, Paper,
-} from "@material-ui/core";
+import {Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TablePagination, withStyles} from "@material-ui/core";
 
 import {DateTime} from "../common";
 import styles from './CollectionList.styles';
 import getDisplayName from "../../utils/userUtils";
+import useSorting from "../common/useSorting";
+import usePagination from "../common/usePagination";
 
-const collectionList = (props) => {
+const CollectionList = (props) => {
     const {
-        collections, selectedCollectionLocation,
-        onCollectionClick, onCollectionDoubleClick, classes
+        collections = [],
+        selectedCollectionLocation,
+        onCollectionClick,
+        onCollectionDoubleClick, classes
     } = props;
+
+    // Extend collections with displayName to avoid computing it when sorting
+    const collectionsWithDisplayName = collections.map(collection => ({
+        ...collection,
+        displayName: getDisplayName(collection.creatorObj)
+    }));
+
+    const columns = {
+        name: {
+            valueExtractor: 'name',
+            label: 'Name'
+        },
+        created: {
+            valueExtractor: 'dateCreated',
+            label: 'Created'
+        },
+        creator: {
+            valueExtractor: 'displayName',
+            label: 'Creator'
+        }
+    };
+
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, columns, 'name');
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!collections || collections.length === 0) {
         return "No collections";
@@ -23,13 +48,23 @@ const collectionList = (props) => {
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Created</TableCell>
-                        <TableCell>Creator</TableCell>
+                        {
+                            Object.entries(columns).map(([key, column]) => (
+                                <TableCell key={key}>
+                                    <TableSortLabel
+                                        active={orderBy === key}
+                                        direction={orderAscending ? 'asc' : 'desc'}
+                                        onClick={() => toggleSort(key)}
+                                    >
+                                        {column.label}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))
+                        }
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {collections.map((collection) => {
+                    {pagedItems.map((collection) => {
                         const selected = selectedCollectionLocation && (collection.location === selectedCollectionLocation);
 
                         return (
@@ -54,8 +89,17 @@ const collectionList = (props) => {
                     })}
                 </TableBody>
             </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={collections.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={(e, p) => setPage(p)}
+                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+            />
         </Paper>
     );
 };
 
-export default withStyles(styles, {withTheme: true})(collectionList);
+export default withStyles(styles, {withTheme: true})(CollectionList);

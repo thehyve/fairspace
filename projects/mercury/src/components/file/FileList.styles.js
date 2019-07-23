@@ -1,7 +1,7 @@
 const styles = () => ({
     root: {
         'width': '100%',
-        'maxHeight': 'inherit',
+        'maxHeight': 'calc(100% - 60px)',
         'overflowX': 'auto',
         '-webkit-touch-callout': 'none', /* iOS Safari */
         '-webkit-user-select': 'none', /* Safari */

@@ -1,116 +1,159 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Table, TableHead, TableRow, TableCell,
     TableBody, Typography, Icon,
-    withStyles, Paper, Grid, Checkbox
+    withStyles, Paper, Grid, Checkbox, TableSortLabel, TablePagination
 } from "@material-ui/core";
 import filesize from 'filesize';
 
 import {DateTime} from "../common";
 import styles from './FileList.styles';
+import useSorting from "../common/useSorting";
+import usePagination from "../common/usePagination";
 
-class FileList extends React.Component {
-    state = {
-        hoveredFileName: ''
-    }
+const FileList = ({
+    classes, files, onPathCheckboxClick, onPathDoubleClick,
+    selectionEnabled, onAllSelection, onPathHighlight
+}) => {
+    const [hoveredFileName, setHoveredFileName] = useState('');
 
-    toggleHover = (hoveredFileName) => {
-        this.setState({hoveredFileName});
-    }
-
-    render() {
-        const {
-            classes, files, onPathCheckboxClick, onPathDoubleClick,
-            selectionEnabled, onAllSelection, onPathHighlight
-        } = this.props;
-
-        if (!files || files.length === 0 || files[0] === null) {
-            return (
-                <Grid container>
-                    <Grid item xs={12}>
-                        <Typography variant="subtitle1" style={{textAlign: 'center'}}>Empty directory</Typography>
-                    </Grid>
-                </Grid>
-            );
+    const columns = {
+        name: {
+            valueExtractor: f => f.item.basename,
+            label: 'Name'
+        },
+        size: {
+            valueExtractor: f => f.item.size,
+            label: 'Size'
+        },
+        lastmodified: {
+            valueExtractor: f => f.item.lastmod,
+            label: 'Last modified'
         }
+    };
 
-        let checkboxHeader = null;
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns, 'name');
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
-        if (selectionEnabled) {
-            const numOfSelected = files.filter(f => f.selected).length;
-            const allItemsSelected = files.length === numOfSelected;
-            checkboxHeader = (
-                <TableCell padding="none">
-                    <Checkbox
-                        indeterminate={numOfSelected > 0 && numOfSelected < files.length}
-                        checked={allItemsSelected}
-                        onChange={(event) => onAllSelection(event.target.checked)}
-                    />
-                </TableCell>
-            );
-        }
-
+    if (!files || files.length === 0 || files[0] === null) {
         return (
-            <Paper className={classes.root}>
-                <Table padding="dense">
-                    <TableHead>
-                        <TableRow>
-                            {checkboxHeader}
-                            <TableCell padding="none" />
-                            <TableCell padding="none">Name</TableCell>
-                            <TableCell align="right">Size</TableCell>
-                            <TableCell align="right">Last Modified</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {files.map((file) => {
-                            const item = selectionEnabled ? file.item : file;
-                            const checkboxVisibility = this.state.hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
-
-                            return (
-                                <TableRow
-                                    hover
-                                    key={item.filename}
-                                    selected={selectionEnabled && file.selected}
-                                    onClick={() => onPathHighlight(item)}
-                                    onDoubleClick={() => onPathDoubleClick(item)}
-                                    onMouseEnter={() => this.toggleHover(item.filename)}
-                                    onMouseLeave={() => this.toggleHover('')}
-                                >
-                                    {
-                                        selectionEnabled ? (
-                                            <TableCell
-                                                padding="none"
-                                                onDoubleClick={(e) => e.stopPropagation()}
-                                                onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(item);}}
-                                            >
-                                                <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
-                                            </TableCell>
-                                        ) : null
-                                    }
-
-                                    <TableCell align="left" padding="checkbox">
-                                        <Icon>
-                                            {item.type === 'directory' ? 'folder_open' : 'note_open'}
-                                        </Icon>
-                                    </TableCell>
-                                    <TableCell padding="none">
-                                        {item.basename}
-                                    </TableCell>
-                                    <TableCell padding="none" align="right">
-                                        {item.type === 'file' ? filesize(item.size) : ''}
-                                    </TableCell>
-                                    <TableCell padding="checkbox" align="right">
-                                        {item.lastmod ? <DateTime value={item.lastmod} /> : null}
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </Paper>
+            <Grid container>
+                <Grid item xs={12}>
+                    <Typography variant="subtitle1" style={{textAlign: 'center'}}>Empty directory</Typography>
+                </Grid>
+            </Grid>
         );
     }
-}
+
+    let checkboxHeader = null;
+
+    if (selectionEnabled) {
+        const numOfSelected = files.filter(f => f.selected).length;
+        const allItemsSelected = files.length === numOfSelected;
+        checkboxHeader = (
+            <TableCell padding="none">
+                <Checkbox
+                    indeterminate={numOfSelected > 0 && numOfSelected < files.length}
+                    checked={allItemsSelected}
+                    onChange={(event) => onAllSelection(event.target.checked)}
+                />
+            </TableCell>
+        );
+    }
+
+    return (
+        <Paper className={classes.root}>
+            <Table padding="dense">
+                <TableHead>
+                    <TableRow>
+                        {checkboxHeader}
+                        <TableCell padding="none" />
+                        <TableCell padding="none">
+                            <TableSortLabel
+                                active={orderBy === 'name'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('name')}
+                            >
+                                Name
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell align="right">
+                            <TableSortLabel
+                                active={orderBy === 'size'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('size')}
+                            >
+                                Size
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell align="right">
+                            <TableSortLabel
+                                active={orderBy === 'lastmodified'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('lastmodified')}
+                            >
+                                Last modified
+                            </TableSortLabel>
+                        </TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {pagedItems.map((file) => {
+                        const {item} = file;
+                        const checkboxVisibility = hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
+
+                        return (
+                            <TableRow
+                                hover
+                                key={item.filename}
+                                selected={selectionEnabled && file.selected}
+                                onClick={() => onPathHighlight(item)}
+                                onDoubleClick={() => onPathDoubleClick(item)}
+                                onMouseEnter={() => setHoveredFileName(item.filename)}
+                                onMouseLeave={() => setHoveredFileName('')}
+                            >
+                                {
+                                    selectionEnabled ? (
+                                        <TableCell
+                                            padding="none"
+                                            onDoubleClick={(e) => e.stopPropagation()}
+                                            onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(item);}}
+                                        >
+                                            <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
+                                        </TableCell>
+                                    ) : null
+                                }
+
+                                <TableCell align="left" padding="checkbox">
+                                    <Icon>
+                                        {item.type === 'directory' ? 'folder_open' : 'note_open'}
+                                    </Icon>
+                                </TableCell>
+                                <TableCell padding="none">
+                                    {item.basename}
+                                </TableCell>
+                                <TableCell padding="none" align="right">
+                                    {item.type === 'file' ? filesize(item.size) : ''}
+                                </TableCell>
+                                <TableCell padding="checkbox" align="right">
+                                    {item.lastmod ? <DateTime value={item.lastmod} /> : null}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={files.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={(e, p) => setPage(p)}
+                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+            />
+        </Paper>
+    );
+};
 
 export default withStyles(styles)(FileList);
