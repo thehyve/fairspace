@@ -10,6 +10,7 @@ metadata:
 data:
   application.yaml: |-
     port: 8080
+    publicUrl: {{ template "workspace.url" . }}
     jena:
       metadataBaseIRI: http://{{ template "pluto.hostname" . }}/iri/
       vocabularyBaseIRI: http://{{ template "pluto.hostname" . }}/vocabulary/
