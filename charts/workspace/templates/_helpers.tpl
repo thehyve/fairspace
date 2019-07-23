@@ -101,12 +101,21 @@ Scheme to access workspace components (http or https)
 {{- printf "storage.%s" .Values.workspace.ingress.domain -}}
 {{- end -}}
 
+{{/* Docs external hostname */}}
+{{- define "docs.hostname" -}}
+{{- printf "docs.%s" .Values.workspace.ingress.domain -}}
+{{- end -}}
+
 {{- define "workspace.url" -}}
 {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
 {{- end -}}
 
 {{- define "storage.url" -}}
 {{ template "workspace.scheme" . }}://{{ template "storage.hostname" . }}
+{{- end -}}
+
+{{- define "docs.url" -}}
+{{ template "workspace.scheme" . }}://{{ template "docs.hostname" . }}
 {{- end -}}
 
 {{- define "saturn.fullname" -}}
@@ -117,6 +126,9 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 {{- define "pluto.fullname" -}}
 {{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
+{{- end -}}
+{{- define "docs.fullname" -}}
+{{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
 {{- end -}}
 
 {{- define "workspace.elasticsearch.restbaseurl" -}}

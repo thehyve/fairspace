@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "docs.fullname" . }}
+  labels:
+    app: docs
+    chart: {{ template "workspace.chart" . }}
+    draft: {{ default "draft-app" .Values.draft }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.docs.replicaCount }}
+  selector:
+    matchLabels:
+      app: docs
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: docs
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.docs }}
+      annotations:
+{{ toYaml .Values.podAnnotations.docs | indent 8 }}
+{{- end }}
+    spec:
+      containers:
+      - name: {{ template "docs.fullname" . }}
+        image: "{{ .Values.docs.image.image }}:{{ .Values.docs.image.tag }}"
+        imagePullPolicy: {{ .Values.docs.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.docs.service.internalPort }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.docs.probePath }}
+            port: {{ .Values.docs.service.internalPort }}
+          initialDelaySeconds: {{ .Values.docs.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.docs.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.docs.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.docs.livenessProbe.timeoutSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.docs.probePath }}
+            port: {{ .Values.docs.service.internalPort }}
+          periodSeconds: {{ .Values.docs.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.docs.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.docs.readinessProbe.timeoutSeconds }}
+        resources:
+{{ toYaml .Values.docs.resources | indent 12 }}
+      terminationGracePeriodSeconds: {{ .Values.docs.terminationGracePeriodSeconds }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+      {{- end }}
