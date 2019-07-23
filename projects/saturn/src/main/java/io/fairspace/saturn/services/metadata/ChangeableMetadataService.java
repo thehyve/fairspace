@@ -139,9 +139,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
         addObjectTypes(before);
         var after = before.difference(modelToRemove).union(modelToAdd);
-        var deletedTypes = before.difference(after).listStatements(null, RDF.type, (RDFNode) null).toModel();
+        var deletedTypeStatements = modelToRemove.listStatements(null, RDF.type, (RDFNode) null).toModel();
         addObjectTypes(after);
-        after.remove(deletedTypes);
+        after.remove(deletedTypeStatements);
 
         validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
     }
