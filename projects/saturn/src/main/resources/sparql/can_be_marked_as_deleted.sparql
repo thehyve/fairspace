@@ -1,0 +1,6 @@
+PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+
+ASK WHERE { GRAPH %2$s { %1$s ?p ?o }
+  FILTER(NOT EXISTS {GRAPH %2$s { %1$s fs:dateDeleted ?date }})
+}
