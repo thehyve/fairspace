@@ -10,6 +10,7 @@ import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
@@ -53,9 +54,11 @@ public class App {
 
         var userService = new UserService(CONFIG.users.endpoint, TimeUnit.SECONDS.toMillis(CONFIG.users.synchronizationInterval), new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
-        var mailService = new MailService(CONFIG.mail);
 
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, userService, mailService);
+        var mailService = new MailService(CONFIG.mail);
+        var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler);
+
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new CompoundFileSystem(collections, Map.of(

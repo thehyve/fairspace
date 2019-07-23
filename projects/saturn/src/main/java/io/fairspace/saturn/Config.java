@@ -15,6 +15,8 @@ import java.util.Set;
 public class Config {
     public int port = 8080;
 
+    public String publicUrl = "http://localhost:3000";
+
     public final Jena jena = new Jena();
 
     public final Auth auth = new Auth();

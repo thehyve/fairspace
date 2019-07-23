@@ -2,9 +2,6 @@ package io.fairspace.saturn.services.permissions;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +11,13 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.vocabulary.RDFS;
 
-import javax.mail.Message;
-import javax.mail.internet.InternetAddress;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -31,7 +30,6 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.apache.jena.system.Txn.calculateRead;
 import static org.apache.jena.system.Txn.executeRead;
 
@@ -43,8 +41,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private final RDFConnection rdf;
     private final Supplier<Node> userIriSupplier;
-    private final UserService userService;
-    private final MailService mailService;
+    private final PermissionChangeEventHandler permissionChangeEventHandler;
 
     @Override
     public void createResource(Node resource) {
@@ -80,7 +77,8 @@ public class PermissionsServiceImpl implements PermissionsService {
             }
         });
 
-        notifyUser(user, resource, access);
+        if(permissionChangeEventHandler != null)
+            permissionChangeEventHandler.onPermissionChange(userIriSupplier.get(), resource, user, access);
     }
 
     @Override
@@ -248,30 +246,5 @@ public class PermissionsServiceImpl implements PermissionsService {
         });
 
         return result;
-    }
-
-    private void notifyUser(Node user, Node resource, Access access) {
-        Optional.ofNullable(userService.getUser(user))
-                .map(User::getEmail)
-                .ifPresent(email -> {
-                    try {
-                        var msg = mailService.newMessage();
-                        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
-                        msg.setSubject("Your access permissions changed");
-                        msg.setText("Your access level for " +
-                                (isCollection(resource)
-                                        ? "collection " + getLabel(resource)
-                                        : "resource " + getLabel(resource) + " (" + resource.getURI() + ")") +
-                                " was set to " + access + " by " + userService.getUser(userIriSupplier.get()).getName() + ".");
-                        mailService.send(msg);
-                    } catch (Exception e) {
-                        log.error("Error sending an email", e);
-                    }
-                });
-    }
-
-    private String getLabel(Node node) {
-        var stmts = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label, null)).listStatements();
-        return stmts.hasNext() ? stmts.nextStatement().getString() : "";
     }
 }
