@@ -30,6 +30,11 @@ class Config {
      * @returns {Promise<any> | *}
      */
     init() {
+        // Avoid double initialization
+        if (this.loadingPromise) {
+            return this.loadingPromise;
+        }
+
         // Load external configuration files. Please note that
         // if multiple files are provided, there is no guarantee
         // about ordering, so it is best for the configuration files

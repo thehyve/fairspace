@@ -2,6 +2,7 @@ import {useState} from "react";
 import ErrorDialog from "../common/ErrorDialog";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors} from "../../utils/linkeddata/metadataUtils";
+import useIsMounted from "../../utils/useIsMounted";
 
 const onFormSubmissionError = (e, id) => {
     if (e.details) {
@@ -13,13 +14,14 @@ const onFormSubmissionError = (e, id) => {
 
 const useFormSubmission = (submitFunc, subject) => {
     const [isUpdating, setUpdating] = useState(false);
+    const isMounted = useIsMounted();
 
     const submitForm = () => {
         setUpdating(true);
 
         submitFunc()
             .catch(e => onFormSubmissionError(e, subject))
-            .then(() => setUpdating(false));
+            .then(() => isMounted() && setUpdating(false));
     };
 
     return {isUpdating, submitForm};

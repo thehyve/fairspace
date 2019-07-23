@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
@@ -12,60 +12,44 @@ import Layout from "./common/Layout/Layout";
 import {ErrorDialog, LoadingInlay} from './common';
 import {UserProvider} from '../UserContext';
 import {UsersProvider} from "./permissions/UsersContext";
+import useIsMounted from "../utils/useIsMounted";
 
-class App extends React.Component {
-    cancellable = {
-        // it's important that this is one level down, so we can drop the
-        // reference to the entire object by setting it to undefined.
-        setState: this.setState.bind(this)
-    };
+const App = () => {
+    const isMounted = useIsMounted();
+    const [configLoaded, setConfigLoaded] = useState(false);
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            configLoaded: false
-        };
-    }
-
-    componentDidMount() {
-        this.store = configureStore();
-
+    useEffect(() => {
         Config.init()
             .then(() => {
-                this.store.dispatch(fetchWorkspace());
-
-                if (this.cancellable.setState) {
-                    this.cancellable.setState({configLoaded: true});
-                }
+                return isMounted() && setConfigLoaded(true);
             });
-    }
+    }, [isMounted]);
 
-    componentWillUnmount() {
-        this.cancellable.setState = undefined;
-    }
-
-    render() {
-        if (this.state.configLoaded) {
-            return (
-                <UserProvider>
-                    <UsersProvider>
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            <MuiThemeProvider theme={theme}>
-                                <Provider store={this.store}>
-                                    <ErrorDialog>
-                                        <Router>
-                                            <Layout />
-                                        </Router>
-                                    </ErrorDialog>
-                                </Provider>
-                            </MuiThemeProvider>
-                        </MuiPickersUtilsProvider>
-                    </UsersProvider>
-                </UserProvider>
-            );
-        }
+    if (!configLoaded) {
         return <LoadingInlay />;
     }
-}
+
+    // Initialize the store after configuration has loaded
+    const store = configureStore();
+    store.dispatch(fetchWorkspace());
+
+    return (
+        <UserProvider>
+            <UsersProvider>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <MuiThemeProvider theme={theme}>
+                        <Provider store={store}>
+                            <ErrorDialog>
+                                <Router>
+                                    <Layout />
+                                </Router>
+                            </ErrorDialog>
+                        </Provider>
+                    </MuiThemeProvider>
+                </MuiPickersUtilsProvider>
+            </UsersProvider>
+        </UserProvider>
+    );
+};
 
 export default App;
