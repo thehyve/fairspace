@@ -43,7 +43,7 @@ class LinkedDataCreator extends React.Component {
     };
 
     render() {
-        const {children, shapesLoading, shapes, requireIdentifier, onCreate} = this.props;
+        const {children, shapesLoading, shapesError, shapes, requireIdentifier, onCreate} = this.props;
         const {creationState, shape, creatingMetadataEntity} = this.state;
 
         return (
@@ -55,7 +55,7 @@ class LinkedDataCreator extends React.Component {
                     title="Create a new metadata entity"
                     onClick={this.startCreating}
                     style={{margin: '10px 0'}}
-                    disabled={shapesLoading || !shapes}
+                    disabled={shapesLoading || shapesError || !shapes}
                 >
                     Create
                 </Button>

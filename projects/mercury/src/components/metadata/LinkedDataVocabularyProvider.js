@@ -28,10 +28,16 @@ import UserContext from "../../UserContext";
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
     metaVocabulary, vocabulary, authorizations, createEntity,
+    shapesError, hasLinkedDataErrorForSubject,
     getLinkedDataSearchResults, searchVocabularyDispatch, ...otherProps
 }) => {
-    fetchMetaVocabulary();
-    fetchMetadataVocabulary();
+    if (!shapesError) {
+        fetchMetaVocabulary();
+    }
+
+    if (!hasLinkedDataErrorForSubject()) {
+        fetchMetadataVocabulary();
+    }
 
     const {currentUser} = useContext(UserContext);
 
@@ -69,6 +75,7 @@ const LinkedDataVocabularyProvider = ({
                 createLinkedDataEntity,
                 submitLinkedDataChanges,
                 getLinkedDataForSubject,
+                hasLinkedDataErrorForSubject,
 
                 // Fixed properties
                 namespaces,
@@ -82,12 +89,13 @@ const LinkedDataVocabularyProvider = ({
                 getTypeInfoForLinkedData,
                 getClassesInCatalog,
 
+                shapesError,
+                shapes: metaVocabulary,
+
                 // Generic methods without reference to shapes
                 extendProperties,
                 getSearchResults: getLinkedDataSearchResults,
-                valueComponentFactory,
-
-                shapes: metaVocabulary
+                valueComponentFactory
             }}
         >
             {children}

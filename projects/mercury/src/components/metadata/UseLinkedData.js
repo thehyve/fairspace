@@ -58,7 +58,7 @@ export const useLinkedData = (subject, defaultType, context = {}) => {
 
     let error = shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '';
 
-    if (!linkedDataLoading && !(properties && properties.length > 0)) {
+    if (!error && !linkedDataLoading && !(properties && properties.length > 0)) {
         error = 'No metadata found for this subject';
     }
 
