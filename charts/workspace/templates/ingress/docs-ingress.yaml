@@ -24,7 +24,7 @@ spec:
     - host: {{ template "docs.hostname" $ }}
       http:
         paths:
-          - path: /(.*)
+          - path: /
             backend:
               serviceName: {{ template "docs.fullname" . }}
               servicePort: 80
