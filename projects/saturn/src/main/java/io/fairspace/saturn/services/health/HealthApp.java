@@ -1,16 +1,16 @@
 package io.fairspace.saturn.services.health;
 
-import lombok.AllArgsConstructor;
-import spark.servlet.SparkApplication;
+import io.fairspace.saturn.services.BaseApp;
 
 import static spark.Spark.get;
 
-@AllArgsConstructor
-public class HealthApp implements SparkApplication {
-    private final String pathPrefix;
+public class HealthApp extends BaseApp {
+    public HealthApp(String basePath) {
+        super(basePath);
+    }
 
     @Override
-    public void init() {
-        get(pathPrefix + "/health/", (req, res) -> "Welcome to FairSpace!");
+    protected void initApp() {
+        get("/", (req, res) -> "Welcome to FairSpace!");
     }
 }

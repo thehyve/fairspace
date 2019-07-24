@@ -35,6 +35,11 @@ public class UserServiceTest {
 
     private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
 
+    private final KeycloakGroup keycloakGroup = new KeycloakGroup() {{
+       setId("groupid");
+       setName("workspace-users");
+    }};
+
     private final KeycloakUser keycloakUser = new KeycloakUser() {{
         setId("123");
         setFirstName("John");
@@ -50,19 +55,24 @@ public class UserServiceTest {
 
     private volatile List<KeycloakUser> keycloakUsers = List.of(keycloakUser);
 
-
     @Before
     public void before() throws IOException {
         mockServer = HttpServer.create(new InetSocketAddress(0), 0);
-        mockServer.createContext("/users", exchange -> {
+        mockServer.createContext("/groups/groupid/members", exchange -> {
             var response = mapper.writeValueAsBytes(keycloakUsers);
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        mockServer.createContext("/groups", exchange -> {
+            var response = mapper.writeValueAsBytes(List.of(keycloakGroup));
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
             exchange.getResponseBody().write(response);
             exchange.close();
         });
         mockServer.start();
 
-        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users", refreshInterval, new DAO(rdf, null));
+        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/groups", "workspace-users", "http://localhost:" + mockServer.getAddress().getPort() + "/groups/%s/members/", refreshInterval, new DAO(rdf, null));
     }
 
     @Test
