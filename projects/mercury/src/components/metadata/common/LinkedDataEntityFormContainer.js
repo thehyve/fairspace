@@ -9,7 +9,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../useFormSubmission";
 
 const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEditable = true, ...otherProps}) => {
-    const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
     const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject, defaultType);
 
     const {
@@ -25,8 +25,10 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEdi
         subject
     );
 
+    const canEdit = isEntityEditable && hasEditRight;
+
     // Apply context-specific logic to the properties and filter on visibility
-    const extendedProperties = extendProperties({properties, subject, isEntityEditable});
+    const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
 
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
@@ -38,7 +40,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEdi
 
     if (isUpdating) {
         footer = <CircularProgress />;
-    } else if (isEntityEditable) {
+    } else if (canEdit) {
         footer = (
             <Button
                 onClick={validateAndSubmit}
