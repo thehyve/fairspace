@@ -39,6 +39,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
+import static org.apache.jena.riot.system.IRIResolver.checkIRI;
 
 public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
@@ -135,8 +136,9 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     private Optional<String> getFairspaceIRI(List<MetaDataAndDomainData> meta) {
         return meta.stream()
                 .filter(m -> FAIRSPACE_IRI_ATTRIBUTE.equals(m.getAvuAttribute()))
-                .findFirst()
-                .map(MetaDataAndDomainData::getAvuValue);
+                .map(MetaDataAndDomainData::getAvuValue)
+                .filter(iri -> !checkIRI(iri))
+                .findFirst();
     }
 
     private AvuData createIri(Resource type) {
