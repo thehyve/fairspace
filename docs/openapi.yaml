@@ -107,7 +107,12 @@ paths:
                     "ws" : "http://workspace.ci.fairway.app/iri/"
                   }
                 }
-
+        '404':
+          description: No metadata matched the given query.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -434,7 +439,12 @@ paths:
                     }
                   ]
                 }
-
+        '404':
+          description: No vocabulary entries matched the given query.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -769,7 +779,12 @@ paths:
                     }
                   ]
                 }
-
+        '404':
+          description: No meta-vocabulary entries matched the given query.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:

@@ -4,6 +4,7 @@ package io.fairspace.saturn.services.metadata;
 import io.fairspace.saturn.services.BaseApp;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.rdf.model.Model;
 
 import static io.fairspace.saturn.services.JsonLDUtils.JSON_LD_HEADER_STRING;
 import static io.fairspace.saturn.services.JsonLDUtils.toJsonLD;
@@ -25,11 +26,15 @@ public class ReadableMetadataApp extends BaseApp {
         path(basePath, () -> {
             get("/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSON_LD_HEADER_STRING);
-                return toJsonLD(api.get(
+
+                Model model = api.get(
                         req.queryParams("subject"),
                         req.queryParams("predicate"),
                         req.queryParams("object"),
-                        req.queryParams().contains("includeObjectProperties")));
+                        req.queryParams().contains("includeObjectProperties"));
+
+                // Return 404 if the model is empty, i.e. when the entity was not found
+                return model.isEmpty() ? null : toJsonLD(model);
             });
             get("/entities/", JSON_LD_HEADER_STRING, (req, res) -> {
                 res.type(JSON_LD_HEADER_STRING);
