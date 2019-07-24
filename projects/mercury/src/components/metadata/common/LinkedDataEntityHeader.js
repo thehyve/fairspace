@@ -7,10 +7,11 @@ import IriTooltip from "../../common/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {DATE_DELETED_URI, FILE_PATH_URI, FIXED_SHAPE_URI} from "../../../constants";
 import DeleteEntityButton from "./DeleteEntityButton";
+import CopyButton from "../../common/CopyButton";
 
 const styles = {
     iri: {
-        maxWidth: '600px',
+        maxWidth: '570px',
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis'
@@ -23,12 +24,14 @@ const LinkedDataEntityHeader = ({classes, subject}) => {
     return !linkedDataError && (
         <>
             <Grid container justify="space-between" style={{alignItems: "center"}}>
-                <Grid item>
+                <Grid item style={{display: "flex", alignItems: "center"}}>
                     <Typography variant="h5" className={classes.iri}>
                         <IriTooltip title={subject}>
                             <Iri iri={subject} />
                         </IriTooltip>
                     </Typography>
+
+                    <CopyButton style={{marginLeft: 10}} value={subject} />
                 </Grid>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
                     <DeleteEntityButton
