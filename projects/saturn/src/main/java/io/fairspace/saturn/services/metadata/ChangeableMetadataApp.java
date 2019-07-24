@@ -11,6 +11,7 @@ import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.saturn.util.ValidationUtils.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -34,11 +35,15 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             put("/", (req, res) -> {
                 validateContentType(req, JSON_LD_HEADER_STRING);
                 api.put(fromJsonLD(req.body(), baseURI));
+
+                res.status(SC_NO_CONTENT);
                 return "";
             });
             patch("/", (req, res) -> {
                 validateContentType(req, JSON_LD_HEADER_STRING);
                 api.patch(fromJsonLD(req.body(), baseURI));
+
+                res.status(SC_NO_CONTENT);
                 return "";
             });
             delete("/", (req, res) -> {
@@ -49,10 +54,13 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                     validate(subject != null, "Parameter \"subject\" is required");
                     validateIRI(subject);
                     if (!api.softDelete(createResource(subject))) {
+                        // Subject could not be deleted. Return a 404 error response
                         return null;
                     }
 
                 }
+
+                res.status(SC_NO_CONTENT);
                 return "";
             });
             exception(PayloadParsingException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
