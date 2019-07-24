@@ -51,6 +51,21 @@ public class CorsIntegrationTests {
 	}
 
 	@Test
+	public void corsIsAllowedForAllConfiguredDomains() throws Exception {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Origin", "http://other-origin");
+		headers.set("access-control-request-headers", "fake-header");
+		headers.set("access-control-request-method", "PUT");
+
+		HttpEntity<Object> request = new HttpEntity<>(headers);
+		ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + "/thehyve", HttpMethod.OPTIONS, request, String.class);
+
+		// Expect no restrictions on origin, headers and methods and that credentials are allowed
+		assertEquals(200, response.getStatusCodeValue());
+		assertEquals("http://other-origin", response.getHeaders().get("Access-Control-Allow-Origin").get(0));
+	}
+
+	@Test
 	public void corsHeadersForWebdavRequestMethod() throws Exception {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Origin", "http://fake-origin");
