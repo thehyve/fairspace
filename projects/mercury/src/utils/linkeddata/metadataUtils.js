@@ -1,7 +1,7 @@
 import _, {mapValues} from 'lodash';
 
 import * as consts from "../../constants";
-import {getFirstPredicateValue} from "./jsonLdUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import {isNonEmptyValue} from '../genericUtils';
 
 /**
@@ -153,7 +153,11 @@ export const getTypeInfo = (linkedDataItem, vocabulary) => {
     }
 
     const shape = vocabulary.determineShapeForTypes(types);
-    return {label: getFirstPredicateValue(shape, consts.SHACL_NAME), description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION)};
+    return {
+        typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS),
+        label: getFirstPredicateValue(shape, consts.SHACL_NAME),
+        description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION)
+    };
 };
 
 /**

@@ -129,6 +129,18 @@ class LinkedDataAPI {
             body: JSON.stringify(jsonLd)
         });
     }
+
+    /**
+     * Deletes a subject from the metadata store
+     * @param subject
+     * @returns {Promise<Response>}
+     */
+    delete(subject) {
+        return fetch(this.getStatementsUrl() + "?subject=" + encodeURIComponent(subject), {
+            method: 'DELETE',
+            credentials: 'same-origin'
+        }).then(failOnHttpError("Failure when deleting subject"));
+    }
 }
 
 export const MetadataAPI = new LinkedDataAPI(config => config.urls.metadata);

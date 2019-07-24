@@ -2,7 +2,8 @@ import React, {useContext} from 'react';
 import {connect} from 'react-redux';
 // Actions
 import {
-    createVocabularyEntity, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded, submitVocabularyChanges
+    createVocabularyEntity, deleteVocabularyEntity, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded,
+    submitVocabularyChanges
 } from "../../actions/vocabularyActions";
 import {searchVocabulary} from "../../actions/searchActions";
 // Reducers
@@ -28,7 +29,7 @@ import UserContext from "../../UserContext";
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
     metaVocabulary, vocabulary, authorizations, createEntity,
-    shapesError, hasLinkedDataErrorForSubject,
+    shapesError, hasLinkedDataErrorForSubject, dispatchDeleteEntity,
     getLinkedDataSearchResults, searchVocabularyDispatch, ...otherProps
 }) => {
     if (!shapesError) {
@@ -43,6 +44,9 @@ const LinkedDataVocabularyProvider = ({
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary)
+        .then(fetchMetadataVocabulary);
+
+    const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)
         .then(fetchMetadataVocabulary);
 
     const extendProperties = ({properties, isEntityEditable = true, subject}) => {
@@ -73,6 +77,7 @@ const LinkedDataVocabularyProvider = ({
                 fetchLinkedDataForSubject: fetchMetadataVocabulary,
                 searchLinkedData: searchVocabularyDispatch,
                 createLinkedDataEntity,
+                deleteLinkedDataEntity,
                 submitLinkedDataChanges,
                 getLinkedDataForSubject,
                 hasLinkedDataErrorForSubject,
@@ -129,6 +134,7 @@ const mapDispatchToProps = {
     fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
     dispatchSubmitVocabularyChanges: submitVocabularyChanges,
     createEntity: createVocabularyEntity,
+    dispatchDeleteEntity: deleteVocabularyEntity,
     searchVocabularyDispatch: searchVocabulary,
 };
 

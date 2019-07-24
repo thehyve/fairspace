@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 // Actions
 import {fetchMetadataVocabularyIfNeeded} from "../../actions/vocabularyActions";
 import {
-    createMetadataEntity, fetchMetadataBySubjectIfNeeded, submitMetadataChanges
+    createMetadataEntity, deleteMetadataEntity, fetchMetadataBySubjectIfNeeded, submitMetadataChanges
 } from "../../actions/metadataActions";
 import {searchMetadata} from "../../actions/searchActions";
 // Reducers
@@ -21,7 +21,7 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
     vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch,
-    getLinkedDataForSubject, shapesError,
+    getLinkedDataForSubject, shapesError, dispatchDeleteEntity,
     ...otherProps
 }) => {
     if (!shapesError) {
@@ -30,6 +30,9 @@ const LinkedDataMetadataProvider = ({
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
     const submitLinkedDataChanges = (subject, values, defaultType) => dispatchSubmitMetadataChanges(subject, values, vocabulary, defaultType)
+        .then(() => fetchMetadataBySubject(subject));
+
+    const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)
         .then(() => fetchMetadataBySubject(subject));
 
     const extendProperties = ({properties, isEntityEditable = true}) => properties
@@ -53,6 +56,7 @@ const LinkedDataMetadataProvider = ({
                 fetchLinkedDataForSubject: fetchMetadataBySubject,
                 searchLinkedData: searchMetadataDispatch,
                 createLinkedDataEntity,
+                deleteLinkedDataEntity,
                 submitLinkedDataChanges,
                 getLinkedDataForSubject,
 
@@ -108,6 +112,7 @@ const mapDispatchToProps = {
     fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
     dispatchSubmitMetadataChanges: submitMetadataChanges,
     createEntity: createMetadataEntity,
+    dispatchDeleteEntity: deleteMetadataEntity,
     searchMetadataDispatch: searchMetadata,
 };
 
