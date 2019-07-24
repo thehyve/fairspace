@@ -11,7 +11,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 
 @Slf4j
-public class ModelUtils {
+public class JsonLDUtils {
     public static final String JSON_LD_HEADER_STRING = JSONLD.getLang().getHeaderString();
 
     public static String toJsonLD(Model model) {

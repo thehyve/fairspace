@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
@@ -73,8 +74,18 @@ class MetadataEntityLifeCycleManager {
         }
     }
 
-    void softDelete(Resource resource) {
-        rdf.update(storedQuery("soft_delete", resource, userIriSupplier.get(), graph, vocabulary));
+    boolean softDelete(Resource resource) {
+        if (permissionsService != null) {
+            permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
+        }
+        if (rdf.queryAsk(storedQuery("is_machine_only", resource, graph, vocabulary))) {
+            throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
+        }
+        if (rdf.queryAsk(storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
+            rdf.update(storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userIriSupplier.get(), graph));
+            return true;
+        }
+        return false;
     }
 
     /**

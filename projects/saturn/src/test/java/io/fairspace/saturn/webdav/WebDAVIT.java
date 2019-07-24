@@ -58,12 +58,6 @@ public class WebDAVIT {
     private Node anotherUser = createURI("http://example.com/new-user");
     private Node currentUser = defaultUser;
 
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private MailService mailService;
-
     @Before
     public void before() {
         var rdf = connect(createTxnMem());
@@ -76,7 +70,7 @@ public class WebDAVIT {
 
         var eventBus = new EventBus();
 
-        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, userService, mailService);
+        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, null);
         collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
         var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
         fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
