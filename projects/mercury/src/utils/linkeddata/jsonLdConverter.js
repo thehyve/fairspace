@@ -26,20 +26,26 @@ const generateValueEntry = (entry, allMetadata) => ({
 export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
     const valuesByPredicate = {};
 
+    const expectsRdfList = predicateUri => {
+        const propertyShape = propertyShapes
+            .find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
+        return propertyShape && isRdfList(propertyShape);
+    };
+
     Object.keys(metadata)
         .forEach(predicateUri => {
-            const propertyShape = propertyShapes
-                .find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
-            const propertyExpectsRdfList = propertyShape && isRdfList(propertyShape);
-
             // Ensure that we have a list of values for the predicate
             if (!Array.isArray(metadata[predicateUri])) {
-                console.warn("Metadata should be provided in expanded form");
                 return;
             }
 
             let values;
-            if (propertyExpectsRdfList) {
+
+            if (predicateUri === '@type') {
+                // Treat @type as special case, as it does not have the correct
+                // format (with @id or @value)
+                values = metadata[predicateUri].map(t => ({id: t}));
+            } else if (expectsRdfList(predicateUri)) {
                 // RDF lists in JSON LD are arrays in a container with key '@list'
                 // We want to use just the arrays. If there are multiple lists
                 // they are concatenated
