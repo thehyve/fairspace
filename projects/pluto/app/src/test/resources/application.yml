@@ -1,7 +1,9 @@
 app:
   apiVersion:
     pluto: v1
-  domain: http://fake-origin
+  domains:
+  - http://fake-origin
+  - http://other-origin
 
 security:
   oidc:
