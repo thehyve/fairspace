@@ -149,6 +149,12 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     @Override
+    protected String fileOrDirectoryIri(String path) throws IOException {
+        return selectSingle(rdf, storedQuery("fs_stat", path), row -> row.getResource("iri").getURI())
+                .orElse(null);    
+    }
+
+    @Override
     public void close() throws IOException {
     }
 
@@ -164,7 +170,6 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     private FileInfo fileInfo(QuerySolution row) {
         return FileInfo.builder()
-                .iri(row.getResource("iri").getURI())
                 .path(row.getLiteral("path").getString())
                 .size(row.getLiteral("size").getLong())
                 .isDirectory(row.getLiteral("isDirectory").getBoolean())

@@ -200,24 +200,7 @@ describe('jsonLdConverter', () => {
                 }
             ];
 
-            expect(getJsonLdForSubject(metadata, 'http://other-subject', 'http://default-type')).toEqual({
-                '@type': ['http://default-type']
-            });
-        });
-
-        it('should add a default type if no type is given', () => {
-            const metadata = [
-                {
-                    '@id': 'http://no-type',
-                    'http://label': [{'@value': 'label'}]
-                }
-            ];
-
-            expect(getJsonLdForSubject(metadata, 'http://no-type', 'http://default-type')).toEqual({
-                '@id': 'http://no-type',
-                '@type': ['http://default-type'],
-                'http://label': [{'@value': 'label'}]
-            });
+            expect(getJsonLdForSubject(metadata, 'http://other-subject')).toEqual({});
         });
     });
 

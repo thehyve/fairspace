@@ -33,7 +33,6 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
@@ -85,7 +84,7 @@ public class ManagedFileSystemTest {
     public void statCollection() throws IOException {
         assertEquals("coll", fs.stat("coll").getPath());
         assertTrue(fs.stat("coll").isDirectory());
-        assertNotNull(fs.stat("coll").getIri());
+        assertNotNull(fs.iri("coll"));
     }
 
     @Test
@@ -94,7 +93,7 @@ public class ManagedFileSystemTest {
         var stat = fs.stat("coll/aaa");
         assertEquals("coll/aaa", stat.getPath());
         assertTrue(stat.isDirectory());
-        assertNotNull(stat.getIri());
+        assertNotNull(fs.iri(stat.getPath()));
     }
 
     @Test
@@ -123,7 +122,7 @@ public class ManagedFileSystemTest {
         assertEquals(1, children.size());
         assertEquals("coll/aaa/bbb/ccc", children.get(0).getPath());
         assertTrue(children.get(0).isDirectory());
-        assertNotNull(children.get(0).getIri());
+        assertNotNull(fs.iri(children.get(0).getPath()));
     }
 
     @Test
@@ -134,8 +133,9 @@ public class ManagedFileSystemTest {
         var stat = fs.stat("coll/aaa/bbb/ccc");
         assertEquals("coll/aaa/bbb/ccc", stat.getPath());
         assertTrue(stat.isDirectory());
-        assertNotNull(stat.getIri());
-        assertTrue(ds.getDefaultModel().contains(createResource(stat.getIri()), RDFS.label, createStringLiteral("ccc")));
+        var iri = fs.iri(stat.getPath());
+        assertNotNull(iri);
+        assertTrue(ds.getDefaultModel().contains(createResource(iri), RDFS.label, createStringLiteral("ccc")));
         ensureRecentInstant(stat.getCreated());
         ensureRecentInstant(stat.getModified());
     }
@@ -205,7 +205,7 @@ public class ManagedFileSystemTest {
     @Test
     public void checksumCalculation() throws IOException {
         fs.create("coll/file", new ByteArrayInputStream(content1));
-        var resource = createResource(fs.stat("coll/file").getIri());
+        var resource = createResource(fs.iri("coll/file"));
         assertEquals(encodeHexString(md5(content1)), ds.getDefaultModel().getProperty(resource, FS.md5).getString());
 
         fs.modify("coll/file", new ByteArrayInputStream(content2));
@@ -215,7 +215,7 @@ public class ManagedFileSystemTest {
     @Test
     public void directoryLifecycleMetadata() throws IOException {
         fs.mkdir("coll/dir");
-        var dir = createResource(fs.stat("coll/dir").getIri());
+        var dir = createResource(fs.iri("coll/dir"));
         var user = createResource("http://example.com/user");
         assertTrue(ds.getDefaultModel().contains(dir, FS.createdBy, user));
         assertTrue(ds.getDefaultModel().contains(dir, FS.modifiedBy, user));
@@ -227,7 +227,7 @@ public class ManagedFileSystemTest {
     @Test
     public void fileLifecycleMetadata() throws IOException {
         fs.create("coll/file", new ByteArrayInputStream(content1));
-        var file = createResource(fs.stat("coll/file").getIri());
+        var file = createResource(fs.iri("coll/file"));
         var user = createResource("http://example.com/user");
         assertTrue(ds.getDefaultModel().contains(file, FS.createdBy, user));
         assertTrue(ds.getDefaultModel().contains(file, FS.modifiedBy, user));
@@ -241,7 +241,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir1/subdir");
         fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
-        var oldIri = fs.stat("coll/dir1").getIri();
+        var oldIri = fs.iri("coll/dir1");
         fs.copy("coll/dir1", "coll/dir2");
         assertTrue(fs.exists("coll/dir1"));
         assertTrue(fs.exists("coll/dir2"));
@@ -250,8 +250,8 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertNotEquals(oldIri, fs.stat("coll/dir2").getIri());
-        assertTrue(ds.getDefaultModel().contains(createResource(fs.stat("coll/dir2").getIri()), RDFS.label, createStringLiteral("dir2")));
+        assertNotEquals(oldIri, fs.iri("coll/dir2"));
+        assertTrue(ds.getDefaultModel().contains(createResource(fs.iri("coll/dir2")), RDFS.label, createStringLiteral("dir2")));
     }
 
     @Test(expected = IOException.class)
@@ -265,7 +265,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir2");
         fs.create("coll/dir1/file", new ByteArrayInputStream(content1));
-        var oldIri = fs.stat("coll/dir1/file").getIri();
+        var oldIri = fs.iri("coll/dir1/file");
         fs.copy("coll/dir1/file", "coll/dir2/file");
         assertTrue(fs.exists("coll/dir1"));
         assertTrue(fs.exists("coll/dir2"));
@@ -274,7 +274,7 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/file", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertNotEquals(oldIri, fs.stat("coll/dir2/file").getIri());
+        assertNotEquals(oldIri, fs.iri("coll/dir2/file"));
     }
 
     @Test
@@ -282,7 +282,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir1/subdir");
         fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
-        var oldIri = fs.stat("coll/dir1").getIri();
+        var oldIri = fs.iri("coll/dir1");
         fs.move("coll/dir1", "coll/dir2");
         assertFalse(fs.exists("coll/dir1"));
         assertTrue(fs.exists("coll/dir2"));
@@ -291,7 +291,7 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertEquals(oldIri, fs.stat("coll/dir2").getIri());
+        assertEquals(oldIri, fs.iri("coll/dir2"));
         assertTrue(ds.getDefaultModel().contains(createResource(oldIri), RDFS.label, createStringLiteral("dir2")));
     }
 
@@ -300,14 +300,14 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir1");
         fs.create("coll/dir1/file1", new ByteArrayInputStream(content1));
         fs.mkdir("coll/dir2");
-        var oldIri = fs.stat("coll/dir1/file1").getIri();
+        var oldIri = fs.iri("coll/dir1/file1");
         fs.move("coll/dir1/file1", "coll/dir2/file2");
         assertFalse(fs.exists("coll/dir1/file1"));
         assertTrue(fs.exists("coll/dir2/file2"));
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/file2", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertEquals(oldIri, fs.stat("coll/dir2/file2").getIri());
+        assertEquals(oldIri, fs.iri("coll/dir2/file2"));
     }
 
     @Test(expected = IOException.class)

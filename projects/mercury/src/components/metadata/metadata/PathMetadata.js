@@ -4,7 +4,6 @@ import {Grid} from "@material-ui/core";
 
 import MessageDisplay from "../../common/MessageDisplay";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
-import {EXTERNAL_DIRECTORY_URI, EXTERNAL_FILE_URI} from "../../../constants";
 import {
     getFileInfoByPath, hasFileInfoErrorByPath, isFileInfoByPathPending
 } from "../../../reducers/cache/fileInfoByPathReducers";
@@ -51,7 +50,6 @@ const PathMetadata = ({
             <Grid item xs={12}>
                 <LinkedDataEntityFormContainer
                     subject={fileProps.iri}
-                    defaultType={type === 'directory' ? EXTERNAL_DIRECTORY_URI : EXTERNAL_FILE_URI}
                     {...otherProps}
                 />
             </Grid>

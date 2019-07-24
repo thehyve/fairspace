@@ -8,10 +8,10 @@ export const invalidateMetadata = subject => ({
     meta: {subject}
 });
 
-export const submitMetadataChanges = (subject, values, vocabulary, defaultType) => ({
+export const submitMetadataChanges = (subject, values, vocabulary) => ({
     type: actionTypes.UPDATE_METADATA,
     payload: MetadataAPI.get({subject})
-        .then(meta => (meta.length ? getFirstPredicateValue(meta[0], '@type', defaultType) : defaultType))
+        .then(meta => (meta.length && getFirstPredicateValue(meta[0], '@type')))
         .then(type => MetadataAPI.updateEntity(subject, values, vocabulary, type)),
     meta: {
         subject

@@ -37,7 +37,6 @@ export default reduceReducers(jsonLdFetchReducer, updateMetadataReducer, default
  * Returns an object representing the metadata for the given subject
  * @param state
  * @param subject
- * @param defaultType
  * @returns {*}
  */
 export const getMetadataForSubject = (state, subject) => {

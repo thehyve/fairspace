@@ -13,27 +13,27 @@ class CreateDirectoryButton extends React.Component {
     openDialog = (e) => {
         e.stopPropagation();
         this.setState({creating: true, name: ''});
-    }
+    };
 
     closeDialog = (e) => {
         if (e) e.stopPropagation();
         this.setState({creating: false});
-    }
+    };
 
     createDirectory = (e) => {
         e.stopPropagation();
 
         this.props.onCreate(this.state.name)
             .then(shouldClose => shouldClose && this.closeDialog());
-    }
+    };
 
     render() {
-        const {children} = this.props;
+        const {children, disabled} = this.props;
         const {creating, name} = this.state;
 
         return (
             <>
-                <span onClick={this.openDialog}>
+                <span onClick={e => !disabled && this.openDialog(e)}>
                     {children}
                 </span>
 
