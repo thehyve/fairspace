@@ -40,7 +40,7 @@ export const useLinkedData = (subject, context = {}) => {
     let values = {};
     let typeInfo = {};
 
-    if (linkedData) {
+    if (linkedData && linkedData.length > 0) {
         const linkedDataItem = getJsonLdForSubject(linkedData, subject);
         typeInfo = getTypeInfoForLinkedData(linkedDataItem);
 
