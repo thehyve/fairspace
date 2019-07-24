@@ -9,6 +9,7 @@ const jsonLdFetchReducer = promiseReducerFactory(actionTypes.FETCH_METADATA, def
 const updateMetadataReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.UPDATE_METADATA_FULFILLED:
+        case actionTypes.DELETE_METADATA_FULFILLED:
             return {
                 ...state,
                 [action.meta.subject]: {

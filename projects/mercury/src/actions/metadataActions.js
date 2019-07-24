@@ -34,6 +34,14 @@ export const createMetadataEntity = (subject, values, vocabulary, type) => ({
     }
 });
 
+export const deleteMetadataEntity = (subject) => ({
+    type: actionTypes.DELETE_METADATA,
+    payload: MetadataAPI.delete(subject),
+    meta: {
+        subject
+    }
+});
+
 const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({
     type: actionTypes.FETCH_METADATA,
     payload: MetadataAPI.get({subject, includeObjectProperties: true}),

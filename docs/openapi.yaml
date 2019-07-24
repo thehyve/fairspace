@@ -38,9 +38,9 @@ paths:
           schema:
             type: string
             format: iri
-        - name: labels
+        - name: includeObjectProperties
           in: query
-          description: If set, the response will include labels for the included objects
+          description: If set, the response will include several properties for the included objects. The properties to be included are marked with `fs:importantProperty` in the vocabulary.
           required: false
           schema:
             type: boolean
@@ -140,7 +140,7 @@ paths:
               }
 
       responses:
-        '200':
+        '204':
           description: Data was stored properly
         '400':
           description: Bad request. Either the syntax or the data was invalid.
@@ -187,7 +187,7 @@ paths:
               }
 
       responses:
-        '200':
+        '204':
           description: Data was stored properly
         '400':
           description: Bad request. Either the syntax or the data was invalid.
@@ -241,7 +241,7 @@ paths:
                 }
               }
       responses:
-        '200':
+        '204':
           description: Data was deleted
         '400':
           description: Bad request. Either the syntax was invalid, or the data would be invalidated by this deletion.
@@ -344,9 +344,9 @@ paths:
           schema:
             type: string
             format: iri
-        - name: labels
+        - name: includeObjectProperties
           in: query
-          description: If set, the response will include labels for the included objects
+          description: If set, the response will include several properties for the included objects. The properties to be included are marked with `fs:importantProperty` in the meta-vocabulary.
           required: false
           schema:
             type: boolean
@@ -461,12 +461,12 @@ paths:
                 ],
                 "@context": {
                   "schema": "http://schema.org/",
-                  "sh": "http://www.w3.org/ns/shacl#",
+                  "sh": "http://www.w3.org/ns/shacl#"
                 }
               }
 
       responses:
-        '200':
+        '204':
           description: Data was stored properly
         '400':
           description: Bad request. Either the syntax or the data was invalid.
@@ -507,12 +507,12 @@ paths:
                 ],
                 "@context": {
                   "schema": "http://schema.org/",
-                  "sh": "http://www.w3.org/ns/shacl#",
+                  "sh": "http://www.w3.org/ns/shacl#"
                 }
               }
 
       responses:
-        '200':
+        '204':
           description: Data was stored properly
         '400':
           description: Bad request. Either the syntax or the data was invalid.
@@ -561,11 +561,11 @@ paths:
                 ],
                 "@context": {
                   "schema": "http://schema.org/",
-                  "sh": "http://www.w3.org/ns/shacl#",
+                  "sh": "http://www.w3.org/ns/shacl#"
                 }
               }
       responses:
-        '200':
+        '204':
           description: Data was deleted
         '400':
           description: Bad request. Either the syntax was invalid, or the data would be invalidated by this deletion.

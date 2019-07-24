@@ -207,7 +207,7 @@ describe('Metadata Utils', () => {
     describe('getTypeInfo', () => {
         const vocabulary = {
             determineShapeForTypes: (typeIris) => ({
-                [constants.SHACL_TARGET_CLASS]: [{'@id': typeIris[0]}],
+                [constants.SHACL_TARGET_CLASS]: typeIris[0],
                 [constants.SHACL_NAME]: [{'@value': 'Name'}],
                 [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
             })

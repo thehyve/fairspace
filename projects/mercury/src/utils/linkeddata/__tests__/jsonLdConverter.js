@@ -132,7 +132,7 @@ describe('jsonLdConverter', () => {
                 ['My first collection', 'Some more info']
             );
         });
-        it('should ignore properties for which no shape is given', () => {
+        it('should include properties for which no shape is given', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['http://fairspace.io/ontology#Collection'],
@@ -142,7 +142,8 @@ describe('jsonLdConverter', () => {
                 ]
             };
 
-            expect(fromJsonLd(metadata, propertyShapes)).toEqual({});
+            const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
+            expect(valuesByPredicate['http://not-existing'].map(v => v.value)).toEqual(['My first collection', 'Some more info']);
         });
 
         it('should return information about the other entry for reference', () => {

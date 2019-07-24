@@ -30,10 +30,7 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
         .forEach(predicateUri => {
             const propertyShape = propertyShapes
                 .find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
-
-            if (!propertyShape) {
-                return;
-            }
+            const propertyExpectsRdfList = propertyShape && isRdfList(propertyShape);
 
             // Ensure that we have a list of values for the predicate
             if (!Array.isArray(metadata[predicateUri])) {
@@ -42,7 +39,7 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
             }
 
             let values;
-            if (isRdfList(propertyShape)) {
+            if (propertyExpectsRdfList) {
                 // RDF lists in JSON LD are arrays in a container with key '@list'
                 // We want to use just the arrays. If there are multiple lists
                 // they are concatenated
