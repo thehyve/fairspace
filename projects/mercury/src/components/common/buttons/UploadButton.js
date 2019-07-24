@@ -26,7 +26,7 @@ class UploadButton extends React.Component {
     openDialog = (e) => {
         e.stopPropagation();
         this.setState({uploading: true, filesUploaded: false});
-    }
+    };
 
     closeDialog = (e) => {
         if (e) e.stopPropagation();
@@ -38,7 +38,7 @@ class UploadButton extends React.Component {
             uploading: false,
             files: {}
         });
-    }
+    };
 
     uploadFiles = (files, names) => {
         if (this.props.onUpload) {
@@ -46,7 +46,7 @@ class UploadButton extends React.Component {
             this.props.onUpload(files, names)
                 .then(() => this.setFilesState(files, 'uploaded'));
         }
-    }
+    };
 
     setFilesState(files, fileState) {
         this.setState(prevState => {
@@ -55,7 +55,7 @@ class UploadButton extends React.Component {
             files.forEach((file) => {filesMap[file.name] = fileState;});
             return {files: filesMap, filesUploaded: true};
         });
-    }
+    };
 
     renderDropzoneContent() {
         const {filesUploaded, files} = this.state;
@@ -90,15 +90,15 @@ class UploadButton extends React.Component {
                     </Grid>
                 </Grid>
             ));
-    }
+    };
 
     render() {
-        const {children, classes} = this.props;
+        const {children, disabled, classes} = this.props;
         const {uploading} = this.state;
 
         return (
             <>
-                <span onClick={this.openDialog}>
+                <span onClick={e => !disabled && this.openDialog(e)}>
                     {children}
                 </span>
 
