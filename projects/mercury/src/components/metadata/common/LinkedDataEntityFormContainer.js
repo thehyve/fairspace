@@ -8,9 +8,9 @@ import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../useFormSubmission";
 
-const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEditable = true, ...otherProps}) => {
+const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, ...otherProps}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
-    const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject, defaultType);
+    const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject);
 
     const {
         addValue, updateValue, deleteValue, clearForm,
@@ -20,7 +20,7 @@ const LinkedDataEntityFormContainer = ({subject, defaultType = null, isEntityEdi
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => submitLinkedDataChanges(subject, updates, defaultType)
+        () => submitLinkedDataChanges(subject, updates)
             .then(() => clearForm()),
         subject
     );

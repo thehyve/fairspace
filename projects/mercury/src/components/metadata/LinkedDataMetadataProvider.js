@@ -29,7 +29,7 @@ const LinkedDataMetadataProvider = ({
     }
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
-    const submitLinkedDataChanges = (subject, values, defaultType) => dispatchSubmitMetadataChanges(subject, values, vocabulary, defaultType)
+    const submitLinkedDataChanges = (subject, values) => dispatchSubmitMetadataChanges(subject, values, vocabulary)
         .then(() => fetchMetadataBySubject(subject));
 
     const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)

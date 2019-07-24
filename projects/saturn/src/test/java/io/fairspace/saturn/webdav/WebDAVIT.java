@@ -6,23 +6,19 @@ import com.mockrunner.mock.web.MockHttpServletResponse;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.vfs.managed.MemoryBlobStore;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
-import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletException;
@@ -118,7 +114,7 @@ public class WebDAVIT {
         milton.service(req, res);
         assertEquals(207, res.getStatus());
         assertTrue(res.getOutputStreamContent().contains("xmlns:ns1=\"" + FS.NS +"\""));
-        assertTrue(res.getOutputStreamContent().contains("<d:prop><ns1:iri>" + fs.stat("coll1").getIri() + "</ns1:iri>"));
+        assertTrue(res.getOutputStreamContent().contains("<d:prop><ns1:iri>" + fs.iri("coll1") + "</ns1:iri>"));
     }
 
     @Test

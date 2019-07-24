@@ -114,22 +114,15 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
  * Extracts the metadata that describes the given subject from the given metadata
  * @param expandedMetadata
  * @param subject
- * @param defaultType
  * @returns {*|{}}
  */
-export const getJsonLdForSubject = (expandedMetadata, subject, defaultType) => {
+export const getJsonLdForSubject = (expandedMetadata, subject) => {
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
         console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
         return {};
     }
 
-    const metadataItem = expandedMetadata.find(item => item['@id'] === subject) || {};
-
-    if (!metadataItem['@type'] && defaultType) {
-        metadataItem['@type'] = [defaultType];
-    }
-
-    return metadataItem;
+    return expandedMetadata.find(item => item['@id'] === subject) || {};
 };
 
 /**

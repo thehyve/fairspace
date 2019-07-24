@@ -9,9 +9,8 @@ import {fromJsonLd, getJsonLdForSubject} from "../../utils/linkeddata/jsonLdConv
  * The contextual logic is being provided by {@link LinkedDataContext}
  *
  * @param {string} subject
- * @param {string} defaultType
  */
-export const useLinkedData = (subject, defaultType, context = {}) => {
+export const useLinkedData = (subject, context = {}) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
@@ -42,7 +41,7 @@ export const useLinkedData = (subject, defaultType, context = {}) => {
     let typeInfo = {};
 
     if (linkedData) {
-        const linkedDataItem = getJsonLdForSubject(linkedData, subject, defaultType);
+        const linkedDataItem = getJsonLdForSubject(linkedData, subject);
         typeInfo = getTypeInfoForLinkedData(linkedDataItem);
 
         if (!Array.isArray(linkedDataItem['@type'])) {
@@ -73,4 +72,4 @@ export const useLinkedData = (subject, defaultType, context = {}) => {
 };
 
 // Export a custom hook attached to the context by default
-export default (subject, defaultType) => useLinkedData(subject, defaultType, useContext(LinkedDataContext));
+export default (subject) => useLinkedData(subject, useContext(LinkedDataContext));
