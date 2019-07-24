@@ -3,12 +3,12 @@ package io.fairspace.saturn.vfs.irods;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.vfs.FileInfo;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdfconnection.Isolation;
+import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.irods.jargon.core.exception.JargonException;
-import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
-import org.irods.jargon.core.pub.DataTransferOperations;
-import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
-import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.*;
 import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
+import static io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem.FAIRSPACE_URI_ATTRIBUTE;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -52,12 +53,16 @@ public class IRODSVirtualFileSystemTest {
     @Mock
     private DataTransferOperations dto;
 
+    @Mock
+    private DataObjectAO doao;
+
     private final ObjStat stat1 = new ObjStat();
 
     private final ObjStat stat2 = new ObjStat();
 
     private IRODSVirtualFileSystem vfs;
 
+    private final RDFConnection rdf = new RDFConnectionLocal(DatasetFactory.createTxnMem(), Isolation.COPY);
 
 
     @Before
@@ -93,7 +98,9 @@ public class IRODSVirtualFileSystemTest {
 
         when(aof.getDataTransferOperations(any())).thenReturn(dto);
 
-        vfs = new IRODSVirtualFileSystem(collections, fs);
+        when(aof.getDataObjectAO(any())).thenReturn(doao);
+
+        vfs = new IRODSVirtualFileSystem(collections, fs, rdf);
     }
 
     @Test
@@ -133,8 +140,11 @@ public class IRODSVirtualFileSystemTest {
 
 
     @Test
-    public void testIriGeneration() throws IOException {
-        assertEquals("irods://host.com#" + stat1.getDataId(), vfs.stat("rods/path").getIri());
+    public void testIriGeneration() throws IOException, JargonException {
+        var iri = vfs.iri("rods/path");
+        assertNotNull(iri);
+        verify(doao).findMetadataValuesForDataObject("/zone/home/path");
+        verify(doao).addAVUMetadata(eq("/zone/home/path"), argThat(avu -> avu.getAttribute().equals(FAIRSPACE_URI_ATTRIBUTE)));
     }
 
     @Test

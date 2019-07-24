@@ -11,7 +11,6 @@ import java.util.Map;
 @Getter
 @Builder
 public class FileInfo implements Comparable<FileInfo> {
-    private String iri;
     private String path;
     private boolean isDirectory;
     private long size;

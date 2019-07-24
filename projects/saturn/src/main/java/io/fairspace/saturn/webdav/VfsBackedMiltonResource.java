@@ -136,7 +136,13 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public Object getProperty(QName name) {
-        if (name.equals(IRI_PROPERTY)) return info.getIri();
+        if (name.equals(IRI_PROPERTY)) {
+            try {
+                return fs.iri(info.getPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         if (name.equals(ISREADONLY_PROPERTY)) return info.isReadOnly();
 
         return propertySource.getProperty(name);

@@ -18,6 +18,13 @@ public class FS {
     public static final String FILE_URI = NS + "File";
     public static final Resource File = createResource(FILE_URI);
 
+    public static final String EXTERNAL_DIRECTORY_URI = NS + "ExternalDirectory";
+    public static final Resource ExternalDirectory = createResource(EXTERNAL_DIRECTORY_URI);
+
+    public static final String EXTERNAL_FILE_URI = NS + "ExternalFile";
+    public static final Resource ExternalFile = createResource(EXTERNAL_FILE_URI);
+
+
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 

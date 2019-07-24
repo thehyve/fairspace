@@ -6,17 +6,21 @@ import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
 import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
+import org.irods.jargon.core.query.MetaDataAndDomainData;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,41 +30,45 @@ import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
+import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
 
 public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
-
+    public static final String FAIRSPACE_URI_ATTRIBUTE = "FairspaceURI";
     private final IRODSFileSystem fs;
+    private final RDFConnection rdf;
 
-    public IRODSVirtualFileSystem(CollectionsService collections) throws JargonException {
-        this(collections, IRODSFileSystem.instance());
+    public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) throws JargonException {
+        this(collections, IRODSFileSystem.instance(), rdf);
     }
 
-    IRODSVirtualFileSystem(CollectionsService collections, IRODSFileSystem fs) {
+    IRODSVirtualFileSystem(CollectionsService collections, IRODSFileSystem fs, RDFConnection rdf) {
         super(collections);
 
         this.fs = fs;
+        this.rdf = rdf;
     }
 
     @Override
     protected FileInfo statRegularFile(String path) throws IOException {
         try {
-            var collection = collectionByPath(path);
-            var account = accountForCollection(collection);
             var f = getFile(path);
             if (!f.exists()) {
                 return null;
             }
 
+            var collection = collectionByPath(path);
+            var account = accountForCollection(collection);
             var stat = getAccessObject(account).retrieveObjectStatForPath(f.getAbsolutePath());
 
             return FileInfo.builder()
-                    .iri(getIri(account, stat))
                     .path(path)
                     .isDirectory(stat.isSomeTypeOfCollection())
                     .readOnly(!collection.canWrite() || !f.canWrite())
@@ -72,6 +80,57 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
         } catch (JargonException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    protected String fileIri(String path) throws IOException {
+        try {
+            var f = getFile(path);
+            if (!f.exists()) {
+                return null;
+            }
+            var account = getAccount(path);
+            var irodsPath = getIrodsPath(path);
+            if (f.isDirectory()) {
+                var cao = fs.getIRODSAccessObjectFactory().getCollectionAO(account);
+                var meta = cao.findMetadataValuesForCollection(irodsPath);
+                var existing = getFairspaceIRI(meta);
+                if (existing.isPresent()) {
+                    return existing.get();
+                } else {
+                    var avu = createIri(FS.ExternalDirectory);
+                    cao.addAVUMetadata(irodsPath, avu);
+                    return avu.getValue();
+                }
+            } else {
+                var doao = fs.getIRODSAccessObjectFactory().getDataObjectAO(account);
+                var meta = doao.findMetadataValuesForDataObject(irodsPath);
+                var existing = getFairspaceIRI(meta);
+                if (existing.isPresent()) {
+                    return existing.get();
+                } else {
+                    var avu = createIri(FS.ExternalFile);
+                    doao.addAVUMetadata(irodsPath, avu);
+                    return avu.getValue();
+                }
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    private Optional<String> getFairspaceIRI(List<MetaDataAndDomainData> meta) {
+        return meta.stream()
+                .filter(m -> FAIRSPACE_URI_ATTRIBUTE.equals(m.getAvuAttribute()))
+                .findFirst()
+                .map(MetaDataAndDomainData::getAvuValue);
+    }
+
+    private AvuData createIri(Resource type) {
+        var iri = generateMetadataIri();
+        withCommitMessage("Generate an IRI for an external resource", () ->
+                rdf.update(storedQuery("register_external_resource", iri, type)));
+        return new AvuData(FAIRSPACE_URI_ATTRIBUTE, iri.getURI(), "");
     }
 
     @Override
@@ -88,7 +147,6 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
             for (var child : f.listFiles()) {
                 var stat = cao.retrieveObjectStatForPath(child.getAbsolutePath());
                 result.add(FileInfo.builder()
-                        .iri(getIri(account, stat))
                         .path(parentPath + "/" + child.getName())
                         .isDirectory(stat.isSomeTypeOfCollection())
                         .readOnly(!collection.canWrite() || !child.canWrite())
@@ -224,10 +282,6 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private IRODSFileFactory getIrodsFileFactory(IRODSAccount account) throws JargonException {
         return fs.getIRODSAccessObjectFactory().getIRODSFileFactory(account);
-    }
-
-    private static String getIri(IRODSAccount account, ObjStat stat) {
-        return "irods://" + account.getHost() + "#" + stat.getDataId();
     }
 
     private static IRODSAccount accountForCollection(Collection collection) throws IOException {

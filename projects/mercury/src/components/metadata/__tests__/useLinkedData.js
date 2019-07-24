@@ -6,11 +6,11 @@ import {
 } from "../../../constants";
 import {vocabularyUtils} from "../../../utils/linkeddata/vocabularyUtils";
 
-const testUseLinkedData = (subject, defaultType, context) => {
+const testUseLinkedData = (subject, context) => {
     let linkedData;
 
     testHook(() => {
-        linkedData = useLinkedData(subject, defaultType, context);
+        linkedData = useLinkedData(subject, context);
     });
 
     return linkedData;
@@ -19,6 +19,7 @@ const testUseLinkedData = (subject, defaultType, context) => {
 describe('useLinkedData', () => {
     const defaultJsonLd = [{
         '@id': 'http://subject',
+        '@type': ['http://type'],
         'http://prop1': [{'@value': 'v'}]
     }];
 
@@ -28,7 +29,7 @@ describe('useLinkedData', () => {
         };
 
         act(() => {
-            testUseLinkedData('my-subject', 'http://type', context);
+            testUseLinkedData('my-subject', context);
         });
 
         expect(context.fetchLinkedDataForSubject.mock.calls.length).toEqual(1);
@@ -37,7 +38,7 @@ describe('useLinkedData', () => {
     it('should handle missing linkedData', () => {
         let linkedData;
         act(() => {
-            linkedData = testUseLinkedData('my-subject', 'http://type');
+            linkedData = testUseLinkedData('my-subject');
         });
 
         expect(linkedData.properties).toEqual([]);
@@ -50,7 +51,7 @@ describe('useLinkedData', () => {
             let linkedData;
 
             act(() => {
-                linkedData = testUseLinkedData('my-subject', 'http://type');
+                linkedData = testUseLinkedData('my-subject');
             });
 
             expect(linkedData.linkedDataLoading).toBe(false);
@@ -61,7 +62,7 @@ describe('useLinkedData', () => {
             let linkedData;
 
             act(() => {
-                linkedData = testUseLinkedData('my-subject', 'http://type', context);
+                linkedData = testUseLinkedData('my-subject', context);
             });
 
             expect(linkedData.linkedDataLoading).toBe(true);
@@ -72,7 +73,7 @@ describe('useLinkedData', () => {
             let linkedData;
 
             act(() => {
-                linkedData = testUseLinkedData('my-subject', 'http://type', context);
+                linkedData = testUseLinkedData('my-subject', context);
             });
 
             expect(linkedData.linkedDataLoading).toBe(true);
@@ -84,7 +85,7 @@ describe('useLinkedData', () => {
             let linkedData;
 
             act(() => {
-                linkedData = testUseLinkedData('my-subject', 'http://type');
+                linkedData = testUseLinkedData('my-subject');
             });
 
             expect(linkedData.linkedDataError).toBeTruthy();
@@ -95,7 +96,7 @@ describe('useLinkedData', () => {
             let linkedData;
 
             act(() => {
-                linkedData = testUseLinkedData('my-subject', 'http://type', context);
+                linkedData = testUseLinkedData('my-subject', context);
             });
 
             expect(linkedData.linkedDataError).toBeTruthy();
@@ -106,7 +107,7 @@ describe('useLinkedData', () => {
             let linkedData;
 
             act(() => {
-                linkedData = testUseLinkedData('my-subject', 'http://type', context);
+                linkedData = testUseLinkedData('my-subject', context);
             });
 
             expect(linkedData.linkedDataError).toBeTruthy();
@@ -126,7 +127,7 @@ describe('useLinkedData', () => {
 
         let linkedData;
         act(() => {
-            linkedData = testUseLinkedData('http://subject', 'http://type', context);
+            linkedData = testUseLinkedData('http://subject', context);
         });
 
         expect(linkedData.values['http://prop1'][0].value).toEqual('v');
@@ -161,7 +162,7 @@ describe('useLinkedData', () => {
 
         let linkedData;
         act(() => {
-            linkedData = testUseLinkedData('http://subject', 'http://type', context);
+            linkedData = testUseLinkedData('http://subject', context);
         });
 
         // Expect the label and comment to be returned, along with the type
@@ -180,7 +181,7 @@ describe('useLinkedData', () => {
 
         let linkedData;
         act(() => {
-            linkedData = testUseLinkedData('http://subject', 'http://type', context);
+            linkedData = testUseLinkedData('http://subject', context);
         });
 
         expect(linkedData.typeInfo).toEqual('type-info');
