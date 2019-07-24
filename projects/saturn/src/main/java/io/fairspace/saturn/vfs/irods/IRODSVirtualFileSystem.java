@@ -20,6 +20,7 @@ import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
 import org.irods.jargon.core.pub.io.IRODSFileInputStream;
 import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
+import org.irods.jargon.core.query.JargonQueryException;
 import org.irods.jargon.core.query.MetaDataAndDomainData;
 
 import java.io.IOException;
@@ -41,15 +42,15 @@ import static org.apache.commons.io.IOUtils.copyLarge;
 
 public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
-    public static final String FAIRSPACE_URI_ATTRIBUTE = "FairspaceURI";
+    public static final String FAIRSPACE_IRI_ATTRIBUTE = "FairspaceIRI";
     private final IRODSFileSystem fs;
     private final RDFConnection rdf;
 
-    public IRODSVirtualFileSystem(CollectionsService collections, RDFConnection rdf) throws JargonException {
-        this(collections, IRODSFileSystem.instance(), rdf);
+    public IRODSVirtualFileSystem(RDFConnection rdf, CollectionsService collections) throws JargonException {
+        this(rdf, collections, IRODSFileSystem.instance());
     }
 
-    IRODSVirtualFileSystem(CollectionsService collections, IRODSFileSystem fs, RDFConnection rdf) {
+    IRODSVirtualFileSystem(RDFConnection rdf, CollectionsService collections, IRODSFileSystem fs) {
         super(collections);
 
         this.fs = fs;
@@ -83,45 +84,57 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected String fileIri(String path) throws IOException {
+    protected String fileOrDirectoryIri(String path) throws IOException {
         try {
             var f = getFile(path);
             if (!f.exists()) {
                 return null;
             }
-            var account = getAccount(path);
-            var irodsPath = getIrodsPath(path);
+
             if (f.isDirectory()) {
-                var cao = fs.getIRODSAccessObjectFactory().getCollectionAO(account);
-                var meta = cao.findMetadataValuesForCollection(irodsPath);
-                var existing = getFairspaceIRI(meta);
-                if (existing.isPresent()) {
-                    return existing.get();
-                } else {
-                    var avu = createIri(FS.ExternalDirectory);
-                    cao.addAVUMetadata(irodsPath, avu);
-                    return avu.getValue();
-                }
+                return directoryIri(path);
             } else {
-                var doao = fs.getIRODSAccessObjectFactory().getDataObjectAO(account);
-                var meta = doao.findMetadataValuesForDataObject(irodsPath);
-                var existing = getFairspaceIRI(meta);
-                if (existing.isPresent()) {
-                    return existing.get();
-                } else {
-                    var avu = createIri(FS.ExternalFile);
-                    doao.addAVUMetadata(irodsPath, avu);
-                    return avu.getValue();
-                }
+                return fileIri(path);
             }
+        } catch (IOException e) {
+            throw e;
         } catch (Exception e) {
             throw new IOException(e);
         }
     }
 
+    private String directoryIri(String path) throws IOException, JargonException, JargonQueryException {
+        var irodsPath = getIrodsPath(path);
+        var collectionAO = fs.getIRODSAccessObjectFactory().getCollectionAO(getAccount(path));
+        var meta = collectionAO.findMetadataValuesForCollection(irodsPath);
+        var existing = getFairspaceIRI(meta);
+        if (existing.isPresent()) {
+            return existing.get();
+        } else {
+            var avu = createIri(FS.ExternalDirectory);
+            collectionAO.addAVUMetadata(irodsPath, avu);
+            return avu.getValue();
+        }
+    }
+
+    private String fileIri(String path) throws IOException, JargonException {
+        var account = getAccount(path);
+        var irodsPath = getIrodsPath(path);
+        var dataObjectAO = fs.getIRODSAccessObjectFactory().getDataObjectAO(account);
+        var meta = dataObjectAO.findMetadataValuesForDataObject(irodsPath);
+        var existing = getFairspaceIRI(meta);
+        if (existing.isPresent()) {
+            return existing.get();
+        } else {
+            var avu = createIri(FS.ExternalFile);
+            dataObjectAO.addAVUMetadata(irodsPath, avu);
+            return avu.getValue();
+        }
+    }
+
     private Optional<String> getFairspaceIRI(List<MetaDataAndDomainData> meta) {
         return meta.stream()
-                .filter(m -> FAIRSPACE_URI_ATTRIBUTE.equals(m.getAvuAttribute()))
+                .filter(m -> FAIRSPACE_IRI_ATTRIBUTE.equals(m.getAvuAttribute()))
                 .findFirst()
                 .map(MetaDataAndDomainData::getAvuValue);
     }
@@ -130,7 +143,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
         var iri = generateMetadataIri();
         withCommitMessage("Generate an IRI for an external resource", () ->
                 rdf.update(storedQuery("register_external_resource", iri, type)));
-        return new AvuData(FAIRSPACE_URI_ATTRIBUTE, iri.getURI(), "");
+        return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }
 
     @Override

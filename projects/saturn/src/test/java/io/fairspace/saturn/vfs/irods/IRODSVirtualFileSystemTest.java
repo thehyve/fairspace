@@ -12,6 +12,7 @@ import org.irods.jargon.core.pub.*;
 import org.irods.jargon.core.pub.domain.ObjStat;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.pub.io.IRODSFileFactory;
+import org.irods.jargon.core.query.MetaDataAndDomainData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,9 +22,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
-import static io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem.FAIRSPACE_URI_ATTRIBUTE;
+import static io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem.FAIRSPACE_IRI_ATTRIBUTE;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -55,6 +57,9 @@ public class IRODSVirtualFileSystemTest {
 
     @Mock
     private DataObjectAO doao;
+
+    @Mock
+    private MetaDataAndDomainData meta;
 
     private final ObjStat stat1 = new ObjStat();
 
@@ -100,7 +105,7 @@ public class IRODSVirtualFileSystemTest {
 
         when(aof.getDataObjectAO(any())).thenReturn(doao);
 
-        vfs = new IRODSVirtualFileSystem(collections, fs, rdf);
+        vfs = new IRODSVirtualFileSystem(rdf, collections, fs);
     }
 
     @Test
@@ -144,7 +149,20 @@ public class IRODSVirtualFileSystemTest {
         var iri = vfs.iri("rods/path");
         assertNotNull(iri);
         verify(doao).findMetadataValuesForDataObject("/zone/home/path");
-        verify(doao).addAVUMetadata(eq("/zone/home/path"), argThat(avu -> avu.getAttribute().equals(FAIRSPACE_URI_ATTRIBUTE)));
+        verify(doao).addAVUMetadata(eq("/zone/home/path"), argThat(avu -> avu.getAttribute().equals(FAIRSPACE_IRI_ATTRIBUTE)));
+    }
+
+    @Test
+    public void testIriRetrieval() throws IOException, JargonException {
+        when(doao.findMetadataValuesForDataObject(eq("/zone/home/path")))
+                .thenReturn(List.of(meta));
+
+        when(meta.getAvuAttribute()).thenReturn(FAIRSPACE_IRI_ATTRIBUTE);
+        when(meta.getAvuValue()).thenReturn("http://example.com/123");
+
+        assertEquals("http://example.com/123", vfs.iri("rods/path"));
+        verify(doao).findMetadataValuesForDataObject("/zone/home/path");
+        verifyNoMoreInteractions(doao);
     }
 
     @Test

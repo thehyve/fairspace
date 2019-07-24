@@ -54,10 +54,10 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
             }
             return collection.getIri().getURI();
         }
-        return fileIri(path);
+        return fileOrDirectoryIri(path);
     }
 
-    protected abstract String fileIri(String path) throws IOException;
+    protected abstract String fileOrDirectoryIri(String path) throws IOException;
 
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {
