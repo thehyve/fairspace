@@ -29,7 +29,7 @@ data:
           indexName: "fairspace"
     workspace:
       name: {{ .Release.Name }}
-      version: {{ RELEASEVERSION }}
+      version: RELEASEVERSION
     auth:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
