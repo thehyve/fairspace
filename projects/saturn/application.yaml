@@ -1,11 +1,11 @@
 # Application's port
-# Base IRI for all vocabulary entities
-vocabularyBaseIRI: "http://localhost/vocabulary/"
 port: 8080
 publicUrl: "http://localhost:3000"
 jena:
   # Base IRI for all metadata entities
   metadataBaseIRI: "http://localhost/iri/"
+  # Base IRI for all vocabulary entities
+  vocabularyBaseIRI: "http://localhost/vocabulary/"
   # Jena's TDB2 database path
   datasetPath: "data/db"
   # Path of the transaction log
