@@ -45,12 +45,14 @@ public class UserServiceTest {
         setFirstName("John");
         setLastName("Smith");
         setEmail("john@example.com");
+        setEnabled(true);
     }};
     private final KeycloakUser alteredKeycloakUser = new KeycloakUser() {{
         setId(keycloakUser.getId());
         setFirstName(keycloakUser.getFirstName());
         setLastName(keycloakUser.getLastName());
         setEmail("smith@example.com");
+        setEnabled(true);
     }};
 
     private volatile List<KeycloakUser> keycloakUsers = List.of(keycloakUser);

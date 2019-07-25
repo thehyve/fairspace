@@ -17,13 +17,6 @@ data:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
 
-    keycloak:
-      workspace-login-group: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
-
-    workspace:
-      name: {{ .Release.Name }}
-      version: {{ .Values.pluto.workspace.version }}
-
     security:
       oidc:
         redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "workspace.url" .) }}

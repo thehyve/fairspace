@@ -15,7 +15,7 @@ public class UserApp extends BaseApp {
 
     @Override
     protected void initApp() {
-        get("/", (req, res) -> {
+        get("/", APPLICATION_JSON.asString(), (req, res) -> {
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(service.getUsers());
         });

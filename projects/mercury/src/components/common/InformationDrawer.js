@@ -13,12 +13,10 @@ import * as metadataActions from "../../actions/metadataActions";
 import * as collectionActions from '../../actions/collectionActions';
 import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../../utils/fileUtils";
-import {findById} from "../../utils/genericUtils";
-import {getLocalPart} from "../../utils/linkeddata/metadataUtils";
 import UsersContext from "../permissions/UsersContext";
 import getDisplayName from "../../utils/userUtils";
 
-const getUserObject = (users, iri) => findById(users, getLocalPart(iri));
+const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = (collection, locationChanged) => {

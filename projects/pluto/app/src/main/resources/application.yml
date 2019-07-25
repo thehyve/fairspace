@@ -63,17 +63,6 @@ security:
     needsAuthorization:
     - /*
 
-workspace:
-  name: Workspace
-  version: 0.0.0
-
-keycloak:
-  workspace-login-group: workspace-users
-  groupUri: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/?max=1&search=${keycloak.workspace-login-group}
-
-  # The URI pattern has 2 parameters: the groupId and a query string
-  usersUriPattern: ${app.oauth2.base-url}/auth/admin/realms/${app.oauth2.realm}/groups/%s/members?%s
-
 zuul:
   retryable: false
   routes:
@@ -101,7 +90,6 @@ zuul:
   ignored-patterns:
   - /actuator/**
   - /api/${app.apiVersion.pluto}/account/**
-  - /api/${app.apiVersion.pluto}/workspace/**
   - /login
   - /logout
   - /authorize

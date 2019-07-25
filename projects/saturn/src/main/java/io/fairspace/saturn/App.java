@@ -15,6 +15,7 @@ import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserApp;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspace.WorkspaceApp;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
@@ -108,6 +109,7 @@ public class App {
                         new CollectionsApp("/collections", collections),
                         new PermissionsApp("/permissions", permissions),
                         new UserApp("/users", userService),
+                        new WorkspaceApp("/workspace", CONFIG.workspace),
                         new HealthApp("/health")))
                 .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
                 .port(CONFIG.port)

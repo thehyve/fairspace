@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import spark.*;
 import spark.servlet.SparkApplication;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
@@ -22,7 +23,8 @@ public abstract class BaseApp implements SparkApplication {
     protected static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new IRIModule())
             .registerModule(new JavaTimeModule())
-            .configure(WRITE_DATES_AS_TIMESTAMPS, false);
+            .configure(WRITE_DATES_AS_TIMESTAMPS, false)
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final String basePath;
 

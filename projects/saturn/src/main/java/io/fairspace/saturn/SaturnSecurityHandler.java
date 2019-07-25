@@ -23,6 +23,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
 
     private final Function<HttpServletRequest, UserInfo> authenticator;
     private final String healthResource;
+    private final String workspaceResource;
     private final String sparqlResource;
     private final String vocabularyResource;
     private final String workspaceUserRole;
@@ -39,6 +40,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
         this.authenticator = authenticator;
         this.onAuthorized = onAuthorized;
         this.healthResource = apiPrefix + "/health/";
+        this.workspaceResource = apiPrefix + "/workspace/";
         this.sparqlResource = apiPrefix + "/rdf/";
         this.vocabularyResource = apiPrefix + "/vocabulary/";
         this.workspaceUserRole = config.workspaceUserRole;
@@ -63,7 +65,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
     }
 
     private String authorize(String pathInContext, HttpServletRequest request) {
-        if (healthResource.equals(pathInContext)) {
+        if (healthResource.equals(pathInContext) || workspaceResource.equals(pathInContext)) {
             return null;
         }
 

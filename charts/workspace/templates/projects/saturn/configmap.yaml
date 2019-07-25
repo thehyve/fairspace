@@ -27,8 +27,9 @@ data:
           shards: 1
           replicas: 1
           indexName: "fairspace"
-    users:
-      endpoint: https://{{ template "pluto.hostname" . }}/api/v1/workspace/users
+    workspace:
+      name: {{ .Release.Name }}
+      version: {{ .Values.workspace.version }}
     auth:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
@@ -38,8 +39,7 @@ data:
       sparqlRole: "{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparql-%s" (include "workspace.name" .)) }}"
       workspaceLoginGroup: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
       groupsUrl: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}/groups/?max=1&search={{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}"
-      sparqlRole: "sparql"
-      usersUrlTemplate: "http://localhost:3000/api/v1/workspace/users"
+      usersUrlTemplate: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}/groups/%s/members?%s"
       userListSynchronizationInterval: 60
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"

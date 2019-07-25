@@ -1,9 +1,7 @@
 package nl.fairspace.pluto.app.web;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.app.config.dto.WorkspaceDetails;
 import nl.fairspace.pluto.app.model.UserInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +18,7 @@ import java.util.Map;
 
 import static nl.fairspace.pluto.app.config.Urls.EXCHANGE_TOKENS_PATH;
 import static nl.fairspace.pluto.app.config.Urls.USERINFO_PATH;
-import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_DETAILS_PATH;
-import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_USERS_PATH;
+import static nl.fairspace.pluto.app.config.Urls.KEYCLOAK_USERS_PATH;
 
 /**
  * REST controller for managing the current user's account.
@@ -30,9 +27,6 @@ import static nl.fairspace.pluto.app.config.Urls.WORKSPACE_USERS_PATH;
 @Profile("noAuth")
 @Slf4j
 public class NoAuthResource {
-
-    @Autowired
-    WorkspaceDetails workspaceDetails;
 
     /**
      * GET  /name : returns the name of the user currently logged in
@@ -66,7 +60,7 @@ public class NoAuthResource {
      * @return a list with information on all users in the system.
      * @see <https://www.keycloak.org/docs-api/3.4/rest-api/index.html#_users_resource>
      */
-    @GetMapping(value = WORKSPACE_USERS_PATH, produces = "application/json")
+    @GetMapping(value = KEYCLOAK_USERS_PATH, produces = "application/json")
     public ResponseEntity<String> getUsers(HttpServletRequest incomingRequest) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -80,16 +74,6 @@ public class NoAuthResource {
                         "{\"id\":\"0d68d4d2-9cb9-4e7c-a06b-16d36a0527ef\",\"createdTimestamp\":1543394857172,\"username\":\"user2-ws\",\"enabled\":true,\"emailVerified\":false,\"firstName\":\"Ygritte\",\"lastName\":\"\",\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}," +
                         "{\"id\":\"1e861c7f-b968-4476-991f-78ce537abc55\",\"createdTimestamp\":1543394861173,\"username\":\"user3-ws\",\"enabled\":true,\"emailVerified\":false,\"firstName\":\"Daenarys\",\"lastName\":\"Targaryen\",\"access\":{\"manageGroupMembership\":true,\"view\":true,\"mapRoles\":true,\"impersonate\":true,\"manage\":true}}" +
                         "]");
-    }
-
-    /**
-     * GET  /details: returns a map with workspace details (name, version)
-     *
-     * @return a map with workspace details
-     */
-    @GetMapping(value = WORKSPACE_DETAILS_PATH, produces = "application/json")
-    public WorkspaceDetails getDetails() {
-        return workspaceDetails;
     }
 
     /**

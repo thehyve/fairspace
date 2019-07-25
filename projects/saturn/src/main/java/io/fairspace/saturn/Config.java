@@ -25,6 +25,8 @@ public class Config {
 
     public final Properties mail = new Properties();
 
+    public final Workspace workspace = new Workspace();
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
         public String vocabularyBaseIRI = "http://localhost/vocabulary/";
@@ -74,6 +76,11 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
+    }
+
+    public static class Workspace {
+        public String name = "Workspace";
+        public String version = "1.0.0";
     }
 
     @Override

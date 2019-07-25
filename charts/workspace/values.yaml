@@ -68,7 +68,6 @@ workspace:
     datasteward:
       username:
       password: fairspace123
-
     keycloak:
       # Roles defining the keycloak roles for this workspace
       roles:
@@ -98,6 +97,11 @@ workspace:
         enabled: true
         restport: 9200
         transportport: 9300
+    # Reference to the workspace for informational purposes
+    # These values default to the release name and chart version
+    # The name is also used in the default setting for clientId
+    name:
+    version: 0.0.0-RELEASEVERSION
 
 # Generic settings for tracing
 tracing:
@@ -145,13 +149,6 @@ pluto:
     successThreshold: 1
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
-
-  # Reference to the workspace for informational purposes
-  # These values default to the release name and chart version
-  # The name is also used in the default setting for clientId
-  workspace:
-    name:
-    version: 0.0.0-RELEASEVERSION
 
   # Keycloak configuration for authentication
   keycloak:
