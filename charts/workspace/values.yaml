@@ -97,11 +97,6 @@ workspace:
         enabled: true
         restport: 9200
         transportport: 9300
-    # Reference to the workspace for informational purposes
-    # These values default to the release name and chart version
-    # The name is also used in the default setting for clientId
-    name:
-    version: 0.0.0-RELEASEVERSION
 
 # Generic settings for tracing
 tracing:
