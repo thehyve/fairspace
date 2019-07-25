@@ -98,7 +98,7 @@ public class UserService {
     }
 
     private List<User> fetchUsers(String authorization) {
-        var groupId = getGroupId();
+        var groupId = getGroupId(authorization);
         if (groupId != null) {
             var url = format(usersUrlTemplate, groupId);
             try {
@@ -139,7 +139,7 @@ public class UserService {
         return generateMetadataIri(userId);
     }
 
-    private String getGroupId() {
+    private String getGroupId(String authorization) {
         // Retrieve the groupId, if it has not been retrieved before
         // As it will never change, we will cache it forever
         if (groupId == null) {
@@ -150,6 +150,9 @@ public class UserService {
                     httpClient.start();
                 }
                 var request = httpClient.newRequest(groupsEndpoint);
+                if (authorization != null) {
+                    request.header(AUTHORIZATION, authorization);
+                }
                 var response = request.send();
                 if (response.getStatus() == SC_OK) {
                     List<KeycloakGroup> groups = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakGroup>>() {});
