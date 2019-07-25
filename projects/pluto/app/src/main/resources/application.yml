@@ -48,6 +48,7 @@ security:
     - /logout
     - /authorize
     - /api/${app.apiVersion.pluto}/account/tokens
+    - /api/${app.apiVersion.saturn}/workspace/*
     needsAuthentication:
     - /
     - /static/*
@@ -59,7 +60,7 @@ security:
     - /notebooks/*
     - "*.js"
     - /api/${app.apiVersion.pluto}/account/*
-    - /api/${app.apiVersion.pluto}/workspace/*
+    - /api/${app.apiVersion.saturn}/users/*
     needsAuthorization:
     - /*
 
