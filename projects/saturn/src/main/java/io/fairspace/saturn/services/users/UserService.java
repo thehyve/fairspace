@@ -98,36 +98,39 @@ public class UserService {
     }
 
     private List<User> fetchUsers(String authorization) {
-        var url = format(usersUrlTemplate, getGroupId());
-        try {
-            if (!httpClient.isStarted()) {
-                httpClient.start();
+        var groupId = getGroupId();
+        if (groupId != null) {
+            var url = format(usersUrlTemplate, groupId);
+            try {
+                if (!httpClient.isStarted()) {
+                    httpClient.start();
+                }
+                var request = httpClient.newRequest(url);
+                if (authorization != null) {
+                    request.header(AUTHORIZATION, authorization);
+                }
+                var response = request.send();
+                if (response.getStatus() == SC_OK) {
+                    List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {
+                    });
+                    log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
+                    return keycloakUsers
+                            .stream()
+                            .filter(KeycloakUser::isEnabled)
+                            .map(keycloakUser -> {
+                                var user = new User();
+                                user.setIri(getUserIri(keycloakUser.getId()));
+                                user.setName(keycloakUser.getFullName());
+                                user.setEmail(keycloakUser.getEmail());
+                                return user;
+                            })
+                            .collect(toList());
+                } else {
+                    log.error("Error retrieving users from {}: {} {}", url, response.getStatus(), response.getReason());
+                }
+            } catch (Exception e) {
+                log.error("Error retrieving users from {}", url, e);
             }
-            var request = httpClient.newRequest(url);
-            if (authorization != null) {
-                request.header(AUTHORIZATION, authorization);
-            }
-            var response = request.send();
-            if (response.getStatus() == SC_OK) {
-                List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {
-                });
-                log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
-                return keycloakUsers
-                        .stream()
-                        .filter(KeycloakUser::isEnabled)
-                        .map(keycloakUser -> {
-                            var user = new User();
-                            user.setIri(getUserIri(keycloakUser.getId()));
-                            user.setName(keycloakUser.getFullName());
-                            user.setEmail(keycloakUser.getEmail());
-                            return user;
-                        })
-                        .collect(toList());
-            } else {
-                log.error("Error retrieving users from {}: {} {}", url, response.getStatus(), response.getReason());
-            }
-        } catch (Exception e) {
-            log.error("Error retrieving users from {}", url, e);
         }
         return List.of();
     }
@@ -141,7 +144,7 @@ public class UserService {
         // As it will never change, we will cache it forever
         if (groupId == null) {
             try {
-                //   log.info("Retrieve group identifier for keycloak user group at {}", config.getGroupUri());
+                log.info("Retrieve group identifier for keycloak user group at {}", workspaceLoginGroup);
 
                 if (!httpClient.isStarted()) {
                     httpClient.start();
@@ -149,8 +152,7 @@ public class UserService {
                 var request = httpClient.newRequest(groupsEndpoint);
                 var response = request.send();
                 if (response.getStatus() == SC_OK) {
-                    List<KeycloakGroup> groups = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakGroup>>() {
-                    });
+                    List<KeycloakGroup> groups = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakGroup>>() {});
                     // Keycloak may return multiple groups, as there may be groups with similar names to the one
                     // being sought. For example, if we search for 'group-workspace', then it may return 'group-workspace2' as well
                     // For that reason we search the list to find the group with a matching name.
@@ -169,5 +171,4 @@ public class UserService {
 
         return groupId;
     }
-
 }
