@@ -104,15 +104,17 @@ public class UserService {
                 httpClient.start();
             }
             var request = httpClient.newRequest(url);
-            if(authorization != null) {
+            if (authorization != null) {
                 request.header(AUTHORIZATION, authorization);
             }
             var response = request.send();
             if (response.getStatus() == SC_OK) {
-                List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {});
+                List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {
+                });
                 log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
                 return keycloakUsers
                         .stream()
+                        .filter(KeycloakUser::isEnabled)
                         .map(keycloakUser -> {
                             var user = new User();
                             user.setIri(getUserIri(keycloakUser.getId()));
@@ -137,17 +139,18 @@ public class UserService {
     private String getGroupId() {
         // Retrieve the groupId, if it has not been retrieved before
         // As it will never change, we will cache it forever
-        if(groupId == null) {
+        if (groupId == null) {
             try {
-         //   log.info("Retrieve group identifier for keycloak user group at {}", config.getGroupUri());
+                //   log.info("Retrieve group identifier for keycloak user group at {}", config.getGroupUri());
 
-            if (!httpClient.isStarted()) {
-                httpClient.start();
-            }
-            var request = httpClient.newRequest(groupsEndpoint);
+                if (!httpClient.isStarted()) {
+                    httpClient.start();
+                }
+                var request = httpClient.newRequest(groupsEndpoint);
                 var response = request.send();
                 if (response.getStatus() == SC_OK) {
-                    List<KeycloakGroup> groups = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakGroup>>() {});
+                    List<KeycloakGroup> groups = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakGroup>>() {
+                    });
                     // Keycloak may return multiple groups, as there may be groups with similar names to the one
                     // being sought. For example, if we search for 'group-workspace', then it may return 'group-workspace2' as well
                     // For that reason we search the list to find the group with a matching name.
@@ -156,10 +159,9 @@ public class UserService {
                             .findFirst()
                             .orElseThrow(() -> new IllegalStateException("None of the returned groups from keycloak matches the requested name"))
                             .getId();
-            } else {
-                log.warn("Could not retrieve group identifier from keycloak on url {}: status {}", groupsEndpoint, response.getStatus());
-                throw new IllegalStateException("Could not retrieve group identifier from keycloak");
-            }
+                } else {
+                    log.error("Could not retrieve group identifier from keycloak on url {}: status {}", groupsEndpoint, response.getStatus());
+                }
             } catch (Exception e) {
                 log.error("Error determining group id", e);
             }
