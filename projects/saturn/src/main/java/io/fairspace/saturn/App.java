@@ -13,7 +13,9 @@ import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
+import io.fairspace.saturn.services.users.UserApp;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspace.WorkspaceApp;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
@@ -52,7 +54,7 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(CONFIG.users.endpoint, TimeUnit.SECONDS.toMillis(CONFIG.users.synchronizationInterval), new DAO(rdf, null));
+        var userService = new UserService(CONFIG.auth.groupsUrl, CONFIG.auth.workspaceLoginGroup, CONFIG.auth.usersUrlTemplate, TimeUnit.SECONDS.toMillis(CONFIG.auth.userListSynchronizationInterval), new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
 
         var mailService = new MailService(CONFIG.mail);
@@ -100,13 +102,15 @@ public class App {
         FusekiServer.create()
                 .securityHandler(securityHandler)
                 .add(apiPathPrefix + "/rdf/", ds, false)
-                .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(
-                        new ChangeableMetadataApp(apiPathPrefix + "/metadata", metadataService, CONFIG.jena.metadataBaseIRI),
-                        new ChangeableMetadataApp(apiPathPrefix + "/vocabulary/", userVocabularyService, CONFIG.jena.vocabularyBaseIRI),
-                        new ReadableMetadataApp(apiPathPrefix + "/meta-vocabulary/", metaVocabularyService),
-                        new CollectionsApp(apiPathPrefix, collections),
-                        new PermissionsApp(apiPathPrefix, permissions),
-                        new HealthApp(apiPathPrefix)))
+                .addFilter(apiPathPrefix + "/*", new SaturnSparkFilter(apiPathPrefix,
+                        new ChangeableMetadataApp("/metadata", metadataService, CONFIG.jena.metadataBaseIRI),
+                        new ChangeableMetadataApp("/vocabulary", userVocabularyService, CONFIG.jena.vocabularyBaseIRI),
+                        new ReadableMetadataApp("/meta-vocabulary", metaVocabularyService),
+                        new CollectionsApp("/collections", collections),
+                        new PermissionsApp("/permissions", permissions),
+                        new UserApp("/users", userService),
+                        new WorkspaceApp("/workspace", CONFIG.workspace),
+                        new HealthApp("/health")))
                 .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
                 .port(CONFIG.port)
                 .build()

@@ -17,8 +17,8 @@
     "metaVocabulary": {
       "statements": "/api/v1/meta-vocabulary/"
     },
-    "users": "/api/v1/workspace/users",
-    "workspace": "/api/v1/workspace/details"
+    "users": "/api/v1/users/",
+    "workspace": "/api/v1/workspace/"
   },
   "elasticsearch": {
     "host": "/api/v1/search",

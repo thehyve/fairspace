@@ -13,6 +13,7 @@ class KeycloakUser {
     private String firstName;
     private String lastName;
     private String email;
+    private boolean enabled;
 
     String getFullName() {
         return Stream.of(firstName, lastName)

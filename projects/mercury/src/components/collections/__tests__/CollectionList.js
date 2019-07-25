@@ -9,8 +9,7 @@ describe('CollectionList', () => {
     const collections = [{
         name: 'My Collection',
         creatorObj: {
-            firstName: 'Mariah',
-            lastName: 'Carey'
+            name: 'Mariah Carey'
         },
         dateCreated: dateCreated.toUTCString(),
         iri: 'http://example.com/0'

@@ -25,7 +25,7 @@ public class Config {
 
     public final Properties mail = new Properties();
 
-    public final Users users = new Users();
+    public final Workspace workspace = new Workspace();
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
@@ -64,16 +64,23 @@ public class Config {
         public String dataStewardRole = "datasteward";
 
         public String sparqlRole = "sparql";
+
+        public String groupsUrl = "http://localhost:8080/api/v1/workspace/groups/";
+
+        public String workspaceLoginGroup = "workspace";
+
+        public String usersUrlTemplate = "http://localhost:8080/api/v1/workspace/users/";
+
+        public int userListSynchronizationInterval = 60;
     }
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
     }
 
-    public static class Users {
-        public String endpoint  = "http://localhost:8080/api/v1/workspace/users";
-
-        public int synchronizationInterval = 60;
+    public static class Workspace {
+        public String name = "Workspace";
+        public String version = "1.0.0";
     }
 
     @Override

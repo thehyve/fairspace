@@ -28,50 +28,48 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
     }
 
     @Override
-    public void init() {
-        super.init();
+    protected void initApp() {
+        super.initApp();
 
-        path(basePath, () -> {
-            put("/", (req, res) -> {
-                validateContentType(req, JSON_LD_HEADER_STRING);
-                api.put(fromJsonLD(req.body(), baseURI));
+        put("/", (req, res) -> {
+            validateContentType(req, JSON_LD_HEADER_STRING);
+            api.put(fromJsonLD(req.body(), baseURI));
 
-                res.status(SC_NO_CONTENT);
-                return "";
-            });
-            patch("/", (req, res) -> {
-                validateContentType(req, JSON_LD_HEADER_STRING);
-                api.patch(fromJsonLD(req.body(), baseURI));
+            res.status(SC_NO_CONTENT);
+            return "";
+        });
+        patch("/", (req, res) -> {
+            validateContentType(req, JSON_LD_HEADER_STRING);
+            api.patch(fromJsonLD(req.body(), baseURI));
 
-                res.status(SC_NO_CONTENT);
-                return "";
-            });
-            delete("/", (req, res) -> {
-                if (JSON_LD_HEADER_STRING.equals(req.contentType())) {
-                    api.delete(fromJsonLD(req.body(), baseURI));
-                } else {
-                    var subject = req.queryParams("subject");
-                    validate(subject != null, "Parameter \"subject\" is required");
-                    validateIRI(subject);
-                    if (!api.softDelete(createResource(subject))) {
-                        // Subject could not be deleted. Return a 404 error response
-                        return null;
-                    }
-
+            res.status(SC_NO_CONTENT);
+            return "";
+        });
+        delete("/", (req, res) -> {
+            if (JSON_LD_HEADER_STRING.equals(req.contentType())) {
+                api.delete(fromJsonLD(req.body(), baseURI));
+            } else {
+                var subject = req.queryParams("subject");
+                validate(subject != null, "Parameter \"subject\" is required");
+                validateIRI(subject);
+                if (!api.softDelete(createResource(subject))) {
+                    // Subject could not be deleted. Return a 404 error response
+                    return null;
                 }
 
-                res.status(SC_NO_CONTENT);
-                return "";
-            });
-            exception(PayloadParsingException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
-            exception(ValidationException.class, (e, req, res) -> {
-                log.error("400 Error handling request {} {}", req.requestMethod(), req.uri());
-                e.getViolations().forEach(v -> log.error("{}", v));
+            }
 
-                res.type(APPLICATION_JSON.asString());
-                res.status(SC_BAD_REQUEST);
-                res.body(errorBody(SC_BAD_REQUEST, "Validation Error", e.getViolations()));
-            });
+            res.status(SC_NO_CONTENT);
+            return "";
+        });
+        exception(PayloadParsingException.class, exceptionHandler(SC_BAD_REQUEST, "Malformed request body"));
+        exception(ValidationException.class, (e, req, res) -> {
+            log.error("400 Error handling request {} {}", req.requestMethod(), req.uri());
+            e.getViolations().forEach(v -> log.error("{}", v));
+
+            res.type(APPLICATION_JSON.asString());
+            res.status(SC_BAD_REQUEST);
+            res.body(errorBody(SC_BAD_REQUEST, "Validation Error", e.getViolations()));
         });
     }
 
