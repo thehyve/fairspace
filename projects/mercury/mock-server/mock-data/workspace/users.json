@@ -1,0 +1,30 @@
+[
+  {
+    "iri":"http://localhost/iri/13300b41-b4a0-463f-95aa-764d9efdc5cc",
+    "name":"Ygritte Lopez"
+  },
+  {
+    "iri":"http://localhost/iri/ab161dae-e402-4fd2-9d86-130387dc25ef",
+    "name":"Daenarys Targaryen"
+  },
+  {
+    "iri":"http://localhost/iri/f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
+    "name":"Gregor Clegane"
+  },
+  {
+    "iri":"http://localhost/iri/05364a93-cd21-4c48-8b01-948512d63a8b",
+    "name":"Cersei Lannister"
+  },
+  {
+    "iri":"http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+    "name":"John Snow"
+  },
+  {
+    "iri":"http://localhost/iri/user1-id",
+    "name":"Andre Hazes"
+  },
+  {
+    "iri":"http://localhost/iri/user2-id",
+    "name":"Gerald Joling",
+  }
+]
