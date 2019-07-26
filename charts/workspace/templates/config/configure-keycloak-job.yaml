@@ -70,6 +70,16 @@ spec:
               secretKeyRef:
                 name: "{{ template "workspace.fullname" . }}-datasteward"
                 key: password
+          - name: ORGANISATION_ADMIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.hyperspace.keycloak.realm}}-organisation-admin"
+                key: username
+          - name: ORGANISATION_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.hyperspace.keycloak.realm}}-organisation-admin"
+                key: password
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
