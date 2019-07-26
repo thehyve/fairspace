@@ -30,8 +30,8 @@ hyperspace:
         username: keycloak
         password: abcdefghi
         realm: hyperspace
-    organisation-admin:
-        username: hyperspace-organisation-admin
+    organisationadmin:
+        username: hyperspace-organisationadmin
         password: secret-password     
 
 workspace:
@@ -106,9 +106,9 @@ installation.
 | `hyperspace.keycloak.password`  | Password used for setting up keycloak users. | |
 | `hyperspace.keycloak.realm`  | Keycloak realm that is used for this hyperspace. Also set this variable in `pluto.keycloak.realm`| |
 | `hyperspace.keycloak.clientSecret`  | UUID that is used as client secret in communication between pluto and keycloak.| <random uuid> |
-| `workspace.keycloak.roles.organisation-admin` | Role for the organisation admin. | `<realm>-organisation-admin` |
-| `hyperspace.organisation-admin.username` | Username for the organisation admin that will be created for this hyperspace | `<realm>-organisation-admin` |
-| `hyperspace.organisation-admin.password` | Password for the organisation admin that will be created for this hyperspace | `fairspace123` |
+| `workspace.keycloak.roles.organisationadmin` | Role for the organisation admin. | `<realm>-organisationadmin` |
+| `hyperspace.organisationadmin.username` | Username for the organisation admin that will be created for this hyperspace | `<realm>-organisationadmin` |
+| `hyperspace.organisationadmin.password` | Password for the organisation admin that will be created for this hyperspace | `fairspace123` |
 
 #### Pluto parameters
 | Parameter  | Description  | Default |

@@ -35,8 +35,8 @@ hyperspace:
         realm:
         clientSecret:
         roles:
-          organisation-admin:
-    organisation-admin:
+          organisationadmin:
+    organisationadmin:
       username:
       password: fairspace123
 

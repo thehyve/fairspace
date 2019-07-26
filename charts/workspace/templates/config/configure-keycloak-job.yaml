@@ -73,12 +73,12 @@ spec:
           - name: ORGANISATION_ADMIN_USERNAME
             valueFrom:
               secretKeyRef:
-                name: "{{.Values.hyperspace.keycloak.realm}}-organisation-admin"
+                name: "{{.Values.hyperspace.keycloak.realm}}-organisationadmin"
                 key: username
           - name: ORGANISATION_ADMIN_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: "{{.Values.hyperspace.keycloak.realm}}-organisation-admin"
+                name: "{{.Values.hyperspace.keycloak.realm}}-organisationadmin"
                 key: password
           - name: CLIENT_SECRET
             valueFrom:
