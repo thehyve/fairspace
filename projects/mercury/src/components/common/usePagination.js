@@ -13,7 +13,7 @@ const usePagination = (items, initialRowsPerPage = 10) => {
     // Reset the page when the number of items per page changes
     useEffect(() => setPage(0), [rowsPerPage]);
 
-    const pagedItems = items.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    const pagedItems = items.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return {
         page,

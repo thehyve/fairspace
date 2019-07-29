@@ -50,12 +50,11 @@ describe('uniqueDestinationPaths', () => {
     });
 });
 
-
 describe('createDirectory', () => {
     it('should result in clear error on 405 response', () => {
         // eslint-disable-next-line prefer-promise-reject-errors
         FileAPI.webDavClient = {createDirectory: jest.fn(() => Promise.reject({response: {status: 405}}))};
 
-        return expect(FileAPI.createDirectory("/test")).rejects.toEqual(new Error("A directory or file with this name already exists. Please choose another name"))
+        return expect(FileAPI.createDirectory("/test")).rejects.toEqual(new Error("A directory or file with this name already exists. Please choose another name"));
     });
 });

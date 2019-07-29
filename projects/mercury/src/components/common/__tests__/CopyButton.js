@@ -3,7 +3,7 @@ import {act} from 'react-dom/test-utils';
 import {mount} from "enzyme";
 
 import {Tooltip} from "@material-ui/core";
-import {ClipboardText, ClipboardCheck} from "mdi-material-ui/light"
+import {ClipboardText, ClipboardCheck} from "mdi-material-ui/light";
 import CopyButton from "../CopyButton";
 import ClipboardCopy from "../ClipboardCopy";
 

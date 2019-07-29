@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {TableBody, TableCell, TableHead} from "@material-ui/core";
-import CollectionList from "../CollectionList";
 import {mount} from "enzyme";
+
+import CollectionList from "../CollectionList";
 
 describe('CollectionList', () => {
     const dateCreated = new Date();

@@ -100,5 +100,4 @@ describe('joinWithSeparator', () => {
     it('should work without a separator', () => {
         expect(joinWithSeparator(['a', 'b', 'c'])).toEqual(['a', 'b', 'c']);
     });
-
 });

@@ -15,8 +15,6 @@ const formatDateTime = (date) => {
     return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
 
-const DateTime = ({value}) => {
-    return formatDateTime(new Date(value));
-};
+const DateTime = ({value}) => formatDateTime(new Date(value));
 
 export default DateTime;

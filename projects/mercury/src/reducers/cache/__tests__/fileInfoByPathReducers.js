@@ -156,6 +156,5 @@ describe('Subject by path reducers', () => {
             expect(newState['/coll/dir/file.txt'].invalidated).toBe(true);
             expect(newState['/other/coll'].invalidated).toBe(false);
         });
-
     });
 });

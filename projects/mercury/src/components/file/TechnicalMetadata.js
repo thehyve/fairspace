@@ -52,6 +52,6 @@ TechnicalMetadata.propTypes = {
         fileSize: PropTypes.number,
         checksum: PropTypes.string
     })
-}
+};
 
 export default TechnicalMetadata;

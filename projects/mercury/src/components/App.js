@@ -4,6 +4,7 @@ import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
+
 import {fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
 import Config from "../services/Config/Config";
@@ -20,9 +21,7 @@ const App = () => {
 
     useEffect(() => {
         Config.init()
-            .then(() => {
-                return isMounted() && setConfigLoaded(true);
-            });
+            .then(() => isMounted() && setConfigLoaded(true));
     }, [isMounted]);
 
     if (!configLoaded) {

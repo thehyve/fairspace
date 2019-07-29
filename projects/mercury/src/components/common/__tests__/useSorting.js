@@ -1,4 +1,4 @@
-import { act } from 'react-dom/test-utils'
+import {act} from 'react-dom/test-utils';
 
 import {testHook} from "../../../utils/testUtils";
 import useSorting from "../useSorting";
