@@ -1,63 +1,55 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {Table, TableBody, TableCell, TableRow} from "@material-ui/core";
+import {List, ListItem, ListItemText} from "@material-ui/core";
 import filesize from "filesize";
 
 import {isNonEmptyValue, formatDateTime} from "../../utils/genericUtils";
 
-const TechnicalMetadata = ({fileProps}) => (
-    <Table>
-        <TableBody>
-            {(fileProps.dateCreated || fileProps.createdBy) && (
-                <TableRow>
-                    <TableCell>Created</TableCell>
-                    <TableCell>
-                        {formatDateTime(fileProps.dateCreated)}
-                        {fileProps.createdBy ? ' by ' + fileProps.createdBy : ''}
-                    </TableCell>
-                </TableRow>
-            )}
-            {(fileProps.dateModified || fileProps.modifiedBy) && (
-                <TableRow>
-                    <TableCell>Last modified</TableCell>
-                    <TableCell>
-                        {formatDateTime(fileProps.dateModified)}
-                        {fileProps.modifiedBy ? ' by ' + fileProps.modifiedBy : ''}
-                    </TableCell>
-                </TableRow>
-            )}
-            {isNonEmptyValue(fileProps.fileSize) && (
-                <TableRow>
-                    <TableCell>Filesize</TableCell>
-                    <TableCell>{filesize(fileProps.fileSize)}</TableCell>
-                </TableRow>
-            )}
-            {fileProps.checksum && (
-                <TableRow>
-                    <TableCell>Checksum</TableCell>
-                    <TableCell>{fileProps.checksum}</TableCell>
-                </TableRow>
-            )}
-            {fileProps.ownedBy && (
-                <TableRow>
-                    <TableCell>Owner</TableCell>
-                    <TableCell>{fileProps.ownedBy}</TableCell>
-                </TableRow>
-            )}
-        </TableBody>
-    </Table>
+const ItemData = ({primary, secondary}) => (primary && secondary ? (
+    <ListItem disableGutters style={{paddingTop: 4, paddingBottom: 4}}>
+        <ListItemText primary={primary} secondary={secondary} />
+    </ListItem>
+) : null);
+
+const TechnicalMetadata = ({fileProps: {dateCreated, createdBy, dateModified, modifiedBy, fileSize, checksum, ownedBy}}) => (
+    <List dense>
+        <ItemData
+            primary="Created"
+            secondary={(dateCreated || createdBy) && `${formatDateTime(dateCreated)} ${createdBy ? ' by ' + createdBy : ''}`}
+        />
+
+        <ItemData
+            primary="Last modified"
+            secondary={(dateModified || modifiedBy) && `${formatDateTime(dateModified)} ${modifiedBy ? ' by ' + modifiedBy : ''}`}
+        />
+
+        {isNonEmptyValue(fileSize) && (
+            <ItemData
+                primary="Filesize"
+                secondary={filesize(fileSize)}
+            />
+        )}
+
+        <ItemData
+            primary="Checksum"
+            secondary={checksum}
+        />
+
+        <ItemData
+            primary="Owner"
+            secondary={ownedBy}
+        />
+    </List>
 );
 
 TechnicalMetadata.propTypes = {
-    fileProps: PropTypes.shape({
-        dateCreated: PropTypes.string,
-        createdBy: PropTypes.string,
-        dateModified: PropTypes.string,
-        modifiedBy: PropTypes.string,
-        ownedBy: PropTypes.string,
-        fileSize: PropTypes.number,
-        checksum: PropTypes.string
-    })
+    dateCreated: PropTypes.string,
+    createdBy: PropTypes.string,
+    dateModified: PropTypes.string,
+    modifiedBy: PropTypes.string,
+    ownedBy: PropTypes.string,
+    fileSize: PropTypes.number,
+    checksum: PropTypes.string
 };
 
 export default TechnicalMetadata;

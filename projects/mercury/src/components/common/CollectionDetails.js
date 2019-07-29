@@ -102,12 +102,12 @@ class CollectionDetails extends React.Component {
                             </Icon>
                         )}
                     />
-                    <CardContent>
-                        <Typography component="p">
+                    <CardContent style={{paddingTop: 0}}>
+                        <Typography component="p" style={{marginBottom: 8}}>
                             {collection.description}
                         </Typography>
 
-                        {this.props.collectionProps && <TechnicalMetadata fileProps={this.props.collectionProps} /> }
+                        {this.props.collectionProps && <TechnicalMetadata fileProps={this.props.collectionProps} />}
                     </CardContent>
                 </Card>
 
