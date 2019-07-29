@@ -1,4 +1,8 @@
-import {compareBy, comparing, findById, flattenShallow, isNonEmptyValue, joinWithSeparator} from "../genericUtils";
+import {
+    compareBy, comparing, findById,
+    flattenShallow, isNonEmptyValue, joinWithSeparator,
+    formatDateTime
+} from "../genericUtils";
 
 describe('array Utils', () => {
     describe('findById', () => {
@@ -99,5 +103,31 @@ describe('joinWithSeparator', () => {
     });
     it('should work without a separator', () => {
         expect(joinWithSeparator(['a', 'b', 'c'])).toEqual(['a', 'b', 'c']);
+    });
+});
+
+describe('formatDateTime', () => {
+    it('should show date when it is not today', () => {
+        const dateValue = '2008-09-15T15:53:00';
+        const formatted = formatDateTime(dateValue);
+        expect(formatted).toEqual('Sep 15, 2008');
+    });
+
+    it('should show time when it is today', () => {
+        const dateValue = new Date().toISOString();
+        const formatted = formatDateTime(dateValue);
+        expect(formatted).not.toContain(',');
+        expect(formatted).toContain(':');
+        expect(formatted).toContain('M');
+    });
+
+    it('should return the given value for invalid dates', () => {
+        const invalidDates = [
+            '2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN
+        ];
+
+        invalidDates.forEach(date => {
+            expect(formatDateTime(date)).toEqual(date);
+        });
     });
 });

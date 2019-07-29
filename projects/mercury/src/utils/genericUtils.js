@@ -1,3 +1,5 @@
+import {isValid} from "date-fns";
+
 //* *********************************
 //* ARRAYS
 //* *********************************
@@ -65,3 +67,35 @@ export function comparing(...comparators) {
  * @param value
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
+
+//* *********************************
+//* DATE - TIME (PS: We should utilize the already used date-fns library for a more reliable code)
+//* *********************************
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+});
+
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: 'numeric'
+});
+
+/**
+ * Returns a user friendly date/date-time format, it will return the time if the date is today
+ *
+ * @param {string | number | Date} value - the date to be formatted
+ * @return {string} the formatted date
+ */
+export const formatDateTime = (value) => {
+    const date = new Date(value);
+    if (!value || !isValid(date)) {
+        return value;
+    }
+
+    const today = new Date();
+    const isToday = (today.toDateString() === date.toDateString());
+    return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
+};
