@@ -63,7 +63,7 @@ describe('useFormData', () => {
 
         it('should allow deleting existing values', () => {
             act(() => {
-                formData.deleteValue(propertyA,  1);
+                formData.deleteValue(propertyA, 1);
             });
 
             expect(formData.updates).toEqual({

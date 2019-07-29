@@ -1,4 +1,4 @@
-import {act} from 'react-dom/test-utils'
+import {act} from 'react-dom/test-utils';
 
 import {testHook} from "../../../utils/testUtils";
 import usePagination from "../usePagination";
@@ -52,5 +52,4 @@ describe('usePagination custom hook', () => {
 
         expect(pagination.pagedItems).toEqual([]);
     });
-
 });

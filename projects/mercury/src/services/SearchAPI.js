@@ -22,7 +22,8 @@ export const SORT_DATE_CREATED = [
 
 export const SORT_ALPHABETICALLY = [
     "_score", "label.keyword", "name.keyword"
-]
+];
+
 export class SearchAPI {
     constructor(client, index) {
         this.client = client;

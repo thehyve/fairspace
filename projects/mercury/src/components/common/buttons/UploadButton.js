@@ -48,7 +48,7 @@ class UploadButton extends React.Component {
         }
     };
 
-    setFilesState(files, fileState) {
+    setFilesState = (files, fileState) => {
         this.setState(prevState => {
             // Add these file to a copy of the current map with files
             const filesMap = {...prevState.files};
@@ -57,7 +57,7 @@ class UploadButton extends React.Component {
         });
     };
 
-    renderDropzoneContent() {
+    renderDropzoneContent = () => {
         const {filesUploaded, files} = this.state;
 
         if (!filesUploaded) {

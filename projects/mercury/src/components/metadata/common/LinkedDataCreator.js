@@ -63,7 +63,7 @@ const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requir
             {children}
         </>
     );
-}
+};
 
 LinkedDataCreator.propTypes = {
     shapes: PropTypes.array,

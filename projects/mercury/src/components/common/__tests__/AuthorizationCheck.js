@@ -1,12 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import configureStore from 'redux-mock-store';
 import {mount} from "enzyme";
-import thunk from 'redux-thunk';
-import promiseMiddleware from "redux-promise-middleware";
-import {AuthorizationCheck} from '../AuthorizationCheck';
 
-const middlewares = [thunk, promiseMiddleware];
+import {AuthorizationCheck} from '../AuthorizationCheck';
 
 it('renders without crashing', () => {
     const element = (

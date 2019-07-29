@@ -61,7 +61,7 @@ export const AuthorizationCheck = props => {
         return renderError();
     }
     return props.children;
-}
+};
 
 AuthorizationCheck.propTypes = {
     /**
