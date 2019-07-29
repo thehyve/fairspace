@@ -1,9 +1,9 @@
 import React from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TablePagination, withStyles} from "@material-ui/core";
 
-import {DateTime} from "../common";
 import styles from './CollectionList.styles';
 import getDisplayName from "../../utils/userUtils";
+import {formatDateTime} from "../../utils/genericUtils";
 import useSorting from "../common/useSorting";
 import usePagination from "../common/usePagination";
 
@@ -79,7 +79,7 @@ const CollectionList = (props) => {
                                     {collection.name}
                                 </TableCell>
                                 <TableCell padding="none">
-                                    <DateTime value={collection.dateCreated} />
+                                    {formatDateTime(collection.dateCreated)}
                                 </TableCell>
                                 <TableCell>
                                     {getDisplayName(collection.creatorObj)}

@@ -1,7 +1,6 @@
 export {default as AuthorizationCheck} from "./AuthorizationCheck";
 export {default as BreadCrumbs} from "./breadcrumbs/BreadCrumbs";
 export {default as ConfirmationDialog} from './ConfirmationDialog';
-export {default as DateTime} from './DateTime';
 export {default as ErrorDialog} from "./ErrorDialog";
 export {default as MessageDisplay} from "./MessageDisplay";
 export {default as CollectionEditor} from "./CollectionEditor";

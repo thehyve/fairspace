@@ -6,7 +6,7 @@ import {
 } from "@material-ui/core";
 import filesize from 'filesize';
 
-import {DateTime} from "../common";
+import {formatDateTime} from "../../utils/genericUtils";
 import styles from './FileList.styles';
 import useSorting from "../common/useSorting";
 import usePagination from "../common/usePagination";
@@ -136,7 +136,7 @@ const FileList = ({
                                     {item.type === 'file' ? filesize(item.size) : ''}
                                 </TableCell>
                                 <TableCell padding="checkbox" align="right">
-                                    {item.lastmod ? <DateTime value={item.lastmod} /> : null}
+                                    {item.lastmod ? formatDateTime(item.lastmod) : null}
                                 </TableCell>
                             </TableRow>
                         );

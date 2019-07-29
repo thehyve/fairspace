@@ -1,16 +1,17 @@
 import React, {useContext} from 'react';
 import Switch from "@material-ui/core/Switch";
-import DateTime from "../../../common/DateTime";
+
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI} from "../../../../constants";
 import Iri from "../../../common/Iri";
 import LinkedDataContext from "../../LinkedDataContext";
+import {formatDateTime} from "../../../../utils/genericUtils";
 
 export const ReferringValue = ({property, entry, editorPath}) => {
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
-                return <DateTime value={value.value} absolute />;
+                return formatDateTime(value.value);
             case BOOLEAN_URI:
                 return <Switch checked={value.value} readOnly />;
             default:

@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import {Table, TableBody, TableCell, TableRow} from "@material-ui/core";
 import filesize from "filesize";
-import DateTime from "../common/DateTime";
-import {isNonEmptyValue} from "../../utils/genericUtils";
+
+import {isNonEmptyValue, formatDateTime} from "../../utils/genericUtils";
 
 const TechnicalMetadata = ({fileProps}) => (
     <Table>
@@ -11,13 +11,19 @@ const TechnicalMetadata = ({fileProps}) => (
             {(fileProps.dateCreated || fileProps.createdBy) && (
                 <TableRow>
                     <TableCell>Created</TableCell>
-                    <TableCell><DateTime value={fileProps.dateCreated} />{fileProps.createdBy ? ' by ' + fileProps.createdBy : ''}</TableCell>
+                    <TableCell>
+                        {formatDateTime(fileProps.dateCreated)}
+                        {fileProps.createdBy ? ' by ' + fileProps.createdBy : ''}
+                    </TableCell>
                 </TableRow>
             )}
             {(fileProps.dateModified || fileProps.modifiedBy) && (
                 <TableRow>
                     <TableCell>Last modified</TableCell>
-                    <TableCell><DateTime value={fileProps.dateModified} />{fileProps.modifiedBy ? ' by ' + fileProps.modifiedBy : ''}</TableCell>
+                    <TableCell>
+                        {formatDateTime(fileProps.dateModified)}
+                        {fileProps.modifiedBy ? ' by ' + fileProps.modifiedBy : ''}
+                    </TableCell>
                 </TableRow>
             )}
             {isNonEmptyValue(fileProps.fileSize) && (

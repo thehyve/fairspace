@@ -1,13 +1,12 @@
 import React from 'react';
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import Icon from "@material-ui/core/Icon";
-import withStyles from "@material-ui/core/styles/withStyles";
 import {Link} from "react-router-dom";
-import Typography from "@material-ui/core/Typography";
-import DateTime from "./common/DateTime";
+import {
+    List, ListItem, ListItemText,
+    ListItemIcon, Icon, Typography
+} from "@material-ui/core";
+import withStyles from "@material-ui/core/styles/withStyles";
+
+import {formatDateTime} from "../utils/genericUtils";
 
 const styles = theme => ({
     listItemIcon: {
@@ -119,7 +118,7 @@ function RecentActivity({classes}) {
                                 {item.icon}
                             </Icon>
                         </ListItemIcon>
-                        <ListItemText primary={item.message} secondary={<DateTime value={item.date} />} />
+                        <ListItemText primary={item.message} secondary={formatDateTime(item.date)} />
                     </ListItem>
                 ))}
             </List>
