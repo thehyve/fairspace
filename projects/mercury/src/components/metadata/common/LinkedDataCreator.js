@@ -39,7 +39,7 @@ const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requir
                 title="Create a new metadata entity"
                 onClick={startCreating}
                 style={{margin: '10px 0'}}
-                disabled={shapesLoading || shapesError || !shapes}
+                disabled={shapesLoading || !!shapesError || !shapes || shapes.length === 0}
             >
                 Create
             </Button>
