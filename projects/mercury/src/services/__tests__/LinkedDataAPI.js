@@ -1,14 +1,8 @@
+import mockAxios from 'axios';
+
 import {MetadataAPI} from "../LinkedDataAPI";
 import Config from "../Config/Config";
 import {vocabularyUtils} from "../../utils/linkeddata/vocabularyUtils";
-
-const mockResponse = (status, statusText, response) => new window.Response(response, {
-    status,
-    statusText,
-    headers: {
-        'Content-type': 'application/ld+json'
-    }
-});
 
 beforeAll(() => {
     Config.setConfig({
@@ -23,20 +17,30 @@ beforeAll(() => {
     return Config.init();
 });
 
+beforeEach(() => {
+    mockAxios.get.mockClear();
+    mockAxios.patch.mockClear();
+});
+
 it('fetches metadata with provided parameters', () => {
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({data: []}));
+
     MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c', includeObjectProperties: true});
-    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?subject=a&predicate=b&object=c&includeObjectProperties=true");
+
+    expect(mockAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockAxios.get).toHaveBeenCalledWith('/meta/?subject=a&predicate=b&object=c&includeObjectProperties=true', {headers: {Accept: 'application/ld+json'}});
 });
 
 it('calls the correct url without any parameters', () => {
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({data: []}));
+
     MetadataAPI.get({});
-    expect(window.fetch.mock.calls[0][0]).toEqual("/meta/?");
+
+    expect(mockAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockAxios.get).toHaveBeenCalledWith('/meta/?', {headers: {Accept: 'application/ld+json'}});
 });
 
 it('stores metadata as jsonld', () => {
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.updateEntity(
         'http://thehyve.nl',
         {
@@ -45,7 +49,7 @@ it('stores metadata as jsonld', () => {
         vocabularyUtils([]),
         'http://examle.com/Company'
     );
-    expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
+
     const expected = [{
         '@id': 'http://thehyve.nl',
         'hasEmployees': [
@@ -57,11 +61,12 @@ it('stores metadata as jsonld', () => {
         '@id': 'http://thehyve.nl',
         '@type': 'http://examle.com/Company',
     }];
-    expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
+
+    expect(mockAxios.patch).toHaveBeenCalledTimes(1);
+    expect(mockAxios.patch).toHaveBeenCalledWith('/meta/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
 });
 
 it('stores metadata as jsonld (Full entity)', () => {
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
     MetadataAPI.updateEntity(
         'http://thehyve.nl',
         {
@@ -71,7 +76,7 @@ it('stores metadata as jsonld (Full entity)', () => {
         vocabularyUtils([]),
         'http://examle.com/Company'
     );
-    expect(window.fetch.mock.calls[0][1].method).toEqual("PATCH");
+
     const expected = [
         {
             '@id': 'http://thehyve.nl',
@@ -92,13 +97,17 @@ it('stores metadata as jsonld (Full entity)', () => {
             '@type': 'http://examle.com/Company',
         }
     ];
-    expect(window.fetch.mock.calls[0][1].body).toEqual(JSON.stringify(expected));
+
+    expect(mockAxios.patch).toHaveBeenCalledTimes(1);
+    expect(mockAxios.patch).toHaveBeenCalledWith('/meta/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
 });
 
 it('retrieves metadata entities using a sparql query', () => {
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(200, 'OK', JSON.stringify([]))));
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({data: []}));
+
     const type = 'http://my-special-entity-type';
     MetadataAPI.getEntitiesByType(type);
-    expect(window.fetch.mock.calls[0][0]).toEqual("/entities/?type=http%3A%2F%2Fmy-special-entity-type");
-    expect(window.fetch.mock.calls[0][1].method).toEqual('GET');
+
+    expect(mockAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockAxios.get).toHaveBeenCalledWith('/entities/?type=http%3A%2F%2Fmy-special-entity-type', {headers: {Accept: 'application/ld+json'}});
 });

@@ -1,15 +1,15 @@
 import {expand} from 'jsonld';
+import axios from 'axios';
+
 import Config from "./Config/Config";
-import failOnHttpError from "../utils/httpUtils";
+import {handleHttpError} from "../utils/httpUtils";
 import {normalizeTypes, toJsonLd} from "../utils/linkeddata/jsonLdConverter";
 
-class LinkedDataAPI {
-    static getParams = {
-        method: 'GET',
-        headers: new Headers({Accept: 'application/ld+json'}),
-        credentials: 'same-origin'
-    };
+const requestOptions = {
+    headers: {Accept: 'application/ld+json'}
+};
 
+class LinkedDataAPI {
     /**
      *
      * @param configParserFunc Function to retrieve the right urls from configuration.
@@ -42,9 +42,9 @@ class LinkedDataAPI {
     get(params = {}) {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
 
-        return fetch(`${this.getStatementsUrl()}?${query}`, LinkedDataAPI.getParams)
-            .then(failOnHttpError("Failure when retrieving metadata"))
-            .then(response => response.json())
+        return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
+            .catch(handleHttpError("Failure when retrieving metadata"))
+            .then(response => response.data)
             .then(expand)
             .then(normalizeTypes);
     }
@@ -73,7 +73,7 @@ class LinkedDataAPI {
         }
 
         return this.patch(jsonLd)
-            .then(failOnHttpError("Failure when updating entity"));
+            .catch(handleHttpError("Failure when updating entity"));
     }
 
     /**
@@ -91,9 +91,9 @@ class LinkedDataAPI {
             return Promise.reject(new Error("No entities URL provided"));
         }
 
-        return fetch(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), LinkedDataAPI.getParams)
-            .then(failOnHttpError("Failure when retrieving entities"))
-            .then(response => response.json())
+        return axios.get(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), requestOptions)
+            .catch(handleHttpError("Failure when retrieving entities"))
+            .then(response => response.data)
             .then(expand)
             .then(normalizeTypes);
     }
@@ -109,9 +109,9 @@ class LinkedDataAPI {
             return Promise.reject(new Error("No entities URL provided"));
         }
 
-        return fetch(this.getEntitiesUrl() + "?catalog", LinkedDataAPI.getParams)
-            .then(failOnHttpError("Failure when retrieving entities"))
-            .then(response => response.json())
+        return axios.get(this.getEntitiesUrl() + "?catalog", requestOptions)
+            .catch(handleHttpError("Failure when retrieving entities"))
+            .then(response => response.data)
             .then(expand)
             .then(normalizeTypes);
     }
@@ -122,11 +122,8 @@ class LinkedDataAPI {
      * @returns {Promise<Response>}
      */
     patch(jsonLd) {
-        return fetch(this.getStatementsUrl(), {
-            method: 'PATCH',
-            headers: new Headers({'Content-type': 'application/ld+json'}),
-            credentials: 'same-origin',
-            body: JSON.stringify(jsonLd)
+        return axios.patch(this.getStatementsUrl(), JSON.stringify(jsonLd), {
+            headers: {'Content-type': 'application/ld+json'}
         });
     }
 
@@ -136,10 +133,8 @@ class LinkedDataAPI {
      * @returns {Promise<Response>}
      */
     delete(subject) {
-        return fetch(this.getStatementsUrl() + "?subject=" + encodeURIComponent(subject), {
-            method: 'DELETE',
-            credentials: 'same-origin'
-        }).then(failOnHttpError("Failure when deleting subject"));
+        return axios.delete(this.getStatementsUrl() + "?subject=" + encodeURIComponent(subject))
+            .catch(handleHttpError("Failure when deleting subject"));
     }
 }
 

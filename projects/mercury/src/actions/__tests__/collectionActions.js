@@ -1,9 +1,10 @@
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
+import mockAxios from 'axios';
+
 import Config from "../../services/Config/Config";
 import configFile from "../../config";
-import {mockResponse} from "../../utils/testUtils";
 import {UPDATE_COLLECTION} from "../actionTypes";
 import {updateCollection} from "../collectionActions";
 
@@ -21,7 +22,7 @@ describe('Update metadata', () => {
     it('should return an error if updating a collection fails', () => {
         const store = mockStore({});
 
-        window.fetch = jest.fn(() => Promise.reject(mockResponse(409, 'Conflict')));
+        mockAxios.patch.mockImplementationOnce(() => Promise.reject());
 
         return store.dispatch(updateCollection(1, "collection", "description", "location"))
             .then(() => {

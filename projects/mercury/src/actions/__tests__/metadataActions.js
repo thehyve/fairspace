@@ -4,7 +4,6 @@ import promiseMiddleware from "redux-promise-middleware";
 import {fetchMetadataBySubjectIfNeeded} from "../metadataActions";
 import Config from "../../services/Config/Config";
 import configFile from "../../config";
-import {mockResponse} from "../../utils/testUtils";
 import {FETCH_METADATA} from "../actionTypes";
 
 const subject = 'my-subject';
@@ -21,8 +20,6 @@ beforeAll(() => {
 describe('fetch metadata', () => {
     it('should fetch data if nothing is present', () => {
         const store = mockStore({});
-
-        window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify([{name: 'collection1'}]))));
 
         return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
             .then(() => {
@@ -64,8 +61,6 @@ describe('fetch metadata', () => {
                 }
             }
         });
-
-        window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify([{name: 'collection1'}]))));
 
         return store.dispatch(fetchMetadataBySubjectIfNeeded(subject))
             .then(() => {

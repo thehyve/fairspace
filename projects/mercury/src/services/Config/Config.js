@@ -1,4 +1,6 @@
 import merge from 'deepmerge';
+import axios from 'axios';
+
 import internalConfig from "../../config";
 
 class Config {
@@ -41,8 +43,8 @@ class Config {
         // not to contain the same properties.
         if (this.internalConfig.externalConfigurationFiles) {
             this.loadingPromise = Promise.all(
-                this.internalConfig.externalConfigurationFiles.map(file => fetch(file, {credentials: 'same-origin'})
-                    .then(response => (response.ok ? response.json() : Promise.reject(Error(`Error loading configuration file ${file}`))))
+                this.internalConfig.externalConfigurationFiles.map(file => axios.get(file)
+                    .then(({status, data}) => (status === 200 ? data : Promise.reject(Error(`Error loading configuration file ${file}`))))
                     .then((json) => {
                         console.info("Loaded external configuration from", file);
                         this.externalConfig = merge(this.externalConfig, json);
@@ -68,7 +70,7 @@ class Config {
      * Returns a promise that resolves with the loaded configuration options
      * @returns {Promise<any[]> | *}
      */
-    waitFor() { return this.loadingPromise; }
+    waitFor() {return this.loadingPromise;}
 
     /**
      * Returns the full configuration, including all dependencies
