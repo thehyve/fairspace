@@ -83,25 +83,6 @@ const transformUserToOptions = (users, collaborators, currentUser) => {
     return applyDisableFilter(tmp, collaborators, currentUser);
 };
 
-/**
- * Get no options message based on users
- * @param users
- * @returns {string}
- */
-const getNoOptionMessage = () => {
-    const {loading, error} = this.props;
-
-    if (loading) {
-        return 'Loading ..';
-    }
-
-    if (error) {
-        return 'Error: Cannot fetch users.';
-    }
-
-    return 'No options';
-};
-
 export class AlterPermissionDialog extends React.Component {
     constructor(props) {
         super(props);
@@ -148,10 +129,27 @@ export class AlterPermissionDialog extends React.Component {
         }
     };
 
+    /**
+     * Get no options message based on users
+     * @param users
+     * @returns {string}
+     */
+    getNoOptionMessage = () => {
+        const {loading, error} = this.props;
+
+        if (loading) {
+            return 'Loading ..';
+        }
+
+        if (error) {
+            return 'Error: Cannot fetch users.';
+        }
+
+        return 'No options';
+    };
+
     renderUser = () => {
-        const {
-            user, users, collaborators, currentUser
-        } = this.props;
+        const {user, users, collaborators, currentUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
 
         let options = [];
@@ -179,7 +177,7 @@ export class AlterPermissionDialog extends React.Component {
                 onChange={this.handleSelectedUserChange}
                 placeholder="Please select a user"
                 value={selectedUser}
-                noOptionsMessage={() => (getNoOptionMessage())}
+                noOptionsMessage={this.getNoOptionMessage}
                 label={selectedUserLabel}
             />
         );
