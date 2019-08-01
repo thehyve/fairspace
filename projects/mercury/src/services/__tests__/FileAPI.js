@@ -12,19 +12,21 @@ beforeAll(() => {
 });
 
 
-it('uploads multiple files', () => {
+it('uploads multiple files', async () => {
     FileAPI.webDavClient = {putFileContents: jest.fn(() => Promise.resolve())};
     const files = [{name: 'filea.txt'}, {name: 'fileb.txt'}, {name: 'filec.txt'}];
 
     const result = FileAPI.upload('', files, new Map());
-    expect(result).resolves.toEqual(files);
+    await expect(result).resolves.toEqual(files);
     expect(FileAPI.webDavClient.putFileContents.mock.calls.length).toEqual(3);
 });
 
-it('ignores cut-and-paste into same folder', () => {
+it('ignores cut-and-paste into same folder', async () => {
     FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.resolve())};
-    FileAPI.move('/coll/path/file.ext', '/coll/path/file.ext')
-        .then(() => expect(FileAPI.webDavClient.moveFile.mock.calls.length).toEqual(0));
+
+    await FileAPI.move('/coll/path/file.ext', '/coll/path/file.ext');
+
+    expect(FileAPI.webDavClient.moveFile.mock.calls.length).toEqual(0);
 });
 
 

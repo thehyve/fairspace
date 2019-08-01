@@ -10,6 +10,7 @@ export const mockResponse = (response, status = 200, statusText = 'OK', headers 
 );
 
 export const testNoChangedOnUnknownActionType = (description, reducer) => {
+    // eslint-disable-next-line jest/valid-describe
     describe(description, () => {
         it('should return the same state unchanged if action type is unknown by reducer', () => {
             const state = {'say what?': 'you can not touch this'};
