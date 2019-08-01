@@ -63,34 +63,34 @@ beforeEach(() => {
     return Config.init();
 });
 
-it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(collectionBrowser, div);
-    ReactDOM.unmountComponentAtNode(div);
-});
+describe('CollectionBrowser', () => {
+    it('renders without crashing', () => {
+        const div = document.createElement('div');
+        ReactDOM.render(collectionBrowser, div);
+        ReactDOM.unmountComponentAtNode(div);
+    });
 
-it('dispatch an action on collection save', () => {
-    const wrapper = mount(collectionBrowser);
+    it('dispatch an action on collection save', () => {
+        const wrapper = mount(collectionBrowser);
 
-    const addButton = wrapper.find('[aria-label="Add"]').first();
-    addButton.simulate('click');
+        const addButton = wrapper.find('[aria-label="Add"]').first();
+        addButton.simulate('click');
 
-    const nameField = wrapper.find('input#name').first();
-    nameField.simulate('focus');
-    nameField.simulate('change', {target: {value: 'New collection'}});
+        const nameField = wrapper.find('input#name').first();
+        nameField.simulate('focus');
+        nameField.simulate('change', {target: {value: 'New collection'}});
 
-    const locationField = wrapper.find('input#location').first();
-    locationField.simulate('focus');
-    locationField.simulate('change', {target: {value: 'new-collection'}});
+        const locationField = wrapper.find('input#location').first();
+        locationField.simulate('focus');
+        locationField.simulate('change', {target: {value: 'new-collection'}});
 
-    const saveButton = wrapper.find('button[aria-label="Save"]').first();
-    saveButton.simulate('click');
+        const saveButton = wrapper.find('button[aria-label="Save"]').first();
+        saveButton.simulate('click');
 
-    expect(store.getActions().length).toEqual(1);
-    expect(store.getActions()[0].type).toBe(actionTypes.ADD_COLLECTION_PENDING);
-});
+        expect(store.getActions().length).toEqual(1);
+        expect(store.getActions()[0].type).toBe(actionTypes.ADD_COLLECTION_PENDING);
+    });
 
-describe('loading state', () => {
     it('is loading as long as the user is pending', () => {
         const wrapper = shallow(<CollectionBrowser currentUserLoading />);
 
@@ -102,18 +102,12 @@ describe('loading state', () => {
 
         expect(wrapper.find(LoadingInlay).length).toBe(1);
     });
-});
-
-describe('error state', () => {
-    it('is in error state when user fetching failed', () => {
-        const wrapper = shallow(<CollectionBrowser currentUserError={new Error()} />);
-
-        expect(wrapper.find(MessageDisplay).length).toBe(1);
-    });
 
     it('is in error state when user fetching failed', () => {
-        const wrapper = shallow(<CollectionBrowser error="some error" />);
+        const wrapperErrorObj = shallow(<CollectionBrowser currentUserError={new Error()} />);
+        const wrapperErrorText = shallow(<CollectionBrowser error="some error" />);
 
-        expect(wrapper.find(MessageDisplay).length).toBe(1);
+        expect(wrapperErrorObj.find(MessageDisplay).length).toBe(1);
+        expect(wrapperErrorText.find(MessageDisplay).length).toBe(1);
     });
 });
