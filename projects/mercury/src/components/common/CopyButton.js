@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Tooltip} from "@material-ui/core";
-import {ClipboardText, ClipboardCheck} from "mdi-material-ui/light";
-import ClipboardCopy from "./ClipboardCopy";
+import {AssignmentOutlined, AssignmentTurnedInOutlined} from '@material-ui/icons';
+
 import useIsMounted from "../../utils/useIsMounted";
 
 const DEFAULT_TIMEOUT = 1000;
@@ -12,33 +12,34 @@ const DEFAULT_TIMEOUT = 1000;
  *
  * @param value
  * @param timeout
- * @param popupLabel
- * @returns {*}
- * @constructor
+ * @param labelPreCopy
+ * @param labelAfterCopy
  */
 const CopyButton = ({
-    value,
-    fontSize = 'default',
-    timeout = DEFAULT_TIMEOUT,
-    popupLabel = 'Copied!',
-    style = {}
+    value, style = {}, timeout = DEFAULT_TIMEOUT,
+    labelPreCopy = 'Copy full IRI', labelAfterCopy = 'Copied!',
 }) => {
     const [justCopied, setJustCopied] = useState(false);
     const isMounted = useIsMounted();
 
     const handleCopy = () => {
-        setJustCopied(true);
-        setTimeout(() => isMounted() && setJustCopied(false), timeout);
+        if ('clipboard' in navigator) {
+            setJustCopied(true);
+            navigator.clipboard.writeText(value);
+            setTimeout(() => isMounted() && setJustCopied(false), timeout);
+        }
     };
 
     return (
-        <span style={{...style, cursor: 'pointer'}}>
-            <ClipboardCopy value={value} onCopy={handleCopy}>
-                {justCopied
-                    ? <Tooltip title={popupLabel}><ClipboardCheck fontSize={fontSize} /></Tooltip>
-                    : <ClipboardText fontSize={fontSize} />}
-            </ClipboardCopy>
-        </span>
+        <Tooltip
+            title={justCopied ? labelAfterCopy : labelPreCopy}
+            onClick={handleCopy}
+            style={{...style, cursor: 'pointer'}}
+        >
+            <span>
+                {justCopied ? <AssignmentTurnedInOutlined color="action" /> : <AssignmentOutlined color="action" />}
+            </span>
+        </Tooltip>
     );
 };
 
