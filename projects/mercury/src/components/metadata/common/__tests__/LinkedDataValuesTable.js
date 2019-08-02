@@ -1,6 +1,6 @@
 import React from 'react';
 import {shallow} from "enzyme";
-import {Button, TableBody, TableCell, TableFooter, TableHead, TableRow} from '@material-ui/core';
+import {TableBody, TableCell, TableFooter, TableHead, TableRow} from '@material-ui/core';
 
 import {STRING_URI} from "../../../../constants";
 import {LinkedDataValuesTable} from "../LinkedDataValuesTable";
@@ -59,7 +59,7 @@ describe('LinkedDataValuesTable elements', () => {
         };
         const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} />);
         expect(wrapper.find(TableHead).find(TableCell).length).toEqual(1);
-        expect(wrapper.find(TableBody).find(TableRow).first().find(Button).length).toEqual(1);
+        expect(wrapper.find(TableBody).find(TableRow).first().find('[data-testid="delete-btn"]').length).toEqual(1);
     });
 
     it('should show an add input field when adding is allowed', () => {

@@ -52,6 +52,7 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                                     canDelete(property, entry)
                                     && (
                                         <IconButton
+                                            data-testid="delete-btn"
                                             title="Delete"
                                             onClick={() => onDelete(idx)}
                                             style={{
