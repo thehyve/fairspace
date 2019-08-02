@@ -8,7 +8,7 @@ import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../useFormSubmission";
 
-const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, ...otherProps}) => {
+const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
     const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject);
 
@@ -43,8 +43,9 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, ...oth
     } else if (canEdit) {
         footer = (
             <Button
-                onClick={validateAndSubmit}
+                variant={fullpage ? 'contained' : 'text'}
                 color="primary"
+                onClick={validateAndSubmit}
                 disabled={!hasFormUpdates || !isValid}
             >
                 Update

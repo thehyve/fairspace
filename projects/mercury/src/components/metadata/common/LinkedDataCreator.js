@@ -32,18 +32,6 @@ const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requir
 
     return (
         <>
-            <Button
-                variant="contained"
-                color="primary"
-                aria-label="Add"
-                title="Create a new metadata entity"
-                onClick={startCreating}
-                style={{margin: '10px 0'}}
-                disabled={shapesLoading || !!shapesError || !shapes || shapes.length === 0}
-            >
-                Create
-            </Button>
-
             <LinkedDataShapeChooserDialog
                 open={creationState === CREATION_STATE_CHOOSE_SHAPE}
                 shapes={shapes}
@@ -61,6 +49,18 @@ const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requir
             )}
 
             {children}
+
+            <Button
+                variant="contained"
+                color="primary"
+                aria-label="Add"
+                title="Create a new metadata entity"
+                onClick={startCreating}
+                style={{margin: '10px 0'}}
+                disabled={shapesLoading || !!shapesError || !shapes || shapes.length === 0}
+            >
+                Create
+            </Button>
         </>
     );
 };

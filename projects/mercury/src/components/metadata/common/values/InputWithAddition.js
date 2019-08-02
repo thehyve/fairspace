@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Icon} from "@material-ui/core";
+import {Grid, IconButton} from "@material-ui/core";
+import Add from '@material-ui/icons/Add';
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/LoadingInlay";
@@ -32,15 +33,13 @@ const InputWithAddition = ({
 
         return (
             <>
-                <Button
-                    variant="text"
+                <IconButton
                     aria-label="Add"
                     title="Add a new"
                     onClick={() => setAdding(true)}
                 >
-                    <Icon>add</Icon>
-                </Button>
-
+                    <Add />
+                </IconButton>
                 {adding && (
                     <NewLinkedDataEntityDialog
                         shape={shape}

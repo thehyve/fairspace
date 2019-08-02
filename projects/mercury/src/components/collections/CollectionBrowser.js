@@ -1,6 +1,5 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
-import Icon from "@material-ui/core/Icon";
 
 import {
     ErrorDialog, MessageDisplay, CollectionEditor,
@@ -89,12 +88,14 @@ export class CollectionBrowser extends React.Component {
             <>
                 {loading || usersLoading || currentUserLoading ? <LoadingInlay /> : this.renderCollectionList()}
                 <Button
-                    variant="text"
+                    style={{marginTop: 8}}
+                    color="primary"
+                    variant="contained"
                     aria-label="Add"
                     title="Create a new collection"
                     onClick={this.handleAddCollectionClick}
                 >
-                    <Icon>add</Icon>
+                    New
                 </Button>
             </>
         );

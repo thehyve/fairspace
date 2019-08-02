@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
 import {withRouter} from 'react-router-dom';
-import {Checkbox, FormControl, Input, ListItemText, MenuItem, Paper, Select, withStyles} from "@material-ui/core";
+import {
+    Input, ListItemText, MenuItem, Select, withStyles, Grid, Chip
+} from "@material-ui/core";
 
 import {LoadingInlay, MessageDisplay, SearchBar} from "../../common";
 import BreadCrumbs from "../../common/breadcrumbs/BreadCrumbs";
@@ -9,8 +11,12 @@ import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
 
 const styles = theme => ({
-    typeSelect: {
-        paddingLeft: theme.spacing.unit * 10
+    chips: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    chip: {
+        margin: theme.spacing.unit / 4,
     }
 });
 
@@ -28,13 +34,6 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
         requireIdentifier, editorPath,
         hasEditRight
     } = useContext(LinkedDataContext);
-
-    const renderTypeClass = ({targetClass, label}) => (
-        <MenuItem key={targetClass} value={targetClass}>
-            <Checkbox checked={selectedTypes.includes(targetClass)} />
-            <ListItemText primary={label} secondary={targetClass} />
-        </MenuItem>
-    );
 
     const ListBody = () => {
         if (shapesLoading || searchPending) {
@@ -72,25 +71,35 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
     return (
         <>
             <BreadCrumbs />
-            <Paper>
-                <SearchBar
-                    placeholder="Search"
-                    disableUnderline
-                    onSearchChange={setQuery}
-                />
-                <FormControl className={classes.typeSelect}>
+            <Grid style={{minHeight: 60}} container alignItems="center" justify="space-evenly">
+                <Grid xs={6} item>
+                    <SearchBar
+                        placeholder="Search"
+                        disableUnderline={false}
+                        onSearchChange={setQuery}
+                    />
+                </Grid>
+                <Grid xs={5} item>
                     <Select
                         multiple
                         displayEmpty
                         value={selectedTypes}
                         onChange={e => setSelectedTypes(e.target.value)}
-                        input={<Input id="select-multiple-checkbox" />}
-                        renderValue={selected => (selected.length === 0 ? '[All types]' : selected.map(getTypeLabel).join(', '))}
+                        input={<Input fullWidth disableUnderline style={{margin: '8px 0'}} />}
+                        renderValue={selected => (selected.length === 0 ? 'Types' : (
+                            <div className={classes.chips}>
+                                {selected.map(value => <Chip key={value} label={getTypeLabel(value)} className={classes.chip} />)}
+                            </div>
+                        ))}
                     >
-                        {availableTypes.map(renderTypeClass)}
+                        {availableTypes.map(({targetClass, label}) => (
+                            <MenuItem key={targetClass} value={targetClass}>
+                                <ListItemText primary={label} secondary={targetClass} />
+                            </MenuItem>
+                        ))}
                     </Select>
-                </FormControl>
-            </Paper>
+                </Grid>
+            </Grid>
             {
                 hasEditRight ? (
                     <LinkedDataCreator
@@ -104,7 +113,6 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
                     </LinkedDataCreator>
                 ) : <ListBody />
             }
-
         </>
     );
 };
