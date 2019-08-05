@@ -8,7 +8,7 @@ export default ({subject}) => (
         <BreadCrumbs />
         <Paper style={{maxWidth: 800, padding: 20}}>
             <LinkedDataEntityHeader subject={subject} />
-            <LinkedDataEntityFormContainer subject={subject} />
+            <LinkedDataEntityFormContainer subject={subject} fullpage />
         </Paper>
     </>
 );

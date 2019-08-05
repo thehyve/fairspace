@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 import PropTypes from "prop-types";
-import {Button, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
+import {
+    Table, TableBody, TableCell, TableHead, TableRow,
+    TableFooter, withStyles, IconButton
+} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
-import TableFooter from "@material-ui/core/TableFooter";
+
 import {canDelete} from "../../../utils/linkeddata/metadataUtils";
 
 const styles = {
@@ -42,26 +45,28 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                         key={idx}
                     >
                         {columnDefinitions.map(columnDef => <TableCell key={columnDef.id}>{columnDef.getValue(entry, idx)}</TableCell>)}
-                        {property.isEditable
-                            ? (
+                        {
+                            property.isEditable
+                            && (
                                 <TableCell className={classes.buttonColumn}>{
                                     canDelete(property, entry)
-                                        ? (
-                                            <Button
-                                                size="small"
-                                                aria-label="Delete"
-                                                title="Delete"
-                                                onClick={() => onDelete(idx)}
-                                                style={{
-                                                    visibility: hoveredIndex === idx ? 'visible' : 'hidden',
-                                                }}
-                                            >
-                                                <ClearIcon />
-                                            </Button>
-                                        ) : null
+                                    && (
+                                        <IconButton
+                                            data-testid="delete-btn"
+                                            title="Delete"
+                                            onClick={() => onDelete(idx)}
+                                            style={{
+                                                visibility: hoveredIndex === idx ? 'visible' : 'hidden',
+                                            }}
+                                            aria-label="Delete"
+                                        >
+                                            <ClearIcon />
+                                        </IconButton>
+                                    )
                                 }
                                 </TableCell>
-                            ) : undefined}
+                            )
+                        }
                     </TableRow>
                 )))}
             </TableBody>
