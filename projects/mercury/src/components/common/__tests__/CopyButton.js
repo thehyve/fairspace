@@ -4,13 +4,8 @@ import {mount, shallow} from "enzyme";
 import {Tooltip} from "@material-ui/core";
 import {AssignmentOutlined, AssignmentTurnedInOutlined} from '@material-ui/icons';
 
+import '../clipboard.mock';
 import CopyButton from "../CopyButton";
-
-const mockClipboard = {
-    writeText: jest.fn(),
-};
-
-global.navigator.clipboard = mockClipboard;
 
 describe('<CopyButton />', () => {
     jest.useFakeTimers();
