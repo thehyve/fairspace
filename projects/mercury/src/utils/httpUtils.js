@@ -7,7 +7,9 @@
  * @returns {Function}
  */
 export function handleHttpError(providedMessage) {
-    return ({status, error, details, message}) => {
+    return ({response}) => {
+        const {status, data: {details, message}} = response;
+
         switch (status) {
             case 401:
                 window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
@@ -24,7 +26,7 @@ export function handleHttpError(providedMessage) {
                 }
 
                 // If a message was provided by the backend, provide it to the calling party
-                const defaultMessage = `${providedMessage} ${error || ''}`.trim();
+                const defaultMessage = `${providedMessage} ${response.message || ''}`.trim();
                 throw Error(message || defaultMessage);
             }
         }
