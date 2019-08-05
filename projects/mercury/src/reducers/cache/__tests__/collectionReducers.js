@@ -43,52 +43,8 @@ describe('Collections reducers', () => {
                 description: 'new description'
             }
         })).toEqual({
-            data: [{
-                location: "Jan_Smit_s_collection-500",
-                name: "new name",
-                description: "new description",
-                iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                access: "Manage",
-                type: "LOCAL_STORAGE",
-                dateCreated: "2018-09-19T15:48:23.016165Z",
-                createdBy: "user4-id",
-            }],
+            data: [],
             invalidated: true,
-        });
-    });
-
-    it('should not modify state on update if collection id is not found', () => {
-        const state = {
-            data: [{
-                location: "Jan_Smit_s_collection-500",
-                name: "Jan Smit's collection 1",
-                description: "Jan Smit's collection, beyond the horizon 01",
-                iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                access: "Manage",
-                type: "LOCAL_STORAGE",
-                dateCreated: "2018-09-19T15:48:23.016165Z",
-                createdBy: "user4-id",
-            }]
-        };
-
-        expect(reducer(state, {
-            type: actionTypes.UPDATE_COLLECTION_FULFILLED,
-            meta: {
-                id: '',
-                name: 'new name',
-                description: 'new description'
-            }
-        })).toEqual({
-            data: [{
-                location: "Jan_Smit_s_collection-500",
-                name: "Jan Smit's collection 1",
-                description: "Jan Smit's collection, beyond the horizon 01",
-                iri: "https://workspace.ci.test.fairdev.app/iri/500",
-                access: "Manage",
-                type: "LOCAL_STORAGE",
-                dateCreated: "2018-09-19T15:48:23.016165Z",
-                createdBy: "user4-id",
-            }]
         });
     });
 });

@@ -10,30 +10,8 @@ const additionalReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.ADD_COLLECTION_FULFILLED:
         case actionTypes.DELETE_COLLECTION_FULFILLED:
-            return {
-                ...state,
-                invalidated: true,
-            };
         case actionTypes.UPDATE_COLLECTION_FULFILLED:
-            if (!state.data.some(collection => collection.iri === action.meta.id)) {
-                return state;
-            }
-
-            return {
-                ...state,
-                invalidated: true,
-                data: state.data
-                    .map((collection) => {
-                        if (collection.iri !== action.meta.id) {
-                            return collection;
-                        }
-                        return {
-                            ...collection,
-                            name: action.meta.name,
-                            description: action.meta.description
-                        };
-                    })
-            };
+            return {...defaultState};
         default:
             return state;
     }

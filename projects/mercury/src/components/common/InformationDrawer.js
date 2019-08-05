@@ -19,15 +19,14 @@ import getDisplayName from "../../utils/userUtils";
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 
 export class InformationDrawer extends React.Component {
-    handleDetailsChange = (collection, locationChanged) => {
-        const {fetchMetadata} = this.props;
-        fetchMetadata(collection.iri);
+    handleDetailsChange = ({iri, location}, locationChanged) => {
+        this.props.fetchMetadata(iri);
 
         // If the location of a collection has changed, the URI where it
         // can be found may also change. For that reason we need to redirect
         // the user there.
         if (locationChanged && this.props.onCollectionLocationChange) {
-            this.props.onCollectionLocationChange(collection);
+            this.props.onCollectionLocationChange(location);
         }
     };
 
@@ -43,16 +42,17 @@ export class InformationDrawer extends React.Component {
     }
 
     handleUpdateCollection = (name, description, location) => {
-        const oldLocation = this.props.collection.location;
-        // TODO: validation should be part of the child component
-        if ((name !== this.props.collection.name || description !== this.props.collection.description || location !== oldLocation)
+        const oldCollection = this.props.collection;
+
+        if ((name !== this.props.collection.name
+            || description !== this.props.collection.description
+            || location !== oldCollection.location)
             && (name !== '') && (location !== '')) {
-            return this.props.updateCollection(this.props.collection.iri, name, description, location, oldLocation)
+            return this.props.updateCollection(this.props.collection.iri, name, description, location, oldCollection.location)
+                .then(this.props.fetchCollectionsIfNeeded)
                 .then(() => {
-                    // TODO: no need to clone object, just use the id in the handleDetailsChange
-                    const locationChanged = this.props.collection.location !== location;
-                    const collection = Object.assign(this.props.collection, {name, description, location});
-                    this.handleDetailsChange(collection, locationChanged);
+                    const locationChanged = oldCollection.location !== location;
+                    this.handleDetailsChange({iri: oldCollection.iri, location}, locationChanged);
                 })
                 .catch(err => {
                     const message = err && err.message ? err.message : "An error occurred while creating a collection";
