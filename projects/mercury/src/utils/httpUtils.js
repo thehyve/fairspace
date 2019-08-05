@@ -8,7 +8,7 @@
  */
 export function handleHttpError(providedMessage) {
     return ({response}) => {
-        const {status, data: {details, message}} = response;
+        const {status, data} = response;
 
         switch (status) {
             case 401:
@@ -20,14 +20,14 @@ export function handleHttpError(providedMessage) {
                     redirecting: true
                 };
             default: {
-                if (status === 400 && details) {
+                if (status === 400 && data && data.details) {
                     // eslint-disable-next-line no-throw-literal
-                    throw {details, message};
+                    throw {details: data.details, message: data.message};
                 }
 
                 // If a message was provided by the backend, provide it to the calling party
                 const defaultMessage = `${providedMessage} ${response.message || ''}`.trim();
-                throw Error(message || defaultMessage);
+                throw Error((data && data.message) || defaultMessage);
             }
         }
     };

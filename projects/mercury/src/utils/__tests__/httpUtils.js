@@ -4,7 +4,7 @@ describe('Http Utils', () => {
     describe('handleHttpError', () => {
         it('Should redirect to the login page on 401 and throw exception', () => {
             window.location.assign = jest.fn();
-            expect(() => handleHttpError("Default error")({ok: false, status: 401})).toThrow();
+            expect(() => handleHttpError("Default error")({response: {status: 401}})).toThrow();
             expect(window.location.assign).toHaveBeenCalledWith('/login?redirectUrl=http://localhost/');
         });
 
@@ -12,9 +12,7 @@ describe('Http Utils', () => {
             expect(
                 () => {
                     handleHttpError("Default error")({
-                        ok: false,
-                        status: 500,
-                        message: 'Backend error'
+                        response: {status: 500, data: {message: 'Backend error'}}
                     });
                 }
             ).toThrow(new Error('Backend error'));
