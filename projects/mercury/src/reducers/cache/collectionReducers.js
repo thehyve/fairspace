@@ -10,6 +10,10 @@ const additionalReducer = (state = defaultState, action) => {
     switch (action.type) {
         case actionTypes.ADD_COLLECTION_FULFILLED:
         case actionTypes.DELETE_COLLECTION_FULFILLED:
+            return {
+                ...state,
+                invalidated: true,
+            };
         case actionTypes.UPDATE_COLLECTION_FULFILLED:
             return {...defaultState};
         default:
