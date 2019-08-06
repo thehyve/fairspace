@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 const MessageDisplay = ({
     message, isError = true, withIcon = true,
     small = false, noMessage = false, variant = "body2",
-    color = 'inherit', messageColor = 'default',
+    color = 'inherit', messageColor = 'default', noWrap = true
 }) => (
     <div style={{textAlign: 'center', padding: 10}}>
         {withIcon && (
@@ -14,7 +14,7 @@ const MessageDisplay = ({
             </Icon>
         )}
         {!noMessage && (
-            <Typography variant={variant} noWrap color={messageColor}>
+            <Typography variant={variant} noWrap={noWrap} color={messageColor}>
                 <span>
                     {message || 'An error occurred'}
                 </span>

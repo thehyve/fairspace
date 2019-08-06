@@ -86,7 +86,13 @@ class FileBrowser extends React.Component {
         };
 
         if (!collectionExists) {
-            return <MessageDisplay message="This collection does not exist or you don't have sufficient permissions to view it." variant="h6" />;
+            return (
+                <MessageDisplay
+                    message="This collection does not exist or you don't have sufficient permissions to view it."
+                    variant="h6"
+                    noWrap={false}
+                />
+            );
         }
 
         return (
