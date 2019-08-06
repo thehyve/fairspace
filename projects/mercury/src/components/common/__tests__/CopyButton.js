@@ -1,51 +1,45 @@
 import React from 'react';
 import {act} from 'react-dom/test-utils';
-import {mount} from "enzyme";
-
+import {mount, shallow} from "enzyme";
 import {Tooltip} from "@material-ui/core";
-import {ClipboardText, ClipboardCheck} from "mdi-material-ui/light";
+import {AssignmentOutlined, AssignmentTurnedInOutlined} from '@material-ui/icons';
+
+import '../clipboard.mock';
 import CopyButton from "../CopyButton";
-import ClipboardCopy from "../ClipboardCopy";
 
 describe('<CopyButton />', () => {
     jest.useFakeTimers();
 
-    it('changes the icon and shows a popup after copying', () => {
-        const wrapper = mount(<CopyButton />);
+    it('changes the icon and title after copying', () => {
+        const wrapper = shallow(<CopyButton
+            labelPreCopy="Copy full IRI"
+            labelAfterCopy="Copied!"
+        />);
 
-        expect(wrapper.find(ClipboardText).length).toEqual(1);
+        expect(wrapper.find(AssignmentOutlined).length).toEqual(1);
+        expect(wrapper.find(Tooltip).at(0).prop("title")).toBe('Copy full IRI');
 
         // Simulate copying
-        act(() => {
-            const onCopyHandler = wrapper.find(ClipboardCopy).at(0).prop("onCopy");
-            onCopyHandler();
-        });
+        wrapper.find(Tooltip).simulate('click');
 
-        // An update to the wrapper seems to be needed due to the use of a webcomponent
-        wrapper.update();
         expect(wrapper.find(Tooltip).length).toEqual(1);
-        expect(wrapper.find(ClipboardCheck).length).toEqual(1);
+        expect(wrapper.find(Tooltip).at(0).prop("title")).toBe('Copied!');
+        expect(wrapper.find(AssignmentTurnedInOutlined).length).toEqual(1);
     });
 
     it('changes restores the original icon icon after some timeout', () => {
         const wrapper = mount(<CopyButton timeout={50} />);
 
         // Simulate copying
-        act(() => {
-            const onCopyHandler = wrapper.find(ClipboardCopy).at(0).prop("onCopy");
-            onCopyHandler();
-        });
+        wrapper.find(Tooltip).simulate('click');
 
-        // An update to the wrapper seems to be needed due to the use of a webcomponent
-        wrapper.update();
-        expect(wrapper.find(ClipboardCheck).length).toEqual(1);
+        expect(wrapper.find(AssignmentTurnedInOutlined).length).toEqual(1);
 
         act(() => {
             jest.advanceTimersByTime(100);
         });
 
-        // An update to the wrapper seems to be needed due to the use of a webcomponent
         wrapper.update();
-        expect(wrapper.find(ClipboardText).length).toEqual(1);
+        expect(wrapper.find(AssignmentOutlined).length).toEqual(1);
     });
 });
