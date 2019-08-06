@@ -85,20 +85,20 @@ class FileBrowser extends React.Component {
             }
         };
 
+        if (!collectionExists) {
+            return <MessageDisplay message="This collection does not exist." variant="h6" />;
+        }
+
         return (
             <>
-                {collectionExists
-                    ? (
-                        <FileList
-                            selectionEnabled
-                            files={filesWithSelectionState}
-                            onPathCheckboxClick={this.handlePathCheckboxClick}
-                            onPathHighlight={this.handlePathHighlight}
-                            onPathDoubleClick={this.handlePathDoubleClick}
-                            onAllSelection={allSelectionChangeHandler}
-                        />
-                    ) : 'Collection does not exist.'
-                }
+                <FileList
+                    selectionEnabled
+                    files={filesWithSelectionState}
+                    onPathCheckboxClick={this.handlePathCheckboxClick}
+                    onPathHighlight={this.handlePathHighlight}
+                    onPathDoubleClick={this.handlePathDoubleClick}
+                    onAllSelection={allSelectionChangeHandler}
+                />
                 <div style={{marginTop: 8}}>
                     <FileOperations
                         openedCollection={openedCollection}

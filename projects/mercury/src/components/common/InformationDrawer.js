@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography, withStyles} from '@material-ui/core';
+import {
+    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
+    Typography, withStyles, Grid
+} from '@material-ui/core';
+import {AssignmentOutlined} from '@material-ui/icons';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
@@ -15,6 +19,7 @@ import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../../utils/fileUtils";
 import UsersContext from "../permissions/UsersContext";
 import getDisplayName from "../../utils/userUtils";
+import MessageDisplay from './MessageDisplay';
 
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 
@@ -64,13 +69,29 @@ export class InformationDrawer extends React.Component {
     };
 
     render() {
-        const {classes, collection, loading} = this.props;
+        const {classes, collection, loading, atLeastSingleCollectionExists, inCollectionsBrowser = false} = this.props;
         const {users} = this.context;
 
         const getUsernameByIri = iri => getDisplayName(getUserObject(users, iri));
 
         if (!collection) {
-            return <Typography variant="h6">Please select a collection..</Typography>;
+            return atLeastSingleCollectionExists && inCollectionsBrowser
+                && (
+                    <Grid container direction="column" justify="center" alignItems="center">
+                        <Grid item>
+                            <AssignmentOutlined color="disabled" style={{fontSize: '4em'}} />
+                        </Grid>
+                        <Grid item>
+                            <MessageDisplay
+                                message="Select a collection to display its metadata"
+                                variant="h6"
+                                withIcon={false}
+                                isError={false}
+                                messageColor="textSecondary"
+                            />
+                        </Grid>
+                    </Grid>
+                );
         }
 
         const isMetaDataEditable = collection && collection.canManage && this.props.paths.length === 0;
@@ -160,11 +181,13 @@ const mapStateToProps = ({cache: {collections},
     const {collectionLocation, openedPath} = getPathInfoFromParams(params);
     const location = collectionLocation || selectedCollectionLocation;
     const collection = (collections.data && collections.data.find(c => c.location === location));
+    const atLeastSingleCollectionExists = !!(collections.data && collections.data.length > 0);
 
     return {
         collection,
         paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
-        loading: collections.pending
+        loading: collections.pending,
+        atLeastSingleCollectionExists
     };
 };
 
