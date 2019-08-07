@@ -70,14 +70,6 @@ export const UPDATE_VOCABULARY_FULFILLED            = UPDATE_VOCABULARY + '_FULF
 export const DELETE_VOCABULARY                      = 'DELETE_VOCABULARY';
 export const DELETE_VOCABULARY_FULFILLED            = DELETE_VOCABULARY + '_FULFILLED';
 
-// Workspace
-export const FETCH_WORKSPACE                        = 'FETCH_WORKSPACE';
-
-// UI
-export const TOGGLE_MENU                            = 'TOGGLE_MENU';
-export const MOUSE_ENTER_MENU                       = 'MOUSE_ENTER_MENU';
-export const MOUSE_LEAVE_MENU                       = 'MOUSE_LEAVE_MENU';
-
 // Search
 export const COLLECTIONS_SEARCH                     = 'COLLECTIONS_SEARCH';
 export const COLLECTIONS_SEARCH_PENDING             = 'COLLECTIONS_SEARCH_PENDING';

@@ -5,7 +5,6 @@ import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 
-import {fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
 import Config from "../services/Config/Config";
 import theme from './App.theme';
@@ -30,7 +29,6 @@ const App = () => {
 
     // Initialize the store after configuration has loaded
     const store = configureStore();
-    store.dispatch(fetchWorkspace());
 
     return (
         <UserProvider>
