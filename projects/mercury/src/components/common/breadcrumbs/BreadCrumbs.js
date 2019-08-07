@@ -9,6 +9,7 @@ import Icon from '@material-ui/core/Icon';
 import {withStyles} from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
 import BreadcrumbsContext from "./BreadcrumbsContext";
+import usePageTitleUpdater from '../../UsePageTitleUpdater';
 
 /**
  * Renders a list of breadcrumbs
@@ -22,6 +23,8 @@ import BreadcrumbsContext from "./BreadcrumbsContext";
 const BreadCrumbs = ({classes, additionalSegments = []}) => {
     const {segments: contextSegments} = useContext(BreadcrumbsContext);
     const allSegments = [...contextSegments, ...additionalSegments];
+
+    usePageTitleUpdater(allSegments);
 
     return (
         <Breadcrumbs aria-label="Breadcrumb" className={classes.root}>
