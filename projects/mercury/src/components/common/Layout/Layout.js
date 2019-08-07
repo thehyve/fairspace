@@ -11,14 +11,14 @@ import Config from "../../../services/Config/Config";
 import {LoadingInlay} from "../index";
 import UserContext from '../../../UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
-import useWorkspaceInfo from '../../UseWorkspaceInfo';
+import WorkspaceContext from '../../../WorkspaceContext';
 
 const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const {currentUserLoading} = useContext(UserContext);
-    const {name: workspaceName, version, loading: workspaceInfoLoading, redirecting} = useWorkspaceInfo();
+    const {name: workspaceName, version, loading: workspaceInfoLoading, redirecting} = useContext(WorkspaceContext);
 
     if (redirecting || workspaceInfoLoading || currentUserLoading) {
         return <LoadingInlay />;

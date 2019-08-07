@@ -13,6 +13,7 @@ import {ErrorDialog, LoadingInlay} from './common';
 import {UserProvider} from '../UserContext';
 import {UsersProvider} from "./permissions/UsersContext";
 import useIsMounted from "../utils/useIsMounted";
+import {WorkspaceProvider} from '../WorkspaceContext';
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -31,21 +32,23 @@ const App = () => {
     const store = configureStore();
 
     return (
-        <UserProvider>
-            <UsersProvider>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <MuiThemeProvider theme={theme}>
-                        <Provider store={store}>
-                            <ErrorDialog>
-                                <Router>
-                                    <Layout />
-                                </Router>
-                            </ErrorDialog>
-                        </Provider>
-                    </MuiThemeProvider>
-                </MuiPickersUtilsProvider>
-            </UsersProvider>
-        </UserProvider>
+        <WorkspaceProvider>
+            <UserProvider>
+                <UsersProvider>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <MuiThemeProvider theme={theme}>
+                            <Provider store={store}>
+                                <ErrorDialog>
+                                    <Router>
+                                        <Layout />
+                                    </Router>
+                                </ErrorDialog>
+                            </Provider>
+                        </MuiThemeProvider>
+                    </MuiPickersUtilsProvider>
+                </UsersProvider>
+            </UserProvider>
+        </WorkspaceProvider>
     );
 };
 
