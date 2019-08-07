@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {withRouter} from 'react-router-dom';
 import {
-    Input, ListItemText, MenuItem, Select, withStyles, Grid, Chip
+    Input, ListItemText, MenuItem, Select, withStyles, Grid, Chip, Checkbox
 } from "@material-ui/core";
 
 import {LoadingInlay, MessageDisplay, SearchBar} from "../../common";
@@ -94,6 +94,7 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
                     >
                         {availableTypes.map(({targetClass, label}) => (
                             <MenuItem key={targetClass} value={targetClass}>
+                                <Checkbox checked={selectedTypes.includes(targetClass)} />
                                 <ListItemText primary={label} secondary={targetClass} />
                             </MenuItem>
                         ))}
