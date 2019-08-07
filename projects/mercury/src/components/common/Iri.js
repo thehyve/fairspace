@@ -1,11 +1,3 @@
-import {connect} from "react-redux";
-import {getNamespacedIri} from "../../utils/linkeddata/metadataUtils";
-import {getVocabulary} from "../../reducers/cache/vocabularyReducers";
+import useNamespacedIri from "../UseNamespacedIri";
 
-const Iri = ({iri, namespaces}) => !!iri && getNamespacedIri(iri, namespaces);
-
-const mapStateToProps = state => ({
-    namespaces: getVocabulary(state).getNamespaces()
-});
-
-export default connect(mapStateToProps)(Iri);
+export default ({iri}) => useNamespacedIri(iri);

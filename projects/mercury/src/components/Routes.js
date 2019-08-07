@@ -1,6 +1,5 @@
 import React from 'react';
 import {Redirect, Route} from "react-router-dom";
-import queryString from "query-string";
 
 import Home from "./Home";
 import Collections from "./collections/CollectionsPage";
@@ -13,13 +12,7 @@ import {MetadataWrapper, VocabularyWrapper} from './metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "./metadata/common/LinkedDataEntityPage";
 import MetadataListPage from "./metadata/MetadataListPage";
 import VocabularyListPage from "./metadata/VocabularyListPage";
-
-const linkedDataPageComponent = (location, ListPage) => {
-    // React-router seems not to be able to directly match query parameters.
-    // For that reason, we parse the query string ourselves
-    const iriParam = queryString.parse(location.search).iri;
-    return iriParam ? <LinkedDataEntityPage subject={decodeURIComponent(iriParam)} /> : <ListPage />;
-};
+import useSubject from './UseSubject';
 
 const routes = () => (
     <>
@@ -49,11 +42,15 @@ const routes = () => (
         <Route
             path="/metadata"
             exact
-            render={({location}) => (
-                <MetadataWrapper location={location}>
-                    {linkedDataPageComponent(location, MetadataListPage)}
-                </MetadataWrapper>
-            )}
+            render={() => {
+                const subject = useSubject();
+
+                return (
+                    <MetadataWrapper>
+                        {subject ? <LinkedDataEntityPage subject={subject} /> : <MetadataListPage />}
+                    </MetadataWrapper>
+                );
+            }}
         />
 
         <Route
@@ -65,11 +62,15 @@ const routes = () => (
         <Route
             path="/vocabulary"
             exact
-            render={({location}) => (
-                <VocabularyWrapper location={location}>
-                    {linkedDataPageComponent(location, VocabularyListPage)}
-                </VocabularyWrapper>
-            )}
+            render={() => {
+                const subject = useSubject();
+
+                return (
+                    <VocabularyWrapper>
+                        {subject ? <LinkedDataEntityPage subject={subject} /> : <VocabularyListPage />}
+                    </VocabularyWrapper>
+                );
+            }}
         />
 
         <Route
