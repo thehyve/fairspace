@@ -14,7 +14,7 @@ const collectionsPage = () => (
                 <CollectionBrowserContainer />
             </Grid>
             <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                <InformationDrawer />
+                <InformationDrawer inCollectionsBrowser />
             </Grid>
         </Grid>
     </CollectionBreadcrumbsContextProvider>

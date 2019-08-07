@@ -1,46 +1,53 @@
 import React from 'react';
-import {Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TablePagination, withStyles} from "@material-ui/core";
+import {
+    Paper, Table, TableBody, TableCell, TableHead, TableRow,
+    TableSortLabel, TablePagination, withStyles,
+} from "@material-ui/core";
 
 import styles from './CollectionList.styles';
 import getDisplayName from "../../utils/userUtils";
 import {formatDateTime} from "../../utils/genericUtils";
 import useSorting from "../common/useSorting";
 import usePagination from "../common/usePagination";
+import MessageDisplay from '../common/MessageDisplay';
 
-const CollectionList = (props) => {
-    const {
-        collections = [],
-        selectedCollectionLocation,
-        onCollectionClick,
-        onCollectionDoubleClick, classes
-    } = props;
+const columns = {
+    name: {
+        valueExtractor: 'name',
+        label: 'Name'
+    },
+    created: {
+        valueExtractor: 'dateCreated',
+        label: 'Created'
+    },
+    creator: {
+        valueExtractor: 'displayName',
+        label: 'Creator'
+    }
+};
 
+const CollectionList = ({
+    collections = [], selectedCollectionLocation, onCollectionClick, onCollectionDoubleClick, classes
+}) => {
     // Extend collections with displayName to avoid computing it when sorting
     const collectionsWithDisplayName = collections.map(collection => ({
         ...collection,
         displayName: getDisplayName(collection.creatorObj)
     }));
 
-    const columns = {
-        name: {
-            valueExtractor: 'name',
-            label: 'Name'
-        },
-        created: {
-            valueExtractor: 'dateCreated',
-            label: 'Created'
-        },
-        creator: {
-            valueExtractor: 'displayName',
-            label: 'Creator'
-        }
-    };
-
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!collections || collections.length === 0) {
-        return "No collections";
+        return (
+            <MessageDisplay
+                message="Please create a collection."
+                variant="h6"
+                withIcon={false}
+                isError={false}
+                messageColor="textSecondary"
+            />
+        );
     }
 
     return (
