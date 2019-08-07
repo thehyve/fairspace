@@ -11,7 +11,7 @@ import Config from "../../../services/Config/Config";
 import {LoadingInlay} from "../index";
 import UserContext from '../../../UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
-import useWorkspaceInfo from '../../useWorkspaceInfo';
+import useWorkspaceInfo from '../../UseWorkspaceInfo';
 
 const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
