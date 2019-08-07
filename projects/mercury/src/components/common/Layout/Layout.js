@@ -1,5 +1,4 @@
 import React, {useContext, useState} from 'react';
-import {connect} from "react-redux";
 import {withStyles} from '@material-ui/core/styles';
 
 import styles from './Layout.styles';
@@ -9,19 +8,19 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../Routes";
 import Config from "../../../services/Config/Config";
-import {isWorkspacePending} from "../../../reducers/workspaceReducers";
-import {isRedirectingForLogin} from "../../../reducers/uiReducers";
 import {LoadingInlay} from "../index";
 import UserContext from '../../../UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
+import WorkspaceContext from '../../../WorkspaceContext';
 
-const Layout = ({classes, workspaceName, version, pending}) => {
+const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const {currentUserLoading} = useContext(UserContext);
+    const {name: workspaceName, version, loading: workspaceInfoLoading, redirecting} = useContext(WorkspaceContext);
 
-    if (pending || currentUserLoading) {
+    if (redirecting || workspaceInfoLoading || currentUserLoading) {
         return <LoadingInlay />;
     }
 
@@ -33,7 +32,6 @@ const Layout = ({classes, workspaceName, version, pending}) => {
             {errorContent}
         </main>
     );
-
 
     const menuOpen = menuExpanded || menuOpenDueToHover;
     const toggleMenuExpansion = () => {
@@ -79,15 +77,4 @@ const Layout = ({classes, workspaceName, version, pending}) => {
 };
 
 
-const mapStateToProps = state => {
-    const {name, version} = {...state.workspace.data};
-
-    return {
-        pending: isWorkspacePending(state) || isRedirectingForLogin(state),
-        menuExpanded: state.ui.menuExpanded,
-        workspaceName: name,
-        version
-    };
-};
-
-export default connect(mapStateToProps)(withStyles(styles)(Layout));
+export default withStyles(styles)(Layout);

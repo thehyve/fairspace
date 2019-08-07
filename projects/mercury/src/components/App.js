@@ -5,7 +5,6 @@ import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 
-import {fetchWorkspace} from "../actions/workspaceActions";
 import configureStore from "../store/configureStore";
 import Config from "../services/Config/Config";
 import theme from './App.theme';
@@ -14,6 +13,7 @@ import {ErrorDialog, LoadingInlay} from './common';
 import {UserProvider} from '../UserContext';
 import {UsersProvider} from "./permissions/UsersContext";
 import useIsMounted from "../utils/useIsMounted";
+import {WorkspaceProvider} from '../WorkspaceContext';
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -30,24 +30,25 @@ const App = () => {
 
     // Initialize the store after configuration has loaded
     const store = configureStore();
-    store.dispatch(fetchWorkspace());
 
     return (
-        <UserProvider>
-            <UsersProvider>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <MuiThemeProvider theme={theme}>
-                        <Provider store={store}>
-                            <ErrorDialog>
-                                <Router>
-                                    <Layout />
-                                </Router>
-                            </ErrorDialog>
-                        </Provider>
-                    </MuiThemeProvider>
-                </MuiPickersUtilsProvider>
-            </UsersProvider>
-        </UserProvider>
+        <WorkspaceProvider>
+            <UserProvider>
+                <UsersProvider>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <MuiThemeProvider theme={theme}>
+                            <Provider store={store}>
+                                <ErrorDialog>
+                                    <Router>
+                                        <Layout />
+                                    </Router>
+                                </ErrorDialog>
+                            </Provider>
+                        </MuiThemeProvider>
+                    </MuiPickersUtilsProvider>
+                </UsersProvider>
+            </UserProvider>
+        </WorkspaceProvider>
     );
 };
 
