@@ -79,6 +79,8 @@ export class SearchAPI {
         })
             .then(this.transformESResult)
             .catch((error) => {
+                // TODO: 401 should be handled here as well, right now if the auth has expired
+                // and the user uses the search api it will show an error but will not redirect to sign in page.
                 switch (error.status) {
                     case 400: throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
                     default: throw new Error("Error retrieving search results");
