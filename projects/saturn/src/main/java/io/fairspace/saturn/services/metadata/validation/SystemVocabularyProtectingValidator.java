@@ -4,16 +4,13 @@ import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.topbraid.shacl.vocabulary.SH;
 
-import java.util.Set;
-
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 
 /**
  * Protects the system vocabulary from modification except to addition of new properties to open class shapes
  */
 public class SystemVocabularyProtectingValidator implements MetadataRequestValidator {
-    private static final Set<?> ALLOWED_PREDICATES = Set.of(SH.property, FS.domainIncludes);
-
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         removed.listStatements()
@@ -22,7 +19,15 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
 
         added.listStatements()
                 .filterKeep(statement -> SYSTEM_VOCABULARY.contains(statement.getSubject(), null))
-                .filterDrop(statement -> ALLOWED_PREDICATES.contains(statement.getPredicate()))
-                .forEachRemaining(statement -> violationHandler.onViolation("Cannot add a statement modifying a shape from the system vocabulary", statement));
+                .filterDrop(statement -> statement.getPredicate().equals(SH.property))
+                .forEachRemaining(statement -> {
+                    if (statement.getPredicate().equals(FS.domainIncludes)) {
+                        if (SYSTEM_VOCABULARY.contains(statement.getSubject(), FS.machineOnly, createTypedLiteral(true))) {
+                            violationHandler.onViolation("Cannot add a machine-only property", statement);
+                        }
+                    } else {
+                        violationHandler.onViolation("Cannot add a statement modifying a shape from the system vocabulary", statement);
+                    }
+                });
     }
 }
