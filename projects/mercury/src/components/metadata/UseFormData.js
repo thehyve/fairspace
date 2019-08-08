@@ -21,10 +21,10 @@ const useFormData = (values) => {
     const valuesWithUpdates = {...values, ...updates};
 
     const save = (property, newValue) => {
-        setUpdates({
-            ...updates,
+        setUpdates(prev => ({
+            ...prev,
             [property.key]: newValue
-        });
+        }));
         validateProperty(property, newValue);
     };
 
