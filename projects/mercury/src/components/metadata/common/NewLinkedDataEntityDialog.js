@@ -49,8 +49,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     // Store the type to create in the form to ensure it is known
     // and will be stored
     useEffect(() => {
-        addValue('@type', {id: type});
-    });
+        addValue('@type', type);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), updates, type)
@@ -136,7 +137,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     color="primary"
                     disabled={!canCreate() || isUpdating || !isValid}
                 >
-                    {isUpdating ? <CircularProgress /> : 'Create' }
+                    {isUpdating ? <CircularProgress /> : 'Create'}
                 </Button>
             </DialogActions>
         </Dialog>
