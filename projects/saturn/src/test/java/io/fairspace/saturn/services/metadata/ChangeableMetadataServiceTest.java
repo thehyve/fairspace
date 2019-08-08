@@ -2,7 +2,10 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
@@ -124,7 +127,7 @@ public class ChangeableMetadataServiceTest {
 
         api.patch(createDefaultModel().add(S1, P1, NIL));
 
-        assertFalse(ds.getDefaultModel().contains(S1, P1, (RDFNode) null));
+        assertFalse(ds.getDefaultModel().contains(S1, P1));
     }
 
     @Test
