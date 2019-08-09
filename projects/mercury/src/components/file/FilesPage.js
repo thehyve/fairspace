@@ -63,7 +63,7 @@ export class FilesPage extends React.Component {
 
     render() {
         const {
-            openedCollection, fetchFilesIfNeeded, openedPath, files, loading, selectedPaths, selectPath,
+            openedCollection, fetchFilesIfNeeded, openedPath, files, loading, error, selectedPaths, selectPath,
             deselectPath, renameFile, selectPaths, deselectAllPaths,
         } = this.props;
 
@@ -78,6 +78,7 @@ export class FilesPage extends React.Component {
                             openedPath={openedPath}
                             files={files}
                             loading={loading}
+                            error={error}
                             selectPath={selectPath}
                             selectedPaths={selectedPaths}
                             deselectPath={deselectPath}
