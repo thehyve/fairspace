@@ -133,7 +133,6 @@ class CollectionEditor extends React.Component {
                         name="connectionString"
                         onChange={(event) => this.handleInputChange('connectionString', event.target.value)}
                         fullWidth
-                        required
                     />
 
                 </DialogContent>
