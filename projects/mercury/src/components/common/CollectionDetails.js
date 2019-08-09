@@ -86,7 +86,7 @@ class CollectionDetails extends React.Component {
                                     onClose={this.handleMenuClose}
                                 >
                                     <MenuItem onClick={this.handleEdit}>
-                                        Rename
+                                        Edit
                                     </MenuItem>
                                     <MenuItem onClick={this.handleDelete}>
                                         Delete
@@ -120,7 +120,6 @@ class CollectionDetails extends React.Component {
                         name={collection.name}
                         description={collection.description}
                         location={collection.location}
-                        title={`Edit ${collection.name}`}
                         connectionString={collection.connectionString}
                         onSave={this.handleSave}
                         onClose={() => this.setState({editing: false})}
