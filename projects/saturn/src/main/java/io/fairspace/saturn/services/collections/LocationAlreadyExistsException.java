@@ -5,7 +5,7 @@ public class LocationAlreadyExistsException extends RuntimeException {
     }
 
     public LocationAlreadyExistsException(String location) {
-        super("This location has been already taken: " + location);
+        super("This location '" + location + "' is already taken");
     }
 
 }
