@@ -15,7 +15,7 @@ const additionalReducer = (state = defaultState, action) => {
                 invalidated: true,
             };
         case actionTypes.UPDATE_COLLECTION_FULFILLED:
-            return {...defaultState};
+            return {...state, invalidated: true};
         default:
             return state;
     }
