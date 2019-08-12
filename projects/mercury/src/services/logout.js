@@ -7,7 +7,7 @@ export default function logout() {
     const performLocalLogout = () => {window.location.href = Config.get().urls.logout;};
 
     if (jupyterhubUrl) {
-        return axios.get(`${Config.get().urls.jupyterhub}/hub/logout`)
+        return axios.get(`${Config.get().urls.jupyterhub}/hub/logout`, {withCredentials: true})
             .catch(() => {})
             .then(performLocalLogout);
     }
