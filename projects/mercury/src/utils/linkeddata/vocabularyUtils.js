@@ -95,9 +95,13 @@ export const vocabularyUtils = (vocabulary = []) => {
     /**
      * Returns a list of classes marked as fairspace entities.
      *
-     * This is a list of entities that is not marked as machine-only, but does contain a targetClass predicate
+     * This is a list of entities that is not marked as machine-only, but does contain a targetClass predicate.
+     * Deleted entries are excluded from the list
      */
-    const getClassesInCatalog = () => vocabulary.filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) && !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI));
+    const getClassesInCatalog = () => vocabulary
+        .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))
+        .filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI))
+        .filter(entry => !getFirstPredicateValue(entry, constants.DATE_DELETED_URI));
 
     /**
      * Returns a list of classes marked as fairspace entities

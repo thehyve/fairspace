@@ -8,6 +8,37 @@
     ]
   },
   {
+    "@id": "http://fairspace.io/ontology#DeletedClass",
+    "@type": [
+      "http://fairspace.io/ontology#ClassShape"
+    ],
+    "http://www.w3.org/ns/shacl#name": [
+      {
+        "@value": "Deleted class"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#property": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape"
+      }
+    ],
+    "http://www.w3.org/ns/shacl#targetClass": [
+      {
+        "@id": "http://fairspace.io/ontology#Some-Class"
+      }
+    ],
+    "http://fairspace.io/ontology#dateDeleted": [
+      {
+        "@value": "2010-01-01"
+      }
+    ],
+    "http://fairspace.io/ontology#deletedBy": [
+      {
+        "@id": "http://some-person"
+      }
+    ]
+  },
+  {
     "@id": "http://fairspace.io/ontology#CollectionShape",
     "@type": [
       "http://fairspace.io/ontology#ClassShape"
