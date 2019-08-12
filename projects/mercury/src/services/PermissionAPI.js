@@ -13,7 +13,12 @@ class PermissionAPI {
     getPermissions(iri) {
         return axios.get(
             `${Config.get().urls.permissions}?${queryString.stringify({iri, all: true})}`,
-            {headers: {Accept: 'application/json'}}
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            }
         ).catch(handleHttpError('Error while loading collection permissions'))
             .then(response => response.data);
     }
