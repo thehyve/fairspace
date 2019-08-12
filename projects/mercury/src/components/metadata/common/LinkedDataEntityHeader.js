@@ -1,6 +1,7 @@
 import React from 'react';
-import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 
+import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
 import useLinkedData from '../UseLinkedData';
 import Iri from "../../common/Iri";
 import IriTooltip from "../../common/IriTooltip";
@@ -15,17 +16,32 @@ const styles = {
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis'
+    },
+
+    deletedIri: {
+        textDecoration: 'line-through'
+    },
+
+    deleteText: {
+        color: 'red',
+        fontSize: '0.7em'
     }
 };
 
-const LinkedDataEntityHeader = ({classes, subject}) => {
-    const {linkedDataError, values, typeInfo} = useLinkedData(subject);
-
-    return !linkedDataError && (
+export const LinkedDataEntityHeader = ({
+    subject,
+    classes = {},
+    linkedDataLoading = false,
+    linkedDataError = false,
+    values = {},
+    typeInfo = {}
+}) => {
+    const isDeleted = values[DATE_DELETED_URI];
+    return !linkedDataError && !linkedDataLoading && (
         <>
             <Grid container justify="space-between" style={{alignItems: "center"}}>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
-                    <Typography variant="h5" className={classes.iri}>
+                    <Typography variant="h5" className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}>
                         <IriTooltip title={subject}>
                             <Iri iri={subject} />
                         </IriTooltip>
@@ -36,7 +52,7 @@ const LinkedDataEntityHeader = ({classes, subject}) => {
                 <Grid item style={{display: "flex", alignItems: "center"}}>
                     <DeleteEntityButton
                         subject={subject}
-                        isDeletable={!values[DATE_DELETED_URI] && !values[FIXED_SHAPE_URI]}
+                        isDeletable={!isDeleted && !values[FIXED_SHAPE_URI]}
                     />
 
                     <CollectionBrowserLink
@@ -60,9 +76,23 @@ const LinkedDataEntityHeader = ({classes, subject}) => {
                     </Tooltip>
                 </Grid>
             </Grid>
+
+            {isDeleted ? <span className={classes.deleteText}>This entity has been deleted</span> : ''}
+
             <Divider style={{marginTop: 16}} />
         </>
     );
 };
 
-export default withStyles(styles)(LinkedDataEntityHeader);
+LinkedDataEntityHeader.propTypes = {
+    subject: PropTypes.string.isRequired
+};
+
+const ContextualLinkedDataEntityHeader = props => (
+    <LinkedDataEntityHeader
+        {...props}
+        {...useLinkedData(props.subject)}
+    />
+);
+
+export default withStyles(styles)(ContextualLinkedDataEntityHeader);
