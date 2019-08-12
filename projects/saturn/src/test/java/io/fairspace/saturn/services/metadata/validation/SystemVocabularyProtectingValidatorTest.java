@@ -55,4 +55,12 @@ public class SystemVocabularyProtectingValidatorTest {
         verify(violationHandler).onViolation("Cannot add a statement modifying a shape from the system vocabulary", stmt);
     }
 
+    @Test
+    public void itIsNotPossibleToAddMachineOnlyProperties() {
+        var stmt = createStatement(createResource(FS.createdBy +"Shape"), FS.domainIncludes, createResource("http://example.com/Test"));
+        var model = modelOf(stmt);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
+
+        verify(violationHandler).onViolation("Cannot add a machine-only property", stmt);
+    }
 }
