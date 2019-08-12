@@ -49,6 +49,10 @@ it('merges existing config with external config', () => {
     expect(mockAxios.get).toHaveBeenCalledTimes(1);
 });
 
+// The test are actually affected by each other, making the 2nd one fails (silently).
+// To confirm this just await the expect method.
+// One idea to improve the implementation and tests of the Config files is to make it a custom hook.
+// But this require that all other files using it (APIs, redux actions) to be custom hooks or function based components
 it('performs no calls without external configuration files', () => {
     Config.setConfig(initialConfig);
 

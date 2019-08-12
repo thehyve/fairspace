@@ -46,10 +46,10 @@ auth:
   # Role name for data stewards, who are allowed to modify the vocabulary
   dataStewardRole: "datasteward"
   # Role name for users who are allowed to perform SPARQL queries
-  groupsUrl: "http://localhost:3000/groups"
+  groupsUrl: "http://localhost:5000/groups"
   workspaceLoginGroup: "workspace-users"
   sparqlRole: "sparql"
-  usersUrlTemplate: "http://localhost:3000/groups/%s/members"
+  usersUrlTemplate: "http://localhost:5000/groups/%s/members"
   userListSynchronizationInterval: 60
 webDAV:
   # Path of the WebDAV's local blob store

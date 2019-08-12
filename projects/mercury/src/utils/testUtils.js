@@ -2,6 +2,7 @@ import React from 'react';
 import {mount} from 'enzyme'; // eslint-disable-line import/no-extraneous-dependencies
 
 export const testNoChangedOnUnknownActionType = (description, reducer) => {
+    // eslint-disable-next-line jest/valid-describe
     describe(description, () => {
         it('should return the same state unchanged if action type is unknown by reducer', () => {
             const state = {'say what?': 'you can not touch this'};

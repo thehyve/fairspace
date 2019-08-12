@@ -1,30 +1,32 @@
 [
   {
-    "iri":"http://localhost/iri/13300b41-b4a0-463f-95aa-764d9efdc5cc",
-    "name":"Ygritte Lopez"
+    "id": "13300b41-b4a0-463f-95aa-764d9efdc5cc",
+    "firstName": "Ygritte",
+    "lastName": "Lopez",
+    "enabled": true
   },
   {
-    "iri":"http://localhost/iri/ab161dae-e402-4fd2-9d86-130387dc25ef",
-    "name":"Daenarys Targaryen"
+    "id": "ab161dae-e402-4fd2-9d86-130387dc25ef",
+    "firstName": "Daenarys",
+    "lastName": "Targaryen",
+    "enabled": true
   },
   {
-    "iri":"http://localhost/iri/f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
-    "name":"Gregor Clegane"
+    "id": "f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
+    "firstName": "Gregor",
+    "lastName": "Clegane",
+    "enabled": true
   },
   {
-    "iri":"http://localhost/iri/05364a93-cd21-4c48-8b01-948512d63a8b",
-    "name":"Cersei Lannister"
+    "id": "05364a93-cd21-4c48-8b01-948512d63a8b",
+    "firstName": "Cersei",
+    "lastName": "Lannister",
+    "enabled": true
   },
   {
-    "iri":"http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-    "name":"John Snow"
-  },
-  {
-    "iri":"http://localhost/iri/user1-id",
-    "name":"Andre Hazes"
-  },
-  {
-    "iri":"http://localhost/iri/user2-id",
-    "name":"Gerald Joling"
+    "id": "6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+    "firstName": "John",
+    "lastName": "Snow",
+    "enabled": true
   }
 ]

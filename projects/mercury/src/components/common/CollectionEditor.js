@@ -88,7 +88,7 @@ class CollectionEditor extends React.Component {
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle id="form-dialog-title">
-                    {this.props.title}
+                    Edit Collection
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>You can edit the collection details here.</DialogContentText>
@@ -133,7 +133,6 @@ class CollectionEditor extends React.Component {
                         name="connectionString"
                         onChange={(event) => this.handleInputChange('connectionString', event.target.value)}
                         fullWidth
-                        required
                     />
 
                 </DialogContent>

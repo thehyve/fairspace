@@ -21,8 +21,10 @@ app.get('/config/config.json', (req, res) => res.sendFile(`${mockDataDir}/worksp
 // Account API
 app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
 
+app.get('/groups', (req, res) => res.sendFile(`${mockDataDir}/workspace/groups.json`));
+
 // Workspace API
-app.get('/api/v1/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
+app.get('/groups/123/members', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
 
 
 app.listen(port);

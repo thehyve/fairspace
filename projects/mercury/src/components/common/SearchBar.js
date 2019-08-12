@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {InputBase, withStyles} from '@material-ui/core';
+import {Input, withStyles} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
 import styles from './SearchBar.styles';
 
 const SearchBar = ({
-    classes, query = '', placeholder, onSearchChange = () => {}
+    classes, query = '', placeholder, onSearchChange = () => {}, disableUnderline = true,
 }) => {
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
@@ -33,7 +33,7 @@ const SearchBar = ({
             <form
                 onSubmit={handleSearch}
             >
-                <InputBase
+                <Input
                     placeholder={placeholder}
                     classes={{
                         root: classes.inputRoot,
@@ -41,6 +41,7 @@ const SearchBar = ({
                     }}
                     value={value}
                     onChange={handleChange}
+                    disableUnderline={disableUnderline}
                 />
             </form>
         </div>

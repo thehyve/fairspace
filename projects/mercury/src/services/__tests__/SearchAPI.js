@@ -182,41 +182,33 @@ describe('Search API', () => {
         });
     });
 
-    it('forwards the metadata search query to ES', () => {
+    it('forwards the metadata search query to ES', async () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
 
-        searchAPI.searchLinkedData({types, query: 'my-query'})
-            .then(() => {
-                expect(mockClient.search.mock.calls.length)
-                    .toEqual(1);
+        await searchAPI.searchLinkedData({types, query: 'my-query'});
 
-                expect(mockClient.search.mock.calls[0][0].body.size)
-                    .toEqual(SEARCH_DEFAULT_SIZE);
-
-                expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
-                    .toEqual('my-query');
-
-                expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
-                    .toEqual(types);
-            });
+        expect(mockClient.search.mock.calls.length)
+            .toEqual(1);
+        expect(mockClient.search.mock.calls[0][0].body.size)
+            .toEqual(SEARCH_DEFAULT_SIZE);
+        expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
+            .toEqual('my-query');
+        expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
+            .toEqual(types);
     });
 
-    it('searchs all metadata when no query is given', () => {
+    it('searchs all metadata when no query is given', async () => {
         const types = ["http://localhost/vocabulary/Analysis", "http://osiris.fairspace.io/ontology#BiologicalSample"];
 
-        searchAPI.searchLinkedData({types})
-            .then(() => {
-                expect(mockClient.search.mock.calls.length)
-                    .toEqual(1);
+        await searchAPI.searchLinkedData({types});
 
-                expect(mockClient.search.mock.calls[0][0].body.size)
-                    .toEqual(SEARCH_DEFAULT_SIZE);
-
-                expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
-                    .toEqual('*');
-
-                expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
-                    .toEqual(types);
-            });
+        expect(mockClient.search.mock.calls.length)
+            .toEqual(1);
+        expect(mockClient.search.mock.calls[0][0].body.size)
+            .toEqual(SEARCH_DEFAULT_SIZE);
+        expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
+            .toEqual('*');
+        expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
+            .toEqual(types);
     });
 });

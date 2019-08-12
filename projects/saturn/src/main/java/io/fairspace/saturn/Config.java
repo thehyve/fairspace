@@ -69,7 +69,7 @@ public class Config {
 
         public String workspaceLoginGroup = "workspace";
 
-        public String usersUrlTemplate = "http://localhost:8080/api/v1/workspace/users/";
+        public String usersUrlTemplate = "http://localhost:5000/groups/%s/members";
 
         public int userListSynchronizationInterval = 60;
     }

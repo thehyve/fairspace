@@ -11,7 +11,6 @@ export {default as LinkedDataListPage} from "./LinkedDataListPage";
 export {default as LinkedDataProperty} from "./LinkedDataProperty";
 export {default as LinkedDataRelationTable} from "./LinkedDataRelationTable";
 export {default as LinkedDataShapeChooserDialog} from "./LinkedDataShapeChooserDialog";
-export * from "./LinkedDataValuesContext";
 export {default as LinkedDataValuesTable} from "./LinkedDataValuesTable";
 export {default as NewLinkedDataEntityDialog} from "./NewLinkedDataEntityDialog";
 export {default as ValidationErrorsDisplay} from "./ValidationErrorsDisplay";

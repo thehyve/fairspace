@@ -126,46 +126,6 @@ describe('Files by collection and path reducers', () => {
         expect(reducer(undefined, action)).toEqual(expectedState);
     });
 
-    it('should append files to collection (empty state)', () => {
-        const action = {
-            type: actionTypes.FETCH_FILES_FULFILLED,
-            payload: [
-                {
-                    filename: "/Jan_Smit_s_collection-500/dir1",
-                    basename: "dir1",
-                    lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
-                    size: 0,
-                    type: "directory",
-                    etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
-                }
-            ],
-            meta: {
-                path: "/Jan_Smit_s_collection-500"
-            }
-        };
-
-        const expectedState = {
-            "creatingDirectory": false,
-            "/Jan_Smit_s_collection-500": {
-                pending: false,
-                error: false,
-                invalidated: false,
-                data: [
-                    {
-                        filename: "/Jan_Smit_s_collection-500/dir1",
-                        basename: "dir1",
-                        lastmod: "Tue, 26 Feb 2019 09:12:53 GMT",
-                        size: 0,
-                        type: "directory",
-                        etag: "62831cd6fa9d1b0c4d3d2948f4e9881e"
-                    }
-                ]
-            }
-        };
-
-        expect(reducer(undefined, action)).toEqual(expectedState);
-    });
-
     it('should append files to collection', () => {
         const state = {
             "creatingDirectory": false,

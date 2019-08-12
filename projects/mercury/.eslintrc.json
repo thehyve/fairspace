@@ -1,13 +1,16 @@
 {
   "env": {
     "browser": true,
-    "jest": true
+    "jest": true,
+    "jest/globals": true
   },
   "plugins": [
-    "react-hooks"
+    "react-hooks",
+    "jest"
   ],
   "extends": [
-    "airbnb"
+    "airbnb",
+    "plugin:jest/recommended"
   ],
   "parser": "babel-eslint",
   "rules": {

@@ -164,7 +164,7 @@ describe('saving', () => {
         expect(saveCallback.mock.calls.length).toEqual(0);
     });
 
-    it('does not invoke the save callback when no name is present', () => {
+    it('does not invoke the save callback when no location is present', () => {
         // Enter data into each field
         wrapper.instance().handleInputChange('name', name);
         wrapper.instance().handleInputChange('description', description);
