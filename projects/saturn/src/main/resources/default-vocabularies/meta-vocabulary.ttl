@@ -247,7 +247,7 @@ fs:relationDomainIncludes a fs:RelationShape ;
     sh:class fs:ClassShape ;
     sh:order 3 ;
     sh:name "Domain Includes" ;
-    sh:description "The class shapes that includes this relation." ;
+    sh:description "The class shape that includes this relation." ;
 
     # Additional validation for relations as we currently do not support
     # linking more than 2 classes through a single relation. This fails
