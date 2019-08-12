@@ -6,7 +6,9 @@ import useLinkedData from '../UseLinkedData';
 import Iri from "../../common/Iri";
 import IriTooltip from "../../common/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
-import {DATE_DELETED_URI, FILE_PATH_URI, FIXED_SHAPE_URI} from "../../../constants";
+import {
+    COLLECTION_URI, DATE_DELETED_URI, DIRECTORY_URI, FILE_PATH_URI, FILE_URI, FIXED_SHAPE_URI
+} from "../../../constants";
 import DeleteEntityButton from "./DeleteEntityButton";
 import CopyButton from "../../common/CopyButton";
 
@@ -28,6 +30,8 @@ const styles = {
     }
 };
 
+const PROTECTED_ENTITY_TYPES = [COLLECTION_URI, FILE_URI, DIRECTORY_URI];
+
 export const LinkedDataEntityHeader = ({
     subject,
     classes = {},
@@ -37,6 +41,9 @@ export const LinkedDataEntityHeader = ({
     typeInfo = {}
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
+    const isFixedShape = values[FIXED_SHAPE_URI];
+    const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
+
     return !linkedDataError && !linkedDataLoading && (
         <>
             <Grid container justify="space-between" style={{alignItems: "center"}}>
@@ -52,7 +59,7 @@ export const LinkedDataEntityHeader = ({
                 <Grid item style={{display: "flex", alignItems: "center"}}>
                     <DeleteEntityButton
                         subject={subject}
-                        isDeletable={!isDeleted && !values[FIXED_SHAPE_URI]}
+                        isDeletable={!isDeleted && !isFixedShape && !isProtectedEntity}
                     />
 
                     <CollectionBrowserLink
