@@ -156,6 +156,10 @@ describe('vocabularyUtils', () => {
         it('should not return classes with machineOnly predicate', () => {
             expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#CollectionShape']));
         });
+
+        it('should not return deleted classes', () => {
+            expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#DeletedClass']));
+        });
     });
 
     describe('Class hierarchy (subclasses and descendants)', () => {
