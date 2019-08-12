@@ -151,7 +151,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:MaxCountShape, 
         fs:DescriptionShape,
         fs:PathShape,
-        fs:domainIncludes,
+        fs:relationDomainIncludes,
     [
         # This nodeKind restriction could be replaced by something like
         # sh:class fs:Class. Currently that restriction will limit our
@@ -164,15 +164,6 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         fs:importantProperty true ;
         sh:order 3
     ] ;
-    sh:and (
-      [
-        # Additional validation for relations as we currently do not support
-        # linking more than 2 classes through a single relation. This fails
-        # in table redering and in the search box. Could be fixed later. 
-        sh:path fs:domainIncludes ;
-        sh:maxCount 1 ; 
-      ]
-    ) ;
     sh:targetClass fs:RelationShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
@@ -246,6 +237,22 @@ fs:domainIncludes a fs:RelationShape ;
     sh:order 3 ;
     sh:name "Domain Includes" ;
     sh:description "All class shapes that include this property." .
+
+fs:relationDomainIncludes a fs:RelationShape ;
+    fs:inverseRelation [
+        a sh:PropertyShape ;
+        sh:path sh:property
+        ] ;
+    sh:path fs:domainIncludes ;
+    sh:class fs:ClassShape ;
+    sh:order 3 ;
+    sh:name "Domain Includes" ;
+    sh:description "The class shape that includes this relation." ;
+
+    # Additional validation for relations as we currently do not support
+    # linking more than 2 classes through a single relation. This fails
+    # in table rendering and in the search box. Could be fixed later.
+    sh:maxCount 1 .
 
 fs:fixedShapeShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
