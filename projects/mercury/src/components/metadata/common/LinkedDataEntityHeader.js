@@ -19,7 +19,6 @@ const styles = {
     },
 
     deletedIri: {
-        extend: 'iri',
         textDecoration: 'line-through'
     },
 
@@ -42,7 +41,7 @@ export const LinkedDataEntityHeader = ({
         <>
             <Grid container justify="space-between" style={{alignItems: "center"}}>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
-                    <Typography variant="h5" className={isDeleted ? classes.deletedIri : classes.iri}>
+                    <Typography variant="h5" className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}>
                         <IriTooltip title={subject}>
                             <Iri iri={subject} />
                         </IriTooltip>
