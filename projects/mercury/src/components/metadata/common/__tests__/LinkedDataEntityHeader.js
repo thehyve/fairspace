@@ -39,7 +39,7 @@ describe('LinkedDataEntityHeader', () => {
             expect(button.prop("isDeletable")).toBe(false);
         });
 
-        it('should not show a delete button for deleted entities', () => {
+        it('should show a disabled delete button for deleted entities', () => {
             const values = {
                 [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}],
                 [DELETED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
@@ -52,7 +52,8 @@ describe('LinkedDataEntityHeader', () => {
             />);
 
             const button = wrapper.find(DeleteEntityButton);
-            expect(button.length).toBe(0);
+            expect(button.length).toBe(1);
+            expect(button.prop("isDeletable")).toBe(false);
         });
     });
 });
