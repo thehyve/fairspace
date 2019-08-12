@@ -1,6 +1,7 @@
 import React from 'react';
-import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 
+import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
 import {Delete} from "@material-ui/icons";
 import useLinkedData from '../UseLinkedData';
 import Iri from "../../common/Iri";
@@ -19,15 +20,14 @@ const styles = {
     }
 };
 
-export const LinkedDataEntityHeader = ({subject, classes = {}, context = {}}) => {
-    const {
-        linkedDataLoading = false,
-        linkedDataError = false,
-        values = {},
-        typeInfo = {}
-    } = context;
-
-    return !linkedDataError && !linkedDataLoading && (
+export const LinkedDataEntityHeader = ({
+    subject,
+    classes = {},
+    linkedDataLoading = false,
+    linkedDataError = false,
+    values = {},
+    typeInfo = {}
+}) => !linkedDataError && !linkedDataLoading && (
         <>
             <Grid container justify="space-between" style={{alignItems: "center"}}>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
@@ -74,13 +74,16 @@ export const LinkedDataEntityHeader = ({subject, classes = {}, context = {}}) =>
             </Grid>
             <Divider style={{marginTop: 16}} />
         </>
-    );
-};
+);
+
+LinkedDataEntityHeader.propTypes = {
+    subject: PropTypes.string.required
+}
 
 const ContextualLinkedDataEntityHeader = props => (
     <LinkedDataEntityHeader
         {...props}
-        context={useLinkedData(props.subject)}
+        {...useLinkedData(props.subject)}
     />
 );
 

@@ -5,17 +5,17 @@ import DeleteEntityButton from "../DeleteEntityButton";
 import {CREATED_BY_URI, DATE_DELETED_URI, DELETED_BY_URI, FIXED_SHAPE_URI} from "../../../../constants";
 
 describe('LinkedDataEntityHeader', () => {
+    const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
+
     describe('delete button', () => {
         it('should show a delete button for regular entities', () => {
             const values = {
                 [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}]
             };
 
-            const context = {values};
-            const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
             const wrapper = shallow(<LinkedDataEntityHeader
                 subject={subject}
-                context={context}
+                values={values}
             />);
 
             const button = wrapper.find(DeleteEntityButton);
@@ -29,11 +29,9 @@ describe('LinkedDataEntityHeader', () => {
                 [FIXED_SHAPE_URI]: [{value: true}]
             };
 
-            const context = {values};
-            const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
             const wrapper = shallow(<LinkedDataEntityHeader
                 subject={subject}
-                context={context}
+                values={values}
             />);
 
             const button = wrapper.find(DeleteEntityButton);
@@ -48,11 +46,9 @@ describe('LinkedDataEntityHeader', () => {
                 [DATE_DELETED_URI]: [{value: '2000-01-01'}]
             };
 
-            const context = {values};
-            const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
             const wrapper = shallow(<LinkedDataEntityHeader
                 subject={subject}
-                context={context}
+                values={values}
             />);
 
             const button = wrapper.find(DeleteEntityButton);
