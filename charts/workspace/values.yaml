@@ -34,9 +34,6 @@ hyperspace:
         loginRealm: master
         realm:
         clientSecret:
-    organisationadmin:
-      username:
-      password: fairspace123
 
 # Setup ingress for workspace components
 workspace:
