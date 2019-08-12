@@ -21,7 +21,7 @@ describe('Collections reducers', () => {
         expect(reducer(undefined, {type: actionTypes.DELETE_COLLECTION_FULFILLED})).toEqual(expectedState);
     });
 
-    it('should modify collections properly on update', () => {
+    it('should invalidates collections on update without changing the data', () => {
         const state = {
             data: [{
                 location: "Jan_Smit_s_collection-500",
@@ -43,7 +43,16 @@ describe('Collections reducers', () => {
                 description: 'new description'
             }
         })).toEqual({
-            data: [],
+            data: [{
+                location: "Jan_Smit_s_collection-500",
+                name: "Jan Smit's collection 1",
+                description: "Jan Smit's collection, beyond the horizon 01",
+                iri: "https://workspace.ci.test.fairdev.app/iri/500",
+                access: "Manage",
+                type: "LOCAL_STORAGE",
+                dateCreated: "2018-09-19T15:48:23.016165Z",
+                createdBy: "user4-id",
+            }],
             invalidated: true,
         });
     });
