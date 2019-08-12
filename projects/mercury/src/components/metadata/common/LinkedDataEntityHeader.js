@@ -1,6 +1,7 @@
 import React from 'react';
 import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
 
+import {Delete} from "@material-ui/icons";
 import useLinkedData from '../UseLinkedData';
 import Iri from "../../common/Iri";
 import IriTooltip from "../../common/IriTooltip";
@@ -18,10 +19,15 @@ const styles = {
     }
 };
 
-const LinkedDataEntityHeader = ({classes, subject}) => {
-    const {linkedDataError, values, typeInfo} = useLinkedData(subject);
+export const LinkedDataEntityHeader = ({subject, classes = {}, context = {}}) => {
+    const {
+        linkedDataLoading = false,
+        linkedDataError = false,
+        values = {},
+        typeInfo = {}
+    } = context;
 
-    return !linkedDataError && (
+    return !linkedDataError && !linkedDataLoading && (
         <>
             <Grid container justify="space-between" style={{alignItems: "center"}}>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
@@ -34,10 +40,16 @@ const LinkedDataEntityHeader = ({classes, subject}) => {
                     <CopyButton style={{marginLeft: 10}} value={subject} />
                 </Grid>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
-                    <DeleteEntityButton
-                        subject={subject}
-                        isDeletable={!values[DATE_DELETED_URI] && !values[FIXED_SHAPE_URI]}
-                    />
+                    {
+                        values[DATE_DELETED_URI]
+                            ? <Tooltip title="This entity has been deleted" style={{padding: 12, color: 'red'}}><Delete /></Tooltip>
+                            : (
+                                <DeleteEntityButton
+                                    subject={subject}
+                                    isDeletable={!values[FIXED_SHAPE_URI]}
+                                />
+                            )
+                    }
 
                     <CollectionBrowserLink
                         type={typeInfo.typeIri}
@@ -65,4 +77,11 @@ const LinkedDataEntityHeader = ({classes, subject}) => {
     );
 };
 
-export default withStyles(styles)(LinkedDataEntityHeader);
+const ContextualLinkedDataEntityHeader = props => (
+    <LinkedDataEntityHeader
+        {...props}
+        context={useLinkedData(props.subject)}
+    />
+);
+
+export default withStyles(styles)(ContextualLinkedDataEntityHeader);
