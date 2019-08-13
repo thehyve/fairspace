@@ -2,7 +2,7 @@ import {expand} from 'jsonld';
 import axios from 'axios';
 
 import Config from "./Config/Config";
-import {handleHttpError} from "../utils/httpUtils";
+import {handleHttpError, extractJsonData} from "../utils/httpUtils";
 import {normalizeTypes, toJsonLd} from "../utils/linkeddata/jsonLdConverter";
 
 const requestOptions = {
@@ -44,7 +44,7 @@ class LinkedDataAPI {
 
         return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
             .catch(handleHttpError("Failure when retrieving metadata"))
-            .then(response => response.data)
+            .then(extractJsonData)
             .then(expand)
             .then(normalizeTypes);
     }
@@ -93,7 +93,7 @@ class LinkedDataAPI {
 
         return axios.get(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), requestOptions)
             .catch(handleHttpError("Failure when retrieving entities"))
-            .then(response => response.data)
+            .then(extractJsonData)
             .then(expand)
             .then(normalizeTypes);
     }
@@ -111,7 +111,7 @@ class LinkedDataAPI {
 
         return axios.get(this.getEntitiesUrl() + "?catalog", requestOptions)
             .catch(handleHttpError("Failure when retrieving entities"))
-            .then(response => response.data)
+            .then(extractJsonData)
             .then(expand)
             .then(normalizeTypes);
     }

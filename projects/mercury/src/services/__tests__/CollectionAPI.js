@@ -15,7 +15,8 @@ beforeAll(() => {
 
 it('retrieves data for collections', async () => {
     mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-        data: [{name: 'collection1'}]
+        data: [{name: 'collection1'}],
+        headers: {'content-type': 'application/json'}
     }));
 
     const collections = await CollectionAPI.getCollections();

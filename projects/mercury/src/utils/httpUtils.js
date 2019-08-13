@@ -32,3 +32,19 @@ export function handleHttpError(providedMessage) {
         }
     };
 }
+
+/**
+ * This function will extract the data property of the axios response if the content-type in the headers contains 'json'
+ * otherwise it will throw an error
+ * @param {{headers, data}}
+ */
+export function extractJsonData({headers, data}) {
+    const contentType = headers ? headers['content-type'] : '';
+    const isJson = contentType && contentType.includes('json');
+
+    if (isJson) {
+        return data;
+    }
+
+    throw Error(`Unable to parse response${contentType ? ', content type: ' + contentType : ''}`);
+}

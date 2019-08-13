@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import axios from 'axios';
 
 import Config from './Config/Config';
-import {handleHttpError} from "../utils/httpUtils";
+import {handleHttpError, extractJsonData} from "../utils/httpUtils";
 
 class PermissionAPI {
     /**
@@ -20,7 +20,7 @@ class PermissionAPI {
                 }
             }
         ).catch(handleHttpError('Error while loading collection permissions'))
-            .then(response => response.data);
+            .then(extractJsonData);
     }
 
     alterPermission(userIri, iri, access) {
@@ -35,7 +35,7 @@ class PermissionAPI {
             JSON.stringify(payload),
             {headers: {'Content-Type': 'application/json'}}
         ).catch(handleHttpError("Failure while altering a collection's permission"))
-            .then(response => response.data);
+            .then(extractJsonData);
     }
 }
 
