@@ -6,12 +6,15 @@ const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, 
     // For input fields there is only a single input field
     const hasErrors = validationErrors && validationErrors.length > 0;
 
+    // only add prop when needed to avoid warnings
+    const multilineCtrlEnter = property.multiLine ? {onMultiLineCtrlEnter} : {};
+
     const columnDefinition = {
         id: property.key,
         label: '',
         getValue: (entry, idx) => (
             <EditComponent
-                onMultiLineCtrlEnter={onMultiLineCtrlEnter}
+                {...multilineCtrlEnter}
                 property={property}
                 entry={entry}
                 onChange={value => onChange(value, idx)}
