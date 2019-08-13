@@ -34,7 +34,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
     const properties = shapes.getPropertiesForNodeShape(shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-    const values = {};
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
@@ -44,7 +43,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         updates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
-    } = useFormData(values);
+    } = useFormData();
 
     // Store the type to create in the form to ensure it is known
     // and will be stored
@@ -61,9 +60,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getIdentifier()
     );
 
-    const createEntity = (event) => {
-        if (event) event.stopPropagation();
-
+    const createEntity = () => {
         const hasErrors = validateAll(extendedProperties);
         if (!hasErrors) submitForm();
     };
@@ -83,6 +80,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 onChange={updateValue}
                 onDelete={deleteValue}
                 key="form"
+                onMultiLineCtrlEnter={() => {
+                    createEntity();
+                }}
             />
         );
 
@@ -115,29 +115,44 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth
-            maxWidth="sm"
+            maxWidth="md"
         >
-            <DialogTitle id="form-dialog-title">
-                New entity: {typeLabel}
-                <Typography variant="body2">{typeDescription}</Typography>
+            <DialogTitle disableTypography id="form-dialog-title">
+                <Typography variant="h5">{typeLabel}</Typography>
+                <Typography variant="subtitle1">{typeDescription}</Typography>
             </DialogTitle>
 
             <DialogContent style={{overflowX: 'hidden'}}>
-                {renderDialogContent()}
+                <form
+                    id={`entity-form-${getIdentifier()}`}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        createEntity();
+                    }}
+                    noValidate
+                >
+                    {renderDialogContent()}
+                </form>
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={closeDialog}
                     color="secondary"
+                    onClick={closeDialog}
+                    type="button"
+                    disabled={isUpdating}
                 >
                     Cancel
                 </Button>
                 <Button
-                    onClick={createEntity}
                     color="primary"
+                    variant="contained"
+                    type="submit"
                     disabled={!canCreate() || isUpdating || !isValid}
+                    form={`entity-form-${getIdentifier()}`}
                 >
-                    {isUpdating ? <CircularProgress /> : 'Create'}
+                    {`Create ${typeLabel}`}
+                    {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
                 </Button>
             </DialogActions>
         </Dialog>

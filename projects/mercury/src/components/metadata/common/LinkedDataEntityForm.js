@@ -15,7 +15,8 @@ export const LinkedDataEntityForm = ({
     loading = false,
     onChange = () => {},
     onAdd = () => {},
-    onDelete = () => {}
+    onDelete = () => {},
+    onMultiLineCtrlEnter = () => {}
 }) => {
     if (error) {
         return <MessageDisplay message={error} />;
@@ -53,6 +54,7 @@ export const LinkedDataEntityForm = ({
                                 onAdd={(value) => onAdd(p, value)}
                                 onChange={(value, index) => onChange(p, value, index)}
                                 onDelete={(index) => onDelete(p, index)}
+                                onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             />
                         </ListItem>
                     ))

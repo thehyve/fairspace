@@ -1,57 +1,43 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import TextField from "@material-ui/core/TextField";
 
-class BaseInputValue extends React.Component {
-    constructor(props) {
-        super(props);
+const BaseInputValue = ({entry: {value}, property: {maxValuesCount, multiLine}, currentValues, style, onChange, onMultiLineCtrlEnter, ...otherProps}) => {
+    const [localValue, setLocalValue] = useState(value);
 
-        this.state = {value: props.entry.value};
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.entry.value !== prevProps.entry.value) {
-            this.updateState();
-        }
-    }
-
-    handleChange = (e) => {
-        this.setState({value: e.target.value});
-    }
-
-    handleBlur = () => {
-        const {onChange, entry: {value: oldValue}, property} = this.props;
-        const {value: newValue} = this.state;
-
+    useEffect(() => {
         // Only store the new values if either
         // 1: the property allows only a single value (Not to add empty values to properties accepting multiple values)
         // 2: the new value is different from the old one
         // 3: the user has removed the existing value
-        if (property.maxValuesCount === 1 || newValue !== oldValue || (!newValue && oldValue)) {
-            onChange({value: newValue});
-            this.updateState();
+        if (maxValuesCount === 1 || localValue !== value || (!localValue && value)) {
+            onChange({value: localValue});
         }
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [localValue]);
 
-    updateState = () => {
-        this.setState({value: this.props.entry.value});
-    }
+    const handleChange = (e) => {
+        setLocalValue(e.target.value);
+    };
 
-    render() {
-        const {entry, property, currentValues, style, ...otherProps} = this.props;
-
-        return (
-            <TextField
-                {...otherProps}
-                multiline={property.multiLine}
-                value={this.state.value}
-                onChange={this.handleChange}
-                onBlur={this.handleBlur}
-                margin="normal"
-                style={{...style, marginTop: 0, width: '100%'}}
-            />
-        );
-    }
-}
+    return (
+        <TextField
+            {...otherProps}
+            onKeyDown={(e) => {
+                // If it's multiline and ctrl+enter then handle as submit
+                if (multiLine && e.ctrlKey && e.keyCode === 13) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onMultiLineCtrlEnter();
+                }
+            }}
+            multiline={multiLine}
+            value={localValue}
+            onChange={handleChange}
+            margin="normal"
+            style={{...style, marginTop: 0, width: '100%'}}
+        />
+    );
+};
 
 BaseInputValue.defaultProps = {
     entry: {value: ''}

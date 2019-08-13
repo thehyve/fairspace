@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from "prop-types";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
 
-const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, onChange, onDelete, canAdd, labelId, addComponent, editComponent: EditComponent}) => {
+const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, onChange, onDelete, canAdd, labelId, addComponent, editComponent: EditComponent, onMultiLineCtrlEnter}) => {
     // For input fields there is only a single input field
     const hasErrors = validationErrors && validationErrors.length > 0;
 
@@ -11,6 +11,7 @@ const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, 
         label: '',
         getValue: (entry, idx) => (
             <EditComponent
+                onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                 property={property}
                 entry={entry}
                 onChange={value => onChange(value, idx)}

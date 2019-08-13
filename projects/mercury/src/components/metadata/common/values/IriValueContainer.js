@@ -16,7 +16,8 @@ export const IriValue = ({
     namespaces = [],
     localPart = '',
     onNamespaceChange = () => {},
-    onLocalPartChange = () => {}
+    onLocalPartChange = () => {},
+    required,
 }) => {
     const namespaceOptions = [
         noNamespace,
@@ -45,6 +46,7 @@ export const IriValue = ({
             </Grid>
             <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
                 <BaseInputValue
+                    autoFocus={required}
                     property={{}}
                     entry={{value: localPart}}
                     onChange={e => onLocalPartChange(e.value)}

@@ -12,7 +12,7 @@ import useValidation from "./useValidation";
  * @returns {{valuesWithUpdates: any, updateValue: updateValue, hasFormUpdates: any, deleteValue: deleteValue, updates: any, addValue: addValue}}
  * @see {useValidation}
  */
-const useFormData = (values) => {
+const useFormData = (values = {}) => {
     const [updates, setUpdates] = useState({});
 
     const {validateProperty, validationErrors, isValid} = useValidation();

@@ -21,7 +21,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete, onMultiLineCtrlEnter}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -60,6 +60,7 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                 {
                     property.isRelationShape ? (
                         <LinkedDataRelationTable
+                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             property={property}
                             values={values}
                             canAdd={canAdd}
@@ -70,6 +71,7 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                         />
                     ) : (
                         <LinkedDataInputFieldsTable
+                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             property={property}
                             values={values}
                             validationErrors={validationErrors}
