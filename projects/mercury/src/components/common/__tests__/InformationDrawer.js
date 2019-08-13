@@ -36,7 +36,7 @@ describe('InformationDrawer', () => {
             .handleUpdateCollection('My collection', 'description', 'newlocation')
             .then(() => {
                 expect(handleCollectionLocationChange.mock.calls.length).toEqual(1);
-                expect(handleCollectionLocationChange.mock.calls[0][0].location).toEqual('newlocation');
+                expect(handleCollectionLocationChange.mock.calls[0][0]).toEqual('newlocation');
             });
     });
 

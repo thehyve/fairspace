@@ -5,7 +5,7 @@ import InputWithAddition from "./values/InputWithAddition";
 import LinkedDataDropdown from "./LinkedDataDropdown";
 import LinkedDataContext from "../LinkedDataContext";
 
-const LinkedDataDropdownWithAddition = ({property, onChange}) => {
+const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => {
     const {
         shapesPending, shapesError, determineShapeForTypes,
         requireIdentifier
@@ -24,6 +24,7 @@ const LinkedDataDropdownWithAddition = ({property, onChange}) => {
         >
             <LinkedDataDropdown
                 property={property}
+                currentValues={currentValues}
                 onChange={onChange}
             />
         </InputWithAddition>

@@ -12,11 +12,7 @@ describe('FilesPage', () => {
             description: 'description',
             location: 'location1'
         };
-        const newCollection = {
-            name: 'My collection',
-            description: 'description',
-            location: 'new-location'
-        };
+        const newLocation = 'new-location';
 
         it('updates url after collection location has changed', () => {
             const history = [];
@@ -29,7 +25,7 @@ describe('FilesPage', () => {
                 fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
             />);
 
-            wrapper.instance().handleCollectionLocationChange(newCollection);
+            wrapper.instance().handleCollectionLocationChange(newLocation);
             expect(history.length).toEqual(1);
             expect(history[0]).toEqual('/collections/new-location/subdirectory/something-else');
         });
@@ -45,7 +41,7 @@ describe('FilesPage', () => {
                 fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
             />);
 
-            wrapper.instance().handleCollectionLocationChange(newCollection);
+            wrapper.instance().handleCollectionLocationChange(newLocation);
             expect(history.length).toEqual(1);
             expect(history[0]).toEqual('/collections/new-location/');
         });
