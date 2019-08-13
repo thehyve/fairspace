@@ -69,7 +69,6 @@ jobs:
       - .travis/build.sh projects/oidc-auth
       - .travis/build.sh projects/saturn
       - .travis/build.sh projects/mercury
-      - .travis/build.sh projects/pluto
       - .travis/build.sh docs
       - export SANITIZED_BRANCH=$(echo $TRAVIS_BRANCH | sed 's/\//_/g')
       - export SPOTBUGS_OUTPUTDIR="${SANITIZED_BRANCH}/${TRAVIS_BUILD_NUMBER}"

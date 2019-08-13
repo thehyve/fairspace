@@ -120,7 +120,7 @@ pluto:
     maxSurge: 25%
   image:
     image: eu.gcr.io/fairspace-207108/pluto
-    tag: RELEASEVERSION
+    tag: "0.6.7-SNAPSHOT"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
