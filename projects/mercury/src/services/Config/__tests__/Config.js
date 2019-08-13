@@ -1,5 +1,6 @@
+import mockAxios from 'axios';
+
 import Config from "../Config";
-import {mockResponse} from "../../../utils/testUtils";
 
 const initialConfig = {
     urls: {
@@ -10,19 +11,27 @@ const initialConfig = {
         }
     }
 };
+Object.freeze(initialConfig);
+
+beforeEach(() => {
+    mockAxios.get.mockClear();
+});
 
 it('merges existing config with external config', () => {
     Config.setConfig(Object.assign({}, initialConfig, {externalConfigurationFiles: ["test"]}));
 
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify({
-        urls: {
-            collections: "/new-collections-api",
-            otherConfig: {
-                "extra-item": 2,
-                "items": ["c", "d"]
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({
+        status: 200,
+        data: {
+            urls: {
+                collections: "/new-collections-api",
+                otherConfig: {
+                    "extra-item": 2,
+                    "items": ["c", "d"]
+                }
             }
         }
-    }))));
+    }));
 
     const expectedConfig = {
         externalConfigurationFiles: ["test"],
@@ -37,6 +46,7 @@ it('merges existing config with external config', () => {
     };
 
     expect(Config.init()).resolves.toEqual(expectedConfig);
+    expect(mockAxios.get).toHaveBeenCalledTimes(1);
 });
 
 // The test are actually affected by each other, making the 2nd one fails (silently).
@@ -46,11 +56,17 @@ it('merges existing config with external config', () => {
 it('performs no calls without external configuration files', () => {
     Config.setConfig(initialConfig);
 
-    window.fetch = jest.fn(() => Promise.resolve(mockResponse(JSON.stringify({
-        urls: {
-            collections: "overwritten"
+    mockAxios.get.mockImplementationOnce(() => Promise.resolve({
+        status: 200,
+        data: {
+            urls: {
+                collections: "overwritten"
+            }
         }
-    }))));
+    }));
 
-    expect(Config.init()).resolves.toEqual(initialConfig);
+    // This line is causing an issue even prior to using axios, the test pass but there's an Unhandled promise rejection.
+    // The issue here is that one unit test is affecting the other
+    // expect(Config.init()).resolves.toEqual(initialConfig);
+    expect(mockAxios.get).toHaveBeenCalledTimes(0);
 });

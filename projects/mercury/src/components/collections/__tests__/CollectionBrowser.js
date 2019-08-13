@@ -42,8 +42,6 @@ const defaultState = {
 };
 
 beforeEach(() => {
-    window.fetch = jest.fn(() => Promise.resolve());
-
     store = mockStore(defaultState);
 
     collectionBrowser = (

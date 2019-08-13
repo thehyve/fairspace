@@ -20,7 +20,7 @@ export const PermissionProvider = ({iri, children}) => {
             setLoading(true);
 
             try {
-                const fetchedPermissions = await PermissionAPI.getPermissions(iri, false);
+                const fetchedPermissions = await PermissionAPI.getPermissions(iri);
                 if (!didCancel) {
                     setPermissions(extendWithUsernames(fetchedPermissions));
                     setLoading(false);
@@ -35,7 +35,7 @@ export const PermissionProvider = ({iri, children}) => {
 
         fetchData();
 
-        return () => { didCancel = true; };
+        return () => {didCancel = true;};
     };
 
     // Refresh the permissions whenever the iri changes

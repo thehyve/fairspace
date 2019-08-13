@@ -35,8 +35,6 @@ describe('LinkedDataEntityForm', () => {
     };
 
     beforeAll(() => {
-        window.fetch = jest.fn(() => Promise.resolve({ok: true, json: () => ({})}));
-
         Config.setConfig({
             urls: {
                 metadata: "/metadata"

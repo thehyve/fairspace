@@ -1,30 +1,39 @@
-import failOnHttpError from "../httpUtils";
+import {handleHttpError, extractJsonData} from "../httpUtils";
 
 describe('Http Utils', () => {
-    describe('failOnHttpError', () => {
-        it('Should pass through valid responses', () => {
-            expect(failOnHttpError("Default error")({ok: true, status: 200}))
-                .toEqual({ok: true, status: 200});
-        });
-
+    describe('handleHttpError', () => {
         it('Should redirect to the login page on 401 and throw exception', () => {
             window.location.assign = jest.fn();
-            expect(() => failOnHttpError("Default error")({ok: false, status: 401})).toThrow();
+            expect(() => handleHttpError("Default error")({response: {status: 401}})).toThrow();
             expect(window.location.assign).toHaveBeenCalledWith('/login?redirectUrl=http://localhost/');
         });
 
-        it('Should throw an exception with the backend error on responses other than 401',
-            () => expect(failOnHttpError("Default error")({
-                ok: false,
-                status: 500,
-                json: () => Promise.resolve({message: 'Backend error'})
-            })).rejects.toEqual(new Error('Backend error')));
+        it('Should throw an exception with the backend error on responses other than 401', () => {
+            expect(
+                () => {
+                    handleHttpError("Default error")({
+                        response: {status: 500, data: {message: 'Backend error'}}
+                    });
+                }
+            ).toThrow(new Error('Backend error'));
+        });
+    });
 
-        it('Should reject the promise on non-JSON response',
-            () => expect(failOnHttpError("Default error")({
-                ok: false,
-                status: 500,
-                json: () => Promise.reject(new Error("Parsing error"))
-            })).rejects.toEqual(new Error('Default error')));
+    describe('extractJsonData', () => {
+        it('Should extract the data of types: application/json and application/ld+json', () => {
+            const data = {dummy: true};
+            const jsonType = {'content-type': 'application/json'};
+            const jsonLdType = {'content-type': 'application/ld+json'};
+
+            expect(extractJsonData({headers: jsonType, data})).toEqual(data);
+            expect(extractJsonData({headers: jsonLdType, data})).toEqual(data);
+        });
+
+        it('Should throw an error for non json content types', () => {
+            const data = {dummy: true};
+
+            expect(() => extractJsonData({headers: {}, data})).toThrow();
+            expect(() => extractJsonData({headers: {'content-type': 'application/html'}, data})).toThrow();
+        });
     });
 });

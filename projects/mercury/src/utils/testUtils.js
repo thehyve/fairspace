@@ -1,14 +1,6 @@
 import React from 'react';
 import {mount} from 'enzyme'; // eslint-disable-line import/no-extraneous-dependencies
 
-export const mockResponse = (response, status = 200, statusText = 'OK', headers = {'Content-type': 'application/json'}) => (
-    new window.Response(response, {
-        status,
-        statusText,
-        headers
-    })
-);
-
 export const testNoChangedOnUnknownActionType = (description, reducer) => {
     // eslint-disable-next-line jest/valid-describe
     describe(description, () => {

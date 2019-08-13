@@ -1,45 +1,38 @@
+import axios from 'axios';
+
 import Config from "./Config/Config";
-import failOnHttpError from "../utils/httpUtils";
+import {handleHttpError, extractJsonData} from "../utils/httpUtils";
+
+const headers = {'Content-Type': 'application/json'};
 
 class CollectionAPI {
-    static changeHeaders = new Headers({'Content-Type': 'application/json'});
-
-    static getHeaders = new Headers({Accept: 'application/json'});
-
     getCollections() {
-        return fetch(Config.get().urls.collections, {
-            method: 'GET',
-            headers: CollectionAPI.getHeaders,
-            credentials: 'same-origin'
-        })
-            .then(failOnHttpError("Failure when retrieving a list of collections"))
-            .then(response => response.json());
+        return axios.get(Config.get().urls.collections, {headers: {Accept: 'application/json'}})
+            .catch(handleHttpError("Failure when retrieving a list of collections"))
+            .then(extractJsonData);
     }
 
     addCollection(name, description, connectionString, location) {
-        return fetch(Config.get().urls.collections, {
-            method: 'PUT',
-            headers: CollectionAPI.changeHeaders,
-            credentials: 'same-origin',
-            body: JSON.stringify({name, description, connectionString, location})
-        }).then(failOnHttpError("Failure while saving a collection"));
+        return axios.put(
+            Config.get().urls.collections,
+            JSON.stringify({name, description, connectionString, location}),
+            {headers}
+        ).catch(handleHttpError("Failure while saving a collection"));
     }
 
     updateCollection(iri, name, description, location) {
-        return fetch(`${Config.get().urls.collections}`, {
-            method: 'PATCH',
-            headers: CollectionAPI.changeHeaders,
-            credentials: 'same-origin',
-            body: JSON.stringify({iri, name, description, location})
-        }).then(failOnHttpError("Failure while updating a collection"));
+        return axios.patch(
+            Config.get().urls.collections,
+            JSON.stringify({iri, name, description, location}),
+            {headers}
+        ).catch(handleHttpError("Failure while updating a collection"));
     }
 
     deleteCollection(id) {
-        return fetch(`${Config.get().urls.collections}?iri=${encodeURIComponent(id)}`, {
-            method: 'DELETE',
-            headers: CollectionAPI.changeHeaders,
-            credentials: 'same-origin'
-        }).then(failOnHttpError("Failure while deleting collection"));
+        return axios.delete(
+            `${Config.get().urls.collections}?iri=${encodeURIComponent(id)}`,
+            {headers}
+        ).catch(handleHttpError("Failure while deleting collection"));
     }
 }
 
