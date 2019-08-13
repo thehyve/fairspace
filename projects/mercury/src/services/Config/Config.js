@@ -45,9 +45,9 @@ class Config {
             this.loadingPromise = Promise.all(
                 this.internalConfig.externalConfigurationFiles.map(file => axios.get(file)
                     .catch(({response}) => Promise.reject(Error(`Error loading configuration file ${file} ${response ? response.data : ''}`)))
-                    .then((json) => {
+                    .then((response) => {
                         console.info("Loaded external configuration from", file);
-                        this.externalConfig = merge(this.externalConfig, json);
+                        this.externalConfig = merge(this.externalConfig, response.data);
                     }))
             ).catch((msg) => {
                 // Log error message and continue with the default configuration
