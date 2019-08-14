@@ -19,7 +19,10 @@ const styles = {
     }
 };
 
-export const LinkedDataValuesTable = ({classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
+export const LinkedDataValuesTable = ({
+    classes, property, values, columnDefinitions, onOpen, onAdd,
+    onDelete, onBlur, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent
+}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const showRowDividers = property.maxValuesCount !== 1;
@@ -80,6 +83,7 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                                 currentValues={values}
                                 placeholder=""
                                 onChange={onAdd}
+                                onBlur={onBlur}
                                 aria-labelledby={labelId}
                             />
                         </TableCell>

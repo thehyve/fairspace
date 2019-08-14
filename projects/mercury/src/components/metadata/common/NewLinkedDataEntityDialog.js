@@ -39,10 +39,8 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
 
     const {
-        addValue, updateValue, deleteValue,
-        updates, valuesWithUpdates,
-
-        validateAll, validationErrors, isValid
+        addValue, updateValue, deleteValue, onBlur, updates,
+        valuesWithUpdates, validateAll, validationErrors, isValid
     } = useFormData();
 
     // Store the type to create in the form to ensure it is known
@@ -79,6 +77,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 onAdd={addValue}
                 onChange={updateValue}
                 onDelete={deleteValue}
+                onBlur={onBlur}
                 key="form"
                 onMultiLineCtrlEnter={() => {
                     createEntity();
@@ -92,6 +91,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 localPart={localPart}
                 onLocalPartChange={setLocalPart}
                 onNamespaceChange={setNamespace}
+                onBlur={onBlur}
                 required={requireIdentifier}
                 key="identifier"
             />

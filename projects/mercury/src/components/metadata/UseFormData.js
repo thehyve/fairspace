@@ -25,7 +25,7 @@ const useFormData = (values = {}) => {
             ...prev,
             [property.key]: newValue
         }));
-        validateProperty(property, newValue);
+        // validateProperty(property, newValue);
     };
 
     const current = key => valuesWithUpdates[key] || [];
@@ -43,6 +43,12 @@ const useFormData = (values = {}) => {
     const deleteValue = (property, index) => {
         const newValue = current(property.key).filter((el, idx) => idx !== index);
         save(property, newValue);
+        validateProperty(property, newValue);
+    };
+
+    const onBlur = (property, value, index) => {
+        const combinedValues = current(property.key).map((el, idx) => ((idx === index) ? value : el));
+        validateProperty(property, combinedValues);
     };
 
     const clearForm = () => setUpdates({});
@@ -54,6 +60,7 @@ const useFormData = (values = {}) => {
         updateValue,
         deleteValue,
         clearForm,
+        onBlur,
 
         hasFormUpdates,
         updates,

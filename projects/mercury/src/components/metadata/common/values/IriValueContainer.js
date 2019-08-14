@@ -17,6 +17,7 @@ export const IriValue = ({
     localPart = '',
     onNamespaceChange = () => {},
     onLocalPartChange = () => {},
+    onBlur = () => {},
     required,
 }) => {
     const namespaceOptions = [
@@ -42,6 +43,7 @@ export const IriValue = ({
                     options={namespaceOptions}
                     value={namespace || defaultNamespace}
                     onChange={onNamespaceChange}
+                    onBlur={onBlur}
                 />
             </Grid>
             <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
@@ -50,6 +52,7 @@ export const IriValue = ({
                     property={{}}
                     entry={{value: localPart}}
                     onChange={e => onLocalPartChange(e.value)}
+                    onBlur={onBlur}
                     type="url"
                 />
             </Grid>

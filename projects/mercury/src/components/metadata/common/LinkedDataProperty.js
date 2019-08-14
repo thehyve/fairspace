@@ -21,7 +21,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete, onMultiLineCtrlEnter}) => {
+const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete, onMultiLineCtrlEnter, onBlur}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -60,18 +60,17 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                 {
                     property.isRelationShape ? (
                         <LinkedDataRelationTable
-                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             property={property}
                             values={values}
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onDelete={onDelete}
+                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             addComponent={addInputComponent}
                             editorPath={editorPath}
                         />
                     ) : (
                         <LinkedDataInputFieldsTable
-                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             property={property}
                             values={values}
                             validationErrors={validationErrors}
@@ -79,6 +78,8 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                             onAdd={onAdd}
                             onChange={onChange}
                             onDelete={onDelete}
+                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
+                            onBlur={onBlur}
                             labelId={labelId}
                             editComponent={editInputComponent}
                             addComponent={addInputComponent}

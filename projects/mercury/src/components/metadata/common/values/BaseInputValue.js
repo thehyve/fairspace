@@ -1,7 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import TextField from "@material-ui/core/TextField";
 
-const BaseInputValue = ({entry: {value}, property: {maxValuesCount, multiLine}, currentValues, style, onChange, onMultiLineCtrlEnter, ...otherProps}) => {
+const BaseInputValue = ({
+    entry: {value}, property: {maxValuesCount, multiLine},
+    currentValues, style, onChange, onMultiLineCtrlEnter, onBlur, ...otherProps
+}) => {
     const [localValue, setLocalValue] = useState(value);
 
     useEffect(() => {
@@ -23,7 +26,7 @@ const BaseInputValue = ({entry: {value}, property: {maxValuesCount, multiLine}, 
         <TextField
             {...otherProps}
             onKeyDown={(e) => {
-                // If it's multiline and ctrl+enter then handle as submit
+                // If it's multiline and ctrl+enter then call the given function
                 if (multiLine && e.ctrlKey && e.keyCode === 13) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -33,6 +36,7 @@ const BaseInputValue = ({entry: {value}, property: {maxValuesCount, multiLine}, 
             multiline={multiLine}
             value={localValue}
             onChange={handleChange}
+            onBlur={() => onBlur({value: localValue})}
             margin="normal"
             style={{...style, marginTop: 0, width: '100%'}}
         />

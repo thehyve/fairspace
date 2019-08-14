@@ -13,7 +13,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject);
 
     const {
-        addValue, updateValue, deleteValue, clearForm,
+        addValue, updateValue, deleteValue, clearForm, onBlur,
         updates, hasFormUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
@@ -79,6 +79,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                         onAdd={addValue}
                         onChange={updateValue}
                         onDelete={deleteValue}
+                        onBlur={onBlur}
                     />
                 </form>
             </Grid>
