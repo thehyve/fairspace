@@ -35,14 +35,6 @@ export const deleteMultiple = (paths) => (
         }
     });
 
-export const uploadFiles = (path, files, nameMapping) => ({
-    type: actionTypes.UPLOAD_FILES,
-    payload: FileAPI.upload(path, files, nameMapping),
-    meta: {
-        path, files, nameMapping
-    }
-});
-
 export const createDirectory = (path) => ({
     type: actionTypes.CREATE_DIRECTORY,
     payload: FileAPI.createDirectory(path),

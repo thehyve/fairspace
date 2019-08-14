@@ -7,7 +7,7 @@ import {ContentCopy, ContentCut, ContentPaste, Download} from "mdi-material-ui";
 import {CreateDirectoryButton, DeleteButton, ErrorDialog, ProgressButton, RenameButton} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {generateUniqueFileName, getParentPath, joinPaths} from "../../utils/fileUtils";
+import {getParentPath, joinPaths} from "../../utils/fileUtils";
 import {CUT} from '../../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 
@@ -15,8 +15,7 @@ export const Operations = {
     PASTE: 'PASTE',
     RENAME: 'RENAME',
     MKDIR: 'MKDIR',
-    DELETE: 'DELETE',
-    UPLOAD: 'UPLOAD'
+    DELETE: 'DELETE'
 };
 Object.freeze(Operations);
 
@@ -41,23 +40,6 @@ export class FileOperations extends React.Component {
             });
     }
 
-    handleUpload(files) {
-        if (files && files.length > 0) {
-            const usedNames = [...this.props.existingFiles];
-            const updatedFiles = files.map(file => {
-                const name = generateUniqueFileName(file.name, usedNames);
-                usedNames.push(name);
-                return {value: file, name};
-            });
-
-            return this.fileOperation(Operations.UPLOAD, this.props.uploadFiles(this.props.openedPath, updatedFiles))
-                .catch((err) => {
-                    ErrorDialog.showError(err, err.message || "An error occurred while uploading files", () => this.handleUpload(files));
-                });
-        }
-        return Promise.resolve([]);
-    }
-
     handleCreateDirectory(name) {
         return this.fileOperation(Operations.MKDIR, this.props.createDirectory(joinPaths(this.props.openedPath, name)))
             .catch((err) => {
@@ -79,7 +61,7 @@ export class FileOperations extends React.Component {
                 ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
             });
-    }
+    };
 
     addBadgeIfNotEmpty(badgeContent, children) {
         if (badgeContent) {

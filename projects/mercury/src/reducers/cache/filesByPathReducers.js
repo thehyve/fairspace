@@ -76,8 +76,9 @@ const filesByPath = (state = defaultState, action) => {
             return invalidateFiles(state, ...action.meta.paths.map(getParentPath));
         case actionTypes.RENAME_FILE_FULFILLED:
         case actionTypes.INVALIDATE_FETCH_FILES:
-        case actionTypes.UPLOAD_FILES_FULFILLED:
             return invalidateFiles(state, action.meta.path);
+        case actionTypes.UPLOAD_FILE_FULFILLED:
+            return invalidateFiles(state, action.meta.destinationPath);
         case actionTypes.CLIPBOARD_PASTE_FULFILLED: {
             return invalidateFiles(state, action.meta.destinationDir, ...action.meta.filenames.map(getParentPath));
         }

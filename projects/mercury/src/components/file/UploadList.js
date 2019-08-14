@@ -1,56 +1,70 @@
 import React from 'react';
-import {Grid, Icon, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
+import {
+    Grid, Icon, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow
+} from "@material-ui/core";
 import Dropzone from "react-dropzone";
+import filesize from "filesize";
+import {UPLOAD_STATUS_IN_PROGRESS} from "../../reducers/uploadsReducers";
+import usePagination from "../common/usePagination";
 
-const UploadList = () => {
-    const files = [
-        {
-            filename: 'abc.txt',
-            collection: {
-                iri: '',
-                name: 'My collection',
-                location: '/my-collection'
-            },
-            destinationPath: 'subdirectory',
-            started: true,
-            progress: 25
-        },
-        {
-            filename: 'other-file.csv',
-            collection: {
-                iri: '',
-                name: 'My collection',
-                location: '/my-collection'
-            },
-            destinationPath: 'subdirectory',
-            started: true,
-            progress: 99
-        }
-    ];
-
-    const uploadFiles = () => {};
+const UploadList = ({uploads, enqueue}) => {
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(uploads);
 
     return (
         <Paper>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Filename</TableCell>
-                        <TableCell>Destination</TableCell>
-                        <TableCell>Progress</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {files.map(upload => (
-                        <TableRow key={upload.filename}>
-                            <TableCell>{upload.filename}</TableCell>
-                            <TableCell>{upload.collection.name} / {upload.destinationPath}</TableCell>
-                            <TableCell>{upload.started ? <LinearProgress variant="determinate" value={upload.progress} /> : 'Not started yet'}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <Dropzone onDrop={uploadFiles}>
+            {uploads.length > 0
+                ? (
+                    <>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Filename</TableCell>
+                                    <TableCell>Size</TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell>Progress</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {pagedItems.map(upload => (
+                                    <TableRow key={upload.destinationFilename}>
+                                        <TableCell>
+                                            {
+                                                upload.file.name === upload.destinationFilename
+                                                    ? upload.file.name
+                                                    : (
+                                                        <>
+                                                            {upload.file.name} <em>renamed to {upload.destinationFilename}</em>
+                                                        </>
+                                                    )
+                                            }
+                                        </TableCell>
+                                        <TableCell>{filesize(upload.file.size)}</TableCell>
+                                        <TableCell>{upload.status}</TableCell>
+                                        <TableCell>{upload.status === UPLOAD_STATUS_IN_PROGRESS ? (
+                                            <LinearProgress
+                                                variant="determinate"
+                                                value={upload.progress}
+                                            />
+                                        ) : ''}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={uploads.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onChangePage={(e, p) => setPage(p)}
+                            onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                        />
+                    </>
+                )
+                : undefined
+            }
+            <Dropzone onDrop={files => enqueue(files)}>
                 {({getRootProps, getInputProps}) => (
                     <div
                         {...getRootProps()}

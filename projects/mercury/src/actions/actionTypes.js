@@ -46,13 +46,18 @@ export const RENAME_FILE_FULFILLED                  = 'RENAME_FILE_FULFILLED';
 export const DELETE_FILES                           = 'DELETE_FILES';
 export const DELETE_FILES_FULFILLED                 = 'DELETE_FILES_FULFILLED';
 export const DELETE_FILES_REJECTED                  = 'DELETE_FILES_REJECTED';
-export const UPLOAD_FILES                           = 'UPLOAD_FILES';
-export const UPLOAD_FILES_FULFILLED                 = 'UPLOAD_FILES_FULFILLED';
 export const CREATE_DIRECTORY                       = 'CREATE_DIRECTORY';
 export const CREATE_DIRECTORY_PENDING               = 'CREATE_DIRECTORY_PENDING';
 export const CREATE_DIRECTORY_FULFILLED             = 'CREATE_DIRECTORY_FULFILLED';
 export const CREATE_DIRECTORY_REJECTED              = 'CREATE_DIRECTORY_REJECTED';
 export const INVALIDATE_CREATE_DIRECTORY            = 'INVALIDATE_CREATE_DIRECTORY';
+
+// Uploads
+export const ENQUEUE_UPLOAD                         = 'ENQUEUE_UPLOAD';
+export const UPLOAD_FILE                            = 'UPLOAD_FILE';
+export const UPLOAD_FILE_PENDING                    = 'UPLOAD_FILE_PENDING';
+export const UPLOAD_FILE_FULFILLED                  = 'UPLOAD_FILE_FULFILLED';
+export const UPLOAD_FILE_REJECTED                   = 'UPLOAD_FILE_REJECTED';
 
 // Metadata
 export const FETCH_METADATA                         = 'FETCH_METADATA';

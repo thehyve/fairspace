@@ -9,6 +9,8 @@ import FileOperations from "./FileOperations";
 import FileAPI from "../../services/FileAPI";
 import useSelection from "./useSelection";
 import UploadList from "./UploadList";
+import useUploads from "./useUploads";
+import {UPLOAD_STATUS_INITIAL} from "../../reducers/uploadsReducers";
 
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
@@ -23,7 +25,10 @@ const FileBrowser = ({
     error
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
-    const {select, selectAll, deselectAll, toggle, isSelected} = useSelection(files.map(f => f.filename));
+    const {select, selectAll, deselectAll, toggle, isSelected, selected} = useSelection(files.map(f => f.filename));
+
+    const existingFilenames = files ? files.map(file => file.basename) : [];
+    const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
 
     // Deselect all files on history changes
     useEffect(() => {
@@ -34,6 +39,11 @@ const FileBrowser = ({
         // Specify how to clean up after this effect:
         return historyListener;
     });
+
+    // Reload the files after returning from the upload tab
+    useEffect(() => {
+        fetchFilesIfNeeded(openedPath);
+    }, [currentTab, fetchFilesIfNeeded, openedPath]);
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
@@ -62,22 +72,31 @@ const FileBrowser = ({
 
     const renderFileOperations = () => (
         <FileOperations
+            selectedPaths={selected}
             openedCollection={openedCollection}
             openedPath={openedPath}
             disabled={!openedCollection.canWrite}
-            existingFiles={files ? files.map(file => file.basename) : []}
             getDownloadLink={FileAPI.getDownloadLink}
             fetchFilesIfNeeded={fetchFilesIfNeeded}
         />
     );
 
     const renderUploadOperations = () => (
-        <Button variant="contained">
+        <Button
+            variant="contained"
+            disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
+            onClick={startAll}
+        >
             <Play /> Start uploading
         </Button>
     );
 
-    const renderUploadList = () => <UploadList />;
+    const renderUploadList = () => (
+        <UploadList
+            uploads={uploads}
+            enqueue={enqueue}
+        />
+    );
 
     if (error) {
         return (<MessageDisplay message="An error occurred while loading files" />);
