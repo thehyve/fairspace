@@ -1,6 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
 import {FilesPage} from "../FilesPage";
+import InformationDrawer from "../../common/InformationDrawer";
 
 describe('FilesPage', () => {
     describe('handling of changed collection location', () => {
@@ -25,7 +26,8 @@ describe('FilesPage', () => {
                 fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
             />);
 
-            wrapper.instance().handleCollectionLocationChange(newLocation);
+            const collectionChangeHandler = wrapper.find(InformationDrawer).prop("onCollectionLocationChange");
+            collectionChangeHandler(newLocation);
             expect(history.length).toEqual(1);
             expect(history[0]).toEqual('/collections/new-location/subdirectory/something-else');
         });
@@ -41,7 +43,8 @@ describe('FilesPage', () => {
                 fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
             />);
 
-            wrapper.instance().handleCollectionLocationChange(newLocation);
+            const collectionChangeHandler = wrapper.find(InformationDrawer).prop("onCollectionLocationChange");
+            collectionChangeHandler(newLocation);
             expect(history.length).toEqual(1);
             expect(history[0]).toEqual('/collections/new-location/');
         });
