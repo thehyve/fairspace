@@ -4,15 +4,20 @@ export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
 export const UPLOAD_STATUS_ERROR = 'ERROR';
 export const UPLOAD_STATUS_FINISHED = 'FINISHED';
-export const UPLOAD_STATUS_CANCELLED = 'CANCELLED';
 
-const setStateForUpload = (uploads, selected, newState) => uploads.map(upload => {
+const updateSpecificUpload = (uploads, selected, updateFunc) => uploads.map(upload => {
     if (upload.destinationPath === selected.destinationPath && upload.destinationFilename === selected.destinationFilename) {
-        return {...upload, status: newState}
+        return updateFunc(upload);
     }
 
     return upload;
 });
+
+const setStateForUpload = (uploads, selected, newState) => updateSpecificUpload(
+    uploads,
+    selected,
+    upload => ({...upload, status: newState})
+);
 
 export default (state = [], action) => {
     switch (action.type) {
@@ -23,6 +28,8 @@ export default (state = [], action) => {
             ];
         case actionTypes.UPLOAD_FILE_PENDING:
             return setStateForUpload(state, action.meta, UPLOAD_STATUS_IN_PROGRESS);
+        case actionTypes.UPLOAD_FILE_PROGRESS:
+            return updateSpecificUpload(state, action.meta, upload => ({...upload, progress: action.meta.progress}));
         case actionTypes.UPLOAD_FILE_FULFILLED:
             return setStateForUpload(state, action.meta, UPLOAD_STATUS_FINISHED);
         case actionTypes.UPLOAD_FILE_REJECTED:

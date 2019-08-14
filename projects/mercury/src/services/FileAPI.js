@@ -73,12 +73,14 @@ class FileAPI {
      * @param destinationPath
      * @returns {Promise<never>|Promise<any[]>}
      */
-    upload({file, destinationFilename, destinationPath}) {
+    upload({file, destinationFilename, destinationPath}, onUploadProgress = () => {}) {
         if (!file) {
             return Promise.reject(Error("No file given"));
         }
 
-        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, defaultOptions)
+        const requestOptions = {...defaultOptions, onUploadProgress};
+
+        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, requestOptions)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case

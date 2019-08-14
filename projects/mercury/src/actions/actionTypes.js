@@ -55,6 +55,7 @@ export const INVALIDATE_CREATE_DIRECTORY            = 'INVALIDATE_CREATE_DIRECTO
 // Uploads
 export const ENQUEUE_UPLOAD                         = 'ENQUEUE_UPLOAD';
 export const UPLOAD_FILE                            = 'UPLOAD_FILE';
+export const UPLOAD_FILE_PROGRESS                   = 'UPLOAD_FILE_PROGRESS';
 export const UPLOAD_FILE_PENDING                    = 'UPLOAD_FILE_PENDING';
 export const UPLOAD_FILE_FULFILLED                  = 'UPLOAD_FILE_FULFILLED';
 export const UPLOAD_FILE_REJECTED                   = 'UPLOAD_FILE_REJECTED';
