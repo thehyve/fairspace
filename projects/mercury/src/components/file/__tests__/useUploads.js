@@ -1,6 +1,5 @@
 import {testHook} from "../../../utils/testUtils";
 import {disconnectedUseUploads} from "../useUploads";
-import React from "react";
 
 const testUseUploads = (path, existingFilenames, uploads, dispatch) => {
     let uploadInfo;
@@ -54,5 +53,4 @@ describe('useUploads', () => {
             destinationPath: '/'
         }]);
     });
-
 });
