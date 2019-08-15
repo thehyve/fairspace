@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import io.fairspace.saturn.util.Ref;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +21,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
     private final TransactionLog transactionLog;
-    private final Supplier<UserInfo> userInfoProvider;
+    private final Supplier<OAuthAuthenticationToken> userInfoProvider;
     private final Supplier<String> commitMessageProvider;
 
 
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<UserInfo> userInfoProvider, Supplier<String> commitMessageProvider) {
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<OAuthAuthenticationToken> userInfoProvider, Supplier<String> commitMessageProvider) {
         super(dsg);
         this.transactionLog = transactionLog;
         this.userInfoProvider = userInfoProvider;
@@ -67,7 +67,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             if (userInfoProvider != null) {
                 var userInfo = userInfoProvider.get();
                 if (userInfo != null) {
-                    userId.value = userInfo.getUserId();
+                    userId.value = userInfo.getSubjectClaim();
                     userName.value = userInfo.getFullName();
                 }
             }

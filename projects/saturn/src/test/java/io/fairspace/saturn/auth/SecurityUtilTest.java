@@ -1,7 +1,7 @@
 package io.fairspace.saturn.auth;
 
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.proc.JWTProcessor;
+import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,26 +9,26 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
+import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SecurityUtilTest {
     @Mock
-    private JWTProcessor<?> jwtProcessor;
+    private JwtTokenValidator jwtProcessor;
 
     @Mock
     private HttpServletRequest request;
 
-    private Function<HttpServletRequest, UserInfo> authenticator;
+    private Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
 
     @Before
     public void before() {
@@ -38,22 +38,21 @@ public class SecurityUtilTest {
     @Test
     public void testHappyFlow() throws Exception {
         when(request.getHeader(eq("Authorization"))).thenReturn("Bearer token");
-        var claimSet  = new JWTClaimsSet.Builder()
-                .subject("subj")
-                .claim("name", "John Smith")
-                .claim("preferred_username", "user1")
-                .claim("email", "user@example.com")
-                .claim("authorities", asList("role1", "role2"))
-                .build();
-        when(jwtProcessor.process(eq("token"), any())).thenReturn(claimSet);
+        var claims  = Map.of(
+                SUBJECT_CLAIM, "subj",
+                FULLNAME_CLAIM, "John Smith",
+                USERNAME_CLAIM, "user1",
+                EMAIL_CLAIM, "user@example.com",
+                AUTHORITIES_CLAIM, asList("role1", "role2"));
+        when(jwtProcessor.parseAndValidate(eq("token"))).thenReturn(claims);
 
         var userInfo = authenticator.apply(request);
         assertNotNull(userInfo);
-        assertEquals("subj", userInfo.getUserId());
+        assertEquals("subj", userInfo.getSubjectClaim());
         assertEquals("John Smith", userInfo.getFullName());
-        assertEquals("user1", userInfo.getUserName());
+        assertEquals("user1", userInfo.getUsername());
         assertEquals("user@example.com", userInfo.getEmail());
-        assertEquals(new HashSet<>(asList("role1", "role2")), userInfo.getAuthorities());
+        assertEquals(Set.of("role1", "role2"), userInfo.getAuthorities());
     }
 
     @Test
@@ -73,7 +72,7 @@ public class SecurityUtilTest {
     @Test
     public void testWrongToken() throws Exception {
         when(request.getHeader(eq("Authorization"))).thenReturn("Bearer token");
-        when(jwtProcessor.process(eq("token"), any())).thenThrow(ParseException.class);
+        when(jwtProcessor.parseAndValidate(eq("token"))).thenReturn(null);
 
         assertNull(authenticator.apply(request));
     }

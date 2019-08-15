@@ -8,9 +8,9 @@ import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 public class Config {
     public int port = 8080;
@@ -53,7 +53,7 @@ public class Config {
     public static class Auth {
         public boolean enabled = false;
 
-        public Set<String> developerRoles = Set.of("user", "datasteward", "sparql");
+        public List<String> developerRoles = List.of("user", "datasteward", "sparql");
 
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 

@@ -55,7 +55,7 @@ public class App {
         var eventBus = new EventBus();
 
         var userService = new UserService(CONFIG.auth.groupsUrl, CONFIG.auth.workspaceLoginGroup, CONFIG.auth.usersUrlTemplate, TimeUnit.SECONDS.toMillis(CONFIG.auth.userListSynchronizationInterval), new DAO(rdf, null));
-        Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getUserId());
+        Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getSubjectClaim());
 
         var mailService = new MailService(CONFIG.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
@@ -97,7 +97,7 @@ public class App {
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
         var apiPathPrefix = "/api/" + API_VERSION;
-        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo.getUserId()));
+        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo.getSubjectClaim()));
 
         FusekiServer.create()
                 .securityHandler(securityHandler)
