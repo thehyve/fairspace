@@ -227,7 +227,7 @@ describe('LinkedDataEntityForm', () => {
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
             const wrapper = shallow(<LinkedDataEntityForm
                 properties={metadata}
-                values={[]}
+                values={{}}
                 subject={subject}
             />);
 

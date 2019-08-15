@@ -2,7 +2,7 @@ import React from 'react';
 import {createShallow} from '@material-ui/core/test-utils';
 import {mount} from 'enzyme';
 
-import {AlterPermissionDialog, styles} from "../AlterPermissionDialog";
+import {AlterPermissionDialog} from "../AlterPermissionDialog";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
@@ -72,7 +72,7 @@ describe('AlterPermissionDialog', () => {
 
         wrapper = shallow(<AlterPermissionDialog
             open={false}
-            classes={styles()}
+            classes={{}}
             permission={null}
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
@@ -108,7 +108,7 @@ describe('AlterPermissionDialog', () => {
         wrapper = mount(
             <AlterPermissionDialog
                 open
-                classes={styles()}
+                classes={{}}
                 user={mockPermission.user}
                 access={mockPermission.access}
                 iri={mockPermission.iri}
