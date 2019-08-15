@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SecurityUtilTest {
     @Mock
-    private JwtTokenValidator jwtProcessor;
+    private JwtTokenValidator tokenValidator;
 
     @Mock
     private HttpServletRequest request;
@@ -32,7 +32,7 @@ public class SecurityUtilTest {
 
     @Before
     public void before() {
-        authenticator = createAuthenticator(jwtProcessor);
+        authenticator = createAuthenticator(tokenValidator);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class SecurityUtilTest {
                 USERNAME_CLAIM, "user1",
                 EMAIL_CLAIM, "user@example.com",
                 AUTHORITIES_CLAIM, asList("role1", "role2"));
-        when(jwtProcessor.parseAndValidate(eq("token"))).thenReturn(claims);
+        when(tokenValidator.parseAndValidate(eq("token"))).thenReturn(claims);
 
         var userInfo = authenticator.apply(request);
         assertNotNull(userInfo);
@@ -72,7 +72,7 @@ public class SecurityUtilTest {
     @Test
     public void testWrongToken() throws Exception {
         when(request.getHeader(eq("Authorization"))).thenReturn("Bearer token");
-        when(jwtProcessor.parseAndValidate(eq("token"))).thenReturn(null);
+        when(tokenValidator.parseAndValidate(eq("token"))).thenReturn(null);
 
         assertNull(authenticator.apply(request));
     }

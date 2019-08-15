@@ -12,10 +12,10 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 class JWTAuthenticator {
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final JwtTokenValidator jwtProcessor;
+    private final JwtTokenValidator tokenValidator;
 
-    JWTAuthenticator(JwtTokenValidator jwtProcessor) {
-        this.jwtProcessor = jwtProcessor;
+    JWTAuthenticator(JwtTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
     }
 
     OAuthAuthenticationToken getUserInfo(HttpServletRequest request) {
@@ -26,7 +26,7 @@ class JWTAuthenticator {
         }
 
         var token = authorizationHeader.substring(BEARER_PREFIX.length());
-        var claims = jwtProcessor.parseAndValidate(token);
+        var claims = tokenValidator.parseAndValidate(token);
 
         return claims != null ? new OAuthAuthenticationToken(token, claims) : null;
     }
