@@ -21,7 +21,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => console.log({updates}) || submitLinkedDataChanges(subject, updates)
+        () => submitLinkedDataChanges(subject, updates)
             .then(() => clearForm()),
         subject
     );
@@ -62,8 +62,6 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                 <form
                     id={`entity-form-${subject}`}
                     onSubmit={(e) => {
-                        console.log('onSubmit');
-
                         e.preventDefault();
                         e.stopPropagation();
                         validateAndSubmit();
