@@ -4,13 +4,10 @@ import LinkedDataValuesTable from "./LinkedDataValuesTable";
 
 const LinkedDataInputFieldsTable = ({
     property, values, validationErrors, onAdd, onChange, onDelete, canAdd,
-    labelId, addComponent, editComponent: EditComponent, onMultiLineCtrlEnter, onBlur
+    labelId, addComponent, editComponent: EditComponent, submitButtonRef
 }) => {
     // For input fields there is only a single input field
     const hasErrors = validationErrors && validationErrors.length > 0;
-
-    // only add prop when needed to avoid warnings
-    const multilineCtrlEnter = property.multiLine ? {onMultiLineCtrlEnter} : {};
 
     const columnDefinition = {
         id: property.key,
@@ -20,8 +17,7 @@ const LinkedDataInputFieldsTable = ({
                 property={property}
                 entry={entry}
                 onChange={value => onChange(value, idx)}
-                {...multilineCtrlEnter}
-                onBlur={value => onBlur(value, idx)}
+                submitButtonRef={submitButtonRef}
                 aria-labelledby={labelId}
                 error={hasErrors}
             />
@@ -38,8 +34,8 @@ const LinkedDataInputFieldsTable = ({
             showHeader={false}
             labelId={labelId}
             canAdd={canAdd}
-            onBlur={onBlur}
             addComponent={addComponent}
+            submitButtonRef={submitButtonRef}
         />
     );
 };

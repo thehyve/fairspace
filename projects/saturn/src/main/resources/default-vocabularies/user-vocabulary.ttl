@@ -110,7 +110,7 @@ fs:CollectionShape sh:property
 
 <AnalysisShape> a fs:ClassShape ;
     sh:closed false ; 
-    sh:description "Description for <Analysis" ;
+    sh:description "Description for Analysis" ;
     sh:name "Analysis" ;
     sh:targetClass <Analysis> ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;

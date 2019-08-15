@@ -14,7 +14,7 @@ const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@i
 
 export const LinkedDataRelationTable = ({
     property, values, onDelete, onAdd, canAdd,
-    addComponent, editorPath, history, onMultiLineCtrlEnter, onBlur
+    addComponent, editorPath, history
 }) => {
     // Determine the columns to show. If no important property shapes are defined, only
     // the URI will be shown
@@ -64,8 +64,6 @@ export const LinkedDataRelationTable = ({
             canAdd={canAdd}
             addComponent={addComponent}
             rowDecorator={rowDecorator}
-            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
-            onBlur={onBlur}
         />
     );
 };

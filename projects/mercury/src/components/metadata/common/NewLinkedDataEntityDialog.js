@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState, useRef} from "react";
 import PropTypes from 'prop-types';
 import {
     Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
@@ -16,6 +16,7 @@ import useFormSubmission from "../useFormSubmission";
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
+    const submitButtonRef = useRef(null);
 
     const getIdentifier = () => {
         // If no localPart is specified, treat the identifier as not being entered
@@ -39,7 +40,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
 
     const {
-        addValue, updateValue, deleteValue, onBlur, updates,
+        addValue, updateValue, deleteValue, updates,
         valuesWithUpdates, validateAll, validationErrors, isValid
     } = useFormData();
 
@@ -77,11 +78,8 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 onAdd={addValue}
                 onChange={updateValue}
                 onDelete={deleteValue}
-                onBlur={onBlur}
                 key="form"
-                onMultiLineCtrlEnter={() => {
-                    createEntity();
-                }}
+                submitButtonRef={submitButtonRef}
             />
         );
 
@@ -91,9 +89,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 localPart={localPart}
                 onLocalPartChange={setLocalPart}
                 onNamespaceChange={setNamespace}
-                onBlur={onBlur}
                 required={requireIdentifier}
                 key="identifier"
+                submitButtonRef={submitButtonRef}
             />
         );
 
@@ -150,6 +148,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     type="submit"
                     disabled={!canCreate() || isUpdating || !isValid}
                     form={`entity-form-${getIdentifier()}`}
+                    buttonRef={submitButtonRef}
                 >
                     {`Create ${typeLabel}`}
                     {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}

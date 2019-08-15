@@ -21,7 +21,7 @@ const styles = {
 
 export const LinkedDataValuesTable = ({
     classes, property, values, columnDefinitions, onOpen, onAdd,
-    onDelete, onBlur, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent
+    onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent, submitButtonRef
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -83,8 +83,8 @@ export const LinkedDataValuesTable = ({
                                 currentValues={values}
                                 placeholder=""
                                 onChange={onAdd}
-                                onBlur={onBlur}
                                 aria-labelledby={labelId}
+                                submitButtonRef={submitButtonRef}
                             />
                         </TableCell>
                         {property.isEditable ? <TableCell className={classes.buttonColumn} /> : undefined}

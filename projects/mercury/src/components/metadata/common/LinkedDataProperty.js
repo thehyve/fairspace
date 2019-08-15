@@ -21,7 +21,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete, onMultiLineCtrlEnter, onBlur}) => {
+const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete, submitButtonRef}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -65,7 +65,6 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                             canAdd={canAdd}
                             onAdd={onAdd}
                             onDelete={onDelete}
-                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
                             addComponent={addInputComponent}
                             editorPath={editorPath}
                         />
@@ -78,8 +77,7 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                             onAdd={onAdd}
                             onChange={onChange}
                             onDelete={onDelete}
-                            onMultiLineCtrlEnter={onMultiLineCtrlEnter}
-                            onBlur={onBlur}
+                            submitButtonRef={submitButtonRef}
                             labelId={labelId}
                             editComponent={editInputComponent}
                             addComponent={addInputComponent}

@@ -14,7 +14,7 @@ class ResourceValue extends React.Component {
     handleNamespaceChange = namespace => this.setState({namespace});
 
     render() {
-        const {entry, onChange, onBlur, ...otherProps} = this.props;
+        const {entry, onChange, ...otherProps} = this.props;
 
         return (
             <IriValueContainer
@@ -22,7 +22,6 @@ class ResourceValue extends React.Component {
                 localPart={entry.id || ''}
                 onLocalPartChange={this.handleLocalPartChange}
                 onNamespaceChange={this.handleNamespaceChange}
-                onBlur={() => onBlur(this.state.namespace)}
                 {...otherProps}
             />
         );

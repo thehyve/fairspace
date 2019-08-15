@@ -16,8 +16,7 @@ export const LinkedDataEntityForm = ({
     onChange = () => {},
     onAdd = () => {},
     onDelete = () => {},
-    onMultiLineCtrlEnter = () => {},
-    onBlur,
+    submitButtonRef,
 }) => {
     if (error) {
         return <MessageDisplay message={error} />;
@@ -55,8 +54,7 @@ export const LinkedDataEntityForm = ({
                                 onAdd={(value) => onAdd(p, value)}
                                 onChange={(value, index) => onChange(p, value, index)}
                                 onDelete={(index) => onDelete(p, index)}
-                                onMultiLineCtrlEnter={onMultiLineCtrlEnter}
-                                onBlur={(value, index) => onBlur(p, value, index)}
+                                submitButtonRef={submitButtonRef}
                             />
                         </ListItem>
                     ))

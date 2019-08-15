@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useRef} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid} from "@material-ui/core";
 
@@ -11,16 +11,17 @@ import useFormSubmission from "../useFormSubmission";
 const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
     const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject);
+    const submitButtonRef = useRef(null);
 
     const {
-        addValue, updateValue, deleteValue, clearForm, onBlur,
+        addValue, updateValue, deleteValue, clearForm,
         updates, hasFormUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => submitLinkedDataChanges(subject, updates)
+        () => console.log({updates}) || submitLinkedDataChanges(subject, updates)
             .then(() => clearForm()),
         subject
     );
@@ -43,6 +44,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     } else if (canEdit) {
         footer = (
             <Button
+                buttonRef={submitButtonRef}
                 type="submit"
                 form={`entity-form-${subject}`}
                 variant={fullpage ? 'contained' : 'text'}
@@ -60,6 +62,8 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                 <form
                     id={`entity-form-${subject}`}
                     onSubmit={(e) => {
+                        console.log('onSubmit');
+
                         e.preventDefault();
                         e.stopPropagation();
                         validateAndSubmit();
@@ -68,9 +72,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                 >
                     <LinkedDataEntityForm
                         {...otherProps}
-                        onMultiLineCtrlEnter={() => {
-                            validateAndSubmit();
-                        }}
+                        submitButtonRef={submitButtonRef}
                         error={linkedDataError}
                         loading={linkedDataLoading}
                         properties={extendedProperties}
@@ -79,7 +81,6 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                         onAdd={addValue}
                         onChange={updateValue}
                         onDelete={deleteValue}
-                        onBlur={onBlur}
                     />
                 </form>
             </Grid>
