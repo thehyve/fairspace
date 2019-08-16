@@ -74,27 +74,24 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         onClose();
     };
 
+    const formId = `entity-form-${getIdentifier()}`;
+
     const renderDialogContent = () => {
         const form = (
-            <form
-                key="form"
-                id={`entity-form-${getIdentifier()}`}
+            <LinkedDataEntityForm
+                id={formId}
                 onSubmit={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     createEntity();
                 }}
-                noValidate
-            >
-                <LinkedDataEntityForm
-                    properties={extendedProperties}
-                    values={valuesWithUpdates}
-                    validationErrors={validationErrors}
-                    onAdd={addValue}
-                    onChange={updateValue}
-                    onDelete={deleteValue}
-                />
-            </form>
+                properties={extendedProperties}
+                values={valuesWithUpdates}
+                validationErrors={validationErrors}
+                onAdd={addValue}
+                onChange={updateValue}
+                onDelete={deleteValue}
+            />
         );
 
         const idField = (
@@ -150,7 +147,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     onClick={createEntity}
                     color="primary"
                     variant="contained"
-                    form={`entity-form-${getIdentifier()}`}
+                    form={formId}
                     disabled={!canCreate() || isUpdating || !isValid}
                 >
                     {`Create ${typeLabel}`}

@@ -37,6 +37,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
         if (!hasErrors) submitForm();
     };
 
+    const formId = `entity-form-${subject}`;
     let footer;
 
     if (isUpdating) {
@@ -45,7 +46,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
         footer = (
             <Button
                 type="submit"
-                form={`entity-form-${subject}`}
+                form={formId}
                 variant={fullpage ? 'contained' : 'text'}
                 color="primary"
                 onClick={validateAndSubmit}
@@ -60,27 +61,23 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
         <FormContext.Provider value={{submit: validateAndSubmit}}>
             <Grid container>
                 <Grid item xs={12}>
-                    <form
-                        id={`entity-form-${subject}`}
+                    <LinkedDataEntityForm
+                        {...otherProps}
+                        id={formId}
                         onSubmit={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             validateAndSubmit();
                         }}
-                        noValidate
-                    >
-                        <LinkedDataEntityForm
-                            {...otherProps}
-                            error={linkedDataError}
-                            loading={linkedDataLoading}
-                            properties={extendedProperties}
-                            values={valuesWithUpdates}
-                            validationErrors={validationErrors}
-                            onAdd={addValue}
-                            onChange={updateValue}
-                            onDelete={deleteValue}
-                        />
-                    </form>
+                        error={linkedDataError}
+                        loading={linkedDataLoading}
+                        properties={extendedProperties}
+                        values={valuesWithUpdates}
+                        validationErrors={validationErrors}
+                        onAdd={addValue}
+                        onChange={updateValue}
+                        onDelete={deleteValue}
+                    />
                 </Grid>
                 {footer && <Grid item>{footer}</Grid>}
             </Grid>
