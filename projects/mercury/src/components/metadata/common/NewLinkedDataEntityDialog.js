@@ -12,6 +12,7 @@ import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../useFormSubmission";
+import FormContext from "./FormContext";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -41,7 +42,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const {
         addValue, updateValue, deleteValue,
-        updates, valuesWithUpdates,
+        getUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
     } = useFormData(values);
@@ -54,7 +55,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     }, []);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => createLinkedDataEntity(getIdentifier(), updates, type)
+        () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
             .then(result => {
                 onCreate(result);
             }),
@@ -123,7 +124,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             </DialogTitle>
 
             <DialogContent style={{overflowX: 'hidden'}}>
-                {renderDialogContent()}
+                <FormContext.Provider value={{submit: createEntity}}>
+                    {renderDialogContent()}
+                </FormContext.Provider>
             </DialogContent>
             <DialogActions>
                 <Button

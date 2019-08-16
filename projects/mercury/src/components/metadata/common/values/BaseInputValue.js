@@ -1,57 +1,49 @@
-import React from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import TextField from "@material-ui/core/TextField";
+import FormContext from "../FormContext";
 
-class BaseInputValue extends React.Component {
-    constructor(props) {
-        super(props);
+const BaseInputValue = ({entry: {value}, property, currentValues, style, onChange, ...otherProps}) => {
+    const [localValue, setLocalValue] = useState(value);
+    const {submit} = useContext(FormContext);
 
-        this.state = {value: props.entry.value};
-    }
+    useEffect(() => {
+        setLocalValue(value);
+    }, [value]);
 
-    componentDidUpdate(prevProps) {
-        if (this.props.entry.value !== prevProps.entry.value) {
-            this.updateState();
-        }
-    }
+    const handleChange = (e) => {
+        setLocalValue(e.target.value);
+    };
 
-    handleChange = (e) => {
-        this.setState({value: e.target.value});
-    }
-
-    handleBlur = () => {
-        const {onChange, entry: {value: oldValue}, property} = this.props;
-        const {value: newValue} = this.state;
-
+    const updateOuterState = (newValue) => {
         // Only store the new values if either
         // 1: the property allows only a single value (Not to add empty values to properties accepting multiple values)
         // 2: the new value is different from the old one
         // 3: the user has removed the existing value
-        if (property.maxValuesCount === 1 || newValue !== oldValue || (!newValue && oldValue)) {
+        if (property.maxValuesCount === 1 || newValue !== value || (!newValue && value)) {
             onChange({value: newValue});
-            this.updateState();
         }
-    }
+    };
 
-    updateState = () => {
-        this.setState({value: this.props.entry.value});
-    }
-
-    render() {
-        const {entry, property, currentValues, style, ...otherProps} = this.props;
-
-        return (
-            <TextField
-                {...otherProps}
-                multiline={property.multiLine}
-                value={this.state.value}
-                onChange={this.handleChange}
-                onBlur={this.handleBlur}
-                margin="normal"
-                style={{...style, marginTop: 0, width: '100%'}}
-            />
-        );
-    }
-}
+    return (
+        <TextField
+            {...otherProps}
+            multiline={property.multiLine}
+            value={localValue}
+            onChange={handleChange}
+            onBlur={() => updateOuterState(localValue)}
+            onKeyDown={(e) => {
+                if (e.keyCode === 13 && e.ctrlKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    updateOuterState(e.target.value);
+                    submit();
+                }
+            }}
+            margin="normal"
+            style={{...style, marginTop: 0, width: '100%'}}
+        />
+    );
+};
 
 BaseInputValue.defaultProps = {
     entry: {value: ''}
