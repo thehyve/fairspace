@@ -79,12 +79,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const renderDialogContent = () => {
         const form = (
             <LinkedDataEntityForm
+                key="form"
                 id={formId}
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    createEntity();
-                }}
+                onSubmit={createEntity}
                 properties={extendedProperties}
                 values={valuesWithUpdates}
                 validationErrors={validationErrors}
@@ -96,12 +93,12 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
         const idField = (
             <LinkedDataIdentifierField
+                key="identifier"
                 namespace={namespace}
                 localPart={localPart}
                 onLocalPartChange={setLocalPart}
                 onNamespaceChange={setNamespace}
                 required={requireIdentifier}
-                key="identifier"
             />
         );
 

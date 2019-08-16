@@ -64,11 +64,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                     <LinkedDataEntityForm
                         {...otherProps}
                         id={formId}
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            validateAndSubmit();
-                        }}
+                        onSubmit={validateAndSubmit}
                         error={linkedDataError}
                         loading={linkedDataLoading}
                         properties={extendedProperties}

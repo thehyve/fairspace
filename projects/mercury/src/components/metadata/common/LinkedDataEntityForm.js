@@ -31,9 +31,12 @@ export const LinkedDataEntityForm = ({
 
     return (
         <form
-            key="form"
             id={id}
-            onSubmit={onSubmit}
+            onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSubmit();
+            }}
             noValidate
         >
             <List dense>
