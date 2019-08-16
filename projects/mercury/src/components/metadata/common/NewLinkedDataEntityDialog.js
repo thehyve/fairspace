@@ -12,6 +12,7 @@ import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../useFormSubmission";
+import FormContext from "./FormContext";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -41,7 +42,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const {
         addValue, updateValue, deleteValue,
-        updates, valuesWithUpdates,
+        getUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
     } = useFormData(values);
@@ -54,7 +55,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     }, []);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => createLinkedDataEntity(getIdentifier(), updates, type)
+        () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
             .then(result => {
                 onCreate(result);
             }),
@@ -73,27 +74,31 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         onClose();
     };
 
+    const formId = `entity-form-${getIdentifier()}`;
+
     const renderDialogContent = () => {
         const form = (
             <LinkedDataEntityForm
+                key="form"
+                id={formId}
+                onSubmit={createEntity}
                 properties={extendedProperties}
                 values={valuesWithUpdates}
                 validationErrors={validationErrors}
                 onAdd={addValue}
                 onChange={updateValue}
                 onDelete={deleteValue}
-                key="form"
             />
         );
 
         const idField = (
             <LinkedDataIdentifierField
+                key="identifier"
                 namespace={namespace}
                 localPart={localPart}
                 onLocalPartChange={setLocalPart}
                 onNamespaceChange={setNamespace}
                 required={requireIdentifier}
-                key="identifier"
             />
         );
 
@@ -115,29 +120,35 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth
-            maxWidth="sm"
+            maxWidth="md"
         >
-            <DialogTitle id="form-dialog-title">
-                New entity: {typeLabel}
-                <Typography variant="body2">{typeDescription}</Typography>
+            <DialogTitle disableTypography id="form-dialog-title">
+                <Typography variant="h5">{typeLabel}</Typography>
+                <Typography variant="subtitle1">{typeDescription}</Typography>
             </DialogTitle>
-
             <DialogContent style={{overflowX: 'hidden'}}>
-                {renderDialogContent()}
+                <FormContext.Provider value={{submit: createEntity}}>
+                    {renderDialogContent()}
+                </FormContext.Provider>
             </DialogContent>
             <DialogActions>
                 <Button
                     onClick={closeDialog}
                     color="secondary"
+                    disabled={isUpdating}
                 >
                     Cancel
                 </Button>
                 <Button
+                    type="submit"
                     onClick={createEntity}
                     color="primary"
+                    variant="contained"
+                    form={formId}
                     disabled={!canCreate() || isUpdating || !isValid}
                 >
-                    {isUpdating ? <CircularProgress /> : 'Create'}
+                    {`Create ${typeLabel}`}
+                    {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
                 </Button>
             </DialogActions>
         </Dialog>

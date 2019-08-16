@@ -39,6 +39,8 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                 {values.map((entry, idx) => rowDecorator(entry, (
                     <TableRow
                         onMouseEnter={() => setHoveredIndex(idx)}
+                        onFocus={() => setHoveredIndex(idx)}
+                        onBlur={() => setHoveredIndex(null)}
                         onMouseLeave={() => setHoveredIndex(null)}
                         onDoubleClick={() => onOpen(entry)}
                         // eslint-disable-next-line react/no-array-index-key
@@ -55,9 +57,7 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                                             data-testid="delete-btn"
                                             title="Delete"
                                             onClick={() => onDelete(idx)}
-                                            style={{
-                                                visibility: hoveredIndex === idx ? 'visible' : 'hidden',
-                                            }}
+                                            style={{opacity: hoveredIndex === idx ? 1 : 0}}
                                             aria-label="Delete"
                                         >
                                             <ClearIcon />

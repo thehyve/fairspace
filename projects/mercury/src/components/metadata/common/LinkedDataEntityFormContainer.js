@@ -6,6 +6,7 @@ import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
+import FormContext from "./FormContext";
 import useFormSubmission from "../useFormSubmission";
 
 const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
@@ -14,13 +15,13 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
 
     const {
         addValue, updateValue, deleteValue, clearForm,
-        updates, hasFormUpdates, valuesWithUpdates,
+        getUpdates, hasFormUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
     } = useFormData(values);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => submitLinkedDataChanges(subject, updates)
+        () => submitLinkedDataChanges(subject, getUpdates())
             .then(() => clearForm()),
         subject
     );
@@ -36,6 +37,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
         if (!hasErrors) submitForm();
     };
 
+    const formId = `entity-form-${subject}`;
     let footer;
 
     if (isUpdating) {
@@ -43,6 +45,8 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     } else if (canEdit) {
         footer = (
             <Button
+                type="submit"
+                form={formId}
                 variant={fullpage ? 'contained' : 'text'}
                 color="primary"
                 onClick={validateAndSubmit}
@@ -54,22 +58,26 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     }
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
-                <LinkedDataEntityForm
-                    {...otherProps}
-                    error={linkedDataError}
-                    loading={linkedDataLoading}
-                    properties={extendedProperties}
-                    values={valuesWithUpdates}
-                    validationErrors={validationErrors}
-                    onAdd={addValue}
-                    onChange={updateValue}
-                    onDelete={deleteValue}
-                />
+        <FormContext.Provider value={{submit: validateAndSubmit}}>
+            <Grid container>
+                <Grid item xs={12}>
+                    <LinkedDataEntityForm
+                        {...otherProps}
+                        id={formId}
+                        onSubmit={validateAndSubmit}
+                        error={linkedDataError}
+                        loading={linkedDataLoading}
+                        properties={extendedProperties}
+                        values={valuesWithUpdates}
+                        validationErrors={validationErrors}
+                        onAdd={addValue}
+                        onChange={updateValue}
+                        onDelete={deleteValue}
+                    />
+                </Grid>
+                {footer && <Grid item>{footer}</Grid>}
             </Grid>
-            {footer && <Grid item>{footer}</Grid>}
-        </Grid>
+        </FormContext.Provider>
     );
 };
 
