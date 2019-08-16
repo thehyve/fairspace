@@ -4,11 +4,28 @@ import {
 } from "@material-ui/core";
 import Dropzone from "react-dropzone";
 import filesize from "filesize";
-import {UPLOAD_STATUS_IN_PROGRESS} from "../../reducers/uploadsReducers";
+import {
+    UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
+} from "../../reducers/uploadsReducers";
 import usePagination from "../common/usePagination";
 
 const UploadList = ({uploads, enqueue}) => {
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(uploads);
+
+    const progress = upload => {
+        switch (upload.status) {
+            case UPLOAD_STATUS_INITIAL:
+                return "Upload pending";
+            case UPLOAD_STATUS_IN_PROGRESS:
+                return <LinearProgress variant="determinate" value={upload.progress} />;
+            case UPLOAD_STATUS_FINISHED:
+                return "Finished";
+            case UPLOAD_STATUS_ERROR:
+                return "Error uploading";
+            default:
+                return "";
+        }
+    };
 
     return (
         <Paper>
@@ -20,7 +37,6 @@ const UploadList = ({uploads, enqueue}) => {
                                 <TableRow>
                                     <TableCell>Filename</TableCell>
                                     <TableCell>Size</TableCell>
-                                    <TableCell>Status</TableCell>
                                     <TableCell>Progress</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -39,14 +55,7 @@ const UploadList = ({uploads, enqueue}) => {
                                             }
                                         </TableCell>
                                         <TableCell>{filesize(upload.file.size)}</TableCell>
-                                        <TableCell>{upload.status}</TableCell>
-                                        <TableCell>{upload.status === UPLOAD_STATUS_IN_PROGRESS ? (
-                                            <LinearProgress
-                                                variant="determinate"
-                                                value={upload.progress}
-                                            />
-                                        ) : ''}
-                                        </TableCell>
+                                        <TableCell>{progress(upload)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

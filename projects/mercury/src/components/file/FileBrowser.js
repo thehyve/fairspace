@@ -38,12 +38,16 @@ const FileBrowser = ({
 
         // Specify how to clean up after this effect:
         return historyListener;
-    });
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [history]);
 
     // Reload the files after returning from the upload tab
     useEffect(() => {
         fetchFilesIfNeeded(openedPath);
-    }, [currentTab, fetchFilesIfNeeded, openedPath]);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentTab, openedPath]);
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {

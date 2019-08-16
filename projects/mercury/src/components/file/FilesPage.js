@@ -21,13 +21,19 @@ export const FilesPage = (props) => {
         history
     } = props;
 
-    // Fetch information if needed
+    // Fetch collections on mount
     useEffect(() => {
         fetchCollectionsIfNeeded();
-    });
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Fetch files if the path has changed
     useEffect(() => {
         fetchFilesIfNeeded(openedPath);
-    }, [openedPath, fetchFilesIfNeeded]);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openedPath]);
 
     // Determine breadcrumbs. If a collection is opened, show the full path
     // Otherwise, show a temporary breadcrumb
