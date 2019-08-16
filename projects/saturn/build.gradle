@@ -4,7 +4,7 @@ buildscript {
         milton_version = '2.7.4.8'
         mockitoVersion = '2.23.0'
         jacksonVersion = '2.9.8'
-        oidcAuthVersion = '0.6.7-SNAPSHOT'
+        oidcAuthVersion = '0.6.8-SNAPSHOT'
     }
 }
 
@@ -39,6 +39,9 @@ repositories {
     maven {
         url "https://raw.githubusercontent.com/DICE-UNC/DICE-Maven/master/releases"
     }
+
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
 }
 
 dependencies {
