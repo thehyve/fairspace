@@ -67,17 +67,20 @@ class FileAPI {
     }
 
     /**
-     * Uploads the given files into the provided path
-     * @param path
-     * @param files
-     * @returns Promise<any>
+     * Uploads a file
+     * @param file
+     * @param destinationFilename
+     * @param destinationPath
+     * @returns {Promise<never>|Promise<any[]>}
      */
-    upload(path, files) {
-        if (!files) {
-            return Promise.reject(Error("No files given"));
+    upload({file, destinationFilename, destinationPath}, onUploadProgress = () => {}) {
+        if (!file) {
+            return Promise.reject(Error("No file given"));
         }
 
-        const allPromises = files.map(({name, value}) => this.client().putFileContents(`${path}/${name}`, value, defaultOptions)
+        const requestOptions = {...defaultOptions, onUploadProgress};
+
+        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, requestOptions)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
@@ -88,9 +91,7 @@ class FileAPI {
                 }
 
                 return Promise.reject(e);
-            }));
-
-        return Promise.all(allPromises).then(() => files);
+            });
     }
 
     /**

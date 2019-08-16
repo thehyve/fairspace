@@ -1,28 +1,21 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from "react-router-dom";
-import {Badge, Icon, IconButton, Grid} from "@material-ui/core";
+import {Badge, Icon, IconButton} from "@material-ui/core";
 import {ContentCopy, ContentCut, ContentPaste, Download} from "mdi-material-ui";
-import {withStyles} from '@material-ui/core/styles';
-import classNames from 'classnames';
 
-import {
-    CreateDirectoryButton, ErrorDialog,
-    UploadButton, RenameButton, DeleteButton,
-    ProgressButton
-} from "../common";
+import {CreateDirectoryButton, DeleteButton, ErrorDialog, ProgressButton, RenameButton} from "../common";
 import * as clipboardActions from "../../actions/clipboardActions";
 import * as fileActions from "../../actions/fileActions";
-import {joinPaths, generateUniqueFileName, getParentPath} from "../../utils/fileUtils";
-import styles from './FileOperations.styles';
+import {getParentPath, joinPaths} from "../../utils/fileUtils";
 import {CUT} from '../../constants';
+import FileOperationsGroup from "./FileOperationsGroup";
 
 export const Operations = {
     PASTE: 'PASTE',
     RENAME: 'RENAME',
     MKDIR: 'MKDIR',
-    DELETE: 'DELETE',
-    UPLOAD: 'UPLOAD'
+    DELETE: 'DELETE'
 };
 Object.freeze(Operations);
 
@@ -47,23 +40,6 @@ export class FileOperations extends React.Component {
             });
     }
 
-    handleUpload(files) {
-        if (files && files.length > 0) {
-            const usedNames = [...this.props.existingFiles];
-            const updatedFiles = files.map(file => {
-                const name = generateUniqueFileName(file.name, usedNames);
-                usedNames.push(name);
-                return {value: file, name};
-            });
-
-            return this.fileOperation(Operations.UPLOAD, this.props.uploadFiles(this.props.openedPath, updatedFiles))
-                .catch((err) => {
-                    ErrorDialog.showError(err, err.message || "An error occurred while uploading files", () => this.handleUpload(files));
-                });
-        }
-        return Promise.resolve([]);
-    }
-
     handleCreateDirectory(name) {
         return this.fileOperation(Operations.MKDIR, this.props.createDirectory(joinPaths(this.props.openedPath, name)))
             .catch((err) => {
@@ -85,7 +61,7 @@ export class FileOperations extends React.Component {
                 ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => this.handlePathRename(path, newName));
                 return false;
             });
-    }
+    };
 
     addBadgeIfNotEmpty(badgeContent, children) {
         if (badgeContent) {
@@ -115,124 +91,102 @@ export class FileOperations extends React.Component {
     render() {
         const {
             isWritingDisabled, clipboardItemsCount, selectedPaths,
-            classes, getDownloadLink, selectedItem = {}, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
+            getDownloadLink, selectedItem = {}, disabledForMoreThanOneSelection, isPasteDisabled, noSelectedPath
         } = this.props;
 
         const op = this.state.activeOperation;
         const busy = !!op;
 
         return (
-            <Grid container justify="space-between">
-                <Grid item>
-                    <div
-                        className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}
-                        style={{marginRight: 8}}
-                    >
-                        <IconButton
-                            title={`Download ${selectedItem.basename}`}
-                            aria-label={`Download ${selectedItem.basename}`}
-                            disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file' || busy}
-                            component="a"
-                            href={getDownloadLink(selectedItem.filename)}
-                            download
+            <>
+                <FileOperationsGroup>
+                    <ProgressButton active={op === Operations.MKDIR}>
+                        <CreateDirectoryButton
+                            onCreate={name => this.handleCreateDirectory(name)}
+                            disabled={isWritingDisabled || busy}
                         >
-                            <Download />
-                        </IconButton>
-                        <ProgressButton active={op === Operations.RENAME}>
-                            <RenameButton
-                                currentName={selectedItem.basename}
-                                onRename={newName => this.handlePathRename(selectedItem, newName)}
+                            <IconButton
+                                aria-label="Create directory"
+                                title="Create directory"
+                                disabled={isWritingDisabled || busy}
+                            >
+                                <Icon>create_new_folder</Icon>
+                            </IconButton>
+                        </CreateDirectoryButton>
+                    </ProgressButton>
+                </FileOperationsGroup>
+                <FileOperationsGroup>
+                    <IconButton
+                        title={`Download ${selectedItem.basename}`}
+                        aria-label={`Download ${selectedItem.basename}`}
+                        disabled={disabledForMoreThanOneSelection || selectedItem.type !== 'file' || busy}
+                        component="a"
+                        href={getDownloadLink(selectedItem.filename)}
+                        download
+                    >
+                        <Download />
+                    </IconButton>
+                    <ProgressButton active={op === Operations.RENAME}>
+                        <RenameButton
+                            currentName={selectedItem.basename}
+                            onRename={newName => this.handlePathRename(selectedItem, newName)}
+                            disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
+                        >
+                            <IconButton
+                                title={`Rename ${selectedItem.basename}`}
+                                aria-label={`Rename ${selectedItem.basename}`}
                                 disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
                             >
-                                <IconButton
-                                    title={`Rename ${selectedItem.basename}`}
-                                    aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={isWritingDisabled || disabledForMoreThanOneSelection || busy}
-                                >
-                                    <Icon>border_color</Icon>
-                                </IconButton>
-                            </RenameButton>
-                        </ProgressButton>
-                        <ProgressButton active={op === Operations.DELETE}>
-                            <DeleteButton
-                                numItems={selectedPaths ? selectedPaths.length : 0}
-                                onClick={this.handleDelete}
+                                <Icon>border_color</Icon>
+                            </IconButton>
+                        </RenameButton>
+                    </ProgressButton>
+                    <ProgressButton active={op === Operations.DELETE}>
+                        <DeleteButton
+                            numItems={selectedPaths ? selectedPaths.length : 0}
+                            onClick={this.handleDelete}
+                            disabled={noSelectedPath || isWritingDisabled || busy}
+                        >
+                            <IconButton
+                                title="Delete"
+                                aria-label="Delete"
                                 disabled={noSelectedPath || isWritingDisabled || busy}
                             >
-                                <IconButton
-                                    title="Delete"
-                                    aria-label="Delete"
-                                    disabled={noSelectedPath || isWritingDisabled || busy}
-                                >
-                                    <Icon>delete</Icon>
-                                </IconButton>
-
-                            </DeleteButton>
-                        </ProgressButton>
-                    </div>
-                    <div className={classNames(classes.buttonsContainer, classes.buttonsGroupShadow)}>
-                        <IconButton
-                            aria-label="Copy"
-                            title="Copy"
-                            onClick={e => this.handleCopy(e)}
-                            disabled={noSelectedPath || busy}
-                        >
-                            <ContentCopy />
-                        </IconButton>
-                        <IconButton
-                            aria-label="Cut"
-                            title="Cut"
-                            onClick={e => this.handleCut(e)}
-                            disabled={isWritingDisabled || noSelectedPath || busy}
-                        >
-                            <ContentCut />
-                        </IconButton>
-                        <ProgressButton active={op === Operations.PASTE}>
-                            <IconButton
-                                aria-label="Paste"
-                                title="Paste"
-                                onClick={e => this.handlePaste(e)}
-                                disabled={isPasteDisabled || busy}
-                            >
-                                {this.addBadgeIfNotEmpty(clipboardItemsCount, <ContentPaste />)}
+                                <Icon>delete</Icon>
                             </IconButton>
-                        </ProgressButton>
-                    </div>
-                </Grid>
 
-                <Grid item>
-                    <div className={classes.buttonsContainer}>
-                        <ProgressButton active={op === Operations.MKDIR}>
-                            <CreateDirectoryButton
-                                onCreate={name => this.handleCreateDirectory(name)}
-                                disabled={isWritingDisabled || busy}
-                            >
-                                <IconButton
-                                    aria-label="Create directory"
-                                    title="Create directory"
-                                    disabled={isWritingDisabled || busy}
-                                >
-                                    <Icon>create_new_folder</Icon>
-                                </IconButton>
-                            </CreateDirectoryButton>
-                        </ProgressButton>
-                        <ProgressButton active={op === Operations.UPLOAD}>
-                            <UploadButton
-                                onUpload={files => this.handleUpload(files)}
-                                disabled={isWritingDisabled || busy}
-                            >
-                                <IconButton
-                                    title="Upload"
-                                    aria-label="Upload"
-                                    disabled={isWritingDisabled || busy}
-                                >
-                                    <Icon>cloud_upload</Icon>
-                                </IconButton>
-                            </UploadButton>
-                        </ProgressButton>
-                    </div>
-                </Grid>
-            </Grid>
+                        </DeleteButton>
+                    </ProgressButton>
+                </FileOperationsGroup>
+                <FileOperationsGroup>
+                    <IconButton
+                        aria-label="Copy"
+                        title="Copy"
+                        onClick={e => this.handleCopy(e)}
+                        disabled={noSelectedPath || busy}
+                    >
+                        <ContentCopy />
+                    </IconButton>
+                    <IconButton
+                        aria-label="Cut"
+                        title="Cut"
+                        onClick={e => this.handleCut(e)}
+                        disabled={isWritingDisabled || noSelectedPath || busy}
+                    >
+                        <ContentCut />
+                    </IconButton>
+                    <ProgressButton active={op === Operations.PASTE}>
+                        <IconButton
+                            aria-label="Paste"
+                            title="Paste"
+                            onClick={e => this.handlePaste(e)}
+                            disabled={isPasteDisabled || busy}
+                        >
+                            {this.addBadgeIfNotEmpty(clipboardItemsCount, <ContentPaste />)}
+                        </IconButton>
+                    </ProgressButton>
+                </FileOperationsGroup>
+            </>
         );
     }
 }
@@ -269,4 +223,4 @@ const mapDispatchToProps = {
     ...clipboardActions
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FileOperations)));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(FileOperations));

@@ -19,15 +19,15 @@ const FileList = ({
 
     const columns = {
         name: {
-            valueExtractor: f => f.item.basename,
+            valueExtractor: f => f.basename,
             label: 'Name'
         },
         size: {
-            valueExtractor: f => f.item.size,
+            valueExtractor: f => f.size,
             label: 'Size'
         },
         lastmodified: {
-            valueExtractor: f => f.item.lastmod,
+            valueExtractor: f => f.lastmod,
             label: 'Last modified'
         }
     };
@@ -99,17 +99,16 @@ const FileList = ({
                 </TableHead>
                 <TableBody>
                     {pagedItems.map((file) => {
-                        const {item} = file;
-                        const checkboxVisibility = hoveredFileName === item.filename || file.selected ? 'visible' : 'hidden';
+                        const checkboxVisibility = hoveredFileName === file.filename || file.selected ? 'visible' : 'hidden';
 
                         return (
                             <TableRow
                                 hover
-                                key={item.filename}
+                                key={file.filename}
                                 selected={selectionEnabled && file.selected}
-                                onClick={() => onPathHighlight(item)}
-                                onDoubleClick={() => onPathDoubleClick(item)}
-                                onMouseEnter={() => setHoveredFileName(item.filename)}
+                                onClick={() => onPathHighlight(file)}
+                                onDoubleClick={() => onPathDoubleClick(file)}
+                                onMouseEnter={() => setHoveredFileName(file.filename)}
                                 onMouseLeave={() => setHoveredFileName('')}
                             >
                                 {
@@ -117,7 +116,7 @@ const FileList = ({
                                         <TableCell
                                             padding="none"
                                             onDoubleClick={(e) => e.stopPropagation()}
-                                            onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(item);}}
+                                            onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(file);}}
                                         >
                                             <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
                                         </TableCell>
@@ -126,17 +125,17 @@ const FileList = ({
 
                                 <TableCell align="left" padding="checkbox">
                                     <Icon>
-                                        {item.type === 'directory' ? 'folder_open' : 'note_open'}
+                                        {file.type === 'directory' ? 'folder_open' : 'note_open'}
                                     </Icon>
                                 </TableCell>
                                 <TableCell padding="none">
-                                    {item.basename}
+                                    {file.basename}
                                 </TableCell>
                                 <TableCell padding="none" align="right">
-                                    {item.type === 'file' ? filesize(item.size) : ''}
+                                    {file.type === 'file' ? filesize(file.size) : ''}
                                 </TableCell>
                                 <TableCell padding="checkbox" align="right">
-                                    {item.lastmod ? formatDateTime(item.lastmod) : null}
+                                    {file.lastmod ? formatDateTime(file.lastmod) : null}
                                 </TableCell>
                             </TableRow>
                         );

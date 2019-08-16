@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
@@ -14,87 +14,71 @@ import {getCollectionAbsolutePath} from "../../utils/collectionUtils";
 import BreadCrumbs from "../common/breadcrumbs/BreadCrumbs";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 
-export class FilesPage extends React.Component {
-    componentDidMount() {
-        const {fetchCollectionsIfNeeded, fetchFilesIfNeeded, openedPath} = this.props;
+export const FilesPage = (props) => {
+    const {
+        openedCollection, fetchCollectionsIfNeeded, fetchFilesIfNeeded, openedPath, files, loading, error, selectedPaths, selectPath,
+        deselectPath, renameFile, selectPaths, deselectAllPaths,
+        history
+    } = props;
+
+    // Fetch collections on mount
+    useEffect(() => {
         fetchCollectionsIfNeeded();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Fetch files if the path has changed
+    useEffect(() => {
         fetchFilesIfNeeded(openedPath);
-    }
 
-    componentDidUpdate(prevProps) {
-        const {fetchFilesIfNeeded, openedPath} = this.props;
-        if (prevProps.openedPath !== openedPath) {
-            fetchFilesIfNeeded(openedPath);
-        }
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openedPath]);
 
-    renderBreadcrumbs() {
-        const {openedCollection, openedPath} = this.props;
-
-        if (!openedCollection || !openedCollection.name) {
-            return (
-                <BreadCrumbs additionalSegments={[
-                    {label: '...', href: consts.COLLECTIONS_PATH + openedPath}
-                ]}
-                />
-            );
-        }
-
-        const pathSegments = splitPathIntoArray(openedPath);
-        const segments = pathSegments.map((segment, idx) => ({
-            label: segment,
+    // Determine breadcrumbs. If a collection is opened, show the full path
+    // Otherwise, show a temporary breadcrumb
+    const pathSegments = splitPathIntoArray(openedPath);
+    const breadcrumbSegments = (openedCollection && openedCollection.name)
+        ? pathSegments.map((segment, idx) => ({
+            label: idx === 0 ? openedCollection.name : segment,
             href: consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
-        }));
-        segments[0].label = openedCollection.name;
+        }))
+        : [{label: '...', href: consts.COLLECTIONS_PATH + openedPath}];
 
-        return (
-            <div style={{position: 'relative', zIndex: 1}}>
-                <BreadCrumbs additionalSegments={segments} />
-            </div>
-        );
-    }
-
-    handleCollectionLocationChange = (location) => {
-        const {openedPath} = this.props;
-
+    const handleCollectionLocationChange = (location) => {
         // If the collection location changes, the URI for the current page should change as well
-        this.props.history.push(`${getCollectionAbsolutePath(location)}${getDirectoryFromFullpath(openedPath)}`);
-    }
+        history.push(`${getCollectionAbsolutePath(location)}${getDirectoryFromFullpath(openedPath)}`);
+    };
 
-    render() {
-        const {
-            openedCollection, fetchFilesIfNeeded, openedPath, files, loading, error, selectedPaths, selectPath,
-            deselectPath, renameFile, selectPaths, deselectAllPaths,
-        } = this.props;
-
-        return (
-            <CollectionBreadcrumbsContextProvider>
-                {this.renderBreadcrumbs()}
-                <Grid container spacing={8}>
-                    <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
-                        <FileBrowser
-                            fetchFilesIfNeeded={fetchFilesIfNeeded}
-                            openedCollection={openedCollection}
-                            openedPath={openedPath}
-                            files={files}
-                            loading={loading}
-                            error={error}
-                            selectPath={selectPath}
-                            selectedPaths={selectedPaths}
-                            deselectPath={deselectPath}
-                            renameFile={renameFile}
-                            onSelectAll={() => selectPaths(files.map(f => f.filename))}
-                            onDeselectAll={deselectAllPaths}
-                        />
-                    </Grid>
-                    <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                        <InformationDrawer onCollectionLocationChange={this.handleCollectionLocationChange} />
-                    </Grid>
+    return (
+        <CollectionBreadcrumbsContextProvider>
+            <div style={{position: 'relative', zIndex: 1}}>
+                <BreadCrumbs additionalSegments={breadcrumbSegments} />
+            </div>
+            <Grid container spacing={8}>
+                <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
+                    <FileBrowser
+                        fetchFilesIfNeeded={fetchFilesIfNeeded}
+                        openedCollection={openedCollection}
+                        openedPath={openedPath}
+                        files={files}
+                        loading={loading}
+                        error={error}
+                        selectPath={selectPath}
+                        selectedPaths={selectedPaths}
+                        deselectPath={deselectPath}
+                        renameFile={renameFile}
+                        onSelectAll={() => selectPaths(files.map(f => f.filename))}
+                        onDeselectAll={deselectAllPaths}
+                    />
                 </Grid>
-            </CollectionBreadcrumbsContextProvider>
-        );
-    }
-}
+                <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
+                    <InformationDrawer onCollectionLocationChange={handleCollectionLocationChange} />
+                </Grid>
+            </Grid>
+        </CollectionBreadcrumbsContextProvider>
+    );
+};
 
 const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;

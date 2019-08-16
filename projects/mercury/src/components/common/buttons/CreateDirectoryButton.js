@@ -33,7 +33,7 @@ class CreateDirectoryButton extends React.Component {
 
         return (
             <>
-                <span onClick={e => !disabled && this.openDialog(e)}>
+                <span style={{display: 'inherit'}} onClick={e => !disabled && this.openDialog(e)}>
                     {children}
                 </span>
 
