@@ -25,6 +25,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -245,4 +246,22 @@ public class ShaclValidatorTest {
                 newBlankNode);
     }
 
+    @Test
+    public void multipleResourcesAreValidatedAsExpected() {
+        var model = createDefaultModel();
+        for (int i = 0; i < 2 * availableProcessors(); i++) {
+            var resource = createResource();
+            model.add(resource, RDF.type, FS.File).add(resource, FS.filePath, createTypedLiteral(123));
+        }
+
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+
+        model.listSubjects().forEachRemaining(resource ->
+                verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+                        resource,
+                        FS.filePath,
+                        createTypedLiteral(123)));
+
+        verifyNoMoreInteractions(violationHandler);
+    }
 }
