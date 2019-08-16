@@ -76,15 +76,25 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const renderDialogContent = () => {
         const form = (
-            <LinkedDataEntityForm
-                properties={extendedProperties}
-                values={valuesWithUpdates}
-                validationErrors={validationErrors}
-                onAdd={addValue}
-                onChange={updateValue}
-                onDelete={deleteValue}
+            <form
                 key="form"
-            />
+                id={`entity-form-${getIdentifier()}`}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    createEntity();
+                }}
+                noValidate
+            >
+                <LinkedDataEntityForm
+                    properties={extendedProperties}
+                    values={valuesWithUpdates}
+                    validationErrors={validationErrors}
+                    onAdd={addValue}
+                    onChange={updateValue}
+                    onDelete={deleteValue}
+                />
+            </form>
         );
 
         const idField = (
@@ -116,13 +126,12 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
             fullWidth
-            maxWidth="sm"
+            maxWidth="md"
         >
-            <DialogTitle id="form-dialog-title">
-                New entity: {typeLabel}
-                <Typography variant="body2">{typeDescription}</Typography>
+            <DialogTitle disableTypography id="form-dialog-title">
+                <Typography variant="h5">{typeLabel}</Typography>
+                <Typography variant="subtitle1">{typeDescription}</Typography>
             </DialogTitle>
-
             <DialogContent style={{overflowX: 'hidden'}}>
                 <FormContext.Provider value={{submit: createEntity}}>
                     {renderDialogContent()}
@@ -132,15 +141,20 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 <Button
                     onClick={closeDialog}
                     color="secondary"
+                    disabled={isUpdating}
                 >
                     Cancel
                 </Button>
                 <Button
+                    type="submit"
                     onClick={createEntity}
                     color="primary"
+                    variant="contained"
+                    form={`entity-form-${getIdentifier()}`}
                     disabled={!canCreate() || isUpdating || !isValid}
                 >
-                    {isUpdating ? <CircularProgress /> : 'Create'}
+                    {`Create ${typeLabel}`}
+                    {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
                 </Button>
             </DialogActions>
         </Dialog>

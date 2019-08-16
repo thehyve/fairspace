@@ -44,6 +44,8 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     } else if (canEdit) {
         footer = (
             <Button
+                type="submit"
+                form={`entity-form-${subject}`}
                 variant={fullpage ? 'contained' : 'text'}
                 color="primary"
                 onClick={validateAndSubmit}
@@ -58,17 +60,27 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
         <FormContext.Provider value={{submit: validateAndSubmit}}>
             <Grid container>
                 <Grid item xs={12}>
-                    <LinkedDataEntityForm
-                        {...otherProps}
-                        error={linkedDataError}
-                        loading={linkedDataLoading}
-                        properties={extendedProperties}
-                        values={valuesWithUpdates}
-                        validationErrors={validationErrors}
-                        onAdd={addValue}
-                        onChange={updateValue}
-                        onDelete={deleteValue}
-                    />
+                    <form
+                        id={`entity-form-${subject}`}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            validateAndSubmit();
+                        }}
+                        noValidate
+                    >
+                        <LinkedDataEntityForm
+                            {...otherProps}
+                            error={linkedDataError}
+                            loading={linkedDataLoading}
+                            properties={extendedProperties}
+                            values={valuesWithUpdates}
+                            validationErrors={validationErrors}
+                            onAdd={addValue}
+                            onChange={updateValue}
+                            onDelete={deleteValue}
+                        />
+                    </form>
                 </Grid>
                 {footer && <Grid item>{footer}</Grid>}
             </Grid>
