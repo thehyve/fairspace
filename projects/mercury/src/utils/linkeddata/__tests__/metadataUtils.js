@@ -357,11 +357,11 @@ describe('Metadata Utils', () => {
             ]);
         });
 
-        it('should handle zero or false as actual values but not empty strings', () => {
+        it('should handle zero or false or empty strings as actual values', () => {
             expect(Object.values(normalizeMetadataResource({
-                a: [{value: 0, id: 'a'}, {value: false, id: 'b'}, {value: '', id: 'b'}],
+                a: [{value: 0, id: 'a'}, {value: false, id: 'b'}, {value: '', id: 'c'}],
             }))).toEqual([
-                [0, false, 'b']
+                [0, false, '']
             ]);
         });
     });
