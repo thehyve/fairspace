@@ -16,7 +16,8 @@ describe('InformationDrawer', () => {
         collection = {
             name: 'My collection',
             description: 'description',
-            location: 'location1'
+            location: 'location1',
+            iri: ''
         };
 
         handleCollectionLocationChange = jest.fn();
