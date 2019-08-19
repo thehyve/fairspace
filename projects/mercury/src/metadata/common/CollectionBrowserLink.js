@@ -1,6 +1,6 @@
 import React from 'react';
 import {IconButton} from "@material-ui/core";
-import {FolderOpen} from "@material-ui/icons";
+import FolderOpen from "@material-ui/icons/FolderOpen";
 import {Link} from "react-router-dom";
 
 import {COLLECTION_URI, COLLECTIONS_PATH, DIRECTORY_URI, FILE_URI} from "../../constants";

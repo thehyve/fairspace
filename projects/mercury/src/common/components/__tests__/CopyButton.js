@@ -2,7 +2,8 @@ import React from 'react';
 import {act} from 'react-dom/test-utils';
 import {mount, shallow} from "enzyme";
 import {Tooltip} from "@material-ui/core";
-import {AssignmentOutlined, AssignmentTurnedInOutlined} from '@material-ui/icons';
+import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
+import AssignmentTurnedInOutlined from '@material-ui/icons/AssignmentTurnedInOutlined';
 
 import '../__mocks__/clipboard.mock';
 import CopyButton from "../CopyButton";

@@ -4,7 +4,7 @@ import {
     ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
     Typography, withStyles, Grid
 } from '@material-ui/core';
-import {AssignmentOutlined} from '@material-ui/icons';
+import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
