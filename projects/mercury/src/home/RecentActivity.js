@@ -6,7 +6,7 @@ import {
 } from "@material-ui/core";
 import withStyles from "@material-ui/core/styles/withStyles";
 
-import {formatDateTime} from "./common/utils/genericUtils";
+import {formatDateTime} from "../common/utils/genericUtils";
 
 const styles = theme => ({
     listItemIcon: {

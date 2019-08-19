@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-import Config from "./Config/Config";
-import {handleHttpError, extractJsonData} from "../utils/httpUtils";
+import Config from "../common/services/Config/Config";
+import {handleHttpError, extractJsonData} from "../common/utils/httpUtils";
 
 const headers = {'Content-Type': 'application/json'};
 

@@ -4,7 +4,7 @@ import {mount, shallow} from "enzyme";
 import {Tooltip} from "@material-ui/core";
 import {AssignmentOutlined, AssignmentTurnedInOutlined} from '@material-ui/icons';
 
-import '../clipboard.mock';
+import '../__mocks__/clipboard.mock';
 import CopyButton from "../CopyButton";
 
 describe('<CopyButton />', () => {

@@ -4,7 +4,8 @@ import {withRouter} from "react-router-dom";
 import {Badge, Icon, IconButton} from "@material-ui/core";
 import {ContentCopy, ContentCut, ContentPaste, Download} from "mdi-material-ui";
 
-import {CreateDirectoryButton, DeleteButton, ErrorDialog, ProgressButton, RenameButton} from "../common/components";
+import {ProgressButton, ErrorDialog, DeleteButton} from '../common/components';
+import {CreateDirectoryButton, RenameButton} from "./buttons";
 import * as clipboardActions from "../common/redux/actions/clipboardActions";
 import * as fileActions from "../common/redux/actions/fileActions";
 import {getParentPath, joinPaths} from "../common/utils/fileUtils";

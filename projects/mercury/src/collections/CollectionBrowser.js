@@ -1,10 +1,8 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
 
-import {
-    ErrorDialog, MessageDisplay, CollectionEditor,
-    LoadingInlay, LoadingOverlay
-} from "../common/components";
+import {ErrorDialog, MessageDisplay, LoadingInlay, LoadingOverlay} from "../common/components";
+import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {findById} from "../common/utils/genericUtils";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';

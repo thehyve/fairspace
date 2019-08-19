@@ -10,7 +10,7 @@ import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
 
 import styles from './InformationDrawer.styles';
-import CollectionDetails from "./CollectionDetails";
+import CollectionDetails from "../../collections/CollectionDetails";
 import LinkedDataEntityFormContainer from "../../metadata/common/LinkedDataEntityFormContainer";
 import PathMetadata from "../../metadata/metadata/PathMetadata";
 import * as metadataActions from "../redux/actions/metadataActions";

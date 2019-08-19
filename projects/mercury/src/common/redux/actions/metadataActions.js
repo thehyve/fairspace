@@ -1,5 +1,5 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../../utils/redux";
-import {MetadataAPI} from "../../services/LinkedDataAPI";
+import {MetadataAPI} from "../../../metadata/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
 

@@ -1,18 +1,18 @@
 import React from 'react';
 import {Redirect, Route} from "react-router-dom";
 
-import Home from "./Home";
-import Collections from "./collections/CollectionsPage";
-import Notebooks from "./Notebooks";
-import FilesPage from "./file/FilesPage";
-import logout from "./common/services/logout";
-import SearchPage from './search/SearchPage';
-import {createMetadataIri, createVocabularyIri} from "./common/utils/linkeddata/metadataUtils";
-import {MetadataWrapper, VocabularyWrapper} from './metadata/LinkedDataWrapper';
-import LinkedDataEntityPage from "./metadata/common/LinkedDataEntityPage";
-import MetadataListPage from "./metadata/MetadataListPage";
-import VocabularyListPage from "./metadata/VocabularyListPage";
-import useSubject from './common/hooks/UseSubject';
+import Home from "../home/Home";
+import Collections from "../collections/CollectionsPage";
+import Notebooks from "../notebooks/Notebooks";
+import FilesPage from "../file/FilesPage";
+import logout from "../common/services/logout";
+import SearchPage from '../search/SearchPage';
+import {createMetadataIri, createVocabularyIri} from "../common/utils/linkeddata/metadataUtils";
+import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
+import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
+import MetadataListPage from "../metadata/MetadataListPage";
+import VocabularyListPage from "../metadata/VocabularyListPage";
+import useSubject from '../common/hooks/UseSubject';
 
 const routes = () => (
     <>

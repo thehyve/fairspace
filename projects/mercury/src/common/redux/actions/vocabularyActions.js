@@ -1,5 +1,5 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../../utils/redux";
-import {MetaVocabularyAPI, VocabularyAPI} from "../../services/LinkedDataAPI";
+import {MetaVocabularyAPI, VocabularyAPI} from "../../../metadata/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {SHACL_NAMESPACE, SHACL_PATH, SHACL_TARGET_CLASS} from "../../../constants";
 import {getFirstPredicateProperty} from "../../utils/linkeddata/jsonLdUtils";

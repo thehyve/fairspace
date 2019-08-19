@@ -2,7 +2,7 @@ import React from 'react';
 import {shallow} from "enzyme";
 
 import DeleteButton from '../DeleteButton';
-import ConfirmationDialog from '../../ConfirmationDialog';
+import ConfirmationDialog from '../ConfirmationDialog';
 
 describe('<DeleteButton />', () => {
     it('should close dialog before calling onlick prop', () => {

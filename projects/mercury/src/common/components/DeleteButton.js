@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ConfirmationDialog from '../ConfirmationDialog';
+import ConfirmationDialog from './ConfirmationDialog';
 
 class DeleteButton extends React.Component {
     state = {

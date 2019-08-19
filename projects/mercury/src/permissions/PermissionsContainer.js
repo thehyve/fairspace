@@ -1,10 +1,10 @@
 import React, {useContext, useState} from "react";
 
-import PermissionsViewer from "./PermissionsViewer";
 import PermissionContext from "../common/contexts/PermissionContext";
-import PermissionAPI from "../common/services/PermissionAPI";
 import UserContext from '../common/contexts/UserContext';
 import UsersContext from '../common/contexts/UsersContext';
+import PermissionAPI from "./PermissionAPI";
+import PermissionsViewer from "./PermissionsViewer";
 
 export default (props) => {
     const {permissions, loading: permissionsLoading, error: permissionsError, refresh} = useContext(PermissionContext);

@@ -1,7 +1,7 @@
 import mockAxios from 'axios';
 
 import CollectionAPI from "../CollectionAPI";
-import Config from "../Config/Config";
+import Config from "../../common/services/Config/Config";
 
 beforeAll(() => {
     Config.setConfig({

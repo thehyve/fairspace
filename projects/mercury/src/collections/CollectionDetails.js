@@ -2,12 +2,12 @@ import React from 'react';
 import {Card, CardContent, CardHeader, Icon, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
-import LoadingInlay from './LoadingInlay';
+import LoadingInlay from '../common/components/LoadingInlay';
 import CollectionEditor from "./CollectionEditor";
-import ConfirmationDialog from './ConfirmationDialog';
-import {PermissionProvider} from "../contexts/PermissionContext";
-import PermissionsCard from "../../permissions/PermissionsCard";
-import TechnicalMetadata from "../../file/TechnicalMetadata";
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import {PermissionProvider} from "../common/contexts/PermissionContext";
+import PermissionsCard from "../permissions/PermissionsCard";
+import TechnicalMetadata from "../file/TechnicalMetadata";
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',

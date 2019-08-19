@@ -1,8 +1,8 @@
 import React from 'react';
 import {mount} from 'enzyme';
 import CollectionDetails, {ICONS} from "../CollectionDetails";
-import Config from "../../services/Config/Config";
-import configFile from "../../../config";
+import Config from "../../common/services/Config/Config";
+import configFile from "../../config";
 
 beforeAll(() => {
     Config.setConfig(Object.assign(configFile, {

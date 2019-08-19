@@ -1,5 +1,5 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../../utils/redux";
-import FileAPI from "../../services/FileAPI";
+import FileAPI from "../../../file/FileAPI";
 import * as actionTypes from "./actionTypes";
 import {joinPaths} from '../../utils/fileUtils';
 

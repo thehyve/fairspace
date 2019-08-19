@@ -1,9 +1,9 @@
 import {expand} from 'jsonld';
 import axios from 'axios';
 
-import Config from "./Config/Config";
-import {handleHttpError, extractJsonData} from "../utils/httpUtils";
-import {normalizeTypes, toJsonLd} from "../utils/linkeddata/jsonLdConverter";
+import Config from "../common/services/Config/Config";
+import {handleHttpError, extractJsonData} from "../common/utils/httpUtils";
+import {normalizeTypes, toJsonLd} from "../common/utils/linkeddata/jsonLdConverter";
 
 const requestOptions = {
     headers: {Accept: 'application/ld+json'}

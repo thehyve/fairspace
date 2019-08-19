@@ -1,8 +1,8 @@
 import mockAxios from 'axios';
 
 import {MetadataAPI} from "../LinkedDataAPI";
-import Config from "../Config/Config";
-import {vocabularyUtils} from "../../utils/linkeddata/vocabularyUtils";
+import Config from "../../common/services/Config/Config";
+import {vocabularyUtils} from "../../common/utils/linkeddata/vocabularyUtils";
 
 beforeAll(() => {
     Config.setConfig({
@@ -22,7 +22,6 @@ beforeEach(() => {
     mockAxios.patch.mockClear();
 });
 describe('LinkedDataApi', () => {
-
     it('fetches metadata with provided parameters', () => {
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({data: [], headers: {'content-type': 'application/json'}}));
 

@@ -1,4 +1,4 @@
-import FileAPI from "../../services/FileAPI";
+import FileAPI from "../../../file/FileAPI";
 import * as actionTypes from "./actionTypes";
 import {COPY, CUT} from '../../../constants';
 

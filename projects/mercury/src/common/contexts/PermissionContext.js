@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import PermissionAPI from "../services/PermissionAPI";
+import PermissionAPI from "../../permissions/PermissionAPI";
 import getDisplayName from "../utils/userUtils";
 import UsersContext from "./UsersContext";
 

@@ -6,7 +6,7 @@ import TopBar from "./TopBar/TopBar";
 import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
-import Routes from "../../../Routes";
+import Routes from "../../../routes/Routes";
 import Config from "../../services/Config/Config";
 import {LoadingInlay} from "../index";
 import UserContext from '../../contexts/UserContext';

@@ -1,7 +1,7 @@
 import {act} from 'react-dom/test-utils';
 
 import {testHook} from "../../utils/testUtils";
-import useSorting from "../../hooks/UseSorting";
+import useSorting from "../UseSorting";
 
 const items = [
     {

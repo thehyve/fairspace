@@ -1,5 +1,5 @@
 import * as actionTypes from "./actionTypes";
-import FileAPI from "../../services/FileAPI";
+import FileAPI from "../../../file/FileAPI";
 
 export const enqueueUploads = (uploads = []) => ({
     type: actionTypes.ENQUEUE_UPLOAD,

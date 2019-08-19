@@ -1,5 +1,5 @@
 import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../../utils/redux";
-import CollectionAPI from "../../services/CollectionAPI";
+import CollectionAPI from "../../../collections/CollectionAPI";
 import * as actionTypes from "./actionTypes";
 
 export const invalidateCollections = () => ({
