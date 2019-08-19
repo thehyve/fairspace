@@ -8,14 +8,24 @@ import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.metadata.*;
-import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
+import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
+import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
+import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
+import io.fairspace.saturn.services.metadata.ReadableMetadataService;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.InverseForUsedPropertiesValidator;
+import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
+import io.fairspace.saturn.services.metadata.validation.MetadataAndVocabularyConsistencyValidator;
+import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
+import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
+import io.fairspace.saturn.services.metadata.validation.SystemVocabularyProtectingValidator;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserApp;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.workspace.WorkspaceApp;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
@@ -35,7 +45,9 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.SaturnSecurityHandler.userInfo;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
-import static io.fairspace.saturn.vocabulary.Vocabularies.*;
+import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
@@ -109,7 +121,6 @@ public class App {
                         new CollectionsApp("/collections", collections),
                         new PermissionsApp("/permissions", permissions),
                         new UserApp("/users", userService),
-                        new WorkspaceApp("/workspace", CONFIG.workspace),
                         new HealthApp("/health")))
                 .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
                 .port(CONFIG.port)

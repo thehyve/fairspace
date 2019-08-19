@@ -1,7 +1,7 @@
 const proxy = require('http-proxy-middleware');
 
 module.exports = (app) => {
-    app.use(proxy('/config/config.json', {target: 'http://localhost:5000/'}));
+    app.use(proxy('/config', {target: 'http://localhost:5000/'}));
     app.use(proxy('/api/v1/account', {target: 'http://localhost:5000/'}));
 
     // to talk to a real ES instance on localhost

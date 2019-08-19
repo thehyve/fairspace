@@ -14,9 +14,9 @@ class WorkspaceAPI {
             .then(extractJsonData);
     }
 
-    getWorkspace() {
-        return axios.get(Config.get().urls.workspace, WorkspaceAPI.getConfig, requestOptions)
-            .catch(handleHttpError('Error while loading workspace details'))
+    getVersion() {
+        return axios.get(Config.get().urls.version, WorkspaceAPI.getConfig, requestOptions)
+            .catch(handleHttpError('Error while loading version information'))
             .then(extractJsonData);
     }
 }

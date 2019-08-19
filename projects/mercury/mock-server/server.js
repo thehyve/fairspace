@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
 app.get('/config/config.json', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-config.json`));
+app.get('/config/version.json', (req, res) => res.sendFile(`${mockDataDir}/workspace/version.json`));
 
 // Account API
 app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));

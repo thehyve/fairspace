@@ -7,16 +7,16 @@ const initialState = {
     version: ''
 };
 
-const WorkspaceContext = React.createContext(initialState);
+const VersionContext = React.createContext(initialState);
 
-export const WorkspaceProvider = ({children}) => {
+export const VersionProvider = ({children}) => {
     const [info, setInfo] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [redirecting, setRedirecting] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-        WorkspaceAPI.getWorkspace()
+        WorkspaceAPI.getVersion()
             .then(i => {
                 setInfo(i);
                 setLoading(false);
@@ -27,7 +27,7 @@ export const WorkspaceProvider = ({children}) => {
     }, []);
 
     return (
-        <WorkspaceContext.Provider
+        <VersionContext.Provider
             value={{
                 ...info,
                 loading,
@@ -35,8 +35,8 @@ export const WorkspaceProvider = ({children}) => {
             }}
         >
             {children}
-        </WorkspaceContext.Provider>
+        </VersionContext.Provider>
     );
 };
 
-export default WorkspaceContext;
+export default VersionContext;

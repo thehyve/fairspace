@@ -13,7 +13,7 @@ import {ErrorDialog, LoadingInlay} from './common';
 import {UserProvider} from '../UserContext';
 import {UsersProvider} from "./permissions/UsersContext";
 import useIsMounted from "../utils/useIsMounted";
-import {WorkspaceProvider} from '../WorkspaceContext';
+import {VersionProvider} from '../VersionContext';
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -32,7 +32,7 @@ const App = () => {
     const store = configureStore();
 
     return (
-        <WorkspaceProvider>
+        <VersionProvider>
             <UserProvider>
                 <UsersProvider>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -48,7 +48,7 @@ const App = () => {
                     </MuiPickersUtilsProvider>
                 </UsersProvider>
             </UserProvider>
-        </WorkspaceProvider>
+        </VersionProvider>
     );
 };
 

@@ -63,6 +63,3 @@ mail:
   mail.smtp.host: host
   mail.smtp.port: 587
   mail.smtp.starttls.enable: true
-workspace:
-  name: Workspace
-  version: "1.0.0"

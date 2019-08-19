@@ -23,4 +23,8 @@ data:
       },
       "enableExperimentalFeatures": {{ .Values.workspace.enableExperimentalFeatures }}
     }
-
+  version.json: |-
+    {
+      "name": "{{ .Release.Name }}",
+      "version": "{{ .Release.Version }}"
+    }
