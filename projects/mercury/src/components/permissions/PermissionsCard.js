@@ -1,6 +1,7 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import {ExpandMore, LockOpen} from "@material-ui/icons";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import LockOpen from "@material-ui/icons/LockOpen";
 import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
 import classnames from "classnames";
 import PermissionsContainer from "./PermissionsContainer";

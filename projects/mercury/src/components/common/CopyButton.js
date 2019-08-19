@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Tooltip} from "@material-ui/core";
-import {AssignmentOutlined, AssignmentTurnedInOutlined} from '@material-ui/icons';
+import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
+import AssignmentTurnedInOutlined from '@material-ui/icons/AssignmentTurnedInOutlined';
 
 import useIsMounted from "../../utils/useIsMounted";
 
