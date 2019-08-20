@@ -44,10 +44,13 @@ export const joinWithSeparator = (items = [], separator) => {
 //* *********************************
 
 export function comparePrimitives(x, y) {
-    if (x < y) {
+    const left = typeof x === 'string' ? x.toLowerCase(x) : x;
+    const right = typeof y === 'string' ? y.toLowerCase(y) : y;
+
+    if (left < right) {
         return -1;
     }
-    if (x > y) {
+    if (left > right) {
         return 1;
     }
     return 0;
