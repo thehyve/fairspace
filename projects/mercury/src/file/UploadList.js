@@ -28,15 +28,10 @@ const UploadList = ({uploads, enqueue}) => {
     };
 
     return (
-        <>
-            <Paper>
-                <Grid
-                    container
-                    direction="column"
-                    justify="space-between"
-                    style={{height: 300}}
-                >
-                    <Grid item>
+        <Paper>
+            {uploads.length > 0
+                ? (
+                    <>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -65,8 +60,6 @@ const UploadList = ({uploads, enqueue}) => {
                                 ))}
                             </TableBody>
                         </Table>
-                    </Grid>
-                    <Grid item>
                         <TablePagination
                             rowsPerPageOptions={[5, 10, 25]}
                             component="div"
@@ -76,36 +69,35 @@ const UploadList = ({uploads, enqueue}) => {
                             onChangePage={(e, p) => setPage(p)}
                             onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                         />
-                    </Grid>
-                </Grid>
-            </Paper>
-            <Paper style={{marginTop: 20}}>
-                <Dropzone onDrop={files => enqueue(files)}>
-                    {({getRootProps, getInputProps}) => (
-                        <div
-                            {...getRootProps()}
+                    </>
+                )
+                : undefined
+            }
+            <Dropzone onDrop={files => enqueue(files)}>
+                {({getRootProps, getInputProps}) => (
+                    <div
+                        {...getRootProps()}
+                    >
+                        <input {...getInputProps()} />
+                        <Grid
+                            container
+                            direction="column"
+                            justify="center"
+                            alignItems="center"
+                            spacing={8}
+                            style={{padding: 20}}
                         >
-                            <input {...getInputProps()} />
-                            <Grid
-                                container
-                                direction="column"
-                                justify="center"
-                                alignItems="center"
-                                spacing={8}
-                                style={{padding: 20, minHeight: 200}}
-                            >
-                                <Grid item>
-                                    <Icon>cloud_upload</Icon>
-                                </Grid>
-                                <Grid item>
-                                    Drop files or click here to upload
-                                </Grid>
+                            <Grid item>
+                                <Icon>cloud_upload</Icon>
                             </Grid>
-                        </div>
-                    )}
-                </Dropzone>
-            </Paper>
-        </>
+                            <Grid item>
+                                Drop files to upload
+                            </Grid>
+                        </Grid>
+                    </div>
+                )}
+            </Dropzone>
+        </Paper>
     );
 };
 
