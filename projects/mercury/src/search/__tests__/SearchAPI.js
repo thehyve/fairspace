@@ -1,5 +1,5 @@
 import {SearchAPI} from "../SearchAPI";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE} from "../../../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE} from "../../constants";
 
 let mockClient;
 let searchAPI;

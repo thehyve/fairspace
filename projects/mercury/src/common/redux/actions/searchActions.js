@@ -1,6 +1,6 @@
 import {COLLECTIONS_SEARCH, METADATA_SEARCH, VOCABULARY_SEARCH} from "./actionTypes";
 import {createErrorHandlingPromiseAction} from "../../utils/redux";
-import searchAPI, {SORT_DATE_CREATED} from "../../services/SearchAPI";
+import searchAPI, {SORT_DATE_CREATED} from "../../../search/SearchAPI";
 
 export const searchCollections = createErrorHandlingPromiseAction((query) => ({
     type: COLLECTIONS_SEARCH,
