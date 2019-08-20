@@ -46,3 +46,8 @@ saturn:
 mercury:
   image:
     pullPolicy: Always
+
+# Specific settings for Mercury subchart
+docs:
+  image:
+    pullPolicy: Always
