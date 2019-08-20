@@ -4,6 +4,7 @@ import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
+import useIsMounted from "react-is-mounted-hook";
 
 import configureStore from "./common/redux/store/configureStore";
 import Config from "./common/services/Config/Config";
@@ -12,7 +13,6 @@ import Layout from "./common/components/Layout/Layout";
 import {ErrorDialog, LoadingInlay} from './common/components';
 import {UserProvider} from './common/contexts/UserContext';
 import {UsersProvider} from "./common/contexts/UsersContext";
-import useIsMounted from "./common/hooks/UseIsMounted";
 import {VersionProvider} from './common/contexts/VersionContext';
 
 const App = () => {

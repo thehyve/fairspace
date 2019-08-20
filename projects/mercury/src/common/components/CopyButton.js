@@ -2,8 +2,7 @@ import React, {useState} from 'react';
 import {Tooltip} from "@material-ui/core";
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import AssignmentTurnedInOutlined from '@material-ui/icons/AssignmentTurnedInOutlined';
-
-import useIsMounted from "../hooks/UseIsMounted";
+import useIsMounted from "react-is-mounted-hook";
 
 const DEFAULT_TIMEOUT = 1000;
 const clipboardSupported = 'clipboard' in navigator;
