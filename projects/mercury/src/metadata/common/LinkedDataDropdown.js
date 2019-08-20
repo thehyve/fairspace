@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {PropTypes} from 'prop-types';
 
-import searchAPI, {SORT_ALPHABETICALLY} from "../../common/services/SearchAPI";
+import searchAPI, {SORT_ALPHABETICALLY} from "../../search/SearchAPI";
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";

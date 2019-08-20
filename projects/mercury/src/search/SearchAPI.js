@@ -1,11 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import elasticsearch from "elasticsearch";
 
-import Config from "./Config/Config";
+import Config from "../common/services/Config/Config";
 import {
     COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_DEFAULT_SIZE,
     SEARCH_MAX_SIZE
-} from '../../constants';
+} from '../constants';
 
 const ES_INDEX = 'fairspace';
 
