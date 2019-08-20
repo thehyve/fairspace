@@ -27,9 +27,6 @@ data:
           shards: 1
           replicas: 1
           indexName: "fairspace"
-    workspace:
-      name: {{ .Release.Name }}
-      version: RELEASEVERSION
     auth:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs

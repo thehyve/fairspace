@@ -1,7 +1,7 @@
 import {useContext, useEffect} from 'react';
 
 import useNamespacedIri from './UseNamespacedIri';
-import WorkspaceContext from '../contexts/WorkspaceContext';
+import VersionContext from '../contexts/VersionContext';
 import useSubject from './UseSubject';
 
 const separator = '-';
@@ -9,7 +9,7 @@ const separator = '-';
 const UsePageTitleUpdater = (segments) => {
     const subject = useSubject();
     const iri = useNamespacedIri(subject);
-    const {name: workspaceName} = useContext(WorkspaceContext);
+    const {name: workspaceName} = useContext(VersionContext);
 
     useEffect(() => {
         const labels = segments ? segments.map(({label}) => label).join('/') : '';
