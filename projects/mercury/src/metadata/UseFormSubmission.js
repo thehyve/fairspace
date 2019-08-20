@@ -1,9 +1,9 @@
 import {useState} from "react";
+import useIsMounted from "react-is-mounted-hook";
 
 import ErrorDialog from "../common/components/ErrorDialog";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors} from "../common/utils/linkeddata/metadataUtils";
-import useIsMounted from "../common/hooks/UseIsMounted";
 
 const onFormSubmissionError = (e, id) => {
     if (e.details) {
