@@ -33,7 +33,7 @@ export const FilesPage = (props) => {
         fetchFilesIfNeeded(openedPath);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [openedPath]);
+    }, [openedPath, openedCollection.connectionString]);
 
     // Determine breadcrumbs. If a collection is opened, show the full path
     // Otherwise, show a temporary breadcrumb

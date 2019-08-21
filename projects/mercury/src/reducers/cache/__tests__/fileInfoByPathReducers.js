@@ -131,7 +131,7 @@ describe('Subject by path reducers', () => {
             const action = {
                 type: actionTypes.UPDATE_COLLECTION_FULFILLED,
                 meta: {
-                    oldLocation: 'coll'
+                    previousLocation: 'coll'
                 }
             };
 
