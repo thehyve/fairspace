@@ -8929,6 +8929,11 @@ react-input-autosize@^2.2.1:
   dependencies:
     prop-types "^15.5.8"
 
+react-is-mounted-hook@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-is-mounted-hook/-/react-is-mounted-hook-1.0.2.tgz#0da3fa2eeab0d3032cf167d22e8b90f5c13118fb"
+  integrity sha512-BYgVf4Yj5eHyIy1qDX5unNvVn/Ow7sDTQTRkxfLTwoS6iQhLpNrmxijJvn3dGp7Jbudexf1jSIyMQxOhSniQhw==
+
 react-is@^16.6.0, react-is@^16.6.3, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"

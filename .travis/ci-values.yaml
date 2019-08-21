@@ -11,9 +11,6 @@ hyperspace:
 workspace:
   ingress:
     domain: workspace.ci.fairway.app
-    tls:
-      certificate:
-        dns01Provider: gke
   enableExperimentalFeatures: true
   configurationScripts:
     keycloak:
@@ -44,5 +41,10 @@ saturn:
 
 # Specific settings for Mercury subchart
 mercury:
+  image:
+    pullPolicy: Always
+
+# Specific settings for Mercury subchart
+docs:
   image:
     pullPolicy: Always
