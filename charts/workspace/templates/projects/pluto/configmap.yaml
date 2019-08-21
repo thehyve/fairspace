@@ -34,6 +34,7 @@ data:
         needsAuthentication:
         - /
         - /static/*
+        - /public/*
         - /config/*
         - "*.js"
         - /api/${app.apiVersion.pluto}/account/*

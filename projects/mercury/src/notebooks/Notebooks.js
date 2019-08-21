@@ -38,7 +38,7 @@ const Notebooks = ({classes}) => (
             <CardActionArea>
                 <CardMedia
                     className={classes.media}
-                    image="/images/jupyter.svg"
+                    image="/public/images/jupyter.svg"
                     title="JupyterHub"
                 />
                 <CardContent>

@@ -46,7 +46,7 @@ export const PermissionsCard = ({classes, iri, canManage, maxCollaboratorIcons})
     const permissionIcons = permissions
         .slice(0, maxCollaboratorIcons)
         .map(permission => (
-            <Avatar key={permission.user} title={permission.userName} src="/images/avatar.png" className={classes.avatar} />
+            <Avatar key={permission.user} title={permission.userName} src="/public/images/avatar.png" className={classes.avatar} />
         ));
 
     const cardHeaderAction = (
