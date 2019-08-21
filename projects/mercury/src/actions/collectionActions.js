@@ -21,11 +21,11 @@ export const addCollection = (name, description, connectionString, location) => 
     payload: CollectionAPI.addCollection(name, description, connectionString, location),
 });
 
-export const updateCollection = (id, name, description, location, previousLocation) => ({
+export const updateCollection = (id, name, description, connectionString, location, previousLocation) => ({
     type: actionTypes.UPDATE_COLLECTION,
-    payload: CollectionAPI.updateCollection(id, name, description, location),
+    payload: CollectionAPI.updateCollection(id, name, description, connectionString, location),
     meta: {
-        id, name, description, location, previousLocation
+        id, name, description, connectionString, location, previousLocation
     }
 });
 

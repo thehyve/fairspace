@@ -51,8 +51,8 @@ class CollectionDetails extends React.Component {
         this.setState({anchorEl: null});
     };
 
-    handleSave = (name, description, location) => {
-        this.props.onUpdateCollection(name, description, location);
+    handleSave = (name, description, location, connectionString) => {
+        this.props.onUpdateCollection(name, description, location, connectionString);
         this.setState({editing: false});
     }
 

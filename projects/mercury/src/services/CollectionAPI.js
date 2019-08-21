@@ -20,10 +20,10 @@ class CollectionAPI {
         ).catch(handleHttpError("Failure while saving a collection"));
     }
 
-    updateCollection(iri, name, description, location) {
+    updateCollection(iri, name, description, connectionString, location) {
         return axios.patch(
             Config.get().urls.collections,
-            JSON.stringify({iri, name, description, location}),
+            JSON.stringify({iri, name, description, location, connectionString}),
             {headers}
         ).catch(handleHttpError("Failure while updating a collection"));
     }
