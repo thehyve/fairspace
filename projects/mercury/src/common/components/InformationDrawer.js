@@ -46,14 +46,15 @@ export class InformationDrawer extends React.Component {
             ));
     }
 
-    handleUpdateCollection = (name, description, location) => {
+    handleUpdateCollection = (name, description, location, connectionString) => {
         const oldCollection = this.props.collection;
 
         if ((name !== this.props.collection.name
             || description !== this.props.collection.description
-            || location !== oldCollection.location)
+            || location !== oldCollection.location
+            || connectionString !== oldCollection.connectionString)
             && (name !== '') && (location !== '')) {
-            return this.props.updateCollection(this.props.collection.iri, name, description, location, oldCollection.location)
+            return this.props.updateCollection(this.props.collection.iri, name, description, connectionString, location, oldCollection.location)
                 .then(this.props.fetchCollectionsIfNeeded)
                 .then(() => {
                     const locationChanged = oldCollection.location !== location;
