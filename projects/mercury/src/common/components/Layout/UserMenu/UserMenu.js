@@ -54,7 +54,7 @@ const UserMenu = ({classes}) => {
                 onClick={handleClick}
                 className={classes.row}
             >
-                <Avatar alt={currentUser.fullName} src="/images/avatar.png" className={classes.avatar} />
+                <Avatar alt={currentUser.fullName} src="/public/images/avatar.png" className={classes.avatar} />
                 <span>
                     {currentUser.fullName}
                 </span>
