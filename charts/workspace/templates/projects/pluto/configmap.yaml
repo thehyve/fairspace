@@ -25,6 +25,24 @@ data:
       oidc:
         redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "workspace.url" .) }}
         required-authority: {{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
+      urls:
+        # Please note that by default pluto is configured to allow certain urls anonymously
+        # (e.g. login or health), and is configured to require specific authorization for anything else
+        # This configuration will make sure that all frontend resources can be accessed for anyone
+        # that has logged in, even if the user does not have the required authority. This enables the
+        # frontend to show a nice error message
+        needsAuthentication:
+        - /
+        - /static/*
+        - /config/*
+        - "*.js"
+        - /api/${app.apiVersion.pluto}/account/*
+        - /metadata/*
+        - /iri/*
+        - /collections/*
+        - /vocabulary/*
+        - /notebooks/*
+        - /api/${app.apiVersion.saturn}/users/*
 
     spring:
       zipkin:
