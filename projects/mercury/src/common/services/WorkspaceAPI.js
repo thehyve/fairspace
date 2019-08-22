@@ -9,13 +9,13 @@ const requestOptions = {
 
 class WorkspaceAPI {
     getUsers() {
-        return axios.get(Config.get().urls.users, WorkspaceAPI.getConfig, requestOptions)
+        return axios.get(Config.get().urls.users, requestOptions)
             .catch(handleHttpError('Error while loading users'))
             .then(extractJsonData);
     }
 
     getVersion() {
-        return axios.get(Config.get().urls.version, WorkspaceAPI.getConfig, requestOptions)
+        return axios.get(Config.get().urls.version, requestOptions)
             .catch(handleHttpError('Error while loading version information'))
             .then(extractJsonData);
     }
