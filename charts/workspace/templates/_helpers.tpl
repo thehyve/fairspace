@@ -150,3 +150,20 @@ Scheme to access workspace components (http or https)
 {{- printf "%s-elasticsearch-discovery.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "workspace.roles.sparql" -}}
+{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparql-%s" (include "workspace.name" .)) }}
+{{- end -}}
+
+{{- define "workspace.roles.datasteward" -}}
+{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}
+{{- end -}}
+
+{{- define "workspace.roles.coordinator" -}}
+{{ .Values.workspace.keycloak.roles.coordinator | default (printf "coordinator-%s" (include "workspace.name" .)) }}
+{{- end -}}
+
+{{- define "workspace.roles.user" -}}
+{{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
+{{- end -}}
+

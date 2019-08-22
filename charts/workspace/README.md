@@ -31,10 +31,6 @@ hyperspace:
         password: abcdefghi
         realm: hyperspace
 
-workspace:
-    testuser:
-        password: secret-password
-
 pluto:
     keycloak:
         baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
@@ -82,8 +78,6 @@ installation.
 | Parameter  | Description  | Default |
 |---|---|---|
 | `nameOverride`  | Unique name for the workspace to install. Please note that if you override the name, also set `pluto.workspace.name` | <release name> |
-| `workspace.testuser.username`  | Username for the testuser that will be created for this workspace | `test-<workspace_name>` |
-| `workspace.testuser.password`  | Password for the testuser for this workspace | `fairspace123` |
 | `workspace.ingress.enabled`  | Whether or not an ingress is setup for the workspace components. Should be set to false when running locally.  | true |
 | `workspace.ingress.domain`   | Domain that is used for setting up the workspace. Is used as postfix for the hostname for the specific components.  | workspace.ci.test.fairdev.app  |
 | `workspace.ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for workspace  | true  |
