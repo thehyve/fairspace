@@ -33,7 +33,7 @@ data:
       jwtAlgorithm: "RS256"
       workspaceUserRole: "{{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}"
       dataStewardRole: "{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}"
-      sparqlRole: "{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparql-%s" (include "workspace.name" .)) }}"
+      sparqlRole: "{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparqluser-%s" (include "workspace.name" .)) }}"
       workspaceLoginGroup: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
       groupsUrl: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}/groups/?max=1&search={{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}"
       usersUrlTemplate: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}/groups/%s/members"
