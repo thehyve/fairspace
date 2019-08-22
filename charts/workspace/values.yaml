@@ -61,6 +61,7 @@ workspace:
       # Roles defining the keycloak roles for this workspace
       roles:
         user:
+        coordinator:
         datasteward:
         sparql:
 
