@@ -45,8 +45,7 @@ export const joinWithSeparator = (items = [], separator) => {
 
 /**
  * Compares given primitives,
- * For strings from MDN docs:
- *   "base": Only strings that differ in base letters compare as unequal. Examples: a ≠ b, a = á, a = A
+ * For strings, cases and accents are ignored, i.e. 'a' !== 'b', 'a' === 'á', 'a' === 'A'
  * @param {*} x
  * @param {*} y
  */
