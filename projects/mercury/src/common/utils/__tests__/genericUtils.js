@@ -1,7 +1,7 @@
 import {
     compareBy, comparing, findById,
     flattenShallow, isNonEmptyValue, joinWithSeparator,
-    formatDateTime
+    formatDateTime, comparePrimitives
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -40,6 +40,27 @@ describe('comparison Utils', () => {
             expect(c({x: 2, y: 2, z: 3}, {x: 1, y: 20, z: 30})).toBe(1);
             expect(c({x: 1, y: 2, z: 3}, {x: 1, y: 2, z: 4})).toBe(-1);
             expect(c({x: 1, y: 3, z: 3}, {x: 1, y: 2, z: 30})).toBe(1);
+        });
+    });
+
+    describe('comparePrimitives', () => {
+        it('compares numbers properly', () => {
+            expect(comparePrimitives(1, 2)).toBe(-1);
+            expect(comparePrimitives(2, 1)).toBe(1);
+            expect(comparePrimitives(1, 1)).toBe(0);
+        });
+
+        it('compares string properly (cases are ignored)', () => {
+            expect(comparePrimitives('B', 'a')).toBe(1);
+            expect(comparePrimitives('b', 'a')).toBe(1);
+            expect(comparePrimitives('a', 'x')).toBe(-1);
+            expect(comparePrimitives('A', 'x')).toBe(-1);
+            expect(comparePrimitives('abcde', 'abcde')).toBe(0);
+        });
+
+        it('compares string properly (accents of same base letter are equal)', () => {
+            expect(comparePrimitives('a', 'á')).toBe(0);
+            expect(comparePrimitives('A', 'á')).toBe(0);
         });
     });
 });

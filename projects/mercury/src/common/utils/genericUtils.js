@@ -33,7 +33,17 @@ export const joinWithSeparator = (items = [], separator) => {
 //* COMPARISION
 //* *********************************
 
+/**
+ * Compares given primitives,
+ * For strings, cases and accents are ignored, i.e. 'a' !== 'b', 'a' === 'á', 'a' === 'A'
+ * @param {*} x
+ * @param {*} y
+ */
 export function comparePrimitives(x, y) {
+    if (typeof x === 'string' && typeof y === 'string') {
+        return x.localeCompare(y, undefined, {sensitivity: 'base'});
+    }
+
     if (x < y) {
         return -1;
     }
