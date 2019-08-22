@@ -43,14 +43,22 @@ export const joinWithSeparator = (items = [], separator) => {
 //* COMPARISION
 //* *********************************
 
+/**
+ * Compares given primitives,
+ * For strings from MDN docs:
+ *   "base": Only strings that differ in base letters compare as unequal. Examples: a ≠ b, a = á, a = A
+ * @param {*} x
+ * @param {*} y
+ */
 export function comparePrimitives(x, y) {
-    const left = typeof x === 'string' ? x.toLowerCase(x) : x;
-    const right = typeof y === 'string' ? y.toLowerCase(y) : y;
+    if (typeof x === 'string' && typeof y === 'string' && x && y) {
+        return x.localeCompare(y, undefined, {sensitivity: 'base'});
+    }
 
-    if (left < right) {
+    if (x < y) {
         return -1;
     }
-    if (left > right) {
+    if (x > y) {
         return 1;
     }
     return 0;

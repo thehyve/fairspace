@@ -84,12 +84,17 @@ describe('comparison Utils', () => {
             expect(comparePrimitives(1, 1)).toBe(0);
         });
 
-        it('compares string properly', () => {
+        it('compares string properly (cases are ignored)', () => {
             expect(comparePrimitives('B', 'a')).toBe(1);
             expect(comparePrimitives('b', 'a')).toBe(1);
             expect(comparePrimitives('a', 'x')).toBe(-1);
             expect(comparePrimitives('A', 'x')).toBe(-1);
             expect(comparePrimitives('abcde', 'abcde')).toBe(0);
+        });
+
+        it('compares string properly (accents of same base letter are equal)', () => {
+            expect(comparePrimitives('a', 'á')).toBe(0);
+            expect(comparePrimitives('A', 'á')).toBe(0);
         });
     });
 });
