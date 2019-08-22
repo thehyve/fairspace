@@ -5,16 +5,6 @@ import {isValid} from "date-fns";
 //* *********************************
 
 /**
- * Get the first item that has an id that matches the given {itemId}
- * @param itemList
- * @param itemId
- */
-export function findById(itemList, itemId) {
-    return Array.isArray(itemList)
-        ? itemList.find(item => item.id === itemId) : undefined;
-}
-
-/**
  * Flattens the given array with a depth of 1
  * @param array
  * @returns {*}
@@ -43,7 +33,17 @@ export const joinWithSeparator = (items = [], separator) => {
 //* COMPARISION
 //* *********************************
 
+/**
+ * Compares given primitives,
+ * For strings, cases and accents are ignored, i.e. 'a' !== 'b', 'a' === 'á', 'a' === 'A'
+ * @param {*} x
+ * @param {*} y
+ */
 export function comparePrimitives(x, y) {
+    if (typeof x === 'string' && typeof y === 'string') {
+        return x.localeCompare(y, undefined, {sensitivity: 'base'});
+    }
+
     if (x < y) {
         return -1;
     }

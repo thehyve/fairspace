@@ -1,44 +1,10 @@
 import {
     compareBy, comparing, findById,
     flattenShallow, isNonEmptyValue, joinWithSeparator,
-    formatDateTime
+    formatDateTime, comparePrimitives
 } from "../genericUtils";
 
 describe('array Utils', () => {
-    describe('findById', () => {
-        const mockCollectionsNoId = [{}];
-        const mockCollections = [
-            {
-                id: 500,
-                name: "Jan Smit's collection 1",
-            },
-            {
-                id: 501,
-                name: "Jan Smit's collection 2",
-            },
-        ];
-        it('should get collection by id', () => {
-            const res = findById(mockCollections, 500);
-            expect(res.name).toBe('Jan Smit\'s collection 1');
-        });
-        it('should return undefined if collection is not found', () => {
-            const res = findById(mockCollections, 509);
-            expect(res).toBeUndefined();
-        });
-        it('should return undefined if searching by undefined item id', () => {
-            const res = findById(mockCollections, undefined);
-            expect(res).toBeUndefined();
-        });
-        it('should return undefined if collection does not have id property', () => {
-            const res = findById(mockCollectionsNoId, 509);
-            expect(res).toBeUndefined();
-        });
-        it('should return undefined if collections is null does not have id property', () => {
-            const res = findById(null, 509);
-            expect(res).toBeUndefined();
-        });
-    });
-
     describe('flattenShallow', () => {
         it('flattens an array of arrays', () => {
             expect(flattenShallow([[1, 2], [], [3, 4], [5]])).toEqual([1, 2, 3, 4, 5]);
@@ -74,6 +40,27 @@ describe('comparison Utils', () => {
             expect(c({x: 2, y: 2, z: 3}, {x: 1, y: 20, z: 30})).toBe(1);
             expect(c({x: 1, y: 2, z: 3}, {x: 1, y: 2, z: 4})).toBe(-1);
             expect(c({x: 1, y: 3, z: 3}, {x: 1, y: 2, z: 30})).toBe(1);
+        });
+    });
+
+    describe('comparePrimitives', () => {
+        it('compares numbers properly', () => {
+            expect(comparePrimitives(1, 2)).toBe(-1);
+            expect(comparePrimitives(2, 1)).toBe(1);
+            expect(comparePrimitives(1, 1)).toBe(0);
+        });
+
+        it('compares string properly (cases are ignored)', () => {
+            expect(comparePrimitives('B', 'a')).toBe(1);
+            expect(comparePrimitives('b', 'a')).toBe(1);
+            expect(comparePrimitives('a', 'x')).toBe(-1);
+            expect(comparePrimitives('A', 'x')).toBe(-1);
+            expect(comparePrimitives('abcde', 'abcde')).toBe(0);
+        });
+
+        it('compares string properly (accents of same base letter are equal)', () => {
+            expect(comparePrimitives('a', 'á')).toBe(0);
+            expect(comparePrimitives('A', 'á')).toBe(0);
         });
     });
 });
