@@ -50,7 +50,7 @@ export const joinWithSeparator = (items = [], separator) => {
  * @param {*} y
  */
 export function comparePrimitives(x, y) {
-    if (typeof x === 'string' && typeof y === 'string' && x && y) {
+    if (typeof x === 'string' && typeof y === 'string') {
         return x.localeCompare(y, undefined, {sensitivity: 'base'});
     }
 
