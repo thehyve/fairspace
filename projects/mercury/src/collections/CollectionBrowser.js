@@ -1,13 +1,11 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
 
-import {ErrorDialog, MessageDisplay, LoadingInlay, LoadingOverlay} from "../common/components";
+import {ErrorDialog, LoadingInlay, LoadingOverlay, MessageDisplay} from "../common/components";
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
-import {findById} from "../common/utils/genericUtils";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import Config from "../common/services/Config/Config";
-import {getLocalPart} from "../common/utils/linkeddata/metadataUtils";
 
 export class CollectionBrowser extends React.Component {
     state = {
@@ -48,10 +46,10 @@ export class CollectionBrowser extends React.Component {
     }
 
     renderCollectionList() {
-        const {collections, addingCollection, deletingCollection, users} = this.props;
+        const {collections, addingCollection, deletingCollection, users = []} = this.props;
 
         collections.forEach(col => {
-            col.creatorObj = findById(users, getLocalPart(col.createdBy));
+            col.creatorObj = users.find(u => u.iri === col.createdBy);
         });
 
         return (
