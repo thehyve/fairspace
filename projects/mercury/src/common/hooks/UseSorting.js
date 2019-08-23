@@ -1,28 +1,6 @@
 import {useState} from "react";
 
-import {compareBy} from "../utils/genericUtils";
-
-/**
- * Sorting algorithm that will use the original order if
- * the fields are the same, and as such always return a stable order
- * @param array
- * @param cmp
- * @param ascending
- * @returns {*}
- */
-const stableSort = (array, cmp, ascending = true) => {
-    if (!Array.isArray(array)) {
-        return array;
-    }
-
-    const arrayWithIndices = array.map((el, index) => [el, index]);
-    arrayWithIndices.sort((a, b) => {
-        const order = cmp(a[0], b[0]);
-        if (order !== 0) return order;
-        return ascending ? a[1] - b[1] : b[1] - a[1];
-    });
-    return arrayWithIndices.map(el => el[0]);
-};
+import {compareBy, stableSort} from "../utils/genericUtils";
 
 /**
  * Custom hook to perform sorting

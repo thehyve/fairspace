@@ -6,7 +6,7 @@ import {
 } from "@material-ui/core";
 import filesize from 'filesize';
 
-import {formatDateTime} from "../common/utils/genericUtils";
+import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
 import styles from './FileList.styles';
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
@@ -33,7 +33,8 @@ const FileList = ({
     };
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns, 'name');
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const directoriesBeforeFiles = stableSort(orderedItems, compareBy('type'));
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
 
     if (!files || files.length === 0 || files[0] === null) {
         return (
