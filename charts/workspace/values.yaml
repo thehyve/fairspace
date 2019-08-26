@@ -73,7 +73,7 @@ workspace:
     configurationScripts:
       keycloak:
         enabled: true
-        image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.4-SNAPSHOT
+        image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.4
         pullPolicy: IfNotPresent
         resources:
             requests:
