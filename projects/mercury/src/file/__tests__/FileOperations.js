@@ -5,15 +5,17 @@ import {IconButton} from "@material-ui/core";
 import {FileOperations} from "../FileOperations";
 
 describe('FileOperations', () => {
-    it('should disable all buttons on file operation', () => {
+    it('should disable all buttons on when file operation is not finished yet', () => {
         const wrapper = shallow(<FileOperations
             classes={{}}
             paste={() => Promise.resolve()}
+            selectedPaths={['a']}
             fetchFilesIfNeeded={() => {}}
             getDownloadLink={() => {}}
         />);
 
-        wrapper.instance().handlePaste({stopPropagation: () => {}});
+        const handlePaste = wrapper.find('[aria-label="Paste"]').prop("onClick");
+        handlePaste({stopPropagation: () => {}});
 
         wrapper.find(IconButton)
             .forEach(b => {
@@ -25,15 +27,18 @@ describe('FileOperations', () => {
         const wrapper = shallow(<FileOperations
             classes={{}}
             paste={() => Promise.resolve()}
+            selectedPaths={['a']}
             fetchFilesIfNeeded={() => {}}
             getDownloadLink={() => {}}
         />);
 
-        return wrapper.instance().handlePaste({stopPropagation: () => {}})
+        const handlePaste = wrapper.find('[aria-label="Paste"]').prop("onClick");
+        return handlePaste({stopPropagation: () => {}})
             .then(() => {
                 wrapper.find(IconButton)
                     .not('[download]')
                     .forEach(b => {
+                        console.log(b.props()["aria-label"], b.props().disabled);
                         expect(b.props().disabled).toBe(false);
                     });
             });
