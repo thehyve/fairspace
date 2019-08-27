@@ -33,7 +33,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
             .then(shouldClose => isMounted() && shouldClose && setOpened(false));
     };
 
-    const dialog = !disabled && opened ? (
+    const dialog = opened ? (
         <Dialog
             open
             onClick={e => e.stopPropagation()}
@@ -67,7 +67,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
                 <Button
                     onClick={handleRename}
                     color="primary"
-                    disabled={disabled || !name || name === currentName}
+                    disabled={!name || name === currentName}
                 >
                     Rename
                 </Button>
