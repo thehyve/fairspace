@@ -18,15 +18,15 @@ data:
       transactionLogPath: "/data/saturn/files/log"
       maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
       elasticSearch:
-        enabled: {{ .Values.workspace.elasticsearch.enabled }}
+        enabled: {{ .Values.hyperspace.elasticsearch.enabled }}
         required: true
         settings:
           hostToPortMapping:
-            {{ template "workspace.elasticsearch.transporthost" . }}: {{ .Values.workspace.elasticsearch.transportport }}
+            {{ .Values.hyperspace.elasticsearch.transport.host }}: {{ .Values.hyperspace.elasticsearch.transport.port }}
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1
-          indexName: "fairspace"
+          indexName: "{{ .Values.hyperspace.elasticsearch.indexName }}"
     auth:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
