@@ -200,7 +200,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private void addSubjectTypes(Model model) {
         model.listSubjects()
                 .filterDrop(subj -> subj.hasProperty(RDF.type))
-                .forEachRemaining(subj -> model.add(get(subj.getURI(), RDF.type.getURI(), null, false)));
+                .forEachRemaining(subj -> {
+                    System.out.println(subj);
+                    model.add(get(subj.getURI(), RDF.type.getURI(), null, false));
+                });
     }
 
     private void addObjectTypes(Model model) {

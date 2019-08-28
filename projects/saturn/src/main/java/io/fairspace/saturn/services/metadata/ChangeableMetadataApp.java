@@ -2,13 +2,21 @@ package io.fairspace.saturn.services.metadata;
 
 
 import io.fairspace.saturn.services.PayloadParsingException;
+import io.fairspace.saturn.services.metadata.serialization.JsonLdSerializer;
+import io.fairspace.saturn.services.metadata.serialization.Serializer;
+import io.fairspace.saturn.services.metadata.serialization.TurtleSerializer;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.rdf.model.Model;
+import spark.Request;
 
-import static io.fairspace.saturn.services.JsonLDUtils.JSON_LD_HEADER_STRING;
-import static io.fairspace.saturn.services.JsonLDUtils.fromJsonLD;
+import java.util.Map;
+
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
+import static io.fairspace.saturn.services.metadata.serialization.JsonLdSerializer.JSON_LD_HEADER_STRING;
+import static io.fairspace.saturn.services.metadata.serialization.TurtleSerializer.TURTLE_HEADER_STRING;
 import static io.fairspace.saturn.util.ValidationUtils.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
@@ -21,6 +29,11 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
     protected final ChangeableMetadataService api;
     private final String baseURI;
 
+    private static final Map<String, Serializer> deserializers = Map.of(
+            JSON_LD_HEADER_STRING, new JsonLdSerializer(),
+            TURTLE_HEADER_STRING, new TurtleSerializer()
+    );
+
     public ChangeableMetadataApp(String basePath, ChangeableMetadataService api, String baseURI) {
         super(basePath, api);
         this.api = api;
@@ -32,22 +45,34 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
         super.initApp();
 
         put("/", (req, res) -> {
-            validateContentType(req, JSON_LD_HEADER_STRING);
-            api.put(fromJsonLD(req.body(), baseURI));
+            Model model = getModelFromRequest(req);
+
+            if(model == null) {
+                throw new UnsupportedMediaTypeException(deserializers.keySet());
+            }
+
+            api.put(model);
 
             res.status(SC_NO_CONTENT);
             return "";
         });
         patch("/", (req, res) -> {
-            validateContentType(req, JSON_LD_HEADER_STRING);
-            api.patch(fromJsonLD(req.body(), baseURI));
+            Model model = getModelFromRequest(req);
+
+            if(model == null) {
+                throw new UnsupportedMediaTypeException(deserializers.keySet());
+            }
+
+            api.patch(model);
 
             res.status(SC_NO_CONTENT);
             return "";
         });
         delete("/", (req, res) -> {
-            if (JSON_LD_HEADER_STRING.equals(req.contentType())) {
-                api.delete(fromJsonLD(req.body(), baseURI));
+            Model model = getModelFromRequest(req);
+
+            if(model != null) {
+                api.delete(model);
             } else {
                 var subject = req.queryParams("subject");
                 validate(subject != null, "Parameter \"subject\" is required");
@@ -56,7 +81,6 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                     // Subject could not be deleted. Return a 404 error response
                     return null;
                 }
-
             }
 
             res.status(SC_NO_CONTENT);
@@ -72,5 +96,16 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             res.body(errorBody(SC_BAD_REQUEST, "Validation Error", e.getViolations()));
         });
     }
+
+    private Model getModelFromRequest(Request req) {
+        for(String mimeType: deserializers.keySet()) {
+            if(hasContentType(req, mimeType)) {
+                return deserializers.get(mimeType).deserialize(req.body(), baseURI);
+            }
+        }
+
+        return null;
+    }
+
 
 }
