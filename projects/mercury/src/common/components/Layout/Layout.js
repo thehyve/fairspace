@@ -12,6 +12,7 @@ import {LoadingInlay} from "../index";
 import UserContext from '../../contexts/UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
 import VersionContext from '../../contexts/VersionContext';
+import {UsersProvider} from "../../contexts/UsersContext";
 
 const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
@@ -66,10 +67,12 @@ const Layout = ({classes}) => {
         <>
             <TopBar workspaceName={workspaceName} />
             <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
-                <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
-                <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
-                    <Routes />
-                </main>
+                <UsersProvider>
+                    <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
+                    <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
+                        <Routes />
+                    </main>
+                </UsersProvider>
             </AuthorizationCheck>
             <Footer workspaceName={workspaceName} version={version} />
         </>

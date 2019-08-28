@@ -12,7 +12,6 @@ import theme from './App.theme';
 import Layout from "./common/components/Layout/Layout";
 import {ErrorDialog, LoadingInlay} from './common/components';
 import {UserProvider} from './common/contexts/UserContext';
-import {UsersProvider} from "./common/contexts/UsersContext";
 import {VersionProvider} from './common/contexts/VersionContext';
 
 const App = () => {
@@ -34,19 +33,17 @@ const App = () => {
     return (
         <VersionProvider>
             <UserProvider>
-                <UsersProvider>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <MuiThemeProvider theme={theme}>
-                            <Provider store={store}>
-                                <ErrorDialog>
-                                    <Router>
-                                        <Layout />
-                                    </Router>
-                                </ErrorDialog>
-                            </Provider>
-                        </MuiThemeProvider>
-                    </MuiPickersUtilsProvider>
-                </UsersProvider>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <MuiThemeProvider theme={theme}>
+                        <Provider store={store}>
+                            <ErrorDialog>
+                                <Router>
+                                    <Layout />
+                                </Router>
+                            </ErrorDialog>
+                        </Provider>
+                    </MuiThemeProvider>
+                </MuiPickersUtilsProvider>
             </UserProvider>
         </VersionProvider>
     );
