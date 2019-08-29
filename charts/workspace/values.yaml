@@ -35,6 +35,17 @@ hyperspace:
         realm:
         clientSecret:
 
+    elasticsearch:
+      enabled: true
+      indexName:
+      rest:
+        scheme: http
+        host:
+        port: 9200
+      transport:
+        host:
+        port: 9300
+
 # Setup ingress for workspace components
 workspace:
     ingress:
@@ -83,10 +94,6 @@ workspace:
                 cpu: "500m"
                 memory: "2048Mi"
     enableExperimentalFeatures: false
-    elasticsearch:
-        enabled: true
-        restport: 9200
-        transportport: 9300
 
 # Generic settings for tracing
 tracing:
@@ -312,60 +319,6 @@ docs:
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
 
-#####################################################################
-# Specific settings for ElasticSearch
-#####################################################################
-elasticsearch:
-  persistence:
-    enabled: true
-    size: 20Gi
-    storageClass: standard
-  client:
-    resources:
-      requests:
-        memory: "800Mi"
-        cpu: 0.1
-      limits:
-        memory: "1024Mi"
-        cpu: 1
-    initResources:
-      limits:
-        cpu: "25m"
-        memory: "128Mi"
-      requests:
-        cpu: "25m"
-        memory: "128Mi"
-  data:
-    exposeHttp: true
-    resources:
-      requests:
-        memory: "1600Mi"
-        cpu: 0.1
-      limits:
-        memory: "2048Mi"
-        cpu: 1
-    initResources:
-      limits:
-        cpu: "25m"
-        memory: "128Mi"
-      requests:
-        cpu: "25m"
-        memory: "128Mi"
-  master:
-    resources:
-      requests:
-        memory: "800Mi"
-        cpu: 0.1
-      limits:
-        memory: "1024Mi"
-        cpu: 1
-    initResources:
-      limits:
-        cpu: "25m"
-        memory: "128Mi"
-      requests:
-        cpu: "25m"
-        memory: "128Mi"
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}

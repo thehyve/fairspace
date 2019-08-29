@@ -6,6 +6,13 @@ hyperspace:
     password: keycloak-ci-123
     realm: ci
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+  elasticsearch:
+    enabled: true
+    indexName: workspace-ci
+    transport:
+      host: hyperspace-ci-elasticsearch-discovery.hyperspace-ci.svc.cluster.local
+    rest:
+      host: hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local
 
 # Settings for the workspace
 workspace:

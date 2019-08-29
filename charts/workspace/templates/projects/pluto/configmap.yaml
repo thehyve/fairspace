@@ -62,8 +62,12 @@ data:
         # saturn, which must be defined before ui, because of the
         # paths they listen to
         elasticsearch:
-          path: /api/${app.apiVersion.elasticSearch}/search/*/_search
-          url: {{ template "workspace.elasticsearch.resturl" . }}
+          # The path contains 'fairspace' in the url, wheres the upstream url contain
+          # the actual index name. This allows the clients to be unaware of the specific
+          # index name and just use 'fairspace'
+          path: /api/${app.apiVersion.elasticSearch}/search/fairspace/_search
+          url: {{ template "elasticsearch.resturl" . }}
+          strip-prefix: true
         storage:
           path: /webdav/${app.apiVersion.saturn}/**
           strip-prefix: false

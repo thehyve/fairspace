@@ -27,20 +27,6 @@ spec:
 {{ toYaml .Values.podAnnotations.saturn | indent 8 }}
 {{- end }}
     spec:
-{{- if .Values.workspace.elasticsearch.enabled }}
-      initContainers:
-      - name: wait-for-elasticsearch
-        image: "{{ .Values.saturn.initContainer.image }}"
-        imagePullPolicy: {{ .Values.saturn.initContainer.pullPolicy }}
-        command:
-          - sh
-          - -c
-          - |
-            until printf "." && nc -z -w 2 "{{ template "workspace.elasticsearch.transporthost" . }}" "{{ .Values.workspace.elasticsearch.transportport }}"; do
-                sleep 2;
-            done;
-            echo 'ElasticSearch OK ✓'
-{{- end }}
       containers:
         - name: {{ template "saturn.fullname" . }}
           image: "{{ .Values.saturn.image.image }}:{{ .Values.saturn.image.tag }}"

@@ -131,24 +131,8 @@ Scheme to access workspace components (http or https)
 {{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
 {{- end -}}
 
-{{- define "workspace.elasticsearch.restbaseurl" -}}
-{{- if .Values.workspace.elasticsearch.host -}}
-{{- printf "http://%s" .Values.workspace.elasticsearch.host -}}
-{{- else -}}
-{{- printf "http://%s-elasticsearch-client.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "workspace.elasticsearch.resturl" -}}
-{{- template "workspace.elasticsearch.restbaseurl" . -}}:{{- int64 .Values.workspace.elasticsearch.restport -}}
-{{- end -}}
-
-{{- define "workspace.elasticsearch.transporthost" -}}
-{{- if .Values.workspace.elasticsearch.host -}}
-{{- .Values.workspace.elasticsearch.host -}}
-{{- else -}}
-{{- printf "%s-elasticsearch-discovery.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
-{{- end -}}
+{{- define "elasticsearch.resturl" -}}
+{{- printf "%s://%s:%d/%s/_search" .Values.hyperspace.elasticsearch.rest.scheme .Values.hyperspace.elasticsearch.rest.host .Values.hyperspace.elasticsearch.rest.port .Values.hyperspace.elasticsearch.indexName -}}
 {{- end -}}
 
 {{- define "workspace.roles.sparql" -}}
