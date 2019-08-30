@@ -1,6 +1,6 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
-  domain: hyperspace.demo.fairway.app
+  domain: demo.fairway.app
   keycloak:
     username: keycloak
     password: keycloak-demo-123
