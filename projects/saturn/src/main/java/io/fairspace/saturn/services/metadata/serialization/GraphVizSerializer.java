@@ -25,6 +25,11 @@ public class GraphVizSerializer implements Serializer {
     private static final String BIDIRECTIONAL_EDGE_TEMPLATE = "\"%s\" -> \"%s\" [dir=\"both\" tooltip=\"%s / %s\"]";
 
     @Override
+    public String getMimeType() {
+        return GRAPHVIZ_MIMETYPE;
+    }
+
+    @Override
     public String serialize(Model model) {
         var stringBuilder = new StringBuilder("digraph {\n");
 

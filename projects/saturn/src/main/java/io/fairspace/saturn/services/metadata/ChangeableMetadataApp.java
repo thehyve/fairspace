@@ -2,25 +2,25 @@ package io.fairspace.saturn.services.metadata;
 
 
 import io.fairspace.saturn.services.PayloadParsingException;
-import io.fairspace.saturn.services.metadata.serialization.JsonLdSerializer;
+import io.fairspace.saturn.services.metadata.serialization.RDFSerializer;
 import io.fairspace.saturn.services.metadata.serialization.Serializer;
-import io.fairspace.saturn.services.metadata.serialization.TurtleSerializer;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.rdf.model.Model;
 import spark.Request;
 
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.saturn.services.metadata.serialization.JsonLdSerializer.JSON_LD_HEADER_STRING;
-import static io.fairspace.saturn.services.metadata.serialization.TurtleSerializer.TURTLE_HEADER_STRING;
 import static io.fairspace.saturn.util.ValidationUtils.*;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.riot.RDFFormat.JSONLD;
+import static org.apache.jena.riot.RDFFormat.TURTLE;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -29,10 +29,15 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
     protected final ChangeableMetadataService api;
     private final String baseURI;
 
-    private static final Map<String, Serializer> deserializers = Map.of(
-            JSON_LD_HEADER_STRING, new JsonLdSerializer(),
-            TURTLE_HEADER_STRING, new TurtleSerializer()
+    private static final List<Serializer> deserializers = List.of(
+            new RDFSerializer(JSONLD),
+            new RDFSerializer(TURTLE)
     );
+
+    private static final List<String> supportedMimetypes = deserializers
+            .stream()
+            .map(Serializer::getMimeType)
+            .collect(Collectors.toList());
 
     public ChangeableMetadataApp(String basePath, ChangeableMetadataService api, String baseURI) {
         super(basePath, api);
@@ -48,7 +53,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             Model model = getModelFromRequest(req);
 
             if(model == null) {
-                throw new UnsupportedMediaTypeException(deserializers.keySet());
+                throw new UnsupportedMediaTypeException(supportedMimetypes);
             }
 
             api.put(model);
@@ -60,7 +65,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             Model model = getModelFromRequest(req);
 
             if(model == null) {
-                throw new UnsupportedMediaTypeException(deserializers.keySet());
+                throw new UnsupportedMediaTypeException(supportedMimetypes);
             }
 
             api.patch(model);
@@ -98,9 +103,9 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
     }
 
     private Model getModelFromRequest(Request req) {
-        for(String mimeType: deserializers.keySet()) {
-            if(hasContentType(req, mimeType)) {
-                return deserializers.get(mimeType).deserialize(req.body(), baseURI);
+        for(Serializer deserializer: deserializers) {
+            if(hasContentType(req, deserializer.getMimeType())) {
+                return deserializer.deserialize(req.body(), baseURI);
             }
         }
 
