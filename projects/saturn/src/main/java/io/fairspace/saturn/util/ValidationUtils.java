@@ -16,9 +16,7 @@ public class ValidationUtils {
         validate(!checkIRI(iri), "Invalid IRI: " + iri);
     }
 
-    public static void validateContentType(Request request, String contentType) {
-        if (request.contentType() == null || !contentType.equals(getContentTypeWithoutCharset(request.contentType()))) {
-            throw new UnsupportedMediaTypeException(contentType);
-        }
+    public static boolean hasContentType(Request request, String contentType) {
+        return request.contentType() != null && contentType.equals(getContentTypeWithoutCharset(request.contentType()));
     }
 }
