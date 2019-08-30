@@ -199,13 +199,14 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private void addSubjectTypes(Model model) {
         model.listSubjects()
+                .filterKeep(RDFNode::isURIResource)
                 .filterDrop(subj -> subj.hasProperty(RDF.type))
                 .forEachRemaining(subj -> model.add(get(subj.getURI(), RDF.type.getURI(), null, false)));
     }
 
     private void addObjectTypes(Model model) {
         model.listObjects()
-                .filterKeep(RDFNode::isResource)
+                .filterKeep(RDFNode::isURIResource)
                 .mapWith(RDFNode::asResource)
                 .filterDrop(obj -> obj.hasProperty(RDF.type))
                 .toSet()
