@@ -132,7 +132,7 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 
 {{- define "elasticsearch.resturl" -}}
-{{- printf "%s://%s:%d/%s/_search" .Values.hyperspace.elasticsearch.rest.scheme .Values.hyperspace.elasticsearch.rest.host .Values.hyperspace.elasticsearch.rest.port .Values.hyperspace.elasticsearch.indexName -}}
+{{- printf "%s://%s:%s/%s/_search" .Values.hyperspace.elasticsearch.rest.scheme .Values.hyperspace.elasticsearch.rest.host (.Values.hyperspace.elasticsearch.rest.port | toString) .Values.hyperspace.elasticsearch.indexName -}}
 {{- end -}}
 
 {{- define "workspace.roles.sparql" -}}
