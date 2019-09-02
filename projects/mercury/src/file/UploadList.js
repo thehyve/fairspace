@@ -71,8 +71,7 @@ const UploadList = ({uploads, enqueue}) => {
                         />
                     </>
                 )
-                : undefined
-            }
+                : undefined}
             <Dropzone onDrop={files => enqueue(files)}>
                 {({getRootProps, getInputProps}) => (
                     <div

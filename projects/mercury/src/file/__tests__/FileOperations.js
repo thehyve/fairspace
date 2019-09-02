@@ -38,7 +38,6 @@ describe('FileOperations', () => {
                 wrapper.find(IconButton)
                     .not('[download]')
                     .forEach(b => {
-                        console.log(b.props()["aria-label"], b.props().disabled);
                         expect(b.props().disabled).toBe(false);
                     });
             });

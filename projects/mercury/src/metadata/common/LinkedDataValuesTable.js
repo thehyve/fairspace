@@ -86,8 +86,7 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                         {property.isEditable ? <TableCell className={classes.buttonColumn} /> : undefined}
                     </TableRow>
                 </TableFooter>
-            ) : undefined
-            }
+            ) : undefined}
         </Table>
     );
 };
