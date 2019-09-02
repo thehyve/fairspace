@@ -18,7 +18,10 @@ beforeEach(() => {
 });
 
 it('merges existing config with external config', () => {
-    Config.setConfig(Object.assign({}, initialConfig, {externalConfigurationFiles: ["test"]}));
+    Config.setConfig({
+        ...initialConfig,
+        externalConfigurationFiles: ["test"]
+    });
 
     mockAxios.get.mockImplementationOnce(() => Promise.resolve({
         status: 200,

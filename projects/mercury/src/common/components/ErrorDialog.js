@@ -113,8 +113,7 @@ class ErrorDialog extends React.Component {
                             >
                                 Retry
                             </Button>
-                        ) : null
-                    }
+                        ) : null}
                 </DialogActions>
             </Dialog>
         );

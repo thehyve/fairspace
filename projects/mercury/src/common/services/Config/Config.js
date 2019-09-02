@@ -54,7 +54,7 @@ class Config {
                 console.warn(msg);
             }).then(() => {
                 this.loaded = true;
-                this.fullConfig = merge(Object.assign({}, this.internalConfig), this.externalConfig);
+                this.fullConfig = merge({...this.internalConfig}, this.externalConfig);
                 return this.fullConfig;
             });
         } else {

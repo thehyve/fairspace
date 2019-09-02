@@ -13,11 +13,11 @@ beforeAll(() => {
 
 
 it('uploads a file', async () => {
-    FileAPI.webDavClient = {putFileContents: jest.fn(() => Promise.resolve())};
+    FileAPI.webDavClient = {putFileContents: jest.fn(() => Promise.resolve({}))};
     const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
 
     const result = FileAPI.upload(file);
-    await expect(result).resolves;
+    await expect(result).resolves.toEqual({});
     expect(FileAPI.webDavClient.putFileContents.mock.calls[0][0]).toEqual('/test/path/destination.txt');
     expect(FileAPI.webDavClient.putFileContents.mock.calls[0][1]).toEqual('FILE_OBJECT');
 });

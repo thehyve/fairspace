@@ -1,7 +1,6 @@
 import {
-    compareBy, comparing, findById,
-    flattenShallow, isNonEmptyValue, joinWithSeparator,
-    formatDateTime, comparePrimitives
+    compareBy, comparing, flattenShallow, isNonEmptyValue, joinWithSeparator,
+    formatDateTime, comparePrimitives,
 } from "../genericUtils";
 
 describe('array Utils', () => {
