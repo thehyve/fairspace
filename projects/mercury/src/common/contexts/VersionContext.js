@@ -4,6 +4,7 @@ import WorkspaceAPI from "../services/WorkspaceAPI";
 
 const initialState = {
     name: 'Fairspace',
+    description: '',
     version: ''
 };
 

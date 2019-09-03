@@ -15,7 +15,7 @@ const styles = theme => ({
     }
 });
 
-const TopBar = ({classes, workspaceName, location, history}) => {
+const TopBar = ({classes, title, location, history}) => {
     const searchQuery = getSearchQueryFromString(location.search);
 
     const handleSearch = (value) => {
@@ -27,7 +27,7 @@ const TopBar = ({classes, workspaceName, location, history}) => {
         <AppBar className={classes.root} position="sticky">
             <Toolbar>
                 <Typography variant="h6" color="inherit" noWrap className={classes.title}>
-                    {workspaceName}
+                    {title}
                 </Typography>
                 <SearchBar query={searchQuery} onSearchChange={handleSearch} />
                 <UserMenu />

@@ -16,6 +16,7 @@ hyperspace:
 
 # Settings for the workspace
 workspace:
+  description: "Demo Workspace"
   ingress:
     domain: workspace.demo.fairway.app
   enableExperimentalFeatures: true
@@ -34,6 +35,11 @@ pluto:
 
 # Specific settings for Saturn
 saturn:
+  persistence:
+    files:
+      size: 50Gi
+    database:
+      size: 50Gi
   mail:
     mail.from: janneke@thehyve.nl
     mail.user: AKIAISXHGXUIMMU75YVA
