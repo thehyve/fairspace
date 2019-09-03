@@ -16,6 +16,7 @@ hyperspace:
 
 # Settings for the workspace
 workspace:
+  description: "CI Workspace"
   ingress:
     domain: workspace.ci.fairway.app
   enableExperimentalFeatures: true
@@ -35,6 +36,11 @@ pluto:
 saturn:
   image:
     pullPolicy: Always
+  persistence:
+    files:
+      size: 50Gi
+    database:
+      size: 50Gi
   mail:
     mail.from: pavel@thehyve.nl
     mail.user: AKIAISXHGXUIMMU75YVA
