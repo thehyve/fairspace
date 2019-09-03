@@ -26,6 +26,6 @@ data:
   version.json: |-
     {
       "name": "{{ .Release.Name }}",
-      "version": "{{ .Release.Revision }}",
+      "version": "{{ .Chart.Version }}",
       "description": "{{ .Values.workspace.description }}"
     }
