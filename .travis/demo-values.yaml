@@ -50,5 +50,3 @@ saturn:
     mail.smtp.port: 587
     mail.smtp.starttls.enable: true
 
-# Specific settings for Mercury
-mercury: {}
