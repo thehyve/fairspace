@@ -1,6 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
@@ -14,7 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.Map;
 
+import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -37,7 +39,7 @@ public class TxnLogDatasetGraphTest {
     @Before
     public void before() {
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log,
-                () -> new UserInfo("userId", "userName", "fullName", "email", null),
+                () -> new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")),
                 () -> "message"));
     }
 

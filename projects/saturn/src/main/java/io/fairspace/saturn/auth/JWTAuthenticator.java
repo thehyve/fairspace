@@ -1,36 +1,24 @@
 package io.fairspace.saturn.auth;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.proc.BadJOSEException;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.proc.JWTProcessor;
+import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 class JWTAuthenticator {
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String USERNAME_CLAIM = "preferred_username";
-    private static final String FULLNAME_CLAIM = "name";
-    private static final String SUBJECT_CLAIM = "sub";
-    private static final String AUTHORITIES_CLAIM = "authorities";
-    private static final String EMAIL_CLAIM = "email";
 
-    private final JWTProcessor<?> jwtProcessor;
+    private final JwtTokenValidator tokenValidator;
 
-    JWTAuthenticator(JWTProcessor<?> jwtProcessor) {
-        this.jwtProcessor = jwtProcessor;
+    JWTAuthenticator(JwtTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
     }
 
-    UserInfo getUserInfo(HttpServletRequest request) {
+    OAuthAuthenticationToken getUserInfo(HttpServletRequest request) {
         var authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
@@ -38,29 +26,8 @@ class JWTAuthenticator {
         }
 
         var token = authorizationHeader.substring(BEARER_PREFIX.length());
-        JWTClaimsSet claimsSet;
-        try {
-            claimsSet = jwtProcessor.process(token, null);
-        } catch (ParseException | BadJOSEException | JOSEException e) {
-            log.error("Error validating token", e);
-            return null;
-        }
+        var claims = tokenValidator.parseAndValidate(token);
 
-        var claims = claimsSet.getClaims();
-
-        return new UserInfo(
-                getStringClaim(claims, SUBJECT_CLAIM),
-                getStringClaim(claims, USERNAME_CLAIM),
-                getStringClaim(claims, FULLNAME_CLAIM),
-                getStringClaim(claims, EMAIL_CLAIM),
-                ((List<?>) claims.getOrDefault(AUTHORITIES_CLAIM, emptyList()))
-                        .stream()
-                        .map(Object::toString)
-                        .collect(toSet()));
-    }
-
-    private static String getStringClaim(Map<String, ?> claims, String key) {
-        var value = claims.get(key);
-        return (value != null) ? value.toString() : null;
+        return claims != null ? new OAuthAuthenticationToken(token, claims) : null;
     }
 }

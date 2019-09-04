@@ -1,19 +1,24 @@
 # Hyperspace that this workspace is connected to
 hyperspace:
-  domain: hyperspace.ci.fairway.app
+  domain: ci.fairway.app
   keycloak:
     username: keycloak
     password: keycloak-ci-123
     realm: ci
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+  elasticsearch:
+    enabled: true
+    indexName: workspace-ci
+    transport:
+      host: hyperspace-ci-elasticsearch-discovery.hyperspace-ci.svc.cluster.local
+    rest:
+      host: hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local
 
 # Settings for the workspace
 workspace:
+  description: "CI Workspace"
   ingress:
     domain: workspace.ci.fairway.app
-    tls:
-      certificate:
-        dns01Provider: gke
   enableExperimentalFeatures: true
   configurationScripts:
     keycloak:
@@ -31,6 +36,11 @@ pluto:
 saturn:
   image:
     pullPolicy: Always
+  persistence:
+    files:
+      size: 50Gi
+    database:
+      size: 50Gi
   mail:
     mail.from: pavel@thehyve.nl
     mail.user: AKIAISXHGXUIMMU75YVA
@@ -44,5 +54,10 @@ saturn:
 
 # Specific settings for Mercury subchart
 mercury:
+  image:
+    pullPolicy: Always
+
+# Specific settings for Mercury subchart
+docs:
   image:
     pullPolicy: Always

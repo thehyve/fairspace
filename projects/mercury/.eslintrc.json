@@ -1,13 +1,16 @@
 {
   "env": {
     "browser": true,
-    "jest": true
+    "jest": true,
+    "jest/globals": true
   },
   "plugins": [
-    "react-hooks"
+    "react-hooks",
+    "jest"
   ],
   "extends": [
-    "airbnb"
+    "airbnb",
+    "plugin:jest/recommended"
   ],
   "parser": "babel-eslint",
   "rules": {
@@ -79,6 +82,7 @@
     "react/require-default-props": 0,
     "react/forbid-prop-types": 0,
     "import/prefer-default-export": 0,
-    "prefer-template": 0
+    "prefer-template": 0,
+    "react/state-in-constructor": 0
   }
 }

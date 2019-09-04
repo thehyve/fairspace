@@ -7,19 +7,23 @@ import io.milton.property.PropertySource;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class VfsBackedMiltonResourceTest {
     @Test
-    public void testGetIriProperty() {
+    public void testGetIriProperty() throws IOException {
+        var fs = mock(VirtualFileSystem.class);
+        when(fs.iri(any())).thenReturn("http://this-iri");
         var resource = new ResourceImpl(
-                null,
-                FileInfo.builder().iri("http://this-iri").build()
+                fs,
+                FileInfo.builder().build()
         );
 
         assertEquals("http://this-iri", resource.getProperty(new QName(FS.NS, "iri")));

@@ -27,14 +27,6 @@ Your workspace is named {{ template "workspace.name" . }} and can be accessed vi
 
 The installation contains instances of Mercury, Pluto and Saturn.
 
-----------------------------
-
-A user has been setup in hyperspace {{ .Values.hyperspace.domain }} that is able to login to the workspace.
-You can find the credentials for this user with the following commands:
-
-kubectl get secret --namespace {{ .Release.Namespace }} {{ template "workspace.fullname" . }}-testuser -o jsonpath="{.data.username}" | base64 --decode; echo
-kubectl get secret --namespace {{ .Release.Namespace }} {{ template "workspace.fullname" . }}-testuser -o jsonpath="{.data.password}" | base64 --decode; echo
-
 {{- if not .Values.workspace.ingress.enabled }}
 ----------------------------
 Please note that as ingress is disabled, we do not know the url of pluto while configuring keycloak. This means

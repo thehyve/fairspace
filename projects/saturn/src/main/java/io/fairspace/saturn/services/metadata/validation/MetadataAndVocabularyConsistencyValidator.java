@@ -40,10 +40,10 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private final RDFConnection rdf;
 
     @Override
-    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         // We first determine which shapes were modified and how the updated vocabulary will look like.
         var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
-        var newVocabulary = oldVocabulary.difference(modelToRemove).union(modelToAdd);
+        var newVocabulary = oldVocabulary.difference(removed).union(added);
         var actuallyAdded = newVocabulary.difference(oldVocabulary);
 
         actuallyAdded.listStatements().forEachRemaining(stmt -> {

@@ -1,63 +1,60 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import lombok.AllArgsConstructor;
+import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.topbraid.shacl.validation.ValidationEngine;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.addObjectTypes;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
 import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
+import static java.lang.Math.min;
 import static java.lang.Thread.currentThread;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static java.util.concurrent.Executors.newFixedThreadPool;
+import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
 
 @AllArgsConstructor
 public class ShaclValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
-    private final Node dataGraph;
-    private final Node vocabularyGraph;
+    private static final int NUM_THREADS = availableProcessors();
+    private final ExecutorService executorService = newFixedThreadPool(NUM_THREADS);
 
-    public void validate(Model modelToRemove, Model modelToAdd, ViolationHandler violationHandler) {
-        var affectedResources = modelToRemove.listSubjects()
-                .andThen(modelToAdd.listSubjects())
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+        var affectedNodes = removed.listSubjects()
+                .andThen(added.listSubjects())
+                .mapWith(FrontsNode::asNode)
                 .toSet();
+        if (affectedNodes.isEmpty()) {
+            return;
+        }
+        var nodeQueue = new ArrayBlockingQueue<>(affectedNodes.size(), false, affectedNodes);
+        var futures = new ArrayList<Future<ValidationEngine>>();
+        var numberOfTasks = min(NUM_THREADS, nodeQueue.size());
+        for (int i = 0; i < numberOfTasks; i++) {
+            var validationEngine = createEngine(after, vocabulary); // must be on the main thread
+            futures.add(executorService.submit(() -> {
+                Node node;
+                while ((node = nodeQueue.poll()) != null) {
+                    validationEngine.validateNode(node);
+                }
+                return validationEngine;
+            }));
+        }
 
-        var modelToValidate = affectedModelSubSet(affectedResources)
-                .remove(modelToRemove)
-                .add(modelToAdd);
-
-        addObjectTypes(modelToValidate, dataGraph, rdf);
-
-        var shapesModel = rdf.fetch(vocabularyGraph.getURI());
-        var validationEngine = createEngine(modelToValidate, shapesModel);
-
-        affectedResources.forEach(resource -> {
-            try {
-                validationEngine.validateNode(resource.asNode());
-            } catch (InterruptedException e) {
-                currentThread().interrupt();
-                throw new RuntimeException("SHACL validation was interrupted");
+        try {
+            for (var future: futures) {
+                getViolations(future.get(), violationHandler);
             }
-        });
-
-        getViolations(validationEngine, violationHandler);
-    }
-
-    /**
-     * @param affectedResources
-     * @return a model containing all triples describing the affected resources
-     */
-    private Model affectedModelSubSet(Set<Resource> affectedResources) {
-        var model = createDefaultModel();
-        affectedResources.forEach(r -> {
-            if(r.isURIResource()) {
-                model.add(rdf.queryConstruct(storedQuery("select_by_mask_with_object_types", dataGraph, r, null, null)));
-            }
-        });
-        return model;
+        } catch (InterruptedException e) {
+            currentThread().interrupt();
+            throw new RuntimeException("SHACL validation was interrupted", e);
+        } catch(ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

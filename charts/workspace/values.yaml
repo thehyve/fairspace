@@ -35,13 +35,27 @@ hyperspace:
         realm:
         clientSecret:
 
+    elasticsearch:
+      enabled: true
+      indexName:
+      rest:
+        scheme: http
+        host:
+        port: 9200
+      transport:
+        host:
+        port: 9300
+
 # Setup ingress for workspace components
 workspace:
+    description: "Workspace"
     ingress:
         enabled: true
         domain:
         annotations:
           pluto:
+            kubernetes.io/ingress.class: nginx
+          docs:
             kubernetes.io/ingress.class: nginx
           storage:
             kubernetes.io/ingress.class: nginx
@@ -55,22 +69,11 @@ workspace:
                 issuerRef:
                     name: letsencrypt-prod
                     kind: ClusterIssuer
-                dns01Provider: clouddns
-
-    testuser:
-      username:
-      password: fairspace123
-    coordinator:
-      username:
-      password: fairspace123
-    datasteward:
-      username:
-      password: fairspace123
-
     keycloak:
       # Roles defining the keycloak roles for this workspace
       roles:
         user:
+        coordinator:
         datasteward:
         sparql:
 
@@ -82,7 +85,7 @@ workspace:
     configurationScripts:
       keycloak:
         enabled: true
-        image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
+        image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.4
         pullPolicy: IfNotPresent
         resources:
             requests:
@@ -92,10 +95,6 @@ workspace:
                 cpu: "500m"
                 memory: "2048Mi"
     enableExperimentalFeatures: false
-    elasticsearch:
-        enabled: true
-        restport: 9200
-        transportport: 9300
 
 # Generic settings for tracing
 tracing:
@@ -119,7 +118,7 @@ pluto:
     maxSurge: 25%
   image:
     image: eu.gcr.io/fairspace-207108/pluto
-    tag: RELEASEVERSION
+    tag: "0.6.7"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -143,13 +142,6 @@ pluto:
     successThreshold: 1
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
-
-  # Reference to the workspace for informational purposes
-  # These values default to the release name and chart version
-  # The name is also used in the default setting for clientId
-  workspace:
-    name:
-    version: 0.0.0-RELEASEVERSION
 
   # Keycloak configuration for authentication
   keycloak:
@@ -297,60 +289,37 @@ mercury:
   urls:
     storage:
 
-#####################################################################
-# Specific settings for ElasticSearch
-#####################################################################
-elasticsearch:
-  persistence:
-    enabled: true
-    size: 20Gi
-    storageClass: standard
-  client:
-    resources:
-      requests:
-        memory: "800Mi"
-        cpu: 0.1
-      limits:
-        memory: "1024Mi"
-        cpu: 1
-    initResources:
-      limits:
-        cpu: "25m"
-        memory: "128Mi"
-      requests:
-        cpu: "25m"
-        memory: "128Mi"
-  data:
-    exposeHttp: true
-    resources:
-      requests:
-        memory: "1600Mi"
-        cpu: 0.1
-      limits:
-        memory: "2048Mi"
-        cpu: 1
-    initResources:
-      limits:
-        cpu: "25m"
-        memory: "128Mi"
-      requests:
-        cpu: "25m"
-        memory: "128Mi"
-  master:
-    resources:
-      requests:
-        memory: "800Mi"
-        cpu: 0.1
-      limits:
-        memory: "1024Mi"
-        cpu: 1
-    initResources:
-      limits:
-        cpu: "25m"
-        memory: "128Mi"
-      requests:
-        cpu: "25m"
-        memory: "128Mi"
+# Settings for the documentation container
+docs:
+  nameOverride:
+  replicaCount: 1
+  image:
+    image: eu.gcr.io/fairspace-207108/docs
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    externalPort: 80
+    internalPort: 8080
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+  probePath: /
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
+
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}

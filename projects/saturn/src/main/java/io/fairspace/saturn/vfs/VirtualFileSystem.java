@@ -19,6 +19,8 @@ public interface VirtualFileSystem extends Closeable {
      */
     FileInfo stat(String path) throws IOException;
 
+    String iri(String path) throws IOException;
+
     default boolean exists(String path) throws IOException {
         return stat(path) != null;
     }

@@ -1,7 +1,7 @@
 package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -17,19 +17,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.AUTHORITIES_CLAIM;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SaturnSecurityHandlerTest {
     @Mock
-    private Function<HttpServletRequest, UserInfo> authenticator;
+    private Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
     @Mock
     private Request baseRequest;
     @Mock
@@ -38,6 +38,8 @@ public class SaturnSecurityHandlerTest {
     private HttpServletResponse response;
     @Mock
     private Handler nextHandler;
+    @Mock
+    private Consumer<OAuthAuthenticationToken> onAuthorized;
 
     private StringWriter writer;
 
@@ -45,7 +47,7 @@ public class SaturnSecurityHandlerTest {
 
     @Before
     public void before() throws IOException {
-        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator);
+        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator, onAuthorized);
         handler.setHandler(nextHandler);
 
         writer = new StringWriter();
@@ -71,13 +73,13 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void sparqlRequiresSparqlRole() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user")));
+        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
 
         handler.handle("/api/v1/rdf/", baseRequest, request, response);
 
         verifyAuthenticated(false);
 
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user", "sparql")));
+        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user", "sparql"))));
 
         handler.handle("/api/v1/rdf/", baseRequest, request, response);
 
@@ -86,7 +88,7 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void vocabularyCanBeAccessedWithoutAdditionalRoles() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user")));
+        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
         when(request.getMethod()).thenReturn("GET");
 
         handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
@@ -96,14 +98,14 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void vocabularyEditingRequiresDatastewardRole() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user")));
+        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
         when(request.getMethod()).thenReturn("PUT");
 
         handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(false);
 
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user", "datasteward")));
+        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user", "datasteward"))));
         when(request.getMethod()).thenReturn("PUT");
 
         handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
@@ -113,7 +115,7 @@ public class SaturnSecurityHandlerTest {
 
     @Test
     public void otherEndpointsCanBeAccessedWithValidAuth() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new UserInfo(null, null, null, null, Set.of("user")));
+        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
 
         handler.handle("/api/v1/some/", baseRequest, request, response);
 
@@ -140,11 +142,12 @@ public class SaturnSecurityHandlerTest {
 
     private void verifyAuthenticated(boolean success) {
         verifyIfRequestWasPassedToNextHandler(success);
+        verify(onAuthorized, times(success ? 1 : 0)).accept(any());
     }
 
     private void verifyIfRequestWasPassedToNextHandler(boolean success) {
         try {
-            verify(nextHandler, times(success ? 1 : 0)).handle(any(), any(), any(), any()); // Called in super.handle
+            verify(nextHandler, times(success ? 1 : 0)).handle(any(), any(), any(), any());
         } catch (Exception e) {
             fail();
         }

@@ -134,6 +134,7 @@ public class TextIndexESBulk extends TextIndexES {
             var entry = getDataEntry(entity);
             var builder = jsonBuilder()
                     .startObject()
+                    .field(getDocDef().getEntityField(), entity.getId())
                     .field(entry.getKey(), List.of(entry.getValue()))
                     .endObject();
             var indexRequest = new IndexRequest(indexName, getDocDef().getEntityField(), entity.getId())

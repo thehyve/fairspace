@@ -10,6 +10,7 @@ metadata:
 data:
   application.yaml: |-
     port: 8080
+    publicUrl: {{ template "workspace.url" . }}
     jena:
       metadataBaseIRI: http://{{ template "pluto.hostname" . }}/iri/
       vocabularyBaseIRI: http://{{ template "pluto.hostname" . }}/vocabulary/
@@ -17,25 +18,26 @@ data:
       transactionLogPath: "/data/saturn/files/log"
       maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
       elasticSearch:
-        enabled: {{ .Values.workspace.elasticsearch.enabled }}
-        required: false
+        enabled: {{ .Values.hyperspace.elasticsearch.enabled }}
+        required: true
         settings:
           hostToPortMapping:
-            {{ template "workspace.elasticsearch.transporthost" . }}: {{ .Values.workspace.elasticsearch.transportport }}
+            {{ .Values.hyperspace.elasticsearch.transport.host }}: {{ .Values.hyperspace.elasticsearch.transport.port }}
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1
-          indexName: "fairspace"
-    users:
-      endpoint: https://{{ template "pluto.hostname" . }}/api/v1/workspace/users
-      synchronizationInterval: 60
+          indexName: "{{ .Values.hyperspace.elasticsearch.indexName }}"
     auth:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: "RS256"
-      workspaceUserRole: "{{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}"
-      dataStewardRole: "{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}"
-      sparqlRole: "{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparql-%s" (include "workspace.name" .)) }}"
+      workspaceUserRole: "{{ template "workspace.roles.user" . }}"
+      dataStewardRole: "{{ template "workspace.roles.datasteward" . }}"
+      sparqlRole: "{{ template "workspace.roles.sparql" . }}"
+      workspaceLoginGroup: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
+      groupsUrl: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}/groups/?max=1&search={{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}"
+      usersUrlTemplate: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}/groups/%s/members"
+      userListSynchronizationInterval: 60
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     mail:

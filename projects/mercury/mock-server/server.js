@@ -17,13 +17,15 @@ app.use(bodyParser.json());
 app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
 app.get('/config/config.json', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-config.json`));
+app.get('/config/version.json', (req, res) => res.sendFile(`${mockDataDir}/workspace/version.json`));
 
 // Account API
-app.get('/api/v1/account/user', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
-app.get('/api/v1/account/authorizations', (req, res) => res.send(['user-workspace', 'datasteward', 'ROLE_USER']));
+app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
+
+app.get('/groups', (req, res) => res.sendFile(`${mockDataDir}/workspace/groups.json`));
 
 // Workspace API
-app.get('/api/v1/workspace/users', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
-app.get('/api/v1/workspace/details', (req, res) => res.sendFile(`${mockDataDir}/workspace/workspace-details.json`));
+app.get('/groups/123/members', (req, res) => res.sendFile(`${mockDataDir}/workspace/users.json`));
+
 
 app.listen(port);

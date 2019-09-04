@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +25,7 @@ public class UserServiceTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    private static final int refreshInterval = 1;
+    private static final int refreshInterval = 50;
 
     private HttpServer mockServer;
 
@@ -36,34 +35,46 @@ public class UserServiceTest {
 
     private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
 
+    private final KeycloakGroup keycloakGroup = new KeycloakGroup() {{
+       setId("groupid");
+       setName("workspace-users");
+    }};
+
     private final KeycloakUser keycloakUser = new KeycloakUser() {{
         setId("123");
         setFirstName("John");
         setLastName("Smith");
         setEmail("john@example.com");
+        setEnabled(true);
     }};
     private final KeycloakUser alteredKeycloakUser = new KeycloakUser() {{
         setId(keycloakUser.getId());
         setFirstName(keycloakUser.getFirstName());
         setLastName(keycloakUser.getLastName());
         setEmail("smith@example.com");
+        setEnabled(true);
     }};
 
     private volatile List<KeycloakUser> keycloakUsers = List.of(keycloakUser);
 
-
     @Before
     public void before() throws IOException {
         mockServer = HttpServer.create(new InetSocketAddress(0), 0);
-        mockServer.createContext("/users", exchange -> {
+        mockServer.createContext("/groups/groupid/members", exchange -> {
             var response = mapper.writeValueAsBytes(keycloakUsers);
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        mockServer.createContext("/groups", exchange -> {
+            var response = mapper.writeValueAsBytes(List.of(keycloakGroup));
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
             exchange.getResponseBody().write(response);
             exchange.close();
         });
         mockServer.start();
 
-        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users", refreshInterval, new DAO(rdf, null), false);
+        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/groups", "workspace-users", "http://localhost:" + mockServer.getAddress().getPort() + "/groups/%s/members/", refreshInterval, new DAO(rdf, null));
     }
 
     @Test
@@ -83,22 +94,31 @@ public class UserServiceTest {
 
         userService.getUser(iri);
 
-        Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Saving might take some time
+        Thread.sleep(2 * refreshInterval); // Saving might take some time
 
         assertTrue(ds.getDefaultModel().containsResource(createResource(iri.getURI())));
     }
 
+
     @Test
-    public void userInformationGetRefreshed() throws InterruptedException {
+    public void userInformationIsRefreshedWhenOnAuthorizedIsCalled() throws InterruptedException {
         var iri = userService.getUserIri(keycloakUser.getId());
 
         userService.getUser(iri);
 
-        keycloakUsers = List.of(alteredKeycloakUser);
+        Thread.sleep(2 * refreshInterval); // User information gets staled
 
-        Thread.sleep(TimeUnit.SECONDS.toMillis(2 * refreshInterval)); // Refreshing might take some time
+        keycloakUsers = List.of(alteredKeycloakUser); // Modify users
 
         var user =  userService.getUser(iri);
+
+        assertEquals(keycloakUser.getEmail(), user.getEmail()); // The returned user is not refreshed
+
+        userService.onAuthorized(keycloakUser.getId()); // Triggers refreshing
+
+        Thread.sleep(100); // Refreshing is taking place
+
+        user =  userService.getUser(iri); // Must be refreshed now
 
         assertEquals(alteredKeycloakUser.getEmail(), user.getEmail());
 

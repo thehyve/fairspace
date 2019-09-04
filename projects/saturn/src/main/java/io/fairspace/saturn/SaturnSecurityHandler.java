@@ -1,6 +1,6 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.UserInfo;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.Request;
 
@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.Context.currentRequest;
@@ -17,24 +18,29 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
 class SaturnSecurityHandler extends ConstraintSecurityHandler {
-    private static final String USER_INFO_REQUEST_ATTRIBUTE = UserInfo.class.getName();
+    private static final String USER_INFO_REQUEST_ATTRIBUTE = OAuthAuthenticationToken.class.getName();
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
 
-    private final Function<HttpServletRequest, UserInfo> authenticator;
+    private final Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
     private final String healthResource;
+    private final String workspaceResource;
     private final String sparqlResource;
     private final String vocabularyResource;
     private final String workspaceUserRole;
     private final String sparqlRole;
     private final String dataStewardRole;
+    private final Consumer<OAuthAuthenticationToken> onAuthorized;
 
     /**
      * @param apiPrefix
      * @param authenticator Authenticator returning a UserInfo for an incoming request
+     * @param onAuthorized An optional callback, called on successful authorization
      */
-    SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, UserInfo> authenticator) {
+    SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
         this.authenticator = authenticator;
+        this.onAuthorized = onAuthorized;
         this.healthResource = apiPrefix + "/health/";
+        this.workspaceResource = apiPrefix + "/workspace/";
         this.sparqlResource = apiPrefix + "/rdf/";
         this.vocabularyResource = apiPrefix + "/vocabulary/";
         this.workspaceUserRole = config.workspaceUserRole;
@@ -59,7 +65,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
     }
 
     private String authorize(String pathInContext, HttpServletRequest request) {
-        if (healthResource.equals(pathInContext)) {
+        if (healthResource.equals(pathInContext) || workspaceResource.equals(pathInContext)) {
             return null;
         }
 
@@ -81,14 +87,18 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
                     && !authorities.contains(dataStewardRole)) {
                 return "Only data stewards can edit the vocabulary";
             }
+
+            if (onAuthorized != null) {
+                onAuthorized.accept(userInfo);
+            }
         }
 
         return null;
     }
 
-    public static UserInfo userInfo() {
+    public static OAuthAuthenticationToken userInfo() {
         return currentRequest()
-                .map(request -> (UserInfo) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
+                .map(request -> (OAuthAuthenticationToken) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
                 .orElse(null);
     }
 }

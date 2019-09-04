@@ -3,7 +3,7 @@
 PREFIX fs: <http://fairspace.io/ontology#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?iri ?path ?isDirectory ?size ?created ?modified ?createdBy ?modifiedBy ?createdByName ?modifiedByName
+SELECT ?iri ?path ?isDirectory ?size ?created ?modified ?createdBy ?modifiedBy ?createdByName ?modifiedByName ?md5
 WHERE {
     ?iri fs:filePath %1$s;
          fs:fileSize ?size;
@@ -12,8 +12,11 @@ WHERE {
          fs:createdBy ?createdBy;
          fs:modifiedBy ?modifiedBy.
 
+
     ?createdBy rdfs:label ?createdByName .
     ?modifiedBy rdfs:label ?modifiedByName .
+
+    OPTIONAL { ?iri fs:md5 ?md5 }
 
     BIND(%1$s as ?path)
     BIND (EXISTS {?iri ?a fs:Directory} as ?isDirectory)

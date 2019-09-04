@@ -18,10 +18,18 @@ public class FS {
     public static final String FILE_URI = NS + "File";
     public static final Resource File = createResource(FILE_URI);
 
+    public static final String EXTERNAL_DIRECTORY_URI = NS + "ExternalDirectory";
+    public static final Resource ExternalDirectory = createResource(EXTERNAL_DIRECTORY_URI);
+
+    public static final String EXTERNAL_FILE_URI = NS + "ExternalFile";
+    public static final Resource ExternalFile = createResource(EXTERNAL_FILE_URI);
+
+
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 
     public static final String OWNED_BY_LOCAL_PART = "ownedBy";
+    public static final String CHECKSUM_LOCAL_PART = "checksum";
 
     public static final String CREATED_BY_LOCAL_PART = "createdBy";
     public static final String CREATED_BY_URI = NS + CREATED_BY_LOCAL_PART;
@@ -96,6 +104,9 @@ public class FS {
 
     public static final String IMPORTANT_PROPERTY_URI = NS + "importantProperty";
     public static final Property importantProperty = createProperty(IMPORTANT_PROPERTY_URI);
+
+    public static final String DOMAIN_INCLUDES_URI = NS + "domainIncludes";
+    public static final Property domainIncludes = createProperty(DOMAIN_INCLUDES_URI);
 
     public static final String ERROR_URI = NS + "error";
     public static final String ERROR_STATUS_URI = NS + "errorStatus";

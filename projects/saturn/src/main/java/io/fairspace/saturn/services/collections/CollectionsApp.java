@@ -10,61 +10,56 @@ import static spark.Spark.*;
 
 @Slf4j
 public class CollectionsApp extends BaseApp {
-    private String pathPrefix;
     private final CollectionsService service;
 
-    public CollectionsApp(String pathPrefix, CollectionsService service) {
-        this.pathPrefix = pathPrefix;
+    public CollectionsApp(String basePath, CollectionsService service) {
+        super(basePath);
         this.service = service;
     }
 
     @Override
-    public void init() {
-        super.init();
+    protected void initApp() {
+        get("/", (req, res) -> {
+            var iri = req.queryParams("iri");
 
-        path(pathPrefix + "/collections", () -> {
-            get("/", (req, res) -> {
-                var iri = req.queryParams("iri");
-
-                if (iri != null) {
-                    var collection = service.get(iri);
-                    if (collection != null) {
-                        res.type(APPLICATION_JSON.asString());
-                        return mapper.writeValueAsString(collection);
-                    } else {
-                        return null; // 404
-                    }
-                } else {
-                    var collections = service.list();
+            if (iri != null) {
+                var collection = service.get(iri);
+                if (collection != null) {
                     res.type(APPLICATION_JSON.asString());
-                    return mapper.writeValueAsString(collections);
-                }
-            });
-            put("/", (req, res) -> {
-                var template = mapper.readValue(req.body(), Collection.class);
-                var result = service.create(template);
-                if (result == null) {
-                    res.status(SC_CONFLICT);
-                    return "";
+                    return mapper.writeValueAsString(collection);
                 } else {
-                    res.status(SC_CREATED);
-                    res.type(APPLICATION_JSON.asString());
-                    return mapper.writeValueAsString(result);
+                    return null; // 404
                 }
-            });
-            patch("/", (req, res) -> {
-                var collection = mapper.readValue(req.body(), Collection.class);
-                var result = service.update(collection);
-
+            } else {
+                var collections = service.list();
+                res.type(APPLICATION_JSON.asString());
+                return mapper.writeValueAsString(collections);
+            }
+        });
+        put("/", (req, res) -> {
+            var template = mapper.readValue(req.body(), Collection.class);
+            var result = service.create(template);
+            if (result == null) {
+                res.status(SC_CONFLICT);
+                return "";
+            } else {
+                res.status(SC_CREATED);
                 res.type(APPLICATION_JSON.asString());
                 return mapper.writeValueAsString(result);
-            });
-            delete("/", (req, res) -> {
-                var iri = req.queryParams("iri");
-                service.delete(iri);
-                res.status(SC_NO_CONTENT);
-                return "";
-            });
+            }
+        });
+        patch("/", (req, res) -> {
+            var collection = mapper.readValue(req.body(), Collection.class);
+            var result = service.update(collection);
+
+            res.type(APPLICATION_JSON.asString());
+            return mapper.writeValueAsString(result);
+        });
+        delete("/", (req, res) -> {
+            var iri = req.queryParams("iri");
+            service.delete(iri);
+            res.status(SC_NO_CONTENT);
+            return "";
         });
 
         exception(CollectionNotFoundException.class, exceptionHandler(SC_NOT_FOUND, null));

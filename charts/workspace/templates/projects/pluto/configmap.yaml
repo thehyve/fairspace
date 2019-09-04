@@ -10,22 +10,40 @@ metadata:
 data:
   application.yaml: |-
     app:
-      domain: {{ template "workspace.url" . }}
+      apiVersion:
+        pluto: v1
+        saturn: v1
+        elasticSearch: v1
+      domains:
+        - {{ template "workspace.url" . }}
+        - {{ template "docs.url" . }}
       oauth2:
         base-url: {{ template "keycloak.baseUrl" . }}
         realm: {{ .Values.hyperspace.keycloak.realm }}
-
-    keycloak:
-      workspace-login-group: {{ .Values.workspace.keycloak.groups.user | default (printf "%s-users" (include "workspace.name" .)) }}
-
-    workspace:
-      name: {{ .Release.Name }}
-      version: {{ .Values.pluto.workspace.version }}
 
     security:
       oidc:
         redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "workspace.url" .) }}
         required-authority: {{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
+      urls:
+        # Please note that by default pluto is configured to allow certain urls anonymously
+        # (e.g. login or health), and is configured to require specific authorization for anything else
+        # This configuration will make sure that all frontend resources can be accessed for anyone
+        # that has logged in, even if the user does not have the required authority. This enables the
+        # frontend to show a nice error message
+        needsAuthentication:
+        - /
+        - /static/*
+        - /public/*
+        - /config/*
+        - "*.js"
+        - /api/${app.apiVersion.pluto}/account/*
+        - /metadata/*
+        - /iri/*
+        - /collections/*
+        - /vocabulary/*
+        - /notebooks/*
+        - /api/${app.apiVersion.saturn}/users/*
 
     spring:
       zipkin:
@@ -44,10 +62,20 @@ data:
         # saturn, which must be defined before ui, because of the
         # paths they listen to
         elasticsearch:
-          url: {{ template "workspace.elasticsearch.resturl" . }}
+          # The path contains 'fairspace' in the url, wheres the upstream url contain
+          # the actual index name. This allows the clients to be unaware of the specific
+          # index name and just use 'fairspace'
+          path: /api/${app.apiVersion.elasticSearch}/search/fairspace/_search/**
+          url: {{ template "elasticsearch.resturl" . }}
+          strip-prefix: true
         storage:
+          path: /webdav/${app.apiVersion.saturn}/**
+          strip-prefix: false
           url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         saturn:
+          path: /api/${app.apiVersion.saturn}/**
+          strip-prefix: false
           url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         ui:
+          path: /**
           url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
