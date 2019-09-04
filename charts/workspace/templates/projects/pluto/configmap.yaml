@@ -32,18 +32,18 @@ data:
         # that has logged in, even if the user does not have the required authority. This enables the
         # frontend to show a nice error message
         needsAuthentication:
-        - /
-        - /static/*
-        - /public/*
-        - /config/*
+        - /*
+        - /static/**
+        - /public/**
+        - /config/**
         - "*.js"
         - /api/${app.apiVersion.pluto}/account/*
-        - /metadata/*
-        - /iri/*
-        - /collections/*
-        - /vocabulary/*
-        - /notebooks/*
-        - /api/${app.apiVersion.saturn}/users/*
+        - /metadata/**
+        - /iri/**
+        - /collections/**
+        - /vocabulary/**
+        - /notebooks/**
+        - /api/${app.apiVersion.saturn}/users/**`
 
     spring:
       zipkin:
