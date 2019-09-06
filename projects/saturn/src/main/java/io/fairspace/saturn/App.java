@@ -8,19 +8,8 @@ import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
-import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
-import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
-import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
-import io.fairspace.saturn.services.metadata.ReadableMetadataService;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.InverseForUsedPropertiesValidator;
-import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
-import io.fairspace.saturn.services.metadata.validation.MetadataAndVocabularyConsistencyValidator;
-import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
-import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
-import io.fairspace.saturn.services.metadata.validation.SystemVocabularyProtectingValidator;
+import io.fairspace.saturn.services.metadata.*;
+import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
@@ -45,9 +34,7 @@ import java.util.function.Supplier;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.SaturnSecurityHandler.userInfo;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
+import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
@@ -66,7 +53,7 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(CONFIG.auth.groupsUrl, CONFIG.auth.workspaceLoginGroup, CONFIG.auth.usersUrlTemplate, TimeUnit.SECONDS.toMillis(CONFIG.auth.userListSynchronizationInterval), new DAO(rdf, null));
+        var userService = new UserService(CONFIG.auth.userUrlTemplate, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getSubjectClaim());
 
         var mailService = new MailService(CONFIG.mail);
@@ -109,7 +96,7 @@ public class App {
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
         var apiPathPrefix = "/api/" + API_VERSION;
-        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo.getSubjectClaim()));
+        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator);
 
         FusekiServer.create()
                 .securityHandler(securityHandler)

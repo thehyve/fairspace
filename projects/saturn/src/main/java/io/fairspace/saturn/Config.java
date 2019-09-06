@@ -65,13 +65,7 @@ public class Config {
 
         public String sparqlRole = "sparql";
 
-        public String groupsUrl = "http://localhost:8080/api/v1/workspace/groups/";
-
-        public String workspaceLoginGroup = "workspace";
-
-        public String usersUrlTemplate = "http://localhost:5000/groups/%s/members";
-
-        public int userListSynchronizationInterval = 60;
+        public String userUrlTemplate = "http://localhost:5100/auth/admin/realms/ci/users/%s";
     }
 
     public static class WebDAV {

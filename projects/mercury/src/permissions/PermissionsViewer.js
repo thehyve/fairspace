@@ -134,8 +134,8 @@ const PermissionsViewer = ({
     );
 
     const renderConfirmationDialog = () => {
-        const fullName = selectedPermission && getDisplayName(selectedPermission.user);
-        const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
+        const user = (selectedPermission && permissions.find(p => p.user === selectedPermission.user)) || {};
+        const content = `Are you sure you want to remove "${user.userName}" from the collaborator list?`;
 
         return (
             <ConfirmationDialog
