@@ -127,6 +127,8 @@ const PermissionsViewer = ({
     );
 
     const renderConfirmationDialog = () => {
+        // TODO: Refactor variable naming: user vs iri vs id.
+        // TODO: Use descriptive variable names. E.g. user.userName contains the fullName of the user
         const user = (selectedPermission && permissions.find(p => p.user === selectedPermission.user)) || {};
         const content = `Are you sure you want to remove "${user.userName}" from the collaborator list?`;
 
