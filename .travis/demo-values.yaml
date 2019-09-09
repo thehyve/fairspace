@@ -16,6 +16,7 @@ hyperspace:
 
 # Settings for the workspace
 workspace:
+  name: "Demo Workspace"
   description: "Demo Workspace"
   ingress:
     domain: workspace.demo.fairway.app

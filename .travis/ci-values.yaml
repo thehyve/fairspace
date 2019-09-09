@@ -16,6 +16,7 @@ hyperspace:
 
 # Settings for the workspace
 workspace:
+  name: "CI Workspace"
   description: "CI Workspace"
   ingress:
     domain: workspace.ci.fairway.app
