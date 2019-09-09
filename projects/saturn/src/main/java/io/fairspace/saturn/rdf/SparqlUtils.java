@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -86,6 +87,10 @@ public class SparqlUtils {
 
     public static Node generateMetadataIri(String id) {
         return createURI(CONFIG.jena.metadataBaseIRI + id);
+    }
+
+    public static String extractIdFromIri(@NonNull Node iri) {
+        return iri.getURI().replace(CONFIG.jena.metadataBaseIRI, "");
     }
 
     public static Node generateVocabularyIri() {
