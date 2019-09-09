@@ -1,17 +1,10 @@
 import React, {useState} from 'react';
-import {
-    List, ListItem, ListItemSecondaryAction,
-    ListItemText, IconButton, Menu, Button
-} from "@material-ui/core";
+import {Button, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Menu} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import MoreIcon from '@material-ui/icons/MoreVert';
 
-import {
-    MessageDisplay, ConfirmationDialog, LoadingInlay,
-    LoadingOverlay
-} from "../common/components";
+import {ConfirmationDialog, LoadingInlay, LoadingOverlay, MessageDisplay} from "../common/components";
 import AlterPermissionContainer from "./AlterPermissionContainer";
-import getDisplayName from "../common/utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../common/utils/permissionUtils';
 
 const PermissionsViewer = ({
@@ -134,8 +127,10 @@ const PermissionsViewer = ({
     );
 
     const renderConfirmationDialog = () => {
-        const fullName = selectedPermission && getDisplayName(selectedPermission.user);
-        const content = `Are you sure you want to remove "${fullName}" from the collaborator list?`;
+        // TODO: Refactor variable naming: user vs iri vs id.
+        // TODO: Use descriptive variable names. E.g. user.userName contains the fullName of the user
+        const user = (selectedPermission && permissions.find(p => p.user === selectedPermission.user)) || {};
+        const content = `Are you sure you want to remove "${user.userName}" from the collaborator list?`;
 
         return (
             <ConfirmationDialog

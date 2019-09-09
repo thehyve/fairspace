@@ -42,34 +42,6 @@ describe('AlterPermissionDialog', () => {
     });
 
     it('should render initial state of the dialog correctly', () => {
-        const expectedOptions = [
-            {
-                disabled: true,
-                label: "Mariah Carey",
-                value: 'http://localhost/iri/user1-id'
-            },
-            {
-                disabled: true,
-                label: "Michael Jackson",
-                value: 'http://localhost/iri/user2-id'
-            },
-            {
-                disabled: false,
-                label: "Bruno Mars",
-                value: 'http://localhost/iri/user3-id'
-            },
-            {
-                disabled: true,
-                label: "Kurt Cobain",
-                value: 'http://localhost/iri/user4-id'
-            },
-            {
-                disabled: false,
-                label: "Ariana Grande",
-                value: 'http://localhost/iri/user5-id'
-            }
-        ];
-
         wrapper = shallow(<AlterPermissionDialog
             open={false}
             classes={{}}
@@ -88,8 +60,7 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('WithStyles(DialogTitle)').childAt(0).text()).toEqual('Share with');
 
         // render collacborator selector
-        expect(wrapper.find('WithStyles(materialReactSelect)').prop('value')).toBe(null);
-        expect(wrapper.find('WithStyles(materialReactSelect)').prop('options')).toEqual(expectedOptions);
+        expect(wrapper.find('UserSelect').prop('value')).toBe(null);
 
         // initial value of the access right is "Read"
         expect(wrapper.find('RadioGroup').prop('value')).toEqual('Read');
