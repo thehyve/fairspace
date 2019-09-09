@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.saturn.rdf.dao.DAO;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.client.HttpClient;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.authorizationHeader;
+import static io.fairspace.saturn.rdf.SparqlUtils.extractIdFromIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.String.format;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -41,14 +43,17 @@ public class UserService {
         if (localUser == null) {
             // Fetch user from keycloak and store locally for future reference
             localUser = fetchUserFromKeycloak(iri);
-            dao.write(localUser);
+
+            if(localUser != null) {
+                dao.write(localUser);
+            }
         }
 
         return localUser;
     }
 
     private User fetchUserFromKeycloak(Node iri) {
-        var userId = iri.getURI().replace(CONFIG.jena.metadataBaseIRI, "");
+        var userId = getUserId(iri);
         var authorization = authorizationHeader();
 
         var url = format(userUrlTemplate, userId);
@@ -82,5 +87,9 @@ public class UserService {
 
     public Node getUserIri(String userId) {
         return generateMetadataIri(userId);
+    }
+
+    public String getUserId(Node iri) {
+        return extractIdFromIri(iri);
     }
 }
