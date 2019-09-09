@@ -70,7 +70,7 @@ data:
           strip-prefix: true
         keycloak:
           path: /api/keycloak/**
-          url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm )}
+          url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}
           strip-prefix: true
         storage:
           path: /webdav/${app.apiVersion.saturn}/**
