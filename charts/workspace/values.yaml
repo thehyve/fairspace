@@ -48,6 +48,7 @@ hyperspace:
 
 # Setup ingress for workspace components
 workspace:
+    name: "workspace"
     description: "Workspace"
     ingress:
         enabled: true

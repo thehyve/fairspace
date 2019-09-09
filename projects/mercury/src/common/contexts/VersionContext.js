@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import WorkspaceAPI from "../services/WorkspaceAPI";
 
 const initialState = {
+    id: '',
     name: 'Fairspace',
     description: '',
     version: ''

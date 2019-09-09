@@ -19,7 +19,7 @@ const Layout = ({classes}) => {
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const {currentUserLoading} = useContext(UserContext);
-    const {name: workspaceName, description, version, loading: workspaceInfoLoading, redirecting} = useContext(VersionContext);
+    const {id: workspaceId, name: workspaceName, version, loading: workspaceInfoLoading, redirecting} = useContext(VersionContext);
 
     if (redirecting || workspaceInfoLoading || currentUserLoading) {
         return <LoadingInlay />;
@@ -65,7 +65,7 @@ const Layout = ({classes}) => {
     // The topbar is shown even if the user has no proper authorization
     return (
         <>
-            <TopBar title={description} />
+            <TopBar title={workspaceName} />
             <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
                 <UsersProvider>
                     <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
@@ -74,7 +74,7 @@ const Layout = ({classes}) => {
                     </main>
                 </UsersProvider>
             </AuthorizationCheck>
-            <Footer workspaceName={workspaceName} version={version} />
+            <Footer workspaceName={workspaceId} version={version} />
         </>
     );
 };
