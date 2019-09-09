@@ -1,17 +1,10 @@
 import React, {useState} from 'react';
-import {
-    List, ListItem, ListItemSecondaryAction,
-    ListItemText, IconButton, Menu, Button
-} from "@material-ui/core";
+import {Button, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Menu} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import MoreIcon from '@material-ui/icons/MoreVert';
 
-import {
-    MessageDisplay, ConfirmationDialog, LoadingInlay,
-    LoadingOverlay
-} from "../common/components";
+import {ConfirmationDialog, LoadingInlay, LoadingOverlay, MessageDisplay} from "../common/components";
 import AlterPermissionContainer from "./AlterPermissionContainer";
-import getDisplayName from "../common/utils/userUtils";
 import {canAlterPermission, sortPermissions} from '../common/utils/permissionUtils';
 
 const PermissionsViewer = ({

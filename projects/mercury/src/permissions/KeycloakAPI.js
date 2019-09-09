@@ -11,10 +11,9 @@ export default {
      * @param types     List of class URIs to search for. If empty, it returns all types
      * @return Promise
      */
-    users: ({query, size = SEARCH_DEFAULT_SIZE}) => {
-        return axios.get(Config.get().urls.userSearch + '?search=' + encodeURIComponent(query) + '&max=' + size)
-            .catch(handleHttpError("Failure when retrieving users"))
-            .then(extractJsonData)
-            .then(users => users.map(user => ({...user, iri: createMetadataIri(user.id)})));
-    }
+    users: ({query, size = SEARCH_DEFAULT_SIZE}) => axios
+        .get(Config.get().urls.userSearch + '?search=' + encodeURIComponent(query) + '&max=' + size)
+        .catch(handleHttpError("Failure when retrieving users"))
+        .then(extractJsonData)
+        .then(users => users.map(user => ({...user, iri: createMetadataIri(user.id)})))
 };
