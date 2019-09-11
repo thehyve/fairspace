@@ -23,8 +23,7 @@ workspace:
   enableExperimentalFeatures: true
   configurationScripts:
     keycloak:
-      enabled: true
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
 
 services:
   jupyterhub: https://jupyter.workspace.ci.fairway.app
