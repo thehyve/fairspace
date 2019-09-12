@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {List, ListItem} from '@material-ui/core';
+import {LoadingInlay, MessageDisplay, compareBy, comparing} from '@fairspace/shared-frontend';
 
-import {MessageDisplay, LoadingInlay} from "../../common/components";
 import LinkedDataProperty from "./LinkedDataProperty";
-import {compareBy, comparing} from "../../common/utils/genericUtils";
 import {hasValue, shouldPropertyBeHidden} from "../../common/utils/linkeddata/metadataUtils";
 
 export const LinkedDataEntityForm = ({

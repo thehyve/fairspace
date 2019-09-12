@@ -1,6 +1,6 @@
 import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
-import LoadingInlay from "./LoadingInlay";
+import {LoadingInlay} from '@fairspace/shared-frontend';
 
 const loadingOverlay = (props) => (
     <Dialog

@@ -1,9 +1,9 @@
 import React from 'react';
 import {shallow} from 'enzyme';
+import {MessageDisplay} from '@fairspace/shared-frontend';
 
 import {SearchPage} from '../SearchPage';
 import SearchResults from '../SearchResults';
-import {MessageDisplay} from "../../common/components";
 
 describe('<SearchPage />', () => {
     let wrapper;

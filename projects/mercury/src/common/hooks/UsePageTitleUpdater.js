@@ -1,7 +1,7 @@
 import {useContext, useEffect} from 'react';
+import {VersionContext} from '@fairspace/shared-frontend';
 
 import useNamespacedIri from './UseNamespacedIri';
-import VersionContext from '../contexts/VersionContext';
 import useSubject from './UseSubject';
 
 const separator = '-';

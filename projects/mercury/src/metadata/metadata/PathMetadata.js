@@ -1,15 +1,14 @@
 import React, {useEffect} from "react";
 import {connect} from 'react-redux';
 import {Grid} from "@material-ui/core";
+import {MessageDisplay, isNonEmptyValue} from '@fairspace/shared-frontend';
 
-import MessageDisplay from "../../common/components/MessageDisplay";
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
 import {
     getFileInfoByPath, hasFileInfoErrorByPath, isFileInfoByPathPending
 } from "../../common/redux/reducers/cache/fileInfoByPathReducers";
 import {statFileIfNeeded} from "../../common/redux/actions/fileActions";
 import TechnicalMetadata from "../../file/TechnicalMetadata";
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 const PathMetadata = ({
     statFile,

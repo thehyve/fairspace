@@ -1,5 +1,5 @@
 import {mapValues} from 'lodash';
-import {isNonEmptyValue} from '../genericUtils';
+import {isNonEmptyValue} from '@fairspace/shared-frontend';
 
 /**
  * Returns the value of the given property on the first entry of the predicate for the metadat

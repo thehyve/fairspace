@@ -4,10 +4,11 @@ import {
 } from "@material-ui/core";
 import Dropzone from "react-dropzone";
 import filesize from "filesize";
+import {usePagination} from '@fairspace/shared-frontend';
+
 import {
     UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
 } from "../common/redux/reducers/uploadsReducers";
-import usePagination from "../common/hooks/UsePagination";
 
 const UploadList = ({uploads, enqueue}) => {
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(uploads);

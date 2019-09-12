@@ -1,11 +1,12 @@
 import React from 'react';
 import {Redirect, Route} from "react-router-dom";
+import {logout} from '@fairspace/shared-frontend';
 
+import Config from "../common/services/Config/Config";
 import Home from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import Notebooks from "../notebooks/Notebooks";
 import FilesPage from "../file/FilesPage";
-import logout from "../common/services/logout";
 import SearchPage from '../search/SearchPage';
 import {createMetadataIri, createVocabularyIri} from "../common/utils/linkeddata/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
@@ -80,7 +81,13 @@ const routes = () => (
         />
 
         <Route path="/login" render={() => {window.location.href = '/login';}} />
-        <Route path="/logout" render={logout} />
+        <Route
+            path="/logout"
+            render={() => logout({
+                logoutUrl: Config.get().urls.logout,
+                jupyterhubUrl: Config.get().urls.jupyterhub
+            })}
+        />
         <Route path="/search" component={SearchPage} />
     </>
 );

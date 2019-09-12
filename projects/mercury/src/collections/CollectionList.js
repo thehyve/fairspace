@@ -3,13 +3,10 @@ import {
     Paper, Table, TableBody, TableCell, TableHead, TableRow,
     TableSortLabel, TablePagination, withStyles,
 } from "@material-ui/core";
+import {MessageDisplay, useSorting, usePagination, formatDateTime} from '@fairspace/shared-frontend';
 
 import styles from './CollectionList.styles';
 import getDisplayName from "../common/utils/userUtils";
-import {formatDateTime} from "../common/utils/genericUtils";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import MessageDisplay from '../common/components/MessageDisplay';
 
 const columns = {
     name: {
