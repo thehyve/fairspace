@@ -1,7 +1,8 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
+import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
-import {ErrorDialog, LoadingInlay, LoadingOverlay, MessageDisplay} from "../common/components";
+import {ErrorDialog, LoadingOverlay} from "../common/components";
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';

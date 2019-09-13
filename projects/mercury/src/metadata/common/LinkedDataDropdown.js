@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {PropTypes} from 'prop-types';
+import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import searchAPI, {SORT_ALPHABETICALLY} from "../../search/SearchAPI";
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
@@ -7,7 +8,6 @@ import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
-import {LoadingInlay, MessageDisplay} from "../../common/components";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
     let fetchRequest = null;

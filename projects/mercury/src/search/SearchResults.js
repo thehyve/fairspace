@@ -4,8 +4,8 @@ import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow
 } from '@material-ui/core';
+import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
-import {LoadingInlay, MessageDisplay} from "../common/components";
 import SearchResultHighlights from "./SearchResultHighlights";
 
 const searchResults = ({

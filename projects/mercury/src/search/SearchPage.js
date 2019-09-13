@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
+import {MessageDisplay} from '@fairspace/shared-frontend';
 
 import SearchResults from './SearchResults';
 import {getSearchQueryFromString} from '../common/utils/searchUtils';
@@ -10,7 +11,6 @@ import {getParentPath} from '../common/utils/fileUtils';
 import {searchCollections} from '../common/redux/actions/searchActions';
 import * as vocabularyActions from '../common/redux/actions/vocabularyActions';
 import * as collectionBrowserActions from "../common/redux/actions/collectionBrowserActions";
-import {MessageDisplay} from "../common/components";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";

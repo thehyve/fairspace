@@ -1,5 +1,6 @@
 import React, {useContext, useState} from 'react';
 import {withStyles} from '@material-ui/core/styles';
+import {LoadingInlay, UserContext, VersionContext, UsersProvider} from '@fairspace/shared-frontend';
 
 import styles from './Layout.styles';
 import TopBar from "./TopBar/TopBar";
@@ -8,11 +9,7 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../../routes/Routes";
 import Config from "../../services/Config/Config";
-import {LoadingInlay} from "../index";
-import UserContext from '../../contexts/UserContext';
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
-import VersionContext from '../../contexts/VersionContext';
-import {UsersProvider} from "../../contexts/UsersContext";
 
 const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
@@ -67,7 +64,7 @@ const Layout = ({classes}) => {
         <>
             <TopBar title={workspaceName} />
             <AuthorizationCheck authorization={Config.get().roles.user} transformError={transformError}>
-                <UsersProvider>
+                <UsersProvider url={Config.get().urls.users}>
                     <MenuDrawer open={menuOpen} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
                     <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                         <Routes />

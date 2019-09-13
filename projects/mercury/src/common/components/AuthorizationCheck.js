@@ -1,9 +1,7 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
-
-import LoadingInlay from './LoadingInlay';
-import UserContext from "../contexts/UserContext";
+import {LoadingInlay, UserContext} from '@fairspace/shared-frontend';
 
 /**
  * This component performs an authorization check for the current user

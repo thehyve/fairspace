@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {BottomNavigation, BottomNavigationAction, Button, Grid, Icon} from "@material-ui/core";
 import Play from "mdi-material-ui/Play";
+import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
-import {LoadingInlay, MessageDisplay} from "../common/components";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";

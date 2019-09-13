@@ -1,6 +1,7 @@
 import axios from "axios";
+import {extractJsonData, handleHttpError} from '@fairspace/shared-frontend';
+
 import Config from "../common/services/Config/Config";
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {createMetadataIri} from "../common/utils/linkeddata/metadataUtils";
 import {SEARCH_DEFAULT_SIZE} from "../constants";
 

@@ -4,9 +4,9 @@ import {
     Paper, Popper, ClickAwayListener, MenuList
 } from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
+import {UserContext, MessageDisplay} from '@fairspace/shared-frontend';
 
-import UserContext from '../../../contexts/UserContext';
-import MessageDisplay from '../../MessageDisplay';
+import Config from "../../../services/Config/Config";
 
 const styles = {
     row: {
@@ -34,7 +34,10 @@ const UserMenu = ({classes}) => {
 
     const handleLogout = () => {
         handleClose();
-        onLogout();
+        onLogout({
+            logoutUrl: Config.get().urls.logout,
+            jupyterhubUrl: Config.get().urls.jupyterhub
+        });
     };
 
     if (currentUserLoading) {
