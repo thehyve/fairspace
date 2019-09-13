@@ -12,7 +12,7 @@ export const COLLECTIONS_PATH = '/collections';
 export const METADATA_PATH = '/metadata';
 export const VOCABULARY_PATH = '/vocabulary';
 export const TOOLTIP_ENTER_DELAY = 350;
-
+export const DATE_FORMAT = 'dd/MM/yyyy';
 
 // Search
 export const COLLECTION_SEARCH_TYPE = 'collections';

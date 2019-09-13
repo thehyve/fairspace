@@ -1,5 +1,6 @@
 import React from 'react';
 import {DateTimePicker} from "material-ui-pickers";
+import {DATE_FORMAT} from '../../../constants';
 
 class DateTimeValue extends React.Component {
     constructor(props) {
@@ -27,6 +28,10 @@ class DateTimeValue extends React.Component {
 
         return (
             <DateTimePicker
+                showTodayButton
+                openTo="year"
+                format={`${DATE_FORMAT} hh:mm a`}
+                views={["year", "month", "day", "hours", "minutes"]}
                 {...otherProps}
                 value={this.state.value}
                 onChange={this.handleChange}
