@@ -8,7 +8,7 @@ import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import Routes from "../../../routes/Routes";
-import Config from "../../services/Config/Config";
+import Config from "../../services/Config";
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
 
 const Layout = ({classes}) => {

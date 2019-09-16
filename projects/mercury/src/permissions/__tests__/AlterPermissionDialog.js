@@ -3,6 +3,8 @@ import {createShallow} from '@material-ui/core/test-utils';
 import {mount} from 'enzyme';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
+import UserSelect from "../UserSelect";
+import {DebouncedSelect} from "@fairspace/shared-frontend";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
@@ -60,7 +62,7 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('WithStyles(DialogTitle)').childAt(0).text()).toEqual('Share with');
 
         // render collacborator selector
-        expect(wrapper.find('UserSelect').prop('value')).toBe(null);
+        expect(wrapper.find(UserSelect).prop('value')).toBe(null);
 
         // initial value of the access right is "Read"
         expect(wrapper.find('RadioGroup').prop('value')).toEqual('Read');

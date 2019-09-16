@@ -1,6 +1,6 @@
+import {testNoChangedOnUnknownActionType} from "@fairspace/shared-frontend";
 import reducer, {invalidateFiles} from '../filesByPathReducers';
 import * as actionTypes from '../../../actions/actionTypes';
-import {testNoChangedOnUnknownActionType} from '../../../../utils/testUtils';
 
 testNoChangedOnUnknownActionType('Files by collection and path reducers', reducer);
 

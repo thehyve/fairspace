@@ -1,6 +1,6 @@
+import {testNoChangedOnUnknownActionType} from "@fairspace/shared-frontend";
 import reducer from "../jsonLdBySubjectReducers";
 import {FETCH_METADATA, UPDATE_METADATA, UPDATE_COLLECTION_FULFILLED} from '../../../actions/actionTypes';
-import {testNoChangedOnUnknownActionType} from '../../../../utils/testUtils';
 
 testNoChangedOnUnknownActionType('Metadata reducer', reducer);
 

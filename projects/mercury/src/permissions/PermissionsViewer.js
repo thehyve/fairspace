@@ -2,11 +2,11 @@ import React, {useState} from 'react';
 import {Button, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Menu} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import MoreIcon from '@material-ui/icons/MoreVert';
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {ConfirmationDialog, LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
-import {ConfirmationDialog, LoadingOverlay} from "../common/components";
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import {canAlterPermission, sortPermissions} from '../common/utils/permissionUtils';
+import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const PermissionsViewer = ({
     permissions, error, loading, altering, iri,

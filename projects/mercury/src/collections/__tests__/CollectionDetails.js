@@ -1,7 +1,7 @@
 import React from 'react';
 import {mount} from 'enzyme';
 import CollectionDetails, {ICONS} from "../CollectionDetails";
-import Config from "../../common/services/Config/Config";
+import Config from "../../common/services/Config";
 import configFile from "../../config";
 
 beforeAll(() => {

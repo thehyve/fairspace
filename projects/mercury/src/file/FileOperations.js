@@ -6,8 +6,9 @@ import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
+import {ConfirmationButton, ErrorDialog} from "@fairspace/shared-frontend";
 
-import {DeleteButton, ErrorDialog, ProgressButton} from '../common/components';
+import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";
 import * as clipboardActions from "../common/redux/actions/clipboardActions";
 import * as fileActions from "../common/redux/actions/fileActions";
@@ -150,8 +151,8 @@ export const FileOperations = ({
                     </RenameButton>
                 </ProgressButton>
                 <ProgressButton active={activeOperation === Operations.DELETE}>
-                    <DeleteButton
-                        numItems={selectedPaths ? selectedPaths.length : 0}
+                    <ConfirmationButton
+                        message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
                         onClick={handleDelete}
                         disabled={noPathSelected || isWritingDisabled || busy}
                     >
@@ -163,7 +164,7 @@ export const FileOperations = ({
                             <Icon>delete</Icon>
                         </IconButton>
 
-                    </DeleteButton>
+                    </ConfirmationButton>
                 </ProgressButton>
             </FileOperationsGroup>
             <FileOperationsGroup>

@@ -2,7 +2,7 @@ import React from 'react';
 import {withRouter, NavLink} from "react-router-dom";
 import {List, ListItem, ListItemIcon, ListItemText, Divider, Icon} from "@material-ui/core";
 
-import Config from '../../../services/Config/Config';
+import Config from '../../../services/Config';
 
 const Menu = ({location: {pathname}}) => (
     <>

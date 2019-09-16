@@ -5,13 +5,12 @@ import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 import useIsMounted from "react-is-mounted-hook";
-import {LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
+import {ErrorDialog, LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
 
 import configureStore from "./common/redux/store/configureStore";
-import Config from "./common/services/Config/Config";
+import Config from "./common/services/Config";
 import theme from './App.theme';
 import Layout from "./common/components/Layout/Layout";
-import {ErrorDialog} from './common/components';
 
 const App = () => {
     const isMounted = useIsMounted();

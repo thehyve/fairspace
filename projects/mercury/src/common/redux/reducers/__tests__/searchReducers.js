@@ -1,6 +1,6 @@
+import {testNoChangedOnUnknownActionType} from "@fairspace/shared-frontend";
 import {collectionsSearchReducer, destrctureSearchState} from '../searchReducers';
 import * as actionTypes from '../../actions/actionTypes';
-import {testNoChangedOnUnknownActionType} from '../../../utils/testUtils';
 
 testNoChangedOnUnknownActionType('Search reducers', collectionsSearchReducer);
 

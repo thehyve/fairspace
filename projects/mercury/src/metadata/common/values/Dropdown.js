@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {compareBy} from '@fairspace/shared-frontend';
-
-import MaterialReactSelect from "../../../common/components/MaterialReactSelect";
+import {compareBy, MaterialReactSelect} from '@fairspace/shared-frontend';
 
 const Dropdown = ({options, ...otherProps}) => (
     <MaterialReactSelect

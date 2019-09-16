@@ -1,4 +1,4 @@
+import {testNoChangedOnUnknownActionType} from "@fairspace/shared-frontend";
 import reducer from '../vocabularyReducers';
-import {testNoChangedOnUnknownActionType} from '../../../../utils/testUtils';
 
 testNoChangedOnUnknownActionType('vocabularyUtils reducers', reducer);

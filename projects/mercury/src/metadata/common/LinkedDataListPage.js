@@ -3,9 +3,9 @@ import {withRouter} from 'react-router-dom';
 import {
     Input, ListItemText, MenuItem, Select, withStyles, Grid, Chip, Checkbox
 } from "@material-ui/core";
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {BreadCrumbs, LoadingInlay, MessageDisplay, usePageTitleUpdater} from '@fairspace/shared-frontend';
 
-import {SearchBar, BreadCrumbs} from "../../common/components";
+import {SearchBar} from "../../common/components";
 import useLinkedDataSearch from '../UseLinkedDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
@@ -22,7 +22,7 @@ const styles = theme => ({
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
-const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) => {
+const LinkedDataListPage = ({classes, history, title, listComponent: ListComponent}) => {
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
         size, setSize, page, setPage,
@@ -34,6 +34,8 @@ const LinkedDataListPage = ({classes, history, listComponent: ListComponent}) =>
         requireIdentifier, editorPath,
         hasEditRight
     } = useContext(LinkedDataContext);
+
+    usePageTitleUpdater(title);
 
     const ListBody = () => {
         if (shapesLoading || searchPending) {

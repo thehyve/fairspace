@@ -2,8 +2,8 @@ import React, {useContext, useState} from 'react';
 import {IconButton} from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
 import useIsMounted from "react-is-mounted-hook";
-
-import {ProgressButton, ErrorDialog, DeleteButton} from '../../common/components';
+import {ConfirmationButton, ErrorDialog} from "@fairspace/shared-frontend";
+import {ProgressButton} from '../../common/components';
 import LinkedDataContext from "../LinkedDataContext";
 
 const DeleteEntityButton = ({subject, isDeletable}) => {
@@ -24,8 +24,8 @@ const DeleteEntityButton = ({subject, isDeletable}) => {
 
     return (
         <ProgressButton active={isDeleting}>
-            <DeleteButton
-                numItems={1}
+            <ConfirmationButton
+                message="Are you sure you want to delete this resource?"
                 onClick={handleDelete}
                 disabled={!canDelete}
             >
@@ -36,7 +36,7 @@ const DeleteEntityButton = ({subject, isDeletable}) => {
                 >
                     <Delete />
                 </IconButton>
-            </DeleteButton>
+            </ConfirmationButton>
         </ProgressButton>
     );
 };

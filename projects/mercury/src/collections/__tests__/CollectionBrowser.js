@@ -10,7 +10,7 @@ import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import CollectionBrowser from "../CollectionBrowser";
 import CollectionBrowserContainer from "../CollectionBrowserContainer";
-import Config from "../../common/services/Config/Config";
+import Config from "../../common/services/Config";
 import * as actionTypes from "../../common/redux/actions/actionTypes";
 
 const middlewares = [thunk, promiseMiddleware];

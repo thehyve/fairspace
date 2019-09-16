@@ -3,7 +3,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 
 import {fetchMetadataBySubjectIfNeeded} from "../metadataActions";
-import Config from "../../../services/Config/Config";
+import Config from "../../../services/Config";
 import configFile from "../../../../config";
 import {FETCH_METADATA} from "../actionTypes";
 

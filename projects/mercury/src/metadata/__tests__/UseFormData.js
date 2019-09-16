@@ -1,5 +1,5 @@
 import {act} from 'react-dom/test-utils';
-import {testHook} from "../../common/utils/testUtils";
+import {testHook} from "@fairspace/shared-frontend";
 import {SHACL_MAX_LENGTH, SHACL_MIN_COUNT} from "../../constants";
 import useFormData from "../UseFormData";
 

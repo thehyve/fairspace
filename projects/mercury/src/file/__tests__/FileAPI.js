@@ -1,5 +1,5 @@
 import FileAPI from "../FileAPI";
-import Config from "../../common/services/Config/Config";
+import Config from "../../common/services/Config";
 
 beforeAll(() => {
     Config.setConfig({
