@@ -1,7 +1,7 @@
 import mockAxios from 'axios';
 
 import {MetadataAPI} from "../LinkedDataAPI";
-import Config from "../../common/services/Config/Config";
+import Config from "../../common/services/Config";
 import {vocabularyUtils} from "../../common/utils/linkeddata/vocabularyUtils";
 
 beforeAll(() => {

@@ -1,5 +1,5 @@
 import {act} from 'react-dom/test-utils';
-import {testHook} from "../../common/utils/testUtils";
+import {testHook} from "@fairspace/shared-frontend";
 import {useLinkedData} from "../UseLinkedData";
 import {
     COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS

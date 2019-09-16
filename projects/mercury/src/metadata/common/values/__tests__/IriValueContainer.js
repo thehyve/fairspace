@@ -1,8 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
-
+import {MaterialReactSelect} from "@fairspace/shared-frontend";
 import {IriValue} from "../IriValueContainer";
-import MaterialReactSelect from "../../../../common/components/MaterialReactSelect";
 
 describe('IriValueContainer', () => {
     it('should render a dropdown with namespaces', () => {

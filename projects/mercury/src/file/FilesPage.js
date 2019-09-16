@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
+import {BreadCrumbs} from "@fairspace/shared-frontend";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
@@ -11,7 +12,6 @@ import * as fileActions from "../common/redux/actions/fileActions";
 import * as collectionActions from "../common/redux/actions/collectionActions";
 import * as consts from '../constants';
 import {getCollectionAbsolutePath} from "../common/utils/collectionUtils";
-import BreadCrumbs from "../common/components/breadcrumbs/BreadCrumbs";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 
 export const FilesPage = (props) => {

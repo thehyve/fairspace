@@ -2,7 +2,7 @@ import {expand} from 'jsonld';
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '@fairspace/shared-frontend';
 
-import Config from "../common/services/Config/Config";
+import Config from "../common/services/Config";
 import {normalizeTypes, toJsonLd} from "../common/utils/linkeddata/jsonLdConverter";
 
 const requestOptions = {

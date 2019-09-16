@@ -1,7 +1,7 @@
 import React from 'react';
 import {Paper} from "@material-ui/core";
+import {BreadCrumbs} from "@fairspace/shared-frontend";
 import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '.';
-import {BreadCrumbs} from "../../common/components";
 
 export default ({subject}) => (
     <>

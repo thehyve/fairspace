@@ -1,7 +1,7 @@
 import {useState} from "react";
 import useIsMounted from "react-is-mounted-hook";
+import {ErrorDialog} from "@fairspace/shared-frontend";
 
-import ErrorDialog from "../common/components/ErrorDialog";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors} from "../common/utils/linkeddata/metadataUtils";
 

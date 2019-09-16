@@ -24,7 +24,7 @@ import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
-import Config from "../common/services/Config/Config";
+import Config from "../common/services/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataVocabularyProvider = ({

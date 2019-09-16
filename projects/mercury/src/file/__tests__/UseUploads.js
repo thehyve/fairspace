@@ -1,4 +1,4 @@
-import {testHook} from "../../common/utils/testUtils";
+import {testHook} from "@fairspace/shared-frontend";
 import {disconnectedUseUploads} from "../UseUploads";
 
 const testUseUploads = (path, existingFilenames, uploads, dispatch) => {

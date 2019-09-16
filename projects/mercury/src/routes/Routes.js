@@ -2,7 +2,7 @@ import React from 'react';
 import {Redirect, Route} from "react-router-dom";
 import {logout} from '@fairspace/shared-frontend';
 
-import Config from "../common/services/Config/Config";
+import Config from "../common/services/Config";
 import Home from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import Notebooks from "../notebooks/Notebooks";

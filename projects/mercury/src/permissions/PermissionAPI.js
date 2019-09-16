@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import axios from 'axios';
 import {handleHttpError, extractJsonData} from '@fairspace/shared-frontend';
 
-import Config from '../common/services/Config/Config';
+import Config from '../common/services/Config';
 
 class PermissionAPI {
     /**

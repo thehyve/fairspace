@@ -1,10 +1,10 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import {BreadCrumbs} from "@fairspace/shared-frontend";
 
 import InformationDrawer from '../common/components/InformationDrawer';
 import CollectionBrowserContainer from "./CollectionBrowserContainer";
 import * as consts from '../constants';
-import BreadCrumbs from "../common/components/breadcrumbs/BreadCrumbs";
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
 
 const collectionsPage = () => (

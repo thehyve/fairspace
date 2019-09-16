@@ -3,7 +3,7 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import mockAxios from 'axios';
 
-import Config from "../../../services/Config/Config";
+import Config from "../../../services/Config";
 import configFile from "../../../../config";
 import {UPDATE_COLLECTION} from "../actionTypes";
 import {updateCollection} from "../collectionActions";
