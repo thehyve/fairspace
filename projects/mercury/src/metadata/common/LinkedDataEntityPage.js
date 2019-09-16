@@ -6,7 +6,7 @@ import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 
 export default ({title, subject}) => {
     const iri = useNamespacedIri(subject)
-    usePageTitleUpdater(`${iri} / ${title}`);
+    usePageTitleUpdater(`${iri} - ${title}`);
 
     return (
         <>
