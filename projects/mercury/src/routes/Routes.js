@@ -14,6 +14,7 @@ import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataListPage from "../metadata/MetadataListPage";
 import VocabularyListPage from "../metadata/VocabularyListPage";
 import useSubject from '../common/hooks/UseSubject';
+import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 
 const routes = () => (
     <>
@@ -22,19 +23,19 @@ const routes = () => (
         <Route
             path="/collections"
             exact
-            render={({location}) => (
-                <MetadataWrapper location={location}>
+            render={() => (
+                <LinkedDataMetadataProvider>
                     <Collections />
-                </MetadataWrapper>
+                </LinkedDataMetadataProvider>
             )}
         />
 
         <Route
             path="/collections/:collection/:path(.*)?"
             render={(props) => (
-                <MetadataWrapper location={props.location}>
+                <LinkedDataMetadataProvider>
                     <FilesPage {...props} />
-                </MetadataWrapper>
+                </LinkedDataMetadataProvider>
             )}
         />
 
@@ -48,7 +49,7 @@ const routes = () => (
 
                 return (
                     <MetadataWrapper>
-                        {subject ? <LinkedDataEntityPage subject={subject} /> : <MetadataListPage />}
+                        {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataListPage />}
                     </MetadataWrapper>
                 );
             }}
@@ -68,7 +69,7 @@ const routes = () => (
 
                 return (
                     <VocabularyWrapper>
-                        {subject ? <LinkedDataEntityPage subject={subject} /> : <VocabularyListPage />}
+                        {subject ? <LinkedDataEntityPage title="Vocabulary" subject={subject} /> : <VocabularyListPage />}
                     </VocabularyWrapper>
                 );
             }}

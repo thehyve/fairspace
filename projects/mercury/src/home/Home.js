@@ -1,12 +1,13 @@
 import React from 'react';
-import {BreadCrumbs} from "@fairspace/shared-frontend";
+import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
 
 import WithRightDrawer from "../common/components/WithRightDrawer";
 import RecentActivity from "./RecentActivity";
 import Config from "../common/services/Config";
 
-export default () => (
-    Config.get().enableExperimentalFeatures
+export default () => {
+    usePageTitleUpdater("Home");
+    return Config.get().enableExperimentalFeatures
         ? (
             <WithRightDrawer
                 collapsible={false}
@@ -14,5 +15,5 @@ export default () => (
                 drawerContents={<RecentActivity />}
             />
         )
-        : <BreadCrumbs />
-);
+        : <BreadCrumbs />;
+};
