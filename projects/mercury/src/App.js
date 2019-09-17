@@ -5,12 +5,16 @@ import {MuiThemeProvider} from '@material-ui/core/styles';
 import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 import useIsMounted from "react-is-mounted-hook";
-import {ErrorDialog, LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
+import {
+    ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, VersionProvider
+} from '@fairspace/shared-frontend';
 
 import configureStore from "./common/redux/store/configureStore";
 import Config from "./common/services/Config";
 import theme from './App.theme';
-import Layout from "./common/components/Layout/Layout";
+import Menu from "./common/components/Menu";
+import Routes from "./routes/Routes";
+import WorkspaceTopBar from "./common/components/WorkspaceTopBar";
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -31,17 +35,27 @@ const App = () => {
     return (
         <VersionProvider url={Config.get().urls.version}>
             <UserProvider url={Config.get().urls.userInfo}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <MuiThemeProvider theme={theme}>
-                        <Provider store={store}>
-                            <ErrorDialog>
-                                <Router>
-                                    <Layout />
-                                </Router>
-                            </ErrorDialog>
-                        </Provider>
-                    </MuiThemeProvider>
-                </MuiPickersUtilsProvider>
+                <LogoutContextProvider
+                    logoutUrl={Config.get().urls.logout}
+                    jupyterhubUrl={Config.get().urls.jupyterhub}
+                >
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <MuiThemeProvider theme={theme}>
+                            <Provider store={store}>
+                                <ErrorDialog>
+                                    <Router>
+                                        <Layout
+                                            renderMenu={() => <Menu />}
+                                            renderMain={() => <Routes />}
+                                            renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                            renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                        />
+                                    </Router>
+                                </ErrorDialog>
+                            </Provider>
+                        </MuiThemeProvider>
+                    </MuiPickersUtilsProvider>
+                </LogoutContextProvider>
             </UserProvider>
         </VersionProvider>
     );
