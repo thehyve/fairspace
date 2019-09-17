@@ -2,8 +2,9 @@ import React from "react";
 import {
     ListItemText, Paper, Table, TableBody, TableCell, TableFooter, TableHead, TablePagination, TableRow, withStyles
 } from "@material-ui/core";
+import {SearchResultHighlights} from '@fairspace/shared-frontend';
+
 import styles from './LinkedDataList.styles';
-import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";

@@ -3,9 +3,8 @@ import {withRouter} from 'react-router-dom';
 import {
     Input, ListItemText, MenuItem, Select, withStyles, Grid, Chip, Checkbox
 } from "@material-ui/core";
-import {BreadCrumbs, LoadingInlay, MessageDisplay, usePageTitleUpdater} from '@fairspace/shared-frontend';
+import {BreadCrumbs, LoadingInlay, MessageDisplay, usePageTitleUpdater, SearchBar} from '@fairspace/shared-frontend';
 
-import {SearchBar} from "../../common/components";
 import useLinkedDataSearch from '../UseLinkedDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';

@@ -1,8 +1,6 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import {TopBar} from "@fairspace/shared-frontend";
-import SearchBar from './SearchBar';
-import {buildSearchUrl, getSearchQueryFromString} from '../utils/searchUtils';
+import {TopBar, SearchBar, buildSearchUrl, getSearchQueryFromString} from "@fairspace/shared-frontend";
 
 const WorkspaceTopBar = ({name, location, history}) => {
     const searchQuery = getSearchQueryFromString(location.search);
