@@ -22,7 +22,8 @@ export const SearchPage = ({
     useEffect(() => {
         fetchVocabularyIfNeeded();
         performSearch(query);
-    }, [fetchVocabularyIfNeeded, performSearch, query, search]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [query]);
 
     const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {

@@ -7,43 +7,42 @@ import {
 
 import SearchResultHighlights from "./SearchResultHighlights";
 
-const searchResults = ({headerLabels, results, onResultDoubleClick}) =>
-    (
-        <Paper style={{width: '100%'}}>
-            <Table padding="dense">
-                <TableHead>
-                    <TableRow>
-                        {headerLabels
-                            .map((l) => (
-                                <TableCell key={l}>
-                                    {l}
-                                </TableCell>
-                            ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {results
-                        .map(({id, columns, highlights}) => (
-                            <TableRow
-                                hover
-                                key={id}
-                                onDoubleClick={() => onResultDoubleClick(id)}
-                            >
-                                {columns
-                                    .map((c) => (
-                                        <TableCell key={id + c}>
-                                            {c}
-                                        </TableCell>
-                                    ))}
-                                <TableCell>
-                                    <SearchResultHighlights highlights={highlights} />
-                                </TableCell>
-                            </TableRow>
+const searchResults = ({headerLabels, results, onResultDoubleClick}) => (
+    <Paper style={{width: '100%'}}>
+        <Table padding="dense">
+            <TableHead>
+                <TableRow>
+                    {headerLabels
+                        .map((l) => (
+                            <TableCell key={l}>
+                                {l}
+                            </TableCell>
                         ))}
-                </TableBody>
-            </Table>
-        </Paper>
-    );
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {results
+                    .map(({id, columns, highlights}) => (
+                        <TableRow
+                            hover
+                            key={id}
+                            onDoubleClick={() => onResultDoubleClick(id)}
+                        >
+                            {columns
+                                .map((c) => (
+                                    <TableCell key={id + c}>
+                                        {c}
+                                    </TableCell>
+                                ))}
+                            <TableCell>
+                                <SearchResultHighlights highlights={highlights} />
+                            </TableCell>
+                        </TableRow>
+                    ))}
+            </TableBody>
+        </Table>
+    </Paper>
+);
 
 searchResults.propTypes = {
     headerLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
