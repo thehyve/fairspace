@@ -6,7 +6,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 import useIsMounted from "react-is-mounted-hook";
 import {
-    ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, VersionProvider
+    ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, UsersProvider, VersionProvider
 } from '@fairspace/shared-frontend';
 
 import configureStore from "./common/redux/store/configureStore";
@@ -32,31 +32,35 @@ const App = () => {
     // Initialize the store after configuration has loaded
     const store = configureStore();
 
+    const {version: versionUrl, users, userInfo, logout, jupyterhub} = Config.get().urls;
+
     return (
-        <VersionProvider url={Config.get().urls.version}>
-            <UserProvider url={Config.get().urls.userInfo}>
-                <LogoutContextProvider
-                    logoutUrl={Config.get().urls.logout}
-                    jupyterhubUrl={Config.get().urls.jupyterhub}
-                >
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <MuiThemeProvider theme={theme}>
-                            <Provider store={store}>
-                                <ErrorDialog>
-                                    <Router>
-                                        <Layout
-                                            renderMenu={() => <Menu />}
-                                            renderMain={() => <Routes />}
-                                            renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                            renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                        />
-                                    </Router>
-                                </ErrorDialog>
-                            </Provider>
-                        </MuiThemeProvider>
-                    </MuiPickersUtilsProvider>
-                </LogoutContextProvider>
-            </UserProvider>
+        <VersionProvider url={versionUrl}>
+            <UsersProvider url={users}>
+                <UserProvider url={userInfo}>
+                    <LogoutContextProvider
+                        logoutUrl={logout}
+                        jupyterhubUrl={jupyterhub}
+                    >
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <MuiThemeProvider theme={theme}>
+                                <Provider store={store}>
+                                    <ErrorDialog>
+                                        <Router>
+                                            <Layout
+                                                renderMenu={() => <Menu />}
+                                                renderMain={() => <Routes />}
+                                                renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                                renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                            />
+                                        </Router>
+                                    </ErrorDialog>
+                                </Provider>
+                            </MuiThemeProvider>
+                        </MuiPickersUtilsProvider>
+                    </LogoutContextProvider>
+                </UserProvider>
+            </UsersProvider>
         </VersionProvider>
     );
 };
