@@ -1,8 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from "prop-types";
-import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {MessageDisplay} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import SearchResults from './SearchResults';
 import {getSearchQueryFromString} from '../common/utils/searchUtils';
@@ -16,39 +15,16 @@ import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache
 import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
 
 // Exporting here to be able to test the component outside of Redux
-export class SearchPage extends React.Component {
-    componentDidMount() {
-        this.props.fetchVocabularyIfNeeded();
-        this.updateResults();
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.location.search !== prevProps.location.search) {
-            this.updateResults();
-        }
-    }
-
-    updateResults = () => {
-        const {location: {search}, performSearch} = this.props;
-        const query = getSearchQueryFromString(search);
-
+export const SearchPage = ({
+    location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
+    history, selectPath, deselectAllPaths, results, vocabulary, loading, error
+}) => {
+    useEffect(() => {
+        fetchVocabularyIfNeeded();
         performSearch(query);
-    };
+    }, [fetchVocabularyIfNeeded, performSearch, query, search]);
 
-    /**
-     * Handles a click on a search result.
-     * @param result   The clicked search result. For the format, see the ES api
-     */
-    handleResultDoubleClick = (result) => {
-        const {history, selectPath, deselectAllPaths} = this.props;
-        const navigationPath = getCollectionAbsolutePath(this.getPathOfResult(result));
-
-        history.push(navigationPath);
-        deselectAllPaths();
-        selectPath('/' + result.filePath);
-    }
-
-    getPathOfResult = ({type, filePath}) => {
+    const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {
             case COLLECTION_URI:
             case DIRECTORY_URI:
@@ -59,25 +35,51 @@ export class SearchPage extends React.Component {
                 // TODO: handle metadata open. Out of scope for now
                 return '';
         }
+    };
+
+    // If vocabulary has not been loaded, we can not
+    // retrieve the label. Just return the URI in that (rare) case
+    const generateTypeLabel = (typeUri) => (vocabulary ? vocabulary.getLabelForPredicate(typeUri) : typeUri);
+
+    const handleResultDoubleClick = (id) => {
+        const result = results.items.find(i => i.id === id);
+        const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
+
+        history.push(navigationPath);
+        deselectAllPaths();
+        selectPath('/' + result.filePath);
+    };
+
+    if (loading) {
+        return <LoadingInlay />;
     }
 
-    render() {
-        const {results, vocabulary, loading, error} = this.props;
-
-        if (!loading && error && error.message) {
-            return <MessageDisplay message={error.message} />;
-        }
-
-        return (
-            <SearchResults
-                loading={loading}
-                results={results}
-                onResultDoubleClick={this.handleResultDoubleClick}
-                vocabulary={vocabulary}
-            />
-        );
+    if (!loading && error && error.message) {
+        return <MessageDisplay message={error.message} />;
     }
-}
+
+    if (!results || results.total === 0) {
+        return <MessageDisplay message="No results found!" isError={false} />;
+    }
+
+    const mappedResults = results.items
+        .map(({id, label, type, comment, highlights}) => ({
+            id,
+            columns: [label[0], generateTypeLabel(type)[0], comment[0]],
+            highlights
+        }));
+
+    const headerLabels = ['Label', 'Type', 'Description', 'Match'];
+
+    return (
+        <SearchResults
+            loading={loading}
+            headerLabels={headerLabels}
+            results={mappedResults}
+            onResultDoubleClick={handleResultDoubleClick}
+        />
+    );
+};
 
 const mapStateToProps = (state) => {
     const results = getCollectionsSearchResults(state);
@@ -107,4 +109,4 @@ SearchPage.propTypes = {
     fetchVocabularyIfNeeded: PropTypes.func.isRequired
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SearchPage));
+export default connect(mapStateToProps, mapDispatchToProps)(SearchPage);

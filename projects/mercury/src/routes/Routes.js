@@ -89,7 +89,10 @@ const routes = () => (
                 jupyterhubUrl: Config.get().urls.jupyterhub
             })}
         />
-        <Route path="/search" component={SearchPage} />
+        <Route
+            path="/search"
+            render={({location, history}) => <SearchPage location={location} history={history} />}
+        />
     </>
 );
 

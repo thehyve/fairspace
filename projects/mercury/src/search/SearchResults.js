@@ -4,58 +4,39 @@ import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow
 } from '@material-ui/core';
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import SearchResultHighlights from "./SearchResultHighlights";
 
-const searchResults = ({
-    loading,
-    results,
-    onResultDoubleClick,
-    vocabulary
-}) => {
-    // If vocabulary has not been loaded, we can not
-    // retrieve the label. Just return the URI in that (rare) case
-    const generateTypeLabel = (typeUri) => (vocabulary ? vocabulary.getLabelForPredicate(typeUri) : typeUri);
-
-    if (loading) {
-        return <LoadingInlay />;
-    }
-
-    if (!results || results.total === 0) {
-        return <MessageDisplay message="No results found!" isError={false} />;
-    }
-
-    return (
+const searchResults = ({headerLabels, results, onResultDoubleClick}) =>
+    (
         <Paper style={{width: '100%'}}>
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Label</TableCell>
-                        <TableCell>Type</TableCell>
-                        <TableCell>Description</TableCell>
-                        <TableCell>Match</TableCell>
+                        {headerLabels
+                            .map((l) => (
+                                <TableCell key={l}>
+                                    {l}
+                                </TableCell>
+                            ))}
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {results.items
-                        .map((item) => (
+                    {results
+                        .map(({id, columns, highlights}) => (
                             <TableRow
                                 hover
-                                key={item.id}
-                                onDoubleClick={() => onResultDoubleClick(item)}
+                                key={id}
+                                onDoubleClick={() => onResultDoubleClick(id)}
                             >
+                                {columns
+                                    .map((c) => (
+                                        <TableCell key={id + c}>
+                                            {c}
+                                        </TableCell>
+                                    ))}
                                 <TableCell>
-                                    {item.label}
-                                </TableCell>
-                                <TableCell>
-                                    {generateTypeLabel(item.type)}
-                                </TableCell>
-                                <TableCell>
-                                    {item.comment}
-                                </TableCell>
-                                <TableCell>
-                                    <SearchResultHighlights highlights={item.highlights} />
+                                    <SearchResultHighlights highlights={highlights} />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -63,9 +44,14 @@ const searchResults = ({
             </Table>
         </Paper>
     );
-};
 
 searchResults.propTypes = {
+    headerLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+    results: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        columns: PropTypes.arrayOf(PropTypes.string).isRequired,
+        highlights: PropTypes.arrayOf.isRequired
+    })).isRequired,
     onResultDoubleClick: PropTypes.func.isRequired
 };
 
