@@ -1,39 +1,39 @@
 import React, {useContext} from 'react';
 import {withRouter} from 'react-router-dom';
-import {
-    Input, ListItemText, MenuItem, Select, withStyles, Grid, Chip, Checkbox
-} from "@material-ui/core";
 import {BreadCrumbs, LoadingInlay, MessageDisplay, usePageTitleUpdater} from '@fairspace/shared-frontend';
 
-import {SearchBar} from "../../common/components";
 import useLinkedDataSearch from '../UseLinkedDataSearch';
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
-
-const styles = theme => ({
-    chips: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
-    chip: {
-        margin: theme.spacing.unit / 4,
-    }
-});
+import LinkedDataListHeader from "./LinkedDataListHeader";
+import useLinkedDataSearchParams from "../UseLinkedDataSearchParams";
+import {getFirstPredicateId} from "../../common/utils/linkeddata/jsonLdUtils";
+import {SHACL_TARGET_CLASS} from "../../constants";
+import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
-const LinkedDataListPage = ({classes, history, title, listComponent: ListComponent}) => {
-    const {
-        query, setQuery, selectedTypes, setSelectedTypes,
-        size, setSize, page, setPage,
-        shapes, shapesLoading, shapesError, searchPending, searchError,
-        availableTypes, items, total, hasHighlights,
-    } = useLinkedDataSearch(true);
-
+const LinkedDataListPage = ({history, title, listComponent: ListComponent}) => {
     const {
         requireIdentifier, editorPath,
-        hasEditRight
+        hasEditRight, getClassesInCatalog, shapesLoading, shapesError
     } = useContext(LinkedDataContext);
+
+    const {
+        query, setQuery, selectedTypes, setSelectedTypes,
+        size, setSize, page, setPage
+    } = useLinkedDataSearchParams();
+
+    const availableTypes = getClassesInCatalog().map(type => {
+        const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
+        const label = getLabel(type);
+        return {targetClass, label};
+    });
+
+    const {
+        searchPending, searchError,
+        items, total, hasHighlights,
+    } = useLinkedDataSearch(selectedTypes, query, size, page, availableTypes);
 
     usePageTitleUpdater(title);
 
@@ -68,47 +68,22 @@ const LinkedDataListPage = ({classes, history, title, listComponent: ListCompone
         return <MessageDisplay message={query && query !== '*' ? 'No results found' : 'The metadata is empty'} isError={false} />;
     };
 
-    const getTypeLabel = (type) => availableTypes.find(({targetClass}) => targetClass === type).label;
-
     return (
         <>
             <BreadCrumbs />
-            <Grid style={{minHeight: 60}} container alignItems="center" justify="space-evenly">
-                <Grid xs={6} item>
-                    <SearchBar
-                        placeholder="Search"
-                        disableUnderline={false}
-                        onSearchChange={setQuery}
-                    />
-                </Grid>
-                <Grid xs={5} item>
-                    <Select
-                        multiple
-                        displayEmpty
-                        value={selectedTypes}
-                        onChange={e => setSelectedTypes(e.target.value)}
-                        input={<Input fullWidth disableUnderline style={{margin: '8px 0'}} />}
-                        renderValue={selected => (selected.length === 0 ? 'Types' : (
-                            <div className={classes.chips}>
-                                {selected.map(value => <Chip key={value} label={getTypeLabel(value)} className={classes.chip} />)}
-                            </div>
-                        ))}
-                    >
-                        {availableTypes.map(({targetClass, label}) => (
-                            <MenuItem key={targetClass} value={targetClass}>
-                                <Checkbox checked={selectedTypes.includes(targetClass)} />
-                                <ListItemText primary={label} secondary={targetClass} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Grid>
-            </Grid>
+            <LinkedDataListHeader
+                setQuery={setQuery}
+                selectedTypes={selectedTypes}
+                setSelectedTypes={setSelectedTypes}
+                availableTypes={availableTypes}
+            />
+
             {
                 hasEditRight ? (
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
                         shapesError={shapesError}
-                        shapes={shapes}
+                        shapes={getClassesInCatalog()}
                         requireIdentifier={requireIdentifier}
                         onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}
                     >
@@ -120,4 +95,4 @@ const LinkedDataListPage = ({classes, history, title, listComponent: ListCompone
     );
 };
 
-export default withRouter(withStyles(styles)(LinkedDataListPage));
+export default withRouter(LinkedDataListPage);
