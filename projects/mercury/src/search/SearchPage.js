@@ -1,9 +1,13 @@
 import React, {useEffect} from 'react';
 import PropTypes from "prop-types";
 import {connect} from 'react-redux';
+import {
+    Paper, Table, TableBody,
+    TableCell, TableHead, TableRow
+} from '@material-ui/core';
 import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
-import SearchResults from './SearchResults';
+import SearchResultHighlights from "./SearchResultHighlights";
 import {getSearchQueryFromString} from '../common/utils/searchUtils';
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
@@ -23,7 +27,7 @@ export const SearchPage = ({
         fetchVocabularyIfNeeded();
         performSearch(query);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [query]);
+    }, [search, query]);
 
     const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {
@@ -42,8 +46,11 @@ export const SearchPage = ({
     // retrieve the label. Just return the URI in that (rare) case
     const generateTypeLabel = (typeUri) => (vocabulary ? vocabulary.getLabelForPredicate(typeUri) : typeUri);
 
-    const handleResultDoubleClick = (id) => {
-        const result = results.items.find(i => i.id === id);
+    /**
+     * Handles a click on a search result.
+     * @param result   The clicked search result. For the format, see the ES api
+     */
+    const handleResultDoubleClick = (result) => {
         const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
 
         history.push(navigationPath);
@@ -63,19 +70,42 @@ export const SearchPage = ({
         return <MessageDisplay message="No results found!" isError={false} />;
     }
 
-    const mappedResults = results.items
-        .map(({id, label, type, comment, highlights}) => ({
-            id,
-            columns: [label, generateTypeLabel(type), comment],
-            highlights
-        }));
-
     return (
-        <SearchResults
-            headerLabels={['Label', 'Type', 'Description', 'Match']}
-            results={mappedResults}
-            onResultDoubleClick={handleResultDoubleClick}
-        />
+        <Paper style={{width: '100%'}} data-testid="results-table">
+            <Table padding="dense">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Label</TableCell>
+                        <TableCell>Type</TableCell>
+                        <TableCell>Description</TableCell>
+                        <TableCell>Match</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {results.items
+                        .map((item) => (
+                            <TableRow
+                                hover
+                                key={item.id}
+                                onDoubleClick={() => handleResultDoubleClick(item)}
+                            >
+                                <TableCell>
+                                    {item.label}
+                                </TableCell>
+                                <TableCell>
+                                    {generateTypeLabel(item.type)}
+                                </TableCell>
+                                <TableCell>
+                                    {item.comment}
+                                </TableCell>
+                                <TableCell>
+                                    <SearchResultHighlights highlights={item.highlights} />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                </TableBody>
+            </Table>
+        </Paper>
     );
 };
 

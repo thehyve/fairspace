@@ -3,7 +3,6 @@ import {shallow, mount} from 'enzyme';
 import {MessageDisplay} from '@fairspace/shared-frontend';
 
 import {SearchPage} from '../SearchPage';
-import SearchResults from '../SearchResults';
 
 describe('<SearchPage />', () => {
     let wrapper;
@@ -17,8 +16,8 @@ describe('<SearchPage />', () => {
         />);
     });
 
-    it('should render <SearchResults /> when receiving results', () => {
-        expect(wrapper.find(SearchResults)).toHaveLength(1);
+    it('should render table when receiving results', () => {
+        expect(wrapper.find('[data-testid="results-table"]')).toHaveLength(1);
     });
 
     it('should render error component on error', () => {
