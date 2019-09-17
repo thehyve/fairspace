@@ -13,9 +13,9 @@ const searchResults = ({headerLabels, results, onResultDoubleClick}) => (
             <TableHead>
                 <TableRow>
                     {headerLabels
-                        .map((l) => (
-                            <TableCell key={l}>
-                                {l}
+                        .map((label) => (
+                            <TableCell key={label}>
+                                {label}
                             </TableCell>
                         ))}
                 </TableRow>
@@ -29,9 +29,10 @@ const searchResults = ({headerLabels, results, onResultDoubleClick}) => (
                             onDoubleClick={() => onResultDoubleClick(id)}
                         >
                             {columns
-                                .map((c) => (
-                                    <TableCell key={id + c}>
-                                        {c}
+                                .map((column, idx) => (
+                                    // eslint-disable-next-line react/no-array-index-key
+                                    <TableCell key={idx}>
+                                        {column}
                                     </TableCell>
                                 ))}
                             <TableCell>
@@ -48,7 +49,9 @@ searchResults.propTypes = {
     headerLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
     results: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
-        columns: PropTypes.arrayOf(PropTypes.string).isRequired,
+        columns: PropTypes.arrayOf(
+            PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+        ).isRequired,
         highlights: PropTypes.arrayOf.isRequired
     })).isRequired,
     onResultDoubleClick: PropTypes.func.isRequired

@@ -66,16 +66,13 @@ export const SearchPage = ({
     const mappedResults = results.items
         .map(({id, label, type, comment, highlights}) => ({
             id,
-            columns: [label[0], generateTypeLabel(type)[0], comment[0]],
+            columns: [label, generateTypeLabel(type), comment],
             highlights
         }));
 
-    const headerLabels = ['Label', 'Type', 'Description', 'Match'];
-
     return (
         <SearchResults
-            loading={loading}
-            headerLabels={headerLabels}
+            headerLabels={['Label', 'Type', 'Description', 'Match']}
             results={mappedResults}
             onResultDoubleClick={handleResultDoubleClick}
         />
