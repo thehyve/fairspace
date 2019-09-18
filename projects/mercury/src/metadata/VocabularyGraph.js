@@ -1,7 +1,11 @@
 import React, {useCallback, useContext, useState} from "react";
 import {Link} from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
+import Icon from "@material-ui/core/Icon";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {LoadingInlay, MessageDisplay, useAsync} from "@fairspace/shared-frontend";
 import {uniqWith} from 'lodash';
@@ -9,7 +13,8 @@ import {VocabularyAPI} from "./LinkedDataAPI";
 import NetworkGraphVisualization from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
 import {getFirstPredicateId, getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
-import {SHACL_CLASS, SHACL_NAME} from "../constants";
+import {SHACL_CLASS, SHACL_NAME, SHACL_PATH, SHACL_TARGET_CLASS} from "../constants";
+import {getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
 
 const styles = {
     graph: {
@@ -22,7 +27,7 @@ const styles = {
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
 const VocabularyGraph = ({classes}) => {
-    const {vocabulary, editorPath} = useContext(LinkedDataContext);
+    const {namespaces, vocabulary, editorPath} = useContext(LinkedDataContext);
     const {data, error, loading} = useAsync(useCallback(() => VocabularyAPI.graph(), []));
     const [selection, setSelection] = useState({nodes: [], edges: []});
 
@@ -56,15 +61,22 @@ const VocabularyGraph = ({classes}) => {
         return uniqWith(relationShapes.filter(s => s), shape => shape['@id']);
     };
 
-    const showShape = shape => (
-        <div key={shape['@id']}>
-            <Typography variant="h6">{getFirstPredicateValue(shape, SHACL_NAME)}</Typography>
-            <Link to={getEntityRelativeUrl(editorPath, shape['@id'])}>View</Link>
-        </div>
+    const showShape = (shape, predicateToShow, icon) => (
+        <ListItem
+            key={shape['@id']}
+            component={Link}
+            to={getEntityRelativeUrl(editorPath, shape['@id'])}
+        >
+            {icon ? <ListItemIcon><Icon>{icon}</Icon></ListItemIcon> : undefined}
+            <ListItemText
+                primary={getFirstPredicateValue(shape, SHACL_NAME)}
+                secondary={getNamespacedIri(getFirstPredicateId(shape, predicateToShow), namespaces)}
+            />
+        </ListItem>
     );
 
-    const renderNodeInfo = node => showShape(vocabulary.determineShapeForTypes([node.id]));
-    const renderEdgeInfo = edge => getRelationShapes(edge).map(showShape);
+    const renderNodeInfo = node => showShape(vocabulary.determineShapeForTypes([node.id]), SHACL_TARGET_CLASS, 'lens');
+    const renderEdgeInfo = edge => getRelationShapes(edge).map(shape => showShape(shape, SHACL_PATH, 'link'));
 
     return (
         <Grid container spacing={8}>
@@ -76,8 +88,10 @@ const VocabularyGraph = ({classes}) => {
                 />
             </Grid>
             <Grid item sm={12} md={4}>
-                {selection.nodes.map(renderNodeInfo)}
-                {selection.edges.map(renderEdgeInfo)}
+                <List>
+                    {selection.nodes.map(renderNodeInfo)}
+                    {selection.edges.map(renderEdgeInfo)}
+                </List>
             </Grid>
         </Grid>
     );
