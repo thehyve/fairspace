@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {LoadingInlay, MessageDisplay, useAsync} from "@fairspace/shared-frontend";
-import {uniq} from 'lodash';
+import {uniqWith} from 'lodash';
 import {VocabularyAPI} from "./LinkedDataAPI";
 import NetworkGraphVisualization from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
@@ -53,7 +53,7 @@ const VocabularyGraph = ({classes}) => {
         }
 
         // Return a unique list of non-undefined values
-        return uniq(relationShapes.filter(s => s), false, shape => shape['@id']);
+        return uniqWith(relationShapes.filter(s => s), shape => shape['@id']);
     };
 
     const showShape = shape => (
