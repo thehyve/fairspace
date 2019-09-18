@@ -7,7 +7,6 @@ const BACKEND_URL = 'http://localhost:8080/';
 module.exports = (app) => {
     app.use(proxy('/config', {target: MOCKED_SERVER_URL}));
     app.use(proxy('/api/v1/account', {target: MOCKED_SERVER_URL}));
-    app.use(proxy('/api/v1/users', {target: MOCKED_SERVER_URL}));
     app.use(proxy('/api/keycloak/users', {target: MOCKED_SERVER_URL}));
 
     // to talk to a real ES instance on localhost
