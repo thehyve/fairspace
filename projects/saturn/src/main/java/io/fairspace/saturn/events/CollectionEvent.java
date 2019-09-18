@@ -1,5 +1,6 @@
 package io.fairspace.saturn.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -8,6 +9,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class CollectionEvent extends BaseEvent {
+    @JsonIgnore
     Type eventType;
     Collection collection;
 

@@ -71,7 +71,7 @@ public class WebDAVIT {
 
         var eventBus = new EventBus();
 
-        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, null);
+        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, null, event -> {});
         collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions, eventService);
         fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
         milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)), null);

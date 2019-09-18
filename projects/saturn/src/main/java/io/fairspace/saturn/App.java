@@ -3,10 +3,7 @@ package io.fairspace.saturn;
 import com.google.common.eventbus.EventBus;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.auth.DummyAuthenticator;
-import io.fairspace.saturn.events.Event;
-import io.fairspace.saturn.events.EventService;
-import io.fairspace.saturn.events.RabbitMQEventService;
-import io.fairspace.saturn.events.WebdavEvent;
+import io.fairspace.saturn.events.*;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -67,7 +64,7 @@ public class App {
 
         var mailService = new MailService(CONFIG.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler, eventService);
 
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions, eventService);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
@@ -83,7 +80,14 @@ public class App {
                 new PermissionCheckingValidator(permissions),
                 new ShaclValidator());
 
-        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, CONFIG.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator);
+        Consumer<MetadataEvent.Type> metadataEventConsumer = type ->
+            eventService.emitEvent(MetadataEvent.builder()
+                    .category(EventCategory.metadata)
+                    .eventType(type)
+                    .build()
+            );
+
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, CONFIG.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -94,7 +98,14 @@ public class App {
         );
         var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
 
-        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
+        Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
+                eventService.emitEvent(MetadataEvent.builder()
+                        .category(EventCategory.vocabulary)
+                        .eventType(type)
+                        .build()
+                );
+
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var auth = CONFIG.auth;
