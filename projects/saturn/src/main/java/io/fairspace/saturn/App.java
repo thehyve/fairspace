@@ -1,7 +1,11 @@
 package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.auth.DummyAuthenticator;
+import io.fairspace.saturn.events.Event;
+import io.fairspace.saturn.events.EventService;
+import io.fairspace.saturn.events.RabbitMQEventService;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -56,11 +60,13 @@ public class App {
         var userService = new UserService(CONFIG.auth.userUrlTemplate, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getSubjectClaim());
 
+        EventService eventService = setupEventService();
+
         var mailService = new MailService(CONFIG.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
         var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler);
 
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions, eventService);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new CompoundFileSystem(collections, Map.of(
                 ManagedFileSystem.TYPE, new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus),
@@ -115,5 +121,27 @@ public class App {
                 .start();
 
         log.info("Saturn has started");
+    }
+
+    private static EventService setupEventService() throws Exception {
+        if(CONFIG.rabbitMQ.enabled) {
+            try {
+                var eventService = new RabbitMQEventService(CONFIG.rabbitMQ, CONFIG.workspace.name, SaturnSecurityHandler::userInfo);
+                eventService.init();
+                return eventService;
+            } catch(Exception e) {
+                log.error("Error connecting to RabbitMQ", e);
+
+                if(CONFIG.rabbitMQ.required) {
+                   throw e;
+                }
+
+                log.warn("Continuing without event functionality");
+            }
+        } else {
+            log.warn("Logging to rabbitMQ is disabled due to configuration settings. Set rabbitMQ.enabled to true to enable logging");
+        }
+
+        return event -> log.trace("Logging events is disabled in configuration. Set rabbitMQ.enabled to true");
     }
 }

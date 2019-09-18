@@ -3,6 +3,7 @@ package io.fairspace.saturn.webdav;
 import com.google.common.eventbus.EventBus;
 import com.mockrunner.mock.web.MockHttpServletRequest;
 import com.mockrunner.mock.web.MockHttpServletResponse;
+import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -19,6 +20,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletException;
@@ -48,6 +50,9 @@ public class WebDAVIT {
 
     private CollectionsService collections;
 
+    @Mock
+    private EventService eventService;
+
     private Node collectionIRI;
 
     private Node defaultUser = createURI("http://example.com/user");
@@ -67,8 +72,7 @@ public class WebDAVIT {
         var eventBus = new EventBus();
 
         permissions = new PermissionsServiceImpl(rdf, () -> currentUser, null);
-        collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
-        var collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions);
+        collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions, eventService);
         fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
         milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)));
         var coll = new Collection();
