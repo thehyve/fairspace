@@ -56,20 +56,15 @@ const VocabularyGraph = ({classes}) => {
         return uniq(relationShapes.filter(s => s), false, shape => shape['@id']);
     };
 
-    const renderNodeInfo = node => (
-        <div key={node.id}>
-            <Typography variant="h6">{node.label}</Typography>
-            <Link to={getEntityRelativeUrl(editorPath, node.id)}>View</Link>
+    const showShape = shape => (
+        <div key={shape['@id']}>
+            <Typography variant="h6">{getFirstPredicateValue(shape, SHACL_NAME)}</Typography>
+            <Link to={getEntityRelativeUrl(editorPath, shape['@id'])}>View</Link>
         </div>
     );
 
-    const renderEdgeInfo = edge => getRelationShapes(edge)
-        .map(relationShape => (
-            <div key={relationShape['@id']}>
-                <Typography variant="h6">{getFirstPredicateValue(relationShape, SHACL_NAME)}</Typography>
-                <Link to={getEntityRelativeUrl(editorPath, relationShape['@id'])}>View</Link>
-            </div>
-        ));
+    const renderNodeInfo = node => showShape(vocabulary.determineShapeForTypes([node.id]));
+    const renderEdgeInfo = edge => getRelationShapes(edge).map(showShape);
 
     return (
         <Grid container spacing={8}>
