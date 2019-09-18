@@ -8,7 +8,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {LoadingInlay, MessageDisplay, useAsync} from "@fairspace/shared-frontend";
-import {uniqWith} from 'lodash';
+import {uniqBy} from 'lodash';
 import {VocabularyAPI} from "./LinkedDataAPI";
 import NetworkGraphVisualization from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
@@ -58,7 +58,7 @@ const VocabularyGraph = ({classes}) => {
         }
 
         // Return a unique list of non-undefined values
-        return uniqWith(relationShapes.filter(s => s), shape => shape['@id']);
+        return uniqBy(relationShapes.filter(s => s), s => s['@id']);
     };
 
     const showShape = (shape, predicateToShow, icon) => (
