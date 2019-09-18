@@ -11,6 +11,12 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
 
     // Execute query when any of the parameters changes
     useEffect(() => {
+        // Only execute search if there are any availableTypes to query on,
+        // i.e. when the shapes have been loaded
+        if (availableTypes.length === 0 || shapesLoading) {
+            return;
+        }
+
         const getTypesToQuery = () => {
             const targetClassesInCatalog = availableTypes.map(typeDefinition => typeDefinition.targetClass);
 
@@ -28,7 +34,7 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
 
         // Due to current setup of how vocabulary/meta-vocab is being store, getClassesInCatalog can't be added as dependency
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [query, selectedTypes, shapesLoading, size, page, searchLinkedData]);
+    }, [query, shapesLoading, selectedTypes, size, page]);
 
     return {
         searchPending: pending,

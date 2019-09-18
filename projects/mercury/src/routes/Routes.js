@@ -11,8 +11,8 @@ import SearchPage from '../search/SearchPage';
 import {createMetadataIri, createVocabularyIri} from "../common/utils/linkeddata/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
-import MetadataListPage from "../metadata/MetadataListPage";
-import VocabularyListPage from "../metadata/VocabularyListPage";
+import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
+import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import useSubject from '../common/hooks/UseSubject';
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 
@@ -49,7 +49,7 @@ const routes = () => (
 
                 return (
                     <MetadataWrapper>
-                        {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataListPage />}
+                        {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataOverviewPage />}
                     </MetadataWrapper>
                 );
             }}
@@ -69,7 +69,7 @@ const routes = () => (
 
                 return (
                     <VocabularyWrapper>
-                        {subject ? <LinkedDataEntityPage title="Vocabulary" subject={subject} /> : <VocabularyListPage />}
+                        {subject ? <LinkedDataEntityPage title="Vocabulary" subject={subject} /> : <VocabularyOverviewPage />}
                     </VocabularyWrapper>
                 );
             }}

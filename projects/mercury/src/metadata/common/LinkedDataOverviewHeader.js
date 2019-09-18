@@ -13,7 +13,7 @@ const styles = theme => ({
     }
 });
 
-const LinkedDataListHeader = ({classes, setQuery, selectedTypes, setSelectedTypes, availableTypes}) => {
+const LinkedDataOverviewHeader = ({classes, setQuery, selectedTypes, setSelectedTypes, availableTypes}) => {
     const getTypeLabel = (type) => availableTypes.find(({targetClass}) => targetClass === type).label;
 
     return (
@@ -50,4 +50,4 @@ const LinkedDataListHeader = ({classes, setQuery, selectedTypes, setSelectedType
     );
 };
 
-export default withStyles(styles)(LinkedDataListHeader);
+export default withStyles(styles)(LinkedDataOverviewHeader);
