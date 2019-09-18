@@ -74,7 +74,7 @@ public class WebDAVIT {
         permissions = new PermissionsServiceImpl(rdf, () -> currentUser, null);
         collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions, eventService);
         fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
-        milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)));
+        milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)), null);
         var coll = new Collection();
         coll.setName("My Collection");
         coll.setLocation("coll1");

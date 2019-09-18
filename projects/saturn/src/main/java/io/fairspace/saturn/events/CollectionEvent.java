@@ -1,7 +1,9 @@
 package io.fairspace.saturn.events;
 
-import io.fairspace.saturn.services.collections.Collection;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 
 @Value
 @EqualsAndHashCode(callSuper = true)

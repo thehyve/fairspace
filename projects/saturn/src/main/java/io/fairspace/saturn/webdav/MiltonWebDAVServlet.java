@@ -3,6 +3,7 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.config.HttpManagerBuilder;
+import io.milton.event.RequestEvent;
 import io.milton.http.*;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
@@ -29,8 +31,8 @@ import static java.util.Collections.singletonList;
 public class MiltonWebDAVServlet extends HttpServlet {
     private final HttpManager httpManager;
 
-    public MiltonWebDAVServlet(String pathPrefix, VirtualFileSystem fs) {
-        httpManager = setupHttpManager(pathPrefix, fs);
+    public MiltonWebDAVServlet(String pathPrefix, VirtualFileSystem fs, Consumer<Request> requestEventListener) {
+        httpManager = setupHttpManager(pathPrefix, fs, requestEventListener);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class MiltonWebDAVServlet extends HttpServlet {
         }
     }
 
-    private static HttpManager setupHttpManager(String pathPrefix, VirtualFileSystem fs) {
+    private static HttpManager setupHttpManager(String pathPrefix, VirtualFileSystem fs, Consumer<Request> requestEventListener) {
         return new HttpManagerBuilder() {{
             setResourceFactory(new VfsBackedMiltonResourceFactory(pathPrefix, fs));
             setMultiNamespaceCustomPropertySourceEnabled(true);
@@ -76,6 +78,10 @@ public class MiltonWebDAVServlet extends HttpServlet {
                     responseHandler.respondContent(resource, response, request, params);
                 }
             });
+
+            if(requestEventListener != null) {
+                eventManager.registerEventListener(e -> requestEventListener.accept(((RequestEvent) e).getRequest()), RequestEvent.class);
+            }
         }}.buildHttpManager();
     }
 }

@@ -6,6 +6,7 @@ import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.events.Event;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.RabbitMQEventService;
+import io.fairspace.saturn.events.WebdavEvent;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -24,6 +25,7 @@ import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
+import io.milton.http.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
@@ -33,6 +35,7 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
@@ -104,6 +107,15 @@ public class App {
         var apiPathPrefix = "/api/" + API_VERSION;
         var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator);
 
+        Consumer<Request> eventListener = request -> {
+            eventService.emitEvent(
+                    WebdavEvent.builder()
+                            .httpMethod(request.getMethod().code)
+                            .path(request.getAbsolutePath())
+                            .build()
+            );
+        };
+
         FusekiServer.create()
                 .securityHandler(securityHandler)
                 .add(apiPathPrefix + "/rdf/", ds, false)
@@ -115,7 +127,11 @@ public class App {
                         new PermissionsApp("/permissions", permissions),
                         new UserApp("/users", userService),
                         new HealthApp("/health")))
-                .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
+                .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet(
+                        "/webdav/" + API_VERSION + "/",
+                        fs,
+                        eventListener
+                ))
                 .port(CONFIG.port)
                 .build()
                 .start();
