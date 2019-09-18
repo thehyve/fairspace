@@ -36,31 +36,33 @@ const App = () => {
 
     return (
         <VersionProvider url={versionUrl}>
-            <UsersProvider url={users}>
-                <UserProvider url={userInfo}>
-                    <LogoutContextProvider
-                        logoutUrl={logout}
-                        jupyterhubUrl={jupyterhub}
-                    >
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            <MuiThemeProvider theme={theme}>
-                                <Provider store={store}>
-                                    <ErrorDialog>
-                                        <Router>
-                                            <Layout
-                                                renderMenu={() => <Menu />}
-                                                renderMain={() => <Routes />}
-                                                renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                                renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                            />
-                                        </Router>
-                                    </ErrorDialog>
-                                </Provider>
-                            </MuiThemeProvider>
-                        </MuiPickersUtilsProvider>
-                    </LogoutContextProvider>
-                </UserProvider>
-            </UsersProvider>
+            <UserProvider url={userInfo}>
+                <LogoutContextProvider
+                    logoutUrl={logout}
+                    jupyterhubUrl={jupyterhub}
+                >
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <MuiThemeProvider theme={theme}>
+                            <Provider store={store}>
+                                <ErrorDialog>
+                                    <Router>
+                                        <Layout
+                                            renderMenu={() => <Menu />}
+                                            renderMain={() => (
+                                                <UsersProvider url={users}>
+                                                    <Routes />
+                                                </UsersProvider>
+                                            )}
+                                            renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                            renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                        />
+                                    </Router>
+                                </ErrorDialog>
+                            </Provider>
+                        </MuiThemeProvider>
+                    </MuiPickersUtilsProvider>
+                </LogoutContextProvider>
+            </UserProvider>
         </VersionProvider>
     );
 };
