@@ -88,5 +88,6 @@ export const IMPORTANT_PROPERTY_URI = FAIRSPACE_NS + 'importantProperty';
 export const DEFAULT_NAMESPACE_URI = FAIRSPACE_NS + 'defaultNamespace';
 export const USABLE_IN_METADATA_URI = FAIRSPACE_NS + 'usableInMetadata';
 export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
+export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';
