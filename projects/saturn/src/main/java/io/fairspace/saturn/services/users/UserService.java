@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,25 @@ public class UserService {
         }
 
         return localUser;
+    }
+
+    /**
+     * Stores user information in local database on login
+     * @param token
+     */
+    public void onAuthorized(OAuthAuthenticationToken token) {
+        if(token != null) {
+            var iri = getUserIri(token.getSubjectClaim());
+
+            // Only write user information if no information is present yet
+            if(dao.read(User.class, iri) == null) {
+                var user = new User();
+                user.setIri(iri);
+                user.setName(token.getFullName());
+                user.setEmail(token.getEmail());
+                dao.write(user);
+            }
+        }
     }
 
     private User fetchUserFromKeycloak(Node iri) {
