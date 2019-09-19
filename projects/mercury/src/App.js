@@ -6,7 +6,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import {MuiPickersUtilsProvider} from "material-ui-pickers";
 import useIsMounted from "react-is-mounted-hook";
 import {
-    ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, VersionProvider
+    ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, UsersProvider, VersionProvider
 } from '@fairspace/shared-frontend';
 
 import configureStore from "./common/redux/store/configureStore";
@@ -32,12 +32,14 @@ const App = () => {
     // Initialize the store after configuration has loaded
     const store = configureStore();
 
+    const {version: versionUrl, users, userInfo, logout, jupyterhub} = Config.get().urls;
+
     return (
-        <VersionProvider url={Config.get().urls.version}>
-            <UserProvider url={Config.get().urls.userInfo}>
+        <VersionProvider url={versionUrl}>
+            <UserProvider url={userInfo}>
                 <LogoutContextProvider
-                    logoutUrl={Config.get().urls.logout}
-                    jupyterhubUrl={Config.get().urls.jupyterhub}
+                    logoutUrl={logout}
+                    jupyterhubUrl={jupyterhub}
                 >
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <MuiThemeProvider theme={theme}>
@@ -46,7 +48,11 @@ const App = () => {
                                     <Router>
                                         <Layout
                                             renderMenu={() => <Menu />}
-                                            renderMain={() => <Routes />}
+                                            renderMain={() => (
+                                                <UsersProvider url={users}>
+                                                    <Routes />
+                                                </UsersProvider>
+                                            )}
                                             renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
                                             renderFooter={({id, version}) => <Footer name={id} version={version} />}
                                         />

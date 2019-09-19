@@ -101,7 +101,9 @@ const LinkedDataVocabularyProvider = ({
                 // Generic methods without reference to shapes
                 extendProperties,
                 getSearchResults: getLinkedDataSearchResults,
-                valueComponentFactory
+                valueComponentFactory,
+
+                vocabulary
             }}
         >
             {children}

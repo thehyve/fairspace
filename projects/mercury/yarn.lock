@@ -836,6 +836,13 @@
     lerna "^3.10.2"
     typescript "^3.2.2"
 
+"@egjs/hammerjs@^2.0.15":
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.15.tgz#b6ef675540d275f7445647a64413af425b97bb9a"
+  integrity sha512-BysW5KdNiJ1Qq4JRILaX/Lx2eJGyVPsFSwKA3aJbY+SKv57lS5ZFbEdlgj5shfYPLeJGEnK1WjfleDT+y4s1aQ==
+  dependencies:
+    "@types/hammerjs" "^2.0.36"
+
 "@emotion/cache@^10.0.17", "@emotion/cache@^10.0.9":
   version "10.0.17"
   resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.17.tgz#3491a035f62f276620d586677bfc3d4fad0b8472"
@@ -2168,6 +2175,11 @@
     "@types/events" "*"
     "@types/minimatch" "*"
     "@types/node" "*"
+
+"@types/hammerjs@^2.0.36":
+  version "2.0.36"
+  resolved "https://registry.yarnpkg.com/@types/hammerjs/-/hammerjs-2.0.36.tgz#17ce0a235e9ffbcdcdf5095646b374c2bf615a4c"
+  integrity sha512-7TUK/k2/QGpEAv/BCwSHlYu3NXZhQ9ZwBYpzr9tjlPIL2C5BeGhH3DmVavRx3ZNyELX5TLC91JTz/cen6AAtIQ==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.1"
@@ -3838,7 +3850,7 @@ compare-func@^1.3.1:
     array-ify "^1.0.0"
     dot-prop "^3.0.0"
 
-component-emitter@^1.2.1:
+component-emitter@^1.2.1, component-emitter@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/component-emitter/-/component-emitter-1.3.0.tgz#16e4070fba8ae29b679f2215853ee181ab2eabc0"
   integrity sha512-Rd3se6QB+sO1TwqZjscQrurpEPIfO0/yYnSin6Q/rD3mOutHvUrCAhJub3r90uNb+SESBuE0QYoB90YdfatsRg==
@@ -7845,6 +7857,11 @@ jsx-ast-utils@^2.1.0, jsx-ast-utils@^2.2.1:
     array-includes "^3.0.3"
     object.assign "^4.1.0"
 
+keycharm@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/keycharm/-/keycharm-0.2.0.tgz#fa6ea2e43b90a68028843d27f2075d35a8c3e6f9"
+  integrity sha1-+m6i5DuQpoAohD0n8gddNajD5vk=
+
 keycode@^2.1.9:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/keycode/-/keycode-2.2.0.tgz#3d0af56dc7b8b8e5cba8d0a97f107204eec22b04"
@@ -8552,6 +8569,11 @@ modify-values@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
+
+moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 moo@^0.4.3:
   version "0.4.3"
@@ -12765,6 +12787,39 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vis-data@^6.1.1:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/vis-data/-/vis-data-6.2.1.tgz#286c57e812d1f85601d248485e519b51dca67b51"
+  integrity sha512-y80h+jJ6gQXfeWqDdts9UTrLubggx99Q0dJionQF/XxHIbcxNZ+2cuwv4y+bIapVF9nW0DyE08EcMMlicAlSWg==
+  dependencies:
+    vis-util "^1.1.0"
+
+vis-network@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/vis-network/-/vis-network-6.0.0.tgz#1988a3c7a4eb2f00526b2cfa5793dcdf962eda17"
+  integrity sha512-nsUXyZv11m+bNtGIIwdL77Tgv3oYoErYTSzc2srVOqC1v+ExMejs2uIcXpvvs0VhLfpC+VOBBAmy7eiIJhWfYg==
+  dependencies:
+    "@egjs/hammerjs" "^2.0.15"
+    component-emitter "^1.3.0"
+    keycharm "^0.2.0"
+    moment "^2.24.0"
+    timsort "^0.3.0"
+    vis-data "^6.1.1"
+    vis-util "^1.1.6"
+
+vis-util@^1.1.0, vis-util@^1.1.6:
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/vis-util/-/vis-util-1.1.8.tgz#d4b5c37b2c327ed2df1cb02d0b55882156c66374"
+  integrity sha512-gX461BUrYnHfDpMalvQdQ26SG/DplIvsK7u5KUCWEfPpcnTXm22FtQH5a+GIbDBcePe1sm578mpbWwTbCgRVww==
+  dependencies:
+    moment "^2.24.0"
+    vis-uuid "^1.1.3"
+
+vis-uuid@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/vis-uuid/-/vis-uuid-1.1.3.tgz#2f53ff35e9e026b0ec93bc433ce685c40c2f784c"
+  integrity sha512-2B6XdY1bkzbUh+TugmnAaFa61KO9R5pzBzIuFIm8a9FrkbxIdSmQXV+FbfkL8QunkQV/bT0JDLQ2puqCS2+0Og==
 
 vm-browserify@^1.0.1:
   version "1.1.0"

@@ -47,6 +47,7 @@
     "redux": "^4.0.4",
     "redux-promise-middleware": "^6.1.1",
     "redux-thunk": "^2.3.0",
+    "vis-network": "^6.0.0",
     "wait-on": "^3.3.0",
     "webdav": "^2.9.1"
   },

@@ -6,12 +6,12 @@ import LinkedDataList from "../LinkedDataList";
 
 describe('LinkedDataList', () => {
     it('should show match column if hasHighlights is set to true', () => {
-        const wrapper = mount(<LinkedDataList hasHighlights />);
+        const wrapper = mount(<LinkedDataList total={1} hasHighlights />);
         const headings = wrapper.find(TableHead).at(0).find(TableCell).map(c => c.text());
         expect(headings).toEqual(expect.arrayContaining(["Match"]));
     });
     it('should not show match column if hasHighlights is set to false', () => {
-        const wrapper = mount(<LinkedDataList hasHighlight={false} />);
+        const wrapper = mount(<LinkedDataList total={1} hasHighlight={false} />);
         const headings = wrapper.find(TableHead).at(0).find(TableCell).map(c => c.text());
         expect(headings).not.toEqual(expect.arrayContaining(["Match"]));
     });
@@ -24,6 +24,7 @@ describe('LinkedDataList', () => {
 
         const wrapper = mount(<LinkedDataList
             entities={entities}
+            total={2}
             typeRender={typeRender}
         />);
 
