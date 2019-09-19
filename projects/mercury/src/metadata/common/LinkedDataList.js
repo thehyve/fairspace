@@ -1,10 +1,11 @@
 import React from "react";
 import {
-    ListItemText, Paper, Table, TableBody, TableCell, TableFooter, TableHead, TablePagination, TableRow, withStyles
+    ListItemText, Paper, Table, TableBody, TableCell, TableFooter,
+    TableHead, TablePagination, TableRow, withStyles,
 } from "@material-ui/core";
-import {LoadingInlay, MessageDisplay} from "@fairspace/shared-frontend";
+import {SearchResultHighlights, LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+
 import styles from './LinkedDataList.styles';
-import SearchResultHighlights from "../../search/SearchResultHighlights";
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
@@ -28,7 +29,7 @@ const LinkedDataList = ({
     }
 
     if (error) {
-        return <MessageDisplay message='An error occurred while loading data' />;
+        return <MessageDisplay message="An error occurred while loading data" />;
     }
 
     if (total === 0) {

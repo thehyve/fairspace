@@ -1,13 +1,13 @@
 import React, {useContext} from 'react';
 import {PropTypes} from 'prop-types';
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay, SearchAPI, SORT_ALPHABETICALLY} from '@fairspace/shared-frontend';
 
-import searchAPI, {SORT_ALPHABETICALLY} from "../../search/SearchAPI";
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
-import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
+import {SEARCH_DROPDOWN_DEFAULT_SIZE, ES_INDEX} from "../../constants";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
+import Config from "../../common/services/Config";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
     let fetchRequest = null;
@@ -62,7 +62,8 @@ LinkedDataDropdown.propTypes = {
 };
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({types, size, query}) => searchAPI().searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY}),
+    fetchItems: ({types, size, query}) => SearchAPI(Config.get(), ES_INDEX)
+        .searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY}),
     debounce: 300
 };
 

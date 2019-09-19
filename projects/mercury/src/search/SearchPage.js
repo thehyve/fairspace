@@ -5,10 +5,8 @@ import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow
 } from '@material-ui/core';
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString} from '@fairspace/shared-frontend';
 
-import SearchResultHighlights from "./SearchResultHighlights";
-import {getSearchQueryFromString} from '../common/utils/searchUtils';
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
 import {searchCollections} from '../common/redux/actions/searchActions';

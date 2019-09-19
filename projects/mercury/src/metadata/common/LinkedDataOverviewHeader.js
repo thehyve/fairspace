@@ -1,7 +1,6 @@
 import React from 'react';
 import {Checkbox, Chip, Grid, Input, ListItemText, MenuItem, Select, withStyles} from "@material-ui/core";
-
-import {SearchBar} from "../../common/components";
+import {SearchBar} from '@fairspace/shared-frontend';
 
 const styles = theme => ({
     chips: {
