@@ -1,5 +1,5 @@
 {{ if .Values.rabbitmq.enabled -}}
-{{- $scripts := .Values.hyperspace.configurationScripts.rabbitmq -}}
+{{- $scripts := .Values.workspace.configurationScripts.rabbitmq -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
