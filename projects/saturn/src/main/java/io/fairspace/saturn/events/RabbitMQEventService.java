@@ -13,7 +13,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -21,7 +20,8 @@ import java.util.function.Supplier;
 @Slf4j
 public class RabbitMQEventService implements EventService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String CONTENT_TYPE = "application/json; charset=UTF-8";
+    private static final String CONTENT_TYPE = "application/json";
+    private static final String CONTENT_ENCODING = "UTF-8";
 
     private Config.RabbitMQ config;
     private String workspaceId;
@@ -59,6 +59,7 @@ public class RabbitMQEventService implements EventService {
 
         AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
                 .contentType(CONTENT_TYPE)
+                .contentEncoding(CONTENT_ENCODING)
                 .timestamp(new Date())
                 .build();
         try {
