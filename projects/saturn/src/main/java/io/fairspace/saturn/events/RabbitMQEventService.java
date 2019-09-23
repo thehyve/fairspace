@@ -20,8 +20,8 @@ import java.util.function.Supplier;
 
 @Slf4j
 public class RabbitMQEventService implements EventService {
-    private final static AMQP.BasicProperties.Builder COMMON_PROPERTIES_BUILDER = new AMQP.BasicProperties.Builder().contentType("application/json");
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String CONTENT_TYPE = "application/json; charset=UTF-8";
 
     private Config.RabbitMQ config;
     private String workspaceId;
@@ -56,8 +56,11 @@ public class RabbitMQEventService implements EventService {
 
         EventContainer eventContainer = new EventContainer(workspaceId, getCurrentUser(), event);
         var routingKey = String.format("%s.%s.%s", workspaceId, event.getCategory().name().toLowerCase(), event.getType());
-        AMQP.BasicProperties properties = COMMON_PROPERTIES_BUILDER.timestamp(Date.from(Instant.now())).build();
 
+        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
+                .contentType(CONTENT_TYPE)
+                .timestamp(new Date())
+                .build();
         try {
             var bytes = objectMapper.writeValueAsString(eventContainer).getBytes(Charsets.UTF_8);
             channel.basicPublish(config.exchangeName, routingKey, properties, bytes);
