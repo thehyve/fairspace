@@ -55,7 +55,7 @@ public class RabbitMQEventService implements EventService {
         }
 
         EventContainer eventContainer = new EventContainer(workspaceId, getCurrentUser(), event);
-        var routingKey = String.format("%s.%s.%s", workspaceId, event.getCategory(), event.getType());
+        var routingKey = String.format("%s.%s.%s", workspaceId, event.getCategory().name().toLowerCase(), event.getType());
         AMQP.BasicProperties properties = COMMON_PROPERTIES_BUILDER.timestamp(Date.from(Instant.now())).build();
 
         try {

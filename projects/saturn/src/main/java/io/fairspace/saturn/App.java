@@ -21,6 +21,7 @@ import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
+import io.fairspace.saturn.webdav.WebdavEventEmitter;
 import io.milton.http.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
@@ -116,15 +117,6 @@ public class App {
         var apiPathPrefix = "/api/" + API_VERSION;
         var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator);
 
-        Consumer<Request> eventListener = request -> {
-            eventService.emitEvent(
-                    WebdavEvent.builder()
-                            .httpMethod(request.getMethod())
-                            .path(request.getAbsolutePath())
-                            .build()
-            );
-        };
-
         FusekiServer.create()
                 .securityHandler(securityHandler)
                 .add(apiPathPrefix + "/rdf/", ds, false)
@@ -139,7 +131,7 @@ public class App {
                 .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet(
                         "/webdav/" + API_VERSION + "/",
                         fs,
-                        eventListener
+                        new WebdavEventEmitter(eventService)
                 ))
                 .port(CONFIG.port)
                 .build()
