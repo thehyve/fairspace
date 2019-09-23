@@ -51,7 +51,7 @@ public class PermissionsServiceImplTest {
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, permissionChangeEventHandler);
+        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, permissionChangeEventHandler, event -> {});
         service.createResource(RESOURCE);
     }
 

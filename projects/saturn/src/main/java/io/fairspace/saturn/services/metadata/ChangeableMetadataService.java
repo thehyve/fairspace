@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.events.MetadataEvent;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
@@ -17,6 +18,7 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
@@ -30,16 +32,21 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
-
+    private final Consumer<MetadataEvent.Type> eventConsumer;
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator);
+        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator, event -> {});
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator, eventConsumer);
+    }
+
+    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
         super(rdf, graph, vocabulary, tripleLimit);
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
+        this.eventConsumer = eventConsumer;
     }
 
     /**
@@ -52,6 +59,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void put(Model model) {
         commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
+        eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
     /**
@@ -60,7 +68,12 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        return commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject));
+        if(commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject))) {
+            eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -72,6 +85,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void delete(Model model) {
         commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
+        eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
     /**

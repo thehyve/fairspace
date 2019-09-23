@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.collections;
 
+import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -30,12 +31,14 @@ public class CollectionsServiceTest {
     private Consumer<Object> eventListener;
     @Mock
     private PermissionsService permissions;
+    @Mock
+    private EventService eventService;
 
     @Before
     public void before() {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions, eventService);
     }
 
     @Test

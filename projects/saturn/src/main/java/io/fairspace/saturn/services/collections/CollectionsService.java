@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.collections;
 
+import io.fairspace.saturn.events.CollectionEvent;
+import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -27,6 +29,7 @@ public class CollectionsService {
     private final DAO dao;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
+    private final EventService eventService;
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
@@ -39,7 +42,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        return commit("Create collection " + collection.getName(), dao, () -> {
+        Collection storedCollection = commit("Create collection " + collection.getName(), dao, () -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -47,6 +50,14 @@ public class CollectionsService {
             eventListener.accept(new CollectionCreatedEvent(collection));
             return collection;
         });
+
+        eventService.emitEvent(CollectionEvent.builder()
+                .eventType(CollectionEvent.Type.CREATED)
+                .collection(getEventCollection(storedCollection))
+                .build()
+        );
+
+        return storedCollection;
     }
 
     public Collection get(String iri) {
@@ -77,12 +88,20 @@ public class CollectionsService {
         var iris = collections.stream().map(Collection::getIri).collect(toList());
         var userPermissions = permissions.getPermissions(iris);
 
-        return collections.stream()
+        List<Collection> collectionList = collections.stream()
                 .filter(c -> {
                     c.setAccess(userPermissions.get(c.getIri()));
-                    return c.canRead(); })
+                    return c.canRead();
+                })
                 .sorted(comparing(Collection::getName))
                 .collect(toList());
+
+        eventService.emitEvent(CollectionEvent.builder()
+                .eventType(CollectionEvent.Type.LISTED)
+                .build()
+        );
+
+        return collectionList;
     }
 
     public void delete(String iri) {
@@ -100,7 +119,15 @@ public class CollectionsService {
 
             dao.markAsDeleted(collection);
 
+            // Emit event on internal eventbus so the filesystem can act accordingly
             eventListener.accept(new CollectionDeletedEvent(collection));
+
+            // Emit event on external eventbus for logging purposes
+            eventService.emitEvent(CollectionEvent.builder()
+                    .eventType(CollectionEvent.Type.DELETED)
+                    .collection(getEventCollection(collection))
+                    .build()
+            );
         });
     }
 
@@ -140,9 +167,22 @@ public class CollectionsService {
 
             validateFields(collection);
             collection = dao.write(collection);
+
+            CollectionEvent.Type eventType;
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
+                eventType = CollectionEvent.Type.MOVED;
+            } else {
+                eventType = CollectionEvent.Type.UPDATED;
             }
+
+            // Emit event on external eventbus for logging purposes
+            eventService.emitEvent(CollectionEvent.builder()
+                    .eventType(eventType)
+                    .collection(getEventCollection(collection))
+                    .build()
+            );
+
             return collection;
         });
     }
@@ -169,4 +209,9 @@ public class CollectionsService {
                 && !name.isEmpty()
                 && name.length() < 128;
     }
+
+    private CollectionEvent.Collection getEventCollection(Collection collection) {
+        return new CollectionEvent.Collection(collection.getIri().toString(), collection.getName());
+    }
+
 }
