@@ -1,0 +1,19 @@
+{{- if .Values.rabbitmq.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{.Release.Name}}-rabbitmq-config-map"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+data:
+  rabbitmq.conf: |-
+    [default]
+    hostname = {{ .Values.hyperspace.rabbitmq.host }}
+    username = {{ .Values.hyperspace.rabbitmq.username }}
+    password = {{ .Values.hyperspace.rabbitmq.password }}
+  commands.txt: |-
+    declare user name={{ .Values.rabbitmq.username }} password={{ .Values.rabbitmq.password }} tags=
+    declare permission vhost=/ user={{ .Values.rabbitmq.username }} configure=.* read=.* write=.*
+{{- end -}}

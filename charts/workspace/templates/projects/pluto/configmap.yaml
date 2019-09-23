@@ -83,3 +83,10 @@ data:
         ui:
           path: /**
           url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+
+    rabbitmq:
+      enabled: {{ .Values.rabbitmq.enabled }}
+      required: {{ .Values.rabbitmq.required }}
+      host: {{ .Values.hyperspace.rabbitmq.host }}
+      username: {{ .Values.rabbitmq.username }}
+      password: {{ .Values.rabbitmq.password }}

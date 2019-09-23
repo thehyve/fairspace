@@ -61,7 +61,7 @@ mail:
   mail.smtp.port: 587
   mail.smtp.starttls.enable: true
 rabbitMQ:
-  enabled: false
+  enabled: true
   required: true
   username: fairspace
   password: test
