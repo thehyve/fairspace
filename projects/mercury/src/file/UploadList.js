@@ -29,9 +29,9 @@ const UploadList = ({uploads, enqueue}) => {
     };
 
     return (
-        <Paper>
-            {uploads.length > 0
-                ? (
+        <>
+            <Paper>
+                {uploads.length > 0 && (
                     <>
                         <Table>
                             <TableHead>
@@ -71,33 +71,35 @@ const UploadList = ({uploads, enqueue}) => {
                             onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                         />
                     </>
-                )
-                : undefined}
-            <Dropzone onDrop={files => enqueue(files)}>
-                {({getRootProps, getInputProps}) => (
-                    <div
-                        {...getRootProps()}
-                    >
-                        <input {...getInputProps()} />
-                        <Grid
-                            container
-                            direction="column"
-                            justify="center"
-                            alignItems="center"
-                            spacing={8}
-                            style={{padding: 20}}
-                        >
-                            <Grid item>
-                                <Icon>cloud_upload</Icon>
-                            </Grid>
-                            <Grid item>
-                                Drop files to upload
-                            </Grid>
-                        </Grid>
-                    </div>
                 )}
-            </Dropzone>
-        </Paper>
+            </Paper>
+            <Paper style={{marginTop: 20}}>
+                <Dropzone onDrop={files => enqueue(files)}>
+                    {({getRootProps, getInputProps}) => (
+                        <div
+                            {...getRootProps()}
+                        >
+                            <input {...getInputProps()} />
+                            <Grid
+                                container
+                                direction="column"
+                                justify="center"
+                                alignItems="center"
+                                spacing={8}
+                                style={{padding: 20, minHeight: 200}}
+                            >
+                                <Grid item>
+                                    <Icon>cloud_upload</Icon>
+                                </Grid>
+                                <Grid item>
+                                    Drop files or click here to upload
+                                </Grid>
+                            </Grid>
+                        </div>
+                    )}
+                </Dropzone>
+            </Paper>
+        </>
     );
 };
 
