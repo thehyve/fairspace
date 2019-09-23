@@ -11,13 +11,13 @@ import java.util.function.Consumer;
 @Slf4j
 public class WebdavEventEmitter implements Consumer<Request> {
     private static Map<Request.Method, FileSystemEvent.FileEventType> httpMethodToEventTypeMap = Map.of(
-            Request.Method.MKCOL, FileSystemEvent.FileEventType.CREATE_DIRECTORY,
-            Request.Method.PROPFIND, FileSystemEvent.FileEventType.LIST,
-            Request.Method.COPY, FileSystemEvent.FileEventType.COPY,
-            Request.Method.MOVE, FileSystemEvent.FileEventType.MOVE,
-            Request.Method.DELETE, FileSystemEvent.FileEventType.DELETE,
-            Request.Method.PUT, FileSystemEvent.FileEventType.WRITE_FILE,
-            Request.Method.GET, FileSystemEvent.FileEventType.READ_FILE
+            Request.Method.MKCOL, FileSystemEvent.FileEventType.DIRECTORY_CREATED,
+            Request.Method.PROPFIND, FileSystemEvent.FileEventType.LISTED,
+            Request.Method.COPY, FileSystemEvent.FileEventType.COPIED,
+            Request.Method.MOVE, FileSystemEvent.FileEventType.MOVED,
+            Request.Method.DELETE, FileSystemEvent.FileEventType.DELETED,
+            Request.Method.PUT, FileSystemEvent.FileEventType.FILE_WRITTEN,
+            Request.Method.GET, FileSystemEvent.FileEventType.FILE_READ
     );
     private EventService eventService;
 

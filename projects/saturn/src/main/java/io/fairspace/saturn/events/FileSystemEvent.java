@@ -12,20 +12,20 @@ public class FileSystemEvent extends BaseEvent<FileSystemEvent.FileEventType> {
 
     @Builder
     public FileSystemEvent(FileEventType eventType, String path, String destination) {
-        super(eventType, EventCategory.FILE);
+        super(eventType, EventCategory.FILE_SYSTEM);
         this.path = path;
         this.destination = destination;
     }
 
     public enum FileEventType {
-        CREATE_DIRECTORY,
-        LIST,
-        COPY,
-        MOVE,
-        DELETE,
+        DIRECTORY_CREATED,
+        LISTED,
+        COPIED,
+        MOVED,
+        DELETED,
 
-        WRITE_FILE,
-        READ_FILE
+        FILE_WRITTEN,
+        FILE_READ
     }
 }
 

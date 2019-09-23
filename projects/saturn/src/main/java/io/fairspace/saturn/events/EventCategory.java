@@ -3,7 +3,7 @@ package io.fairspace.saturn.events;
 public enum EventCategory {
     PERMISSION,
     COLLECTION,
-    FILE,
+    FILE_SYSTEM,
     METADATA,
     VOCABULARY
 }

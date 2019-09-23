@@ -76,10 +76,10 @@ public class PermissionsServiceImpl implements PermissionsService {
             PermissionEvent.Type eventType;
             if (access == Access.None) {
                 rdf.update(storedQuery("permissions_delete", resource, user));
-                eventType = PermissionEvent.Type.PERMISSION_DELETED;
+                eventType = PermissionEvent.Type.DELETED;
             } else {
                 rdf.update(storedQuery("permissions_set", resource, user, toNode(access)));
-                eventType = PermissionEvent.Type.PERMISSION_SET;
+                eventType = PermissionEvent.Type.UPDATED;
             }
 
             eventService.emitEvent(PermissionEvent.builder()
@@ -131,7 +131,7 @@ public class PermissionsServiceImpl implements PermissionsService {
                 rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
 
                 eventService.emitEvent(PermissionEvent.builder()
-                        .eventType(PermissionEvent.Type.WRITE_RESTRICT_UPDATED)
+                        .eventType(PermissionEvent.Type.UPDATED)
                         .resource(resource.getURI())
                         .access(restricted ? "writeRestricted" : "writeNotRestricted")
                         .build()

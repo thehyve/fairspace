@@ -21,9 +21,8 @@ public class PermissionEvent extends BaseEvent<PermissionEvent.Type> {
 
     public enum Type {
         RESOURCE_CREATED,
-        PERMISSION_SET,
-        PERMISSION_DELETED,
-        WRITE_RESTRICT_UPDATED
+        UPDATED,
+        DELETED,
     }
 }
 
