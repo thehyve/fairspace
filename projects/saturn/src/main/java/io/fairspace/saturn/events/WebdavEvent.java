@@ -1,6 +1,6 @@
 package io.fairspace.saturn.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.milton.http.Request;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -11,12 +11,10 @@ public class WebdavEvent extends BaseEvent {
     String httpMethod;
     String path;
 
-    public String getType() { return httpMethod; }
-
     @Builder
-    public WebdavEvent(String workspace, User user, String httpMethod, String path) {
-        super(workspace, user, EventCategory.file);
-        this.httpMethod = httpMethod;
+    public WebdavEvent(Request.Method httpMethod, String path) {
+        super(httpMethod, EventCategory.FILE);
+        this.httpMethod = httpMethod.code;
         this.path = path;
     }
 }

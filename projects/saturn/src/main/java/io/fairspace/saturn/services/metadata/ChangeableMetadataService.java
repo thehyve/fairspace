@@ -59,7 +59,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void put(Model model) {
         commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
-        eventConsumer.accept(MetadataEvent.Type.created);
+        eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
     /**
@@ -69,7 +69,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     boolean softDelete(Resource subject) {
         if(commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject))) {
-            eventConsumer.accept(MetadataEvent.Type.softDeleted);
+            eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
             return false;
@@ -85,7 +85,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void delete(Model model) {
         commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
-        eventConsumer.accept(MetadataEvent.Type.deleted);
+        eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
     /**

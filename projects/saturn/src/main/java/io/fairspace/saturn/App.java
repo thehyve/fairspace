@@ -1,7 +1,6 @@
 package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.events.*;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
@@ -31,7 +30,6 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -82,7 +80,7 @@ public class App {
 
         Consumer<MetadataEvent.Type> metadataEventConsumer = type ->
             eventService.emitEvent(MetadataEvent.builder()
-                    .category(EventCategory.metadata)
+                    .category(EventCategory.METADATA)
                     .eventType(type)
                     .build()
             );
@@ -100,7 +98,7 @@ public class App {
 
         Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
                 eventService.emitEvent(MetadataEvent.builder()
-                        .category(EventCategory.vocabulary)
+                        .category(EventCategory.VOCABULARY)
                         .eventType(type)
                         .build()
                 );
@@ -121,7 +119,7 @@ public class App {
         Consumer<Request> eventListener = request -> {
             eventService.emitEvent(
                     WebdavEvent.builder()
-                            .httpMethod(request.getMethod().code)
+                            .httpMethod(request.getMethod())
                             .path(request.getAbsolutePath())
                             .build()
             );

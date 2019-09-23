@@ -52,7 +52,7 @@ public class CollectionsService {
         });
 
         eventService.emitEvent(CollectionEvent.builder()
-                .eventType(CollectionEvent.Type.created)
+                .eventType(CollectionEvent.Type.CREATED)
                 .collection(getEventCollection(storedCollection))
                 .build()
         );
@@ -97,7 +97,7 @@ public class CollectionsService {
                 .collect(toList());
 
         eventService.emitEvent(CollectionEvent.builder()
-                .eventType(CollectionEvent.Type.listed)
+                .eventType(CollectionEvent.Type.LISTED)
                 .build()
         );
 
@@ -124,7 +124,7 @@ public class CollectionsService {
 
             // Emit event on external eventbus for logging purposes
             eventService.emitEvent(CollectionEvent.builder()
-                    .eventType(CollectionEvent.Type.deleted)
+                    .eventType(CollectionEvent.Type.DELETED)
                     .collection(getEventCollection(collection))
                     .build()
             );
@@ -171,9 +171,9 @@ public class CollectionsService {
             CollectionEvent.Type eventType;
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
-                eventType = CollectionEvent.Type.moved;
+                eventType = CollectionEvent.Type.MOVED;
             } else {
-                eventType = CollectionEvent.Type.updated;
+                eventType = CollectionEvent.Type.UPDATED;
             }
 
             // Emit event on external eventbus for logging purposes

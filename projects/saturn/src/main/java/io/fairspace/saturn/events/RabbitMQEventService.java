@@ -2,6 +2,7 @@ package io.fairspace.saturn.events;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -12,12 +13,14 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 @Slf4j
 public class RabbitMQEventService implements EventService {
-    private final static AMQP.BasicProperties COMMON_PROPERTIES = new AMQP.BasicProperties.Builder().contentType("application/json").build();
+    private final static AMQP.BasicProperties.Builder COMMON_PROPERTIES_BUILDER = new AMQP.BasicProperties.Builder().contentType("application/json");
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
     private Config.RabbitMQ config;
@@ -51,14 +54,13 @@ public class RabbitMQEventService implements EventService {
             log.trace("Not emitting event {} because channel is unavailable", event);
         }
 
-        event.setUser(getCurrentUser());
-        event.setWorkspace(workspaceId);
-
-        var routingKey = String.format("%s.%s.%s", event.getWorkspace(), event.getCategory(), event.getType());
+        EventContainer eventContainer = new EventContainer(workspaceId, getCurrentUser(), event);
+        var routingKey = String.format("%s.%s.%s", workspaceId, event.getCategory(), event.getType());
+        AMQP.BasicProperties properties = COMMON_PROPERTIES_BUILDER.timestamp(Date.from(Instant.now())).build();
 
         try {
-            var bytes = objectMapper.writeValueAsString(event).getBytes();
-            channel.basicPublish(config.exchangeName, routingKey, COMMON_PROPERTIES, bytes);
+            var bytes = objectMapper.writeValueAsString(eventContainer).getBytes(Charsets.UTF_8);
+            channel.basicPublish(config.exchangeName, routingKey, properties, bytes);
         } catch (JsonProcessingException e) {
             log.error("Error serializing event of type {} for message bus: {}", event.getClass().getSimpleName(), event.toString());
         } catch (IOException e) {

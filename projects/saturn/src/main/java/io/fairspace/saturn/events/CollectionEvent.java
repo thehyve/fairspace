@@ -1,6 +1,5 @@
 package io.fairspace.saturn.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -9,32 +8,27 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class CollectionEvent extends BaseEvent {
-    @JsonIgnore
-    Type eventType;
     Collection collection;
 
-    public String getType() { return eventType.toString(); }
-
     @Builder
-    public CollectionEvent(String workspace, User user, Type eventType, Collection collection) {
-        super(workspace, user, EventCategory.collection);
-        this.eventType = eventType;
+    public CollectionEvent(Type eventType, Collection collection) {
+        super(eventType, EventCategory.COLLECTION);
         this.collection = collection;
     }
 
     public enum Type {
-        created,
-        updated,
-        moved,
-        deleted,
-        listed
+        CREATED,
+        UPDATED,
+        MOVED,
+        DELETED,
+        LISTED
     }
 
     @Value
     @AllArgsConstructor
     public static class Collection {
-        final String iri;
-        final String name;
+        String iri;
+        String name;
     }
 }
 
