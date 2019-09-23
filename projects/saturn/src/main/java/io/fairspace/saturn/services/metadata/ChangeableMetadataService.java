@@ -35,7 +35,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private final Consumer<MetadataEvent.Type> eventConsumer;
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator, type -> {});
+        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator, event -> {});
     }
 
     public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
