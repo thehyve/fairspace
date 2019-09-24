@@ -38,8 +38,8 @@ data:
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     workspace:
-      id: "{{ .Release.Name }}",
-      name: "{{ .Values.workspace.name }}",
+      id: "{{ .Release.Name }}"
+      name: "{{ .Values.workspace.name }}"
       version: "{{ .Chart.Version }}"
     rabbitMQ:
       enabled: {{ .Values.rabbitmq.enabled }}
