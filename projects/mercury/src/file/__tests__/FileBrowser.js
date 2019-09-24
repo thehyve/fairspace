@@ -121,4 +121,23 @@ describe('FileBrowser', () => {
         // finds substring ignoring case
         expect(getByText(container, /error occurred/i)).toBeTruthy();
     });
+
+    it('cleans up listener after unmount', () => {
+        const cleanupFn = jest.fn();
+
+        const {unmount} = render(
+            <Provider store={store}>
+                <FileBrowser
+                    {...initialProps}
+                    history={{
+                        listen: () => cleanupFn
+                    }}
+                />
+            </Provider>
+        );
+
+        unmount();
+
+        expect(cleanupFn).toHaveBeenCalledTimes(1);
+    });
 });
