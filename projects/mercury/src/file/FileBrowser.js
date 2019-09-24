@@ -15,8 +15,9 @@ import {UPLOAD_STATUS_INITIAL} from "../common/redux/reducers/uploadsReducers";
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
 
-const FileBrowser = ({
+export const FileBrowser = ({
     history,
+    match,
     files = [],
     openedCollection,
     openedPath,
@@ -85,17 +86,18 @@ const FileBrowser = ({
     return (
         <>
             <Tabs
+                data-testid="tabs"
                 value={currentTab}
                 onChange={(e, tab) => setCurrentTab(tab)}
                 centered
                 style={{marginBottom: 8}}
             >
                 <Tab value={TAB_FILES} label="Files" />
-                <Tab value={TAB_UPLOAD} label="Upload" />
+                <Tab value={TAB_UPLOAD} label="Upload" data-testid="upload-tab" />
             </Tabs>
 
             {(currentTab === TAB_FILES) ? (
-                <>
+                <div data-testid="files-view">
                     <FileList
                         selectionEnabled
                         files={files.map(item => ({...item, selected: isSelected(item.filename)}))}
@@ -106,6 +108,7 @@ const FileBrowser = ({
                     />
                     <div style={{marginTop: 8}}>
                         <FileOperations
+                            match={match}
                             selectedPaths={selected}
                             openedCollection={openedCollection}
                             openedPath={openedPath}
@@ -114,25 +117,26 @@ const FileBrowser = ({
                             fetchFilesIfNeeded={fetchFilesIfNeeded}
                         />
                     </div>
-                </>
+                </div>
             ) : (
-                    <>
+                    <div data-testid="upload-view">
                         <UploadList
                             uploads={uploads}
                             enqueue={enqueue}
                         />
                         <div style={{marginTop: 12}}>
                             <Button
+                                data-testid="upload-button"
                                 color="primary"
                                 variant="contained"
                                 disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
                                 onClick={startAll}
                             >
                                 <Play /> Start uploading
-                            </Button>
+                        </Button>
                         </div>
-                    </>
-            )}
+                    </div>
+                )}
         </>
     );
 };

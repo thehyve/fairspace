@@ -10,23 +10,24 @@ import {
     UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
 } from "../common/redux/reducers/uploadsReducers";
 
+
+const progress = upload => {
+    switch (upload.status) {
+        case UPLOAD_STATUS_INITIAL:
+            return "Upload pending";
+        case UPLOAD_STATUS_IN_PROGRESS:
+            return <LinearProgress variant="determinate" value={upload.progress} />;
+        case UPLOAD_STATUS_FINISHED:
+            return "Finished";
+        case UPLOAD_STATUS_ERROR:
+            return "Error uploading";
+        default:
+            return "";
+    }
+};
+
 const UploadList = ({uploads, enqueue}) => {
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(uploads);
-
-    const progress = upload => {
-        switch (upload.status) {
-            case UPLOAD_STATUS_INITIAL:
-                return "Upload pending";
-            case UPLOAD_STATUS_IN_PROGRESS:
-                return <LinearProgress variant="determinate" value={upload.progress} />;
-            case UPLOAD_STATUS_FINISHED:
-                return "Finished";
-            case UPLOAD_STATUS_ERROR:
-                return "Error uploading";
-            default:
-                return "";
-        }
-    };
 
     return (
         <>
