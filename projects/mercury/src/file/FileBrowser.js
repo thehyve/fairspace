@@ -119,24 +119,24 @@ export const FileBrowser = ({
                     </div>
                 </div>
             ) : (
-                    <div data-testid="upload-view">
-                        <UploadList
-                            uploads={uploads}
-                            enqueue={enqueue}
-                        />
-                        <div style={{marginTop: 12}}>
-                            <Button
-                                data-testid="upload-button"
-                                color="primary"
-                                variant="contained"
-                                disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
-                                onClick={startAll}
-                            >
-                                <Play /> Start uploading
+                <div data-testid="upload-view">
+                    <UploadList
+                        uploads={uploads}
+                        enqueue={enqueue}
+                    />
+                    <div style={{marginTop: 12}}>
+                        <Button
+                            data-testid="upload-button"
+                            color="primary"
+                            variant="contained"
+                            disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
+                            onClick={startAll}
+                        >
+                            <Play /> Start uploading
                         </Button>
-                        </div>
                     </div>
-                )}
+                </div>
+            )}
         </>
     );
 };
