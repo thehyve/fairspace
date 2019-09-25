@@ -1,0 +1,43 @@
+@startuml Hyperspace
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Component.puml
+
+title Component diagram for Organisation Portal backend
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Regular user", "User of a workspace")
+Person(datasteward, "Data steward", "User with privileges to manage the vocabulary")
+
+System_Boundary(saturn, "Saturn") {
+    ComponentDb(file_storage, "Local file storage", "k8s persistent volume", "Stores files within our own system")
+    ComponentDb(jena, "RDF store", "Apache Jena", "Provides storage of triples")
+    Component(transaction_log, "Transaction Log", "Jena plugin, file system", "Stores a representation of each database transaction")
+    Component(vfs, "Virtual File System", "Java class", "Provides a virtual file system abstracted from the actual storage")
+    Component(webdav, "WebDAV server", "Java Servlet, Milton.io", "Handles WebDAV requests")
+    Component(collections, "Collections", "Spark app", "Manages collections")
+    Component(permissions, "Permissions", "Spark app", "Manages permissions on collections and metadata entities")
+    Component(metadata, "Metadata", "Spark metadata app", "Manages and validates metadata")
+    Component(vocabulary, "Vocabulary", "Spark metadata app", "Manages and validates vocabulary")
+}
+
+System_Ext(elasticsearch, "ElasticSearch", "Search index for information from all connected workspaces")
+System_Ext(irods, "iRODS", "Handles storage of files")
+System_Ext(rabbitmq, "Message Bus", "Transport for business events")
+
+Rel_R(user, collections, "Calls API", "JSON over HTTPS")
+Rel_R(user, metadata, "Calls API", "JSON/LD over HTTPS")
+Rel_R(user, webdav, "Calls API", "WebDAV")
+Rel(datasteward, vocabulary, "Calls API", "JSON/LD over HTTPS")
+
+Rel(webdav, vfs, "Stores files in and retrieves files from")
+Rel(vfs, irods, "Stores files in and retrieves files from")
+Rel(vfs, file_storage, "Stores files in and retrieves files from")
+Rel(vfs, jena, "Stores file system information")
+Rel(collections, jena, "Stores collection information")
+Rel(permissions, jena, "Stores permission information")
+Rel(metadata, jena, "Stores metadata")
+Rel(vocabulary, jena, "Stores vocabulary information")
+Rel(jena, transaction_log, "Stores transaction information")
+Rel(jena, elasticsearch, "Updates search index in")
+Rel(saturn, rabbitmq, "Sends business events to", "AMQP")
+@enduml
