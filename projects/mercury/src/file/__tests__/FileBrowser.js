@@ -46,31 +46,31 @@ const initialProps = {
     }
 };
 
+const openedCollection = {
+    iri: "http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0",
+    dateCreated: "2019-09-12T10:34:53.585Z",
+    createdBy: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+    dateModified: "2019-09-12T10:34:53.585Z",
+    modifiedBy: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+    dateDeleted: null,
+    deletedBy: null,
+    name: "asd",
+    description: "",
+    location: "asd",
+    connectionString: "",
+    access: "Manage",
+    canRead: true,
+    canWrite: true,
+    canManage: true,
+    creatorObj: {
+        iri: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+        name: "John Snow",
+        email: "user@example.com"
+    }
+};
+
 describe('FileBrowser', () => {
     it('renders proper view', () => {
-        const openedCollection = {
-            iri: "http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0",
-            dateCreated: "2019-09-12T10:34:53.585Z",
-            createdBy: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-            dateModified: "2019-09-12T10:34:53.585Z",
-            modifiedBy: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-            dateDeleted: null,
-            deletedBy: null,
-            name: "asd",
-            description: "",
-            location: "asd",
-            connectionString: "",
-            access: "Manage",
-            canRead: true,
-            canWrite: true,
-            canManage: true,
-            creatorObj: {
-                iri: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-                name: "John Snow",
-                email: "user@example.com"
-            }
-        };
-
         const {queryByTestId} = render(
             <Provider store={store}>
                 <FileBrowser
@@ -108,11 +108,26 @@ describe('FileBrowser', () => {
         expect(getByText(container, /collection does not exist/i)).toBeTruthy();
     });
 
+    it('show no open collection error when no collection is provided even when another error is given', () => {
+        const {container} = render(
+            <Provider store={store}>
+                <FileBrowser
+                    {...initialProps}
+                    error="some error"
+                />
+            </Provider>
+        );
+
+        expect(getByText(container, /collection does not exist/i)).toBeTruthy();
+    });
+
+
     it('show error when when an error messsage is given', () => {
         const {container} = render(
             <Provider store={store}>
                 <FileBrowser
                     {...initialProps}
+                    openedCollection={openedCollection}
                     error="some error"
                 />
             </Provider>
