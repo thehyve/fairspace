@@ -108,6 +108,20 @@ describe('FileBrowser', () => {
         expect(getByText(container, /collection does not exist/i)).toBeTruthy();
     });
 
+    it('show no open collection error when no collection is provided even when another error is given', () => {
+        const {container} = render(
+            <Provider store={store}>
+                <FileBrowser
+                    {...initialProps}
+                    error="some error"
+                />
+            </Provider>
+        );
+
+        expect(getByText(container, /collection does not exist/i)).toBeTruthy();
+    });
+
+
     it('show error when when an error messsage is given', () => {
         const {container} = render(
             <Provider store={store}>
