@@ -64,10 +64,6 @@ export const FileBrowser = ({
         }
     };
 
-    if (error) {
-        return (<MessageDisplay message="An error occurred while loading files" />);
-    }
-
     if (loading) {
         return <LoadingInlay />;
     }
@@ -81,6 +77,10 @@ export const FileBrowser = ({
                 noWrap={false}
             />
         );
+    }
+
+    if (error) {
+        return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
     return (
