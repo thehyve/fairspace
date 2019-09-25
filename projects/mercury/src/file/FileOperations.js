@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {withRouter} from "react-router-dom";
 import {Badge, Icon, IconButton} from "@material-ui/core";
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
@@ -229,4 +228,4 @@ const mapDispatchToProps = {
     ...clipboardActions
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(FileOperations));
+export default connect(mapStateToProps, mapDispatchToProps)(FileOperations);
