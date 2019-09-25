@@ -33,6 +33,7 @@ const App = () => {
     const store = configureStore();
 
     const {version: versionUrl, users, userInfo, logout, jupyterhub} = Config.get().urls;
+    const requiredRole = Config.get().roles.user;
 
     return (
         <VersionProvider url={versionUrl}>
@@ -47,6 +48,7 @@ const App = () => {
                                 <ErrorDialog>
                                     <Router>
                                         <Layout
+                                            requiredAuthorization={requiredRole}
                                             renderMenu={() => <Menu />}
                                             renderMain={() => (
                                                 <UsersProvider url={users}>
