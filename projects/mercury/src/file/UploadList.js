@@ -10,28 +10,29 @@ import {
     UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
 } from "../common/redux/reducers/uploadsReducers";
 
+
+const progress = upload => {
+    switch (upload.status) {
+        case UPLOAD_STATUS_INITIAL:
+            return "Upload pending";
+        case UPLOAD_STATUS_IN_PROGRESS:
+            return <LinearProgress variant="determinate" value={upload.progress} />;
+        case UPLOAD_STATUS_FINISHED:
+            return "Finished";
+        case UPLOAD_STATUS_ERROR:
+            return "Error uploading";
+        default:
+            return "";
+    }
+};
+
 const UploadList = ({uploads, enqueue}) => {
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(uploads);
 
-    const progress = upload => {
-        switch (upload.status) {
-            case UPLOAD_STATUS_INITIAL:
-                return "Upload pending";
-            case UPLOAD_STATUS_IN_PROGRESS:
-                return <LinearProgress variant="determinate" value={upload.progress} />;
-            case UPLOAD_STATUS_FINISHED:
-                return "Finished";
-            case UPLOAD_STATUS_ERROR:
-                return "Error uploading";
-            default:
-                return "";
-        }
-    };
-
     return (
-        <Paper>
-            {uploads.length > 0
-                ? (
+        <>
+            <Paper>
+                {uploads.length > 0 && (
                     <>
                         <Table>
                             <TableHead>
@@ -71,33 +72,35 @@ const UploadList = ({uploads, enqueue}) => {
                             onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                         />
                     </>
-                )
-                : undefined}
-            <Dropzone onDrop={files => enqueue(files)}>
-                {({getRootProps, getInputProps}) => (
-                    <div
-                        {...getRootProps()}
-                    >
-                        <input {...getInputProps()} />
-                        <Grid
-                            container
-                            direction="column"
-                            justify="center"
-                            alignItems="center"
-                            spacing={8}
-                            style={{padding: 20}}
-                        >
-                            <Grid item>
-                                <Icon>cloud_upload</Icon>
-                            </Grid>
-                            <Grid item>
-                                Drop files to upload
-                            </Grid>
-                        </Grid>
-                    </div>
                 )}
-            </Dropzone>
-        </Paper>
+            </Paper>
+            <Paper style={{marginTop: 20}}>
+                <Dropzone onDrop={files => enqueue(files)}>
+                    {({getRootProps, getInputProps}) => (
+                        <div
+                            {...getRootProps()}
+                        >
+                            <input {...getInputProps()} />
+                            <Grid
+                                container
+                                direction="column"
+                                justify="center"
+                                alignItems="center"
+                                spacing={8}
+                                style={{padding: 20, minHeight: 200}}
+                            >
+                                <Grid item>
+                                    <Icon>cloud_upload</Icon>
+                                </Grid>
+                                <Grid item>
+                                    Drop files or click here to upload
+                                </Grid>
+                            </Grid>
+                        </div>
+                    )}
+                </Dropzone>
+            </Paper>
+        </>
     );
 };
 
