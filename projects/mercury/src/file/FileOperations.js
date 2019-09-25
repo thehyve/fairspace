@@ -199,10 +199,8 @@ export const FileOperations = ({
 };
 
 const mapStateToProps = (state, ownProps) => {
-    const {match: {params}, disabled: isWritingDisabled} = ownProps;
+    const {openedPath, disabled: isWritingDisabled} = ownProps;
     const {collectionBrowser: {selectedPaths}, cache: {filesByPath}, clipboard} = state;
-    const openedCollectionLocation = params.collection;
-    const openedPath = params.path ? `/${openedCollectionLocation}/${params.path}` : `/${openedCollectionLocation}`;
     const filesOfCurrentPath = (filesByPath[openedPath] || {}).data || [];
     const selectedItems = filesOfCurrentPath.filter(f => selectedPaths.includes(f.filename)) || [];
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
