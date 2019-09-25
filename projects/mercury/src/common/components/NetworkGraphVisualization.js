@@ -9,16 +9,22 @@ const draw = (dotNotation, ref, onSelect) => {
     const data = {nodes, edges};
 
     // you can extend the options like a normal JSON variable:
-    options.physics = {
-        stabilization: false,
-        barnesHut: {
-            springLength: 200
+    const networkOptions = {
+        ...options,
+        layout: {
+            randomSeed: 0
+        },
+        physics: {
+            stabilization: true,
+            barnesHut: {
+                springLength: 200
+            }
         }
     };
 
     // create a network
     // eslint-disable-next-line no-new
-    const visNetwork = new vis.Network(ref.current, data, options);
+    const visNetwork = new vis.Network(ref.current, data, networkOptions);
 
     if (onSelect) {
         // Bind select event handler, while returning all known information on
