@@ -17,7 +17,6 @@ const TAB_UPLOAD = 'UPLOAD';
 
 export const FileBrowser = ({
     history,
-    match,
     files = [],
     openedCollection,
     openedPath,
@@ -108,9 +107,7 @@ export const FileBrowser = ({
                     />
                     <div style={{marginTop: 8}}>
                         <FileOperations
-                            match={match}
                             selectedPaths={selected}
-                            openedCollection={openedCollection}
                             openedPath={openedPath}
                             disabled={!openedCollection.canWrite}
                             getDownloadLink={FileAPI.getDownloadLink}
