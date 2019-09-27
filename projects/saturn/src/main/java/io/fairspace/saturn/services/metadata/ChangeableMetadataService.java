@@ -115,6 +115,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             });
 
             update(toDelete, model.removeAll(null, null, NIL));
+            eventConsumer.accept(MetadataEvent.Type.UPDATED);
         });
     }
 
