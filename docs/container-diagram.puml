@@ -1,0 +1,38 @@
+@startuml Workspace
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+title Container diagram for Workspace
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Regular user", "User of a workspace")
+Person(datasteward, "Data steward", "User with privileges to manage the vocabulary")
+
+System_Boundary(workspace, "Workspace") {
+    Container(pluto, "API gateway", "Java, Spring Boot", "Proxies API requests and keeps authenticated session")
+    Container(mercury, "Mercury", "Javascript, React", "Allows users to manage files and metadata")
+    Container(saturn, "Saturn", "Java, Jetty, Apache Spark", "Provides APIs for managing workspaces and apps")
+    Container(docs, "Docs", "Nginx, OpenAPI", "Provides interactive API documentation")
+}
+
+System_Boundary(hyperspace, "Hyperspace") {
+    Container(keycloak, "Keycloak", "Java, WildFly", "Handles authentication and authorization")
+    Container(elasticsearch, "ElasticSearch", "Java", "Search index for information from all connected workspaces")
+    Container(rabbitmq, "Message Bus", "RabbitMQ", "Transport for business events")
+}
+
+System_Ext(irods, "iRODS", "Handles storage of files")
+
+Rel(user, mercury, "Manages files and metadata")
+Rel(user, keycloak, "Logs in at ")
+Rel(datasteward, mercury, "Manages vocabulary")
+
+Rel(mercury, pluto, "Accesses APIs via")
+Rel(pluto, keycloak, "Proxies admin API on")
+Rel(pluto, saturn, "Proxies file and metadata APIs on")
+Rel(pluto, elasticsearch, "Proxies search queries for")
+Rel(pluto, rabbitmq, "Sends authentication events to", "AMQP")
+Rel(saturn, rabbitmq, "Sends events to", "AMQP")
+Rel(saturn, elasticsearch, "Updates search index with metadata and vocabulary updates", "AMQP")
+Rel(saturn, irods, "(Optionally) stores and retrieves files in", "iRODS API")
+@enduml
