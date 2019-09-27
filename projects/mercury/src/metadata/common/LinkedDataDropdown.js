@@ -63,7 +63,8 @@ LinkedDataDropdown.propTypes = {
 
 LinkedDataDropdown.defaultProps = {
     fetchItems: ({types, size, query}) => SearchAPI(Config.get(), ES_INDEX)
-        .searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY}),
+        .searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY})
+        .catch(handleSearchError),
     debounce: 300
 };
 
