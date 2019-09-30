@@ -7,12 +7,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
 public abstract class BaseFileSystem implements VirtualFileSystem {
+    // The file system must be compatible with many external systems.
+    // For that reason, we disallow many special characters, as they
+    // may cause problems in certain other systems.
+    // This list is taken from
+    // https://blogs.msdn.microsoft.com/robert_mcmurray/2011/04/27/bad-characters-to-use-in-web-based-filenames/
+    // and is mainly based on characters that should not be in a URI
+    private static final Character[] INVALID_BASENAME_CHARACTERS = {
+            ';', '/', '?', ':', '@',
+            '&', '=', '+', '$', ',',
+            '<', '>', '#', '%', '"',
+            '{', '}', '|', '\\', '^', '[', ']', '`'
+    };
+
+    // Regex to extract the basename from a path. It can handle
+    // trailing slashes as well as filenames consisting of
+    // only backslashes (\\\)
+    private static final String BASENAME_REGEX = "^.*?([^/]+)/*$";
+
     private static final FileInfo ROOT = FileInfo.builder()
             .path("")
             .readOnly(false)
@@ -20,6 +39,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
             .created(ofEpochMilli(0))
             .modified(ofEpochMilli(0))
             .build();
+
 
     protected final CollectionsService collections;
 
@@ -137,8 +157,18 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
         if (isCollection(path)) {
             throw new AccessDeniedException("Use Collections API for operations on collections");
         }
+
+        if (containsInvalidBaseName(path)) {
+            throw new InvalidFilenameException("The given filename contains invalid special characters");
+        }
     }
 
+    static boolean containsInvalidBaseName(String path) {
+        String baseName = path.replaceFirst(BASENAME_REGEX, "$1");
+
+        return Stream.of(INVALID_BASENAME_CHARACTERS)
+                .anyMatch(character -> baseName.indexOf(character) > -1);
+    }
 
     private static FileInfo fileInfo(Collection collection) {
         return FileInfo.builder()

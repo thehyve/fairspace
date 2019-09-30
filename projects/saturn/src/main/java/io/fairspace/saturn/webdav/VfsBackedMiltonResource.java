@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.vfs.FileInfo;
+import io.fairspace.saturn.vfs.InvalidFilenameException;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
@@ -172,6 +173,9 @@ public abstract class VfsBackedMiltonResource implements
         log.error("A WebDAV operation resulted in an error", e);
         if (e instanceof AccessDeniedException) {
             throw new NotAuthorizedException(this, e);
+        }
+        if (e instanceof InvalidFilenameException) {
+            throw new BadRequestException(this, e.getMessage());
         }
         if (e instanceof FileSystemException) {
             throw new ConflictException(this, e.getMessage());
