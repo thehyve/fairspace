@@ -1,8 +1,8 @@
 import _, {mapValues} from 'lodash';
+import {isNonEmptyValue} from '@fairspace/shared-frontend';
 
 import * as consts from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import {isNonEmptyValue} from '../genericUtils';
 
 /**
  * Returns the local part of the given uri

@@ -12,10 +12,8 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-
-import MaterialReactSelect from '../common/components/MaterialReactSelect';
-import getDisplayName from "../common/utils/userUtils";
 import {AccessRights} from "../common/utils/permissionUtils";
+import UserSelect from "./UserSelect";
 
 export const styles = () => ({
     root: {
@@ -39,51 +37,6 @@ export const styles = () => ({
     },
 });
 
-/**
- * Disable options if a user is :
- *  - already a collaborator,
- *  - current logged user, or
- *  - owner of the collection
- * @param options
- * @param collaborators
- * @param currentUser
- * @returns {*}
- */
-const applyDisableFilter = (options, collaborators, currentUser) => options.map((option) => {
-    const isAlreadySelected = collaborators.find(c => c.user === option.value) !== undefined;
-    const isCurrentUser = option.value === currentUser.iri;
-    option.disabled = isAlreadySelected || isCurrentUser;
-    return option;
-});
-
-/**
- * Get user label by user object
- * @param user
- * @param options
- * @returns {string}
- */
-const getUserLabelByUser = (user, options) => {
-    let label = '';
-    if (options) {
-        const found = options.find(option => option.value === user);
-        label = found && found.label;
-    }
-    return label;
-};
-
-/**
- * Transform result to become react-select friendly array [{label: string, value: string}]
- * @param users
- * @returns {Array}
- */
-const transformUserToOptions = (users, collaborators, currentUser) => {
-    const tmp = users.map(r => ({
-        label: getDisplayName(r),
-        value: r.iri
-    }));
-    return applyDisableFilter(tmp, collaborators, currentUser);
-};
-
 export class AlterPermissionDialog extends React.Component {
     constructor(props) {
         super(props);
@@ -98,7 +51,7 @@ export class AlterPermissionDialog extends React.Component {
         const {access, user} = this.props;
         this.setState({
             accessRight: access || 'Read',
-            selectedUser: {value: user},
+            selectedUser: {iri: user},
             selectedUserLabel: ''
         });
     };
@@ -123,7 +76,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
         const {iri, alterPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.value, iri, accessRight);
+            alterPermission(selectedUser.iri, iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
@@ -149,37 +102,43 @@ export class AlterPermissionDialog extends React.Component {
         return 'No options';
     };
 
+    getName = iri => {
+        const {users} = this.props;
+        return users.find(u => u.iri === iri).name;
+    };
+
     renderUser = () => {
         const {user, users, collaborators, currentUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
 
-        let options = [];
-
-        if (users && collaborators) {
-            options = transformUserToOptions(users, collaborators, currentUser);
-            if (user) { // only render the label if user is passed into this component
-                return (
-                    <div>
-                        <Typography
-                            variant="subtitle1"
-                            gutterBottom
-                        >
-                            {getUserLabelByUser(user, options)}
-                        </Typography>
-                    </div>
-                );
-            }
+        // only render the label if user is passed into this component
+        if (users && collaborators && user) {
+            return (
+                <div>
+                    <Typography
+                        variant="subtitle1"
+                        gutterBottom
+                    >
+                        {this.getName(user)}
+                    </Typography>
+                </div>
+            );
         }
+
+        const isOptionDisabled = option => {
+            const isAlreadySelected = collaborators.find(c => c.user === option.iri) !== undefined;
+            const isCurrentUser = option.iri === currentUser.iri;
+            return isAlreadySelected || isCurrentUser;
+        };
 
         // otherwise render select user component
         return (
-            <MaterialReactSelect
-                options={options}
+            <UserSelect
                 onChange={this.handleSelectedUserChange}
                 placeholder="Please select a user"
                 value={selectedUser}
-                noOptionsMessage={this.getNoOptionMessage}
                 label={selectedUserLabel}
+                isOptionDisabled={isOptionDisabled}
             />
         );
     };

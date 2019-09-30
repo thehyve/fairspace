@@ -1,0 +1,46 @@
+{{ if .Values.rabbitmq.enabled -}}
+{{- $scripts := .Values.workspace.configurationScripts.rabbitmq -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}-rabbitmq-configuration"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}-rabbitmq-configuration"
+      labels:
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      {{- if .Values.fairspaceImagePullSecret }}
+      imagePullSecrets:
+          - name: {{ .Values.fairspaceImagePullSecret }}
+      {{- end }}
+      containers:
+      - name: configure-rabbitmq-job
+        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
+        imagePullPolicy: {{ $scripts.pullPolicy }}
+        resources:
+{{ toYaml $scripts.resources | indent 10 }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /home/config
+        command:
+          - "/home/scripts/configure-rabbitmq.sh"
+          - "/home/config/rabbitmq.conf"
+          - "/home/config/commands.txt"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{.Release.Name}}-rabbitmq-config-map"
+{{ end -}}

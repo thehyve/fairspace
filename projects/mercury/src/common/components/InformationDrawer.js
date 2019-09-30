@@ -8,6 +8,7 @@ import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
+import {ErrorDialog, UsersContext, MessageDisplay} from '@fairspace/shared-frontend';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "../../collections/CollectionDetails";
@@ -15,11 +16,8 @@ import LinkedDataEntityFormContainer from "../../metadata/common/LinkedDataEntit
 import PathMetadata from "../../metadata/metadata/PathMetadata";
 import * as metadataActions from "../redux/actions/metadataActions";
 import * as collectionActions from '../redux/actions/collectionActions';
-import ErrorDialog from './ErrorDialog';
 import {getPathInfoFromParams} from "../utils/fileUtils";
-import UsersContext from "../contexts/UsersContext";
 import getDisplayName from "../utils/userUtils";
-import MessageDisplay from './MessageDisplay';
 
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 

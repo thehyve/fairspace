@@ -79,7 +79,8 @@ installation.
 | Parameter  | Description  | Default |
 |---|---|---|
 | `nameOverride`  | Unique name for the workspace to install. Please note that if you override the name, also set `pluto.workspace.name` | <release name> |
-| `workspace.description`  | Human-friendly description of the purpose of the workspace | Workspace |
+| `workspace.name`  | Human-friendly name of the workspace | workspace |
+| `workspace.description`  | Description of the purpose of the workspace | Workspace |
 | `workspace.ingress.enabled`  | Whether or not an ingress is setup for the workspace components. Should be set to false when running locally.  | true |
 | `workspace.ingress.domain`   | Domain that is used for setting up the workspace. Is used as postfix for the hostname for the specific components.  | workspace.ci.test.fairdev.app  |
 | `workspace.ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for workspace  | true  |

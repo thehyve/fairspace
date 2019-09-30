@@ -1,8 +1,8 @@
 import {expand} from 'jsonld';
 import axios from 'axios';
+import {extractJsonData, handleHttpError} from '@fairspace/shared-frontend';
 
-import Config from "../common/services/Config/Config";
-import {handleHttpError, extractJsonData} from "../common/utils/httpUtils";
+import Config from "../common/services/Config";
 import {normalizeTypes, toJsonLd} from "../common/utils/linkeddata/jsonLdConverter";
 
 const requestOptions = {
@@ -135,6 +135,23 @@ class LinkedDataAPI {
     delete(subject) {
         return axios.delete(this.getStatementsUrl() + "?subject=" + encodeURIComponent(subject))
             .catch(handleHttpError("Failure when deleting subject"));
+    }
+
+    /**
+     * Retrieves a DOT notation of the linked data graph.
+     *
+     * Please note that the backend currently only supports a graph for the vocabulary
+     *
+     * @returns {Promise<AxiosResponse<T> | never>}
+     */
+    graph() {
+        const requestDotParams = {
+            headers: {Accept: 'text/vnd.graphviz'}
+        };
+
+        return axios.get(this.getStatementsUrl(), requestDotParams)
+            .then(response => response.data)
+            .catch(handleHttpError("Failure when retrieving graph"));
     }
 }
 

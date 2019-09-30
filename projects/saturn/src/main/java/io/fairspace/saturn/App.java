@@ -2,25 +2,15 @@ package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
+import io.fairspace.saturn.events.*;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
-import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
-import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
-import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
-import io.fairspace.saturn.services.metadata.ReadableMetadataService;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.InverseForUsedPropertiesValidator;
-import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
-import io.fairspace.saturn.services.metadata.validation.MetadataAndVocabularyConsistencyValidator;
-import io.fairspace.saturn.services.metadata.validation.PermissionCheckingValidator;
-import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
-import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
-import io.fairspace.saturn.services.metadata.validation.SystemVocabularyProtectingValidator;
+import io.fairspace.saturn.services.metadata.*;
+import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
 import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
@@ -31,6 +21,8 @@ import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
+import io.fairspace.saturn.webdav.WebdavEventEmitter;
+import io.milton.http.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
@@ -39,15 +31,13 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.SaturnSecurityHandler.userInfo;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
+import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
@@ -66,14 +56,16 @@ public class App {
 
         var eventBus = new EventBus();
 
-        var userService = new UserService(CONFIG.auth.groupsUrl, CONFIG.auth.workspaceLoginGroup, CONFIG.auth.usersUrlTemplate, TimeUnit.SECONDS.toMillis(CONFIG.auth.userListSynchronizationInterval), new DAO(rdf, null));
+        var userService = new UserService(CONFIG.auth.userUrlTemplate, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getSubjectClaim());
+
+        EventService eventService = setupEventService();
 
         var mailService = new MailService(CONFIG.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler, eventService);
 
-        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions);
+        var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions, eventService);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));
         var fs = new CompoundFileSystem(collections, Map.of(
                 ManagedFileSystem.TYPE, new ManagedFileSystem(rdf, blobStore, userIriSupplier, collections, eventBus),
@@ -87,7 +79,14 @@ public class App {
                 new PermissionCheckingValidator(permissions),
                 new ShaclValidator());
 
-        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, CONFIG.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator);
+        Consumer<MetadataEvent.Type> metadataEventConsumer = type ->
+            eventService.emitEvent(MetadataEvent.builder()
+                    .category(EventCategory.METADATA)
+                    .eventType(type)
+                    .build()
+            );
+
+        var metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, CONFIG.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -98,7 +97,14 @@ public class App {
         );
         var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
 
-        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
+        Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
+                eventService.emitEvent(MetadataEvent.builder()
+                        .category(EventCategory.VOCABULARY)
+                        .eventType(type)
+                        .build()
+                );
+
+        var userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
         var metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         var auth = CONFIG.auth;
@@ -109,7 +115,7 @@ public class App {
                 ? createAuthenticator(auth.jwksUrl, auth.jwtAlgorithm)
                 : new DummyAuthenticator(CONFIG.auth.developerRoles);
         var apiPathPrefix = "/api/" + API_VERSION;
-        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo.getSubjectClaim()));
+        var securityHandler = new SaturnSecurityHandler(apiPathPrefix, CONFIG.auth, authenticator, userInfo -> userService.onAuthorized(userInfo));
 
         FusekiServer.create()
                 .securityHandler(securityHandler)
@@ -122,11 +128,37 @@ public class App {
                         new PermissionsApp("/permissions", permissions),
                         new UserApp("/users", userService),
                         new HealthApp("/health")))
-                .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet("/webdav/" + API_VERSION + "/", fs))
+                .addServlet("/webdav/" + API_VERSION + "/*", new MiltonWebDAVServlet(
+                        "/webdav/" + API_VERSION + "/",
+                        fs,
+                        new WebdavEventEmitter(eventService)
+                ))
                 .port(CONFIG.port)
                 .build()
                 .start();
 
         log.info("Saturn has started");
+    }
+
+    private static EventService setupEventService() throws Exception {
+        if(CONFIG.rabbitMQ.enabled) {
+            try {
+                var eventService = new RabbitMQEventService(CONFIG.rabbitMQ, CONFIG.workspace.name, SaturnSecurityHandler::userInfo);
+                eventService.init();
+                return eventService;
+            } catch(Exception e) {
+                log.error("Error connecting to RabbitMQ", e);
+
+                if(CONFIG.rabbitMQ.required) {
+                   throw e;
+                }
+
+                log.warn("Continuing without event functionality");
+            }
+        } else {
+            log.warn("Logging to rabbitMQ is disabled due to configuration settings. Set rabbitMQ.enabled to true to enable logging");
+        }
+
+        return event -> log.trace("Logging events is disabled in configuration. Set rabbitMQ.enabled to true");
     }
 }

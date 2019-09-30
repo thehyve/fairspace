@@ -1,8 +1,9 @@
 import {createClient} from "webdav";
 import axios from 'axios';
-import Config from "../common/services/Config/Config";
+import {compareBy, comparing} from '@fairspace/shared-frontend';
+
+import Config from "../common/services/Config";
 import {generateUniqueFileName, getFileName, joinPaths} from '../common/utils/fileUtils';
-import {compareBy, comparing} from "../common/utils/genericUtils";
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};

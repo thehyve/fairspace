@@ -68,6 +68,10 @@ data:
           path: /api/${app.apiVersion.elasticSearch}/search/fairspace/_search/**
           url: {{ template "elasticsearch.resturl" . }}
           strip-prefix: true
+        keycloak:
+          path: /api/keycloak/**
+          url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}
+          strip-prefix: true
         storage:
           path: /webdav/${app.apiVersion.saturn}/**
           strip-prefix: false
@@ -79,3 +83,10 @@ data:
         ui:
           path: /**
           url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+
+    rabbitmq:
+      enabled: {{ .Values.rabbitmq.enabled }}
+      required: {{ .Values.rabbitmq.required }}
+      host: {{ .Values.hyperspace.rabbitmq.host }}
+      username: {{ .Values.rabbitmq.username }}
+      password: {{ .Values.rabbitmq.password }}

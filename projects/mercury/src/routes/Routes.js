@@ -1,18 +1,20 @@
 import React from 'react';
 import {Redirect, Route} from "react-router-dom";
+import {logout} from '@fairspace/shared-frontend';
 
+import Config from "../common/services/Config";
 import Home from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import Notebooks from "../notebooks/Notebooks";
 import FilesPage from "../file/FilesPage";
-import logout from "../common/services/logout";
 import SearchPage from '../search/SearchPage';
 import {createMetadataIri, createVocabularyIri} from "../common/utils/linkeddata/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
-import MetadataListPage from "../metadata/MetadataListPage";
-import VocabularyListPage from "../metadata/VocabularyListPage";
+import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
+import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import useSubject from '../common/hooks/UseSubject';
+import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 
 const routes = () => (
     <>
@@ -21,19 +23,19 @@ const routes = () => (
         <Route
             path="/collections"
             exact
-            render={({location}) => (
-                <MetadataWrapper location={location}>
+            render={() => (
+                <LinkedDataMetadataProvider>
                     <Collections />
-                </MetadataWrapper>
+                </LinkedDataMetadataProvider>
             )}
         />
 
         <Route
             path="/collections/:collection/:path(.*)?"
             render={(props) => (
-                <MetadataWrapper location={props.location}>
+                <LinkedDataMetadataProvider>
                     <FilesPage {...props} />
-                </MetadataWrapper>
+                </LinkedDataMetadataProvider>
             )}
         />
 
@@ -47,7 +49,7 @@ const routes = () => (
 
                 return (
                     <MetadataWrapper>
-                        {subject ? <LinkedDataEntityPage subject={subject} /> : <MetadataListPage />}
+                        {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataOverviewPage />}
                     </MetadataWrapper>
                 );
             }}
@@ -67,7 +69,7 @@ const routes = () => (
 
                 return (
                     <VocabularyWrapper>
-                        {subject ? <LinkedDataEntityPage subject={subject} /> : <VocabularyListPage />}
+                        {subject ? <LinkedDataEntityPage title="Vocabulary" subject={subject} /> : <VocabularyOverviewPage />}
                     </VocabularyWrapper>
                 );
             }}
@@ -80,8 +82,17 @@ const routes = () => (
         />
 
         <Route path="/login" render={() => {window.location.href = '/login';}} />
-        <Route path="/logout" render={logout} />
-        <Route path="/search" component={SearchPage} />
+        <Route
+            path="/logout"
+            render={() => logout({
+                logoutUrl: Config.get().urls.logout,
+                jupyterhubUrl: Config.get().urls.jupyterhub
+            })}
+        />
+        <Route
+            path="/search"
+            render={({location, history}) => <SearchPage location={location} history={history} />}
+        />
     </>
 );
 

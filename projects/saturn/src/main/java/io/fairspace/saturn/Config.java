@@ -27,6 +27,8 @@ public class Config {
 
     public final Workspace workspace = new Workspace();
 
+    public final RabbitMQ rabbitMQ = new RabbitMQ();
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
         public String vocabularyBaseIRI = "http://localhost/vocabulary/";
@@ -65,20 +67,27 @@ public class Config {
 
         public String sparqlRole = "sparql";
 
-        public String groupsUrl = "http://localhost:8080/api/v1/workspace/groups/";
-
-        public String workspaceLoginGroup = "workspace";
-
-        public String usersUrlTemplate = "http://localhost:5000/groups/%s/members";
-
-        public int userListSynchronizationInterval = 60;
+        public String userUrlTemplate = "http://localhost:5100/auth/admin/realms/ci/users/%s";
     }
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
     }
 
+    public static class RabbitMQ {
+        public boolean enabled = false;
+        public boolean required = true;
+
+        public String host = "localhost";
+        public int port = 5672;
+        public String username;
+        public String password;
+        public String virtualHost = "/";
+        public String exchangeName = "fairspace";
+    }
+
     public static class Workspace {
+        public String id = "workspace";
         public String name = "Workspace";
         public String version = "1.0.0";
     }

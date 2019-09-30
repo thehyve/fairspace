@@ -1,11 +1,11 @@
 import React from 'react';
 import {shallow} from "enzyme";
 import {List} from '@material-ui/core';
+import {MessageDisplay} from '@fairspace/shared-frontend';
 
 import LinkedDataEntityForm from "../LinkedDataEntityForm";
-import Config from "../../../common/services/Config/Config";
+import Config from "../../../common/services/Config";
 import {STRING_URI} from "../../../constants";
-import MessageDisplay from "../../../common/components/MessageDisplay";
 import LinkedDataProperty from "../LinkedDataProperty";
 
 describe('LinkedDataEntityForm', () => {

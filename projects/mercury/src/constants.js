@@ -12,9 +12,10 @@ export const COLLECTIONS_PATH = '/collections';
 export const METADATA_PATH = '/metadata';
 export const VOCABULARY_PATH = '/vocabulary';
 export const TOOLTIP_ENTER_DELAY = 350;
-
+export const DATE_FORMAT = 'dd/MM/yyyy';
 
 // Search
+export const ES_INDEX = 'fairspace';
 export const COLLECTION_SEARCH_TYPE = 'collections';
 export const FILES_SEARCH_TYPE = 'files';
 export const SEARCH_MAX_SIZE = 10000;
@@ -88,5 +89,6 @@ export const IMPORTANT_PROPERTY_URI = FAIRSPACE_NS + 'importantProperty';
 export const DEFAULT_NAMESPACE_URI = FAIRSPACE_NS + 'defaultNamespace';
 export const USABLE_IN_METADATA_URI = FAIRSPACE_NS + 'usableInMetadata';
 export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
+export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

@@ -1,10 +1,16 @@
+import {SearchAPI, SORT_DATE_CREATED} from "@fairspace/shared-frontend";
+
 import {COLLECTIONS_SEARCH, METADATA_SEARCH, VOCABULARY_SEARCH} from "./actionTypes";
 import {createErrorHandlingPromiseAction} from "../../utils/redux";
-import searchAPI, {SORT_DATE_CREATED} from "../../../search/SearchAPI";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE, ES_INDEX} from '../../../constants';
+import Config from "../../services/Config";
+
+const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
 export const searchCollections = createErrorHandlingPromiseAction((query) => ({
     type: COLLECTIONS_SEARCH,
-    payload: searchAPI().searchCollections(query),
+    payload: SearchAPI(Config.get(), ES_INDEX)
+        .search({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}),
     meta: {
         query
     }
@@ -12,10 +18,12 @@ export const searchCollections = createErrorHandlingPromiseAction((query) => ({
 
 export const searchMetadata = createErrorHandlingPromiseAction(({query, types, size, page}) => ({
     type: METADATA_SEARCH,
-    payload: searchAPI().searchLinkedData({types, query, size, page, sort: SORT_DATE_CREATED})
+    payload: SearchAPI(Config.get(), ES_INDEX)
+        .searchLinkedData({types, query, size, page, sort: SORT_DATE_CREATED})
 }));
 
 export const searchVocabulary = createErrorHandlingPromiseAction(({query, types, size, page}) => ({
     type: VOCABULARY_SEARCH,
-    payload: searchAPI().searchLinkedData({query, types, size, page, sort: SORT_DATE_CREATED})
+    payload: SearchAPI(Config.get(), ES_INDEX)
+        .searchLinkedData({query, types, size, page, sort: SORT_DATE_CREATED})
 }));

@@ -1,11 +1,12 @@
 import React from 'react';
 import Button from "@material-ui/core/Button";
+import {ErrorDialog, LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
-import {ErrorDialog, LoadingInlay, LoadingOverlay, MessageDisplay} from "../common/components";
+import {LoadingOverlay} from "../common/components";
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
-import Config from "../common/services/Config/Config";
+import Config from "../common/services/Config";
 
 export class CollectionBrowser extends React.Component {
     state = {

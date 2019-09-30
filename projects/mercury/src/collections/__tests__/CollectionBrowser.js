@@ -6,12 +6,12 @@ import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
+import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import CollectionBrowser from "../CollectionBrowser";
 import CollectionBrowserContainer from "../CollectionBrowserContainer";
-import Config from "../../common/services/Config/Config";
+import Config from "../../common/services/Config";
 import * as actionTypes from "../../common/redux/actions/actionTypes";
-import {LoadingInlay, MessageDisplay} from "../../common/components";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);

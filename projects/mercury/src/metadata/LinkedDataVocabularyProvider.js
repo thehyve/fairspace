@@ -1,5 +1,7 @@
 import React, {useContext} from 'react';
 import {connect} from 'react-redux';
+import {UserContext} from '@fairspace/shared-frontend';
+
 // Actions
 import {
     createVocabularyEntity, deleteVocabularyEntity, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded,
@@ -22,9 +24,8 @@ import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
-import Config from "../common/services/Config/Config";
+import Config from "../common/services/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
-import UserContext from "../common/contexts/UserContext";
 
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
@@ -100,7 +101,9 @@ const LinkedDataVocabularyProvider = ({
                 // Generic methods without reference to shapes
                 extendProperties,
                 getSearchResults: getLinkedDataSearchResults,
-                valueComponentFactory
+                valueComponentFactory,
+
+                vocabulary
             }}
         >
             {children}

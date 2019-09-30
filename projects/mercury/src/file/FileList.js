@@ -1,15 +1,12 @@
 import React, {useState} from 'react';
 import {
-    Table, TableHead, TableRow, TableCell,
-    TableBody, Typography, Icon,
+    Table, TableHead, TableRow, TableCell, TableBody, Typography, Icon,
     withStyles, Paper, Grid, Checkbox, TableSortLabel, TablePagination
 } from "@material-ui/core";
 import filesize from 'filesize';
+import {useSorting, usePagination, compareBy, formatDateTime, stableSort} from '@fairspace/shared-frontend';
 
-import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
 import styles from './FileList.styles';
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,

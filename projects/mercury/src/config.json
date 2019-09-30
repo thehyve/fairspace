@@ -18,6 +18,7 @@
       "statements": "/api/v1/meta-vocabulary/"
     },
     "users": "/api/v1/users/",
+    "userSearch": "/api/keycloak/users",
     "version": "/config/version.json"
   },
   "elasticsearch": {

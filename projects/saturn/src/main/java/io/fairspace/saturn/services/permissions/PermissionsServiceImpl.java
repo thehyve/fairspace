@@ -2,6 +2,8 @@ package io.fairspace.saturn.services.permissions;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import io.fairspace.saturn.events.EventService;
+import io.fairspace.saturn.events.PermissionEvent;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +39,16 @@ public class PermissionsServiceImpl implements PermissionsService {
     private final RDFConnection rdf;
     private final Supplier<Node> userIriSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
+    private final EventService eventService;
 
     @Override
     public void createResource(Node resource) {
         rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
+        eventService.emitEvent(PermissionEvent.builder()
+                .eventType(PermissionEvent.Type.RESOURCE_CREATED)
+                .resource(resource.getURI())
+                .build()
+        );
     }
 
     @Override
@@ -65,11 +73,23 @@ public class PermissionsServiceImpl implements PermissionsService {
                         "Regular metadata entities must be marked as write-restricted before granting permissions");
             }
 
+            PermissionEvent.Type eventType;
             if (access == Access.None) {
                 rdf.update(storedQuery("permissions_delete", resource, user));
+                eventType = PermissionEvent.Type.DELETED;
             } else {
                 rdf.update(storedQuery("permissions_set", resource, user, toNode(access)));
+                eventType = PermissionEvent.Type.UPDATED;
             }
+
+            eventService.emitEvent(PermissionEvent.builder()
+                    .eventType(eventType)
+                    .resource(resource.getURI())
+                    .otherUser(user.getURI())
+                    .access(access.toString())
+                    .build()
+            );
+
         });
 
         if(permissionChangeEventHandler != null)
@@ -109,6 +129,13 @@ public class PermissionsServiceImpl implements PermissionsService {
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {
                 rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
+
+                eventService.emitEvent(PermissionEvent.builder()
+                        .eventType(PermissionEvent.Type.UPDATED)
+                        .resource(resource.getURI())
+                        .access(restricted ? "writeRestricted" : "writeNotRestricted")
+                        .build()
+                );
             }
         });
     }

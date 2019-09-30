@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from '../App';
-import Config from "../common/services/Config/Config";
+import Config from "../common/services/Config";
 import configFile from "../config";
 
 beforeAll(() => {

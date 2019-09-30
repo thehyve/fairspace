@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
+import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
@@ -11,7 +12,6 @@ import * as fileActions from "../common/redux/actions/fileActions";
 import * as collectionActions from "../common/redux/actions/collectionActions";
 import * as consts from '../constants';
 import {getCollectionAbsolutePath} from "../common/utils/collectionUtils";
-import BreadCrumbs from "../common/components/breadcrumbs/BreadCrumbs";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 
 export const FilesPage = (props) => {
@@ -20,6 +20,18 @@ export const FilesPage = (props) => {
         deselectPath, renameFile, selectPaths, deselectAllPaths,
         history
     } = props;
+
+    // Determine breadcrumbs. If a collection is opened, show the full path
+    // Otherwise, show a temporary breadcrumb
+    const pathSegments = splitPathIntoArray(openedPath);
+    const breadcrumbSegments = (openedCollection && openedCollection.name)
+        ? pathSegments.map((segment, idx) => ({
+            label: idx === 0 ? openedCollection.name : segment,
+            href: consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
+        }))
+        : [{label: '...', href: consts.COLLECTIONS_PATH + openedPath}];
+
+    usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
     // Fetch collections on mount
     useEffect(() => {
@@ -34,16 +46,6 @@ export const FilesPage = (props) => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [openedPath, openedCollection.connectionString]);
-
-    // Determine breadcrumbs. If a collection is opened, show the full path
-    // Otherwise, show a temporary breadcrumb
-    const pathSegments = splitPathIntoArray(openedPath);
-    const breadcrumbSegments = (openedCollection && openedCollection.name)
-        ? pathSegments.map((segment, idx) => ({
-            label: idx === 0 ? openedCollection.name : segment,
-            href: consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
-        }))
-        : [{label: '...', href: consts.COLLECTIONS_PATH + openedPath}];
 
     const handleCollectionLocationChange = (location) => {
         // If the collection location changes, the URI for the current page should change as well

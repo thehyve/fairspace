@@ -1,7 +1,7 @@
 import React from 'react';
+import {BreadcrumbsContext} from "@fairspace/shared-frontend";
 import LinkedDataVocabularyProvider from './LinkedDataVocabularyProvider';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
-import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 
 export const MetadataWrapper = ({children}) => (
     <BreadcrumbsContext.Provider value={{segments: [{label: 'Metadata', href: '/metadata', icon: 'assignment'}]}}>

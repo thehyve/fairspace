@@ -1,6 +1,6 @@
+import {testNoChangedOnUnknownActionType} from "@fairspace/shared-frontend";
 import reducer from '../collectionReducers';
 import * as actionTypes from '../../../actions/actionTypes';
-import {testNoChangedOnUnknownActionType} from '../../../../utils/testUtils';
 
 testNoChangedOnUnknownActionType('Collections reducers', reducer);
 

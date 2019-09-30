@@ -28,7 +28,7 @@ spec:
       {{- end }}
       containers:
       - name: configure-keycloak-job
-        image: "{{ $scripts.image }}"
+        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
         imagePullPolicy: {{ $scripts.pullPolicy }}
         resources:
 {{ toYaml $scripts.resources | indent 10 }}

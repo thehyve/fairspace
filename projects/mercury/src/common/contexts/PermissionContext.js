@@ -1,7 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
+import {UsersContext} from '@fairspace/shared-frontend';
+
 import PermissionAPI from "../../permissions/PermissionAPI";
 import getDisplayName from "../utils/userUtils";
-import UsersContext from "./UsersContext";
 
 const PermissionContext = React.createContext({});
 

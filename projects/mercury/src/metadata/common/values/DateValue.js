@@ -2,6 +2,8 @@ import React from 'react';
 import {DatePicker} from "material-ui-pickers";
 import {format} from 'date-fns';
 
+import {DATE_FORMAT} from '../../../constants';
+
 class DateValue extends React.Component {
     constructor(props) {
         super(props);
@@ -17,7 +19,7 @@ class DateValue extends React.Component {
 
     handleChange = (date) => {
         // Formatting is required because the backend expect the date with no time
-        const value = format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
+        const value = date && format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
         this.props.onChange({value});
     }
 
@@ -30,6 +32,10 @@ class DateValue extends React.Component {
 
         return (
             <DatePicker
+                showTodayButton
+                openTo="year"
+                format={DATE_FORMAT}
+                views={["year", "month", "day"]}
                 {...otherProps}
                 value={this.state.value}
                 onChange={this.handleChange}

@@ -1,16 +1,18 @@
 import React, {useContext, useState} from "react";
+import {UsersContext, UserContext} from '@fairspace/shared-frontend';
 
 import PermissionContext from "../common/contexts/PermissionContext";
-import UserContext from '../common/contexts/UserContext';
-import UsersContext from '../common/contexts/UsersContext';
 import PermissionAPI from "./PermissionAPI";
 import PermissionsViewer from "./PermissionsViewer";
+import {createMetadataIri} from "../common/utils/linkeddata/metadataUtils";
 
 export default (props) => {
     const {permissions, loading: permissionsLoading, error: permissionsError, refresh} = useContext(PermissionContext);
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {usersLoading, usersError} = useContext(UsersContext);
     const [altering, setAltering] = useState(false);
+
+    const currentUserWithIri = {...currentUser, iri: createMetadataIri(currentUser.id)};
 
     const alterPermission = (userIri, resourceIri, access) => {
         setAltering(true);
@@ -28,7 +30,7 @@ export default (props) => {
             altering={altering}
             permissions={permissions}
             alterPermission={alterPermission}
-            currentUser={currentUser}
+            currentUser={currentUserWithIri}
             {...props}
         />
     );

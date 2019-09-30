@@ -46,11 +46,8 @@ auth:
   # Role name for data stewards, who are allowed to modify the vocabulary
   dataStewardRole: "datasteward"
   # Role name for users who are allowed to perform SPARQL queries
-  groupsUrl: "http://localhost:5000/groups"
-  workspaceLoginGroup: "workspace-users"
   sparqlRole: "sparql"
-  usersUrlTemplate: "http://localhost:5000/groups/%s/members"
-  userListSynchronizationInterval: 60
+  userUrlTemplate: "http://localhost:5100/auth/admin/realms/ci/users/%s"
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
@@ -63,3 +60,8 @@ mail:
   mail.smtp.host: host
   mail.smtp.port: 587
   mail.smtp.starttls.enable: true
+rabbitMQ:
+  enabled: true
+  required: true
+  username: fairspace
+  password: test

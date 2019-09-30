@@ -5,7 +5,12 @@ hyperspace:
     username: keycloak
     password: keycloak-demo-123
     realm: demo
+    clientId: workspace-demo-pluto
     clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
+  rabbitmq:
+    host: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
+    username: rabbitmq
+    password: gtzb28355LFqxbar
   elasticsearch:
     enabled: true
     indexName: workspace-demo
@@ -16,6 +21,7 @@ hyperspace:
 
 # Settings for the workspace
 workspace:
+  name: "Demo Workspace"
   description: "Demo Workspace"
   ingress:
     domain: workspace.demo.fairway.app
@@ -50,3 +56,6 @@ saturn:
     mail.smtp.port: 587
     mail.smtp.starttls.enable: true
 
+rabbitmq:
+  username: workspace-demo
+  password: "3peju6WHfUYgCvJD"
