@@ -1,4 +1,4 @@
-import {SearchAPI, SORT_DATE_CREATED} from "@fairspace/shared-frontend";
+import {SearchAPI, handleSearchError, SORT_DATE_CREATED} from "@fairspace/shared-frontend";
 
 import {COLLECTIONS_SEARCH, METADATA_SEARCH, VOCABULARY_SEARCH} from "./actionTypes";
 import {createErrorHandlingPromiseAction} from "../../utils/redux";

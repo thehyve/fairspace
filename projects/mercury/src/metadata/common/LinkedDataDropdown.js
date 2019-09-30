@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {PropTypes} from 'prop-types';
-import {LoadingInlay, MessageDisplay, SearchAPI, SORT_ALPHABETICALLY} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay, SearchAPI, handleSearchError, SORT_ALPHABETICALLY} from '@fairspace/shared-frontend';
 
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
