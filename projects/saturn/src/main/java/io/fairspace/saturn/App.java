@@ -58,12 +58,13 @@ public class App {
 
         var userService = new UserService(CONFIG.auth.userUrlTemplate, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getSubjectClaim());
+        Supplier<Boolean> hasFullAccessSupplier = () -> userInfo().getAuthorities().contains(CONFIG.auth.fullAccessRole);
 
         EventService eventService = setupEventService();
 
         var mailService = new MailService(CONFIG.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler, eventService);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions, eventService);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));

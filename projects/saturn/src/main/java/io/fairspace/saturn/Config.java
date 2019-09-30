@@ -67,6 +67,8 @@ public class Config {
 
         public String sparqlRole = "sparql";
 
+        public String fullAccessRole = "coordinator";
+
         public String userUrlTemplate = "http://localhost:5100/auth/admin/realms/ci/users/%s";
     }
 

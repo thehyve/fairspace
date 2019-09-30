@@ -123,6 +123,27 @@ public class SaturnSecurityHandlerTest {
     }
 
     @Test
+    public void anythingCanBeAccessedByCoordinator() throws IOException, ServletException {
+        var token = new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("coordinator")));
+        when(authenticator.apply(eq(request))).thenReturn(token, token, token, token);
+
+        handler.handle("/api/v1/metadata/", baseRequest, request, response);
+        verifyAuthenticated(true);
+        reset(onAuthorized, nextHandler);
+
+        handler.handle("/webdav/v1/", baseRequest, request, response);
+        verifyAuthenticated(true);
+        reset(onAuthorized, nextHandler);
+
+        handler.handle("/api/v1/rdf/", baseRequest, request, response);
+        verifyAuthenticated(true);
+        reset(onAuthorized, nextHandler);
+
+        handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
+        verifyAuthenticated(true);
+    }
+
+    @Test
     public void errorMessageIsSentCorrectly() throws IOException, ServletException {
         when(authenticator.apply(eq(request))).thenReturn(null);
 

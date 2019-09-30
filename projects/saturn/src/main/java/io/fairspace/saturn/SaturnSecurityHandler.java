@@ -29,6 +29,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private final String workspaceUserRole;
     private final String sparqlRole;
     private final String dataStewardRole;
+    private final String fullAccessRole;
     private final Consumer<OAuthAuthenticationToken> onAuthorized;
 
     /**
@@ -55,6 +56,7 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
         this.workspaceUserRole = config.workspaceUserRole;
         this.sparqlRole = config.sparqlRole;
         this.dataStewardRole = config.dataStewardRole;
+        this.fullAccessRole = config.fullAccessRole;
     }
 
     @Override
@@ -85,16 +87,19 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
             request.setAttribute(USER_INFO_REQUEST_ATTRIBUTE, userInfo);
             var authorities = userInfo.getAuthorities();
 
-            if (!authorities.contains(workspaceUserRole)) {
-                return "Not a workspace user";
-            } else if (pathInContext.startsWith(sparqlResource)) {
-                if (!authorities.contains(sparqlRole)) {
-                    return "User is not allowed to access the SPARQL endpoint";
+            // Certain users with a specific role are allowed to do anything within a workspace
+            if (!authorities.contains(fullAccessRole)) {
+                if (!authorities.contains(workspaceUserRole)) {
+                    return "Not a workspace user";
+                } else if (pathInContext.startsWith(sparqlResource)) {
+                    if (!authorities.contains(sparqlRole)) {
+                        return "User is not allowed to access the SPARQL endpoint";
+                    }
+                } else if (pathInContext.startsWith(vocabularyResource)
+                        && RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod())
+                        && !authorities.contains(dataStewardRole)) {
+                    return "Only data stewards can edit the vocabulary";
                 }
-            } else if (pathInContext.startsWith(vocabularyResource)
-                    && RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod())
-                    && !authorities.contains(dataStewardRole)) {
-                return "Only data stewards can edit the vocabulary";
             }
 
             if (onAuthorized != null) {
