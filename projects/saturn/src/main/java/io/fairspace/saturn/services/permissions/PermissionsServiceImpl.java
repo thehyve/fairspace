@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -38,7 +39,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private final RDFConnection rdf;
     private final Supplier<Node> userIriSupplier;
-    private final Supplier<Boolean> hasFullAccessSupplier;
+    private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final EventService eventService;
 
@@ -100,7 +101,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if(hasFullAccessSupplier.get()) {
+        if(hasFullAccessSupplier.getAsBoolean()) {
             return;
         }
 
@@ -157,7 +158,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if(hasFullAccessSupplier.get()) {
+        if(hasFullAccessSupplier.getAsBoolean()) {
             return;
         }
 
@@ -212,7 +213,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource
-        if(hasFullAccessSupplier.get()) {
+        if(hasFullAccessSupplier.getAsBoolean()) {
             authorities.forEach(node -> result.put(node, Access.Manage));
             return result;
         }

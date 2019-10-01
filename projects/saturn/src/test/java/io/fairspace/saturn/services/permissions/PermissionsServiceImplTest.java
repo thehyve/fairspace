@@ -48,7 +48,7 @@ public class PermissionsServiceImplTest {
 
     private Node currentUser = USER1;
 
-    private Boolean isCoordinator = false;
+    private boolean isCoordinator = false;
 
     @Before
     public void setUp() {
