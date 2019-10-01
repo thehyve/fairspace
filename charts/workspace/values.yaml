@@ -93,7 +93,7 @@ workspace:
         enabled: true
         dockerRepository: eu.gcr.io
         image: fairspace-207108/keycloak-configuration
-        configurationScriptsTag: 0.1.7
+        configurationScriptsTag: 0.1.8
         pullPolicy: IfNotPresent
         resources:
             requests:

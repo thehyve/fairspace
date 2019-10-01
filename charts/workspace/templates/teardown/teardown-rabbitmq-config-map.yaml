@@ -1,0 +1,23 @@
+{{- if .Values.rabbitmq.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{.Release.Name}}-rabbitmq-teardown"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded
+data:
+  rabbitmq.conf: |-
+    [default]
+    hostname = {{ .Values.hyperspace.rabbitmq.host }}
+    username = {{ .Values.hyperspace.rabbitmq.username }}
+    password = {{ .Values.hyperspace.rabbitmq.password }}
+  commands.txt: |-
+    delete permission vhost=/ user={{ .Values.rabbitmq.username }}
+    delete user name={{ .Values.rabbitmq.username }}
+{{- end -}}
