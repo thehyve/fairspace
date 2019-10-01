@@ -9,26 +9,29 @@ public class BaseFileSystemTest {
     @Test
     public void containsInvalidBaseName() {
         // Allow regular filenames
-        assertFalse(BaseFileSystem.containsInvalidBaseName("/test/some/dir/file.txt"));
-        assertFalse(BaseFileSystem.containsInvalidBaseName("/test/some/dir/file23421 - _ABD.txt.some.more.extensions"));
+        assertFalse(BaseFileSystem.containsInvalidPathName("/test/some/dir/file.txt"));
+        assertFalse(BaseFileSystem.containsInvalidPathName("/test/some/dir/file23421 - _ABD.txt.some.more.extensions"));
 
         // Allow unicode characters
-        assertFalse(BaseFileSystem.containsInvalidBaseName("/test/some/dir/⺲⺳⺴⺵⺶⺷⺸⺹⺺⺻⺼⺽"));
+        assertFalse(BaseFileSystem.containsInvalidPathName("/test/some/dir/⺲⺳⺴⺵⺶⺷⺸⺹⺺⺻⺼⺽"));
 
-        // Only tests the basename
-        assertFalse(BaseFileSystem.containsInvalidBaseName("/test/some/[]/test.txt"));
+        // Tests the full path
+        assertTrue(BaseFileSystem.containsInvalidPathName("/test/some/[]/test.txt"));
 
         // Disallow special characters
-        assertTrue(BaseFileSystem.containsInvalidBaseName("/test/some/dir/["));
-        assertTrue(BaseFileSystem.containsInvalidBaseName("/test/some/dir/^"));
-        assertTrue(BaseFileSystem.containsInvalidBaseName("/test/some/dir/&@?"));
+        assertTrue(BaseFileSystem.containsInvalidPathName("/test/some/dir/["));
+        assertTrue(BaseFileSystem.containsInvalidPathName("/test/some/dir/^"));
+        assertTrue(BaseFileSystem.containsInvalidPathName("/test/some/dir/&@?"));
 
         // Handle only slashes as filename
-        assertTrue(BaseFileSystem.containsInvalidBaseName("/test/some/dir/\\\\"));
+        assertTrue(BaseFileSystem.containsInvalidPathName("/test/some/dir/\\\\"));
+
+        // Allows multiple forward slashes
+        assertFalse(BaseFileSystem.containsInvalidPathName("/test/some/dir///test///"));
 
         // Handle trailing slash correctly
-        assertFalse(BaseFileSystem.containsInvalidBaseName("/test/some/abc/test.txt/"));
-        assertTrue(BaseFileSystem.containsInvalidBaseName("/test/some/abc/[]/"));
+        assertFalse(BaseFileSystem.containsInvalidPathName("/test/some/abc/test.txt/"));
+        assertTrue(BaseFileSystem.containsInvalidPathName("/test/some/abc/[]/"));
 
     }
 }

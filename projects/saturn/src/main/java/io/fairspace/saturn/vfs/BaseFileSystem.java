@@ -21,16 +21,11 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     // https://blogs.msdn.microsoft.com/robert_mcmurray/2011/04/27/bad-characters-to-use-in-web-based-filenames/
     // and is mainly based on characters that should not be in a URI
     private static final Character[] INVALID_BASENAME_CHARACTERS = {
-            ';', '/', '?', ':', '@',
+            ';', '?', ':', '@',
             '&', '=', '+', '$', ',',
             '<', '>', '#', '%', '"',
             '{', '}', '|', '\\', '^', '[', ']', '`'
     };
-
-    // Regex to extract the basename from a path. It can handle
-    // trailing slashes as well as filenames consisting of
-    // only backslashes (\\\)
-    private static final String BASENAME_REGEX = "^.*?([^/]+)/*$";
 
     private static final FileInfo ROOT = FileInfo.builder()
             .path("")
@@ -158,16 +153,14 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
             throw new AccessDeniedException("Use Collections API for operations on collections");
         }
 
-        if (containsInvalidBaseName(path)) {
-            throw new InvalidFilenameException("The given filename contains invalid special characters");
+        if (containsInvalidPathName(path)) {
+            throw new InvalidFilenameException("The given path name contains invalid special characters");
         }
     }
 
-    static boolean containsInvalidBaseName(String path) {
-        String baseName = path.replaceFirst(BASENAME_REGEX, "$1");
-
+    static boolean containsInvalidPathName(String path) {
         return Stream.of(INVALID_BASENAME_CHARACTERS)
-                .anyMatch(character -> baseName.indexOf(character) > -1);
+                .anyMatch(character -> path.indexOf(character) > -1);
     }
 
     private static FileInfo fileInfo(Collection collection) {
