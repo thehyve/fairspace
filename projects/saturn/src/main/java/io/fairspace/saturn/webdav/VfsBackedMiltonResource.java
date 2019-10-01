@@ -170,19 +170,26 @@ public abstract class VfsBackedMiltonResource implements
     }
 
     void onException(Exception e) throws NotAuthorizedException, BadRequestException, ConflictException {
-        log.error("A WebDAV operation resulted in an error", e);
+        String errorMessage = "A WebDAV operation resulted in an error: {}";
+
         if (e instanceof AccessDeniedException) {
+            log.info(errorMessage, e.getMessage());
             throw new NotAuthorizedException(this, e);
         }
         if (e instanceof InvalidFilenameException) {
+            log.info(errorMessage, e.getMessage());
             throw new BadRequestException(this, e.getMessage());
         }
         if (e instanceof FileSystemException) {
+            log.info(errorMessage, e.getMessage());
             throw new ConflictException(this, e.getMessage());
         }
         if (e instanceof RuntimeException) {
+            log.error(errorMessage, e);
             throw (RuntimeException) e;
         }
+
+        log.error(errorMessage, e);
         throw new RuntimeException(e);
     }
 
