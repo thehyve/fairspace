@@ -2,7 +2,10 @@ package io.fairspace.saturn;
 
 import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.auth.DummyAuthenticator;
-import io.fairspace.saturn.events.*;
+import io.fairspace.saturn.events.EventCategory;
+import io.fairspace.saturn.events.EventService;
+import io.fairspace.saturn.events.MetadataEvent;
+import io.fairspace.saturn.events.RabbitMQEventService;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsApp;
@@ -22,7 +25,6 @@ import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import io.fairspace.saturn.webdav.MiltonWebDAVServlet;
 import io.fairspace.saturn.webdav.WebdavEventEmitter;
-import io.milton.http.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.graph.Node;
@@ -31,6 +33,7 @@ import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import java.io.File;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -58,12 +61,13 @@ public class App {
 
         var userService = new UserService(CONFIG.auth.userUrlTemplate, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfo().getSubjectClaim());
+        BooleanSupplier hasFullAccessSupplier = () -> userInfo().getAuthorities().contains(CONFIG.auth.fullAccessRole);
 
         EventService eventService = setupEventService();
 
         var mailService = new MailService(CONFIG.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, CONFIG.publicUrl);
-        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, permissionNotificationHandler, eventService);
+        var permissions = new PermissionsServiceImpl(rdf, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
         var collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissions, eventService);
         var blobStore = new LocalBlobStore(new File(CONFIG.webDAV.blobStorePath));

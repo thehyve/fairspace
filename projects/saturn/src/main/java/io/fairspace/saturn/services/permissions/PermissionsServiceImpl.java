@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -38,6 +39,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     private final RDFConnection rdf;
     private final Supplier<Node> userIriSupplier;
+    private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final EventService eventService;
 
@@ -98,6 +100,11 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
+        // Organisation admins are allowed to do anything
+        if(hasFullAccessSupplier.getAsBoolean()) {
+            return;
+        }
+
         // Check access control in batches as the SPARQL queries do not
         // accept an arbitrary number of parameters
         partition(nodes, BATCH_SIZE)
@@ -150,6 +157,11 @@ public class PermissionsServiceImpl implements PermissionsService {
     }
 
     private void ensureAccess(Node resource, Access access) {
+        // Organisation admins are allowed to do anything
+        if(hasFullAccessSupplier.getAsBoolean()) {
+            return;
+        }
+
         if (getPermission(resource).compareTo(access) < 0) {
             throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource), resource);
         }
@@ -198,6 +210,14 @@ public class PermissionsServiceImpl implements PermissionsService {
      */
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
+
+        // Organisation admins are allowed to do anything, so they have manage right
+        // to any resource
+        if(hasFullAccessSupplier.getAsBoolean()) {
+            authorities.forEach(node -> result.put(node, Access.Manage));
+            return result;
+        }
+
         rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userIriSupplier.get()),
                 row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
         return result;

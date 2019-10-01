@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,12 +48,17 @@ public class PermissionsServiceImplTest {
 
     private Node currentUser = USER1;
 
+    private boolean isCoordinator = false;
+
     @Before
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, permissionChangeEventHandler, event -> {});
+        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
         service.createResource(RESOURCE);
+
+        currentUser = USER1;
+        isCoordinator = false;
     }
 
     @Test
@@ -272,6 +278,27 @@ public class PermissionsServiceImplTest {
         currentUser = USER2;
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Write);
+    }
+
+    @Test
+    public void testEnsureAccessForCoordinator() {
+        isCoordinator = true;
+
+        service.ensureAccess(Set.of(RESOURCE), Access.Manage);
+        service.ensureAccess(Set.of(RESOURCE2), Access.Manage);
+    }
+
+    @Test
+    public void getPermissionsForOrganisationAdmins() {
+        isCoordinator = true;
+
+        assertEquals(
+                Map.of(
+                        RESOURCE, Access.Manage,
+                        RESOURCE2, Access.Manage
+                ),
+                service.getPermissions(Set.of(RESOURCE, RESOURCE2))
+        );
     }
 
     @Test
