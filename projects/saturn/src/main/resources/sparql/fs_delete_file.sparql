@@ -1,0 +1,17 @@
+# Deletes a file
+#
+# 0 - path
+# 1 - deletedBy
+
+PREFIX fs: <http://fairspace.io/ontology#>
+
+INSERT {
+  ?s fs:dateDeleted ?date;
+  fs:deletedBy %2$s;
+}
+WHERE {
+  ?s fs:filePath %1$s.
+
+  FILTER NOT EXISTS { ?s fs:dateDeleted ?dateDeleted }
+  BIND(NOW() as ?date)
+};

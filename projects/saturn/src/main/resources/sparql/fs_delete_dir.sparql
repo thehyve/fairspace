@@ -1,4 +1,4 @@
-# Deletes a file or a directory
+# Deletes a directory
 #
 # 0 - path
 # 1 - deletedBy
