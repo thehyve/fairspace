@@ -7,10 +7,9 @@ import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors, getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
 import {getVocabulary} from "../common/redux/reducers/cache/vocabularyReducers";
 
-const useFormSubmission = (submitFunc, subject) => {
+export const useFormSubmission = (submitFunc, subject, namespaces) => {
     const [isUpdating, setUpdating] = useState(false);
     const isMounted = useIsMounted();
-    const namespaces = useSelector(state => getVocabulary(state).getNamespaces());
 
     const toNamespaced = iri => !!iri && getNamespacedIri(iri, namespaces);
 
@@ -20,9 +19,9 @@ const useFormSubmission = (submitFunc, subject) => {
         predicate: toNamespaced(error.predicate)
     });
 
-    const onFormSubmissionError = (error, id) => {
+    const onFormSubmissionError = (error) => {
         if (error.details) {
-            const partitionedErrors = partitionErrors(error.details, id);
+            const partitionedErrors = partitionErrors(error.details, subject);
             const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
             const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
 
@@ -36,11 +35,16 @@ const useFormSubmission = (submitFunc, subject) => {
         setUpdating(true);
 
         submitFunc()
-            .catch(e => onFormSubmissionError(e, subject))
+            .catch(onFormSubmissionError)
             .then(() => isMounted() && setUpdating(false));
     };
 
     return {isUpdating, submitForm};
 };
 
-export default useFormSubmission;
+const useStatefulFormSubmission = (submitFunc, subject) => {
+    const namespaces = useSelector(state => getVocabulary(state).getNamespaces());
+    return useFormSubmission(submitFunc, subject, namespaces);
+};
+
+export default useStatefulFormSubmission;
