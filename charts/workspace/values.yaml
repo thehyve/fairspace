@@ -119,7 +119,7 @@ workspace:
 
 # Generic settings for tracing
 tracing:
-  enabled: true
+  enabled: false
   samplingRate: 0.1
   baseUrl: http://jaeger-collector.jaeger:9411
 
