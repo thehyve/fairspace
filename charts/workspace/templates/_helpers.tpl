@@ -136,7 +136,7 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 
 {{- define "workspace.roles.sparql" -}}
-{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparql-%s" (include "workspace.name" .)) }}
+{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparqluser-%s" (include "workspace.name" .)) }}
 {{- end -}}
 
 {{- define "workspace.roles.datasteward" -}}
