@@ -156,6 +156,8 @@ class FileAPI {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
+                        case 400:
+                            throw new Error("Could not move one or more files. Possibly the filename contains special characters.");
                         case 403:
                             throw new Error("Could not move one or more files. Do you have write permission to both the source and destination collection?");
                         case 409:

@@ -61,3 +61,12 @@ describe('createDirectory', () => {
         return expect(FileAPI.createDirectory("/test")).rejects.toEqual(new Error("A directory or file with this name already exists. Please choose another name"));
     });
 });
+
+describe('move', () => {
+    it('should result in a clear error on 400 response', () => {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.reject({response: {status: 400}}))};
+
+        return expect(FileAPI.move("/test", "special-characters")).rejects.toEqual(new Error("Could not move one or more files. Possibly the filename contains special characters."));
+    });
+});
