@@ -3,18 +3,14 @@ package io.fairspace.saturn.services.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.auth.SecurityUtil.authorizationHeader;
 import static io.fairspace.saturn.rdf.SparqlUtils.extractIdFromIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;

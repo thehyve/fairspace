@@ -8,7 +8,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.saturn.Config;
+import io.fairspace.saturn.config.Config;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 

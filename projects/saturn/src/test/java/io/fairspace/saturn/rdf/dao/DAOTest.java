@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.fairspace.saturn.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
