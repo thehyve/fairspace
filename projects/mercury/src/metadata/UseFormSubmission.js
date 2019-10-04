@@ -1,31 +1,51 @@
 import {useState} from "react";
+import {useSelector} from "react-redux";
 import useIsMounted from "react-is-mounted-hook";
 import {ErrorDialog} from "@fairspace/shared-frontend";
 
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
-import {partitionErrors} from "../common/utils/linkeddata/metadataUtils";
+import {partitionErrors, getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
+import {getVocabulary} from "../common/redux/reducers/cache/vocabularyReducers";
 
-const onFormSubmissionError = (e, id) => {
-    if (e.details) {
-        ErrorDialog.renderError(ValidationErrorsDisplay, partitionErrors(e.details, id), e.message);
-    } else {
-        ErrorDialog.showError(e, `Error saving entity.\n${e.message}`);
-    }
-};
-
-const useFormSubmission = (submitFunc, subject) => {
+export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);
     const isMounted = useIsMounted();
+
+    // from the full IRI to the shortcut/namespaced IRI
+    const toNamespaced = iri => !!iri && getNamespacedIri(iri, namespaces);
+
+    const withNamespacedProperties = (error) => ({
+        ...error,
+        subject: toNamespaced(error.subject),
+        predicate: toNamespaced(error.predicate)
+    });
+
+    const onFormSubmissionError = (error) => {
+        if (error.details) {
+            const partitionedErrors = partitionErrors(error.details, subject);
+            const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
+            const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
+
+            errorDialog.renderError(ValidationErrorsDisplay, {otherErrors, entityErrors}, error.message);
+        } else {
+            errorDialog.showError(error, `Error saving entity.\n${error.message}`);
+        }
+    };
 
     const submitForm = () => {
         setUpdating(true);
 
         submitFunc()
-            .catch(e => onFormSubmissionError(e, subject))
+            .catch(onFormSubmissionError)
             .then(() => isMounted() && setUpdating(false));
     };
 
     return {isUpdating, submitForm};
 };
 
-export default useFormSubmission;
+const useStatefulFormSubmission = (submitFunc, subject) => {
+    const namespaces = useSelector(state => getVocabulary(state).getNamespaces());
+    return useFormSubmission(submitFunc, subject, namespaces);
+};
+
+export default useStatefulFormSubmission;
