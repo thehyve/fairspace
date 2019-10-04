@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;

@@ -2,6 +2,7 @@ package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.config.ConfigLoader;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;

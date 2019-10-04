@@ -1,8 +1,8 @@
 package io.fairspace.saturn.rdf;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.saturn.Config;
 import io.fairspace.saturn.commits.CommitMessages;
+import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;

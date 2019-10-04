@@ -1,4 +1,4 @@
-package io.fairspace.saturn;
+package io.fairspace.saturn.config;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
