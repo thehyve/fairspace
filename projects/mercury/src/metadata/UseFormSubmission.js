@@ -7,10 +7,11 @@ import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors, getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
 import {getVocabulary} from "../common/redux/reducers/cache/vocabularyReducers";
 
-export const useFormSubmission = (submitFunc, subject, namespaces) => {
+export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);
     const isMounted = useIsMounted();
 
+    // from the full IRI to the shortcut/namespaced IRI
     const toNamespaced = iri => !!iri && getNamespacedIri(iri, namespaces);
 
     const withNamespacedProperties = (error) => ({
@@ -25,9 +26,9 @@ export const useFormSubmission = (submitFunc, subject, namespaces) => {
             const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
             const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
 
-            ErrorDialog.renderError(ValidationErrorsDisplay, {otherErrors, entityErrors}, error.message);
+            errorDialog.renderError(ValidationErrorsDisplay, {otherErrors, entityErrors}, error.message);
         } else {
-            ErrorDialog.showError(error, `Error saving entity.\n${error.message}`);
+            errorDialog.showError(error, `Error saving entity.\n${error.message}`);
         }
     };
 

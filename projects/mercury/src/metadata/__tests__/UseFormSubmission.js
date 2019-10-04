@@ -1,9 +1,6 @@
-import React from 'react';
 import {renderHook} from "@testing-library/react-hooks";
 import {act} from 'react-test-renderer';
 
-import {ErrorDialog} from "@fairspace/shared-frontend";
-import {render} from "@testing-library/react";
 import {useFormSubmission} from "../UseFormSubmission";
 
 describe('UseFormSubmission', () => {
@@ -21,24 +18,44 @@ describe('UseFormSubmission', () => {
         expect(submitFunc.mock.calls.length).toEqual(1);
     });
 
-    // it('should show the custom error component', () => {
-    //     // eslint-disable-next-line prefer-promise-reject-errors
-    //     const submitFunc = jest.fn(() => Promise.reject({details: {}}));
+    it('should show the custom error component for validation errors (error with details object)', async () => {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        const submitFunc = jest.fn(() => Promise.reject({details: {}}));
+        const errorDialogMock = {
+            showError: jest.fn(),
+            renderError: jest.fn()
+        };
+        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
 
-    //     const SubmitFormCmp = (props) => {
-    //         const {submitForm} = useFormSubmission(submitFunc);
-    //         // submitForm();
-    //         return null;
-    //     };
+        expect(errorDialogMock.showError.mock.calls.length).toEqual(0);
+        expect(errorDialogMock.renderError.mock.calls.length).toEqual(0);
 
-    //     const Cmp = (props) => (
-    //         <ErrorDialog>
-    //             <SubmitFormCmp />
-    //         </ErrorDialog>
-    //     );
+        act(() => {
+            result.current.submitForm();
+        });
+        await waitForNextUpdate();
 
-    //     const {debug} = render(<Cmp />);
+        expect(errorDialogMock.showError.mock.calls.length).toEqual(0);
+        expect(errorDialogMock.renderError.mock.calls.length).toEqual(1);
+    });
 
-    //     debug();
-    // });
+    it('should show the default error component for general errors', async () => {
+        const submitFunc = jest.fn(() => Promise.reject(new Error()));
+        const errorDialogMock = {
+            showError: jest.fn(),
+            renderError: jest.fn()
+        };
+        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
+
+        expect(errorDialogMock.showError.mock.calls.length).toEqual(0);
+        expect(errorDialogMock.renderError.mock.calls.length).toEqual(0);
+
+        act(() => {
+            result.current.submitForm();
+        });
+        await waitForNextUpdate();
+
+        expect(errorDialogMock.renderError.mock.calls.length).toEqual(0);
+        expect(errorDialogMock.showError.mock.calls.length).toEqual(1);
+    });
 });
