@@ -1,3 +1,4 @@
+{{- if (or (eq "expandable" .Values.saturn.persistence.database.storageClass) (eq "expandable" .Values.saturn.persistence.files.storageClass)) }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -7,3 +8,4 @@ parameters:
 provisioner: kubernetes.io/gce-pd
 allowVolumeExpansion: true
 reclaimPolicy: Delete
+{{- end }}

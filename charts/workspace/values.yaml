@@ -238,7 +238,7 @@ saturn:
       ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
       ##   GKE, AWS & OpenStack)
       ##
-      storageClass: expandable
+      # storageClass: "-"
       accessMode: ReadWriteOnce
       size: 50Gi
       mountPath: /data
@@ -257,7 +257,7 @@ saturn:
       ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
       ##   GKE, AWS & OpenStack)
       ##
-      storageClass: expandable
+      # storageClass: "-"
       accessMode: ReadWriteOnce
       size: 50Gi
       mountPath: /data

@@ -44,8 +44,10 @@ saturn:
   persistence:
     files:
       size: 50Gi
+      storageClass: expandable
     database:
       size: 50Gi
+      storageClass: expandable
   mail:
     mail.from: pavel@thehyve.nl
     mail.user: AKIAISXHGXUIMMU75YVA
