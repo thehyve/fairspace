@@ -144,7 +144,7 @@ public class ManagedFileSystem extends BaseFileSystem {
             if (info.isReadOnly()) {
                 throw new IOException("Cannot delete " + path);
             }
-            rdf.update(storedQuery("fs_delete", path, userIriSupplier.get()));
+            rdf.update(storedQuery("fs_delete_" + (info.isDirectory() ? "dir" : "file"), path, userIriSupplier.get()));
         });
     }
 
@@ -160,12 +160,12 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Subscribe
     public void onCollectionDeleted(CollectionDeletedEvent e) {
-        rdf.update(storedQuery("fs_delete", e.getCollection().getLocation(), userIriSupplier.get()));
+        rdf.update(storedQuery("fs_delete_dir", e.getCollection().getLocation(), userIriSupplier.get()));
     }
 
     @Subscribe
     public void onCollectionMoved(CollectionMovedEvent e) {
-        rdf.update(storedQuery("fs_move", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
+        rdf.update(storedQuery("fs_move_dir", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
     }
 
     private FileInfo fileInfo(QuerySolution row) {
@@ -200,7 +200,8 @@ public class ManagedFileSystem extends BaseFileSystem {
         }
         commit(verb + " data from " + from + " to " + to, rdf, () -> {
             ensureCanCreate(to);
-            rdf.update(storedQuery("fs_" + verb, from, to, name(to)));
+            var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
+            rdf.update(storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));
         });
     }
 

@@ -1,6 +1,7 @@
 package io.fairspace.saturn;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.config.Config;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.Request;
 
@@ -17,7 +18,7 @@ import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
-class SaturnSecurityHandler extends ConstraintSecurityHandler {
+public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private static final String USER_INFO_REQUEST_ATTRIBUTE = OAuthAuthenticationToken.class.getName();
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
 
@@ -34,19 +35,10 @@ class SaturnSecurityHandler extends ConstraintSecurityHandler {
 
     /**
      * @param apiPrefix
-     * @param config
-     * @param authenticator Authenticator returning a UserInfo for an incoming request
-     */
-    SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator) {
-        this(apiPrefix,config, authenticator, null);
-    }
-
-    /**
-     * @param apiPrefix
      * @param authenticator Authenticator returning a UserInfo for an incoming request
      * @param onAuthorized An optional callback, called on successful authorization
      */
-    SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
+    public SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
         this.authenticator = authenticator;
         this.onAuthorized = onAuthorized;
         this.healthResource = apiPrefix + "/health/";

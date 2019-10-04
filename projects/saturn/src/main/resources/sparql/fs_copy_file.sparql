@@ -1,4 +1,4 @@
-# Moves a file or a directory from one location to another.
+# Copies a file from one location to another.
 # Completely overwrites the target.
 #
 # 0 - from
@@ -27,27 +27,6 @@ WHERE {
 
     FILTER( ?p != fs:filePath) # filePath has changed
     FILTER( ?p != rdfs:label)
-};
-
-# Create children
-INSERT {
-   ?newIRI fs:filePath ?newPath.
-   ?s fs:tempNewIRI ?newIRI  }
-WHERE {
-    ?s fs:filePath ?oldPath .
-
-    FILTER(STRSTARTS(?oldPath, CONCAT(%1$s, '/')))
-    FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
-    BIND(IRI(CONCAT(STR(ws:), STRUUID())) as ?newIRI)
-    BIND(CONCAT(%2$s, '/', SUBSTR(?oldPath, STRLEN(%1$s) + 2)) as ?newPath)
-};
-
-# Copy children's statements
-INSERT { ?newIRI ?p ?o }
-WHERE {
-    ?s fs:tempNewIRI ?newIRI ; ?p ?o ;
-
-    FILTER((?p != fs:filePath)) # filePath has changed
 };
 
 DELETE { ?s fs:tempNewIRI ?o } WHERE { ?s fs:tempNewIRI ?o };

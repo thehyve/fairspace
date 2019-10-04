@@ -1,4 +1,4 @@
-# Moves a file or a directory from one location to another
+# Moves a file from one location to another
 # 0 - from
 # 1 - to
 # 2 - label
@@ -11,11 +11,3 @@ DELETE { ?s fs:filePath %1$s; rdfs:label ?oldLabel. }
 INSERT { ?s fs:filePath %2$s; rdfs:label %3$s . }
 WHERE { ?s fs:filePath %1$s; rdfs:label ?oldLabel .
 FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted}) };
-
-# Move the children
-DELETE { ?s fs:filePath ?path }
-INSERT { ?s fs:filePath ?newPath}
-WHERE {?s fs:filePath ?path .
-FILTER(STRSTARTS(?path, CONCAT(%1$s, '/')))
-FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
-BIND(CONCAT(%2$s, '/', SUBSTR(?path, STRLEN(%1$s) + 2)) as ?newPath) };

@@ -1,6 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.Config;
+import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
