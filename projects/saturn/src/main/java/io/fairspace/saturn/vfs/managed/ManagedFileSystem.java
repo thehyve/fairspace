@@ -8,8 +8,9 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.Value;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
@@ -56,11 +57,7 @@ public class ManagedFileSystem extends BaseFileSystem {
                     if (collection == null) {
                         return null;
                     }
-                    var access = collection.getAccess();
-                    if (!access.canRead()) {
-                        return null;
-                    }
-                    fileInfo.setReadOnly(!access.canWrite());
+                    fileInfo.setReadOnly(!collection.canWrite());
                     return fileInfo;
                 })
                 .orElse(null);
@@ -224,10 +221,11 @@ public class ManagedFileSystem extends BaseFileSystem {
         return new BlobInfo(id, countingInputStream.getByteCount(), encodeHexString(messageDigestCalculatingInputStream.getMessageDigest().digest()));
     }
 
-    @Value
+    @Getter
+    @AllArgsConstructor
     private static class BlobInfo {
-        String id;
-        long size;
-        String md5;
+        private final String id;
+        private final long size;
+        private final String md5;
     }
 }

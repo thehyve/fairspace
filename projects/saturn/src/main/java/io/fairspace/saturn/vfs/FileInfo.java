@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Getter
 @Builder
-public class FileInfo implements Comparable<FileInfo> {
+public class FileInfo {
     private String path;
     private boolean isDirectory;
     private long size;
@@ -24,9 +24,4 @@ public class FileInfo implements Comparable<FileInfo> {
 
     @Setter
     private boolean readOnly;
-
-    @Override
-    public int compareTo(FileInfo o) {
-        return isDirectory == o.isDirectory ? path.compareTo(o.path) : isDirectory ? 1 : -1;
-    }
 }

@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,14 @@ public class CompoundFileSystemTest {
 
         fs.mkdir("dir5/path");
         verify(vfs3).mkdir("dir5/path");
+
+        fs.iri("dir1/path");
+        verify(vfs1).iri("dir1/path");
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void returnsAnErrorForUnknownCollections() throws IOException {
+        fs.mkdir("unknown/path");
     }
 
     @Test(expected = IOException.class)
@@ -107,5 +116,24 @@ public class CompoundFileSystemTest {
     @Test(expected = IOException.class)
     public void handlesMalformedURLs() throws IOException {
         fs.stat("dir4/path");
+    }
+
+    @Test(expected = IOException.class)
+    public void copyingBetweenCollectionsOfDifferentTypesIsNotSupported() throws IOException {
+        fs.copy("dir1/path", "dir2/path");
+    }
+
+    @Test(expected = IOException.class)
+    public void movingBetweenCollectionsOfDifferentTypesIsNotSupported() throws IOException {
+        fs.move("dir1/path", "dir2/path");
+    }
+
+    @Test
+    public void shouldCloseAllUnderlyingFileSystems() throws IOException {
+        fs.close();
+
+        verify(vfs1).close();
+        verify(vfs2).close();
+        verify(vfs3).close();
     }
 }
