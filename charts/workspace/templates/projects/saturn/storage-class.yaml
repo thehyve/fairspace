@@ -1,0 +1,11 @@
+{{- if .Values.saturn.customStorageClass.create }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+    name: "{{ .Values.saturn.customStorageClass.name }}"
+parameters:
+    type: "{{ .Values.saturn.customStorageClass.type }}"
+provisioner: "{{ .Values.saturn.customStorageClass.provisioner }}"
+allowVolumeExpansion: {{ .Values.saturn.customStorageClass.allowVolumeExpansion }}
+reclaimPolicy: "{{ .Values.saturn.customStorageClass.reclaimPolicy }}"
+{{- end }}
