@@ -220,6 +220,14 @@ saturn:
     successThreshold: 1
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
+  ## Creates a custom storage class which can be used in persistence section
+  customStorageClass:
+      create: false
+      name:
+      type: pd-standard
+      provisioner:
+      allowVolumeExpansion: true
+      reclaimPolicy: Delete
 
   ## Persist data to a persistent volume
   persistence:

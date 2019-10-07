@@ -41,6 +41,12 @@ pluto:
 
 # Specific settings for Saturn
 saturn:
+  customStorageClass:
+      create: true
+      name: expandable
+      type: pd-standard
+      provisioner: kubernetes.io/gce-pd
+      allowVolumeExpansion: true
   persistence:
     files:
       size: 50Gi

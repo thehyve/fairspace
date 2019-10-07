@@ -41,6 +41,12 @@ pluto:
 saturn:
   image:
     pullPolicy: Always
+  customStorageClass:
+      create: true
+      name: expandable
+      type: pd-standard
+      provisioner: kubernetes.io/gce-pd
+      allowVolumeExpansion: true
   persistence:
     files:
       size: 50Gi
