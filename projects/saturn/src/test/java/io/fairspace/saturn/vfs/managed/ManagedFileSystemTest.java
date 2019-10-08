@@ -20,6 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -123,6 +124,11 @@ public class ManagedFileSystemTest {
         assertEquals("coll/aaa/bbb/ccc", children.get(0).getPath());
         assertTrue(children.get(0).isDirectory());
         assertNotNull(fs.iri(children.get(0).getPath()));
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void listUnknownCollection() throws IOException {
+        fs.list("unknown");
     }
 
     @Test
