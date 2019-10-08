@@ -38,7 +38,7 @@ spec:
           - name: KEYCLOAK_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: "{{ template "workspace.fullname" . }}-keycloak-credentials"
+                name: "{{ template "workspace.fullname" . }}-keycloak-creds-teardown"
                 key: password
           - name: CLIENT_SECRET
             valueFrom:
