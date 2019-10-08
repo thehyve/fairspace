@@ -147,6 +147,16 @@ public class WebDAVIT {
     }
 
     @Test
+    public void testDirectoryCreationTwice() throws ServletException, IOException {
+        req.setMethod("MKCOL");
+        req.setRequestURL("http://localhost/webdav/coll1/twice");
+        milton.service(req, res);
+        assertEquals(201, res.getStatus());
+        milton.service(req, res);
+        assertEquals(405, res.getStatus());
+    }
+
+    @Test
     public void testDirectoryCreationInNonExistingParent() throws ServletException, IOException {
         req.setMethod("MKCOL");
         req.setRequestURL("http://localhost/webdav/coll1/missing/dir");
