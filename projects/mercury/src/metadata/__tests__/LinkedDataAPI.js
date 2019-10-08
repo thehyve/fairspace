@@ -21,6 +21,7 @@ beforeEach(() => {
     mockAxios.get.mockClear();
     mockAxios.patch.mockClear();
 });
+
 describe('LinkedDataApi', () => {
     it('fetches metadata with provided parameters', () => {
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({data: [], headers: {'content-type': 'application/json'}}));
@@ -41,32 +42,6 @@ describe('LinkedDataApi', () => {
     });
 
     it('stores metadata as jsonld', () => {
-        MetadataAPI.updateEntity(
-            'http://thehyve.nl',
-            {
-                hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}]
-            },
-            vocabularyUtils([]),
-            'http://examle.com/Company'
-        );
-
-        const expected = [{
-            '@id': 'http://thehyve.nl',
-            'hasEmployees': [
-                {'@value': 'John Snow'},
-                {'@value': 'Ygritte'}
-            ]
-        },
-        {
-            '@id': 'http://thehyve.nl',
-            '@type': 'http://examle.com/Company',
-        }];
-
-        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith('/meta/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
-    });
-
-    it('stores metadata as jsonld (Full entity)', () => {
         MetadataAPI.updateEntity(
             'http://thehyve.nl',
             {
@@ -100,15 +75,5 @@ describe('LinkedDataApi', () => {
 
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
         expect(mockAxios.patch).toHaveBeenCalledWith('/meta/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
-    });
-
-    it('retrieves metadata entities using a sparql query', () => {
-        mockAxios.get.mockImplementationOnce(() => Promise.resolve({data: [], headers: {'content-type': 'application/json'}}));
-
-        const type = 'http://my-special-entity-type';
-        MetadataAPI.getEntitiesByType(type);
-
-        expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('/entities/?type=http%3A%2F%2Fmy-special-entity-type', {headers: {Accept: 'application/ld+json'}});
     });
 });

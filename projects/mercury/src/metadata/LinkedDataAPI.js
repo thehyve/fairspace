@@ -77,46 +77,6 @@ class LinkedDataAPI {
     }
 
     /**
-     * Returns all entities in the metadata store for the given type
-     *
-     * More specifically this method returns all entities x for which a
-     * triple exist <x> <@type> <type> exists.
-     *
-     * @param type  URI of the Class that the entities should be a type of
-     * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
-     *                          The entities will have an ID, type and optionally an rdfs:label
-     */
-    getEntitiesByType(type) {
-        if (!this.getEntitiesUrl()) {
-            return Promise.reject(new Error("No entities URL provided"));
-        }
-
-        return axios.get(this.getEntitiesUrl() + "?type=" + encodeURIComponent(type), requestOptions)
-            .catch(handleHttpError("Failure when retrieving entities"))
-            .then(extractJsonData)
-            .then(expand)
-            .then(normalizeTypes);
-    }
-
-    /**
-     * Returns all Fairspace entities in the metadata store for the given type
-     *
-     * @returns Promise<jsonld> A promise with an expanded version of the JSON-LD structure, describing the entities.
-     *                          The entities will have an ID, type and optionally an rdfs:label
-     */
-    getAllCatalogEntities() {
-        if (!this.getEntitiesUrl()) {
-            return Promise.reject(new Error("No entities URL provided"));
-        }
-
-        return axios.get(this.getEntitiesUrl() + "?catalog", requestOptions)
-            .catch(handleHttpError("Failure when retrieving entities"))
-            .then(extractJsonData)
-            .then(expand)
-            .then(normalizeTypes);
-    }
-
-    /**
      * Send a patch request to the backend with the given json-ld
      * @param jsonLd
      * @returns {Promise<Response>}
