@@ -27,4 +27,6 @@ const MOCKED_USERS_LOCATION = `${mockDataDir}/keycloak-users.json`;
 // Users search
 app.get('/api/keycloak/users', (req, res) => res.sendFile(MOCKED_USERS_LOCATION));
 
+app.get('/api/v1/users', (req, res) => res.sendFile(`${mockDataDir}/users.json`));
+
 app.listen(port);

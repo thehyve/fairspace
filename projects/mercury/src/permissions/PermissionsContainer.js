@@ -7,9 +7,9 @@ import PermissionsViewer from "./PermissionsViewer";
 import {createMetadataIri} from "../common/utils/linkeddata/metadataUtils";
 
 export default (props) => {
-    const {permissions, loading: permissionsLoading, error: permissionsError, refresh} = useContext(PermissionContext);
+    const {permissions, loading: permissionsLoading, error: permissionsError, refresh: refreshPermissions} = useContext(PermissionContext);
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
-    const {usersLoading, usersError} = useContext(UsersContext);
+    const {usersLoading, usersError, refresh: refreshUsers} = useContext(UsersContext);
     const [altering, setAltering] = useState(false);
 
     const currentUserWithIri = {...currentUser, iri: createMetadataIri(currentUser.id)};
@@ -18,7 +18,10 @@ export default (props) => {
         setAltering(true);
         return PermissionAPI
             .alterPermission(userIri, resourceIri, access)
-            .then(refresh)
+            .then(() => {
+                refreshUsers();
+                refreshPermissions();
+            })
             .catch(e => {console.error("Error altering permission", e);})
             .finally(() => setAltering(false));
     };
