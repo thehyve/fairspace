@@ -65,6 +65,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
                     Close
                 </Button>
                 <Button
+                    data-testid="rename-button"
                     onClick={handleRename}
                     color="primary"
                     disabled={!name || name === currentName}

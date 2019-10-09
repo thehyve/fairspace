@@ -6,20 +6,10 @@ import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
 
 import {FileBrowser} from '../FileBrowser';
-import Config from "../../common/services/Config";
-import configFile from "../../config";
 
 afterEach(cleanup);
 
 const mockStore = configureStore();
-
-beforeAll(() => {
-    Config.setConfig(Object.assign(configFile, {
-        externalConfigurationFiles: [],
-    }));
-
-    return Config.init();
-});
 
 const store = mockStore({
     cache: {

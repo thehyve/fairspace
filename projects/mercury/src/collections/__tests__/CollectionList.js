@@ -1,44 +1,31 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {TableBody, TableCell, TableHead} from "@material-ui/core";
-import {mount} from "enzyme";
+import '@testing-library/jest-dom/extend-expect';
+import {render} from '@testing-library/react';
 
 import CollectionList from "../CollectionList";
 
 describe('CollectionList', () => {
-    const dateCreated = new Date();
-    const collections = [{
-        name: 'My Collection',
-        creatorObj: {
-            name: 'Mariah Carey'
-        },
-        dateCreated: dateCreated.toUTCString(),
-        iri: 'http://example.com/0'
-    }];
-
-    it('renders without crashing', () => {
-        const div = document.createElement('div');
-        ReactDOM.render(<CollectionList />, div);
-        ReactDOM.unmountComponentAtNode(div);
+    it('shows warning message when no collections available', () => {
+        const {getByText} = render(<CollectionList />);
+        expect(getByText(/Please create a collection/i)).toBeInTheDocument();
     });
 
-    it('renders without crashing with elements', () => {
-        const div = document.createElement('div');
-        ReactDOM.render(<CollectionList collections={[]} />, div);
-        ReactDOM.unmountComponentAtNode(div);
-    });
+    it('renders correct header and values columns', () => {
+        const collections = [{
+            name: 'My Collection',
+            creatorObj: {
+                name: 'Mariah Carey'
+            },
+            dateCreated: new Date().toUTCString(),
+            iri: 'http://example.com/0'
+        }];
 
-    it('renders correct header columns', () => {
-        const wrapper = mount(<CollectionList collections={collections} />);
-        const headerCells = wrapper.find(TableHead).find(TableCell);
+        const {getByText} = render(<CollectionList collections={collections} />);
 
-        expect(headerCells.map(c => c.text())).toEqual(expect.arrayContaining(['Name', 'Creator', 'Created']));
-    });
-
-    it('renders correct values columns', () => {
-        const wrapper = mount(<CollectionList collections={collections} />);
-        const bodyCells = wrapper.find(TableBody).find(TableCell);
-
-        expect(bodyCells.map(c => c.text())).toEqual(expect.arrayContaining(['My Collection', 'Mariah Carey']));
+        expect(getByText('Name')).toBeInTheDocument();
+        expect(getByText('Creator')).toBeInTheDocument();
+        expect(getByText('Created')).toBeInTheDocument();
+        expect(getByText('My Collection')).toBeInTheDocument();
+        expect(getByText('Mariah Carey')).toBeInTheDocument();
     });
 });

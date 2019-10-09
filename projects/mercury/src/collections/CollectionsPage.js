@@ -23,6 +23,6 @@ const CollectionsPage = () => {
             </Grid>
         </CollectionBreadcrumbsContextProvider>
     );
-}
+};
 
 export default CollectionsPage;

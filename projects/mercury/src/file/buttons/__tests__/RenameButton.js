@@ -1,55 +1,71 @@
 import React from 'react';
-import {Dialog} from "@material-ui/core";
-import {shallow} from "enzyme";
+import {render, fireEvent} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 
 import RenameButton from '../RenameButton';
 
-describe('<DeleteButton />', () => {
-    it('should open dialog if not disabled and clicked', () => {
-        const onRename = jest.fn();
-        const wrapper = shallow(
-            <RenameButton onRename={onRename}>
+describe('<RenameButton />', () => {
+    it('shows dialog when clicking on children', () => {
+        const {container, queryByText} = render(
+            <RenameButton
+                onRename={() => {}}
+                currentName="filename"
+            >
                 <div>something</div>
             </RenameButton>
         );
 
-        wrapper.childAt(0).simulate('click');
-        expect(wrapper.find(Dialog).length).toEqual(1);
+        fireEvent.click(container.firstChild);
+
+        expect(queryByText(/rename filename/i)).toBeInTheDocument();
     });
 
     it('should not open dialog if disabled', () => {
-        const onRename = jest.fn();
-        const wrapper = shallow(
-            <RenameButton disabled onRename={onRename}>
+        const {container, queryByText} = render(
+            <RenameButton disabled onRename={() => {}} currentName="filename">
                 <div>something</div>
             </RenameButton>
         );
 
-        wrapper.childAt(0).simulate('click');
-        expect(wrapper.find(Dialog).length).toEqual(0);
+        fireEvent.click(container.firstChild);
+
+        expect(queryByText(/rename filename/i)).not.toBeInTheDocument();
     });
 
     it('should call onRename if not disabled', () => {
-        const onRename = jest.fn();
-        const wrapper = shallow(
-            <RenameButton onRename={onRename}>
+        const onRename = jest.fn(() => Promise.resolve());
+        const {container, getByTestId, getByLabelText} = render(
+            <RenameButton
+                onRename={onRename}
+                currentName="filename"
+            >
                 <div>something</div>
             </RenameButton>
         );
 
-        wrapper.childAt(0).simulate('click');
-        expect(onRename.mock.calls.length).toEqual(0);
+        // Open dialog -> change input -> click rename
+        fireEvent.click(container.firstChild);
+        const input = getByLabelText('Name');
+        fireEvent.change(input, {target: {value: 'new filename'}});
+        fireEvent.click(getByTestId('rename-button'));
+
+        expect(onRename).toHaveBeenCalledTimes(1);
     });
 
-    it('should not call onRename if disabled', () => {
-        const onRename = jest.fn();
-        const wrapper = shallow(
-            <RenameButton disabled onRename={onRename}>
+    it('should not find input and not call onRename if disabled', () => {
+        const onRename = jest.fn(() => Promise.resolve());
+        const {container, queryByLabelText} = render(
+            <RenameButton
+                disabled
+                onRename={onRename}
+                currentName="filename"
+            >
                 <div>something</div>
             </RenameButton>
         );
 
-        wrapper.childAt(0).simulate('click');
-        expect(onRename.mock.calls.length).toEqual(0);
+        fireEvent.click(container.firstChild);
+        expect(queryByLabelText('Name')).not.toBeInTheDocument();
+        expect(onRename).toHaveBeenCalledTimes(0);
     });
 });

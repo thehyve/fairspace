@@ -1,16 +1,4 @@
 import FileAPI from "../FileAPI";
-import Config from "../../common/services/Config";
-
-beforeAll(() => {
-    Config.setConfig({
-        urls: {
-            files: "/files",
-            download: "/download"
-        }
-    });
-
-    return Config.init();
-});
 
 describe('FileAPI', () => {
     describe('Uploading', () => {
@@ -121,6 +109,6 @@ describe('FileAPI', () => {
 
     it('Generates proper download link', () => {
         const downloadLink = FileAPI.getDownloadLink('/filePath');
-        expect(downloadLink).toEqual('/download/filePath');
+        expect(downloadLink).toEqual('/webdav/v1/filePath');
     });
 });
