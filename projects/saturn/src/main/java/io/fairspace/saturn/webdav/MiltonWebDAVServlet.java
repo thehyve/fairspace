@@ -52,7 +52,7 @@ public class MiltonWebDAVServlet extends HttpServlet {
         }
     }
 
-    private static HttpManager setupHttpManager(String pathPrefix, VirtualFileSystem fs, Consumer<Request> requestEventListener) {
+    static HttpManager setupHttpManager(String pathPrefix, VirtualFileSystem fs, Consumer<Request> requestEventListener) {
         return new HttpManagerBuilder() {{
             setResourceFactory(new VfsBackedMiltonResourceFactory(pathPrefix, fs));
             setMultiNamespaceCustomPropertySourceEnabled(true);
