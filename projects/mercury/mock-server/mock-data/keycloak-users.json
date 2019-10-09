@@ -1,35 +1,30 @@
 [
   {
     "id": "13300b41-b4a0-463f-95aa-764d9efdc5cc",
-    "iri": "http://localhost/iri/13300b41-b4a0-463f-95aa-764d9efdc5cc",
     "firstName": "Ygritte",
     "lastName": "Lopez",
     "enabled": true
   },
   {
     "id": "ab161dae-e402-4fd2-9d86-130387dc25ef",
-    "iri": "http://localhost/iri/ab161dae-e402-4fd2-9d86-130387dc25ef",
     "firstName": "Daenarys",
     "lastName": "Targaryen",
     "enabled": true
   },
   {
     "id": "f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
-    "iri": "http://localhost/iri/f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
     "firstName": "Gregor",
     "lastName": "Clegane",
     "enabled": true
   },
   {
     "id": "05364a93-cd21-4c48-8b01-948512d63a8b",
-    "iri": "http://localhost/iri/05364a93-cd21-4c48-8b01-948512d63a8b",
     "firstName": "Cersei",
     "lastName": "Lannister",
     "enabled": true
   },
   {
     "id": "6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-    "iri": "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
     "firstName": "John",
     "lastName": "Snow",
     "enabled": true
