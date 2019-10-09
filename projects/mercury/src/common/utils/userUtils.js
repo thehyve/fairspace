@@ -1,5 +1,5 @@
 export default function getDisplayName(user) {
-    return (user && (user.name || user.firstName + ' ' + user.lastName)) || '';
+    return (user && user.name) || '';
 }
 
 export const isDataSteward = (authorizations, config) => authorizations && authorizations.includes(config.roles.dataSteward);
