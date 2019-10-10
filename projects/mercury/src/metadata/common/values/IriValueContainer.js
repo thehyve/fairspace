@@ -1,10 +1,10 @@
 import React, {useContext} from "react";
 import PropTypes from 'prop-types';
 import {Grid} from "@material-ui/core";
+import {MaterialReactSelect} from "@fairspace/shared-frontend";
 
 import BaseInputValue from "./BaseInputValue";
 import LinkedDataContext from "../../LinkedDataContext";
-import {MaterialReactSelect} from "@fairspace/shared-frontend";
 
 export const noNamespace = {
     id: '',
