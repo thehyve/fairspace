@@ -20,13 +20,13 @@ describe('ResourceValue', () => {
         });
 
         // Expect no invocations of the parent onChange function
-        expect(onChange.mock.calls.length).toEqual(0);
+        expect(onChange).toHaveBeenCalledTimes(0);
 
         // Enter a value in the textfield
         iriValue.prop('onLocalPartChange')('postfix');
 
-        expect(onChange.mock.calls.length).toEqual(1);
-        expect(onChange.mock.calls[0][0]).toEqual({id: 'http://fairspace.io/ontology#postfix'});
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenCalledWith({id: 'http://fairspace.io/ontology#postfix'});
     });
 
     it('should use the entry id as value for the textfield', () => {

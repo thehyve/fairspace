@@ -1,10 +1,10 @@
 import {act} from 'react-dom/test-utils';
-import {testHook} from "@fairspace/shared-frontend";
-import {useLinkedData} from "../UseLinkedData";
+import {testHook} from '@fairspace/shared-frontend';
+import {useLinkedData} from '../UseLinkedData';
 import {
     COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS
-} from "../../constants";
-import {vocabularyUtils} from "../../common/utils/linkeddata/vocabularyUtils";
+} from '../../constants';
+import {vocabularyUtils} from '../../common/utils/linkeddata/vocabularyUtils';
 
 const testUseLinkedData = (subject, context) => {
     let linkedData;
@@ -32,7 +32,7 @@ describe('useLinkedData', () => {
             testUseLinkedData('my-subject', context);
         });
 
-        expect(context.fetchLinkedDataForSubject.mock.calls.length).toEqual(1);
+        expect(context.fetchLinkedDataForSubject).toHaveBeenCalledTimes(1);
     });
 
     it('should handle missing linkedData', () => {
@@ -185,6 +185,12 @@ describe('useLinkedData', () => {
         });
 
         expect(linkedData.typeInfo).toEqual('type-info');
-        expect(context.getTypeInfoForLinkedData.mock.calls[0][0]['@id']).toEqual('http://subject');
+        expect(context.getTypeInfoForLinkedData).toHaveBeenCalledTimes(1);
+        expect(context.getTypeInfoForLinkedData).toHaveBeenCalledWith({
+            '@id': 'http://subject',
+            '@type': ['http://type'],
+            'http://prop1': [{'@value': 'v'}
+            ]
+        });
     });
 });

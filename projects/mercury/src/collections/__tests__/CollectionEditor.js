@@ -108,14 +108,17 @@ describe('CollectionEditor', () => {
 
         describe('isInputValid', () => {
             it('marks input as valid if name and location are properly filled', () => expect(wrapper.instance().isInputValid()).toBe(true));
+
             it('marks input as invalid if name is empty', () => {
                 wrapper.instance().handleInputChange('name', '');
                 expect(wrapper.instance().isInputValid()).toBe(false);
             });
+
             it('marks input as invalid if location is empty', () => {
                 wrapper.instance().handleInputChange('location', '');
                 expect(wrapper.instance().isInputValid()).toBe(false);
             });
+
             it('marks input as invalid if location contains invalid characters', () => {
                 const invalidCharacters = ['.', '#', '!', '$', '(', ')', '~', ';', '會'];
                 invalidCharacters.forEach(c => {
@@ -128,13 +131,11 @@ describe('CollectionEditor', () => {
         it('invokes the save callback with existing parameters if nothing is entered', () => {
             wrapper.instance().handleSave();
 
-            // Make sure it is properly saved
-            expect(saveCallback.mock.calls.length).toEqual(1);
-            expect(saveCallback.mock.calls[0]).toEqual([originalName, originalDescription, originalLocation, originalConnectionString]);
+            expect(saveCallback).toHaveBeenCalledTimes(1);
+            expect(saveCallback).toHaveBeenCalledWith(originalName, originalDescription, originalLocation, originalConnectionString);
         });
 
         it('invokes the save callback with parameters entered by the user', () => {
-            // Enter data into each field
             wrapper.instance().handleInputChange('name', name);
             wrapper.instance().handleInputChange('description', description);
             wrapper.instance().handleInputChange('location', location);
@@ -142,33 +143,28 @@ describe('CollectionEditor', () => {
 
             wrapper.instance().handleSave();
 
-            // Make sure it is properly saved
-            expect(saveCallback.mock.calls.length).toEqual(1);
-            expect(saveCallback.mock.calls[0]).toEqual([name, description, location, connectionString]);
+            expect(saveCallback).toHaveBeenCalledTimes(1);
+            expect(saveCallback).toHaveBeenCalledWith(name, description, location, connectionString);
         });
 
         it('does not invoke the save callback when no name is present', () => {
-            // Enter data into each field
             wrapper.instance().handleInputChange('name', '');
             wrapper.instance().handleInputChange('description', description);
             wrapper.instance().handleInputChange('location', location);
 
             wrapper.instance().handleSave();
 
-            // Make sure it is properly saved
-            expect(saveCallback.mock.calls.length).toEqual(0);
+            expect(saveCallback).toHaveBeenCalledTimes(0);
         });
 
         it('does not invoke the save callback when no location is present', () => {
-            // Enter data into each field
             wrapper.instance().handleInputChange('name', name);
             wrapper.instance().handleInputChange('description', description);
             wrapper.instance().handleInputChange('location', '');
 
             wrapper.instance().handleSave();
 
-            // Make sure it is properly saved
-            expect(saveCallback.mock.calls.length).toEqual(0);
+            expect(saveCallback).toHaveBeenCalledTimes(0);
         });
     });
 });

@@ -160,10 +160,11 @@ describe('Dispatch If Needed', () => {
         const localMockDispatch = jest.fn(() => 'result');
         const result = actionCreator(localMockDispatch, () => false);
 
-        expect(localMockDispatch.mock.calls.length).toEqual(1);
-        expect(localMockDispatch.mock.calls[0][0]).toEqual('testaction');
+        expect(localMockDispatch).toHaveBeenCalledTimes(1);
+        expect(localMockDispatch).toHaveBeenCalledWith('testaction');
         expect(result).toEqual('result');
     });
+
     it('looks at the current state for determining update', () => {
         const actionCreator = dispatchIfNeeded(
             () => "testaction",
@@ -173,10 +174,11 @@ describe('Dispatch If Needed', () => {
         const localMockDispatch = jest.fn(() => 'result');
         const result = actionCreator(localMockDispatch, () => ({invalidated: true}));
 
-        expect(localMockDispatch.mock.calls.length).toEqual(1);
-        expect(localMockDispatch.mock.calls[0][0]).toEqual('testaction');
+        expect(localMockDispatch).toHaveBeenCalledTimes(1);
+        expect(localMockDispatch).toHaveBeenCalledWith('testaction');
         expect(result).toEqual('result');
     });
+
     it('resolves with the current value if no update is needed', () => {
         const actionCreator = dispatchIfNeeded(
             () => "testaction",
@@ -186,7 +188,7 @@ describe('Dispatch If Needed', () => {
         const localMockDispatch = jest.fn(() => 'result');
         const result = actionCreator(localMockDispatch, () => undefined);
 
-        expect(localMockDispatch.mock.calls.length).toEqual(0);
+        expect(localMockDispatch).toHaveBeenCalledTimes(0);
 
         return expect(result).resolves.toEqual({value: 'current-data'});
     });

@@ -112,11 +112,15 @@ const FileList = ({
                                 {
                                     selectionEnabled ? (
                                         <TableCell
+                                            data-testid="checkbox-cell"
                                             padding="none"
                                             onDoubleClick={(e) => e.stopPropagation()}
                                             onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(file);}}
                                         >
-                                            <Checkbox style={{visibility: checkboxVisibility}} checked={file.selected} />
+                                            <Checkbox
+                                                style={{visibility: checkboxVisibility}}
+                                                checked={file.selected}
+                                            />
                                         </TableCell>
                                     ) : null
                                 }

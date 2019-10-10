@@ -22,7 +22,11 @@ describe('<RenameButton />', () => {
 
     it('should not open dialog if disabled', () => {
         const {container, queryByText} = render(
-            <RenameButton disabled onRename={() => {}} currentName="filename">
+            <RenameButton
+                disabled
+                onRename={() => {}}
+                currentName="filename"
+            >
                 <div>something</div>
             </RenameButton>
         );

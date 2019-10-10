@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {render, cleanup, fireEvent, getByText} from '@testing-library/react';
+import {render, cleanup, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
@@ -75,18 +75,18 @@ describe('FileBrowser', () => {
             </Provider>
         );
 
-        expect(queryByTestId('files-view')).toBeTruthy();
-        expect(queryByTestId('upload-view')).toBeFalsy();
+        expect(queryByTestId('files-view')).toBeInTheDocument();
+        expect(queryByTestId('upload-view')).not.toBeInTheDocument();
 
         const uploadTab = queryByTestId('upload-tab');
         fireEvent.click(uploadTab);
 
-        expect(queryByTestId('files-view')).toBeFalsy();
-        expect(queryByTestId('upload-view')).toBeTruthy();
+        expect(queryByTestId('files-view')).not.toBeInTheDocument();
+        expect(queryByTestId('upload-view')).toBeInTheDocument();
     });
 
     it('show error when no open collection is provided', () => {
-        const {container} = render(
+        const {getByText} = render(
             <Provider store={store}>
                 <FileBrowser
                     {...initialProps}
@@ -95,11 +95,11 @@ describe('FileBrowser', () => {
         );
 
         // finds substring ignoring case
-        expect(getByText(container, /collection does not exist/i)).toBeTruthy();
+        expect(getByText(/collection does not exist/i)).toBeInTheDocument();
     });
 
     it('show no open collection error when no collection is provided even when another error is given', () => {
-        const {container} = render(
+        const {getByText} = render(
             <Provider store={store}>
                 <FileBrowser
                     {...initialProps}
@@ -108,12 +108,12 @@ describe('FileBrowser', () => {
             </Provider>
         );
 
-        expect(getByText(container, /collection does not exist/i)).toBeTruthy();
+        expect(getByText(/collection does not exist/i)).toBeInTheDocument();
     });
 
 
     it('show error when when an error messsage is given', () => {
-        const {container} = render(
+        const {getByText} = render(
             <Provider store={store}>
                 <FileBrowser
                     {...initialProps}
@@ -124,7 +124,7 @@ describe('FileBrowser', () => {
         );
 
         // finds substring ignoring case
-        expect(getByText(container, /error occurred/i)).toBeTruthy();
+        expect(getByText(/error occurred/i)).toBeInTheDocument();
     });
 
     it('cleans up listener after unmount', () => {

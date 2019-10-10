@@ -4,7 +4,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {ConfirmationDialog, LoadingInlay} from '@fairspace/shared-frontend';
 
 import CollectionEditor from "./CollectionEditor";
-import {PermissionProvider} from "../common/contexts/PermissionContext";
+import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
 import PermissionsCard from "../permissions/PermissionsCard";
 import TechnicalMetadata from "../file/TechnicalMetadata";
 
@@ -111,7 +111,15 @@ class CollectionDetails extends React.Component {
                 </Card>
 
                 <PermissionProvider iri={collection.iri}>
-                    <PermissionsCard iri={collection.iri} canManage={collection.canManage} />
+                    <PermissionContext.Consumer>
+                        {({permissions}) => (
+                            <PermissionsCard
+                                permissions={permissions}
+                                iri={collection.iri}
+                                canManage={collection.canManage}
+                            />
+                        )}
+                    </PermissionContext.Consumer>
                 </PermissionProvider>
 
                 {editing ? (

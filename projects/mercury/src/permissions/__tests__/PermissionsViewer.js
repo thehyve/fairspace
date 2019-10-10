@@ -4,6 +4,10 @@ import {shallow} from "enzyme";
 import {IconButton, Button} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
 
+function getPermissionAt(wrapper, at) {
+    return wrapper.find('WithStyles(ListItemText)').at(at).props('primary');
+}
+
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
         {
@@ -39,44 +43,45 @@ describe('PermissionsViewer', () => {
     const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockCreator = 'user4-id';
-    const mockFetchPermissionsFn = jest.fn();
-    const mockAlterPermissionFn = jest.fn();
 
     describe('Use Case 1: Current user is creator and can manage collection', () => {
-        let wrapper;
-        beforeAll(() => {
-            wrapper = shallow(
-                <PermissionsViewer
-                    creator={mockCreator}
-                    iri={500}
-                    currentUser={mockcurrentUserCreatorCanManage}
-                    canManage
-                    permissions={mockCollaborators}
-                    alterPermission={mockAlterPermissionFn}
-                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-                />
-            );
-        });
+        const wrapper = shallow(
+            <PermissionsViewer
+                creator={mockCreator}
+                iri={500}
+                currentUser={mockcurrentUserCreatorCanManage}
+                canManage
+                permissions={mockCollaborators}
+                alterPermission={() => {}}
+                fetchPermissionsIfNeeded={() => {}}
+            />
+        );
+
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
+
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
-            expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
-                secondary: 'Manage'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Mariah Carey',
-                secondary: 'Manage'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
-                primary: 'Michael Jackson',
-                secondary: 'Write'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(3).props('primary')).toEqual({
-                primary: 'Bruno Mars',
-                secondary: 'Read'
-            });
+            expect(getPermissionAt(wrapper, 0))
+                .toEqual({
+                    primary: 'Kurt Cobain',
+                    secondary: 'Manage'
+                });
+            expect(getPermissionAt(wrapper, 1))
+                .toEqual({
+                    primary: 'Mariah Carey',
+                    secondary: 'Manage'
+                });
+            expect(getPermissionAt(wrapper, 2))
+                .toEqual({
+                    primary: 'Michael Jackson',
+                    secondary: 'Write'
+                });
+            expect(getPermissionAt(wrapper, 3))
+                .toEqual({
+                    primary: 'Bruno Mars',
+                    secondary: 'Read'
+                });
         });
 
         // user can see all 4 permissions (one is disabled not hidden)
@@ -90,92 +95,98 @@ describe('PermissionsViewer', () => {
     });
 
     describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
-        let wrapper;
-        beforeAll(() => {
-            wrapper = shallow(
-                <PermissionsViewer
-                    creator={mockCreator}
-                    iri={500}
-                    canManage={false}
-                    currentUser={mockcurrentUserNotCreatorCannotManage}
-                    permissions={mockCollaborators}
-                    alterPermission={mockAlterPermissionFn}
-                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-                />
-            );
-        });
+        const wrapper = shallow(
+            <PermissionsViewer
+                creator={mockCreator}
+                iri={500}
+                canManage={false}
+                currentUser={mockcurrentUserNotCreatorCannotManage}
+                permissions={mockCollaborators}
+                alterPermission={() => {}}
+                fetchPermissionsIfNeeded={() => {}}
+            />
+        );
 
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
 
         it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
-            expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
-                secondary: 'Manage'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Mariah Carey',
-                secondary: 'Manage'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
-                primary: 'Michael Jackson',
-                secondary: 'Write'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(3).props('primary')).toEqual({
-                primary: 'Bruno Mars',
-                secondary: 'Read'
-            });
+            expect(getPermissionAt(wrapper, 0))
+                .toEqual({
+                    primary: 'Kurt Cobain',
+                    secondary: 'Manage'
+                });
+            expect(getPermissionAt(wrapper, 1))
+                .toEqual({
+                    primary: 'Mariah Carey',
+                    secondary: 'Manage'
+                });
+            expect(getPermissionAt(wrapper, 2))
+                .toEqual({
+                    primary: 'Michael Jackson',
+                    secondary: 'Write'
+                });
+            expect(getPermissionAt(wrapper, 3))
+                .toEqual({
+                    primary: 'Bruno Mars',
+                    secondary: 'Read'
+                });
         });
+
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
             expect(wrapper.find('MoreActions').length).toEqual(0);
         });
+
         it('should NOT render add button', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(0);
         });
     });
 
     describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
-        let wrapper;
-        beforeAll(() => {
-            wrapper = shallow(
-                <PermissionsViewer
-                    creator={mockCreator}
-                    iri={500}
-                    canManage
-                    currentUser={mockcurrentUserNotCreatorCanManage}
-                    permissions={mockCollaborators}
-                    alterPermission={mockAlterPermissionFn}
-                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
-                />
-            );
-        });
+        const wrapper = shallow(
+            <PermissionsViewer
+                creator={mockCreator}
+                iri={500}
+                canManage
+                currentUser={mockcurrentUserNotCreatorCanManage}
+                permissions={mockCollaborators}
+                alterPermission={() => {}}
+                fetchPermissionsIfNeeded={() => {}}
+            />
+        );
 
         it('should render all collaborators', () => {
             expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
         });
 
         it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
-            expect(wrapper.find('WithStyles(ListItemText)').at(0).props('primary')).toEqual({
-                primary: 'Kurt Cobain',
-                secondary: 'Manage'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(1).props('primary')).toEqual({
-                primary: 'Mariah Carey',
-                secondary: 'Manage'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(2).props('primary')).toEqual({
-                primary: 'Michael Jackson',
-                secondary: 'Write'
-            });
-            expect(wrapper.find('WithStyles(ListItemText)').at(3).props('primary')).toEqual({
-                primary: 'Bruno Mars',
-                secondary: 'Read'
-            });
+            expect(getPermissionAt(wrapper, 0))
+                .toEqual({
+                    primary: 'Kurt Cobain',
+                    secondary: 'Manage'
+                });
+            expect(getPermissionAt(wrapper, 1))
+                .toEqual({
+                    primary: 'Mariah Carey',
+                    secondary: 'Manage'
+                });
+            expect(getPermissionAt(wrapper, 2))
+                .toEqual({
+                    primary: 'Michael Jackson',
+                    secondary: 'Write'
+                });
+            expect(getPermissionAt(wrapper, 3))
+                .toEqual({
+                    primary: 'Bruno Mars',
+                    secondary: 'Read'
+                });
         });
+
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
             expect(wrapper.find(IconButton).some('[disabled]')).toBeTruthy();
         });
+
         it('should render add button', () => {
             expect(wrapper.find(Button).length).toEqual(1);
         });

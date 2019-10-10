@@ -30,8 +30,8 @@ describe('InformationDrawer', () => {
         return wrapper.instance()
             .handleUpdateCollection('My collection', 'description', 'newlocation')
             .then(() => {
-                expect(handleCollectionLocationChange.mock.calls.length).toEqual(1);
-                expect(handleCollectionLocationChange.mock.calls[0][0]).toEqual('newlocation');
+                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(1);
+                expect(handleCollectionLocationChange).toHaveBeenCalledWith('newlocation');
             });
     });
 
@@ -45,7 +45,7 @@ describe('InformationDrawer', () => {
         return wrapper.instance()
             .handleUpdateCollection('Other name', 'Other description', 'location1')
             .then(() => {
-                expect(handleCollectionLocationChange.mock.calls.length).toEqual(0);
+                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(0);
             });
     });
 
@@ -61,7 +61,7 @@ describe('InformationDrawer', () => {
         return wrapper.instance()
             .handleUpdateCollection('Other name', 'Other description', 'newlocation')
             .then(() => {
-                expect(handleCollectionLocationChange.mock.calls.length).toEqual(0);
+                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(0);
             });
     });
 

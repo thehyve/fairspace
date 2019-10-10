@@ -23,11 +23,20 @@ describe('useUploads', () => {
 
         uploads.enqueue([{name: 'test.txt'}]);
 
-        expect(dispatch.mock.calls[0][0].uploads).toEqual([{
-            file: {name: 'test.txt'},
-            destinationFilename: 'test.txt',
-            destinationPath: '/'
-        }]);
+        expect(dispatch).toHaveBeenCalledTimes(1);
+        expect(dispatch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                uploads: [
+                    {
+                        destinationFilename: "test.txt",
+                        destinationPath: "/",
+                        file: {
+                            name: "test.txt",
+                        },
+                    },
+                ]
+            })
+        );
     });
 
     it('should resolve naming conflicts with existing files', () => {
@@ -35,11 +44,18 @@ describe('useUploads', () => {
 
         uploads.enqueue([{name: 'test.txt'}]);
 
-        expect(dispatch.mock.calls[0][0].uploads).toEqual([{
-            file: {name: 'test.txt'},
-            destinationFilename: 'test (1).txt',
-            destinationPath: '/'
-        }]);
+        expect(dispatch).toHaveBeenCalledTimes(1);
+        expect(dispatch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                uploads: [
+                    {
+                        file: {name: 'test.txt'},
+                        destinationFilename: 'test (1).txt',
+                        destinationPath: '/'
+                    }
+                ]
+            })
+        );
     });
 
     it('should resolve naming conflicts with previous uploads', () => {
@@ -47,10 +63,17 @@ describe('useUploads', () => {
 
         uploads.enqueue([{name: 'test.txt'}]);
 
-        expect(dispatch.mock.calls[0][0].uploads).toEqual([{
-            file: {name: 'test.txt'},
-            destinationFilename: 'test (1).txt',
-            destinationPath: '/'
-        }]);
+        expect(dispatch).toHaveBeenCalledTimes(1);
+        expect(dispatch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                uploads: [
+                    {
+                        file: {name: 'test.txt'},
+                        destinationFilename: 'test (1).txt',
+                        destinationPath: '/'
+                    }
+                ]
+            })
+        );
     });
 });

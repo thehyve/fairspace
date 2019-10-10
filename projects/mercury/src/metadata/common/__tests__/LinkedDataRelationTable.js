@@ -36,10 +36,12 @@ describe('LinkedDataRelationTable elements', () => {
 
         const wrapper = shallow(<LinkedDataRelationTable editorPath="/editor" history={historyMock} property={defaultProperty} />);
         const table = wrapper.find(LinkedDataValuesTable);
+
         expect(table.length).toEqual(1);
+
         table.prop("onOpen")({id: 'http://id'});
 
-        expect(historyMock.push.mock.calls.length).toEqual(1);
-        expect(historyMock.push.mock.calls[0][0]).toEqual('/editor?iri=http%3A%2F%2Fid');
+        expect(historyMock.push).toHaveBeenCalledTimes(1);
+        expect(historyMock.push).toHaveBeenCalledWith('/editor?iri=http%3A%2F%2Fid');
     });
 });
