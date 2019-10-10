@@ -4,6 +4,10 @@ package io.fairspace.saturn.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
@@ -76,15 +80,24 @@ public class Config {
         public String blobStorePath = "data/blobs";
     }
 
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class RabbitMQ {
+        @Builder.Default
         public boolean enabled = false;
+        @Builder.Default
         public boolean required = true;
 
+        @Builder.Default
         public String host = "localhost";
+        @Builder.Default
         public int port = 5672;
         public String username;
         public String password;
+        @Builder.Default
         public String virtualHost = "/";
+        @Builder.Default
         public String exchangeName = "fairspace";
     }
 

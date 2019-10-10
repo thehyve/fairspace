@@ -15,7 +15,11 @@ public class MailService {
     private final Session session;
 
     public MailService(Properties properties) {
-        this.session = Session.getInstance(properties);
+        this(Session.getInstance(properties));
+    }
+
+    public MailService(Session session) {
+        this.session = session;
     }
 
     public MimeMessage newMessage() {

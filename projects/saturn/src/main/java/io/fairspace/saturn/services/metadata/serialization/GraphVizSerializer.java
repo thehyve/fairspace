@@ -36,17 +36,32 @@ public class GraphVizSerializer implements Serializer {
         var addedRelationShapes = new HashSet<>();
         model.listSubjectsWithProperty(RDF.type, FS.ClassShape).forEachRemaining(classShape-> {
             var classLabel = getStringProperty(classShape, SH.name);
-            var targetClass = getResourceProperty(classShape, SH.targetClass).getURI();
+            var targetClassResource = getResourceProperty(classShape, SH.targetClass);
+
+            // If label or targetclass are missing, don't add the node
+            if(classLabel == null || targetClassResource == null) {
+                return;
+            }
+
+            var targetClass = targetClassResource.getURI();
             addNode(stringBuilder, classLabel, targetClass);
 
             // Add relation properties as edges
             getResourceProperties(classShape, SH.property).forEach(propertyShape -> {
                 // Skip everything but relationshapes
-                if(!getType(propertyShape).equals(FS.RelationShape))
+                var type = getType(propertyShape);
+                if(type == null || !type.equals(FS.RelationShape))
                     return;
 
                 var propertyLabel = getStringProperty(propertyShape, SH.name);
-                var otherClass = getResourceProperty(propertyShape, SH.class_).getURI();
+                var otherClassResource = getResourceProperty(propertyShape, SH.class_);
+
+                // If label or class are missing, don't add the node
+                if(classLabel == null || otherClassResource == null) {
+                    return;
+                }
+                var otherClass = otherClassResource.getURI();
+
 
                 // A relation with an inverse will be combined with its inverse
                 // to simplify the drawing
