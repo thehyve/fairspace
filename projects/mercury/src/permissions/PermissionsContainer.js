@@ -6,7 +6,7 @@ import PermissionAPI from "./PermissionAPI";
 import PermissionsViewer from "./PermissionsViewer";
 import {createMetadataIri} from "../common/utils/linkeddata/metadataUtils";
 
-export default (props) => {
+export default ({iri, canManage}) => {
     const {permissions, loading: permissionsLoading, error: permissionsError, refresh: refreshPermissions} = useContext(PermissionContext);
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {usersLoading, usersError, refresh: refreshUsers} = useContext(UsersContext);
@@ -34,7 +34,8 @@ export default (props) => {
             permissions={permissions}
             alterPermission={alterPermission}
             currentUser={currentUserWithIri}
-            {...props}
+            iri={iri}
+            canManage={canManage}
         />
     );
 };

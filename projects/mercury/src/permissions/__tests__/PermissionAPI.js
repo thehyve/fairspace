@@ -1,17 +1,6 @@
 import mockAxios from 'axios';
 
 import PermissionAPI from "../PermissionAPI";
-import Config from "../../common/services/Config";
-
-beforeAll(() => {
-    Config.setConfig({
-        urls: {
-            permissions: 'permissions'
-        }
-    });
-
-    return Config.init();
-});
 
 beforeEach(() => {
     mockAxios.get.mockClear();
@@ -23,7 +12,7 @@ describe('PermissionAPI', () => {
         PermissionAPI.getPermissions('resource-iri');
 
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('permissions?all=true&iri=resource-iri',
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/permissions/?all=true&iri=resource-iri',
             {
                 headers: {
                     'Accept': 'application/json',
@@ -36,7 +25,7 @@ describe('PermissionAPI', () => {
         PermissionAPI.alterPermission('userIri', 'resource-iri', 'access');
 
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
-        expect(mockAxios.put).toHaveBeenCalledWith('permissions?iri=resource-iri',
+        expect(mockAxios.put).toHaveBeenCalledWith('/api/v1/permissions/?iri=resource-iri',
             JSON.stringify({user: "userIri", access: "access"}),
             {headers: {'Content-Type': 'application/json'}});
     });

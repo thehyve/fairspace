@@ -31,25 +31,44 @@ describe('<SearchPage />', () => {
 
     it('should perform search on component first mount', () => {
         const search = jest.fn();
-        mount(<SearchPage fetchVocabularyIfNeeded={() => {}} location={{search: ''}} performSearch={search} />);
-        expect(search.mock.calls.length).toEqual(1);
+        mount(<SearchPage
+            fetchVocabularyIfNeeded={() => {}}
+            location={{search: ''}}
+            query="theQuery"
+            performSearch={search}
+        />);
+
+        expect(search).toHaveBeenCalledTimes(1);
+        expect(search).toHaveBeenCalledWith('theQuery');
     });
 
     it('should fetch vocabulary on component first mount', () => {
         const fetchVocabularyIfNeeded = jest.fn();
-        mount(<SearchPage fetchVocabularyIfNeeded={fetchVocabularyIfNeeded} location={{search: ''}} performSearch={() => {}} />);
-        expect(fetchVocabularyIfNeeded.mock.calls.length).toEqual(1);
+
+        mount(<SearchPage
+            fetchVocabularyIfNeeded={fetchVocabularyIfNeeded}
+            location={{search: ''}}
+            performSearch={() => {}}
+        />);
+
+        expect(fetchVocabularyIfNeeded).toHaveBeenCalledTimes(1);
     });
 
     it('should perform search after search query change', () => {
-        const localWrapper = mount(<SearchPage fetchVocabularyIfNeeded={() => {}} location={{search: ''}} performSearch={() => {}} />);
+        const localWrapper = mount(<SearchPage
+            fetchVocabularyIfNeeded={() => {}}
+            location={{search: ''}}
+            performSearch={() => {}}
+        />);
         const search = jest.fn();
+
         localWrapper.setProps(
             {
                 location: {search: 'A new Search'},
                 performSearch: search
             }
         );
-        expect(search.mock.calls.length).toEqual(1);
+
+        expect(search).toHaveBeenCalledTimes(1);
     });
 });

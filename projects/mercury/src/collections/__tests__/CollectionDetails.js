@@ -1,22 +1,19 @@
 import React from 'react';
-import {mount} from 'enzyme';
-import CollectionDetails, {ICONS} from "../CollectionDetails";
-import Config from "../../common/services/Config";
-import configFile from "../../config";
+import {render} from '@testing-library/react';
+import {act} from 'react-dom/test-utils';
+import '@testing-library/jest-dom/extend-expect';
 
-beforeAll(() => {
-    Config.setConfig(Object.assign(configFile, {
-        externalConfigurationFiles: [],
-    }));
-    return Config.init();
-});
+import CollectionDetails, {ICONS} from "../CollectionDetails";
 
 describe('<CollectionDetails />', () => {
-    it('renders proper icon for local storage collection', () => {
+    it('renders proper icon for local storage collection', async () => {
         const dateCreated = new Date().toUTCString();
         const collection = {type: 'LOCAL_STORAGE', name: 'Test1', iri: 'http://test', dateCreated};
-        const wrapper = mount(<CollectionDetails collection={collection} />);
 
-        expect(wrapper.contains(ICONS.LOCAL_STORAGE)).toBeTruthy();
+        await act(async () => {
+            const {getByText} = render(<CollectionDetails collection={collection} />);
+
+            expect(getByText(ICONS.LOCAL_STORAGE)).toBeInTheDocument();
+        });
     });
 });

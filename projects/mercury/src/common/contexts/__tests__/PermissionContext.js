@@ -4,8 +4,6 @@ import {UsersContext} from "@fairspace/shared-frontend";
 import {mount} from "enzyme";
 import {act} from "@testing-library/react";
 import PermissionContext, {PermissionProvider} from "../PermissionContext";
-import Config from "../../services/Config";
-import configFile from "../../../config.json";
 
 const defaultPermissions = [
     {
@@ -43,14 +41,6 @@ const defaultUsers = [
 
 describe('PermissionProvider', () => {
     const getPermissionsMock = jest.fn(() => Promise.resolve(defaultPermissions));
-
-    beforeAll(() => {
-        Config.setConfig(Object.assign(configFile, {
-            externalConfigurationFiles: [],
-        }));
-
-        return Config.init();
-    });
 
     it('updates permissions after users change', async () => {
         let permissionContextOutput;

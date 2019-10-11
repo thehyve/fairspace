@@ -1,21 +1,7 @@
 import mockAxios from 'axios';
 
 import {MetadataAPI} from "../LinkedDataAPI";
-import Config from "../../common/services/Config";
 import {vocabularyUtils} from "../../common/utils/linkeddata/vocabularyUtils";
-
-beforeAll(() => {
-    Config.setConfig({
-        urls: {
-            metadata: {
-                statements: "/meta/",
-                entities: "/entities/",
-            }
-        }
-    });
-
-    return Config.init();
-});
 
 beforeEach(() => {
     mockAxios.get.mockClear();
@@ -29,7 +15,7 @@ describe('LinkedDataApi', () => {
         MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c', includeObjectProperties: true});
 
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('/meta/?subject=a&predicate=b&object=c&includeObjectProperties=true', {headers: {Accept: 'application/ld+json'}});
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/metadata/?subject=a&predicate=b&object=c&includeObjectProperties=true', {headers: {Accept: 'application/ld+json'}});
     });
 
     it('calls the correct url without any parameters', () => {
@@ -38,7 +24,7 @@ describe('LinkedDataApi', () => {
         MetadataAPI.get({});
 
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('/meta/?', {headers: {Accept: 'application/ld+json'}});
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/metadata/?', {headers: {Accept: 'application/ld+json'}});
     });
 
     it('stores metadata as jsonld', () => {
@@ -74,6 +60,6 @@ describe('LinkedDataApi', () => {
         ];
 
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith('/meta/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
+        expect(mockAxios.patch).toHaveBeenCalledWith('/api/v1/metadata/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
     });
 });

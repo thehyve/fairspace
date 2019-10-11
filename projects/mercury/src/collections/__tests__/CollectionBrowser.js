@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {mount, shallow} from "enzyme";
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
@@ -10,7 +9,6 @@ import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import CollectionBrowser from "../CollectionBrowser";
 import CollectionBrowserContainer from "../CollectionBrowserContainer";
-import Config from "../../common/services/Config";
 import * as actionTypes from "../../common/redux/actions/actionTypes";
 
 const middlewares = [thunk, promiseMiddleware];
@@ -51,23 +49,9 @@ beforeEach(() => {
             </Provider>
         </MemoryRouter>
     );
-
-    Config.setConfig({
-        urls: {
-            collections: "/collections"
-        }
-    });
-
-    return Config.init();
 });
 
-describe('CollectionBrowser', () => {
-    it('renders without crashing', () => {
-        const div = document.createElement('div');
-        ReactDOM.render(collectionBrowser, div);
-        ReactDOM.unmountComponentAtNode(div);
-    });
-
+describe('<CollectionBrowser />', () => {
     it('dispatch an action on collection save', () => {
         const wrapper = mount(collectionBrowser);
 
@@ -89,16 +73,14 @@ describe('CollectionBrowser', () => {
         expect(store.getActions()[0].type).toBe(actionTypes.ADD_COLLECTION_PENDING);
     });
 
-    it('is loading as long as the user is pending', () => {
+    it('is loading as long as the user, users or collections are pending', () => {
         const wrapper = shallow(<CollectionBrowser currentUserLoading />);
+        const wrapper2 = shallow(<CollectionBrowser usersLoading />);
+        const wrapper3 = shallow(<CollectionBrowser loading />);
 
         expect(wrapper.find(LoadingInlay).length).toBe(1);
-    });
-
-    it('is loading as long as the collections are pending', () => {
-        const wrapper = shallow(<CollectionBrowser loading />);
-
-        expect(wrapper.find(LoadingInlay).length).toBe(1);
+        expect(wrapper2.find(LoadingInlay).length).toBe(1);
+        expect(wrapper3.find(LoadingInlay).length).toBe(1);
     });
 
     it('is in error state when user fetching failed', () => {
