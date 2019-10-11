@@ -49,7 +49,7 @@ const CollectionList = ({
 
     return (
         <Paper className={classes.root}>
-            <Table padding="dense">
+            <Table>
                 <TableHead>
                     <TableRow>
                         {
