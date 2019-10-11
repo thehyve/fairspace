@@ -16,7 +16,7 @@ import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
 
-const styles = () => ({
+const styles = {
     tableRoot: {
         width: '100%',
         overflowX: 'auto'
@@ -24,7 +24,7 @@ const styles = () => ({
     table: {
         minWidth: 700,
     }
-});
+};
 
 // Exporting here to be able to test the component outside of Redux
 export const SearchPage = ({
