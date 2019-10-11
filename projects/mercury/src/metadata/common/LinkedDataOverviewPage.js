@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
+import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {BreadCrumbs, usePageTitleUpdater} from '@fairspace/shared-frontend';
+
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
 import LinkedDataOverviewHeader from "./LinkedDataOverviewHeader";
@@ -8,7 +10,6 @@ import useLinkedDataSearchParams from "../UseLinkedDataSearchParams";
 import {getFirstPredicateId} from "../../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
-import PropTypes from "prop-types";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
@@ -79,6 +80,6 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
 LinkedDataOverviewPage.propTypes = {
     title: PropTypes.string,
     resultsComponent: PropTypes.elementType.isRequired
-}
+};
 
 export default withRouter(LinkedDataOverviewPage);

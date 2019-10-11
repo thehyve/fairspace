@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import PropTypes from "prop-types";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import LockOpen from "@material-ui/icons/LockOpen";
@@ -6,7 +6,6 @@ import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles}
 import classnames from "classnames";
 
 import PermissionsContainer from "./PermissionsContainer";
-import PermissionContext from "../common/contexts/PermissionContext";
 
 const styles = theme => ({
     expand: {
@@ -37,16 +36,20 @@ const styles = theme => ({
     }
 });
 
-export const PermissionsCard = ({classes, iri, canManage, maxCollaboratorIcons}) => {
-    const {permissions} = useContext(PermissionContext);
+export const PermissionsCard = ({classes, permissions, iri, canManage = false, maxCollaboratorIcons = 5}) => {
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
 
     const permissionIcons = permissions
         .slice(0, maxCollaboratorIcons)
-        .map(permission => (
-            <Avatar key={permission.user} title={permission.userName} src="/public/images/avatar.png" className={classes.avatar} />
+        .map(({user, userName}) => (
+            <Avatar
+                key={user}
+                title={userName}
+                src="/public/images/avatar.png"
+                className={classes.avatar}
+            />
         ));
 
     const cardHeaderAction = (
@@ -94,12 +97,6 @@ PermissionsCard.propTypes = {
     iri: PropTypes.string.isRequired,
     canManage: PropTypes.bool,
     maxCollaboratorIcons: PropTypes.number
-};
-
-PermissionsCard.defaultProps = {
-    maxCollaboratorIcons: 5,
-    classes: {},
-    canManage: false
 };
 
 export default withStyles(styles)(PermissionsCard);

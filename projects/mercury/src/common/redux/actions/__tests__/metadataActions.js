@@ -3,20 +3,11 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 
 import {fetchMetadataBySubjectIfNeeded} from "../metadataActions";
-import Config from "../../../services/Config";
-import configFile from "../../../../config";
 import {FETCH_METADATA} from "../actionTypes";
 
 const subject = 'my-subject';
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
-
-beforeAll(() => {
-    Config.setConfig(Object.assign(configFile, {
-        externalConfigurationFiles: [],
-    }));
-    return Config.init();
-});
 
 describe('fetch metadata', () => {
     it('should fetch data if nothing is present', () => {

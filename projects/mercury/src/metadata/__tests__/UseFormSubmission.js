@@ -9,14 +9,14 @@ describe('UseFormSubmission', () => {
         const submitFunc = jest.fn(() => Promise.resolve());
         const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc));
 
-        expect(submitFunc.mock.calls.length).toEqual(0);
+        expect(submitFunc).toHaveBeenCalledTimes(0);
 
         act(() => {
             result.current.submitForm();
         });
         await waitForNextUpdate();
 
-        expect(submitFunc.mock.calls.length).toEqual(1);
+        expect(submitFunc).toHaveBeenCalledTimes(1);
     });
 
     it('should show the custom error component for validation errors (error with details object)', async () => {
@@ -28,16 +28,16 @@ describe('UseFormSubmission', () => {
         };
         const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
 
-        expect(errorDialogMock.showError.mock.calls.length).toEqual(0);
-        expect(errorDialogMock.renderError.mock.calls.length).toEqual(0);
+        expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
+        expect(errorDialogMock.renderError).toHaveBeenCalledTimes(0);
 
         act(() => {
             result.current.submitForm();
         });
         await waitForNextUpdate();
 
-        expect(errorDialogMock.showError.mock.calls.length).toEqual(0);
-        expect(errorDialogMock.renderError.mock.calls.length).toEqual(1);
+        expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
+        expect(errorDialogMock.renderError).toHaveBeenCalledTimes(1);
     });
 
     it('should show the default error component for general errors', async () => {
@@ -48,16 +48,16 @@ describe('UseFormSubmission', () => {
         };
         const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
 
-        expect(errorDialogMock.showError.mock.calls.length).toEqual(0);
-        expect(errorDialogMock.renderError.mock.calls.length).toEqual(0);
+        expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
+        expect(errorDialogMock.renderError).toHaveBeenCalledTimes(0);
 
         act(() => {
             result.current.submitForm();
         });
         await waitForNextUpdate();
 
-        expect(errorDialogMock.renderError.mock.calls.length).toEqual(0);
-        expect(errorDialogMock.showError.mock.calls.length).toEqual(1);
+        expect(errorDialogMock.showError).toHaveBeenCalledTimes(1);
+        expect(errorDialogMock.renderError).toHaveBeenCalledTimes(0);
     });
 
     it('should render validation errors IRIs with namespaces', async () => {

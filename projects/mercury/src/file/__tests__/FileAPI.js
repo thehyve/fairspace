@@ -1,27 +1,16 @@
 import FileAPI from "../FileAPI";
-import Config from "../../common/services/Config";
-
-beforeAll(() => {
-    Config.setConfig({
-        urls: {
-            files: "/files",
-            download: "/download"
-        }
-    });
-
-    return Config.init();
-});
 
 describe('FileAPI', () => {
     describe('Uploading', () => {
         it('uploads a file', async () => {
             FileAPI.webDavClient = {putFileContents: jest.fn(() => Promise.resolve({}))};
             const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
-
             const result = await FileAPI.upload(file);
+
             expect(result).toEqual({});
-            expect(FileAPI.webDavClient.putFileContents.mock.calls[0][0]).toEqual('/test/path/destination.txt');
-            expect(FileAPI.webDavClient.putFileContents.mock.calls[0][1]).toEqual('FILE_OBJECT');
+            expect(FileAPI.webDavClient.putFileContents).toHaveBeenCalledTimes(1);
+            expect(FileAPI.webDavClient.putFileContents)
+                .toHaveBeenCalledWith('/test/path/destination.txt', 'FILE_OBJECT', expect.anything());
         });
 
         it('should result in a clear error on 403 response', () => {
@@ -39,7 +28,7 @@ describe('FileAPI', () => {
 
             await FileAPI.move('/coll/path/file.ext', '/coll/path/file.ext');
 
-            expect(FileAPI.webDavClient.moveFile.mock.calls.length).toEqual(0);
+            expect(FileAPI.webDavClient.moveFile).toHaveBeenCalledTimes(0);
         });
 
         it('should result in a clear error on 400 response', () => {
@@ -121,6 +110,6 @@ describe('FileAPI', () => {
 
     it('Generates proper download link', () => {
         const downloadLink = FileAPI.getDownloadLink('/filePath');
-        expect(downloadLink).toEqual('/download/filePath');
+        expect(downloadLink).toEqual('/webdav/v1/filePath');
     });
 });

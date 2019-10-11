@@ -5,7 +5,7 @@ import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from '.';
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 
 export default ({title, subject}) => {
-    const iri = useNamespacedIri(subject)
+    const iri = useNamespacedIri(subject);
     usePageTitleUpdater(`${iri} - ${title}`);
 
     return (

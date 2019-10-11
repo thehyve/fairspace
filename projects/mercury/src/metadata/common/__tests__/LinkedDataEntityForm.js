@@ -4,7 +4,6 @@ import {List} from '@material-ui/core';
 import {MessageDisplay} from '@fairspace/shared-frontend';
 
 import LinkedDataEntityForm from "../LinkedDataEntityForm";
-import Config from "../../../common/services/Config";
 import {STRING_URI} from "../../../constants";
 import LinkedDataProperty from "../LinkedDataProperty";
 
@@ -33,16 +32,6 @@ describe('LinkedDataEntityForm', () => {
         ],
         'my-property': []
     };
-
-    beforeAll(() => {
-        Config.setConfig({
-            urls: {
-                metadata: "/metadata"
-            }
-        });
-
-        return Config.init();
-    });
 
     it('render properties', () => {
         const metadata = [

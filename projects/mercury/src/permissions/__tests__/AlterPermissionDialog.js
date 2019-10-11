@@ -4,7 +4,6 @@ import {mount} from 'enzyme';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
 import UserSelect from "../UserSelect";
-import {DebouncedSelect} from "@fairspace/shared-frontend";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
@@ -90,14 +89,13 @@ describe('AlterPermissionDialog', () => {
                 currentUser={mockCurrentLoggedUser}
                 alterPermission={mockAlterPermissionFn}
                 users={mockUsers}
-                loading
+                loading={false}
             />
         );
         wrapper.setState({selectedUser: mockPermission.user});
 
         expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
         expect(wrapper.find('WithStyles(Typography)').at(1).text()).toEqual('Michael Jackson');
-        // TODO: fix test
-        // expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeFalsy(); // submit button enabled
+        expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeFalsy(); // submit button enabled
     });
 });

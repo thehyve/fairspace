@@ -1,89 +1,73 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import {shallow} from "enzyme";
 
 import {InformationDrawer} from "../InformationDrawer";
 
 describe('InformationDrawer', () => {
-    const resolveMock = jest.fn(() => Promise.resolve());
-    const rejectMock = jest.fn(() => Promise.reject());
-    const invalidateMetadata = jest.fn();
-    const fetchMetadata = jest.fn();
+    const collection = {
+        name: 'My collection',
+        description: 'description',
+        location: 'location1',
+        iri: ''
+    };
 
-    let collection;
-    let handleCollectionLocationChange;
-    let wrapper;
-
-    beforeEach(() => {
-        collection = {
-            name: 'My collection',
-            description: 'description',
-            location: 'location1',
-            iri: ''
-        };
-
-        handleCollectionLocationChange = jest.fn();
-    });
+    const defaultProps = {
+        collection,
+        updateCollection: () => Promise.resolve(),
+        invalidateMetadata: () => {},
+        fetchMetadata: () => {},
+        paths: []
+    };
 
     it('invokes callback method after collection location has changed', () => {
-        wrapper = shallow(<InformationDrawer
-            collection={collection}
-            updateCollection={resolveMock}
-            invalidateMetadata={invalidateMetadata}
-            fetchMetadata={fetchMetadata}
+        const handleCollectionLocationChange = jest.fn();
+        const wrapper = shallow(<InformationDrawer
+            {...defaultProps}
             onCollectionLocationChange={handleCollectionLocationChange}
-            paths={[]}
         />);
 
         return wrapper.instance()
             .handleUpdateCollection('My collection', 'description', 'newlocation')
             .then(() => {
-                expect(handleCollectionLocationChange.mock.calls.length).toEqual(1);
-                expect(handleCollectionLocationChange.mock.calls[0][0]).toEqual('newlocation');
+                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(1);
+                expect(handleCollectionLocationChange).toHaveBeenCalledWith('newlocation');
             });
     });
 
     it('does not invoke callback method if collection location has not changed', () => {
-        wrapper = shallow(<InformationDrawer
-            collection={collection}
-            updateCollection={resolveMock}
-            invalidateMetadata={invalidateMetadata}
-            fetchMetadata={fetchMetadata}
+        const handleCollectionLocationChange = jest.fn();
+        const wrapper = shallow(<InformationDrawer
+            {...defaultProps}
             onCollectionLocationChange={handleCollectionLocationChange}
-            paths={[]}
         />);
 
         return wrapper.instance()
             .handleUpdateCollection('Other name', 'Other description', 'location1')
             .then(() => {
-                expect(handleCollectionLocationChange.mock.calls.length).toEqual(0);
+                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(0);
             });
     });
 
 
     it('does not invoke callback method if collection update fails', () => {
-        wrapper = shallow(<InformationDrawer
-            collection={collection}
-            updateCollection={rejectMock}
-            invalidateMetadata={invalidateMetadata}
-            fetchMetadata={fetchMetadata}
+        const handleCollectionLocationChange = jest.fn();
+        const wrapper = shallow(<InformationDrawer
+            {...defaultProps}
+            updateCollection={() => Promise.reject()}
             onCollectionLocationChange={handleCollectionLocationChange}
-            paths={[]}
         />);
 
         return wrapper.instance()
             .handleUpdateCollection('Other name', 'Other description', 'newlocation')
             .then(() => {
-                expect(handleCollectionLocationChange.mock.calls.length).toEqual(0);
+                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(0);
             });
     });
 
     it('ignores a missing callback function when a collection location has changed', () => {
-        wrapper = shallow(<InformationDrawer
-            collection={collection}
-            updateCollection={resolveMock}
-            invalidateMetadata={invalidateMetadata}
-            fetchMetadata={fetchMetadata}
-            paths={[]}
+        const wrapper = shallow(<InformationDrawer
+            {...defaultProps}
         />);
 
         // Verify that updating a collection without callback

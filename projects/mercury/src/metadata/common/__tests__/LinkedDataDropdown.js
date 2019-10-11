@@ -17,10 +17,13 @@ describe('LinkedDataDropdown', () => {
 
         const dropdown = wrapper.find(Dropdown);
 
-        return dropdown.prop("loadOptions")().then(() => {
-            expect(mockFetchItems.mock.calls.length).toEqual(1);
-            expect(mockFetchItems.mock.calls[0][0].types)
-                .toEqual(['http://workspace.ci.fairway.app/vocabulary/PersonConsent']);
-        });
+        return dropdown.prop("loadOptions")()
+            .then(() => {
+                expect(mockFetchItems).toHaveBeenCalledTimes(1);
+                expect(mockFetchItems)
+                    .toHaveBeenCalledWith(expect.objectContaining({
+                        types: ['http://workspace.ci.fairway.app/vocabulary/PersonConsent']
+                    }));
+            });
     });
 });

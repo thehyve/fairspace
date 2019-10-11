@@ -2,13 +2,14 @@ import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import {LoadingInlay} from '@fairspace/shared-frontend';
 
-const loadingOverlay = (props) => (
+const loadingOverlay = ({loading}) => (
     <Dialog
-        open={props.loading || false}
+        open={loading || false}
         PaperProps={{
             style: {
                 backgroundColor: 'transparent',
                 boxShadow: 'none',
+                overflow: 'hidden'
             }
         }}
     >

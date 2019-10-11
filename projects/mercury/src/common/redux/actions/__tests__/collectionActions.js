@@ -3,20 +3,11 @@ import thunk from 'redux-thunk';
 import promiseMiddleware from "redux-promise-middleware";
 import mockAxios from 'axios';
 
-import Config from "../../../services/Config";
-import configFile from "../../../../config";
 import {UPDATE_COLLECTION} from "../actionTypes";
 import {updateCollection} from "../collectionActions";
 
 const middlewares = [thunk, promiseMiddleware];
 const mockStore = configureStore(middlewares);
-
-beforeAll(() => {
-    Config.setConfig(Object.assign(configFile, {
-        externalConfigurationFiles: [],
-    }));
-    return Config.init();
-});
 
 describe('Update metadata', () => {
     it('should return an error if updating a collection fails', () => {
