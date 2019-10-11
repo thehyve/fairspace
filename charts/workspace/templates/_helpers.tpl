@@ -49,30 +49,17 @@ Create a name for the tls secret for workspace
 
 
 {{/*
-Create the keycloak baseUrl, either by using the override value or constructing it ourselves
+Create the keycloak baseUrl
 */}}
 {{- define "keycloak.baseUrl" -}}
-
-{{- if .Values.hyperspace.locationOverrides.keycloak -}}
-{{- .Values.hyperspace.locationOverrides.keycloak -}}
-{{- else -}}
-
-{{- if .Values.hyperspace.tls -}}
-{{- $scheme := "https" -}}
-{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.domain -}}
-{{- else -}}
-{{- $scheme := "http" -}}
-{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.domain -}}
-{{- end -}}
-
-{{- end -}}
+{{- .Values.external.keycloak.baseUrl -}}
 {{- end -}}
 
 {{/*
 Define the keycloak realm, by using a set value. This allows us to pass the value to subcharts
 */}}
 {{- define "keycloak.realm" -}}
-{{- .Values.hyperspace.keycloak.realm -}}
+{{- .Values.external.keycloak.realm -}}
 {{- end -}}
 
 {{/*
@@ -132,7 +119,7 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 
 {{- define "elasticsearch.resturl" -}}
-{{- printf "%s://%s:%s/%s/_search" .Values.hyperspace.elasticsearch.rest.scheme .Values.hyperspace.elasticsearch.rest.host (.Values.hyperspace.elasticsearch.rest.port | toString) .Values.hyperspace.elasticsearch.indexName -}}
+{{- printf "%s://%s:%s/%s/_search" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) .Values.external.elasticsearch.indexName -}}
 {{- end -}}
 
 {{- define "workspace.roles.sparql" -}}

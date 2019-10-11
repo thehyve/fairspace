@@ -1,7 +1,7 @@
-# Hyperspace that this workspace is connected to
-hyperspace:
-  domain: demo.fairway.app
+# External dependencies for running the workspace
+external:
   keycloak:
+    baseUrl: https://keycloak.demo.fairway.app
     username: keycloak
     password: keycloak-demo-123
     realm: demo
