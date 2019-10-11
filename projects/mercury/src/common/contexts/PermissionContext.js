@@ -6,7 +6,7 @@ import getDisplayName from "../utils/userUtils";
 
 const PermissionContext = React.createContext({});
 
-export const PermissionProvider = ({iri, children}) => {
+export const PermissionProvider = ({iri, children, getPermissions = PermissionAPI.getPermissions}) => {
     const {users} = useContext(UsersContext);
     const [permissions, setPermissions] = useState([]);
     const [error, setError] = useState(false);
@@ -21,9 +21,9 @@ export const PermissionProvider = ({iri, children}) => {
             setLoading(true);
 
             try {
-                const fetchedPermissions = await PermissionAPI.getPermissions(iri);
+                const fetchedPermissions = await getPermissions(iri);
                 if (!didCancel) {
-                    setPermissions(extendWithUsernames(fetchedPermissions));
+                    setPermissions(fetchedPermissions);
                     setLoading(false);
                 }
             } catch (e) {
@@ -45,7 +45,7 @@ export const PermissionProvider = ({iri, children}) => {
     return (
         <PermissionContext.Provider
             value={{
-                permissions,
+                permissions: extendWithUsernames(permissions),
                 error,
                 loading,
                 refresh
