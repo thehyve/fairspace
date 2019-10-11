@@ -56,6 +56,8 @@ class FileAPI {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
+                        case 400:
+                            throw new Error("Unable to create the given directory. Please check that the name does not contain special characters.");
                         case 403:
                             throw new Error("You do not have authorization to create a directory in this collection.");
                         case 405:
