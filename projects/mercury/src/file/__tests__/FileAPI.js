@@ -1,3 +1,4 @@
+/* eslint-disable prefer-promise-reject-errors */
 import FileAPI from "../FileAPI";
 
 describe('FileAPI', () => {
@@ -14,11 +15,11 @@ describe('FileAPI', () => {
         });
 
         it('should result in a clear error on 403 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {putFileContents: jest.fn(() => Promise.reject({response: {status: 403}}))};
             const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
 
-            return expect(FileAPI.upload(file)).rejects.toEqual(new Error("You do not have authorization to add files to this collection."));
+            return expect(FileAPI.upload(file))
+                .rejects.toThrow(/authorization to add/);
         });
     });
 
@@ -32,45 +33,40 @@ describe('FileAPI', () => {
         });
 
         it('should result in a clear error on 400 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.reject({response: {status: 400}}))};
 
             return expect(FileAPI.move("/test", "special-characters"))
-                .rejects.toEqual(new Error("Could not move one or more files. Possibly the filename contains special characters."));
+                .rejects.toThrow(/contains special characters/);
         });
 
         it('should result in a clear error on 403 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.reject({response: {status: 403}}))};
 
             return expect(FileAPI.move("/test", "special-characters"))
-                .rejects.toEqual(new Error("Could not move one or more files. Do you have write permission to both the source and destination collection?"));
+                .rejects.toThrow(/write permission/);
         });
 
         it('should result in a clear error on 409 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.reject({response: {status: 409}}))};
 
             return expect(FileAPI.move("/test", "special-characters"))
-                .rejects.toEqual(new Error("Could not move one or more files. The destination can not be copied to."));
+                .rejects.toThrow(/destination can not be copied to/);
         });
 
         it('should result in a clear error on 412 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {moveFile: jest.fn(() => Promise.reject({response: {status: 412}}))};
 
             return expect(FileAPI.move("/test", "special-characters"))
-                .rejects.toEqual(new Error("Could not move one or more files. The destination file already exists."));
+                .rejects.toThrow(/already exists/);
         });
     });
 
     describe('Deleting', () => {
         it('should result in a clear error on 403 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {deleteFile: jest.fn(() => Promise.reject({response: {status: 403}}))};
 
             return expect(FileAPI.delete('path'))
-                .rejects.toEqual(new Error("Could not delete file or directory. Do you have write permissions to the collection?"));
+                .rejects.toThrow(/write permissions/);
         });
     });
 
@@ -100,11 +96,25 @@ describe('FileAPI', () => {
     });
 
     describe('createDirectory', () => {
+        it('should result in clear error on 400 response', () => {
+            FileAPI.webDavClient = {createDirectory: jest.fn(() => Promise.reject({response: {status: 400}}))};
+
+            return expect(FileAPI.createDirectory("/test"))
+                .rejects.toThrow(/contain special characters/);
+        });
+
+        it('should result in clear error on 403 response', () => {
+            FileAPI.webDavClient = {createDirectory: jest.fn(() => Promise.reject({response: {status: 403}}))};
+
+            return expect(FileAPI.createDirectory("/test"))
+                .rejects.toThrow(/authorization to create/);
+        });
+
         it('should result in clear error on 405 response', () => {
-            // eslint-disable-next-line prefer-promise-reject-errors
             FileAPI.webDavClient = {createDirectory: jest.fn(() => Promise.reject({response: {status: 405}}))};
 
-            return expect(FileAPI.createDirectory("/test")).rejects.toEqual(new Error("A directory or file with this name already exists. Please choose another name"));
+            return expect(FileAPI.createDirectory("/test"))
+                .rejects.toThrow(/already exists/);
         });
     });
 
