@@ -19,7 +19,7 @@ describe('FileAPI', () => {
             const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
 
             return expect(FileAPI.upload(file))
-                .rejects.toThrow(/files to this collection/);
+                .rejects.toThrow(/authorization to add/);
         });
     });
 
