@@ -9,6 +9,7 @@ describe('<SearchPage />', () => {
 
     beforeEach(() => {
         wrapper = shallow(<SearchPage
+            classes={{}}
             results={{total: 1, items: []}}
             fetchVocabularyIfNeeded={() => {}}
             location={{search: ''}}
@@ -32,6 +33,7 @@ describe('<SearchPage />', () => {
     it('should perform search on component first mount', () => {
         const search = jest.fn();
         mount(<SearchPage
+            classes={{}}
             fetchVocabularyIfNeeded={() => {}}
             location={{search: ''}}
             query="theQuery"
@@ -46,6 +48,7 @@ describe('<SearchPage />', () => {
         const fetchVocabularyIfNeeded = jest.fn();
 
         mount(<SearchPage
+            classes={{}}
             fetchVocabularyIfNeeded={fetchVocabularyIfNeeded}
             location={{search: ''}}
             performSearch={() => {}}
@@ -56,6 +59,7 @@ describe('<SearchPage />', () => {
 
     it('should perform search after search query change', () => {
         const localWrapper = mount(<SearchPage
+            classes={{}}
             fetchVocabularyIfNeeded={() => {}}
             location={{search: ''}}
             performSearch={() => {}}

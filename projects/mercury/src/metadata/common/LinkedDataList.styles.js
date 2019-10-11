@@ -1,14 +1,10 @@
 const styles = {
     root: {
         width: '100%',
-        overflowX: 'auto',
-        wordBreak: 'break-word'
+        overflowX: 'auto'
     },
     table: {
         minWidth: 700,
-    },
-    cell: {
-        minWidth: 80
     }
 };
 

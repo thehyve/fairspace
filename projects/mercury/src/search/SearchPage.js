@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {connect} from 'react-redux';
 import {
     Paper, Table, TableBody,
-    TableCell, TableHead, TableRow
+    TableCell, TableHead, TableRow, withStyles
 } from '@material-ui/core';
 import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString} from '@fairspace/shared-frontend';
 
@@ -16,9 +16,19 @@ import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
 
+const styles = {
+    tableRoot: {
+        width: '100%',
+        overflowX: 'auto'
+    },
+    table: {
+        minWidth: 700,
+    }
+};
+
 // Exporting here to be able to test the component outside of Redux
 export const SearchPage = ({
-    location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
+    classes, location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
     history, selectPath, deselectAllPaths, results, vocabulary, loading, error
 }) => {
     useEffect(() => {
@@ -69,8 +79,8 @@ export const SearchPage = ({
     }
 
     return (
-        <Paper style={{width: '100%'}} data-testid="results-table">
-            <Table padding="dense">
+        <Paper className={classes.root} data-testid="results-table">
+            <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
                         <TableCell>Label</TableCell>
@@ -135,4 +145,4 @@ SearchPage.propTypes = {
     fetchVocabularyIfNeeded: PropTypes.func.isRequired
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchPage);
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(SearchPage));
