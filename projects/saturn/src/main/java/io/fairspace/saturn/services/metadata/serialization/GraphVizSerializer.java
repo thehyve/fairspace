@@ -21,7 +21,7 @@ public class GraphVizSerializer implements Serializer {
     // Mimetype as registered with IANA. See https://www.iana.org/assignments/media-types/text/vnd.graphviz
     public static final String GRAPHVIZ_MIMETYPE = "text/vnd.graphviz";
     private static final String NODE_TEMPLATE = "\"%s\" [label=\"%s\" tooltip=\"%s\"]";
-    private static final String EDGE_TEMPLATE = "\"%s\" -> \"%s\" [tooltip=\"%s\"]";
+    private static final String EDGE_TEMPLATE = "\"%s\" -> \"%s\" [label=\"%s\"]";
     private static final String BIDIRECTIONAL_EDGE_TEMPLATE = "\"%s\" -> \"%s\" [dir=\"both\" tooltip=\"%s / %s\"]";
 
     @Override
@@ -62,20 +62,7 @@ public class GraphVizSerializer implements Serializer {
                 }
                 var otherClass = otherClassResource.getURI();
 
-
-                // A relation with an inverse will be combined with its inverse
-                // to simplify the drawing
-                var inverseShape = getResourceProperty(propertyShape, FS.inverseRelation);
-                if(inverseShape != null && !inverseShape.equals(propertyShape)) {
-                    // Skip any shape for which the inverse was added already
-                    if(addedRelationShapes.contains(inverseShape))
-                        return;
-
-                    var otherPropertyLabel = getStringProperty(inverseShape, SH.name);
-                    addBidirectionalEdge(stringBuilder, targetClass, otherClass, propertyLabel, otherPropertyLabel);
-                } else {
-                    addEdge(stringBuilder, targetClass, otherClass, propertyLabel);
-                }
+                addEdge(stringBuilder, targetClass, otherClass, propertyLabel);
 
                 addedRelationShapes.add(propertyShape);
             });

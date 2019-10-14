@@ -4,11 +4,8 @@ import VocabularySearchResultList from "./VocabularySearchResultList";
 import LinkedDataSearchResultsList from "./common/LinkedDataSearchResultsList";
 import VocabularyGraph from "./VocabularyGraph";
 
-const ResultsComponent = ({query, selectedTypes, ...otherProps}) => {
-    const noQuery = !query || query === '*';
-    const noSelectedTypes = !selectedTypes || selectedTypes.length === 0;
-
-    return (noQuery && noSelectedTypes)
+const ResultsComponent = ({query, selectedTypes, showGraph, ...otherProps}) => {
+    return (showGraph)
         ? <VocabularyGraph />
         : (
             <LinkedDataSearchResultsList
@@ -20,4 +17,4 @@ const ResultsComponent = ({query, selectedTypes, ...otherProps}) => {
         );
 };
 
-export default () => <LinkedDataOverviewPage title="Vocabulary" resultsComponent={ResultsComponent} />;
+export default () => <LinkedDataOverviewPage title="Vocabulary" showGraphSelection resultsComponent={ResultsComponent} />;

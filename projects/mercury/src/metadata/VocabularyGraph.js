@@ -1,53 +1,36 @@
 import React, {useCallback, useContext, useState} from "react";
-import {Link} from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
-import ListItem from "@material-ui/core/ListItem";
-import List from "@material-ui/core/List";
-import Icon from "@material-ui/core/Icon";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import withStyles from "@material-ui/core/styles/withStyles";
+import {withRouter} from "react-router-dom";
 import {LoadingInlay, MessageDisplay, useAsync} from "@fairspace/shared-frontend";
+import {Grid, RadioGroup, FormControlLabel, Radio, Checkbox} from "@material-ui/core";
 import {uniqBy} from 'lodash';
+
 import {VocabularyAPI} from "./LinkedDataAPI";
 import NetworkGraphVisualization from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
-import {getFirstPredicateId, getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
-import {SHACL_CLASS, SHACL_NAME, SHACL_PATH, SHACL_TARGET_CLASS} from "../constants";
-import {getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
-
-const styles = {
-    graph: {
-        height: 'calc(100vh - 300px)',
-        minHeight: 200,
-        maxHeight: 500
-    }
-};
+import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
+import {SHACL_CLASS} from "../constants";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
-const VocabularyGraph = ({classes}) => {
-    const {namespaces, vocabulary, editorPath} = useContext(LinkedDataContext);
+const VocabularyGraph = ({history}) => {
+    const {vocabulary, editorPath} = useContext(LinkedDataContext);
     const {data, error, loading} = useAsync(useCallback(() => VocabularyAPI.graph(), []));
-    const [selection, setSelection] = useState({nodes: [], edges: []});
+    const [showEdgesLabels, setShowEdgesLabels] = useState(false);
+    const [edgesLength, setEdgesLength] = useState("250");
 
-    const handleSelect = useCallback(params => {
-        setSelection(params);
-    }, []);
+    const handleNodeDoubleClick = useCallback(
+        (id) => {
+            const shape = vocabulary.determineShapeForTypes([id]);
+            const url = getEntityRelativeUrl(editorPath, shape['@id']);
+            history.push(url);
+        }, [editorPath, history, vocabulary]
+    );
 
-    if (loading) {
-        return <LoadingInlay />;
-    }
-
-    if (error) {
-        return <MessageDisplay message="An error occurred while loading vocabulary graph data" />;
-    }
-
-    const getRelationShape = (from, to) => vocabulary
+    const getRelationShape = useCallback((from, to) => vocabulary
         .determinePropertyShapesForTypes([from])
-        .find(propertyShape => getFirstPredicateId(propertyShape, SHACL_CLASS) === to);
+        .find(propertyShape => getFirstPredicateId(propertyShape, SHACL_CLASS) === to), [vocabulary]);
 
-    const getRelationShapes = edge => {
+    const getRelationShapes = useCallback(edge => {
         const relationShapes = [];
         if (edge.arrows === 'to' || edge.arrows.to) {
             relationShapes.push(getRelationShape(edge.from, edge.to));
@@ -59,42 +42,70 @@ const VocabularyGraph = ({classes}) => {
 
         // Return a unique list of non-undefined values
         return uniqBy(relationShapes.filter(s => s), s => s['@id']);
-    };
+    }, [getRelationShape]);
 
-    const showShape = (shape, predicateToShow, icon) => (
-        <ListItem
-            key={shape['@id']}
-            component={Link}
-            to={getEntityRelativeUrl(editorPath, shape['@id'])}
-        >
-            {icon ? <ListItemIcon><Icon>{icon}</Icon></ListItemIcon> : undefined}
-            <ListItemText
-                primary={getFirstPredicateValue(shape, SHACL_NAME)}
-                secondary={getNamespacedIri(getFirstPredicateId(shape, predicateToShow), namespaces)}
-            />
-        </ListItem>
+    const handleEdgeDoubleClick = useCallback(
+        (edge) => {
+            if (edge) {
+                const shape = getRelationShapes(edge)[0];
+                const url = getEntityRelativeUrl(editorPath, shape['@id']);
+                history.push(url);
+            }
+        }, [editorPath, getRelationShapes, history]
     );
 
-    const renderNodeInfo = node => showShape(vocabulary.determineShapeForTypes([node.id]), SHACL_TARGET_CLASS, 'lens');
-    const renderEdgeInfo = edge => getRelationShapes(edge).map(shape => showShape(shape, SHACL_PATH, 'link'));
+    if (loading) {
+        return <LoadingInlay />;
+    }
+
+    if (error) {
+        return <MessageDisplay message="An error occurred while loading vocabulary graph data" />;
+    }
 
     return (
-        <Grid container spacing={8}>
-            <Grid item sm={12} md={8}>
-                <NetworkGraphVisualization
-                    network={data}
-                    onSelect={handleSelect}
-                    className={classes.graph}
-                />
+        <Grid container direction="column">
+            <Grid item>
+                <Grid container spacing={32} alignItems="center">
+                    <Grid item>
+                        <FormControlLabel
+                            control={(
+                                <Checkbox
+                                    checked={showEdgesLabels}
+                                    onChange={(e) => setShowEdgesLabels(e.target.checked)}
+                                />
+                            )}
+                            label="Edges Labels"
+                        />
+                    </Grid>
+                    <Grid item>
+                        <RadioGroup
+                            row
+                            aria-label="edges length"
+                            name="edgesLength"
+                            value={edgesLength}
+                            onChange={(e) => setEdgesLength(e.target.value)}
+                        >
+                            <FormControlLabel value="250" control={<Radio />} label="Short Edges" />
+                            <FormControlLabel value="500" control={<Radio />} label="Medium" />
+                            <FormControlLabel value="750" control={<Radio />} label="Long" />
+                        </RadioGroup>
+                    </Grid>
+                </Grid>
             </Grid>
-            <Grid item sm={12} md={4}>
-                <List>
-                    {selection.nodes.map(renderNodeInfo)}
-                    {selection.edges.map(renderEdgeInfo)}
-                </List>
+            <Grid item>
+                <NetworkGraphVisualization
+                    showEdgesLabels={showEdgesLabels}
+                    edgesLength={edgesLength}
+                    network={data}
+                    onNodeDoubleClick={handleNodeDoubleClick}
+                    onEdgeDoubleClick={handleEdgeDoubleClick}
+                    style={{
+                        height: 'calc(100vh - 360px)'
+                    }}
+                />
             </Grid>
         </Grid>
     );
 };
 
-export default withStyles(styles)(VocabularyGraph);
+export default withRouter(VocabularyGraph);
