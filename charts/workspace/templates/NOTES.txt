@@ -35,7 +35,7 @@ that the client `{{ template "workspace.name" . }}-pluto` in keycloak should be 
 You can do so with the following steps:
 
 - Log in to Keycloak at {{ template "keycloak.baseUrl" .}}
-- Go to realm {{ .Values.hyperspace.keycloak.realm }}
+- Go to realm {{ .Values.external.keycloak.realm }}
 - Go to client {{ template "workspace.name" . }}-pluto
 - Add the pluto url (with /*, so for example http://localhost:32124/*) as valid return url
 - Save the client.

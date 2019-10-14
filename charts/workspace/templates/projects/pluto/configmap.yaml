@@ -19,7 +19,7 @@ data:
         - {{ template "docs.url" . }}
       oauth2:
         base-url: {{ template "keycloak.baseUrl" . }}
-        realm: {{ .Values.hyperspace.keycloak.realm }}
+        realm: {{ .Values.external.keycloak.realm }}
 
     security:
       oidc:
@@ -70,7 +70,7 @@ data:
           strip-prefix: true
         keycloak:
           path: /api/keycloak/**
-          url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.hyperspace.keycloak.realm }}
+          url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}
           strip-prefix: true
         storage:
           path: /webdav/${app.apiVersion.saturn}/**
@@ -87,6 +87,6 @@ data:
     rabbitmq:
       enabled: {{ .Values.rabbitmq.enabled }}
       required: {{ .Values.rabbitmq.required }}
-      host: {{ .Values.hyperspace.rabbitmq.host }}
+      host: {{ .Values.external.rabbitmq.host }}
       username: {{ .Values.rabbitmq.username }}
       password: {{ .Values.rabbitmq.password }}

@@ -48,11 +48,9 @@ configuration file would be something like:
 
 ```yaml
 # Provide your own hyperspace settings here
-hyperspace:
-    tls: false
-    locationOverrides:
-        keycloak: http://192.168.99.100:30867
+external:
     keycloak:
+        baseUrl: http://192.168.99.100:30867
         username: keycloak
         password: abcdefghi
         realm: hyperspace
@@ -90,16 +88,14 @@ installation.
 | `workspace.keycloak.roles.datasteward` | Role that the user must have if he wants to manage the vocabulary. | `datasteward-<workspace-name>` |
 | `workspace.keycloak.groups.user` | Members of this group will show up in the collaborator dropdown. These users normally always have the required authority to login. | `<workspace-name>-users` |
 
-#### Hyperspace parameters
+#### External parameters
 | Parameter  | Description  | Default |
 |---|---|---|
-| `hyperspace.tls`  | Whether or not the hyperspace uses tls. Is used for automatic creation of hyperspace urls | true |
-| `hyperspace.domain` | Domain that is used for the hyperspace. Should only include the domain postfix, that was used when installing the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `hyperspace.fairspace.app` as domain will try to lookup keycloak at `keycloak.hyperspace.fairspace.app`  | hyperspace.ci.test.fairdev.app  |
-| `hyperspace.locationOverrides.keycloak` | Optional override for the location of keycloak. Can be used if it runs on a non-standard location. Must include the scheme as well. For example: `http://192.168.99.100:30867` | (Generate url from `hyperspace.domain` property) |
-| `hyperspace.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
-| `hyperspace.keycloak.password`  | Password used for setting up keycloak users. | |
-| `hyperspace.keycloak.realm`  | Keycloak realm that is used for this hyperspace. Also set this variable in `pluto.keycloak.realm`| |
-| `hyperspace.keycloak.clientSecret`  | UUID that is used as client secret in communication between pluto and keycloak.| <random uuid> |
+| `external.keycloak.baseUrl` | Base url for keycloak installation  | https://keycloak.ci.fairway.app  |
+| `external.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
+| `external.keycloak.password`  | Password used for setting up keycloak users. | |
+| `external.keycloak.realm`  | Keycloak realm that is used for this hyperspace. Also set this variable in `pluto.keycloak.realm`| |
+| `external.keycloak.clientSecret`  | UUID that is used as client secret in communication between pluto and keycloak.| <random uuid> |
 
 #### Pluto parameters
 | Parameter  | Description  | Default |

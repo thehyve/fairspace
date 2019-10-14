@@ -34,7 +34,7 @@ spec:
 {{ toYaml $scripts.resources | indent 10 }}
         env:
           - name: LOGIN_REALM
-            value: {{ .Values.hyperspace.keycloak.loginRealm }}
+            value: {{ .Values.external.keycloak.loginRealm }}
           - name: KEYCLOAK_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -51,8 +51,8 @@ spec:
         command:
         - "/opt/jboss/scripts/setup-keycloak-workspace.sh"
         - "{{ template "keycloak.baseUrl" . }}/auth"
-        - "{{.Values.hyperspace.keycloak.username}}"
-        - "{{.Values.hyperspace.keycloak.realm}}"
+        - "{{.Values.external.keycloak.username}}"
+        - "{{.Values.external.keycloak.realm}}"
         - "{{ template "workspace.name" . }}"
         - "/opt/config/redirect.urls"
       volumes:

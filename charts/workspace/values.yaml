@@ -10,46 +10,40 @@ imagePullSecrets: {}
 # Please note that if this is set, also set it for pluto in `pluto.workspace.name`
 nameOverride:
 
-# Hyperspace that this workspace is connected to
-# Please note that pluto also has to know about the
-# keycloak baseUrl and realm, see the pluto configuration
-hyperspace:
-    tls: true
-    domain:
-    locationOverrides:
-        keycloak:
+# External dependencies for running the workspace
+external:
+  # TODO: determine better way to handle keycloak credentials
+  # Keycloak credentials are needed to setup the workspace (e.g. users, clients)
+  # in keycloak. Please note that this is not a sustainable way of doing, due
+  # to the sensitive nature of these parameters
+  #
+  # We could either:
+  # - have the hyperspace setup keycloak itself, when creating a new workspace
+  # - use temporary credentials for setting up these users
+  # - ...
+  keycloak:
+    baseUrl:
+    username:
+    password:
+    loginRealm: master
+    realm:
+    clientSecret:
 
-    # TODO: determine better way to handle keycloak credentials
-    # Keycloak credentials are needed to setup the workspace (e.g. users, clients)
-    # in keycloak. Please note that this is not a sustainable way of doing, due
-    # to the sensitive nature of these parameters
-    #
-    # We could either:
-    # - have the hyperspace setup keycloak itself, when creating a new workspace
-    # - use temporary credentials for setting up these users
-    # - ...
-    keycloak:
-        username:
-        password:
-        loginRealm: master
-        realm:
-        clientSecret:
+  rabbitmq:
+    host:
+    username: rabbitmq
+    password:
 
-    rabbitmq:
+  elasticsearch:
+    enabled: true
+    indexName:
+    rest:
+      scheme: http
       host:
-      username: rabbitmq
-      password:
-
-    elasticsearch:
-      enabled: true
-      indexName:
-      rest:
-        scheme: http
-        host:
-        port: 9200
-      transport:
-        host:
-        port: 9300
+      port: 9200
+    transport:
+      host:
+      port: 9300
 
 # Setup ingress for workspace components
 workspace:
