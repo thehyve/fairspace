@@ -151,8 +151,7 @@ public class GraphVizSerializerTest {
         List<String> edges = getEdges(dotNotation);
 
         assertEquals(1, edges.size());
-        assertTrue(edges.get(0).contains("tooltip=\"Relation / Relation2\""));
-        assertTrue(edges.get(0).contains("dir=\"both\""));
+        assertTrue(edges.get(0).contains("label=\"Relation\""));
         assertTrue(edges.get(0).replaceAll("\\s+", "").contains("\"http://resource\"->\"http://resource2\""));
     }
 

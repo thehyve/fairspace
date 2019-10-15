@@ -22,7 +22,6 @@ public class GraphVizSerializer implements Serializer {
     public static final String GRAPHVIZ_MIMETYPE = "text/vnd.graphviz";
     private static final String NODE_TEMPLATE = "\"%s\" [label=\"%s\" tooltip=\"%s\"]";
     private static final String EDGE_TEMPLATE = "\"%s\" -> \"%s\" [label=\"%s\"]";
-    private static final String BIDIRECTIONAL_EDGE_TEMPLATE = "\"%s\" -> \"%s\" [dir=\"both\" tooltip=\"%s / %s\"]";
 
     @Override
     public String getMimeType() {
@@ -85,14 +84,6 @@ public class GraphVizSerializer implements Serializer {
                 .append(String.format(EDGE_TEMPLATE, start, end, propertyLabel))
                 .append("\n");
     }
-
-    private void addBidirectionalEdge(StringBuilder stringBuilder, String start, String end, String propertyLabel, String otherPropertyLabel) {
-        stringBuilder
-                .append("\t")
-                .append(String.format(BIDIRECTIONAL_EDGE_TEMPLATE, start, end, propertyLabel, otherPropertyLabel))
-                .append("\n");
-    }
-
 
     @Override
     public Model deserialize(String input, String baseURI) {
