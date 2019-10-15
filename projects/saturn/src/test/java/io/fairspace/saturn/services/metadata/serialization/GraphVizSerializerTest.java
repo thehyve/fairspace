@@ -119,12 +119,12 @@ public class GraphVizSerializerTest {
 
         assertEquals(2, edges.size());
         assertTrue(edges.stream().anyMatch(edge ->
-                edge.contains("tooltip=\"Relation\"")
+                edge.contains("label=\"Relation\"")
                         && !edge.contains("dir=\"both\"")
                         && edge.replaceAll("\\s+", "").contains("\"http://resource\"->\"http://resource2\"")
         ));
         assertTrue(edges.stream().anyMatch(edge ->
-                edge.contains("tooltip=\"Parent\"")
+                edge.contains("label=\"Parent\"")
                         && !edge.contains("dir=\"both\"")
                         && edge.replaceAll("\\s+", "").contains("\"http://resource2\"->\"http://resource2\"")
         ));
