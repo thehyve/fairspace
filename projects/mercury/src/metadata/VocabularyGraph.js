@@ -5,7 +5,7 @@ import {Grid, RadioGroup, FormControlLabel, Radio, Checkbox} from "@material-ui/
 import {uniqBy} from 'lodash';
 
 import {VocabularyAPI} from "./LinkedDataAPI";
-import NetworkGraphVisualization from "../common/components/NetworkGraphVisualization";
+import NetworkGraphVisualization, {EDGE_LENGTH_SMALL, EDGE_LENGTH_MEDIUM, EDGE_LENGTH_LARGE} from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
 import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_CLASS} from "../constants";
@@ -16,7 +16,7 @@ const VocabularyGraph = ({history}) => {
     const {vocabulary, editorPath} = useContext(LinkedDataContext);
     const {data, error, loading} = useAsync(useCallback(() => VocabularyAPI.graph(), []));
     const [showEdgesLabels, setShowEdgesLabels] = useState(false);
-    const [edgesLength, setEdgesLength] = useState("250");
+    const [edgesLength, setEdgesLength] = useState(EDGE_LENGTH_SMALL);
 
     const handleNodeDoubleClick = useCallback(
         (id) => {
@@ -85,9 +85,9 @@ const VocabularyGraph = ({history}) => {
                             value={edgesLength}
                             onChange={(e) => setEdgesLength(e.target.value)}
                         >
-                            <FormControlLabel value="250" control={<Radio />} label="Short Edges" />
-                            <FormControlLabel value="500" control={<Radio />} label="Medium" />
-                            <FormControlLabel value="750" control={<Radio />} label="Long" />
+                            <FormControlLabel value={EDGE_LENGTH_SMALL} control={<Radio />} label="Short Edges" />
+                            <FormControlLabel value={EDGE_LENGTH_MEDIUM} control={<Radio />} label="Medium" />
+                            <FormControlLabel value={EDGE_LENGTH_LARGE} control={<Radio />} label="Long" />
                         </RadioGroup>
                     </Grid>
                 </Grid>

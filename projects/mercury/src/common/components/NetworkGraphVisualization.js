@@ -2,6 +2,11 @@ import React, {useEffect, useRef} from 'react';
 import PropTypes from "prop-types";
 import vis from 'vis-network';
 
+
+export const EDGE_LENGTH_SMALL = "250";
+export const EDGE_LENGTH_MEDIUM = "500";
+export const EDGE_LENGTH_LARGE = "750";
+
 /**
  * Draws a network visualization using vis-network
  * @param network   dot-notation of the network to draw
@@ -9,7 +14,8 @@ import vis from 'vis-network';
  * @constructor
  */
 const NetworkGraphVisualization = ({
-    network, showEdgesLabels, edgesLength, onNodeDoubleClick, onEdgeDoubleClick, style
+    network, showEdgesLabels, edgesLength = EDGE_LENGTH_SMALL,
+    onNodeDoubleClick, onEdgeDoubleClick, style
 }) => {
     const ref = useRef(null);
 
@@ -35,7 +41,7 @@ const NetworkGraphVisualization = ({
                 physics: {
                     stabilization: true,
                     barnesHut: {
-                        springLength: Number(edgesLength)
+                        springLength: Number(edgesLength) || EDGE_LENGTH_SMALL
                     }
                 }
             };
@@ -48,8 +54,6 @@ const NetworkGraphVisualization = ({
                     if (params.nodes[0] && onNodeDoubleClick) {
                         onNodeDoubleClick(params.nodes[0]);
                     } else if (params.edges[0] && onEdgeDoubleClick) {
-                        console.log({edges, esge: params.edges[0]});
-
                         onEdgeDoubleClick(edges.find(edge => edge.id === params.edges[0]));
                     }
                 });
@@ -66,7 +70,12 @@ const NetworkGraphVisualization = ({
 };
 
 NetworkGraphVisualization.propTypes = {
-    network: PropTypes.string
+    network: PropTypes.string,
+    showEdgesLabels: PropTypes.bool,
+    edgesLength: PropTypes.oneOf([EDGE_LENGTH_SMALL, EDGE_LENGTH_MEDIUM, EDGE_LENGTH_LARGE]),
+    onNodeDoubleClick: PropTypes.func,
+    onEdgeDoubleClick: PropTypes.func,
+    style: PropTypes.object
 };
 
 export default NetworkGraphVisualization;
