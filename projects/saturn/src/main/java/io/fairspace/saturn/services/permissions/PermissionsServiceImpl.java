@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.PermissionEvent;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final RDFConnection rdf;
+    private final TransactionalBatchExecutorService executor;
     private final Supplier<Node> userIriSupplier;
     private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
@@ -45,7 +47,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void createResource(Node resource) {
-        rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
+        executor.perform(() -> storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
                 .resource(resource.getURI())
@@ -65,7 +67,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = userIriSupplier.get();
 
-        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
+        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), executor, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
@@ -131,7 +133,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
-        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf, () -> {
+        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), executor, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {

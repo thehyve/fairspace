@@ -65,7 +65,7 @@ public class Services {
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsServiceImpl(rdf, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
+        permissionsService = new PermissionsServiceImpl(rdf, transactionalBatchExecutorService, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
         collectionsService = new CollectionsService(new DAO(rdf, userIriSupplier), transactionalBatchExecutorService, eventBus::post, permissionsService, eventService);
 

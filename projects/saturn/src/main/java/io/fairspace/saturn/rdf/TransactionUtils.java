@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import org.apache.jena.sparql.core.Transactional;
 
 import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
-import static org.apache.jena.system.Txn.calculateWrite;
 import static org.apache.jena.system.Txn.executeWrite;
 
 public class TransactionUtils {
@@ -17,11 +16,6 @@ public class TransactionUtils {
             action.run();
             return null;
         })));
-    }
-
-    @Deprecated
-    public static <T> T commit(String message, Transactional transactional, ThrowingSupplier<T, ?> action) {
-        return withCommitMessage(message, () -> calculateWrite(transactional, () -> sneaky(action)));
     }
 
     public static void commit(String message, TransactionalBatchExecutorService executor, ThrowingRunnable<?> action) {
