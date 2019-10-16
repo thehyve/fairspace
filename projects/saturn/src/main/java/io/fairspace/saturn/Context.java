@@ -1,18 +1,13 @@
 package io.fairspace.saturn;
 
-import org.eclipse.jetty.server.HttpChannel;
-import org.eclipse.jetty.server.HttpConnection;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import lombok.Value;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
-
-import static java.util.Optional.ofNullable;
-import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
-
+@Value
 public class Context {
-    public static Optional<HttpServletRequest> currentRequest() {
-        return ofNullable(getCurrentConnection())
-                .map(HttpConnection::getHttpChannel)
-                .map(HttpChannel::getRequest);
-    }
+    public static final ThreadLocal<Context> threadContext = new ThreadLocal<>();
+
+    OAuthAuthenticationToken userInfo;
+    String commitMessage;
+
 }

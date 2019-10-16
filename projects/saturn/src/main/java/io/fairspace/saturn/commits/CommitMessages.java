@@ -2,10 +2,12 @@ package io.fairspace.saturn.commits;
 
 
 import com.pivovarit.function.ThrowingRunnable;
+import io.fairspace.saturn.Context;
 
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.Context.currentRequest;
+import static io.fairspace.saturn.Context.threadContext;
+import static java.util.Optional.ofNullable;
 
 /**
  * Manages commit messages.
@@ -13,38 +15,22 @@ import static io.fairspace.saturn.Context.currentRequest;
  * or by calling withCommitMessage.
  */
 public class CommitMessages {
-    public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
-
-    private static final ThreadLocal<String> systemCommitMessage = new ThreadLocal<>();
 
     public static <E extends Exception> void withCommitMessage(String message, ThrowingRunnable<E> action) throws E {
-        var saved = systemCommitMessage.get();
-        systemCommitMessage.set(message);
-        try {
-            action.run();
-        } finally {
-            systemCommitMessage.set(saved);
-        }
+        var ctx = threadContext.get();
+        threadContext.set(new Context(ofNullable(ctx).map(Context::getUserInfo).orElse(null), message));
+
+        action.run();
     }
 
     public static <T> T withCommitMessage(String message, Supplier<T> action) {
-        var saved = systemCommitMessage.get();
-        systemCommitMessage.set(message);
-        try {
-            return action.get();
-        } finally {
-            systemCommitMessage.set(saved);
-        }
+        var ctx = threadContext.get();
+        threadContext.set(new Context(ofNullable(ctx).map(Context::getUserInfo).orElse(null), message));
+
+        return action.get();
     }
 
     public static String getCommitMessage() {
-        var systemMessage = systemCommitMessage.get();
-        if (systemMessage != null) {
-           return systemMessage;
-        }
-
-        return currentRequest()
-                .map(request -> request.getHeader(COMMIT_MESSAGE_HEADER))
-                .orElse(null);
+        return ofNullable(threadContext.get()).map(Context::getCommitMessage).orElse(null);
     }
 }

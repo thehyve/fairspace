@@ -7,6 +7,7 @@ import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.MetadataEvent;
 import io.fairspace.saturn.events.RabbitMQEventService;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
@@ -47,6 +48,7 @@ public class Services {
     private final ChangeableMetadataService metadataService;
     private final ChangeableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
+    private final TransactionalBatchExecutorService transactionalBatchExecutorService;
 
 
     public Services(@NonNull Config config, @NonNull RDFConnection rdf, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
@@ -102,6 +104,7 @@ public class Services {
 
         userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
         metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
+        transactionalBatchExecutorService = new TransactionalBatchExecutorService(rdf);
     }
 
     private EventService setupEventService() throws Exception {

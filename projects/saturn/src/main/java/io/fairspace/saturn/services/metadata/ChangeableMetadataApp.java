@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.serialization.RDFSerializer;
 import io.fairspace.saturn.services.metadata.serialization.Serializer;
@@ -27,6 +28,7 @@ import static spark.Spark.*;
 @Slf4j
 public class ChangeableMetadataApp extends ReadableMetadataApp {
     protected final ChangeableMetadataService api;
+    private final TransactionalBatchExecutorService executor;
     private final String baseURI;
 
     private static final List<Serializer> deserializers = List.of(
@@ -39,9 +41,10 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             .map(Serializer::getMimeType)
             .collect(Collectors.toList());
 
-    public ChangeableMetadataApp(String basePath, ChangeableMetadataService api, String baseURI) {
+    public ChangeableMetadataApp(String basePath, ChangeableMetadataService api, TransactionalBatchExecutorService executor, String baseURI) {
         super(basePath, api);
         this.api = api;
+        this.executor = executor;
         this.baseURI = baseURI;
     }
 
@@ -56,7 +59,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                 throw new UnsupportedMediaTypeException(supportedMimetypes);
             }
 
-            api.put(model);
+            executor.perform(() -> api.put(model));
 
             res.status(SC_NO_CONTENT);
             return "";
@@ -68,21 +71,20 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                 throw new UnsupportedMediaTypeException(supportedMimetypes);
             }
 
-            api.patch(model);
+            executor.perform(() -> api.patch(model));
 
             res.status(SC_NO_CONTENT);
             return "";
         });
         delete("/", (req, res) -> {
             Model model = getModelFromRequest(req);
-
             if(model != null) {
-                api.delete(model);
+                executor.perform(() -> api.delete(model));
             } else {
                 var subject = req.queryParams("subject");
                 validate(subject != null, "Parameter \"subject\" is required");
                 validateIRI(subject);
-                if (!api.softDelete(createResource(subject))) {
+                if (!executor.perform(() -> api.softDelete(createResource(subject)))) {
                     // Subject could not be deleted. Return a 404 error response
                     return null;
                 }
@@ -111,6 +113,4 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
 
         return null;
     }
-
-
 }

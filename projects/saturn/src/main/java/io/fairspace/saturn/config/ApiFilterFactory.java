@@ -12,8 +12,8 @@ import javax.servlet.Filter;
 public class ApiFilterFactory {
     public static Filter createApiFilter(String apiPathPrefix, Services svc, Config config) {
         return new SaturnSparkFilter(apiPathPrefix,
-                new ChangeableMetadataApp("/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
-                new ChangeableMetadataApp("/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
+                new ChangeableMetadataApp("/metadata", svc.getMetadataService(), svc.getTransactionalBatchExecutorService(), config.jena.metadataBaseIRI),
+                new ChangeableMetadataApp("/vocabulary", svc.getUserVocabularyService(), svc.getTransactionalBatchExecutorService(), config.jena.vocabularyBaseIRI),
                 new ReadableMetadataApp("/meta-vocabulary", svc.getMetaVocabularyService()),
                 new CollectionsApp("/collections", svc.getCollectionsService()),
                 new PermissionsApp("/permissions", svc.getPermissionsService()),

@@ -6,8 +6,8 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import javax.servlet.http.HttpServletRequest;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.Context.currentRequest;
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static io.fairspace.saturn.Context.threadContext;
+import static java.util.Optional.ofNullable;
 
 public class SecurityUtil {
     public static Function<HttpServletRequest, OAuthAuthenticationToken> createAuthenticator(String jwksUrl, String algorithm) {
@@ -19,8 +19,9 @@ public class SecurityUtil {
     }
 
     public static String authorizationHeader() {
-        return currentRequest()
-                .map(context -> context.getHeader(AUTHORIZATION))
+        return ofNullable(threadContext.get().getUserInfo())
+                .map(OAuthAuthenticationToken::getAccessToken)
+                .map(token -> "Bearer " + token)
                 .orElse(null);
     }
 }
