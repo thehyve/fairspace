@@ -6,6 +6,7 @@ const UseNavigationBlocker = (hasPendingChanges) => {
     const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
     const [locationToNavigateTo, setLocationToNavigateTo] = useState(null);
 
+    // This effect is for handlng URL address manual changes
     useEffect(() => {
         // Taken from: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
         // This will show the default browser dialog,
@@ -30,6 +31,7 @@ const UseNavigationBlocker = (hasPendingChanges) => {
 
     const unblockRef = useRef(null);
 
+    // This effect for handling changes from the history/router within React
     useEffect(() => {
         // Avoid having multiple blocking prompts
         if (unblockRef.current) {
