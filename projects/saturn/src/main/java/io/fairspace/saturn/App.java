@@ -27,7 +27,7 @@ public class App {
 
         Supplier<OAuthAuthenticationToken> userInfoProvider = () -> ofNullable(threadContext.get()).map(Context::getUserInfo).orElse(null);
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, userInfoProvider);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, threadContext::get);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application

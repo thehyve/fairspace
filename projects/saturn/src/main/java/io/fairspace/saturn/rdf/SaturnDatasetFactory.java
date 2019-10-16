@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.saturn.commits.CommitMessages;
+import io.fairspace.saturn.Context;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
@@ -32,7 +31,7 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, Supplier<OAuthAuthenticationToken> userInfoSupplier) throws IOException {
+    public static Dataset connect(Config.Jena config, Supplier<Context> contextSupplier) throws IOException {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
@@ -51,7 +50,7 @@ public class SaturnDatasetFactory {
         }
 
         // Add transaction log
-        dsg = new TxnLogDatasetGraph(dsg, txnLog, userInfoSupplier, CommitMessages::getCommitMessage);
+        dsg = new TxnLogDatasetGraph(dsg, txnLog, contextSupplier);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);

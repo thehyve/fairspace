@@ -29,5 +29,6 @@ public class TransactionalBatchExecutorService extends BatchExecutorService {
     @Override
     protected void execute(List<Runnable> tasks) {
         executeWrite(transactional, () -> super.execute(tasks));
+        threadContext.remove();
     }
 }

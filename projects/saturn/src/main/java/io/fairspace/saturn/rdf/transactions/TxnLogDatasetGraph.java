@@ -2,8 +2,8 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.Context;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
-import io.fairspace.saturn.util.Ref;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
@@ -14,6 +14,7 @@ import org.apache.jena.sparql.core.QuadAction;
 import java.util.function.Supplier;
 
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.ofNullable;
 
 @Slf4j
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
@@ -21,15 +22,14 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
     private final TransactionLog transactionLog;
-    private final Supplier<OAuthAuthenticationToken> userInfoProvider;
-    private final Supplier<String> commitMessageProvider;
+    private final Supplier<Context> contextSupplier;
 
 
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<OAuthAuthenticationToken> userInfoProvider, Supplier<String> commitMessageProvider) {
+
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<Context> contextSupplier) {
         super(dsg);
         this.transactionLog = transactionLog;
-        this.userInfoProvider = userInfoProvider;
-        this.commitMessageProvider = commitMessageProvider;
+        this.contextSupplier = contextSupplier;
     }
 
     /**
@@ -62,23 +62,13 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     public void begin(ReadWrite readWrite) {
         super.begin(readWrite);
         if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
-            var userName = new Ref<String>();
-            var userId = new Ref<String>();
-            if (userInfoProvider != null) {
-                var userInfo = userInfoProvider.get();
-                if (userInfo != null) {
-                    userId.value = userInfo.getSubjectClaim();
-                    userName.value = userInfo.getFullName();
-                }
-            }
-            var commitMessage = new Ref<String>();
-
-            if (commitMessageProvider != null) {
-                commitMessage.value = commitMessageProvider.get();
-            }
+            var ctx = ofNullable(contextSupplier.get());
+            var userName = ctx.map(Context::getUserInfo).map(OAuthAuthenticationToken::getFullName).orElse(null);
+            var userId = ctx.map(Context::getUserInfo).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
+            var commitMessage = ctx.map(Context::getCommitMessage).orElse(null);
 
             critical(() ->
-                    transactionLog.onBegin(commitMessage.value, userId.value, userName.value, currentTimeMillis()));
+                    transactionLog.onBegin(commitMessage, userId, userName, currentTimeMillis()));
         }
     }
 
