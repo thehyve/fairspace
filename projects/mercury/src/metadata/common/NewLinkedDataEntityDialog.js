@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from "react";
+import React, {useContext, useState} from "react";
 import PropTypes from 'prop-types';
 import {
     Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
@@ -37,12 +37,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
     const properties = shapes.getPropertiesForNodeShape(shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-    // The type could be required for unknown subjects which may not be known by the backend
-    const values = {
-        '@type': [{
-            id: type
-        }]
-    };
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
@@ -52,7 +46,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid,
         hasFormUpdates
-    } = useFormData(values);
+    } = useFormData({});
     const {
         showCloseConfirmation, setShowCloseConfirmation
     } = UseNavigationBlocker(hasFormUpdates);
