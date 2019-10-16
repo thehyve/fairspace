@@ -135,14 +135,16 @@ public class GraphVizSerializerTest {
         model.add(RESOURCE, RDF.type, FS.ClassShape);
         model.add(RESOURCE, SH.targetClass, RESOURCE);
         model.add(RESOURCE, SH.name, "My first resource");
+        model.add(RESOURCE, SH.property, RELATION_SHAPE);
         model.add(RESOURCE2, RDF.type, FS.ClassShape);
         model.add(RESOURCE2, SH.targetClass, RESOURCE2);
         model.add(RESOURCE2, SH.name, "My second resource");
-        model.add(RESOURCE, SH.property, RELATION_SHAPE);
+        model.add(RESOURCE2, SH.property, RELATION_SHAPE2);
         model.add(RELATION_SHAPE, RDF.type, FS.RelationShape);
         model.add(RELATION_SHAPE, SH.name, "Relation");
         model.add(RELATION_SHAPE, SH.class_, RESOURCE2);
         model.add(RELATION_SHAPE, FS.inverseRelation, RELATION_SHAPE2);
+        model.add(RELATION_SHAPE2, RDF.type, FS.RelationShape);
         model.add(RELATION_SHAPE2, SH.name, "Relation2");
         model.add(RELATION_SHAPE2, SH.class_, RESOURCE);
 
@@ -150,9 +152,18 @@ public class GraphVizSerializerTest {
 
         List<String> edges = getEdges(dotNotation);
 
-        assertEquals(1, edges.size());
-        assertTrue(edges.get(0).contains("label=\"Relation\""));
-        assertTrue(edges.get(0).replaceAll("\\s+", "").contains("\"http://resource\"->\"http://resource2\""));
+        assertEquals(2, edges.size());
+        assertTrue(edges.stream().anyMatch(edge ->
+                edge.contains("label=\"Relation\"")
+                        && !edge.contains("dir=\"both\"")
+                        && edge.replaceAll("\\s+", "").contains("\"http://resource\"->\"http://resource2\"")
+        ));
+        assertTrue(edges.stream().anyMatch(edge ->
+                edge.contains("label=\"Relation2\"")
+                        && !edge.contains("dir=\"both\"")
+                        && edge.replaceAll("\\s+", "").contains("\"http://resource2\"->\"http://resource\"")
+        ));
+
     }
 
     private List<String> getNodes(String dotNotation) {
