@@ -64,7 +64,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-
     const createEntity = (event) => {
         if (event) event.stopPropagation();
 
