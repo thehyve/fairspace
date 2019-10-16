@@ -8,18 +8,19 @@ import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
 import {getDirectoryFromFullpath, getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
 import * as collectionBrowserActions from "../common/redux/actions/collectionBrowserActions";
-import * as fileActions from "../common/redux/actions/fileActions";
 import * as collectionActions from "../common/redux/actions/collectionActions";
 import * as consts from '../constants';
 import {getCollectionAbsolutePath} from "../common/utils/collectionUtils";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
+import {useFiles} from "./UseFiles";
 
-export const FilesPage = (props) => {
-    const {
-        openedCollection, fetchCollectionsIfNeeded, fetchFilesIfNeeded, openedPath, files, loading, error, selectedPaths, selectPath,
-        deselectPath, renameFile, selectPaths, deselectAllPaths,
-        history
-    } = props;
+export const FilesPage = ({
+    openedCollection, fetchCollectionsIfNeeded,
+    openedPath, selectedPaths, selectPath,
+    deselectPath, selectPaths, deselectAllPaths,
+    history
+}) => {
+    const {files, loading, error, refresh, fileActions} = useFiles(openedPath);
 
     // Determine breadcrumbs. If a collection is opened, show the full path
     // Otherwise, show a temporary breadcrumb
@@ -40,13 +41,6 @@ export const FilesPage = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Fetch files if the path has changed
-    useEffect(() => {
-        fetchFilesIfNeeded(openedPath);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [openedPath, openedCollection.connectionString]);
-
     const handleCollectionLocationChange = (location) => {
         // If the collection location changes, the URI for the current page should change as well
         history.push(`${getCollectionAbsolutePath(location)}${getDirectoryFromFullpath(openedPath)}`);
@@ -60,7 +54,7 @@ export const FilesPage = (props) => {
             <Grid container spacing={8}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <FileBrowser
-                        fetchFilesIfNeeded={fetchFilesIfNeeded}
+                        refreshFiles={refresh}
                         openedCollection={openedCollection}
                         openedPath={openedPath}
                         files={files}
@@ -69,7 +63,7 @@ export const FilesPage = (props) => {
                         selectPath={selectPath}
                         selectedPaths={selectedPaths}
                         deselectPath={deselectPath}
-                        renameFile={renameFile}
+                        fileActions={fileActions}
                         onSelectAll={() => selectPaths(files.map(f => f.filename))}
                         onDeselectAll={deselectAllPaths}
                     />
@@ -86,12 +80,8 @@ const mapStateToProps = (state, ownProps) => {
     const {match: {params}} = ownProps;
     const {collectionLocation, openedPath} = getPathInfoFromParams(params);
     const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === collectionLocation)) || {};
-    const files = state.cache.filesByPath[openedPath] || [];
 
     return {
-        loading: files.pending || state.cache.collections.pending,
-        error: files.error || state.cache.collections.error,
-        files: files.data,
         selectedPaths: state.collectionBrowser.selectedPaths,
         openedCollection: collection,
         openedPath
@@ -100,7 +90,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
     ...collectionActions,
-    ...fileActions,
     ...collectionBrowserActions
 };
 

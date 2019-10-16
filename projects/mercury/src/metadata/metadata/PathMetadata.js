@@ -1,34 +1,30 @@
-import React, {useEffect} from "react";
-import {connect} from 'react-redux';
+import React, {useCallback} from "react";
 import {Grid} from "@material-ui/core";
-import {MessageDisplay, isNonEmptyValue} from '@fairspace/shared-frontend';
+import {isNonEmptyValue, MessageDisplay, useAsync} from '@fairspace/shared-frontend';
 
 import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
-import {
-    getFileInfoByPath, hasFileInfoErrorByPath, isFileInfoByPathPending
-} from "../../common/redux/reducers/cache/fileInfoByPathReducers";
-import {statFileIfNeeded} from "../../common/redux/actions/fileActions";
 import TechnicalMetadata from "../../file/TechnicalMetadata";
+import FileAPI from "../../file/FileAPI";
 
 const PathMetadata = ({
-    statFile,
-    subject,
-    fileProps,
     path,
-    type,
-    error,
-    loading,
     ...otherProps
 }) => {
-    useEffect(() => {
-        statFile(path);
-    }, [path, statFile]);
+    const {data, error, loading} = useAsync(useCallback(
+        () => FileAPI.stat(path), [path]
+    ));
 
     if (error) {
         return (<MessageDisplay message="An error occurred while determining metadata subject" />);
     } if (loading) {
         return (<div>Loading...</div>);
-    } if (!subject) {
+    }
+
+    // Parse stat data
+    const fileProps = data && data.props;
+    const subject = data && data.props && data.props.iri;
+
+    if (!subject || !fileProps) {
         return (<div>No metadata found</div>);
     }
     return (
@@ -56,20 +52,4 @@ const PathMetadata = ({
     );
 };
 
-const mapStateToProps = (state, {path}) => {
-    const data = getFileInfoByPath(state, path);
-
-    return {
-        loading: isFileInfoByPathPending(state, path),
-        error: hasFileInfoErrorByPath(state, path),
-        fileProps: data && data.props,
-        subject: data && data.props && data.props.iri,
-        type: data && data.type
-    };
-};
-
-const mapDispatchToProps = {
-    statFile: statFileIfNeeded
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PathMetadata);
+export default PathMetadata;

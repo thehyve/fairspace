@@ -8,7 +8,7 @@ import {usePagination} from '@fairspace/shared-frontend';
 
 import {
     UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
-} from "../common/redux/reducers/uploadsReducers";
+} from "../common/contexts/UploadsContext";
 
 
 const progress = upload => {

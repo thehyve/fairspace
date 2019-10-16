@@ -6,6 +6,7 @@ import configureStore from 'redux-mock-store';
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
+import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 function shallowRender(history, openedPath) {
     const openedCollection = {
@@ -25,37 +26,6 @@ function shallowRender(history, openedPath) {
 }
 
 describe('FilesPage', () => {
-    it('fetchs collections once on render', () => {
-        const fetchCollectionsIfNeeded = jest.fn();
-        const mockStore = configureStore();
-        const store = mockStore({
-            cache: {
-                collections: {
-                    data: [],
-                }
-            },
-            collectionBrowser: {
-                selectedPaths: []
-            },
-            uploads: []
-        });
-
-        mount((
-            <MemoryRouter>
-                <Provider store={store}>
-                    <FilesPage
-                        fetchFilesIfNeeded={() => {}}
-                        openedPath="''"
-                        openedCollection={{}}
-                        fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
-                    />
-                </Provider>
-            </MemoryRouter>
-        ));
-
-        expect(fetchCollectionsIfNeeded).toHaveBeenCalledTimes(1);
-    });
-
     it('updates url after collection location has changed', () => {
         const history = [];
         const wrapper = shallowRender(history, 'location1/subdirectory/something-else');

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
-import {Button, Tabs, Tab} from "@material-ui/core";
+import {Button, Tab, Tabs} from "@material-ui/core";
 import Play from "mdi-material-ui/Play";
 import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
@@ -10,7 +10,7 @@ import FileAPI from "./FileAPI";
 import useSelection from "./UseSelection";
 import UploadList from "./UploadList";
 import useUploads from "./UseUploads";
-import {UPLOAD_STATUS_INITIAL} from "../common/redux/reducers/uploadsReducers";
+import {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
 
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
@@ -20,9 +20,10 @@ export const FileBrowser = ({
     files = [],
     openedCollection,
     openedPath,
-    fetchFilesIfNeeded,
-    loading,
-    error
+    refreshFiles = () => {},
+    fileActions = {},
+    loading = false,
+    error = false
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
     const {select, selectAll, deselectAll, toggle, isSelected, selected} = useSelection(files.map(f => f.filename));
@@ -44,7 +45,7 @@ export const FileBrowser = ({
 
     // Reload the files after returning from the upload tab
     useEffect(() => {
-        fetchFilesIfNeeded(openedPath);
+        refreshFiles(openedPath);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentTab, openedPath]);
@@ -108,10 +109,12 @@ export const FileBrowser = ({
                     <div style={{marginTop: 8}}>
                         <FileOperations
                             selectedPaths={selected}
+                            files={files}
                             openedPath={openedPath}
                             disabled={!openedCollection.canWrite}
-                            getDownloadLink={FileAPI.getDownloadLink}
-                            fetchFilesIfNeeded={fetchFilesIfNeeded}
+                            fileActions={fileActions}
+                            clearSelection={deselectAll}
+                            refreshFiles={refreshFiles}
                         />
                     </div>
                 </div>

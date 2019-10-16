@@ -12,68 +12,64 @@ const testUseUploads = (path, existingFilenames, uploads, dispatch) => {
 };
 
 describe('useUploads', () => {
-    const dispatch = jest.fn();
+    const enqueueUploads = jest.fn();
+    const startUpload = jest.fn();
 
     beforeEach(() => {
-        dispatch.mockReset();
+        enqueueUploads.mockReset();
+        startUpload.mockReset();
     });
 
     it('should enqueue a given file upload', () => {
-        const uploads = testUseUploads('/', [], [], dispatch);
+        const uploads = testUseUploads('/', [], [], enqueueUploads, startUpload);
 
         uploads.enqueue([{name: 'test.txt'}]);
 
-        expect(dispatch).toHaveBeenCalledTimes(1);
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                uploads: [
-                    {
-                        destinationFilename: "test.txt",
-                        destinationPath: "/",
-                        file: {
-                            name: "test.txt",
-                        },
+        expect(enqueueUploads).toHaveBeenCalledTimes(1);
+        expect(enqueueUploads).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                {
+                    destinationFilename: "test.txt",
+                    destinationPath: "/",
+                    file: {
+                        name: "test.txt",
                     },
-                ]
-            })
+                },
+            ])
         );
     });
 
     it('should resolve naming conflicts with existing files', () => {
-        const uploads = testUseUploads('/', ['test.txt'], [], dispatch);
+        const uploads = testUseUploads('/', ['test.txt'], [], enqueueUploads, startUpload);
 
         uploads.enqueue([{name: 'test.txt'}]);
 
-        expect(dispatch).toHaveBeenCalledTimes(1);
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                uploads: [
-                    {
-                        file: {name: 'test.txt'},
-                        destinationFilename: 'test (1).txt',
-                        destinationPath: '/'
-                    }
-                ]
-            })
+        expect(enqueueUploads).toHaveBeenCalledTimes(1);
+        expect(enqueueUploads).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                {
+                    file: {name: 'test.txt'},
+                    destinationFilename: 'test (1).txt',
+                    destinationPath: '/'
+                }
+            ])
         );
     });
 
     it('should resolve naming conflicts with previous uploads', () => {
-        const uploads = testUseUploads('/', [], [{destinationFilename: 'test.txt'}], dispatch);
+        const uploads = testUseUploads('/', [], [{destinationFilename: 'test.txt'}], enqueueUploads, startUpload);
 
         uploads.enqueue([{name: 'test.txt'}]);
 
-        expect(dispatch).toHaveBeenCalledTimes(1);
-        expect(dispatch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                uploads: [
-                    {
-                        file: {name: 'test.txt'},
-                        destinationFilename: 'test (1).txt',
-                        destinationPath: '/'
-                    }
-                ]
-            })
+        expect(enqueueUploads).toHaveBeenCalledTimes(1);
+        expect(enqueueUploads).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                {
+                    file: {name: 'test.txt'},
+                    destinationFilename: 'test (1).txt',
+                    destinationPath: '/'
+                }
+            ])
         );
     });
 });
