@@ -158,6 +158,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     title="Close form"
                     content="You have unsaved changes, are you sure you want to close the form?"
                     agreeButtonText="Close form"
+                    disagreeButtonText="Go back to form"
                     onAgree={() => onClose()}
                     onDisagree={() => setShowCloseConfirmation(false)}
                 />

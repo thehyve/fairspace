@@ -119,6 +119,7 @@ const LinkedDataEntityFormContainer = ({history, subject, isEntityEditable = tru
                     content={'You have unsaved changes, are you sure you want to navigate away?'
                         + ' Your pending changes will be lost.'}
                     agreeButtonText="Navigate"
+                    disagreeButtonText="Go back to form"
                     onAgree={() => {
                         if (locationToNavigateTo) {
                             setShowCloseConfirmation(false);
