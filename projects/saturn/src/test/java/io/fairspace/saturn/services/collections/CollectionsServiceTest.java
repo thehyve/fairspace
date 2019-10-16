@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -38,7 +39,7 @@ public class CollectionsServiceTest {
     public void before() {
         rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions, eventService);
+        collections = new CollectionsService(new DAO(rdf, userIriSupplier), new TransactionalBatchExecutorService(rdf), eventListener, permissions, eventService);
     }
 
     @Test

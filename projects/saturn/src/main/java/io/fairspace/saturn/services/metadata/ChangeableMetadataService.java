@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.events.MetadataEvent;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
@@ -30,20 +31,22 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 public class ChangeableMetadataService extends ReadableMetadataService {
     static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
 
+    private final TransactionalBatchExecutorService executor;
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
     private final Consumer<MetadataEvent.Type> eventConsumer;
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator, event -> {});
+    public ChangeableMetadataService(RDFConnection rdf, TransactionalBatchExecutorService executor, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+        this(rdf, executor, graph, vocabulary, 0, lifeCycleManager, validator, event -> {});
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
-        this(rdf, graph, vocabulary, 0, lifeCycleManager, validator, eventConsumer);
+    public ChangeableMetadataService(RDFConnection rdf, TransactionalBatchExecutorService executor, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+        this(rdf, executor, graph, vocabulary, 0, lifeCycleManager, validator, eventConsumer);
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+    public ChangeableMetadataService(RDFConnection rdf, TransactionalBatchExecutorService executor, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
         super(rdf, graph, vocabulary, tripleLimit);
+        this.executor = executor;
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
         this.eventConsumer = eventConsumer;
@@ -58,7 +61,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
+        commit("Store metadata", executor, () -> update(EMPTY_MODEL, model));
         eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
@@ -68,7 +71,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if(commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject))) {
+        if(commit("Mark <" + subject + "> as deleted", executor, () -> lifeCycleManager.softDelete(subject))) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
@@ -84,7 +87,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
+        commit("Delete metadata", executor, () -> update(model, EMPTY_MODEL));
         eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
@@ -103,7 +106,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        commit("Update metadata", rdf, () -> {
+        commit("Update metadata", executor, () -> {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {
                 // Only explicitly delete triples for URI resources. As this model is also used

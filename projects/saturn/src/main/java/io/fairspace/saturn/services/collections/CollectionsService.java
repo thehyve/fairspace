@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.events.CollectionEvent;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -27,6 +28,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 @Slf4j
 public class CollectionsService {
     private final DAO dao;
+    private final TransactionalBatchExecutorService executor;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
     private final EventService eventService;
@@ -42,7 +44,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        Collection storedCollection = commit("Create collection " + collection.getName(), dao, () -> {
+        Collection storedCollection = commit("Create collection " + collection.getName(), executor, () -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -106,7 +108,7 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        commit("Delete collection " + iri, dao, () -> {
+        commit("Delete collection " + iri, executor, () -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -136,7 +138,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return commit("Update collection " + patch.getName(), dao, () -> {
+        return commit("Update collection " + patch.getName(), executor, () -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());

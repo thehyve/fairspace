@@ -1,5 +1,7 @@
 package io.fairspace.saturn.util;
 
+import com.pivovarit.function.ThrowingRunnable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -51,7 +53,7 @@ public class BatchExecutorService {
         }
     }
 
-    public void perform(Runnable runnable) {
+    public void perform(ThrowingRunnable runnable) {
         perform(() -> {
             runnable.run();
             return null;

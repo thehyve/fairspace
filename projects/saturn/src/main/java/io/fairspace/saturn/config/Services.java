@@ -55,6 +55,7 @@ public class Services {
         this.config = config;
         this.rdf = rdf;
         this.userInfoSupplier = userInfoSupplier;
+        transactionalBatchExecutorService = new TransactionalBatchExecutorService(rdf);
 
         userService = new UserService(config.auth.userUrlTemplate, new DAO(rdf, null));
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
@@ -66,7 +67,7 @@ public class Services {
         var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsServiceImpl(rdf, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
-        collectionsService = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissionsService, eventService);
+        collectionsService = new CollectionsService(new DAO(rdf, userIriSupplier), transactionalBatchExecutorService, eventBus::post, permissionsService, eventService);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissionsService);
 
@@ -83,7 +84,7 @@ public class Services {
                         .build()
                 );
 
-        metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
+        metadataService = new ChangeableMetadataService(rdf, transactionalBatchExecutorService, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -102,9 +103,8 @@ public class Services {
                         .build()
                 );
 
-        userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
+        userVocabularyService = new ChangeableMetadataService(rdf, transactionalBatchExecutorService, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
         metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
-        transactionalBatchExecutorService = new TransactionalBatchExecutorService(rdf);
     }
 
     private EventService setupEventService() throws Exception {
