@@ -140,6 +140,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                         Cancel
                     </Button>
                     <Button
+                        data-testid="submit-button"
                         type="submit"
                         onClick={createEntity}
                         color="primary"
