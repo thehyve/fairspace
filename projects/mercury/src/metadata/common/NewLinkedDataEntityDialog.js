@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import PropTypes from 'prop-types';
 import {
     Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
@@ -35,7 +35,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
     const properties = shapes.getPropertiesForNodeShape(shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-    const values = {};
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
@@ -45,14 +44,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
-    } = useFormData(values);
-
-    // Store the type to create in the form to ensure it is known
-    // and will be stored
-    useEffect(() => {
-        addValue('@type', type);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    } = useFormData({});
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
@@ -140,6 +132,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     Cancel
                 </Button>
                 <Button
+                    data-testid="submit-button"
                     type="submit"
                     onClick={createEntity}
                     color="primary"
