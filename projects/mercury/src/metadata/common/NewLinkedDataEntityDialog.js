@@ -14,11 +14,11 @@ import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../UseFormSubmission";
 import FormContext from "./FormContext";
+import UseNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
-    const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
 
     const getIdentifier = () => {
         // If no localPart is specified, treat the identifier as not being entered
@@ -37,7 +37,12 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
     const properties = shapes.getPropertiesForNodeShape(shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-    const values = {};
+    // The type could be required for unknown subjects which may not be known by the backend
+    const values = {
+        '@type': [{
+            id: type
+        }]
+    };
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
@@ -48,6 +53,9 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         validateAll, validationErrors, isValid,
         hasFormUpdates
     } = useFormData(values);
+    const {
+        showCloseConfirmation, setShowCloseConfirmation
+    } = UseNavigationBlocker(hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
@@ -56,13 +64,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             }),
         getIdentifier()
     );
-
-    // Store the type to create in the form to ensure it is known
-    // and will be stored
-    useEffect(() => {
-        addValue('@type', type);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const createEntity = (event) => {
         if (event) event.stopPropagation();
