@@ -35,12 +35,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
     const properties = shapes.getPropertiesForNodeShape(shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
-    // The type could be required for unknown subjects which may not be known by the backend
-    const values = {
-        '@type': [{
-            id: type
-        }]
-    };
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
@@ -50,7 +44,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getUpdates, valuesWithUpdates,
 
         validateAll, validationErrors, isValid
-    } = useFormData(values);
+    } = useFormData({});
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
