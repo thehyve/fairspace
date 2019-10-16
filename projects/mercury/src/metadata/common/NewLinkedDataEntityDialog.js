@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect} from "react";
 import PropTypes from 'prop-types';
 import {
     Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
@@ -56,6 +56,14 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             }),
         getIdentifier()
     );
+
+    // Store the type to create in the form to ensure it is known
+    // and will be stored
+    useEffect(() => {
+        addValue('@type', type);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
 
     const createEntity = (event) => {
         if (event) event.stopPropagation();
