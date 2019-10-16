@@ -14,7 +14,7 @@ import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../UseFormSubmission";
 import FormContext from "./FormContext";
-import UseNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
+import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -47,9 +47,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         validateAll, validationErrors, isValid,
         hasFormUpdates
     } = useFormData({});
-    const {
-        showCloseConfirmation, setShowCloseConfirmation
-    } = UseNavigationBlocker(hasFormUpdates);
+    const {showCloseConfirmation, setShowCloseConfirmation} = useNavigationBlocker(hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
