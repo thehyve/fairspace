@@ -2,9 +2,8 @@ package io.fairspace.saturn.commits;
 
 
 import com.pivovarit.function.ThrowingRunnable;
+import com.pivovarit.function.ThrowingSupplier;
 import io.fairspace.saturn.Context;
-
-import java.util.function.Supplier;
 
 import static io.fairspace.saturn.Context.threadContext;
 import static java.util.Optional.ofNullable;
@@ -23,14 +22,10 @@ public class CommitMessages {
         action.run();
     }
 
-    public static <T> T withCommitMessage(String message, Supplier<T> action) {
+    public static <T, E extends Exception> T withCommitMessage(String message, ThrowingSupplier<T, E> action) throws E {
         var ctx = threadContext.get();
         threadContext.set(new Context(ofNullable(ctx).map(Context::getUserInfo).orElse(null), message));
 
         return action.get();
-    }
-
-    public static String getCommitMessage() {
-        return ofNullable(threadContext.get()).map(Context::getCommitMessage).orElse(null);
     }
 }

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
@@ -55,7 +56,7 @@ public class MetadataEntityLifeCycleManagerTest {
         model = ds.getNamedModel(graph.getURI());
 
         var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-        initVocabularies(rdf);
+        initVocabularies(rdf, new TransactionalBatchExecutorService(rdf));
         lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
     }
 

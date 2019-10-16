@@ -6,6 +6,7 @@ import io.fairspace.saturn.config.SecurityHandlerFactory;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.config.WebDAVServletFactory;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.Isolation;
@@ -32,7 +33,7 @@ public class App {
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
         var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-        initVocabularies(rdf);
+        initVocabularies(rdf, new TransactionalBatchExecutorService(rdf));
 
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";

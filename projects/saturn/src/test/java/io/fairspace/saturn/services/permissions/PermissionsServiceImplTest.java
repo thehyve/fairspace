@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
@@ -46,18 +47,18 @@ public class PermissionsServiceImplTest {
     @Mock
     private PermissionChangeEventHandler permissionChangeEventHandler;
 
-    private Node currentUser = USER1;
+    private volatile Node currentUser = USER1;
 
-    private boolean isCoordinator = false;
+    private volatile boolean isCoordinator = false;
 
     @Before
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
+        var rdf = new RDFConnectionLocal(ds);
+        service = new PermissionsServiceImpl(rdf, new TransactionalBatchExecutorService(rdf), () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
         service.createResource(RESOURCE);
 
-        currentUser = USER1;
         isCoordinator = false;
     }
 

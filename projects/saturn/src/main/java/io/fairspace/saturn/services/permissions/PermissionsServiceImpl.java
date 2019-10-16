@@ -47,7 +47,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void createResource(Node resource) {
-        executor.perform(() -> storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
+        executor.perform(() -> rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get())));
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
                 .resource(resource.getURI())

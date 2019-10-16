@@ -2,6 +2,7 @@ package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -38,12 +39,14 @@ public class ManagedFileSystem extends BaseFileSystem {
     public static final String TYPE = "";
 
     private final RDFConnection rdf;
+    private final TransactionalBatchExecutorService executor;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
+    public ManagedFileSystem(RDFConnection rdf, TransactionalBatchExecutorService executor, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
         super(collections);
         this.rdf = rdf;
+        this.executor = executor;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         eventBus.register(this);
@@ -78,7 +81,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected void doMkdir(String path) throws IOException {
-        commit("Create directory " + path, rdf, () -> {
+        commit("Create directory " + path, executor, () -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
         });
@@ -88,7 +91,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected void doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Create file " + path, rdf, () -> {
+        commit("Create file " + path, executor, () -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
         });
@@ -98,7 +101,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Modify file " + path, rdf, () -> {
+        commit("Modify file " + path, executor, () -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -133,7 +136,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void doDelete(String path) throws IOException {
-        commit("Delete " + path, rdf, () -> {
+        commit("Delete " + path, executor, () -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -195,7 +198,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        commit(verb + " data from " + from + " to " + to, rdf, () -> {
+        commit(verb + " data from " + from + " to " + to, executor, () -> {
             ensureCanCreate(to);
             var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
             rdf.update(storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));

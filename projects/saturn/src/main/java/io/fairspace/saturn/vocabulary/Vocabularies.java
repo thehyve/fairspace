@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vocabulary;
 
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
@@ -19,8 +20,8 @@ public class Vocabularies {
 
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
-    public static void initVocabularies(RDFConnection rdf) {
-        commit("Initializing the vocabularies", rdf, () -> {
+    public static void initVocabularies(RDFConnection rdf, TransactionalBatchExecutorService executor) {
+        commit("Initializing the vocabularies", executor, () -> {
             rdf.put(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
 
             var oldSystemVocabulary = rdf.fetch(SYSTEM_VOCABULARY_GRAPH_BACKUP);

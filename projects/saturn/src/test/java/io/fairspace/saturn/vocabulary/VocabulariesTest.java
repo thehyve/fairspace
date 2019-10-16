@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vocabulary;
 
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -29,7 +30,7 @@ public class VocabulariesTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);
+        initVocabularies(rdf, new TransactionalBatchExecutorService(rdf));
         isValid = true;
 
         violationHandler = (message, subject, predicate, object) -> {

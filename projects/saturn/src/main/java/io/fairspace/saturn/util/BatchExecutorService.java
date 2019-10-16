@@ -1,6 +1,7 @@
 package io.fairspace.saturn.util;
 
 import com.pivovarit.function.ThrowingRunnable;
+import com.pivovarit.function.ThrowingSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +31,17 @@ public class BatchExecutorService {
 
     public <T> Future<T> submit(Callable<T> callable) {
         var task = new FutureTask<>(callable);
-        queue.offer(task);
+        if (currentThread() == worker) {
+            task.run();
+        } else {
+            queue.offer(task);
+        }
         return task;
     }
 
-    public <T> T perform(Callable<T> callable) {
+    public <T, E extends Exception> T perform(ThrowingSupplier<T, E> callable) throws E {
         try {
-            return submit(callable).get();
+            return submit(callable::get).get();
         } catch (InterruptedException e) {
             currentThread().interrupt();
             throw new RuntimeException(e);
@@ -48,12 +53,12 @@ public class BatchExecutorService {
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
             } else {
-                throw new RuntimeException(cause);
+                throw (E) cause;
             }
         }
     }
 
-    public void perform(ThrowingRunnable runnable) {
+    public <E extends Exception> void perform(ThrowingRunnable<E> runnable) throws E {
         perform(() -> {
             runnable.run();
             return null;

@@ -1,6 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
@@ -63,7 +64,7 @@ public class ManagedFileSystemTest {
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
 
-        fs = new ManagedFileSystem(rdf, store, userIriSupplier, collections, eventBus);
+        fs = new ManagedFileSystem(rdf, new TransactionalBatchExecutorService(rdf), store, userIriSupplier, collections, eventBus);
 
         var collection1 = new Collection();
         collection1.setLocation("coll");
