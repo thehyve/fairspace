@@ -21,9 +21,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.partition;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
@@ -67,7 +67,8 @@ public class PermissionsServiceImpl implements PermissionsService {
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = userIriSupplier.get();
 
-        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), executor, () -> {
+        getThreadContext().setSystemCommitMessage(format("Setting permission for resource %s, user %s to %s", resource, user, access));
+        executor.perform(() -> {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
@@ -93,7 +94,6 @@ public class PermissionsServiceImpl implements PermissionsService {
                     .access(access.toString())
                     .build()
             );
-
         });
 
         if(permissionChangeEventHandler != null)
@@ -133,7 +133,8 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
-        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), executor, () -> {
+        getThreadContext().setSystemCommitMessage(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted));
+        executor.perform(() -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {

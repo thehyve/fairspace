@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Comparator.comparing;
@@ -44,7 +44,8 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        Collection storedCollection = commit("Create collection " + collection.getName(), executor, () -> {
+        getThreadContext().setSystemCommitMessage("Create collection " + collection.getName());
+        var storedCollection = executor.perform(() -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -108,7 +109,8 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        commit("Delete collection " + iri, executor, () -> {
+        getThreadContext().setSystemCommitMessage("Delete collection " + iri);
+        executor.perform(() -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -137,8 +139,8 @@ public class CollectionsService {
         validate(patch.getIri() != null, "No IRI");
 
         validateIRI(patch.getIri().getURI());
-
-        return commit("Update collection " + patch.getName(), executor, () -> {
+        getThreadContext().setSystemCommitMessage( "Update collection " + patch.getName());
+        return executor.perform(() -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());

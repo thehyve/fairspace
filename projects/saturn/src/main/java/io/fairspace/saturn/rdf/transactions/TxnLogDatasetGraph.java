@@ -2,7 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.saturn.Context;
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -10,8 +10,6 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
-
-import java.util.function.Supplier;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
@@ -22,14 +20,11 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
     private final TransactionLog transactionLog;
-    private final Supplier<Context> contextSupplier;
 
 
-
-    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog, Supplier<Context> contextSupplier) {
+    public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
         super(dsg);
         this.transactionLog = transactionLog;
-        this.contextSupplier = contextSupplier;
     }
 
     /**
@@ -62,10 +57,10 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     public void begin(ReadWrite readWrite) {
         super.begin(readWrite);
         if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
-            var ctx = ofNullable(contextSupplier.get());
-            var userName = ctx.map(Context::getUserInfo).map(OAuthAuthenticationToken::getFullName).orElse(null);
-            var userId = ctx.map(Context::getUserInfo).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
-            var commitMessage = ctx.map(Context::getCommitMessage).orElse(null);
+            var ctx = ThreadContext.getThreadContext();
+            var userName = ofNullable(ctx.getUserInfo()).map(OAuthAuthenticationToken::getFullName).orElse(null);
+            var userId = ofNullable(ctx.getUserInfo()).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
+            var commitMessage = ctx.getUserCommitMessage();
 
             critical(() ->
                     transactionLog.onBegin(commitMessage, userId, userName, currentTimeMillis()));

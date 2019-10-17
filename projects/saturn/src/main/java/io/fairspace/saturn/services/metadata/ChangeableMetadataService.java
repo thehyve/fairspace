@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.vocabulary.Inference.getInferredStatements;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -61,7 +61,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", executor, () -> update(EMPTY_MODEL, model));
+        getThreadContext().setSystemCommitMessage("Store metadata");
+        executor.perform(() -> update(EMPTY_MODEL, model));
         eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
@@ -71,7 +72,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if(commit("Mark <" + subject + "> as deleted", executor, () -> lifeCycleManager.softDelete(subject))) {
+        getThreadContext().setSystemCommitMessage("Mark <" + subject + "> as deleted");
+        if(executor.perform(() -> lifeCycleManager.softDelete(subject))) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
@@ -87,7 +89,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", executor, () -> update(model, EMPTY_MODEL));
+        getThreadContext().setSystemCommitMessage("Delete metadata");
+        executor.perform(() -> update(model, EMPTY_MODEL));
         eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
@@ -106,7 +109,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        commit("Update metadata", executor, () -> {
+        getThreadContext().setSystemCommitMessage("Update metadata");
+        executor.perform(() -> {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {
                 // Only explicitly delete triples for URI resources. As this model is also used
@@ -118,8 +122,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             });
 
             update(toDelete, model.removeAll(null, null, NIL));
-            eventConsumer.accept(MetadataEvent.Type.UPDATED);
         });
+        eventConsumer.accept(MetadataEvent.Type.UPDATED);
     }
 
     private void update(Model modelToRemove, Model modelToAdd) {

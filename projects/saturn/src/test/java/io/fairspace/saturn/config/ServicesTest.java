@@ -1,14 +1,11 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -18,9 +15,6 @@ public class ServicesTest {
     @Mock
     private RDFConnection rdf;
 
-    @Mock
-    private Supplier<OAuthAuthenticationToken> userInfoSupplier;
-
     private Config config = new Config();
 
     private Services svc;
@@ -28,7 +22,7 @@ public class ServicesTest {
 
     @Before
     public void before() throws Exception {
-        svc = new Services(config, rdf, userInfoSupplier);
+        svc = new Services(config, rdf);
     }
 
     @Test
@@ -39,11 +33,6 @@ public class ServicesTest {
     @Test
     public void getRdf() {
         assertEquals(rdf, svc.getRdf());
-    }
-
-    @Test
-    public void getUserInfoSupplier() {
-        assertEquals(userInfoSupplier, svc.getUserInfoSupplier());
     }
 
     @Test

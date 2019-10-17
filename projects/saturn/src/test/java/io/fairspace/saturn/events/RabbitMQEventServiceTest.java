@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -52,9 +53,10 @@ public class RabbitMQEventServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        getThreadContext().setUserInfo(token);
         org.apache.log4j.Logger.getRootLogger().addAppender(appender);
 
-        service = new RabbitMQEventService(config, "workspaceId", () -> token);
+        service = new RabbitMQEventService(config, "workspaceId");
         service.setFactory(factory);
 
         when(factory.newConnection()).thenReturn(connection);

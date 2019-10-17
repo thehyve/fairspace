@@ -1,7 +1,6 @@
 package io.fairspace.saturn.config;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.events.EventCategory;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.MetadataEvent;
@@ -28,6 +27,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -37,7 +37,6 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 public class Services {
     private final Config config;
     private final RDFConnection rdf;
-    private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
 
     private final EventBus eventBus = new EventBus();
     private final UserService userService;
@@ -51,15 +50,14 @@ public class Services {
     private final TransactionalBatchExecutorService transactionalBatchExecutorService;
 
 
-    public Services(@NonNull Config config, @NonNull RDFConnection rdf, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
+    public Services(@NonNull Config config, @NonNull RDFConnection rdf) throws Exception {
         this.config = config;
         this.rdf = rdf;
-        this.userInfoSupplier = userInfoSupplier;
         transactionalBatchExecutorService = new TransactionalBatchExecutorService(rdf);
 
         userService = new UserService(config.auth.userUrlTemplate, new DAO(rdf, null));
-        Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
-        BooleanSupplier hasFullAccessSupplier = () -> userInfoSupplier.get().getAuthorities().contains(config.auth.fullAccessRole);
+        Supplier<Node> userIriSupplier = () -> userService.getUserIri(getThreadContext().getUserInfo().getSubjectClaim());
+        BooleanSupplier hasFullAccessSupplier = () -> getThreadContext().getUserInfo().getAuthorities().contains(config.auth.fullAccessRole);
 
         eventService = setupEventService();
 
@@ -110,7 +108,7 @@ public class Services {
     private EventService setupEventService() throws Exception {
         if(config.rabbitMQ.enabled) {
             try {
-                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name, userInfoSupplier);
+                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name);
                 eventService.init();
                 return eventService;
             } catch(Exception e) {

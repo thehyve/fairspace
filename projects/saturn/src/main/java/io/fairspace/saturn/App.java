@@ -1,6 +1,5 @@
 package io.fairspace.saturn;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.ApiFilterFactory;
 import io.fairspace.saturn.config.SecurityHandlerFactory;
 import io.fairspace.saturn.config.Services;
@@ -12,12 +11,8 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
-import java.util.function.Supplier;
-
-import static io.fairspace.saturn.Context.threadContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
-import static java.util.Optional.ofNullable;
 
 @Slf4j
 public class App {
@@ -26,9 +21,8 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        Supplier<OAuthAuthenticationToken> userInfoProvider = () -> ofNullable(threadContext.get()).map(Context::getUserInfo).orElse(null);
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, threadContext::get);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
@@ -38,7 +32,7 @@ public class App {
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";
 
-        var svc = new Services(CONFIG, rdf, userInfoProvider);
+        var svc = new Services(CONFIG, rdf);
 
         FusekiServer.create()
                 .securityHandler(SecurityHandlerFactory.getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))

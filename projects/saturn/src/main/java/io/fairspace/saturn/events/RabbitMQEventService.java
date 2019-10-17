@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.rabbitmq.client.*;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
 import lombok.NonNull;
 import lombok.Setter;
@@ -13,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
+
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static java.util.Optional.ofNullable;
 
 @Slf4j
 public class RabbitMQEventService implements EventService {
@@ -26,13 +27,11 @@ public class RabbitMQEventService implements EventService {
 
     private Config.RabbitMQ config;
     private String workspaceId;
-    private Supplier<OAuthAuthenticationToken> tokenSupplier;
     private Channel channel;
 
-    public RabbitMQEventService(Config.RabbitMQ config, String workspaceId, Supplier<OAuthAuthenticationToken> tokenSupplier) {
+    public RabbitMQEventService(Config.RabbitMQ config, String workspaceId) {
         this.config = config;
         this.workspaceId = workspaceId;
-        this.tokenSupplier = tokenSupplier;
     }
 
     public void init() throws IOException, TimeoutException {
@@ -74,11 +73,8 @@ public class RabbitMQEventService implements EventService {
     }
 
     private User getCurrentUser() {
-        OAuthAuthenticationToken token = tokenSupplier.get();
-
-        if(token == null)
-            return null;
-
-        return new User(token.getSubjectClaim(), token.getUsername(), token.getFullName());
+        return ofNullable(getThreadContext().getUserInfo())
+                .map(token -> new User(token.getSubjectClaim(), token.getUsername(), token.getFullName()))
+                .orElse(null);
     }
 }

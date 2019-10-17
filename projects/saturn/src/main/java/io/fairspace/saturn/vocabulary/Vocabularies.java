@@ -6,9 +6,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.util.FileManager;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
@@ -21,7 +21,8 @@ public class Vocabularies {
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
     public static void initVocabularies(RDFConnection rdf, TransactionalBatchExecutorService executor) {
-        commit("Initializing the vocabularies", executor, () -> {
+        getThreadContext().setSystemCommitMessage("Initializing the vocabularies");
+        executor.perform(() -> {
             rdf.put(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
 
             var oldSystemVocabulary = rdf.fetch(SYSTEM_VOCABULARY_GRAPH_BACKUP);

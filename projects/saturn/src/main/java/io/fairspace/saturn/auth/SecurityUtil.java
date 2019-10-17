@@ -6,7 +6,7 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import javax.servlet.http.HttpServletRequest;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.Context.threadContext;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static java.util.Optional.ofNullable;
 
 public class SecurityUtil {
@@ -19,7 +19,7 @@ public class SecurityUtil {
     }
 
     public static String authorizationHeader() {
-        return ofNullable(threadContext.get().getUserInfo())
+        return ofNullable(getThreadContext().getUserInfo())
                 .map(OAuthAuthenticationToken::getAccessToken)
                 .map(token -> "Bearer " + token)
                 .orElse(null);

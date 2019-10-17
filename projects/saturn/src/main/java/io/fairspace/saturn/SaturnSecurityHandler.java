@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.Context.threadContext;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
@@ -98,7 +98,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
             }
         }
 
-        threadContext.set(new Context(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER)));
+        setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null));
 
         return null;
     }

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vfs.irods;
 
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
@@ -33,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.*;
@@ -46,13 +47,15 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String FAIRSPACE_IRI_ATTRIBUTE = "FairspaceIRI";
     private final IRODSFileSystem fs;
     private final RDFConnection rdf;
+    private final TransactionalBatchExecutorService batchExecutorService;
 
-    public IRODSVirtualFileSystem(RDFConnection rdf, CollectionsService collections) throws JargonException {
-        this(rdf, collections, IRODSFileSystem.instance());
+    public IRODSVirtualFileSystem(RDFConnection rdf, TransactionalBatchExecutorService batchExecutorService, CollectionsService collections) throws JargonException {
+        this(rdf, batchExecutorService, collections, IRODSFileSystem.instance());
     }
 
-    IRODSVirtualFileSystem(RDFConnection rdf, CollectionsService collections, IRODSFileSystem fs) {
+    IRODSVirtualFileSystem(RDFConnection rdf, TransactionalBatchExecutorService batchExecutorService, CollectionsService collections, IRODSFileSystem fs) {
         super(collections);
+        this.batchExecutorService = batchExecutorService;
 
         this.fs = fs;
         this.rdf = rdf;
@@ -143,7 +146,8 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        withCommitMessage("Generate an IRI for an external resource", () ->
+        getThreadContext().setSystemCommitMessage("Generate an IRI for an external resource");
+        batchExecutorService.perform(() ->
                 rdf.update(storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }

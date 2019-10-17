@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
@@ -81,7 +81,8 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected void doMkdir(String path) throws IOException {
-        commit("Create directory " + path, executor, () -> {
+        getThreadContext().setSystemCommitMessage("Create directory " + path);
+        executor.perform(() -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
         });
@@ -91,7 +92,8 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected void doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Create file " + path, executor, () -> {
+        getThreadContext().setSystemCommitMessage("Create file " + path);
+        executor.perform(() -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
         });
@@ -101,7 +103,8 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Modify file " + path, executor, () -> {
+        getThreadContext().setSystemCommitMessage("Modify file " + path);
+        executor.perform(() -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -136,7 +139,8 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void doDelete(String path) throws IOException {
-        commit("Delete " + path, executor, () -> {
+        getThreadContext().setSystemCommitMessage("Delete " + path);
+        executor.perform(() -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -198,7 +202,8 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        commit(verb + " data from " + from + " to " + to, executor, () -> {
+        getThreadContext().setSystemCommitMessage(verb + " data from " + from + " to " + to);
+        executor.perform(() -> {
             ensureCanCreate(to);
             var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
             rdf.update(storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));
