@@ -51,7 +51,7 @@ public class TxnLogDatasetGraphTest {
                 .add(statement)
                 .remove(statement));
 
-        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onBegin(eq("message"), eq("system message"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onCommit();
@@ -66,7 +66,7 @@ public class TxnLogDatasetGraphTest {
                 .remove(statement);
         ds.abort();
 
-        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onBegin(eq("message"), eq("system message"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();
@@ -92,7 +92,7 @@ public class TxnLogDatasetGraphTest {
 
         } catch (Exception ignore) {
         }
-        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onBegin(eq("message"), eq("system message"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();

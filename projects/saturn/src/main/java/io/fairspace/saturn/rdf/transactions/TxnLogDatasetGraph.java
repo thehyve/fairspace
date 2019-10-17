@@ -60,10 +60,9 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             var ctx = ThreadContext.getThreadContext();
             var userName = ofNullable(ctx.getUserInfo()).map(OAuthAuthenticationToken::getFullName).orElse(null);
             var userId = ofNullable(ctx.getUserInfo()).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
-            var commitMessage = ctx.getUserCommitMessage();
 
             critical(() ->
-                    transactionLog.onBegin(commitMessage, userId, userName, currentTimeMillis()));
+                    transactionLog.onBegin(ctx.getUserCommitMessage(), ctx.getSystemCommitMessage(), userId, userName, currentTimeMillis()));
         }
     }
 

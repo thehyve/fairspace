@@ -18,7 +18,7 @@ public class SparqlTransactionCodecTest {
         var out = new ByteArrayOutputStream();
         var writeListener = codec.write(out);
 
-        writeListener.onBegin("message", "userId", "userName", 123L);
+        writeListener.onBegin("message", "system", "userId", "userName", 123L);
         writeListener.onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
         writeListener.onDelete(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
         var blank = createBlankNode();
@@ -29,7 +29,7 @@ public class SparqlTransactionCodecTest {
         var readListener = mock(TransactionListener.class);
         codec.read(in, readListener);
 
-        verify(readListener).onBegin("message", "userId", "userName", 123L);
+        verify(readListener).onBegin("message", "system", "userId", "userName", 123L);
         verify(readListener).onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
         verify(readListener).onDelete(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
         verify(readListener).onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), blank);
@@ -43,14 +43,14 @@ public class SparqlTransactionCodecTest {
         var out = new ByteArrayOutputStream();
         var writeListener = codec.write(out);
 
-        writeListener.onBegin(null, null, null, 123L);
+        writeListener.onBegin(null, null,null, null, 123L);
         writeListener.onCommit();
 
         var in = new ByteArrayInputStream(out.toByteArray());
         var readListener = mock(TransactionListener.class);
         codec.read(in, readListener);
 
-        verify(readListener).onBegin(null, null, null, 123L);
+        verify(readListener).onBegin(null, null, null, null, 123L);
         verify(readListener).onCommit();
         verifyNoMoreInteractions(readListener);
     }
@@ -61,14 +61,14 @@ public class SparqlTransactionCodecTest {
         var out = new ByteArrayOutputStream();
         var writeListener = codec.write(out);
 
-        writeListener.onBegin("message", "userId", "userName", 123L);
+        writeListener.onBegin("message","system", "userId", "userName", 123L);
         writeListener.onAbort();
 
         var in = new ByteArrayInputStream(out.toByteArray());
         var readListener = mock(TransactionListener.class);
         codec.read(in, readListener);
 
-        verify(readListener).onBegin("message", "userId", "userName", 123L);
+        verify(readListener).onBegin("message", "system", "userId", "userName", 123L);
         verify(readListener).onAbort();
         verifyNoMoreInteractions(readListener);
     }
