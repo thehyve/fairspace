@@ -2,13 +2,15 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import com.pivovarit.function.ThrowingSupplier;
+import io.fairspace.saturn.ThreadContext;
 import org.apache.jena.sparql.core.Transactional;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static io.fairspace.saturn.ThreadContext.*;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.lang.Thread.currentThread;
 import static org.apache.jena.system.Txn.executeWrite;
 
@@ -29,7 +31,6 @@ public class TransactionalBatchExecutorService {
                 queue.drainTo(tasks);
                 executeWrite(transactional, () -> tasks.forEach(PartialTask::run));
                 tasks.forEach(PartialTask::batchCompleted);
-                cleanThreadContext();
             }
         });
         worker.start();
@@ -40,11 +41,7 @@ public class TransactionalBatchExecutorService {
             return supplier.get();
         }
 
-        var ctx = getThreadContext();
-        var task = new PartialTask<>(() -> {
-            setThreadContext(ctx);
-            return supplier.get();
-        });
+        var task = new PartialTask<>(getThreadContext(), supplier);
         queue.offer(task);
 
         return task.get();
@@ -59,16 +56,19 @@ public class TransactionalBatchExecutorService {
 
     private static class PartialTask<T, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
+        private final ThreadContext context;
         private final ThrowingSupplier<T, E> supplier;
         private T result;
         private Exception error;
 
-        private PartialTask(ThrowingSupplier<T, E> supplier) {
+        private PartialTask(ThreadContext context, ThrowingSupplier<T, E> supplier) {
+            this.context = context;
             this.supplier = supplier;
         }
 
         void run() {
             try {
+                setThreadContext(context);
                 result = supplier.get();
             } catch (Exception e) {
                 error = e;
