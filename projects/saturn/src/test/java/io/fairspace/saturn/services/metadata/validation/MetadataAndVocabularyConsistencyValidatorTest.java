@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -52,7 +51,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf, new TransactionalBatchExecutorService(rdf));
+        initVocabularies(rdf);
 
         model.removeAll();
         vocabulary.add(TARGET_CLASS_SHAPE, SH.targetClass, TARGET_CLASS);

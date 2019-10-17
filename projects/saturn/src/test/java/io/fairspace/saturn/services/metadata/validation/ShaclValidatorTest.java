@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -48,7 +47,7 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf, new TransactionalBatchExecutorService(rdf));
+        initVocabularies(rdf);
         vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
 
         ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI())

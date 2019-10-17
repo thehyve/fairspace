@@ -47,7 +47,6 @@ public class ChangeableMetadataServiceTest {
 
     private Dataset ds = createTxnMem();
     private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-    private TransactionalBatchExecutorService executor = new TransactionalBatchExecutorService(rdf);
     private ChangeableMetadataService api;
 
     @Mock
@@ -141,7 +140,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testInference() {
-        initVocabularies(rdf, executor);
+        initVocabularies(rdf);
         ds.getDefaultModel()
                 .add(S1, RDF.type, FOAF.Person)
                 .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));
