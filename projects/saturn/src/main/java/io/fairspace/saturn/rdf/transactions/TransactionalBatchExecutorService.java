@@ -61,7 +61,7 @@ public class TransactionalBatchExecutorService {
         private T result;
         private Exception error;
 
-        private PartialTask(ThreadContext context, ThrowingSupplier<T, E> supplier) {
+        PartialTask(ThreadContext context, ThrowingSupplier<T, E> supplier) {
             this.context = context;
             this.supplier = supplier;
         }
@@ -74,6 +74,10 @@ public class TransactionalBatchExecutorService {
                 error = e;
                 canBeRead.countDown(); // No need to wait until the transaction is committed
             }
+        }
+
+        void batchCompleted() {
+            canBeRead.countDown();
         }
 
         T get() throws E {
@@ -93,10 +97,6 @@ public class TransactionalBatchExecutorService {
             }
 
             throw (E) error;
-        }
-
-        void batchCompleted() {
-            canBeRead.countDown();
         }
     }
 }
