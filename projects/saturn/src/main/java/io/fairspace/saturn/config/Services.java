@@ -53,9 +53,10 @@ public class Services {
     public Services(@NonNull Config config, @NonNull RDFConnection rdf) throws Exception {
         this.config = config;
         this.rdf = rdf;
+
         transactionalBatchExecutorService = new TransactionalBatchExecutorService(rdf);
 
-        userService = new UserService(config.auth.userUrlTemplate, new DAO(rdf, null));
+        userService = new UserService(new DAO(rdf, null), transactionalBatchExecutorService, config.auth.userUrlTemplate);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(getThreadContext().getUserInfo().getSubjectClaim());
         BooleanSupplier hasFullAccessSupplier = () -> getThreadContext().getUserInfo().getAuthorities().contains(config.auth.fullAccessRole);
 

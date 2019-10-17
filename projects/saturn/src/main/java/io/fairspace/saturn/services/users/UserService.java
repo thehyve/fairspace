@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.client.HttpClient;
@@ -22,10 +23,12 @@ import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 public class UserService {
     private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final String userUrlTemplate;
-    private DAO dao;
+    private final DAO dao;
+    private final TransactionalBatchExecutorService executor;
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
 
-    public UserService(String userUrlTemplate, DAO dao) {
+    public UserService(DAO dao, TransactionalBatchExecutorService executor, String userUrlTemplate) {
+        this.executor = executor;
         this.userUrlTemplate = userUrlTemplate;
         this.dao = dao;
     }
@@ -42,7 +45,8 @@ public class UserService {
             localUser = fetchUserFromKeycloak(iri);
 
             if(localUser != null) {
-                dao.write(localUser);
+                var user = localUser;
+                executor.perform(() -> dao.write(user));
             }
         }
 
@@ -63,7 +67,7 @@ public class UserService {
                 user.setIri(iri);
                 user.setName(token.getFullName());
                 user.setEmail(token.getEmail());
-                dao.write(user);
+                executor.perform(() -> dao.write(user));
             }
         }
     }
