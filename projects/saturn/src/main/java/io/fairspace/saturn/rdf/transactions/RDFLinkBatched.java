@@ -23,12 +23,10 @@ public class RDFLinkBatched implements RDFLink {
     private final LinkedBlockingQueue<PartialTask<?, ?>> queue = new LinkedBlockingQueue<>();
 
     private final RDFConnection rdf;
-    private final TransactionLog txnLog;
     private final Thread worker;
 
     public RDFLinkBatched(RDFConnection rdf, TransactionLog txnLog) {
         this.rdf = rdf;
-        this.txnLog = txnLog;
         worker = new Thread(() -> {
             while (true) {
                 var tasks = new ArrayList<PartialTask<?, ?>>();
@@ -41,7 +39,7 @@ public class RDFLinkBatched implements RDFLink {
                 Txn.executeWrite(rdf, () -> tasks.forEach(task -> task.apply(rdf, txnLog)));
                 tasks.forEach(PartialTask::batchCompleted);
             }
-        });
+        }, "Batch transaction processor");
         worker.start();
     }
 
