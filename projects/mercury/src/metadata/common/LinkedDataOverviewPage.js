@@ -1,6 +1,8 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
+import {Grid} from "@material-ui/core";
+import ToggleButton from '@material-ui/lab/ToggleButton';
 import {BreadCrumbs, usePageTitleUpdater} from '@fairspace/shared-frontend';
 
 import LinkedDataCreator from "./LinkedDataCreator";
@@ -13,7 +15,7 @@ import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
-const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent}) => {
+const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent, showGraphSelection = false}) => {
     const {
         requireIdentifier, editorPath,
         hasEditRight, getClassesInCatalog, shapesLoading, shapesError
@@ -23,6 +25,21 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
         query, setQuery, selectedTypes, setSelectedTypes,
         size, setSize, page, setPage
     } = useLinkedDataSearchParams();
+
+    const [showGraph, setShowGraph] = useState(true);
+
+    useEffect(() => {
+        if (query || (selectedTypes && selectedTypes.length > 0)) {
+            setShowGraph(false);
+        }
+    }, [query, selectedTypes]);
+
+    useEffect(() => {
+        if (showGraph) {
+            setSelectedTypes([]);
+            setQuery(null);
+        }
+    }, [setQuery, setSelectedTypes, showGraph]);
 
     const availableTypes = getClassesInCatalog().map(type => {
         const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
@@ -34,6 +51,7 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
 
     const renderResults = () => (
         <ResultsComponent
+            showGraph={showGraph}
             selectedTypes={selectedTypes}
             availableTypes={availableTypes}
 
@@ -50,16 +68,38 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
         />
     );
 
+
     return (
         <>
             <BreadCrumbs />
-            <LinkedDataOverviewHeader
-                setQuery={setQuery}
-                selectedTypes={selectedTypes}
-                setSelectedTypes={setSelectedTypes}
-                availableTypes={availableTypes}
-            />
-
+            {showGraphSelection ? (
+                <Grid container justify="space-between" alignItems="center">
+                    <Grid item xs={9}>
+                        <LinkedDataOverviewHeader
+                            setQuery={setQuery}
+                            selectedTypes={selectedTypes}
+                            setSelectedTypes={setSelectedTypes}
+                            availableTypes={availableTypes}
+                        />
+                    </Grid>
+                    <Grid item xs={2}>
+                        <ToggleButton
+                            color="primary"
+                            selected={showGraph}
+                            value
+                            onChange={() => setShowGraph(!showGraph)}>
+                            Show Graph
+                        </ToggleButton>
+                    </Grid>
+                </Grid>
+            ) : (
+                <LinkedDataOverviewHeader
+                    setQuery={setQuery}
+                    selectedTypes={selectedTypes}
+                    setSelectedTypes={setSelectedTypes}
+                    availableTypes={availableTypes}
+                />
+            )}
             {
                 hasEditRight ? (
                     <LinkedDataCreator
