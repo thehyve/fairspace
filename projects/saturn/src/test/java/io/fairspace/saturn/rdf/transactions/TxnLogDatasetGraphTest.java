@@ -4,10 +4,10 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.ThreadContext;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdfconnection.Isolation;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -23,11 +23,8 @@ import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
-import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.mockito.Mockito.*;
 
-@Ignore // TODO: Update me
 @RunWith(MockitoJUnitRunner.class)
 public class TxnLogDatasetGraphTest {
     @Rule
@@ -36,20 +33,22 @@ public class TxnLogDatasetGraphTest {
     @Mock
     private TransactionLog log;
     private Dataset ds;
+    private RDFLink rdfLink;
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
 
     @Before
     public void before() {
-        setThreadContext(new ThreadContext(new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")), "message", "system message"));
+        setThreadContext(new ThreadContext(new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")), "message", null));
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
+        rdfLink = new RDFLinkBatched(new RDFConnectionLocal(ds, Isolation.COPY), log);
     }
 
 
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1")
+        rdfLink.executeWrite("system message", rdf -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
@@ -62,12 +61,15 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
-        ds.begin(ReadWrite.WRITE);
-        ds.getNamedModel("http://example.com/g1")
-                .add(statement)
-                .remove(statement);
-        ds.abort();
-
+        try {
+            rdfLink.executeWrite("system message", rdf -> {
+                ds.getNamedModel("http://example.com/g1")
+                        .add(statement)
+                        .remove(statement);
+                throw new RuntimeException();
+            });
+        } catch (RuntimeException ignore) {
+        }
         verify(log).onBegin(eq("message"), eq("system message"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
@@ -77,7 +79,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldNotLogReadTransactions() throws IOException {
-        executeRead(ds, () -> ds.getNamedModel("http://example.com/g1").listStatements().toList());
+        rdfLink.executeRead(rdf -> ds.getNamedModel("http://example.com/g1").listStatements().toList());
 
         verifyNoMoreInteractions(log);
     }
@@ -85,7 +87,7 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
-            executeWrite(ds, () -> {
+            rdfLink.executeWrite("system message", rdf -> {
                 ds.getNamedModel("http://example.com/g1")
                         .add(statement)
                         .remove(statement);
@@ -106,7 +108,6 @@ public class TxnLogDatasetGraphTest {
 
         doThrow(IOException.class).when(log).onCommit();
 
-        executeWrite(ds, () -> {
-        });
+        rdfLink.executeWrite(rdf -> { });
     }
 }

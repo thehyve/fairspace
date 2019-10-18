@@ -3,9 +3,10 @@ package io.fairspace.saturn.rdf.transactions;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdfconnection.Isolation;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,10 +18,8 @@ import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 
-@Ignore
 public class RestoreTest {
     private final Statement stmt1 = createStatement(createResource("http://example.com/subject1"),
             createProperty("http://example.com/property1"),
@@ -47,10 +46,13 @@ public class RestoreTest {
 
     @Test
     public void restoreWorksAsExpected() throws IOException {
-        var ds1 = SaturnDatasetFactory.connect(config, new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec()));
+        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+        var ds1 = SaturnDatasetFactory.connect(config, txnLog);
+        var rdfLink1 = new RDFLinkBatched(new RDFConnectionLocal(ds1, Isolation.COPY), txnLog);
 
-        executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt1));
-        executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt2));
+
+        rdfLink1.executeWrite(rdf -> ds1.getDefaultModel().add(stmt1));
+        rdfLink1.executeWrite(rdf -> ds1.getDefaultModel().add(stmt2));
 
         ds1.close();
 
@@ -76,8 +78,12 @@ public class RestoreTest {
         m.add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)));
         m.add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b")));
 
-        var ds1 = SaturnDatasetFactory.connect(config, new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec()));
-        executeWrite(ds1, () -> ds1.getDefaultModel().add(m));
+        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+        var ds1 = SaturnDatasetFactory.connect(config, txnLog);
+        var rdfLink1 = new RDFLinkBatched(new RDFConnectionLocal(ds1, Isolation.COPY), txnLog);
+
+        rdfLink1.executeWrite(rdf -> ds1.getDefaultModel().add(m));
+
 
         ds1.close();
 
