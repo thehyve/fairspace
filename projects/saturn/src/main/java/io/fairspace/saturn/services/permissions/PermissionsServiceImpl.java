@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.partition;
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
@@ -43,7 +42,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void createResource(Node resource) {
-        rdfLink.executeWrite(null, rdf -> rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get())));
+        rdfLink.executeWrite(rdf -> rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get())));
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
                 .resource(resource.getURI())
@@ -56,15 +55,14 @@ public class PermissionsServiceImpl implements PermissionsService {
         Model resourcePermissions = createDefaultModel();
         Resource user = ResourceFactory.createResource(userIriSupplier.get().getURI());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
-        rdfLink.executeWrite(null, rdf -> rdf.load(PERMISSIONS_GRAPH, resourcePermissions));
+        rdfLink.executeWrite(rdf -> rdf.load(PERMISSIONS_GRAPH, resourcePermissions));
     }
 
     @Override
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = userIriSupplier.get();
 
-        getThreadContext().setSystemCommitMessage(format("Setting permission for resource %s, user %s to %s", resource, user, access));
-        rdfLink.executeWrite(null, rdf -> {
+        rdfLink.executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf -> {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
@@ -129,8 +127,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
-        getThreadContext().setSystemCommitMessage(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted));
-        rdfLink.executeWrite(null, rdf -> {
+        rdfLink.executeWrite(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {

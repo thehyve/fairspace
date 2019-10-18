@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.vocabulary.Inference.getInferredStatements;
@@ -71,7 +70,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        getThreadContext().setSystemCommitMessage("Mark <" + subject + "> as deleted");
         if (lifeCycleManager.softDelete(subject)) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
@@ -88,7 +86,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        getThreadContext().setSystemCommitMessage("Delete metadata");
         rdfLink.executeWrite("Delete metadata", rdf -> update(model, EMPTY_MODEL, rdf));
         eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
@@ -108,7 +105,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        getThreadContext().setSystemCommitMessage("Update metadata");
         rdfLink.executeWrite("Update metadata", rdf -> {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {

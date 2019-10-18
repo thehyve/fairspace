@@ -10,10 +10,25 @@ public interface RDFLink {
 
     <R, E extends Exception> R calculateWrite(String message, ThrowingFunction<? super RDFConnection, ? extends R, ? extends E> job) throws E;
 
+    default <E extends Exception> void executeRead(ThrowingConsumer<? super SparqlQueryConnection, ? extends E> job) throws E {
+        calculateRead(rdf -> {
+            job.accept(rdf);
+            return null;
+        });
+    }
+
     default <E extends Exception> void executeWrite(String message, ThrowingConsumer<? super RDFConnection, ? extends E> job) throws E {
         calculateWrite(message, rdf -> {
             job.accept(rdf);
             return null;
         });
+    }
+
+    default <R, E extends Exception> R calculateWrite(ThrowingFunction<? super RDFConnection, ? extends R, ? extends E> job) throws E {
+        return calculateWrite(job);
+    }
+
+    default <E extends Exception> void executeWrite(ThrowingConsumer<? super RDFConnection, ? extends E> job) throws E {
+        executeWrite(job);
     }
 }

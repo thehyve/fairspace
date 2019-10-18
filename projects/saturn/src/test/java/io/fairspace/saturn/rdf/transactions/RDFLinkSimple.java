@@ -9,7 +9,6 @@ import org.apache.jena.rdfconnection.SparqlQueryConnection;
 import org.apache.jena.system.Txn;
 
 import static com.pivovarit.function.ThrowingFunction.sneaky;
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 
 public class RDFLinkSimple implements RDFLink {
     private final RDFConnection rdf;
@@ -29,7 +28,6 @@ public class RDFLinkSimple implements RDFLink {
 
     @Override
     public <R, E extends Exception> R calculateWrite(String message, ThrowingFunction<? super RDFConnection, ? extends R, ? extends E> job) throws E {
-        getThreadContext().setSystemCommitMessage(message);
         return Txn.calculateWrite(rdf, () -> sneaky(job).apply(rdf));
     }
 }

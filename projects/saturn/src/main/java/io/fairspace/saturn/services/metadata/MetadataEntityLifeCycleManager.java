@@ -60,7 +60,7 @@ class MetadataEntityLifeCycleManager {
             return;
         }
 
-        rdfLink.executeWrite(null, rdf -> {
+        rdfLink.executeWrite(rdf -> {
             // Determine whether the model to add contains new entities
             // for which new information should be stored
             var newEntities = determineNewEntities(model);
@@ -79,7 +79,7 @@ class MetadataEntityLifeCycleManager {
     }
 
     boolean softDelete(Resource resource) {
-        return rdfLink.calculateWrite(null, rdf -> {
+        return rdfLink.calculateWrite("Soft delete " + resource, rdf -> {
             if (permissionsService != null) {
                 permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
             }

@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import static org.apache.jena.system.Txn.executeRead;
 import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 
+@Ignore
 public class RestoreTest {
     private final Statement stmt1 = createStatement(createResource("http://example.com/subject1"),
             createProperty("http://example.com/property1"),

@@ -126,7 +126,7 @@ public class DAO {
                 setProperty(update, entity.getIri(), propertyNode, value);
             });
 
-            rdfLink.executeWrite(null, rdf -> rdf.update(update));
+            rdfLink.executeWrite(rdf -> rdf.update(update));
 
             return entity;
         });
@@ -160,7 +160,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        rdfLink.executeWrite(null, rdf -> rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null)));
+        rdfLink.executeWrite(rdf -> rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null)));
     }
 
     /**
@@ -170,7 +170,7 @@ public class DAO {
      * @return the entity passed as an argument if no entity was found or it was already marked as deleted
      */
     public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
-        return rdfLink.calculateWrite(null, rdf -> {
+        return rdfLink.calculateWrite(rdf -> {
             var existing = (T) read(entity.getClass(), entity.getIri());
             if (existing != null) {
                 existing.setDateDeleted(now());
