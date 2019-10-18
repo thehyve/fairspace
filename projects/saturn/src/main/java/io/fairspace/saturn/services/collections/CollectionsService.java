@@ -3,7 +3,7 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.events.CollectionEvent;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
@@ -27,8 +26,8 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 @RequiredArgsConstructor
 @Slf4j
 public class CollectionsService {
+    private final RDFLink rdfLink;
     private final DAO dao;
-    private final TransactionalBatchExecutorService executor;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
     private final EventService eventService;
@@ -44,8 +43,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        getThreadContext().setSystemCommitMessage("Create collection " + collection.getName());
-        var storedCollection = executor.perform(() -> {
+        var storedCollection = rdfLink.calculateWrite("Create collection " + collection.getName(), rdf -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -80,7 +78,7 @@ public class CollectionsService {
     }
 
     private void ensureLocationIsNotUsed(String location) {
-        if(getByLocationWithoutAccess(location).isPresent()) {
+        if (getByLocationWithoutAccess(location).isPresent()) {
             throw new LocationAlreadyExistsException(location);
         }
     }
@@ -109,8 +107,8 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        getThreadContext().setSystemCommitMessage("Delete collection " + iri);
-        executor.perform(() -> {
+
+        rdfLink.executeWrite("Delete collection " + iri, rdf -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -139,8 +137,7 @@ public class CollectionsService {
         validate(patch.getIri() != null, "No IRI");
 
         validateIRI(patch.getIri().getURI());
-        getThreadContext().setSystemCommitMessage( "Update collection " + patch.getName());
-        return executor.perform(() -> {
+        return rdfLink.calculateWrite("Update collection " + patch.getName(), rdf -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());
@@ -201,7 +198,7 @@ public class CollectionsService {
     private Collection addPermissionsToObject(Collection c) {
         if (c != null) {
             c.setAccess(permissions.getPermission(c.getIri()));
-            if(c.getAccess() == Access.None) {
+            if (c.getAccess() == Access.None) {
                 return null;
             }
         }

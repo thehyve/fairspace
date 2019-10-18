@@ -43,7 +43,7 @@ public class SparqlTransactionCodecTest {
         var out = new ByteArrayOutputStream();
         var writeListener = codec.write(out);
 
-        writeListener.onBegin(null, null,null, null, 123L);
+        writeListener.onBegin(null, null, null, null, 123L);
         writeListener.onCommit();
 
         var in = new ByteArrayInputStream(out.toByteArray());
@@ -61,7 +61,7 @@ public class SparqlTransactionCodecTest {
         var out = new ByteArrayOutputStream();
         var writeListener = codec.write(out);
 
-        writeListener.onBegin("message","system", "userId", "userName", 123L);
+        writeListener.onBegin("message", "system", "userId", "userName", 123L);
         writeListener.onAbort();
 
         var in = new ByteArrayInputStream(out.toByteArray());

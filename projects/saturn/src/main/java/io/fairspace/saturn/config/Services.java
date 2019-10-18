@@ -6,7 +6,7 @@ import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.MetadataEvent;
 import io.fairspace.saturn.events.RabbitMQEventService;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -36,7 +35,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 @Getter
 public class Services {
     private final Config config;
-    private final RDFConnection rdf;
+    private final RDFLink rdfLink;
 
     private final EventBus eventBus = new EventBus();
     private final UserService userService;
@@ -47,28 +46,25 @@ public class Services {
     private final ChangeableMetadataService metadataService;
     private final ChangeableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
-    private final TransactionalBatchExecutorService transactionalBatchExecutorService;
 
 
-    public Services(@NonNull Config config, @NonNull RDFConnection rdf) throws Exception {
+    public Services(@NonNull Config config, @NonNull RDFLink rdfLink) throws Exception {
         this.config = config;
-        this.rdf = rdf;
+        this.rdfLink = rdfLink;
 
-        transactionalBatchExecutorService = new TransactionalBatchExecutorService(rdf);
-
-        userService = new UserService(new DAO(rdf, null), transactionalBatchExecutorService, config.auth.userUrlTemplate);
+        userService = new UserService(new DAO(rdfLink, null), config.auth.userUrlTemplate);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(getThreadContext().getUserInfo().getSubjectClaim());
         BooleanSupplier hasFullAccessSupplier = () -> getThreadContext().getUserInfo().getAuthorities().contains(config.auth.fullAccessRole);
 
         eventService = setupEventService();
 
         mailService = new MailService(config.mail);
-        var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsServiceImpl(rdf, transactionalBatchExecutorService, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
+        var permissionNotificationHandler = new PermissionNotificationHandler(rdfLink, userService, mailService, config.publicUrl);
+        permissionsService = new PermissionsServiceImpl(rdfLink, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
-        collectionsService = new CollectionsService(new DAO(rdf, userIriSupplier), transactionalBatchExecutorService, eventBus::post, permissionsService, eventService);
+        collectionsService = new CollectionsService(rdfLink, new DAO(rdfLink, userIriSupplier), eventBus::post, permissionsService, eventService);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissionsService);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdfLink, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissionsService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
@@ -83,17 +79,17 @@ public class Services {
                         .build()
                 );
 
-        metadataService = new ChangeableMetadataService(rdf, transactionalBatchExecutorService, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
+        metadataService = new ChangeableMetadataService(rdfLink, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
                 new ShaclValidator(),
                 new SystemVocabularyProtectingValidator(),
-                new MetadataAndVocabularyConsistencyValidator(rdf),
-                new InverseForUsedPropertiesValidator(rdf)
+                new MetadataAndVocabularyConsistencyValidator(),
+                new InverseForUsedPropertiesValidator()
         );
 
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdfLink, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
 
         Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
                 eventService.emitEvent(MetadataEvent.builder()
@@ -102,20 +98,20 @@ public class Services {
                         .build()
                 );
 
-        userVocabularyService = new ChangeableMetadataService(rdf, transactionalBatchExecutorService, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
-        metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
+        userVocabularyService = new ChangeableMetadataService(rdfLink, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
+        metaVocabularyService = new ReadableMetadataService(rdfLink, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
     }
 
     private EventService setupEventService() throws Exception {
-        if(config.rabbitMQ.enabled) {
+        if (config.rabbitMQ.enabled) {
             try {
                 var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name);
                 eventService.init();
                 return eventService;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.error("Error connecting to RabbitMQ", e);
 
-                if(config.rabbitMQ.required) {
+                if (config.rabbitMQ.required) {
                     throw e;
                 }
 

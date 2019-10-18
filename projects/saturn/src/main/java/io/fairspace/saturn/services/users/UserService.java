@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.client.HttpClient;
@@ -24,11 +23,9 @@ public class UserService {
     private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final String userUrlTemplate;
     private final DAO dao;
-    private final TransactionalBatchExecutorService executor;
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
 
-    public UserService(DAO dao, TransactionalBatchExecutorService executor, String userUrlTemplate) {
-        this.executor = executor;
+    public UserService(DAO dao, String userUrlTemplate) {
         this.userUrlTemplate = userUrlTemplate;
         this.dao = dao;
     }
@@ -44,9 +41,8 @@ public class UserService {
             // Fetch user from keycloak and store locally for future reference
             localUser = fetchUserFromKeycloak(iri);
 
-            if(localUser != null) {
-                var user = localUser;
-                executor.perform(() -> dao.write(user));
+            if (localUser != null) {
+                dao.write(localUser);
             }
         }
 
@@ -55,19 +51,20 @@ public class UserService {
 
     /**
      * Stores user information in local database on login
+     *
      * @param token
      */
     public void onAuthorized(OAuthAuthenticationToken token) {
-        if(token != null) {
+        if (token != null) {
             var iri = getUserIri(token.getSubjectClaim());
 
             // Only write user information if no information is present yet
-            if(dao.read(User.class, iri) == null) {
+            if (dao.read(User.class, iri) == null) {
                 var user = new User();
                 user.setIri(iri);
                 user.setName(token.getFullName());
                 user.setEmail(token.getEmail());
-                executor.perform(() -> dao.write(user));
+                dao.write(user);
             }
         }
     }

@@ -2,7 +2,7 @@ package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -16,7 +16,6 @@ import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
@@ -38,15 +36,13 @@ import static org.apache.commons.codec.binary.Hex.encodeHexString;
 public class ManagedFileSystem extends BaseFileSystem {
     public static final String TYPE = "";
 
-    private final RDFConnection rdf;
-    private final TransactionalBatchExecutorService executor;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
+    private final RDFLink rdfLink;
 
-    public ManagedFileSystem(RDFConnection rdf, TransactionalBatchExecutorService executor, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
+    public ManagedFileSystem(RDFLink rdfLink, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
         super(collections);
-        this.rdf = rdf;
-        this.executor = executor;
+        this.rdfLink = rdfLink;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         eventBus.register(this);
@@ -54,7 +50,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo statRegularFile(String path) throws IOException {
-        return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo)
+        return rdfLink.calculateRead(rdf -> selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo)
                 .map(fileInfo -> {
                     var collection = collections.getByLocation(splitPath(path)[0]);
                     if (collection == null) {
@@ -63,26 +59,27 @@ public class ManagedFileSystem extends BaseFileSystem {
                     fileInfo.setReadOnly(!collection.canWrite());
                     return fileInfo;
                 })
-                .orElse(null);
+                .orElse(null));
     }
 
     @Override
     protected List<FileInfo> listCollectionOrDirectory(String path) throws IOException {
-        var collectionLocation = splitPath(path)[0];
-        var collection = collections.getByLocation(collectionLocation);
-        if (collection == null) {
-            throw new AccessDeniedException("User has no access to collection " + collectionLocation);
-        }
-        var readOnly = !collection.canWrite();
-        var files = select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo);
-        files.forEach(f -> f.setReadOnly(readOnly));
-        return files;
+        return rdfLink.calculateRead(rdf -> {
+            var collectionLocation = splitPath(path)[0];
+            var collection = collections.getByLocation(collectionLocation);
+            if (collection == null) {
+                throw new AccessDeniedException("User has no access to collection " + collectionLocation);
+            }
+            var readOnly = !collection.canWrite();
+            var files = select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo);
+            files.forEach(f -> f.setReadOnly(readOnly));
+            return files;
+        });
     }
 
     @Override
     protected void doMkdir(String path) throws IOException {
-        getThreadContext().setSystemCommitMessage("Create directory " + path);
-        executor.perform(() -> {
+        rdfLink.executeWrite("Create directory " + path, rdf -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
         });
@@ -92,8 +89,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected void doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        getThreadContext().setSystemCommitMessage("Create file " + path);
-        executor.perform(() -> {
+        rdfLink.executeWrite("Create file " + path, rdf -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
         });
@@ -103,8 +99,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        getThreadContext().setSystemCommitMessage("Modify file " + path);
-        executor.perform(() -> {
+        rdfLink.executeWrite("Modify file " + path, rdf -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -121,9 +116,9 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        var blobId = selectSingle(rdf, storedQuery("fs_get_blobid", path),
+        var blobId = rdfLink.calculateRead(rdf -> selectSingle(rdf, storedQuery("fs_get_blobid", path),
                 row -> row.getLiteral("blobId").getString())
-                .orElseThrow(() -> new FileNotFoundException(path));
+                .orElseThrow(() -> new FileNotFoundException(path)));
         store.read(blobId, out);
     }
 
@@ -139,8 +134,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void doDelete(String path) throws IOException {
-        getThreadContext().setSystemCommitMessage("Delete " + path);
-        executor.perform(() -> {
+        rdfLink.executeWrite("Delete " + path, rdf -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -154,8 +148,8 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected String fileOrDirectoryIri(String path) throws IOException {
-        return selectSingle(rdf, storedQuery("fs_stat", path), row -> row.getResource("iri").getURI())
-                .orElse(null);    
+        return rdfLink.calculateRead(rdf -> selectSingle(rdf, storedQuery("fs_stat", path), row -> row.getResource("iri").getURI())
+                .orElse(null));
     }
 
     @Override
@@ -164,12 +158,12 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Subscribe
     public void onCollectionDeleted(CollectionDeletedEvent e) {
-        rdf.update(storedQuery("fs_delete_dir", e.getCollection().getLocation(), userIriSupplier.get()));
+        rdfLink.executeWrite(null, rdf -> rdf.update(storedQuery("fs_delete_dir", e.getCollection().getLocation(), userIriSupplier.get())));
     }
 
     @Subscribe
     public void onCollectionMoved(CollectionMovedEvent e) {
-        rdf.update(storedQuery("fs_move_dir", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
+        rdfLink.executeWrite(null, rdf -> rdf.update(storedQuery("fs_move_dir", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName())));
     }
 
     private FileInfo fileInfo(QuerySolution row) {
@@ -189,7 +183,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         properties.put(FS.CREATED_BY_LOCAL_PART, row.getLiteral("createdByName").getString());
         properties.put(FS.MODIFIED_BY_LOCAL_PART, row.getLiteral("modifiedByName").getString());
 
-        if(row.getLiteral("md5") != null) {
+        if (row.getLiteral("md5") != null) {
             properties.put(FS.CHECKSUM_LOCAL_PART, row.getLiteral("md5").getString());
         }
 
@@ -202,8 +196,8 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        getThreadContext().setSystemCommitMessage(verb + " data from " + from + " to " + to);
-        executor.perform(() -> {
+
+        rdfLink.executeWrite(verb + " data from " + from + " to " + to, rdf -> {
             ensureCanCreate(to);
             var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
             rdf.update(storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));

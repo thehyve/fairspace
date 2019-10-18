@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,17 +23,12 @@ public class ServicesTest {
 
     @Before
     public void before() throws Exception {
-        svc = new Services(config, rdf);
+        svc = new Services(config, new RDFLinkSimple(rdf));
     }
 
     @Test
     public void getConfig() {
         assertEquals(config, svc.getConfig());
-    }
-
-    @Test
-    public void getRdf() {
-        assertEquals(rdf, svc.getRdf());
     }
 
     @Test

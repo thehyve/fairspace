@@ -2,12 +2,12 @@ package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,13 +20,12 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionsServiceTest {
-    private RDFConnection rdf;
+    private RDFLink rdf;
     private CollectionsService collections;
     @Mock
     private Consumer<Object> eventListener;
@@ -37,9 +36,9 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        rdf = connect(createTxnMem());
+        rdf = new RDFLinkSimple(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), new TransactionalBatchExecutorService(rdf), eventListener, permissions, eventService);
+        collections = new CollectionsService(rdf, new DAO(rdf, userIriSupplier), eventListener, permissions, eventService);
     }
 
     @Test
@@ -89,7 +88,8 @@ public class CollectionsServiceTest {
         c.setName("c1");
         c.setLocation("dir1");
         c.setDescription("descr");
-        c.setConnectionString("");;
+        c.setConnectionString("");
+        ;
         return c;
     }
 
@@ -154,7 +154,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("Az_1-2");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        ;
 
         assertEquals(c1.getLocation(), collections.create(c1).getLocation());
     }
@@ -166,7 +167,8 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir?");
             c1.setDescription("descr");
-            c1.setConnectionString("managed://example.com");;
+            c1.setConnectionString("managed://example.com");
+            ;
 
             collections.create(c1);
         } finally {
@@ -181,7 +183,8 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir1");
             c1.setDescription("descr");
-            c1.setConnectionString("managed://example.com");;
+            c1.setConnectionString("managed://example.com");
+            ;
 
             collections.create(c1);
             c1.setIri(null);
@@ -199,7 +202,8 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir1");
             c1.setDescription("descr");
-            c1.setConnectionString("managed://example.com");;
+            c1.setConnectionString("managed://example.com");
+            ;
 
             c1 = collections.create(c1);
 
@@ -207,7 +211,8 @@ public class CollectionsServiceTest {
             c2.setName("c2");
             c2.setLocation("dir2");
             c2.setDescription("descr");
-            c2.setConnectionString("managed://example.com");;
+            c2.setConnectionString("managed://example.com");
+            ;
 
             collections.create(c2);
 
@@ -228,7 +233,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        ;
         c1 = collections.create(c1);
 
         mockPermissions(Access.None);
@@ -244,7 +250,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        ;
         c1 = collections.create(c1);
 
         mockPermissions(Access.Write);
@@ -260,7 +267,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        ;
         c1 = collections.create(c1);
 
         mockPermissions(Access.Read);

@@ -13,16 +13,14 @@ import static java.util.Optional.ofNullable;
 /**
  * Ensures that no changes are made to fs:inverseRelation in the vocabulary that
  * would break the metadata validity.
- *
+ * <p>
  * More specifically, it will disallow additions of fs:inverseRelation where the specific
  * property has already been used in the metadata.
  */
 @AllArgsConstructor
 public class InverseForUsedPropertiesValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
-
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler, RDFConnection rdf) {
         added.listStatements(null, FS.inverseRelation, (RDFNode) null).forEachRemaining(stmt -> {
             var shape = stmt.getSubject();
             var property = shape.getPropertyResourceValue(SH.path);

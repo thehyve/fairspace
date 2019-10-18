@@ -1,6 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -54,7 +54,7 @@ public class ChangeableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        api = new ChangeableMetadataService(rdf, new TransactionalBatchExecutorService(rdf), Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
+        api = new ChangeableMetadataService(new RDFLinkSimple(rdf), Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testInference() {
-        initVocabularies(rdf);
+        initVocabularies(new RDFLinkSimple(rdf));
         ds.getDefaultModel()
                 .add(S1, RDF.type, FOAF.Person)
                 .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));

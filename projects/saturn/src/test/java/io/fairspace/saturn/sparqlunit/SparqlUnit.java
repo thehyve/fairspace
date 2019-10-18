@@ -21,7 +21,7 @@ public class SparqlUnit {
 
     static public SparqlUnit given() {
         return given(DatasetFactory.create());
-   }
+    }
 
     public static SparqlUnit given(Model model) {
         return given(DatasetFactory.create(model));

@@ -36,7 +36,7 @@ public class MachineOnlyClassesValidatorTest {
     @Test
     public void machineOnlyClassesCannotBeInstantiated() {
         var model = modelOf(machineOnlyInstance, RDF.type, machineOnlyClass);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler, null);
 
         verify(violationHandler).onViolation("Trying to create a machine-only entity", createStatement(machineOnlyInstance, RDF.type, machineOnlyClass));
         verifyNoMoreInteractions(violationHandler);
@@ -45,7 +45,7 @@ public class MachineOnlyClassesValidatorTest {
     @Test
     public void regularClassesCanBeInstantiated() {
         var model = modelOf(regularInstance, RDF.type, regularClass);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler, null);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -53,7 +53,7 @@ public class MachineOnlyClassesValidatorTest {
     @Test
     public void machineOnlyClassesCannotBeRemoved() {
         var model = modelOf(machineOnlyInstance, RDF.type, machineOnlyClass);
-        validator.validate(model, EMPTY_MODEL, model, EMPTY_MODEL, vocabulary, violationHandler);
+        validator.validate(model, EMPTY_MODEL, model, EMPTY_MODEL, vocabulary, violationHandler, null);
 
         verify(violationHandler).onViolation("Trying to change type of a machine-only entity", createStatement(machineOnlyInstance, RDF.type, machineOnlyClass));
         verifyNoMoreInteractions(violationHandler);
@@ -62,7 +62,7 @@ public class MachineOnlyClassesValidatorTest {
     @Test
     public void regularClassesCannotBeRemoved() {
         var model = modelOf(regularInstance, RDF.type, regularClass);
-        validator.validate(model, EMPTY_MODEL, model, EMPTY_MODEL, vocabulary, violationHandler);
+        validator.validate(model, EMPTY_MODEL, model, EMPTY_MODEL, vocabulary, violationHandler, null);
 
         verifyZeroInteractions(violationHandler);
     }

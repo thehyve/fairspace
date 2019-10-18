@@ -27,7 +27,7 @@ public class WebdavEventEmitter implements Consumer<Request> {
 
     @Override
     public void accept(Request request) {
-        if(!httpMethodToEventTypeMap.containsKey(request.getMethod())) {
+        if (!httpMethodToEventTypeMap.containsKey(request.getMethod())) {
             log.debug("No event to emit for http method {}", request.getMethod());
             return;
         }
@@ -38,7 +38,7 @@ public class WebdavEventEmitter implements Consumer<Request> {
 
 
         // For copy and move operations, the destination of the operation is relevant as well
-        if(request.getMethod() == Request.Method.COPY || request.getMethod() == Request.Method.MOVE) {
+        if (request.getMethod() == Request.Method.COPY || request.getMethod() == Request.Method.MOVE) {
             builder.destination(request.getDestinationHeader());
         }
 

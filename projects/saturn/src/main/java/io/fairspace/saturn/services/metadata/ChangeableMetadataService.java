@@ -1,7 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.events.MetadataEvent;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
@@ -31,22 +31,22 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 public class ChangeableMetadataService extends ReadableMetadataService {
     static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
 
-    private final TransactionalBatchExecutorService executor;
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
     private final Consumer<MetadataEvent.Type> eventConsumer;
 
-    public ChangeableMetadataService(RDFConnection rdf, TransactionalBatchExecutorService executor, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        this(rdf, executor, graph, vocabulary, 0, lifeCycleManager, validator, event -> {});
+    public ChangeableMetadataService(RDFLink rdfLink, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+        this(rdfLink, graph, vocabulary, 0, lifeCycleManager, validator, event -> {
+        });
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, TransactionalBatchExecutorService executor, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
-        this(rdf, executor, graph, vocabulary, 0, lifeCycleManager, validator, eventConsumer);
+    public ChangeableMetadataService(RDFLink rdfLink, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+        this(rdfLink, graph, vocabulary, 0, lifeCycleManager, validator, eventConsumer);
     }
 
-    public ChangeableMetadataService(RDFConnection rdf, TransactionalBatchExecutorService executor, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
-        super(rdf, graph, vocabulary, tripleLimit);
-        this.executor = executor;
+    public ChangeableMetadataService(RDFLink rdfLink, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+        super(rdfLink, graph, vocabulary, tripleLimit);
+
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
         this.eventConsumer = eventConsumer;
@@ -61,19 +61,18 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        getThreadContext().setSystemCommitMessage("Store metadata");
-        executor.perform(() -> update(EMPTY_MODEL, model));
+        rdfLink.executeWrite("Store metadata", rdf -> update(EMPTY_MODEL, model, rdf));
         eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
     /**
      * Marks an entity as deleted
      *
-     * @param subject   Subject URI to mark as deleted
+     * @param subject Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
         getThreadContext().setSystemCommitMessage("Mark <" + subject + "> as deleted");
-        if(executor.perform(() -> lifeCycleManager.softDelete(subject))) {
+        if (lifeCycleManager.softDelete(subject)) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
@@ -90,7 +89,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void delete(Model model) {
         getThreadContext().setSystemCommitMessage("Delete metadata");
-        executor.perform(() -> update(model, EMPTY_MODEL));
+        rdfLink.executeWrite("Delete metadata", rdf -> update(model, EMPTY_MODEL, rdf));
         eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
@@ -110,7 +109,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void patch(Model model) {
         getThreadContext().setSystemCommitMessage("Update metadata");
-        executor.perform(() -> {
+        rdfLink.executeWrite("Update metadata", rdf -> {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {
                 // Only explicitly delete triples for URI resources. As this model is also used
@@ -121,40 +120,40 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                 }
             });
 
-            update(toDelete, model.removeAll(null, null, NIL));
+            update(toDelete, model.removeAll(null, null, NIL), rdf);
         });
         eventConsumer.accept(MetadataEvent.Type.UPDATED);
     }
 
-    private void update(Model modelToRemove, Model modelToAdd) {
+    private void update(Model modelToRemove, Model modelToAdd, RDFConnection rdf) {
         var vocabularyModel = rdf.fetch(vocabulary.getURI());
 
         addInferredStatements(modelToAdd, vocabularyModel);
         addInferredStatements(modelToRemove, vocabularyModel);
 
-        sanitizeAndValidate(modelToRemove, modelToAdd, vocabularyModel);
+        sanitizeAndValidate(modelToRemove, modelToAdd, vocabularyModel, rdf);
 
-        persist(modelToRemove, modelToAdd);
+        persist(modelToRemove, modelToAdd, rdf);
     }
 
-    private void sanitizeAndValidate(Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
-        var before = affectedModelSubSet(modelToRemove, modelToAdd);
+    private void sanitizeAndValidate(Model modelToRemove, Model modelToAdd, Model vocabularyModel, RDFConnection rdf) {
+        var before = affectedModelSubSet(modelToRemove, modelToAdd, rdf);
         sanitize(before, modelToRemove, modelToAdd);
         var after = resultingModelSubset(before, modelToRemove, modelToAdd);
-        validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
+        validate(before, after, modelToRemove, modelToAdd, vocabularyModel, rdf);
     }
 
     /**
      * @return a model containing all triples describing the affected resources
      */
-    private Model affectedModelSubSet(Model modelToRemove, Model modelToAdd) {
+    private Model affectedModelSubSet(Model modelToRemove, Model modelToAdd, RDFConnection rdf) {
         var affectedResources = modelToRemove.listSubjects()
                 .andThen(modelToAdd.listSubjects())
                 .toSet();
 
         var model = createDefaultModel();
         affectedResources.forEach(r -> {
-            if(r.isURIResource()) {
+            if (r.isURIResource()) {
                 model.add(rdf.queryConstruct(storedQuery("get_resource_closure", graph, r)));
             }
         });
@@ -187,18 +186,18 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         return after;
     }
 
-    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
+    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel, RDFConnection rdf) {
         var violations = new LinkedHashSet<Violation>();
         validator.validate(before, after, modelToRemove, modelToAdd,
                 vocabularyModel, (message, subject, predicate, object) ->
-                        violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
+                        violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))), rdf);
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
         }
     }
 
-    private void persist(Model modelToRemove, Model modelToAdd) {
+    private void persist(Model modelToRemove, Model modelToAdd, RDFConnection rdf) {
         rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove))));
 
         // Store information on the lifecycle of the entities

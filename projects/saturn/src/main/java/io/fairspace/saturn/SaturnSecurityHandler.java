@@ -36,7 +36,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     /**
      * @param apiPrefix
      * @param authenticator Authenticator returning a UserInfo for an incoming request
-     * @param onAuthorized An optional callback, called on successful authorization
+     * @param onAuthorized  An optional callback, called on successful authorization
      */
     public SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
         this.authenticator = authenticator;

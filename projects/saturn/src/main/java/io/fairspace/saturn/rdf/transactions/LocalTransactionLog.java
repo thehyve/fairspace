@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 
 import java.io.*;
@@ -10,24 +11,25 @@ import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 /**
  * Stores transactions in the following directory structure:
  * volume-1
- *   chapter-1
- *     tx-1
- *     ...
- *     tx-1000
- *   chapter-2
- *     tx-1001
- *     ...
- *     tx-2000
- *   ...
- *   chapter-1000
- *     tx-999001
- *     ...
- *     tx-1000000
+ * chapter-1
+ * tx-1
+ * ...
+ * tx-1000
+ * chapter-2
+ * tx-1001
+ * ...
+ * tx-2000
+ * ...
+ * chapter-1000
+ * tx-999001
+ * ...
+ * tx-1000000
  * volume-2
- *   chapter-1001
- *     tx-1000001
- *     ...
+ * chapter-1001
+ * tx-1000001
+ * ...
  */
+@Slf4j
 public class LocalTransactionLog implements TransactionLog {
     private static final int CHAPTERS_PER_VOLUME = 1000;
     private static final int RECORDS_PER_CHAPTER = 1000;
@@ -35,6 +37,7 @@ public class LocalTransactionLog implements TransactionLog {
     private static final String CHAPTER_PREFIX = "chapter-";
     private static final String RECORD_PREFIX = "tx-";
     private static final String CURRENT_TRANSACTION_FILE_NAME = "current";
+
 
     private final File directory;
     private final TransactionCodec codec;

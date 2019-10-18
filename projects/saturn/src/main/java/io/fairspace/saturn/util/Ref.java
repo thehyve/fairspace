@@ -5,7 +5,8 @@ import java.util.Objects;
 public final class Ref<T> {
     public T value;
 
-    public Ref() {}
+    public Ref() {
+    }
 
     public Ref(T value) {
         this.value = value;

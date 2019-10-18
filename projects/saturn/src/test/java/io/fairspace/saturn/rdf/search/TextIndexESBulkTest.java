@@ -124,10 +124,10 @@ public class TextIndexESBulkTest {
                         && bulkRequest.requests().get(0) instanceof UpdateRequest
                         && bulkRequest.requests().get(0).id().equals(SUBJECT.getURI())
                         && ((UpdateRequest) bulkRequest.requests().get(0)).script().getParams().equals(
-                                Map.of("field", PREDICATE.getLocalName(), "value", OBJECT.getURI()))
+                        Map.of("field", PREDICATE.getLocalName(), "value", OBJECT.getURI()))
                         && ((UpdateRequest) bulkRequest.requests().get(0)).upsertRequest().sourceAsMap().equals(
-                                Map.of(entityDefinition.getEntityField(), SUBJECT.getURI(),
-                                        PREDICATE.getLocalName(), List.of(OBJECT.getURI())))
+                        Map.of(entityDefinition.getEntityField(), SUBJECT.getURI(),
+                                PREDICATE.getLocalName(), List.of(OBJECT.getURI())))
                         && bulkRequest.requests().get(1) instanceof UpdateRequest
                         && bulkRequest.requests().get(1).id().equals(SUBJECT.getURI())
                         && ((UpdateRequest) bulkRequest.requests().get(1)).script().getParams().equals(Map.of("field", PREDICATE.getLocalName(), "value", OBJECT.getURI()))

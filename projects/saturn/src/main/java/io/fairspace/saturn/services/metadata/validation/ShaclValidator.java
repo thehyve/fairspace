@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.validation.ValidationEngine;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class ShaclValidator implements MetadataRequestValidator {
     private static final int NUM_THREADS = availableProcessors();
     private final ExecutorService executorService = newFixedThreadPool(NUM_THREADS);
 
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler, RDFConnection rdf) {
         var affectedNodes = removed.listSubjects()
                 .andThen(added.listSubjects())
                 .mapWith(FrontsNode::asNode)
@@ -47,13 +48,13 @@ public class ShaclValidator implements MetadataRequestValidator {
         }
 
         try {
-            for (var future: futures) {
+            for (var future : futures) {
                 getViolations(future.get(), violationHandler);
             }
         } catch (InterruptedException e) {
             currentThread().interrupt();
             throw new RuntimeException("SHACL validation was interrupted", e);
-        } catch(ExecutionException e) {
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }

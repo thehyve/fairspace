@@ -25,7 +25,13 @@ public class ThreadContext {
         threadContext.remove();
     }
 
-    @Getter @Setter private OAuthAuthenticationToken userInfo;
-    @Getter @Setter private String userCommitMessage;
-    @Getter @Setter private String systemCommitMessage;
+    @Getter
+    @Setter
+    private OAuthAuthenticationToken userInfo;
+    @Getter
+    @Setter
+    private String userCommitMessage;
+    @Getter
+    @Setter
+    private String systemCommitMessage;
 }

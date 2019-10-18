@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdfconnection.RDFConnection;
 
 import static io.fairspace.saturn.vocabulary.Inference.getPropertyShapeForStatement;
 
@@ -15,7 +16,7 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
     }
 
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler, RDFConnection rdf) {
         validateModelAgainstMachineOnlyPredicates(removed, vocabulary, violationHandler);
         validateModelAgainstMachineOnlyPredicates(added, vocabulary, violationHandler);
 

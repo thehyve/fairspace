@@ -24,7 +24,7 @@ public class SystemVocabularyProtectingValidatorTest {
     @Test
     public void itShouldNotBePossibleToDeleteStatementsFromTheSystemVocabulary() {
         var stmt = createStatement(createResource(FS.NS + "FileShape"), RDF.type, createResource(FS.NS + "ClassShape"));
-        validator.validate(modelOf(stmt), EMPTY_MODEL, modelOf(stmt), EMPTY_MODEL, EMPTY_MODEL, violationHandler);
+        validator.validate(modelOf(stmt), EMPTY_MODEL, modelOf(stmt), EMPTY_MODEL, EMPTY_MODEL, violationHandler, null);
 
 
         verify(violationHandler).onViolation("Cannot remove a statement from the system vocabulary", stmt);
@@ -33,7 +33,7 @@ public class SystemVocabularyProtectingValidatorTest {
     @Test
     public void itShouldBePossibleToAddNewShapes() {
         var model = modelOf(createResource("http://example.com/NewShape"), SH.property, createResource(FS.NS + "ClassShape"));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler, null);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -41,7 +41,7 @@ public class SystemVocabularyProtectingValidatorTest {
     @Test
     public void itShouldBePossibleToAddNewPropertiesToSystemShapes() {
         var model = modelOf(createResource(FS.NS + "FileShape"), SH.property, createProperty("http://example.com/property"));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler, null);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -50,16 +50,16 @@ public class SystemVocabularyProtectingValidatorTest {
     public void itShouldNotBePossibleToAddArbitraryStatementsToTheSystemVocabulary() {
         var stmt = createStatement(createResource(FS.NS + "FileShape"), createProperty(FS.NS + "custom"), createStringLiteral("blah"));
         var model = modelOf(stmt);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler, null);
 
         verify(violationHandler).onViolation("Cannot add a statement modifying a shape from the system vocabulary", stmt);
     }
 
     @Test
     public void itIsNotPossibleToAddMachineOnlyProperties() {
-        var stmt = createStatement(createResource(FS.createdBy +"Shape"), FS.domainIncludes, createResource("http://example.com/Test"));
+        var stmt = createStatement(createResource(FS.createdBy + "Shape"), FS.domainIncludes, createResource("http://example.com/Test"));
         var model = modelOf(stmt);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler, null);
 
         verify(violationHandler).onViolation("Cannot add a machine-only property", stmt);
     }

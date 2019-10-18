@@ -12,5 +12,7 @@ public abstract class BaseEvent<T extends Enum> implements Event {
 
     @JsonIgnore
     @Override
-    public String getType() { return eventType.name().toLowerCase(); }
+    public String getType() {
+        return eventType.name().toLowerCase();
+    }
 }

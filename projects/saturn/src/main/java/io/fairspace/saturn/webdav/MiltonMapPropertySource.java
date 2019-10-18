@@ -50,12 +50,12 @@ public class MiltonMapPropertySource<T> {
     public PropertySource.PropertyMetaData getPropertyMeta(QName name) {
         var value = getProperty(name);
 
-        if(value == null) return null;
+        if (value == null) return null;
         return new PropertySource.PropertyMetaData(PropertySource.PropertyAccessibility.READ_ONLY, value.getClass());
     }
 
     public T getProperty(QName name) {
-        if(!hasProperty(name)) return null;
+        if (!hasProperty(name)) return null;
         return propertySource.get(name.getLocalPart());
     }
 }

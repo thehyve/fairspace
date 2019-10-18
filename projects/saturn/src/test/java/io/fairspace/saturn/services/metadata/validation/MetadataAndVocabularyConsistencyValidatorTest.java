@@ -1,13 +1,12 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.rdf.transactions.RDFLink;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
@@ -39,8 +38,8 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     private static final Resource CLASS2 = createResource(NS + "Class2");
 
     private Dataset ds = DatasetFactory.create();
-    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-    private MetadataAndVocabularyConsistencyValidator validator = new MetadataAndVocabularyConsistencyValidator(rdf);
+    private RDFLink rdf = new RDFLinkSimple(ds);
+    private MetadataAndVocabularyConsistencyValidator validator = new MetadataAndVocabularyConsistencyValidator();
 
     private Model model = ds.getDefaultModel();
     private Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
@@ -81,7 +80,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
         var constraints = modelOf(PROPERTY_SHAPE, SH.class_, CLASS1);
 
         model.add(ENTITY1, PROPERTY, ENTITY2)
-         .add(ENTITY2, RDF.type, CLASS1);
+                .add(ENTITY2, RDF.type, CLASS1);
 
         validateNewConstraints(constraints);
 
@@ -185,6 +184,6 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     }
 
     private void validateNewConstraints(Model constraints) {
-        validator.validate(model, model.union(constraints), EMPTY_MODEL, constraints, vocabulary, violationHandler);
+        rdf.executeWrite(null, conn -> validator.validate(model, model.union(constraints), EMPTY_MODEL, constraints, vocabulary, violationHandler, conn));
     }
 }

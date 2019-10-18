@@ -26,7 +26,7 @@ public class PathUtils {
 
     public static String name(String path) {
         var parts = splitPath(path);
-        return (parts.length == 0) ? "" :  parts[parts.length - 1];
+        return (parts.length == 0) ? "" : parts[parts.length - 1];
     }
 
     public static String parentPath(String path) {

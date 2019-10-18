@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -7,7 +8,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -62,7 +62,7 @@ public class PermissionNotificationHandlerTest {
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDFS.label, "COLLECTION");
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), FS.filePath, "location");
 
-        permissionNotificationHandler = new PermissionNotificationHandler(new RDFConnectionLocal(ds), userService, mailService, "http://public-url");
+        permissionNotificationHandler = new PermissionNotificationHandler(new RDFLinkSimple(ds), userService, mailService, "http://public-url");
     }
 
     @Test

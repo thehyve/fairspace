@@ -1,11 +1,11 @@
 {
-  "properties":{
+  "properties": {
     "dateCreated": {
       "type": "date"
     },
-    "filePath":{
-      "type":"text",
-      "analyzer":"ngram_analyzer"
+    "filePath": {
+      "type": "text",
+      "analyzer": "ngram_analyzer"
     }
   }
 }

@@ -5,6 +5,9 @@ import io.fairspace.saturn.config.SecurityHandlerFactory;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.config.WebDAVServletFactory;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
+import io.fairspace.saturn.rdf.transactions.RDFLinkBatched;
+import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.Isolation;
@@ -20,24 +23,24 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
+        var txnLog = new LocalTransactionLog(CONFIG.jena.transactionLogPath, new SparqlTransactionCodec());
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, txnLog);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
-        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-        initVocabularies(rdf);
+        var rdfLink = new RDFLinkBatched(new RDFConnectionLocal(ds, Isolation.COPY), txnLog);
+        initVocabularies(rdfLink);
 
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";
 
-        var svc = new Services(CONFIG, rdf);
+        var svc = new Services(CONFIG, rdfLink);
 
         FusekiServer.create()
                 .securityHandler(SecurityHandlerFactory.getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", ApiFilterFactory.createApiFilter(apiPathPrefix, svc, CONFIG))
-                .addServlet(webDavPathPrefix + "*", WebDAVServletFactory.initWebDAVServlet(webDavPathPrefix, rdf, svc, CONFIG.webDAV))
+                .addServlet(webDavPathPrefix + "*", WebDAVServletFactory.initWebDAVServlet(webDavPathPrefix, rdfLink, svc, CONFIG.webDAV))
                 .port(CONFIG.port)
                 .build()
                 .start();

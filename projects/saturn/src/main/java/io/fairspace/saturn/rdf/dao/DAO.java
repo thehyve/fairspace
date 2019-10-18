@@ -2,14 +2,12 @@ package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
 import io.fairspace.saturn.rdf.SparqlUtils;
-import lombok.experimental.Delegate;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.core.Transactional;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.modify.request.QuadAcc;
 import org.apache.jena.sparql.modify.request.QuadDataAcc;
@@ -39,7 +37,6 @@ import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.apache.jena.system.Txn.calculateWrite;
 import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
 /**
@@ -69,7 +66,7 @@ import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
  * <p>
  * For LifecycleAwarePersistentEntity's descendants, DAO automatically updates related fields (dateCreated, etc).
  */
-public class DAO implements Transactional {
+public class DAO {
     private static final String NO_VALUE_ERROR = "No value for required field %s in entity %s";
     private static final String UNINITIALIZED_COLLECTION_ERROR = "An uninitialized collection field %s in class %s";
     private static final String NO_RDF_TYPE_ERROR = "No RDF type specified for %s";
@@ -77,12 +74,11 @@ public class DAO implements Transactional {
     private static final String TOO_MANY_VALUES_ERROR = "More than one value for scalar field %s in resource %s";
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
-    @Delegate(types = Transactional.class)
-    private final RDFConnection rdf;
+    private final RDFLink rdfLink;
     private final Supplier<Node> userIriSupplier;
 
-    public DAO(RDFConnection rdf, Supplier<Node> userIriSupplier) {
-        this.rdf = rdf;
+    public DAO(RDFLink rdfLink, Supplier<Node> userIriSupplier) {
+        this.rdfLink = rdfLink;
         this.userIriSupplier = userIriSupplier;
     }
 
@@ -90,6 +86,7 @@ public class DAO implements Transactional {
      * Writes (creates or updates) an entity.
      * This method can modify the entity passed as an argument. It it has no IRI it will be automatically assigned.
      * This method also updates the relevant fields of LifecycleAwarePersistentEntity
+     *
      * @param entity
      * @param <T>
      * @return the entity passed as an argument
@@ -129,7 +126,7 @@ public class DAO implements Transactional {
                 setProperty(update, entity.getIri(), propertyNode, value);
             });
 
-            rdf.update(update);
+            rdfLink.executeWrite(null, rdf -> rdf.update(update));
 
             return entity;
         });
@@ -137,6 +134,7 @@ public class DAO implements Transactional {
 
     /**
      * Reads an entity
+     *
      * @param type
      * @param iri
      * @param <T>
@@ -149,6 +147,7 @@ public class DAO implements Transactional {
 
     /**
      * Deletes an entity
+     *
      * @param entity
      */
     public void delete(PersistentEntity entity) {
@@ -157,19 +156,21 @@ public class DAO implements Transactional {
 
     /**
      * Deletes an entity
+     *
      * @param iri
      */
     public void delete(Node iri) {
-        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null));
+        rdfLink.executeWrite(null, rdf -> rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null)));
     }
 
     /**
      * Marks an entity as deleted and updates its dateDeleted and deletedBy fields
+     *
      * @param entity
      * @return the entity passed as an argument if no entity was found or it was already marked as deleted
      */
     public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
-        return calculateWrite(rdf, () -> {
+        return rdfLink.calculateWrite(null, rdf -> {
             var existing = (T) read(entity.getClass(), entity.getIri());
             if (existing != null) {
                 existing.setDateDeleted(now());
@@ -182,6 +183,7 @@ public class DAO implements Transactional {
 
     /**
      * Lists entities of a specific type (except to marked as deleted)
+     *
      * @param type
      * @param <T>
      * @return
@@ -193,6 +195,7 @@ public class DAO implements Transactional {
     /**
      * Execustes a SPARQL CONSTRUCT query and lists entities of a specific type (except to marked as deleted)
      * in the resulting model
+     *
      * @param type
      * @param query
      * @param <T>
@@ -200,7 +203,7 @@ public class DAO implements Transactional {
      */
     public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
         return safely(() -> {
-            var model = rdf.queryConstruct(query);
+            var model = rdfLink.calculateRead(rdf -> rdf.queryConstruct(query));
             var entities = new ArrayList<T>();
             Iterable<Resource> subjects = model::listSubjects;
             for (var resource : subjects) {

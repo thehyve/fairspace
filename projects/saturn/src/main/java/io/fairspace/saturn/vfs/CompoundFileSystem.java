@@ -92,7 +92,7 @@ public class CompoundFileSystem extends BaseFileSystem {
 
     @Override
     public void close() throws IOException {
-        for (var c: fileSystemsByType.values()) {
+        for (var c : fileSystemsByType.values()) {
             c.close();
         }
     }
@@ -121,7 +121,7 @@ public class CompoundFileSystem extends BaseFileSystem {
 
     private VirtualFileSystem fileSystemForCollection(Collection collection) throws IOException {
         var fs = fileSystemsByType.get(collectionType(collection));
-        if (fs == null){
+        if (fs == null) {
             throw new IOException("Unknown file system type for " + collection.getLocation());
         }
         return fs;

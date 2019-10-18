@@ -11,7 +11,7 @@ public class LocalBlobStore implements BlobStore {
 
     public LocalBlobStore(File dir) {
         this.dir = dir;
-        if(!dir.exists() && !dir.mkdirs()) {
+        if (!dir.exists() && !dir.mkdirs()) {
             throw new RuntimeException("Cannot initialize the local blob store");
         }
     }
@@ -21,7 +21,7 @@ public class LocalBlobStore implements BlobStore {
         var id = randomUUID().toString();
         var dest = new File(dir, id);
         try (var out = new BufferedOutputStream(new FileOutputStream(dest))) {
-             copyLarge(in, out);
+            copyLarge(in, out);
         } catch (IOException e) {
             dest.delete();
             throw e;
@@ -32,7 +32,7 @@ public class LocalBlobStore implements BlobStore {
     @Override
     public void read(String id, OutputStream out) throws IOException {
         var src = new File(dir, id);
-        try(var in = new BufferedInputStream(new FileInputStream(src))) {
+        try (var in = new BufferedInputStream(new FileInputStream(src))) {
             copyLarge(in, out);
         }
     }

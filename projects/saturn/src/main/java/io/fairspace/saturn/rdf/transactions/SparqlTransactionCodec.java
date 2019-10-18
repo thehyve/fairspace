@@ -62,9 +62,9 @@ public class SparqlTransactionCodec implements TransactionCodec {
             }
 
             private void save(Update update) throws IOException {
-                var buff = new IndentedLineBuffer() ;
+                var buff = new IndentedLineBuffer();
                 var sc = new SerializationContext(PROLOGUE, new NodeToLabelMap("b", true));
-                update.output(buff, sc) ;
+                update.output(buff, sc);
                 writer.append(buff.toString().replace('\n', ' ')).append(";\n");
             }
 

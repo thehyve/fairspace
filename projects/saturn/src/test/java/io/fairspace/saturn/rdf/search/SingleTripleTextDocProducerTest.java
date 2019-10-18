@@ -43,7 +43,8 @@ public class SingleTripleTextDocProducerTest {
 
     @Test
     public void shouldOnlyIndexTheDefaultGraph() {
-        producer.change(QuadAction.ADD, createURI("http://example.com/graph"), SUBJECT, PREDICATE, OBJECT);;
+        producer.change(QuadAction.ADD, createURI("http://example.com/graph"), SUBJECT, PREDICATE, OBJECT);
+        ;
 
         verify(indexer, times(0)).addEntity(any());
     }

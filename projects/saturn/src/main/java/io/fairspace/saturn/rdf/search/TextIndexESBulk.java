@@ -1,14 +1,12 @@
 package io.fairspace.saturn.rdf.search;
 
 import org.apache.jena.query.text.Entity;
-import org.apache.jena.query.text.TextIndex;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.query.text.es.TextIndexES;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.script.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * Bulk Elastic Search Implementation of {@link TextIndex}
+ * Bulk Elastic Search Implementation of {@rdfLink TextIndex}
  */
 public class TextIndexESBulk extends TextIndexES {
     /**
@@ -55,8 +53,8 @@ public class TextIndexESBulk extends TextIndexES {
     /**
      * Constructor used mainly for performing Integration tests
      *
-     * @param config an instance of {@link TextIndexConfig}
-     * @param client an instance of {@link TransportClient}. The client should already have been initialized with an index
+     * @param config an instance of {@rdfLink TextIndexConfig}
+     * @param client an instance of {@rdfLink TransportClient}. The client should already have been initialized with an index
      */
     public TextIndexESBulk(TextIndexConfig config, Client client, String indexName) {
         super(config, client, indexName);
@@ -105,7 +103,7 @@ public class TextIndexESBulk extends TextIndexES {
     }
 
     /**
-     * Update an Entity. Since we are doing Upserts in add entity anyway, we simply call {@link #addEntity(Entity)}
+     * Update an Entity. Since we are doing Upserts in add entity anyway, we simply call {@rdfLink #addEntity(Entity)}
      * method that takes care of updating the Entity as well.
      *
      * @param entity the entity to update.

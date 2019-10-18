@@ -38,7 +38,7 @@ public class SecurityUtilTest {
     @Test
     public void testHappyFlow() throws Exception {
         when(request.getHeader(eq("Authorization"))).thenReturn("Bearer token");
-        var claims  = Map.of(
+        var claims = Map.of(
                 SUBJECT_CLAIM, "subj",
                 FULLNAME_CLAIM, "John Smith",
                 USERNAME_CLAIM, "user1",

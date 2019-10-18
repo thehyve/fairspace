@@ -50,7 +50,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
         try {
             resource.createCollection("subdir");
             fail();
-        } catch(BadRequestException e) {
+        } catch (BadRequestException e) {
             // Expected
             assertEquals("test", e.getReason());
         }
@@ -60,7 +60,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
         try {
             resource.createCollection("subdir");
             fail();
-        } catch(ConflictException e) {
+        } catch (ConflictException e) {
             // Expected
             assertEquals("test", e.getMessage());
         }
@@ -70,7 +70,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
         try {
             resource.createCollection("subdir");
             fail();
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             // Expected
             assertTrue(e.getMessage().contains("test-message"));
         }
@@ -83,7 +83,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
         try {
             resource.getChildren();
             fail();
-        } catch(BadRequestException e) {
+        } catch (BadRequestException e) {
             // Expected
             assertEquals("test", e.getReason());
         }
@@ -93,7 +93,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
         try {
             resource.getChildren();
             fail();
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             // Expected
             assertTrue(e.getMessage().contains("test-message"));
         }
@@ -103,7 +103,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
         try {
             resource.getChildren();
             fail();
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             // Expected
             assertTrue(e.getMessage().contains("test-message"));
         }

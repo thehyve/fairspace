@@ -23,7 +23,7 @@ public class ErrorHelperTest {
         // Expect the properties to be serialized as json
         assertEquals(100, parsedMap.get("status"));
         assertEquals("BaseEvent", parsedMap.get("message"));
-        assertEquals( List.of("a", "b"), parsedMap.get("details"));
+        assertEquals(List.of("a", "b"), parsedMap.get("details"));
     }
 
     @Test
@@ -37,9 +37,9 @@ public class ErrorHelperTest {
         assertEquals(FS.ERROR_URI, parsedMap.get("@type"));
         assertEquals(
                 Map.of(
-                    "details", FS.ERROR_DETAILS_URI,
-                    "message", FS.ERROR_MESSAGE_URI,
-                    "status", FS.ERROR_STATUS_URI
+                        "details", FS.ERROR_DETAILS_URI,
+                        "message", FS.ERROR_MESSAGE_URI,
+                        "status", FS.ERROR_STATUS_URI
                 ),
                 parsedMap.get("@context")
         );

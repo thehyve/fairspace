@@ -3,13 +3,11 @@ package io.fairspace.saturn.services.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +29,7 @@ public class UserServiceTest {
 
     private Dataset ds = DatasetFactory.createTxnMem();
 
-    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+    private RDFLink rdf = new RDFLinkSimple(ds);
 
     private final KeycloakUser keycloakUser = new KeycloakUser() {{
         setId("123");
@@ -54,13 +52,13 @@ public class UserServiceTest {
         });
         mockServer.start();
 
-        userService = new UserService(new DAO(rdf, null), new TransactionalBatchExecutorService(rdf), "http://localhost:" + mockServer.getAddress().getPort() + "/users/%s");
+        userService = new UserService(new DAO(rdf, null), "http://localhost:" + mockServer.getAddress().getPort() + "/users/%s");
         userIri = userService.getUserIri(keycloakUser.getId());
     }
 
     @Test
     public void usersAreRetrieved() {
-        var user =  userService.getUser(userIri);
+        var user = userService.getUser(userIri);
 
         assertEquals(keycloakUser.getFullName(), user.getName());
         assertEquals(keycloakUser.getEmail(), user.getEmail());

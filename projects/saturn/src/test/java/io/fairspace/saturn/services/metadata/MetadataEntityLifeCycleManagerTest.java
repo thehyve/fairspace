@@ -1,13 +1,12 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -54,7 +53,7 @@ public class MetadataEntityLifeCycleManagerTest {
         ds = createTxnMem();
         model = ds.getNamedModel(graph.getURI());
 
-        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+        var rdf = new RDFLinkSimple(ds);
         initVocabularies(rdf);
         lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
     }
@@ -134,7 +133,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
     @Test
     public void testMissingPermissionsService() {
-        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFConnectionLocal(ds), graph, VOCABULARY_GRAPH_URI, () -> user);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(new RDFLinkSimple(ds), graph, VOCABULARY_GRAPH_URI, () -> user);
 
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);

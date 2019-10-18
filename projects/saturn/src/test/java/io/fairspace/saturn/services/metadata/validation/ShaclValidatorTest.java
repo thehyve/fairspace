@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.rdf.transactions.RDFLink;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -37,7 +39,8 @@ public class ShaclValidatorTest {
     private static final Resource closedClassShape = createResource("http://example.com/ClosedClassShape");
 
     private Dataset ds = DatasetFactory.create();
-    private RDFConnection rdf = new RDFConnectionLocal(ds);
+    private final RDFConnection rdf = new RDFConnectionLocal(ds);
+    private RDFLink rdfLink = new RDFLinkSimple(rdf);
     private ShaclValidator validator;
     private Model vocabulary;
 
@@ -47,7 +50,7 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);
+        initVocabularies(rdfLink);
         vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
 
         ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI())
@@ -60,19 +63,19 @@ public class ShaclValidatorTest {
         doAnswer(invocation -> {
             System.err.println(Arrays.toString(invocation.getArguments()));
             return null;
-        }).when(violationHandler).onViolation(any(),any(), any(), any());
+        }).when(violationHandler).onViolation(any(), any(), any(), any());
     }
 
     @Test
     public void validateNoChanges() {
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, vocabulary, violationHandler, rdf);
         verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void validateResourceWithNoType() {
         var model = modelOf(resource1, RDFS.label, createTypedLiteral(123));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler, rdf);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -84,7 +87,7 @@ public class ShaclValidatorTest {
                 resource1, RDFS.label, createTypedLiteral(123),
                 resource1, RDFS.comment, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
-                vocabulary, violationHandler);
+                vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Value does not have datatype xsd:string",
                 resource1,
@@ -105,7 +108,7 @@ public class ShaclValidatorTest {
                 resource1, RDF.type, closedClass,
                 resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
-                vocabulary, violationHandler);
+                vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Predicate <http://example.com#unknown> is not allowed (closed shape)",
                 resource1,
@@ -117,7 +120,7 @@ public class ShaclValidatorTest {
     public void validateResourceMissingRequiredProperty() {
         var model = modelOf(resource1, RDF.type, FS.File);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
-                vocabulary, violationHandler);
+                vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Less than 1 values",
                 resource1,
@@ -130,7 +133,7 @@ public class ShaclValidatorTest {
         var model = modelOf(
                 resource1, RDF.type, FS.File,
                 resource1, FS.filePath, createTypedLiteral(123));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Value does not have datatype xsd:string",
                 resource1,
@@ -147,13 +150,13 @@ public class ShaclValidatorTest {
                 resource1, FS.filePath, createStringLiteral("some/path"),
                 resource1, FS.createdBy, resource2);
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler, rdf);
 
         verifyZeroInteractions(violationHandler);
 
         before = modelOf(resource2, RDF.type, FOAF.Person);
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Value does not have class fs:User",
                 resource1,
@@ -170,7 +173,7 @@ public class ShaclValidatorTest {
         var model = modelOf(blankNode, RDF.type, closedClass,
                 blankNode, FS.md5, createStringLiteral("test"));
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Predicate <http://fairspace.io/ontology#md5> is not allowed (closed shape)",
                 blankNode,
@@ -192,7 +195,7 @@ public class ShaclValidatorTest {
                 blankNode, RDF.type, FS.User,
                 blankNode, RDFS.label, createTypedLiteral("My label"));
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler, rdf);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -216,7 +219,7 @@ public class ShaclValidatorTest {
         var toRemove = createDefaultModel()
                 .add(resource1, RDFS.label, "collection");
 
-        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler, rdf);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -238,7 +241,7 @@ public class ShaclValidatorTest {
 
         var toRemove = modelOf(resource1, FS.createdBy, blankNode);
 
-        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler, rdf);
 
         verify(violationHandler).onViolation("Value does not have class fs:User",
                 resource1,
@@ -254,7 +257,7 @@ public class ShaclValidatorTest {
             model.add(resource, RDF.type, FS.File).add(resource, FS.filePath, createTypedLiteral(123));
         }
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler, rdf);
 
         model.listSubjects().forEachRemaining(resource ->
                 verify(violationHandler).onViolation("Value does not have datatype xsd:string",

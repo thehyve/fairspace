@@ -79,7 +79,7 @@ public class MiltonWebDAVServlet extends HttpServlet {
                 }
             });
 
-            if(requestEventListener != null) {
+            if (requestEventListener != null) {
                 eventManager.registerEventListener(e -> requestEventListener.accept(((RequestEvent) e).getRequest()), RequestEvent.class);
             }
         }}.buildHttpManager();

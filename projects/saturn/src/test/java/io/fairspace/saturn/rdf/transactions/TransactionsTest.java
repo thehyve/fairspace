@@ -77,11 +77,13 @@ public class TransactionsTest {
 
     @Test(expected = JenaTransactionException.class)
     public void readToWritePromotionIsNotPossible() {
-        executeRead(ds, () -> executeWrite(ds, () -> {}));
+        executeRead(ds, () -> executeWrite(ds, () -> {
+        }));
     }
 
     @Test
     public void writeToReadDemotionIsPossible() {
-        executeWrite(ds, () -> executeRead(ds, () -> {}));
+        executeWrite(ds, () -> executeRead(ds, () -> {
+        }));
     }
 }

@@ -13,7 +13,6 @@ import static java.lang.annotation.ElementType.FIELD;
 @Target(value = FIELD)
 public @interface RDFProperty {
     /**
-     *
      * @return The property IRI
      */
     String value();

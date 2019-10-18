@@ -13,6 +13,7 @@ public interface PermissionsService {
     /**
      * Creates a new resource entity and grants current user Manage access to it.
      * This method should be only called by other high-level APIs and must not be directly exposed as an API endpoint.
+     *
      * @param resource
      */
     void createResource(Node resource);
@@ -20,6 +21,7 @@ public interface PermissionsService {
     /**
      * Creates multiple new resource entities and grants current user Manage access to it.
      * This method should be only called by other high-level APIs and must not be directly exposed as an API endpoint.
+     *
      * @param resources
      */
     void createResources(Collection<Resource> resources);
@@ -28,6 +30,7 @@ public interface PermissionsService {
      * Sets permission for a specific user and resource.
      * Current user must have Manage access to the resource.
      * Use Access.None for revoking permissions.
+     *
      * @param resource
      * @param user
      * @param access
@@ -45,6 +48,7 @@ public interface PermissionsService {
 
     /**
      * Ensures the current user has access to the specified nodes
+     *
      * @param nodes
      * @param requestedAccess
      * @throws io.fairspace.saturn.services.AccessDeniedException if the user does not have requested access to all nodes
@@ -52,7 +56,6 @@ public interface PermissionsService {
     void ensureAccess(Set<Node> nodes, Access requestedAccess);
 
     /**
-     *
      * @param resource
      * @return A map containing all non-default permissions from all users for a specific resource
      */
@@ -66,7 +69,6 @@ public interface PermissionsService {
     Map<Node, Access> getPermissions(Collection<Node> nodes);
 
     /**
-     *
      * @param resource
      * @return true if the resource is write-restricted
      */
@@ -74,6 +76,7 @@ public interface PermissionsService {
 
     /**
      * Sets fs:writeRestricted attribute for a specific resource
+     *
      * @param resource
      * @param restricted
      */

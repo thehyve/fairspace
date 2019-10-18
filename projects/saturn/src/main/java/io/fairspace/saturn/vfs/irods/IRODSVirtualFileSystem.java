@@ -1,6 +1,6 @@
 package io.fairspace.saturn.vfs.irods;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
@@ -8,7 +8,6 @@ import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -34,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vfs.PathUtils.*;
@@ -46,19 +44,17 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
     public static final String FAIRSPACE_IRI_ATTRIBUTE = "FairspaceIRI";
     private final IRODSFileSystem fs;
-    private final RDFConnection rdf;
-    private final TransactionalBatchExecutorService batchExecutorService;
+    private final RDFLink rdfLink;
 
-    public IRODSVirtualFileSystem(RDFConnection rdf, TransactionalBatchExecutorService batchExecutorService, CollectionsService collections) throws JargonException {
-        this(rdf, batchExecutorService, collections, IRODSFileSystem.instance());
+    public IRODSVirtualFileSystem(RDFLink rdfLink, CollectionsService collections) throws JargonException {
+        this(rdfLink, collections, IRODSFileSystem.instance());
     }
 
-    IRODSVirtualFileSystem(RDFConnection rdf, TransactionalBatchExecutorService batchExecutorService, CollectionsService collections, IRODSFileSystem fs) {
+    IRODSVirtualFileSystem(RDFLink rdfLink, CollectionsService collections, IRODSFileSystem fs) {
         super(collections);
-        this.batchExecutorService = batchExecutorService;
 
         this.fs = fs;
-        this.rdf = rdf;
+        this.rdfLink = rdfLink;
     }
 
     @Override
@@ -146,8 +142,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        getThreadContext().setSystemCommitMessage("Generate an IRI for an external resource");
-        batchExecutorService.perform(() ->
+        rdfLink.executeWrite("Generate an IRI for an external resource", rdf ->
                 rdf.update(storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }
@@ -326,7 +321,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
         var properties = new HashMap<String, String>();
         properties.put(FS.OWNED_BY_LOCAL_PART, stat.getOwnerName());
 
-        if(StringUtils.isNotEmpty(stat.getChecksum())) {
+        if (StringUtils.isNotEmpty(stat.getChecksum())) {
             properties.put(FS.CHECKSUM_LOCAL_PART, stat.getChecksum());
         }
         return properties;

@@ -15,7 +15,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
  * Normally DatasetGraphMonitor reports changes to an external listener.
  * That can be very inconvenient, if you need to implement complex logic involving not only quad operations, but also
  * some other aspect's of the dataset graph;s behavior, e.g. transaction lifecycle.
- *
+ * <p>
  * It also overrides getDefaultGraph and getGraph to avoid exposure of unwrapped graphs.
  * The default DatasetGraphWrapper implementation is somewhat leaky, as it allows to access unwrapped graphs.
  * Changes made to such an unwrapped graph wouldn't be picked up by DatasetGraphMonitor.

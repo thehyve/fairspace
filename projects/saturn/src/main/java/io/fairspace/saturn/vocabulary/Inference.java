@@ -20,7 +20,7 @@ public class Inference {
     public static Model getInferredStatements(Model vocabulary, Model model) {
         var inferred = createDefaultModel();
 
-         model.listStatements()
+        model.listStatements()
                 .filterKeep(stmt -> stmt.getObject().isResource())
                 .forEachRemaining(stmt -> getInversePropertyForStatement(stmt, vocabulary)
                         .map(inverseProperty -> stmt.getModel().createStatement(stmt.getObject().asResource(), inverseProperty, stmt.getSubject()))

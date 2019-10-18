@@ -5,7 +5,7 @@ import com.mockrunner.mock.web.MockHttpServletRequest;
 import com.mockrunner.mock.web.MockHttpServletResponse;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
@@ -33,7 +33,6 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,20 +61,21 @@ public class WebDAVIT {
 
     @Before
     public void before() {
-        var rdf = connect(createTxnMem());
+        var rdf = new RDFLinkSimple(createTxnMem());
 
-        rdf.load(
+        rdf.executeWrite(null, conn -> conn.load(
                 createDefaultModel()
-                    .add(createResource(defaultUser.getURI()), RDFS.label, "current-user")
-                    .add(createResource(anotherUser.getURI()), RDFS.label, "another-user")
+                        .add(createResource(defaultUser.getURI()), RDFS.label, "current-user")
+                        .add(createResource(anotherUser.getURI()), RDFS.label, "another-user"))
         );
 
         var eventBus = new EventBus();
 
-        var executor = new TransactionalBatchExecutorService(rdf);
-        permissions = new PermissionsServiceImpl(rdf, executor, () -> currentUser, () -> false,null, event -> {});
-        collections = new CollectionsService(new DAO(rdf, () -> currentUser), executor, eventBus::post, permissions, eventService);
-        fs = new ManagedFileSystem(rdf, executor, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
+
+        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, () -> false, null, event -> {
+        });
+        collections = new CollectionsService(rdf, new DAO(rdf, () -> currentUser), eventBus::post, permissions, eventService);
+        fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
         milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)), null);
         var coll = new Collection();
         coll.setName("My Collection");
@@ -119,7 +119,7 @@ public class WebDAVIT {
                 "</propfind>");
         milton.service(req, res);
         assertEquals(207, res.getStatus());
-        assertTrue(res.getOutputStreamContent().contains("xmlns:ns1=\"" + FS.NS +"\""));
+        assertTrue(res.getOutputStreamContent().contains("xmlns:ns1=\"" + FS.NS + "\""));
         assertTrue(res.getOutputStreamContent().contains("<d:prop><ns1:iri>" + fs.iri("coll1") + "</ns1:iri>"));
     }
 
@@ -447,8 +447,8 @@ public class WebDAVIT {
         collections.create(newCollection);
         var newCollectionIRI = newCollection.getIri();
 
-        permissions.setPermission(collectionIRI, anotherUser,sourceAccess);
-        permissions.setPermission(newCollectionIRI, anotherUser,destAccess);
+        permissions.setPermission(collectionIRI, anotherUser, sourceAccess);
+        permissions.setPermission(newCollectionIRI, anotherUser, destAccess);
 
         req.setMethod("PUT");
         req.setRequestURL("http://localhost/webdav/coll1/file.ext");

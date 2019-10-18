@@ -35,15 +35,15 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     public void testContainsMachineOnlyPredicates() {
 
         var testModel = modelOf(
-        // A machine-only property may be used as subject or object
-        P1, RDF.type, RDF.Property,
-        MACHINE_ONLY_PROPERTY, RDF.value, P1,
+                // A machine-only property may be used as subject or object
+                P1, RDF.type, RDF.Property,
+                MACHINE_ONLY_PROPERTY, RDF.value, P1,
 
-        // Other statements are allowed as well
-        S1, P2, S2,
-        S2, P2, S1);
+                // Other statements are allowed as well
+                S1, P2, S2,
+                S2, P2, S1);
 
-        validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
+        validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, EMPTY_MODEL, violationHandler, null);
         verifyZeroInteractions(violationHandler);
     }
 
@@ -51,18 +51,18 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     public void testHasMachineOnlyPredicatesRecognizesMachineOnlyStatements() {
         // Create a model that contains one machine only statement between several non-machine-only
         var testModel = modelOf(
-        S1, P2, S2,
-        S2, P2, S1,
-        S3, P2, S1,
+                S1, P2, S2,
+                S2, P2, S1,
+                S3, P2, S1,
 
-        S3, RDF.type, FS.File,
-        S3, MACHINE_ONLY_PROPERTY, S1,
+                S3, RDF.type, FS.File,
+                S3, MACHINE_ONLY_PROPERTY, S1,
 
-        S2, P2, S3,
-        S1, P2, S3,
-        S3, P2, S2);
+                S2, P2, S3,
+                S1, P2, S3,
+                S3, P2, S2);
 
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler, null);
 
         verify(violationHandler).onViolation("The given model contains a machine-only predicate",
                 createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
@@ -70,7 +70,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, SYSTEM_VOCABULARY, violationHandler, null);
         verifyZeroInteractions(violationHandler);
     }
 

@@ -1,6 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
@@ -8,7 +8,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -55,8 +54,9 @@ public class PermissionsServiceImplTest {
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        var rdf = new RDFConnectionLocal(ds);
-        service = new PermissionsServiceImpl(rdf, new TransactionalBatchExecutorService(rdf), () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
+        var rdf = new RDFLinkSimple(ds);
+        service = new PermissionsServiceImpl(rdf, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {
+        });
         service.createResource(RESOURCE);
 
         isCoordinator = false;
@@ -312,7 +312,7 @@ public class PermissionsServiceImplTest {
         try {
             service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Write);
             fail();
-        } catch(MetadataAccessDeniedException e) {
+        } catch (MetadataAccessDeniedException e) {
             assertEquals(RESOURCE, e.getSubject());
         }
 
@@ -321,7 +321,7 @@ public class PermissionsServiceImplTest {
         try {
             service.ensureAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
             fail();
-        } catch(MetadataAccessDeniedException e) {
+        } catch (MetadataAccessDeniedException e) {
             assertEquals(FILE_1, e.getSubject());
         }
 

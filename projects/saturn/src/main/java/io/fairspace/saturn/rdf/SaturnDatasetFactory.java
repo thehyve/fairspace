@@ -2,8 +2,7 @@ package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
-import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
+import io.fairspace.saturn.rdf.transactions.TransactionLog;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
@@ -29,13 +28,11 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config) throws IOException {
+    public static Dataset connect(Config.Jena config, TransactionLog txnLog) throws IOException {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
         var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
-
-        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
         if (config.elasticSearch.enabled) {
             // When a restore is needed, we instruct ES to delete the index first

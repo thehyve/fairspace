@@ -16,7 +16,6 @@ public class ModelUtils {
     public static final Model EMPTY_MODEL = new ModelCom(GraphZero.instance());
 
     /**
-     *
      * @param statements
      * @return A mutable model initialized with statements
      */

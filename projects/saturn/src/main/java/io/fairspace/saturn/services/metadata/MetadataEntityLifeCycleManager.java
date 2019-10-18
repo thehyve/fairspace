@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.RDFLink;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -24,7 +24,7 @@ import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 @AllArgsConstructor
 public
 class MetadataEntityLifeCycleManager {
-    private final RDFConnection rdf;
+    private final RDFLink rdfLink;
     private final Node graph;
     private final Node vocabulary;
     private final Supplier<Node> userIriSupplier;
@@ -32,12 +32,13 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Instantiates a lifecycle manager without a reference for the permissions
-     * @param rdf
+     *
+     * @param rdfLink
      * @param graph
      * @param userIriSupplier
      */
-    public MetadataEntityLifeCycleManager(RDFConnection rdf, Node graph, Node vocabulary, Supplier<Node> userIriSupplier) {
-        this(rdf, graph, vocabulary, userIriSupplier, null);
+    public MetadataEntityLifeCycleManager(RDFLink rdfLink, Node graph, Node vocabulary, Supplier<Node> userIriSupplier) {
+        this(rdfLink, graph, vocabulary, userIriSupplier, null);
     }
 
     /**
@@ -47,7 +48,7 @@ class MetadataEntityLifeCycleManager {
      * - a triple for the creator of an entity (see {@value io.fairspace.saturn.vocabulary.FS#CREATED_BY_URI})
      * - a triple for the date this entity was created (see {@value io.fairspace.saturn.vocabulary.FS#DATE_CREATED_URI})
      * <p>
-     * In addition, the current user will get manage permissions on this entity as well, through the {@link PermissionsService}
+     * In addition, the current user will get manage permissions on this entity as well, through the {@rdfLink PermissionsService}
      * <p>
      * Please note that this method will check the database for existence of the entities. For that reason, this method must be called
      * before actually inserting new triples.
@@ -59,33 +60,39 @@ class MetadataEntityLifeCycleManager {
             return;
         }
 
-        // Determine whether the model to add contains new entities
-        // for which new information should be stored
-        var newEntities = determineNewEntities(model);
+        rdfLink.executeWrite(null, rdf -> {
+            // Determine whether the model to add contains new entities
+            // for which new information should be stored
+            var newEntities = determineNewEntities(model);
 
-        // If there are new entities, updateLifecycleMetadata creation information for them
-        // as well as permissions
-        if (!newEntities.isEmpty()) {
-            rdf.load(graph.getURI(), generateCreationInformation(newEntities));
+            // If there are new entities, updateLifecycleMetadata creation information for them
+            // as well as permissions
+            if (!newEntities.isEmpty()) {
+                rdf.load(graph.getURI(), generateCreationInformation(newEntities));
 
-            if(permissionsService != null) {
-                permissionsService.createResources(newEntities);
+                if (permissionsService != null) {
+                    permissionsService.createResources(newEntities);
+                }
             }
-        }
+        });
+
     }
 
     boolean softDelete(Resource resource) {
-        if (permissionsService != null) {
-            permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
-        }
-        if (rdf.queryAsk(storedQuery("is_machine_only", resource, graph, vocabulary))) {
-            throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
-        }
-        if (rdf.queryAsk(storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
-            rdf.update(storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userIriSupplier.get(), graph));
-            return true;
-        }
-        return false;
+        return rdfLink.calculateWrite(null, rdf -> {
+            if (permissionsService != null) {
+                permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
+            }
+            if (rdf.queryAsk(storedQuery("is_machine_only", resource, graph, vocabulary))) {
+                throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
+            }
+            if (rdf.queryAsk(storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
+                rdf.update(storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userIriSupplier.get(), graph));
+                return true;
+            }
+            return false;
+        });
+
     }
 
     /**
@@ -128,7 +135,7 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private boolean exists(Resource resource) {
-        return rdf.queryAsk(storedQuery("exists", graph, resource, null, null));
+        return rdfLink.calculateRead(rdf -> rdf.queryAsk(storedQuery("exists", graph, resource, null, null)));
     }
 
     /**

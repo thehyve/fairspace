@@ -34,12 +34,12 @@ public class GraphVizSerializer implements Serializer {
         var stringBuilder = new StringBuilder("digraph {\n");
 
         var addedRelationShapes = new HashSet<>();
-        model.listSubjectsWithProperty(RDF.type, FS.ClassShape).forEachRemaining(classShape-> {
+        model.listSubjectsWithProperty(RDF.type, FS.ClassShape).forEachRemaining(classShape -> {
             var classLabel = getStringProperty(classShape, SH.name);
             var targetClassResource = getResourceProperty(classShape, SH.targetClass);
 
             // If label or targetclass are missing, don't add the node
-            if(classLabel == null || targetClassResource == null) {
+            if (classLabel == null || targetClassResource == null) {
                 return;
             }
 
@@ -50,14 +50,14 @@ public class GraphVizSerializer implements Serializer {
             getResourceProperties(classShape, SH.property).forEach(propertyShape -> {
                 // Skip everything but relationshapes
                 var type = getType(propertyShape);
-                if(type == null || !type.equals(FS.RelationShape))
+                if (type == null || !type.equals(FS.RelationShape))
                     return;
 
                 var propertyLabel = getStringProperty(propertyShape, SH.name);
                 var otherClassResource = getResourceProperty(propertyShape, SH.class_);
 
                 // If label or class are missing, don't add the node
-                if(classLabel == null || otherClassResource == null) {
+                if (classLabel == null || otherClassResource == null) {
                     return;
                 }
                 var otherClass = otherClassResource.getURI();
@@ -66,9 +66,9 @@ public class GraphVizSerializer implements Serializer {
                 // A relation with an inverse will be combined with its inverse
                 // to simplify the drawing
                 var inverseShape = getResourceProperty(propertyShape, FS.inverseRelation);
-                if(inverseShape != null && !inverseShape.equals(propertyShape)) {
+                if (inverseShape != null && !inverseShape.equals(propertyShape)) {
                     // Skip any shape for which the inverse was added already
-                    if(addedRelationShapes.contains(inverseShape))
+                    if (addedRelationShapes.contains(inverseShape))
                         return;
 
                     var otherPropertyLabel = getStringProperty(inverseShape, SH.name);

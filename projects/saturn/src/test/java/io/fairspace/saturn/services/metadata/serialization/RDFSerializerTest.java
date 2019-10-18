@@ -26,7 +26,7 @@ public class RDFSerializerTest {
 
     @Test
     public void serialize() {
-        assertArrayEquals(new String[] {"<http://a>", "<http://label>", "\"test\"", "."}, serializer.serialize(model).trim().split("\\s+"));
+        assertArrayEquals(new String[]{"<http://a>", "<http://label>", "\"test\"", "."}, serializer.serialize(model).trim().split("\\s+"));
     }
 
     @Test

@@ -52,7 +52,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
         put("/", (req, res) -> {
             Model model = getModelFromRequest(req);
 
-            if(model == null) {
+            if (model == null) {
                 throw new UnsupportedMediaTypeException(supportedMimetypes);
             }
 
@@ -64,7 +64,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
         patch("/", (req, res) -> {
             Model model = getModelFromRequest(req);
 
-            if(model == null) {
+            if (model == null) {
                 throw new UnsupportedMediaTypeException(supportedMimetypes);
             }
 
@@ -75,8 +75,8 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
         });
         delete("/", (req, res) -> {
             Model model = getModelFromRequest(req);
-            if(model != null) {
-                 api.delete(model);
+            if (model != null) {
+                api.delete(model);
             } else {
                 var subject = req.queryParams("subject");
                 validate(subject != null, "Parameter \"subject\" is required");
@@ -102,8 +102,8 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
     }
 
     private Model getModelFromRequest(Request req) {
-        for(Serializer deserializer: deserializers) {
-            if(hasContentType(req, deserializer.getMimeType())) {
+        for (Serializer deserializer : deserializers) {
+            if (hasContentType(req, deserializer.getMimeType())) {
                 return deserializer.deserialize(req.body(), baseURI);
             }
         }

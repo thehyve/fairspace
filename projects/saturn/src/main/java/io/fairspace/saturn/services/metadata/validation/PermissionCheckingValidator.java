@@ -8,13 +8,14 @@ import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdfconnection.RDFConnection;
 
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
     private final PermissionsService permissions;
 
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler, RDFConnection rdf) {
         try {
             permissions.ensureAccess(removed
                             .listSubjects()

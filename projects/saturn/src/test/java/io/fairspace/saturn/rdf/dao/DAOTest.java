@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf.dao;
 
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
@@ -21,7 +22,6 @@ import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
 
@@ -36,7 +36,7 @@ public class DAOTest {
     @Before
     public void before() {
         dataset = createTxnMem();
-        dao = new DAO(connect(dataset), () -> createURI("http://example.com/" + randomUUID()));
+        dao = new DAO(new RDFLinkSimple(dataset), () -> createURI("http://example.com/" + randomUUID()));
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
@@ -91,7 +91,7 @@ public class DAOTest {
         entity.setFloatPrimitiveValue(1.2345f);
         testWriteAndRead(entity);
     }
-    
+
     @Test
     public void testFloatObjectProperty() {
         entity.setFloatObjectValue(1.2345f);
@@ -124,40 +124,40 @@ public class DAOTest {
 
     @Test
     public void testShortPrimitiveProperty() {
-        entity.setShortPrimitiveValue((short)123);
+        entity.setShortPrimitiveValue((short) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testShortObjectProperty() {
-        entity.setShortObjectValue((short)123);
+        entity.setShortObjectValue((short) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testCharPrimitiveProperty() {
-        entity.setCharPrimitiveValue((char)123);
+        entity.setCharPrimitiveValue((char) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testCharObjectProperty() {
-        entity.setCharacterObjectValue((char)123);
+        entity.setCharacterObjectValue((char) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testBytePrimitiveProperty() {
-        entity.setBytePrimitiveValue((byte)123);
+        entity.setBytePrimitiveValue((byte) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testByteObjectProperty() {
-        entity.setByteObjectValue((byte)123);
+        entity.setByteObjectValue((byte) 123);
         testWriteAndRead(entity);
     }
-    
+
     @Test
     public void testSetProperty() {
         entity.getTags().add("aaa");

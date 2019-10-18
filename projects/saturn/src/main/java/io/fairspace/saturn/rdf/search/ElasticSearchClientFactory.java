@@ -31,7 +31,7 @@ public class ElasticSearchClientFactory {
         if (advancedSettings != null) {
             advancedSettings.forEach(settingsBuilder::put);
         }
-        settingsBuilder.put("cluster.name", esSettings.getClusterName())     ;
+        settingsBuilder.put("cluster.name", esSettings.getClusterName());
         var settings = settingsBuilder.build();
 
         List<TransportAddress> addresses = new ArrayList<>();

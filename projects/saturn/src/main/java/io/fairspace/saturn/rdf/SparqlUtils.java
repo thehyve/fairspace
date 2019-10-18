@@ -10,7 +10,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.SparqlQueryConnection;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -40,15 +40,15 @@ public class SparqlUtils {
             var arg = args[i];
             String param;
 
-            if(arg == null) {
+            if (arg == null) {
                 param = "?" + i;
-            } else if(arg instanceof Collection) {
+            } else if (arg instanceof Collection) {
                 param = ((Collection<?>) arg).stream()
                         .filter(Objects::nonNull)
                         .map(SparqlUtils::toSerializableNode)
                         .map(SparqlUtils::toString)
                         .collect(joining(" "));
-            } else if(arg instanceof RDFList) {
+            } else if (arg instanceof RDFList) {
                 param = toString((RDFList) arg);
             } else {
                 param = toString(toSerializableNode(arg));
@@ -67,7 +67,7 @@ public class SparqlUtils {
         if (value instanceof Resource) {
             value = ((Resource) value).asNode();
         }
-        if (value instanceof Node && ((Node)value).isURI()) {
+        if (value instanceof Node && ((Node) value).isURI()) {
             validateIRI(((Node) value).getURI());
         }
 
@@ -77,7 +77,7 @@ public class SparqlUtils {
     @SneakyThrows(IOException.class)
     private static String load(String name) {
         return "PREFIX ws: " + str(createURI(CONFIG.jena.metadataBaseIRI)) + '\n' +
-               "PREFIX vocabulary: " + str(createURI(CONFIG.jena.vocabularyBaseIRI)) + '\n' +
+                "PREFIX vocabulary: " + str(createURI(CONFIG.jena.vocabularyBaseIRI)) + '\n' +
                 IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
     }
 
@@ -130,19 +130,19 @@ public class SparqlUtils {
         return GregorianCalendar.from(ZonedDateTime.ofInstant(value, ZoneId.systemDefault()));
     }
 
-    public static <T> List<T> select(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+    public static <T> List<T> select(SparqlQueryConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
         var values = new ArrayList<T>();
         rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
         return values;
     }
 
-    public static <T> Set<T> selectDistinct(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+    public static <T> Set<T> selectDistinct(SparqlQueryConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
         var values = new HashSet<T>();
         rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
         return values;
     }
 
-    public static <T> Optional<T> selectSingle(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+    public static <T> Optional<T> selectSingle(SparqlQueryConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
         var values = selectDistinct(rdf, query, valueExtractor);
         if (values.size() > 1) {
             throw new IllegalStateException("Too many values: " + values.size());

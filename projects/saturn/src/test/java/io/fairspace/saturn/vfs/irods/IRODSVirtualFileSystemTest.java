@@ -1,6 +1,6 @@
 package io.fairspace.saturn.vfs.irods;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
@@ -106,7 +106,7 @@ public class IRODSVirtualFileSystemTest {
 
         when(aof.getDataObjectAO(any())).thenReturn(doao);
 
-        vfs = new IRODSVirtualFileSystem(rdf, new TransactionalBatchExecutorService(rdf), collections, fs);
+        vfs = new IRODSVirtualFileSystem(new RDFLinkSimple(rdf), collections, fs);
     }
 
     @Test

@@ -29,7 +29,7 @@ import static org.topbraid.spin.util.JenaUtil.getStringProperty;
 
 public class ShaclUtil {
     public static void getViolations(ValidationEngine validationEngine, ViolationHandler violationHandler) {
-         getAllInstances(SH.ValidationResult.inModel(validationEngine.getReport().getModel()))
+        getAllInstances(SH.ValidationResult.inModel(validationEngine.getReport().getModel()))
                 .forEach(shResult -> {
                     if (shResult.hasProperty(SH.resultSeverity, SH.Violation)) {
                         var message = getStringProperty(shResult, SH.resultMessage);

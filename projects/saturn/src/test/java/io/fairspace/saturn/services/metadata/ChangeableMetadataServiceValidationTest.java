@@ -1,6 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
@@ -10,7 +10,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -67,8 +66,7 @@ public class ChangeableMetadataServiceValidationTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new ChangeableMetadataService(rdf, new TransactionalBatchExecutorService(rdf), createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
+        api = new ChangeableMetadataService(new RDFLinkSimple(ds), createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
     }
 
     @Test
@@ -92,7 +90,7 @@ public class ChangeableMetadataServiceValidationTest {
             handler.onViolation("ERROR", createResource(), null, null);
 
             return null;
-        }).when(validator).validate(any(), any(), any(), any(), any(), any());
+        }).when(validator).validate(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -114,7 +112,7 @@ public class ChangeableMetadataServiceValidationTest {
         ds.getNamedModel(GRAPH).add(STMT1);
         api.patch(modelOf(STMT1));
 
-        verify(validator).validate(any(), any(), argThat(Model::isEmpty), argThat(Model::isEmpty), any(), any());
+        verify(validator).validate(any(), any(), argThat(Model::isEmpty), argThat(Model::isEmpty), any(), any(), any());
     }
 
     @Test
@@ -165,7 +163,7 @@ public class ChangeableMetadataServiceValidationTest {
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
                 isomorphic(ds.getNamedModel(VOCABULARY)),
-                any());
+                any(), any());
     }
 
     @Test
@@ -184,7 +182,7 @@ public class ChangeableMetadataServiceValidationTest {
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
                 isomorphic(ds.getNamedModel(VOCABULARY)),
-                any());
+                any(), any());
     }
 
 
@@ -225,7 +223,7 @@ public class ChangeableMetadataServiceValidationTest {
                         resource1, property1, resource2,
                         resource2, property2, resource1)),
                 isomorphic(ds.getNamedModel(VOCABULARY)),
-                any());
+                any(), any());
     }
 
     @Test
@@ -256,7 +254,7 @@ public class ChangeableMetadataServiceValidationTest {
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
                 isomorphic(ds.getNamedModel(VOCABULARY)),
-                any());
+                any(), any());
     }
 }
 

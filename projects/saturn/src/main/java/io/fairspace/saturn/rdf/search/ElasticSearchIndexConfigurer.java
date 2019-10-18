@@ -89,7 +89,7 @@ public class ElasticSearchIndexConfigurer {
     }
 
     private static String getMappings() throws IOException {
-        try(var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/mappings.json")) {
+        try (var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/mappings.json")) {
             return new String(is.readAllBytes(), UTF_8);
         }
     }

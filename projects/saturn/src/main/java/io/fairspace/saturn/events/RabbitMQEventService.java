@@ -49,7 +49,7 @@ public class RabbitMQEventService implements EventService {
     }
 
     public void emitEvent(@NonNull Event event) {
-        if(channel == null) {
+        if (channel == null) {
             log.warn("Not emitting event {} because channel is unavailable. Has the service been initialized?", event);
             return;
         }

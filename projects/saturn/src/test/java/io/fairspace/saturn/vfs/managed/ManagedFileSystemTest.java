@@ -1,7 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.saturn.rdf.transactions.TransactionalBatchExecutorService;
+import io.fairspace.saturn.rdf.transactions.RDFLinkSimple;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
@@ -50,7 +50,7 @@ public class ManagedFileSystemTest {
     private ManagedFileSystem fs;
 
     @Before
-    public void before()  {
+    public void before() {
         var store = new MemoryBlobStore();
         ds = createTxnMem();
         var rdf = connect(ds);
@@ -64,7 +64,7 @@ public class ManagedFileSystemTest {
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
 
-        fs = new ManagedFileSystem(rdf, new TransactionalBatchExecutorService(rdf), store, userIriSupplier, collections, eventBus);
+        fs = new ManagedFileSystem(new RDFLinkSimple(rdf), store, userIriSupplier, collections, eventBus);
 
         var collection1 = new Collection();
         collection1.setLocation("coll");
@@ -265,7 +265,7 @@ public class ManagedFileSystemTest {
     public void cannotCopyDirToItself() throws IOException {
         fs.mkdir("coll/dir1");
         fs.copy("coll/dir1", "coll/dir1");
-     }
+    }
 
     @Test
     public void copyFile() throws IOException {

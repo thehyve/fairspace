@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
@@ -12,7 +13,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
  */
 public class SystemVocabularyProtectingValidator implements MetadataRequestValidator {
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler, RDFConnection rdf) {
         removed.listStatements()
                 .filterKeep(SYSTEM_VOCABULARY::contains)
                 .forEachRemaining(statement -> violationHandler.onViolation("Cannot remove a statement from the system vocabulary", statement));

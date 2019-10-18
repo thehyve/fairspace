@@ -12,7 +12,6 @@ import java.util.List;
  */
 public interface VirtualFileSystem extends Closeable {
     /**
-     *
      * @param path here and in all other methods paths shall never start or end with a slash
      * @return file info or null if file doesn't exist
      * @throws IOException

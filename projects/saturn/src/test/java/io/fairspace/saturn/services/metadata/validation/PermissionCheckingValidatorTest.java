@@ -44,7 +44,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler, null);
 
         verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
         verifyZeroInteractions(violationHandler);
@@ -56,7 +56,7 @@ public class PermissionCheckingValidatorTest {
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
         doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler, null);
         verify(violationHandler).onViolation("Cannot modify read-only resource", STATEMENT.getSubject(), null, null);
     }
 
@@ -65,7 +65,7 @@ public class PermissionCheckingValidatorTest {
         var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler, null);
 
         verifyZeroInteractions(violationHandler);
         verify(permissions).ensureAccess(nodes, Access.Write);
