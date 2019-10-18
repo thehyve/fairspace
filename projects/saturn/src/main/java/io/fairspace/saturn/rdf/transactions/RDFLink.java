@@ -25,10 +25,10 @@ public interface RDFLink {
     }
 
     default <R, E extends Exception> R calculateWrite(ThrowingFunction<? super RDFConnection, ? extends R, ? extends E> job) throws E {
-        return calculateWrite(job);
+        return calculateWrite(null, job);
     }
 
     default <E extends Exception> void executeWrite(ThrowingConsumer<? super RDFConnection, ? extends E> job) throws E {
-        executeWrite(job);
+        executeWrite(null, job);
     }
 }
