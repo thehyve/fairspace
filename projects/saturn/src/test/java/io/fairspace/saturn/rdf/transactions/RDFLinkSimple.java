@@ -27,7 +27,7 @@ public class RDFLinkSimple implements RDFLink {
     }
 
     @Override
-    public <R, E extends Exception> R calculateWrite(String message, ThrowingFunction<? super RDFConnection, ? extends R, ? extends E> job) throws E {
+    public <R, E extends Exception> R calculateWrite(String systemCommitMessage, ThrowingFunction<? super RDFConnection, ? extends R, ? extends E> job) throws E {
         return Txn.calculateWrite(rdf, () -> sneaky(job).apply(rdf));
     }
 }
