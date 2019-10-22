@@ -41,7 +41,7 @@ export const FileOperations = ({
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.type === CUT);
+    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);

@@ -3,7 +3,7 @@ import {shallow} from "enzyme";
 import {IconButton} from "@material-ui/core";
 
 import {FileOperations} from "../FileOperations";
-import {CUT} from "../../constants";
+import {COPY, CUT} from "../../constants";
 
 describe('FileOperations', () => {
     const clearSelection = jest.fn();
@@ -12,37 +12,40 @@ describe('FileOperations', () => {
     let wrapper;
     let clickHandler;
 
+    const clipboardMock = {
+        method: CUT,
+        filenames: ['a'],
+        isEmpty: () => false,
+        length: () => 1
+    };
+
+    const fileActionsMock = {
+        getDownloadLink: () => 'http://a',
+        createDirectory: () => Promise.resolve(),
+        renameFile: () => Promise.resolve(),
+        deleteMultiple: () => Promise.resolve(),
+        movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
+    };
+
+    const renderFileOperations = (clipboard, fileActions, openedPath) => shallow(<FileOperations
+        classes={{}}
+        paste={() => Promise.resolve()}
+        files={[{filename: 'a'}]}
+        selectedPaths={['a']}
+        clipboard={clipboard}
+        fetchFilesIfNeeded={() => {}}
+        getDownloadLink={() => {}}
+        refreshFiles={refreshFiles}
+        clearSelection={clearSelection}
+        fileActions={fileActions}
+        openedPath={openedPath}
+    />);
+
     beforeEach(() => {
         clearSelection.mockReset();
         refreshFiles.mockReset();
 
-        const clipboardMock = {
-            method: CUT,
-            filenames: ['a'],
-            isEmpty: () => false,
-            length: () => 1
-        };
-
-        const fileActionsMock = {
-            getDownloadLink: () => 'http://a',
-            createDirectory: () => Promise.resolve(),
-            renameFile: () => Promise.resolve(),
-            deleteMultiple: () => Promise.resolve(),
-            movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
-        };
-
-        wrapper = shallow(<FileOperations
-            classes={{}}
-            paste={() => Promise.resolve()}
-            files={[{filename: 'a'}]}
-            selectedPaths={['a']}
-            clipboard={clipboardMock}
-            fetchFilesIfNeeded={() => {}}
-            getDownloadLink={() => {}}
-            refreshFiles={refreshFiles}
-            clearSelection={clearSelection}
-            fileActions={fileActionsMock}
-        />);
+        wrapper = renderFileOperations(clipboardMock, fileActionsMock);
 
         clickHandler = ariaLabel => wrapper.find('[aria-label="' + ariaLabel + '"]').prop("onClick");
     });
@@ -91,4 +94,56 @@ describe('FileOperations', () => {
             })
         );
     });
+
+    describe('paste button', () => {
+        it('should be disabled if clipboard is empty', () => {
+            const emptyClipboard = {
+                method: CUT,
+                filenames: [],
+                isEmpty: () => true,
+                length: () => 0
+            };
+
+            wrapper = renderFileOperations(emptyClipboard, fileActionsMock);
+            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(true);
+        });
+        it('should be disabled if the clipboard contains files cut from the current directory', () => {
+            const openedPath = '/subdirectory';
+            const currentDirClipboard = {
+                method: CUT,
+                filenames: ['/subdirectory/test.txt'],
+                isEmpty: () => false,
+                length: () => 1
+            };
+
+            wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
+            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(true);
+        });
+        it('should be enabled if the clipboard contains files cut from the other directory', () => {
+            const openedPath = '/other-directory';
+            const currentDirClipboard = {
+                method: CUT,
+                filenames: ['/subdirectory/test.txt'],
+                isEmpty: () => false,
+                length: () => 1
+            };
+
+            wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
+            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
+        });
+        it('should be enabled if the clipboard contains files copied from the current directory', () => {
+            const openedPath = '/subdirectory';
+            const currentDirClipboard = {
+                method: COPY,
+                filenames: ['/subdirectory/test.txt'],
+                isEmpty: () => false,
+                length: () => 1
+            };
+
+            wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
+            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
+        });
+
+    });
+
 });
