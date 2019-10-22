@@ -8,7 +8,7 @@ export const UPLOAD_STATUS_FINISHED = 'FINISHED';
 
 export const UploadsContext = React.createContext({});
 
-export const UploadsProvider = ({children}) => {
+export const UploadsProvider = ({children, fileApi = FileAPI}) => {
     const [uploads, setUploads] = useState([]);
 
     const updateSpecificUpload = (selected, updateFunc) => setUploads(
@@ -26,7 +26,6 @@ export const UploadsProvider = ({children}) => {
         upload => ({...upload, status: newState})
     );
 
-    const getUploadsForPath = path => uploads.filter(upload => upload.destinationPath === path);
     const enqueueUploads = newUploads => setUploads(
         currentUploads => [
             ...currentUploads,
@@ -40,16 +39,17 @@ export const UploadsProvider = ({children}) => {
             u => ({...u, progress: (progressEvent.loaded * 100) / progressEvent.total})
         );
         setStateForUpload(upload, UPLOAD_STATUS_IN_PROGRESS);
-        return FileAPI.upload(upload, onUploadProgress)
+        return fileApi.upload(upload, onUploadProgress)
             .then(() => setStateForUpload(upload, UPLOAD_STATUS_FINISHED))
             .catch(() => setStateForUpload(upload, UPLOAD_STATUS_ERROR));
-    }
+    };
+
+    const getUploads = () => uploads;
 
     return (
         <UploadsContext.Provider
             value={{
-                uploads,
-                getUploadsForPath,
+                getUploads,
                 enqueueUploads,
                 startUpload
             }}

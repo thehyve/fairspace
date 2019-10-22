@@ -7,7 +7,9 @@ import UploadsContext, {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsC
  *
  * Information about uploaded files is stored in redux
  */
-export const disconnectedUseUploads = (path, existingFilenames, uploads, enqueueUploads, startUpload) => {
+export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqueueUploads, startUpload) => {
+    const uploads = allUploads.filter(upload => upload.destinationPath === path);
+
     // Create a list of used filenames, including the current uploads
     const usedFilenames = existingFilenames.concat(uploads.map(upload => upload.destinationFilename));
 
@@ -31,10 +33,9 @@ export const disconnectedUseUploads = (path, existingFilenames, uploads, enqueue
 };
 
 const useUploads = (path, existingFilenames = []) => {
-    const {getUploadsForPath, enqueueUploads, startUpload} = useContext(UploadsContext);
-    const uploads = getUploadsForPath(path);
+    const {getUploads, enqueueUploads, startUpload} = useContext(UploadsContext);
 
-    return disconnectedUseUploads(path, existingFilenames, uploads, enqueueUploads, startUpload);
+    return disconnectedUseUploads(path, existingFilenames, getUploads(), enqueueUploads, startUpload);
 };
 
 export default useUploads;

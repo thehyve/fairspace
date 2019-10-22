@@ -57,7 +57,7 @@ describe('useUploads', () => {
     });
 
     it('should resolve naming conflicts with previous uploads', () => {
-        const uploads = testUseUploads('/', [], [{destinationFilename: 'test.txt'}], enqueueUploads, startUpload);
+        const uploads = testUseUploads('/', [], [{destinationPath: '/', destinationFilename: 'test.txt'}], enqueueUploads, startUpload);
 
         uploads.enqueue([{name: 'test.txt'}]);
 
@@ -71,5 +71,30 @@ describe('useUploads', () => {
                 }
             ])
         );
+    });
+
+    it('should only work on uploads in the given path', () => {
+        const allUploads = [
+            {
+                destinationPath: '/test',
+                file: {name: 'not-included.txt'}
+            },
+            {
+                destinationPath: '/',
+                file: {name: 'included.txt'}
+            },
+            {
+                destinationPath: '/subdirectory/',
+                file: {name: 'not-included.txt'}
+            },
+        ];
+        const uploads = testUseUploads('/', [], allUploads, enqueueUploads, startUpload);
+
+        expect(uploads.uploads).toEqual([
+            {
+                destinationPath: '/',
+                file: {name: 'included.txt'}
+            }
+        ]);
     });
 });
