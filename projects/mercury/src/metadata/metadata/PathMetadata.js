@@ -22,7 +22,7 @@ const PathMetadata = ({
 
     // Parse stat data
     const fileProps = data && data.props;
-    const subject = data && data.props && data.props.iri;
+    const subject = fileProps && fileProps.iri;
 
     if (!subject || !fileProps) {
         return (<div>No metadata found</div>);
