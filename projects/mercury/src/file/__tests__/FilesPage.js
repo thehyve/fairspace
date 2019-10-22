@@ -1,12 +1,8 @@
 import React from 'react';
-import {shallow, mount} from "enzyme";
-import {MemoryRouter} from "react-router-dom";
-import {Provider} from "react-redux";
-import configureStore from 'redux-mock-store';
+import {shallow} from "enzyme";
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
-import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 function shallowRender(history, openedPath) {
     const openedCollection = {

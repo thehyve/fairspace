@@ -7,7 +7,7 @@ import {joinPaths} from "../common/utils/fileUtils";
  * This hook contains logic about files for a certain directory.
  */
 export const useFiles = (path) => {
-    const {loading, error, data, refresh} = useAsync(useCallback(
+    const {loading, error, data = [], refresh} = useAsync(useCallback(
         () => FileAPI.list(path), [path]
     ));
 
@@ -20,7 +20,7 @@ export const useFiles = (path) => {
         return FileAPI
             .move(from, to)
             .then(refresh);
-    }
+    };
 
     const createDirectory = directoryPath => FileAPI
         .createDirectory(directoryPath)

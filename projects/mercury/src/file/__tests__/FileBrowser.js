@@ -4,9 +4,8 @@ import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
-import {FileBrowser} from '../FileBrowser';
+import {DisconnectedFileBrowser} from '../FileBrowser';
 import {UploadsProvider} from "../../common/contexts/UploadsContext";
-import {CUT} from "../../constants";
 
 afterEach(cleanup);
 
@@ -17,13 +16,6 @@ const store = mockStore({
         selectedPaths: []
     },
 });
-
-const initialProps = {
-    refreshFiles: () => {},
-    history: {
-        listen: () => {}
-    }
-};
 
 const openedCollection = {
     iri: "http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0",
@@ -48,11 +40,12 @@ const openedCollection = {
     }
 };
 
-const clipboardMock = {
-    method: CUT,
-    filenames: ['a'],
-    isEmpty: () => false,
-    length: () => 1
+const initialProps = {
+    openedPath: '/',
+    history: {
+        listen: () => {}
+    },
+    files: ['a']
 };
 
 const fileActionsMock = {
@@ -74,7 +67,7 @@ describe('FileBrowser', () => {
 
     it('renders proper view', () => {
         const {queryByTestId} = renderWithProviders(
-            <FileBrowser
+            <DisconnectedFileBrowser
                 openedCollection={openedCollection}
                 fileActions={fileActionsMock}
                 {...initialProps}
@@ -93,7 +86,7 @@ describe('FileBrowser', () => {
 
     it('show error when no open collection is provided', () => {
         const {getByText} = renderWithProviders(
-            <FileBrowser
+            <DisconnectedFileBrowser
                 {...initialProps}
             />
         );
@@ -104,7 +97,7 @@ describe('FileBrowser', () => {
 
     it('show no open collection error when no collection is provided even when another error is given', () => {
         const {getByText} = renderWithProviders(
-            <FileBrowser
+            <DisconnectedFileBrowser
                 {...initialProps}
                 error="some error"
             />
@@ -116,7 +109,7 @@ describe('FileBrowser', () => {
 
     it('show error when when an error messsage is given', () => {
         const {getByText} = renderWithProviders(
-            <FileBrowser
+            <DisconnectedFileBrowser
                 {...initialProps}
                 openedCollection={openedCollection}
                 error="some error"
@@ -131,7 +124,7 @@ describe('FileBrowser', () => {
         const cleanupFn = jest.fn();
 
         const {unmount} = renderWithProviders(
-            <FileBrowser
+            <DisconnectedFileBrowser
                 {...initialProps}
                 history={{
                     listen: () => cleanupFn

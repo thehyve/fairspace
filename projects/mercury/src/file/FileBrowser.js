@@ -11,19 +11,20 @@ import useSelection from "./UseSelection";
 import UploadList from "./UploadList";
 import useUploads from "./UseUploads";
 import {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
+import {useFiles} from "./UseFiles";
 
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
 
-export const FileBrowser = ({
+export const DisconnectedFileBrowser = ({
     history,
-    files = [],
     openedCollection,
     openedPath,
-    refreshFiles = () => {},
-    fileActions = {},
+    files = [],
     loading = false,
-    error = false
+    error = false,
+    refreshFiles = () => {},
+    fileActions = {}
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
     const {select, selectAll, deselectAll, toggle, isSelected, selected} = useSelection(files.map(f => f.filename));
@@ -141,4 +142,16 @@ export const FileBrowser = ({
     );
 };
 
-export default withRouter(FileBrowser);
+export default withRouter(({openedPath, ...props}) => {
+    const {files, loading, error, refresh, fileActions} = useFiles(openedPath);
+    return (
+        <DisconnectedFileBrowser
+            files={files}
+            loading={loading}
+            error={error}
+            refreshFiles={refresh}
+            fileActions={fileActions}
+            {...props}
+        />
+    );
+});
