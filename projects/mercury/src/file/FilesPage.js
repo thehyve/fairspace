@@ -14,6 +14,7 @@ import CollectionBreadcrumbsContextProvider from "../collections/CollectionBread
 
 export const FilesPage = ({
     openedCollection, fetchCollectionsIfNeeded,
+    collectionsLoading, collectionsError,
     openedPath, history
 }) => {
     // Determine breadcrumbs. If a collection is opened, show the full path
@@ -50,6 +51,8 @@ export const FilesPage = ({
                     <FileBrowser
                         openedCollection={openedCollection}
                         openedPath={openedPath}
+                        collectionsLoading={collectionsLoading}
+                        collectionsError={collectionsError}
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
@@ -66,6 +69,8 @@ const mapStateToProps = (state, ownProps) => {
     const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === collectionLocation)) || {};
 
     return {
+        collectionsLoading: state.cache.collections.pending,
+        collectionsError: state.cache.collections.error,
         openedCollection: collection,
         openedPath
     };

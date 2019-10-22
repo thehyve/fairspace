@@ -19,6 +19,8 @@ const TAB_UPLOAD = 'UPLOAD';
 export const DisconnectedFileBrowser = ({
     history,
     openedCollection,
+    collectionsLoading = false,
+    collectionsError = false,
     openedPath,
     files = [],
     loading = false,
@@ -65,7 +67,7 @@ export const DisconnectedFileBrowser = ({
         }
     };
 
-    if (loading) {
+    if (loading || collectionsLoading) {
         return <LoadingInlay />;
     }
 
@@ -80,7 +82,7 @@ export const DisconnectedFileBrowser = ({
         );
     }
 
-    if (error) {
+    if (error || collectionsError) {
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
