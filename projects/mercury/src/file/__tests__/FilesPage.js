@@ -3,9 +3,11 @@ import configureStore from 'redux-mock-store';
 import {MemoryRouter} from "react-router-dom";
 import {Provider} from "react-redux";
 import {mount, shallow} from "enzyme";
+import {act} from 'react-dom/test-utils';
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
+import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 function shallowRender(history, openedPath) {
     const openedCollection = {
@@ -25,7 +27,7 @@ function shallowRender(history, openedPath) {
 }
 
 describe('FilesPage', () => {
-    it('fetches collections once on render', () => {
+    it('fetches collections once on render', async () => {
         const fetchCollectionsIfNeeded = jest.fn();
         const mockStore = configureStore();
         const store = mockStore({
@@ -40,18 +42,29 @@ describe('FilesPage', () => {
             uploads: []
         });
 
-        mount((
-            <MemoryRouter>
-                <Provider store={store}>
-                    <FilesPage
-                        fetchFilesIfNeeded={() => {}}
-                        openedPath="''"
-                        openedCollection={{}}
-                        fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
-                    />
-                </Provider>
-            </MemoryRouter>
-        ));
+        const fileApi = {
+            list: () => Promise.resolve([])
+        };
+
+        // Awaiting the render is needed because some of the state updates
+        // only happen after an asynchronous call. See https://github.com/facebook/react/issues/15379
+        await act(async () => {
+            mount((
+                <MemoryRouter>
+                    <Provider store={store}>
+                        <UploadsProvider>
+                            <FilesPage
+                                fetchFilesIfNeeded={() => {}}
+                                openedPath="''"
+                                openedCollection={{}}
+                                fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
+                                fileApi={fileApi}
+                            />
+                        </UploadsProvider>
+                    </Provider>
+                </MemoryRouter>
+            ));
+        });
 
         expect(fetchCollectionsIfNeeded).toHaveBeenCalledTimes(1);
     });

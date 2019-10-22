@@ -6,35 +6,35 @@ import {joinPaths} from "../common/utils/fileUtils";
 /**
  * This hook contains logic about files for a certain directory.
  */
-export const useFiles = (path) => {
+export const useFiles = (path, fileApi = FileAPI) => {
     const {loading, error, data = [], refresh} = useAsync(useCallback(
-        () => FileAPI.list(path), [path]
+        () => fileApi.list(path), [path, fileApi]
     ));
 
-    const {getDownloadLink} = FileAPI;
+    const {getDownloadLink} = fileApi;
 
     const renameFile = (currentFilename, newFilename) => {
         const from = joinPaths(path, currentFilename);
         const to = joinPaths(path, newFilename);
 
-        return FileAPI
+        return fileApi
             .move(from, to)
             .then(refresh);
     };
 
-    const createDirectory = directoryPath => FileAPI
+    const createDirectory = directoryPath => fileApi
         .createDirectory(directoryPath)
         .then(refresh);
 
-    const deleteMultiple = paths => FileAPI
+    const deleteMultiple = paths => fileApi
         .deleteMultiple(paths)
         .then(refresh);
 
-    const movePaths = paths => FileAPI
+    const movePaths = paths => fileApi
         .movePaths(paths, path)
         .then(refresh);
 
-    const copyPaths = paths => FileAPI
+    const copyPaths = paths => fileApi
         .copyPaths(paths, path)
         .then(refresh);
 

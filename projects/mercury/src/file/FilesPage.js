@@ -15,7 +15,7 @@ import CollectionBreadcrumbsContextProvider from "../collections/CollectionBread
 export const FilesPage = ({
     openedCollection, fetchCollectionsIfNeeded,
     collectionsLoading, collectionsError,
-    openedPath, history
+    openedPath, history, fileApi
 }) => {
     // Determine breadcrumbs. If a collection is opened, show the full path
     // Otherwise, show a temporary breadcrumb
@@ -53,6 +53,7 @@ export const FilesPage = ({
                         openedPath={openedPath}
                         collectionsLoading={collectionsLoading}
                         collectionsError={collectionsError}
+                        fileApi={fileApi}
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>

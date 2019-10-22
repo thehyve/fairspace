@@ -144,8 +144,8 @@ export const DisconnectedFileBrowser = ({
     );
 };
 
-export default withRouter(({openedPath, ...props}) => {
-    const {files, loading, error, refresh, fileActions} = useFiles(openedPath);
+export default withRouter(({openedPath, fileApi, ...props}) => {
+    const {files, loading, error, refresh, fileActions} = useFiles(openedPath, fileApi);
     return (
         <DisconnectedFileBrowser
             files={files}
@@ -153,6 +153,8 @@ export default withRouter(({openedPath, ...props}) => {
             error={error}
             refreshFiles={refresh}
             fileActions={fileActions}
+            openedPath={openedPath}
+            fileApi={fileApi}
             {...props}
         />
     );
