@@ -15,7 +15,6 @@ import theme from './App.theme';
 import Menu from "./common/components/Menu";
 import Routes from "./routes/Routes";
 import WorkspaceTopBar from "./common/components/WorkspaceTopBar";
-import {ClipboardProvider} from "./common/contexts/ClipboardContext";
 import {UploadsProvider} from "./common/contexts/UploadsContext";
 
 const App = () => {
@@ -46,27 +45,25 @@ const App = () => {
                 >
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <MuiThemeProvider theme={theme}>
-                            <ClipboardProvider>
-                                <UploadsProvider>
-                                    <Provider store={store}>
-                                        <ErrorDialog>
-                                            <Router>
-                                                <Layout
-                                                    requiredAuthorization={requiredRole}
-                                                    renderMenu={() => <Menu />}
-                                                    renderMain={() => (
-                                                        <UsersProvider url={users}>
-                                                            <Routes />
-                                                        </UsersProvider>
-                                                    )}
-                                                    renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                                    renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                                />
-                                            </Router>
-                                        </ErrorDialog>
-                                    </Provider>
-                                </UploadsProvider>
-                            </ClipboardProvider>
+                            <UploadsProvider>
+                                <Provider store={store}>
+                                    <ErrorDialog>
+                                        <Router>
+                                            <Layout
+                                                requiredAuthorization={requiredRole}
+                                                renderMenu={() => <Menu />}
+                                                renderMain={() => (
+                                                    <UsersProvider url={users}>
+                                                        <Routes />
+                                                    </UsersProvider>
+                                                )}
+                                                renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                                renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                            />
+                                        </Router>
+                                    </ErrorDialog>
+                                </Provider>
+                            </UploadsProvider>
                         </MuiThemeProvider>
                     </MuiPickersUtilsProvider>
                 </LogoutContextProvider>

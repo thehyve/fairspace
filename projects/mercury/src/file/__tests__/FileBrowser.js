@@ -1,12 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {render, cleanup, fireEvent} from '@testing-library/react';
+import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
 import {FileBrowser} from '../FileBrowser';
 import {UploadsProvider} from "../../common/contexts/UploadsContext";
-import ClipboardContext from '../../common/contexts/ClipboardContext';
 import {CUT} from "../../constants";
 
 afterEach(cleanup);
@@ -68,9 +67,7 @@ describe('FileBrowser', () => {
     const renderWithProviders = children => render(
         <Provider store={store}>
             <UploadsProvider>
-                <ClipboardContext.Provider value={clipboardMock}>
-                    {children}
-                </ClipboardContext.Provider>
+                {children}
             </UploadsProvider>
         </Provider>
     );
