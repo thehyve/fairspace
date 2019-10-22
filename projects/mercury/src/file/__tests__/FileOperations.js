@@ -72,13 +72,13 @@ describe('FileOperations', () => {
             });
     });
 
-    it('should clear selection and refresh files after all successful file operations', async () => {
+    it('should clear selection and refresh files after all successful file operations', () => {
         const createDir = () => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir");
         const renameFile = () => wrapper.find('RenameButton').prop("onRename")("new-name");
         const deleteFile = () => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")();
         const paste = () => clickHandler('Paste')({stopPropagation: () => {}});
 
-        await Promise.all(
+        return Promise.all(
             [createDir, renameFile, deleteFile, paste].map(op => {
                 refreshFiles.mockReset();
                 clearSelection.mockReset();
@@ -143,7 +143,6 @@ describe('FileOperations', () => {
             wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
             expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
         });
-
     });
 
 });

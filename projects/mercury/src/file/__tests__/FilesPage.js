@@ -1,5 +1,8 @@
 import React from 'react';
-import {shallow} from "enzyme";
+import configureStore from 'redux-mock-store';
+import {MemoryRouter} from "react-router-dom";
+import {Provider} from "react-redux";
+import {mount, shallow} from "enzyme";
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
@@ -22,6 +25,37 @@ function shallowRender(history, openedPath) {
 }
 
 describe('FilesPage', () => {
+    it('fetches collections once on render', () => {
+        const fetchCollectionsIfNeeded = jest.fn();
+        const mockStore = configureStore();
+        const store = mockStore({
+            cache: {
+                collections: {
+                    data: [],
+                }
+            },
+            collectionBrowser: {
+                selectedPaths: []
+            },
+            uploads: []
+        });
+
+        mount((
+            <MemoryRouter>
+                <Provider store={store}>
+                    <FilesPage
+                        fetchFilesIfNeeded={() => {}}
+                        openedPath="''"
+                        openedCollection={{}}
+                        fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
+                    />
+                </Provider>
+            </MemoryRouter>
+        ));
+
+        expect(fetchCollectionsIfNeeded).toHaveBeenCalledTimes(1);
+    });
+
     it('updates url after collection location has changed', () => {
         const history = [];
         const wrapper = shallowRender(history, 'location1/subdirectory/something-else');
