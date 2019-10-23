@@ -14,7 +14,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id  'com.github.spotbugs' version '1.6.10'
-    id "org.owasp.dependencycheck" version "5.0.0-M3.1"
+    id "org.owasp.dependencycheck" version "5.2.2"
 }
 
 group 'io.fairspace'
@@ -78,6 +78,10 @@ jacocoTestReport {
         xml.enabled false
         csv.enabled true
     }
+}
+
+dependencyCheck {
+    failBuildOnCVSS=9
 }
 
 apply plugin: 'com.github.spotbugs'
