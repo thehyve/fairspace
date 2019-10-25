@@ -37,6 +37,7 @@ export const FilesPage = ({
         if (preselectedFile) {
             selection.select(preselectedFile);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [preselectedFile]);
 
     // Determine breadcrumbs. If a collection is opened, show the full path

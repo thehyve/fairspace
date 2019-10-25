@@ -28,7 +28,7 @@ const styles = {
 // Exporting here to be able to test the component outside of Redux
 export const SearchPage = ({
     classes, location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
-    history, selectPath, deselectAllPaths, results, vocabulary, loading, error
+    history, results, vocabulary, loading, error
 }) => {
     useEffect(() => {
         fetchVocabularyIfNeeded();

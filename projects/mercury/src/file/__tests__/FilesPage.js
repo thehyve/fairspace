@@ -63,5 +63,4 @@ describe('FilesPage', () => {
         expect(history.length).toEqual(1);
         expect(history[0]).toEqual('/collections/new-location/');
     });
-
 });
