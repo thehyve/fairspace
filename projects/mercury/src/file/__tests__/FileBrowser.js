@@ -2,20 +2,10 @@
 import React from 'react';
 import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {Provider} from "react-redux";
-import configureStore from 'redux-mock-store';
 import {DisconnectedFileBrowser} from '../FileBrowser';
 import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 afterEach(cleanup);
-
-const mockStore = configureStore();
-
-const store = mockStore({
-    collectionBrowser: {
-        selectedPaths: []
-    },
-});
 
 const openedCollection = {
     iri: "http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0",
@@ -40,14 +30,6 @@ const openedCollection = {
     }
 };
 
-const initialProps = {
-    openedPath: '/',
-    history: {
-        listen: () => {}
-    },
-    files: ['a']
-};
-
 const fileActionsMock = {
     getDownloadLink: () => 'http://a',
     createDirectory: () => Promise.resolve(),
@@ -56,13 +38,25 @@ const fileActionsMock = {
     movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
 };
 
+const selectionMock = {
+    isSelected: () => false,
+    selected: []
+};
+
+const initialProps = {
+    openedPath: '/',
+    history: {
+        listen: () => {}
+    },
+    files: ['a'],
+    selection: selectionMock
+};
+
 describe('FileBrowser', () => {
     const renderWithProviders = children => render(
-        <Provider store={store}>
-            <UploadsProvider>
-                {children}
-            </UploadsProvider>
-        </Provider>
+        <UploadsProvider>
+            {children}
+        </UploadsProvider>
     );
 
     it('renders proper view', () => {

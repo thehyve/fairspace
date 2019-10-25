@@ -1,21 +1,22 @@
-import {useDispatch, useSelector} from "react-redux";
-import {deselectAllPaths, deselectPath, selectPath, selectPaths} from "../common/redux/actions/collectionBrowserActions";
+import {useState} from "react";
 
 /**
- * This hook contains logic about file path selections stored in redux
- *
- * TODO: Make this logic more generic to be reused in other places
+ * This hook contains logic about selections.
+ * @param allowMultiple Flag indicating whether multiple items can be selected at a time
  */
-const useSelection = (items) => {
-    const selected = useSelector(state => state.collectionBrowser.selectedPaths);
-    const dispatch = useDispatch();
+const useSelection = (allowMultiple) => {
+    const [selected, setSelected] = useState([]);
 
-    const select = item => dispatch(selectPath(item));
-    const deselect = item => dispatch(deselectPath(item));
-    const selectAll = () => dispatch(selectPaths(items));
-    const deselectAll = () => dispatch(deselectAllPaths());
+    const select = item => (
+        allowMultiple
+            ? setSelected(currentSelection => [...currentSelection, item])
+            : setSelected([item])
+    );
+    const deselect = item => setSelected(currentSelection => currentSelection.filter(el => el !== item));
     const isSelected = item => selected.some(el => el === item);
     const toggle = item => (isSelected(item) ? deselect(item) : select(item));
+    const selectAll = items => { if (allowMultiple) setSelected(items); };
+    const deselectAll = () => setSelected([]);
 
     return {
         select,
@@ -27,5 +28,9 @@ const useSelection = (items) => {
         selected
     };
 };
+
+// Convenience methods indicating the use of selection
+export const useSingleSelection = () => useSelection(false);
+export const useMultipleSelection = (items) => useSelection(true, items);
 
 export default useSelection;

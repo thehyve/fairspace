@@ -11,7 +11,6 @@ import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
 import {searchCollections} from '../common/redux/actions/searchActions';
 import * as vocabularyActions from '../common/redux/actions/vocabularyActions';
-import * as collectionBrowserActions from "../common/redux/actions/collectionBrowserActions";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
@@ -133,8 +132,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     performSearch: searchCollections,
     fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded,
-    selectPath: collectionBrowserActions.selectPath,
-    deselectAllPaths: collectionBrowserActions.deselectAllPaths
+    // TODO: fixme
+    // selectPath: collectionBrowserActions.selectPath,
+    // deselectAllPaths: collectionBrowserActions.deselectAllPaths
 };
 
 SearchPage.propTypes = {
