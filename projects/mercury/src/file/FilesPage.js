@@ -1,7 +1,8 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
+import queryString from "query-string";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
@@ -14,17 +15,29 @@ import {useMultipleSelection} from "./UseSelection";
 import {LoadingOverlay} from "../common/components";
 
 export const FilesPage = ({
-    match: {params},
+    match,
+    location,
     history,
     fileApi,
     collections = [],
     loading = false,
     error = false
 }) => {
-    const selection = useMultipleSelection();
-    const [busy, setBusy] = useState(false);
+    const {params} = match;
     const {collectionLocation, openedPath} = getPathInfoFromParams(params);
     const collection = collections.find(c => c.location === collectionLocation) || {};
+    const selection = useMultipleSelection();
+    const [busy, setBusy] = useState(false);
+
+    // Check whether a filename is specified in the url for selection
+    // If so, select it on first render
+    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
+
+    useEffect(() => {
+        if (preselectedFile) {
+            selection.select(preselectedFile);
+        }
+    }, [preselectedFile]);
 
     // Determine breadcrumbs. If a collection is opened, show the full path
     // Otherwise, show a temporary breadcrumb
@@ -38,13 +51,15 @@ export const FilesPage = ({
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
-    const handleCollectionLocationChange = (location) => {
+    const handleCollectionLocationChange = (newLocation) => {
         // If the collection location changes, the URI for the current page should change as well
-        history.push(`${getCollectionAbsolutePath(location)}${getDirectoryFromFullpath(openedPath)}`);
+        history.push(`${getCollectionAbsolutePath(newLocation)}${getDirectoryFromFullpath(openedPath)}`);
     };
 
     // Path for which metadata should be rendered
     const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
+
+    console.log("FilesPage", selection);
 
     return (
         <CollectionBreadcrumbsContextProvider>
@@ -54,6 +69,7 @@ export const FilesPage = ({
             <Grid container spacing={8}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <FileBrowser
+                        data-testid="file-browser"
                         openedCollection={collection}
                         openedPath={openedPath}
                         collectionsLoading={loading}
@@ -86,6 +102,6 @@ const ContextualFilesPage = (props) => {
             {...props}
         />
     );
-}
+};
 
 export default withRouter(ContextualFilesPage);

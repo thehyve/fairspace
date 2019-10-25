@@ -59,10 +59,9 @@ export const SearchPage = ({
      */
     const handleResultDoubleClick = (result) => {
         const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
+        const selectionQueryString = "?selection=" + encodeURIComponent('/' + result.filePath);
 
-        history.push(navigationPath);
-        deselectAllPaths();
-        selectPath('/' + result.filePath);
+        history.push(navigationPath + selectionQueryString);
     };
 
     if (loading) {
@@ -131,10 +130,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     performSearch: searchCollections,
-    fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded,
-    // TODO: fixme
-    // selectPath: collectionBrowserActions.selectPath,
-    // deselectAllPaths: collectionBrowserActions.deselectAllPaths
+    fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded
 };
 
 SearchPage.propTypes = {
