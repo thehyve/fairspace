@@ -11,6 +11,7 @@ import LinkedDataDropdownWithAddition from "../LinkedDataDropdownWithAddition";
 import LinkedDataDropdown from "../LinkedDataDropdown";
 import ReferringValue from "./ReferringValue";
 import ExternalLinkValue from "./ExternalLinkValue";
+import MarkdownValue from "./MarkdownValue";
 
 export const getInputComponent = (property) => {
     // If the property has a restricted set of allowed values
@@ -39,6 +40,8 @@ export const getInputComponent = (property) => {
     switch (property.datatype) {
         case constants.STRING_URI:
             return StringValue;
+        case constants.MARKDOWN_URI:
+            return MarkdownValue;
         case constants.INTEGER_URI:
         case constants.DECIMAL_URI:
         case constants.LONG_URI:
