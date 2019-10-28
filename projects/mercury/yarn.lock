@@ -1012,9 +1012,9 @@
   integrity sha512-6PYY5DVdAY1ifaQW6XYTnOMihmBVT27elqSjEoodchsGjzYlEsTQMcEhSud99kVawatyTZRTiVkJ/c6lwbQ7nA==
 
 "@fairspace/shared-frontend@^0.1.46":
-  version "0.1.46"
-  resolved "https://dl.bintray.com//thehyve/fairspace-npm/fairspace-shared-frontend-v0.1.46.tgz#85aadf4bc4ddbb7172d4f41955dfe529324b80cf"
-  integrity sha1-harfS8Tdu3Fy1PQZVd/lKTJLgM8=
+  version "0.1.47"
+  resolved "https://dl.bintray.com//thehyve/fairspace-npm/fairspace-shared-frontend-v0.1.47.tgz#9bc1bbbd85d4dda59f7fe3fe33a2c15f9ffe7ddf"
+  integrity sha1-m8G7vYXU3aWff+P+M6LBX5/+fd8=
   dependencies:
     "@babel/runtime" "^7.6.3"
     "@material-ui/core" "^3.9.3"
