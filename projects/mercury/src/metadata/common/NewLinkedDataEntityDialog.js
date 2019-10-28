@@ -47,7 +47,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         validateAll, validationErrors, isValid,
         hasFormUpdates
     } = useFormData({});
-    const {showCloseConfirmation, setShowCloseConfirmation} = useNavigationBlocker(hasFormUpdates);
+    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
@@ -67,7 +67,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const handleCloseDialog = (e) => {
         if (e) e.stopPropagation();
         if (hasFormUpdates) {
-            setShowCloseConfirmation(true);
+            showConfirmation();
         } else {
             onClose();
         }
@@ -153,7 +153,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     </Button>
                 </DialogActions>
             </Dialog>
-            {showCloseConfirmation && (
+            {confirmationShown && (
                 <ConfirmationDialog
                     open
                     title="Close form"
@@ -161,7 +161,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     agreeButtonText="Close form"
                     disagreeButtonText="Go back to form"
                     onAgree={() => onClose()}
-                    onDisagree={() => setShowCloseConfirmation(false)}
+                    onDisagree={hideConfirmation}
                 />
             )}
         </>

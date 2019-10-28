@@ -34,7 +34,7 @@ describe('UseFormSubmission', () => {
         expect(window.addEventListener).not.toHaveBeenCalledWith('beforeunload', expect.anything());
     });
 
-    it('returns showCloseConfirmation as true when there are pending changes', () => {
+    it('returns confirmation shown as true when there are pending changes', () => {
         const {result} = renderHook(() => useNavigationBlocker(true), {
             wrapper: ({children}) => (
                 <MemoryRouter>
@@ -45,10 +45,10 @@ describe('UseFormSubmission', () => {
             )
         });
 
-        expect(result.current.showCloseConfirmation).toBe(true);
+        expect(result.current.confirmationShown).toBe(true);
     });
 
-    it('changes showCloseConfirmation to false after "executeNavigation"', () => {
+    it('changes confirmation shown to false after "executeNavigation"', () => {
         const {result} = renderHook(() => useNavigationBlocker(true), {
             wrapper: ({children}) => (
                 <MemoryRouter>
@@ -59,12 +59,12 @@ describe('UseFormSubmission', () => {
             )
         });
 
-        expect(result.current.showCloseConfirmation).toBe(true);
+        expect(result.current.confirmationShown).toBe(true);
 
         act(() => {
             result.current.executeNavigation();
         });
 
-        expect(result.current.showCloseConfirmation).toBe(false);
+        expect(result.current.confirmationShown).toBe(false);
     });
 });

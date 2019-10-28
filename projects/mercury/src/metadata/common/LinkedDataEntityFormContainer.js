@@ -29,7 +29,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     );
 
     const {
-        showCloseConfirmation, setShowCloseConfirmation, executeNavigation
+        confirmationShown, hideConfirmation, executeNavigation
     } = useNavigationBlocker(hasFormUpdates);
 
     const canEdit = isEntityEditable && hasEditRight;
@@ -85,7 +85,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                     {footer && <Grid item>{footer}</Grid>}
                 </Grid>
             </FormContext.Provider>
-            {showCloseConfirmation && (
+            {confirmationShown && (
                 <ConfirmationDialog
                     open
                     title="Unsaved changes"
@@ -94,7 +94,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                     agreeButtonText="Navigate"
                     disagreeButtonText="Go back to form"
                     onAgree={() => executeNavigation()}
-                    onDisagree={() => setShowCloseConfirmation(false)}
+                    onDisagree={hideConfirmation}
                 />
             )}
         </>

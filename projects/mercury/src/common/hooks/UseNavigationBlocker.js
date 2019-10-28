@@ -66,8 +66,19 @@ const UseNavigationBlocker = (hasPendingChanges) => {
         }
     };
 
+    const hideConfirmation = () => {
+        setShowCloseConfirmation(false);
+    };
+
+    const showConfirmation = () => {
+        setShowCloseConfirmation(true);
+    };
+
     return {
-        showCloseConfirmation, setShowCloseConfirmation, executeNavigation
+        confirmationShown: showCloseConfirmation,
+        hideConfirmation,
+        showConfirmation,
+        executeNavigation,
     };
 };
 
