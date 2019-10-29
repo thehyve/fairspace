@@ -212,7 +212,7 @@ export const vocabularyUtils = (vocabulary = []) => {
     const generatePropertyEntry = (predicate, shape) => {
         const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
         const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
-        const multiLine = datatype === constants.STRING_URI && !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false);
+        const multiLine = (datatype === constants.STRING_URI && !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false)) || datatype === constants.MARKDOWN_URI;
         const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
         const path = getFirstPredicateId(shape, constants.SHACL_PATH);
         const shapeIsRelationShape = isRelationShape(shape);

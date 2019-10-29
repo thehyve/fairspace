@@ -342,7 +342,7 @@ fs:ImportantPropertyShape a sh:PropertyShape ;
 fs:DatatypeShape a sh:PropertyShape ;
     sh:path sh:datatype ;
     # direct controlled vocabulary approach
-    sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean )  ;
+    sh:in ( xsd:string xsd:integer xsd:date xsd:dateTime xsd:long xsd:boolean fs:markdown )  ;
     sh:name "Datatype" ;
     fs:importantProperty true ;
     sh:maxCount 1 ;
