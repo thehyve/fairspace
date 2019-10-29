@@ -135,6 +135,7 @@ fs:CollectionShape sh:property
         <dateWidgetShape>,
         <dateTimeWidgetShape>,
         <multiLineStringWidgetShape>,
+        <markdownWidgetShape>,
         <integerLongWidgetShape>,
         <integerWidgetShape>,
         <booleanWidgetShape>,
@@ -169,6 +170,14 @@ fs:CollectionShape sh:property
     sh:datatype xsd:string ;
     sh:maxLength 500 ;
     sh:path <multiLineStringWidget> .
+
+<markdownWidget> a rdf:Property .
+<markdownWidgetShape> a fs:DatatypePropertyShape ;
+    sh:name "Markdown string" ;
+    sh:description "Provides markdown capabilities to a textfield" ;
+    sh:datatype fs:markdown ;
+    sh:maxCount 1 ;
+    sh:path <markdownWidget> .
 
 <integerLongWidget> a rdf:Property .
 <integerLongWidgetShape> a fs:DatatypePropertyShape ;

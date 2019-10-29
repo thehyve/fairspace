@@ -26,9 +26,8 @@ public class SaturnSparkFilter extends SparkFilter {
             } catch (ServletException e) {
                 throw new RuntimeException(e);
             }
-            applyPerformanceMeasuring();
         });
-
+        applyPerformanceMeasuring();
     }
 
     @Override
