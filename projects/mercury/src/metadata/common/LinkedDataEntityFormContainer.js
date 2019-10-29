@@ -1,6 +1,7 @@
 import React, {useContext} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid} from "@material-ui/core";
+import {ConfirmationDialog} from '@fairspace/shared-frontend';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useLinkedData from '../UseLinkedData';
@@ -8,6 +9,7 @@ import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
 import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
+import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 
 const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
@@ -25,6 +27,10 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
             .then(() => clearForm()),
         subject
     );
+
+    const {
+        confirmationShown, hideConfirmation, executeNavigation
+    } = useNavigationBlocker(hasFormUpdates);
 
     const canEdit = isEntityEditable && hasEditRight;
 
@@ -58,26 +64,40 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
     }
 
     return (
-        <FormContext.Provider value={{submit: validateAndSubmit}}>
-            <Grid container>
-                <Grid item xs={12}>
-                    <LinkedDataEntityForm
-                        {...otherProps}
-                        id={formId}
-                        onSubmit={validateAndSubmit}
-                        error={linkedDataError}
-                        loading={linkedDataLoading}
-                        properties={extendedProperties}
-                        values={valuesWithUpdates}
-                        validationErrors={validationErrors}
-                        onAdd={addValue}
-                        onChange={updateValue}
-                        onDelete={deleteValue}
-                    />
+        <>
+            <FormContext.Provider value={{submit: validateAndSubmit}}>
+                <Grid container>
+                    <Grid item xs={12}>
+                        <LinkedDataEntityForm
+                            {...otherProps}
+                            id={formId}
+                            onSubmit={validateAndSubmit}
+                            error={linkedDataError}
+                            loading={linkedDataLoading}
+                            properties={extendedProperties}
+                            values={valuesWithUpdates}
+                            validationErrors={validationErrors}
+                            onAdd={addValue}
+                            onChange={updateValue}
+                            onDelete={deleteValue}
+                        />
+                    </Grid>
+                    {footer && <Grid item>{footer}</Grid>}
                 </Grid>
-                {footer && <Grid item>{footer}</Grid>}
-            </Grid>
-        </FormContext.Provider>
+            </FormContext.Provider>
+            {confirmationShown && (
+                <ConfirmationDialog
+                    open
+                    title="Unsaved changes"
+                    content={'You have unsaved changes, are you sure you want to navigate away?'
+                        + ' Your pending changes will be lost.'}
+                    agreeButtonText="Navigate"
+                    disagreeButtonText="Go back to form"
+                    onAgree={() => executeNavigation()}
+                    onDisagree={hideConfirmation}
+                />
+            )}
+        </>
     );
 };
 

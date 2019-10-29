@@ -67,6 +67,7 @@ export const TIME_URI = XMLSCHEMA_NS + 'time';
 export const INTEGER_URI = XMLSCHEMA_NS + 'integer';
 export const LONG_URI = XMLSCHEMA_NS + 'long';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
+export const MARKDOWN_URI = FAIRSPACE_NS + 'markdown';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
 export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
