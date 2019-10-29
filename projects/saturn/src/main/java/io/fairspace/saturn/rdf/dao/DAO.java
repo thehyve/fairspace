@@ -39,7 +39,6 @@ import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.apache.jena.system.Txn.calculateWrite;
 import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
 /**
@@ -90,6 +89,7 @@ public class DAO implements Transactional {
      * Writes (creates or updates) an entity.
      * This method can modify the entity passed as an argument. It it has no IRI it will be automatically assigned.
      * This method also updates the relevant fields of LifecycleAwarePersistentEntity
+     *
      * @param entity
      * @param <T>
      * @return the entity passed as an argument
@@ -137,6 +137,7 @@ public class DAO implements Transactional {
 
     /**
      * Reads an entity
+     *
      * @param type
      * @param iri
      * @param <T>
@@ -149,6 +150,7 @@ public class DAO implements Transactional {
 
     /**
      * Deletes an entity
+     *
      * @param entity
      */
     public void delete(PersistentEntity entity) {
@@ -157,6 +159,7 @@ public class DAO implements Transactional {
 
     /**
      * Deletes an entity
+     *
      * @param iri
      */
     public void delete(Node iri) {
@@ -165,23 +168,24 @@ public class DAO implements Transactional {
 
     /**
      * Marks an entity as deleted and updates its dateDeleted and deletedBy fields
+     *
      * @param entity
      * @return the entity passed as an argument if no entity was found or it was already marked as deleted
      */
     public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
-        return calculateWrite(rdf, () -> {
-            var existing = (T) read(entity.getClass(), entity.getIri());
-            if (existing != null) {
-                existing.setDateDeleted(now());
-                existing.setDeletedBy(userIriSupplier.get());
-                return write(existing);
-            }
-            return null;
-        });
+        var existing = (T) read(entity.getClass(), entity.getIri());
+        if (existing != null) {
+            existing.setDateDeleted(now());
+            existing.setDeletedBy(userIriSupplier.get());
+            return write(existing);
+        }
+        return null;
+
     }
 
     /**
      * Lists entities of a specific type (except to marked as deleted)
+     *
      * @param type
      * @param <T>
      * @return
@@ -193,6 +197,7 @@ public class DAO implements Transactional {
     /**
      * Execustes a SPARQL CONSTRUCT query and lists entities of a specific type (except to marked as deleted)
      * in the resulting model
+     *
      * @param type
      * @param query
      * @param <T>

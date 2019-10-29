@@ -58,7 +58,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
+        commit("Store metadata", () -> update(EMPTY_MODEL, model));
         eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
@@ -68,7 +68,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if(commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject))) {
+        if(commit("Mark <" + subject + "> as deleted", () -> lifeCycleManager.softDelete(subject))) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
@@ -84,7 +84,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
+        commit("Delete metadata", () -> update(model, EMPTY_MODEL));
         eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
@@ -103,7 +103,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        commit("Update metadata", rdf, () -> {
+        commit("Update metadata", () -> {
             var toDelete = createDefaultModel();
             model.listStatements().forEachRemaining(stmt -> {
                 // Only explicitly delete triples for URI resources. As this model is also used

@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
@@ -143,7 +143,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        withCommitMessage("Generate an IRI for an external resource", () ->
+        commit("Generate an IRI for an external resource", () ->
                 rdf.update(storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }

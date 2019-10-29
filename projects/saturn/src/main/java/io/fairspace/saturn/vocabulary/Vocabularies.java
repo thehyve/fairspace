@@ -20,7 +20,7 @@ public class Vocabularies {
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
     public static void initVocabularies(RDFConnection rdf) {
-        commit("Initializing the vocabularies", rdf, () -> {
+        commit("Initializing the vocabularies", () -> {
             rdf.put(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
 
             var oldSystemVocabulary = rdf.fetch(SYSTEM_VOCABULARY_GRAPH_BACKUP);

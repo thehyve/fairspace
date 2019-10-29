@@ -1,5 +1,7 @@
 package io.fairspace.saturn.vfs.irods;
 
+import io.fairspace.saturn.rdf.TransactionUtils;
+import io.fairspace.saturn.rdf.transactions.TransactionLog;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
@@ -61,6 +63,9 @@ public class IRODSVirtualFileSystemTest {
     @Mock
     private MetaDataAndDomainData meta;
 
+    @Mock
+    private TransactionLog txnLog;
+
     private final ObjStat stat1 = new ObjStat();
 
     private final ObjStat stat2 = new ObjStat();
@@ -72,6 +77,8 @@ public class IRODSVirtualFileSystemTest {
 
     @Before
     public void before() throws JargonException {
+        TransactionUtils.init(rdf, txnLog);
+
         var c = new Collection();
         c.setIri(createURI("http://example.com/123"));
         c.setLocation("rods");

@@ -1,9 +1,9 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.rdf.TransactionUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -38,19 +40,22 @@ public class TxnLogDatasetGraphTest {
 
     @Before
     public void before() {
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log,
-                () -> new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")),
-                () -> "message"));
+        getThreadContext().setUserInfo( new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")));
+        getThreadContext().setUserCommitMessage("message");
+        getThreadContext().setSystemCommitMessage("system");
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
+        TransactionUtils.init(ds, log);
     }
 
 
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        executeWrite(ds, () -> ds.getNamedModel("http://example.com/g1")
+        commit("system", () -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
-        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onBegin();
+        verify(log).onMetadata(eq("message"), eq("system"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onCommit();
@@ -59,13 +64,15 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
-        ds.begin(ReadWrite.WRITE);
-        ds.getNamedModel("http://example.com/g1")
-                .add(statement)
-                .remove(statement);
-        ds.abort();
+        commit("system", () -> {
+            ds.getNamedModel("http://example.com/g1")
+                    .add(statement)
+                    .remove(statement);
+            ds.abort();
+        });
 
-        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onBegin();
+        verify(log).onMetadata(eq("message"), eq("system"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();
@@ -82,16 +89,16 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
-            executeWrite(ds, () -> {
+            commit("system", () -> {
                 ds.getNamedModel("http://example.com/g1")
                         .add(statement)
                         .remove(statement);
                 throw new RuntimeException();
             });
-
         } catch (Exception ignore) {
         }
-        verify(log).onBegin(eq("message"), eq("userId"), eq("fullName"), anyLong());
+        verify(log).onBegin();
+        verify(log).onMetadata(eq("message"), eq("system"), eq("userId"), eq("fullName"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();

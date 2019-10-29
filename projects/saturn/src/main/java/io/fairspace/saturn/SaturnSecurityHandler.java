@@ -13,14 +13,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.Context.currentRequest;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
 public class SaturnSecurityHandler extends ConstraintSecurityHandler {
-    private static final String USER_INFO_REQUEST_ATTRIBUTE = OAuthAuthenticationToken.class.getName();
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
+    public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
 
     private final Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
     private final String healthResource;
@@ -36,7 +36,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     /**
      * @param apiPrefix
      * @param authenticator Authenticator returning a UserInfo for an incoming request
-     * @param onAuthorized An optional callback, called on successful authorization
+     * @param onAuthorized  An optional callback, called on successful authorization
      */
     public SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
         this.authenticator = authenticator;
@@ -76,7 +76,6 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         if (userInfo == null) {
             return "Unauthenticated";
         } else {
-            request.setAttribute(USER_INFO_REQUEST_ATTRIBUTE, userInfo);
             var authorities = userInfo.getAuthorities();
 
             // Certain users with a specific role are allowed to do anything within a workspace
@@ -99,12 +98,8 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
             }
         }
 
-        return null;
-    }
+        setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null));
 
-    public static OAuthAuthenticationToken userInfo() {
-        return currentRequest()
-                .map(request -> (OAuthAuthenticationToken) request.getAttribute(USER_INFO_REQUEST_ATTRIBUTE))
-                .orElse(null);
+        return null;
     }
 }
