@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        jena_version = '3.11.0'
-        milton_version = '2.7.4.8'
+        jena_version = '3.13.1'
+        milton_version = '2.7.4.9'
         mockitoVersion = '2.23.0'
-        jacksonVersion = '2.9.8'
+        jacksonVersion = '2.9.10'
         oidcAuthVersion = '0.6.8-SNAPSHOT'
     }
 }
@@ -58,7 +58,12 @@ dependencies {
     implementation 'org.topbraid:shacl:1.0.1'
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.11.1'
     implementation 'com.io-informatics.oss:jackson-jsonld:0.1.1'
-    implementation 'org.irods.jargon:jargon-core:4.3.0.1-RELEASE'
+    implementation('org.irods.jargon:jargon-core:4.3.0.1-RELEASE') {
+        // The transitive dependency is outdated and contains serious
+        // vulnerabilities. Replaced by bcprov-jdkon below
+        exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
+    }
+    implementation('org.bouncycastle:bcprov-jdk15on:1.64')
     implementation "io.fairspace:oidc-auth-base:${oidcAuthVersion}"
 
     implementation "com.rabbitmq:amqp-client:5.7.3"
@@ -71,6 +76,15 @@ dependencies {
     }
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
+
+    constraints {
+        implementation('org.elasticsearch.client:transport:6.8.2') {
+            because 'previous versions have security vulnerabilities'
+        }
+        implementation('com.fasterxml.jackson.core:jackson-databind:2.9.10.1') {
+            because 'previous versions have security vulnerabilities'
+        }
+    }
 }
 
 jacocoTestReport {
