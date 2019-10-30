@@ -59,13 +59,6 @@ describe('FileBrowser', () => {
         </UploadsProvider>
     );
 
-        const {queryByTestId} = renderWithProviders(
-            <DisconnectedFileBrowser
-                {children}
-            </UploadsProvider>
-        </Provider>
-    );
-
     it('renders proper view', () => {
         const {queryByTestId} = renderWithProviders(
             <DisconnectedFileBrowser
