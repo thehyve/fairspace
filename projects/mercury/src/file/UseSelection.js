@@ -25,12 +25,10 @@ const useSelection = (allowMultiple) => {
         deselectAll,
         isSelected,
         toggle,
-        selected
+        selected: allowMultiple ? selected : selected[0]
     };
 };
 
 // Convenience methods indicating the use of selection
 export const useSingleSelection = () => useSelection(false);
-export const useMultipleSelection = (items) => useSelection(true, items);
-
-export default useSelection;
+export const useMultipleSelection = () => useSelection(true);

@@ -59,8 +59,6 @@ export const FilesPage = ({
     // Path for which metadata should be rendered
     const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
 
-    console.log("FilesPage", selection);
-
     return (
         <CollectionBreadcrumbsContextProvider>
             <div style={{position: 'relative', zIndex: 1}}>

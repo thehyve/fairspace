@@ -29,7 +29,7 @@ const CollectionsPage = () => {
                     <InformationDrawer
                         inCollectionsBrowser
                         setBusy={setBusy}
-                        selectedCollectionIri={selected[0]}
+                        selectedCollectionIri={selected}
                     />
                 </Grid>
             </Grid>
