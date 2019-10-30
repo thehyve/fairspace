@@ -1,40 +1,21 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {render, cleanup, fireEvent} from '@testing-library/react';
+import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {Provider} from "react-redux";
 import configureStore from 'redux-mock-store';
-
-import {FileBrowser} from '../FileBrowser';
+import {DisconnectedFileBrowser} from '../FileBrowser';
+import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 afterEach(cleanup);
 
 const mockStore = configureStore();
 
 const store = mockStore({
-    cache: {
-        filesByPath: []
-    },
-    clipboard: {
-        fileNames: []
-    },
     collectionBrowser: {
         selectedPaths: []
     },
-    uploads: []
 });
-
-const initialProps = {
-    match: {
-        params: {
-            collection: ''
-        }
-    },
-    fetchFilesIfNeeded: () => {},
-    history: {
-        listen: () => {}
-    }
-};
 
 const openedCollection = {
     iri: "http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0",
@@ -59,20 +40,38 @@ const openedCollection = {
     }
 };
 
+const initialProps = {
+    openedPath: '/',
+    history: {
+        listen: () => {}
+    },
+    files: ['a']
+};
+
+const fileActionsMock = {
+    getDownloadLink: () => 'http://a',
+    createDirectory: () => Promise.resolve(),
+    renameFile: () => Promise.resolve(),
+    deleteMultiple: () => Promise.resolve(),
+    movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
+};
+
 describe('FileBrowser', () => {
+    const renderWithProviders = children => render(
+        <Provider store={store}>
+            <UploadsProvider>
+                {children}
+            </UploadsProvider>
+        </Provider>
+    );
+
     it('renders proper view', () => {
-        const {queryByTestId} = render(
-            <Provider store={store}>
-                <FileBrowser
-                    openedCollection={openedCollection}
-                    {...initialProps}
-                    match={{
-                        params: {
-                            collection: openedCollection.location
-                        }
-                    }}
-                />
-            </Provider>
+        const {queryByTestId} = renderWithProviders(
+            <DisconnectedFileBrowser
+                openedCollection={openedCollection}
+                fileActions={fileActionsMock}
+                {...initialProps}
+            />
         );
 
         expect(queryByTestId('files-view')).toBeInTheDocument();
@@ -86,12 +85,10 @@ describe('FileBrowser', () => {
     });
 
     it('show error when no open collection is provided', () => {
-        const {getByText} = render(
-            <Provider store={store}>
-                <FileBrowser
-                    {...initialProps}
-                />
-            </Provider>
+        const {getByText} = renderWithProviders(
+            <DisconnectedFileBrowser
+                {...initialProps}
+            />
         );
 
         // finds substring ignoring case
@@ -99,13 +96,11 @@ describe('FileBrowser', () => {
     });
 
     it('show no open collection error when no collection is provided even when another error is given', () => {
-        const {getByText} = render(
-            <Provider store={store}>
-                <FileBrowser
-                    {...initialProps}
-                    error="some error"
-                />
-            </Provider>
+        const {getByText} = renderWithProviders(
+            <DisconnectedFileBrowser
+                {...initialProps}
+                error="some error"
+            />
         );
 
         expect(getByText(/collection does not exist/i)).toBeInTheDocument();
@@ -113,14 +108,12 @@ describe('FileBrowser', () => {
 
 
     it('show error when when an error messsage is given', () => {
-        const {getByText} = render(
-            <Provider store={store}>
-                <FileBrowser
-                    {...initialProps}
-                    openedCollection={openedCollection}
-                    error="some error"
-                />
-            </Provider>
+        const {getByText} = renderWithProviders(
+            <DisconnectedFileBrowser
+                {...initialProps}
+                openedCollection={openedCollection}
+                error="some error"
+            />
         );
 
         // finds substring ignoring case
@@ -130,15 +123,13 @@ describe('FileBrowser', () => {
     it('cleans up listener after unmount', () => {
         const cleanupFn = jest.fn();
 
-        const {unmount} = render(
-            <Provider store={store}>
-                <FileBrowser
-                    {...initialProps}
-                    history={{
-                        listen: () => cleanupFn
-                    }}
-                />
-            </Provider>
+        const {unmount} = renderWithProviders(
+            <DisconnectedFileBrowser
+                {...initialProps}
+                history={{
+                    listen: () => cleanupFn
+                }}
+            />
         );
 
         unmount();

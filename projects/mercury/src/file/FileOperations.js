@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {connect} from 'react-redux';
 import {Badge, Icon, IconButton} from "@material-ui/core";
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
@@ -9,11 +8,10 @@ import {ConfirmationButton, ErrorDialog} from "@fairspace/shared-frontend";
 
 import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";
-import * as clipboardActions from "../common/redux/actions/clipboardActions";
-import * as fileActions from "../common/redux/actions/fileActions";
 import {getParentPath, joinPaths} from "../common/utils/fileUtils";
-import {CUT} from '../constants';
+import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
+import useClipboard from "../common/hooks/useClipboard";
 
 export const Operations = {
     PASTE: 'PASTE',
@@ -25,32 +23,33 @@ Object.freeze(Operations);
 
 export const FileOperations = ({
     isWritingDisabled,
-    isPasteDisabled,
-    isDisabledForMoreThanOneSelection,
-    clipboardItemsCount,
     openedPath,
-    selectedPaths = [],
-    selectedItem = {},
-    getDownloadLink = () => {},
+    selectedPaths,
+    clearSelection,
+    fileActions = {},
 
-    cut,
-    copy,
-    paste,
-    fetchFilesIfNeeded,
-    createDirectory,
-    deleteMultiple,
-    renameFile
+    files,
+    refreshFiles,
+    clipboard
 }) => {
     const [activeOperation, setActiveOperation] = useState();
     const busy = !!activeOperation;
+
     const noPathSelected = selectedPaths.length === 0;
+    const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
+    const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
+    const moreThanOneItemSelected = selectedPaths.length > 1;
+    const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
+    const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
+    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
         return operationPromise
             .then(r => {
                 setActiveOperation();
-                fetchFilesIfNeeded(openedPath);
+                refreshFiles();
+                clearSelection();
                 return r;
             })
             .catch(e => {
@@ -61,34 +60,48 @@ export const FileOperations = ({
 
     const handleCut = e => {
         if (e) e.stopPropagation();
-        cut(selectedPaths);
+        clipboard.cut(selectedPaths);
     };
 
     const handleCopy = e => {
         if (e) e.stopPropagation();
-        copy(selectedPaths);
+        clipboard.copy(selectedPaths);
     };
 
     const handlePaste = e => {
         if (e) e.stopPropagation();
-        return fileOperation(Operations.PASTE, paste(openedPath))
-            .catch((err) => {
-                ErrorDialog.showError(err, err.message || "An error occurred while pasting your contents");
-            });
+
+        let operation;
+
+        if (clipboard.method === CUT) {
+            operation = fileActions.movePaths(clipboard.filenames);
+        } if (clipboard.method === COPY) {
+            operation = fileActions.copyPaths(clipboard.filenames);
+        }
+
+        if (operation) {
+            return fileOperation(Operations.PASTE, operation)
+                .then(clipboard.clear)
+                .catch((err) => {
+                    ErrorDialog.showError(err, err.message || "An error occurred while pasting your contents");
+                });
+        }
+
+        return Promise.resolve();
     };
 
-    const handleCreateDirectory = name => fileOperation(Operations.MKDIR, createDirectory(joinPaths(openedPath, name)))
+    const handleCreateDirectory = name => fileOperation(Operations.MKDIR, fileActions.createDirectory(joinPaths(openedPath, name)))
         .catch((err) => {
             ErrorDialog.showError(err, err.message || "An error occurred while creating directory", () => handleCreateDirectory(name));
             return true;
         });
 
-    const handleDelete = () => fileOperation(Operations.DELETE, deleteMultiple(selectedPaths))
+    const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
         .catch((err) => {
             ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
         });
 
-    const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, renameFile(openedPath, path.basename, newName))
+    const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
         .catch((err) => {
             ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => handlePathRename(path, newName));
             return false;
@@ -129,7 +142,7 @@ export const FileOperations = ({
                     aria-label={`Download ${selectedItem.basename}`}
                     disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || busy}
                     component="a"
-                    href={getDownloadLink(selectedItem.filename)}
+                    href={fileActions.getDownloadLink(selectedItem.filename)}
                     download
                 >
                     <Download />
@@ -190,7 +203,7 @@ export const FileOperations = ({
                         onClick={e => handlePaste(e)}
                         disabled={isPasteDisabled || busy}
                     >
-                        {addBadgeIfNotEmpty(clipboardItemsCount, <ContentPaste />)}
+                        {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                     </IconButton>
                 </ProgressButton>
             </FileOperationsGroup>
@@ -198,32 +211,9 @@ export const FileOperations = ({
     );
 };
 
-const mapStateToProps = (state, ownProps) => {
-    const {openedPath, disabled: isWritingDisabled} = ownProps;
-    const {collectionBrowser: {selectedPaths}, cache: {filesByPath}, clipboard} = state;
-    const filesOfCurrentPath = (filesByPath[openedPath] || {}).data || [];
-    const selectedItems = filesOfCurrentPath.filter(f => selectedPaths.includes(f.filename)) || [];
-    const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
-    const moreThanOneItemSelected = selectedPaths.length > 1;
-    const filenamesInClipboard = clipboard.filenames;
-    const clipboardItemsCount = clipboard.filenames ? clipboard.filenames.length : 0;
-    const isClipboardItemsOnOpenedPath = filenamesInClipboard && filenamesInClipboard.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = isWritingDisabled || clipboardItemsCount === 0 || (isClipboardItemsOnOpenedPath && clipboard.type === CUT);
-    const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
+const ContextualFileOperations = props => {
+    const clipboard = useClipboard();
+    return <FileOperations clipboard={clipboard} {...props} />;
+}
 
-    return {
-        selectedPaths,
-        selectedItem,
-        clipboardItemsCount,
-        isDisabledForMoreThanOneSelection,
-        isPasteDisabled,
-        isWritingDisabled
-    };
-};
-
-const mapDispatchToProps = {
-    ...fileActions,
-    ...clipboardActions
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(FileOperations);
+export default ContextualFileOperations;

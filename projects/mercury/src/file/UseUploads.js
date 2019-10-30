@@ -1,29 +1,29 @@
-import {useDispatch, useSelector} from "react-redux";
-
-import {enqueueUploads, startUpload} from "../common/redux/actions/uploadActions";
+import {useContext} from "react";
 import {generateUniqueFileName} from "../common/utils/fileUtils";
-import {UPLOAD_STATUS_INITIAL} from "../common/redux/reducers/uploadsReducers";
+import UploadsContext, {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
 
 /**
  * This hook contains logic about uploads for a certain directory.
  *
  * Information about uploaded files is stored in redux
  */
-export const disconnectedUseUploads = (path, existingFilenames, uploads, dispatch) => {
+export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqueueUploads, startUpload) => {
+    const uploads = allUploads.filter(upload => upload.destinationPath === path);
+
     // Create a list of used filenames, including the current uploads
     const usedFilenames = existingFilenames.concat(uploads.map(upload => upload.destinationFilename));
 
-    const enqueue = files => dispatch(enqueueUploads(
+    const enqueue = files => enqueueUploads(
         files.map(file => ({
             file,
             destinationFilename: generateUniqueFileName(file.name, usedFilenames),
             destinationPath: path
         }))
-    ));
+    );
 
     const startAll = () => uploads
         .filter(upload => upload.status === UPLOAD_STATUS_INITIAL)
-        .map(upload => dispatch(startUpload(upload)));
+        .map(upload => startUpload(upload));
 
     return {
         enqueue,
@@ -33,10 +33,9 @@ export const disconnectedUseUploads = (path, existingFilenames, uploads, dispatc
 };
 
 const useUploads = (path, existingFilenames = []) => {
-    const uploads = useSelector(state => state.uploads.filter(upload => upload.destinationPath === path));
-    const dispatch = useDispatch();
+    const {getUploads, enqueueUploads, startUpload} = useContext(UploadsContext);
 
-    return disconnectedUseUploads(path, existingFilenames, uploads, dispatch);
+    return disconnectedUseUploads(path, existingFilenames, getUploads(), enqueueUploads, startUpload);
 };
 
 export default useUploads;
