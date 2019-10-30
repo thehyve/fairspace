@@ -2,13 +2,9 @@ package io.fairspace.saturn;
 
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.rdf.TransactionUtils;
-import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
+import io.fairspace.saturn.rdf.transactions.RDFConnectionBatched;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
@@ -24,13 +20,11 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        var txnLog = new LocalTransactionLog(CONFIG.jena.transactionLogPath, new SparqlTransactionCodec());
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, txnLog);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
-        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-        TransactionUtils.init(ds, txnLog);
+        var rdf = new RDFConnectionBatched(ds);
 
         initVocabularies(rdf);
 

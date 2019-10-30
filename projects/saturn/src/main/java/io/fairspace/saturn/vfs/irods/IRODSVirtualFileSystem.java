@@ -143,7 +143,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        commit("Generate an IRI for an external resource", () ->
+        commit("Generate an IRI for an external resource", rdf, () ->
                 rdf.update(storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }

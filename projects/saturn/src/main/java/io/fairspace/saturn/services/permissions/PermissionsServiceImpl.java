@@ -65,7 +65,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = userIriSupplier.get();
 
-        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), () -> {
+        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
@@ -131,7 +131,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
-        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), () -> {
+        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {

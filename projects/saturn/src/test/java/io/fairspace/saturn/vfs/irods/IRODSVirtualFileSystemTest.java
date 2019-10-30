@@ -1,6 +1,5 @@
 package io.fairspace.saturn.vfs.irods;
 
-import io.fairspace.saturn.rdf.TransactionUtils;
 import io.fairspace.saturn.rdf.transactions.TransactionLog;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -77,8 +76,6 @@ public class IRODSVirtualFileSystemTest {
 
     @Before
     public void before() throws JargonException {
-        TransactionUtils.init(rdf, txnLog);
-
         var c = new Collection();
         c.setIri(createURI("http://example.com/123"));
         c.setLocation("rods");

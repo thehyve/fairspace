@@ -14,7 +14,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private static final String ERROR_MSG =
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
-    private final TransactionLog transactionLog;
+    protected final TransactionLog transactionLog;
 
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {

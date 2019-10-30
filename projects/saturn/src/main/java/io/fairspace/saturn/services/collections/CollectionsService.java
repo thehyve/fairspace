@@ -42,7 +42,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        Collection storedCollection = commit("Create collection " + collection.getName(), () -> {
+        Collection storedCollection = commit("Create collection " + collection.getName(), dao.getRdf(), () -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -106,7 +106,7 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        commit("Delete collection " + iri, () -> {
+        commit("Delete collection " + iri, dao.getRdf(), () -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -136,7 +136,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return commit("Update collection " + patch.getName(), () -> {
+        return commit("Update collection " + patch.getName(), dao.getRdf(), () -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());
