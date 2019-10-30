@@ -15,4 +15,11 @@ sed s/io.fairspace.saturn// ./build/reports/jacoco/test/jacocoTestReport.csv | \
    column -t -s,
 echo
 
+# Run vulnerability check on release to master
+# It is configured in build.gradle to exit with non-zero status for
+# CVSS scores >= 9 (i.e. critical)
+if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then
+  ./gradlew dependencyCheckAnalyze
+fi
+
 $BUILD_SCRIPTS_DIR/docker/build.sh

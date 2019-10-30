@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
     Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
 } from "@material-ui/core";
+import {ConfirmationDialog} from '@fairspace/shared-frontend';
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";
@@ -13,6 +14,7 @@ import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../UseFormSubmission";
 import FormContext from "./FormContext";
+import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -42,9 +44,10 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const {
         addValue, updateValue, deleteValue,
         getUpdates, valuesWithUpdates,
-
-        validateAll, validationErrors, isValid
+        validateAll, validationErrors, isValid,
+        hasFormUpdates
     } = useFormData({});
+    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
@@ -61,9 +64,13 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         if (!hasErrors) submitForm();
     };
 
-    const closeDialog = (e) => {
+    const handleCloseDialog = (e) => {
         if (e) e.stopPropagation();
-        onClose();
+        if (hasFormUpdates) {
+            showConfirmation();
+        } else {
+            onClose();
+        }
     };
 
     const formId = `entity-form-${getIdentifier()}`;
@@ -107,44 +114,57 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     const typeDescription = getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION);
 
     return (
-        <Dialog
-            open
-            onClose={closeDialog}
-            aria-labelledby="form-dialog-title"
-            fullWidth
-            maxWidth="md"
-        >
-            <DialogTitle disableTypography id="form-dialog-title">
-                <Typography variant="h5">{typeLabel}</Typography>
-                <Typography variant="subtitle1">{typeDescription}</Typography>
-            </DialogTitle>
-            <DialogContent style={{overflowX: 'hidden'}}>
-                <FormContext.Provider value={{submit: createEntity}}>
-                    {renderDialogContent()}
-                </FormContext.Provider>
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    onClick={closeDialog}
-                    color="secondary"
-                    disabled={isUpdating}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    data-testid="submit-button"
-                    type="submit"
-                    onClick={createEntity}
-                    color="primary"
-                    variant="contained"
-                    form={formId}
-                    disabled={!canCreate() || isUpdating || !isValid}
-                >
-                    {`Create ${typeLabel}`}
-                    {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
-                </Button>
-            </DialogActions>
-        </Dialog>
+        <>
+            <Dialog
+                open
+                onClose={handleCloseDialog}
+                aria-labelledby="form-dialog-title"
+                fullWidth
+                maxWidth="md"
+            >
+                <DialogTitle disableTypography id="form-dialog-title">
+                    <Typography variant="h5">{typeLabel}</Typography>
+                    <Typography variant="subtitle1">{typeDescription}</Typography>
+                </DialogTitle>
+                <DialogContent style={{overflowX: 'hidden'}}>
+                    <FormContext.Provider value={{submit: createEntity}}>
+                        {renderDialogContent()}
+                    </FormContext.Provider>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={handleCloseDialog}
+                        color="secondary"
+                        disabled={isUpdating}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        data-testid="submit-button"
+                        type="submit"
+                        onClick={createEntity}
+                        color="primary"
+                        variant="contained"
+                        form={formId}
+                        disabled={!canCreate() || isUpdating || !isValid}
+                    >
+                        {`Create ${typeLabel}`}
+                        {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {confirmationShown && (
+                <ConfirmationDialog
+                    open
+                    title="Close form"
+                    content="You have unsaved changes, are you sure you want to close the form?"
+                    agreeButtonText="Close form"
+                    disagreeButtonText="Go back to form"
+                    onAgree={() => onClose()}
+                    onDisagree={hideConfirmation}
+                />
+            )}
+        </>
     );
 };
 

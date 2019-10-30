@@ -1,9 +1,11 @@
 import React from 'react';
 import {shallow} from "enzyme";
 import {act} from 'react-dom/test-utils';
+import {act} from 'react-dom/test-utils';
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
+import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 const collections = [
     {
@@ -35,6 +37,17 @@ function shallowRender(history, openedPath, locationSearch = '') {
 
 describe('FilesPage', () => {
     let wrapper;
+        const fileApi = {
+            list: () => Promise.resolve([])
+        };
+
+        // Awaiting the render is needed because some of the state updates
+        // only happen after an asynchronous call. See https://github.com/facebook/react/issues/15379
+        await act(async () => {
+                        <UploadsProvider>
+                                fileApi={fileApi}
+                        </UploadsProvider>
+        });
 
     it('updates url after collection location has changed', () => {
         const history = [];
