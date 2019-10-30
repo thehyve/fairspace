@@ -107,18 +107,16 @@ describe('UploadsProvider', () => {
 
     it('should store upload progress', async () => {
         const fileApi = {
-            upload: (upload, onProgress) => {
-                return new Promise(resolve => {
-                    // Set progress to 50 on start
-                    onProgress({loaded: 1024, total: 2048});
+            upload: (upload, onProgress) => new Promise(resolve => {
+                // Set progress to 50 on start
+                onProgress({loaded: 1024, total: 2048});
 
-                    setTimeout(() => {
-                        // Set progress to 100 on finish
-                        onProgress({loaded: 2048, total: 2048});
-                        resolve();
-                    }, 50);
-                });
-            }
+                setTimeout(() => {
+                    // Set progress to 100 on finish
+                    onProgress({loaded: 2048, total: 2048});
+                    resolve();
+                }, 50);
+            })
         };
 
         const getContext = getUploadsProviderValue({fileApi});

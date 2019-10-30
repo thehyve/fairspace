@@ -4,7 +4,6 @@ import {act} from 'react-dom/test-utils';
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
-import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
 const collections = [
     {

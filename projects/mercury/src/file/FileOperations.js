@@ -214,6 +214,6 @@ export const FileOperations = ({
 const ContextualFileOperations = props => {
     const clipboard = useClipboard();
     return <FileOperations clipboard={clipboard} {...props} />;
-}
+};
 
 export default ContextualFileOperations;
