@@ -32,13 +32,15 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     private final String dataStewardRole;
     private final String fullAccessRole;
     private final Consumer<OAuthAuthenticationToken> onAuthorized;
+    private final Consumer<String> onProject;
 
     /**
      * @param apiPrefix
      * @param authenticator Authenticator returning a UserInfo for an incoming request
      * @param onAuthorized An optional callback, called on successful authorization
+     * @param onProject
      */
-    public SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
+    public SaturnSecurityHandler(String apiPrefix, Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized, Consumer<String> onProject) {
         this.authenticator = authenticator;
         this.onAuthorized = onAuthorized;
         this.healthResource = apiPrefix + "/health/";
@@ -49,6 +51,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         this.sparqlRole = config.sparqlRole;
         this.dataStewardRole = config.dataStewardRole;
         this.fullAccessRole = config.fullAccessRole;
+        this.onProject = onProject;
     }
 
     @Override
@@ -93,6 +96,8 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
                     return "Only data stewards can edit the vocabulary";
                 }
             }
+
+            onProject.accept(request.getParameter("project"));
 
             if (onAuthorized != null) {
                 onAuthorized.accept(userInfo);

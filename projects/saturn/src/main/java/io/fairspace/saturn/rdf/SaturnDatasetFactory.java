@@ -32,13 +32,14 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, Supplier<OAuthAuthenticationToken> userInfoSupplier) throws IOException {
-        var restoreNeeded = isRestoreNeeded(config.datasetPath);
+    public static Dataset connect(Config.Jena config, String databaseName, Supplier<OAuthAuthenticationToken> userInfoSupplier) throws IOException {
+        var dsDir = new File(config.datasetPath, databaseName);
+        var restoreNeeded = isRestoreNeeded(dsDir);
 
         // Create a TDB2 dataset graph
-        var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
+        var dsg = connectDatasetGraph(dsDir.getAbsolutePath());
 
-        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath, databaseName), new SparqlTransactionCodec());
 
         if (config.elasticSearch.enabled) {
             // When a restore is needed, we instruct ES to delete the index first
