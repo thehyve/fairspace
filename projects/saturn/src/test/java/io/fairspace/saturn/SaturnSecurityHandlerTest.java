@@ -41,6 +41,8 @@ public class SaturnSecurityHandlerTest {
     private Handler nextHandler;
     @Mock
     private Consumer<OAuthAuthenticationToken> onAuthorized;
+    @Mock
+    private Consumer<String> onProject;
 
     private StringWriter writer;
 
@@ -48,7 +50,7 @@ public class SaturnSecurityHandlerTest {
 
     @Before
     public void before() throws IOException {
-        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator, onAuthorized);
+        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator, onAuthorized, onProject);
         handler.setHandler(nextHandler);
 
         writer = new StringWriter();
@@ -160,6 +162,23 @@ public class SaturnSecurityHandlerTest {
         Map errorBody = mapper.readValue(writer.toString(), Map.class);
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, errorBody.get("status"));
         assertNotNull(errorBody.get("message"));
+    }
+
+    @Test
+    public void itCallsOnProject() throws IOException, ServletException {
+        var token = new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("coordinator")));
+        when(authenticator.apply(eq(request))).thenReturn(token, token, token, token);
+
+        handler.handle("/api/v1/metadata/", baseRequest, request, response);
+        verify(onProject).accept(null);
+
+        when(request.getHeader(eq("project"))).thenReturn("A");
+        handler.handle("/api/v1/metadata/?project=A", baseRequest, request, response);
+        verify(onProject).accept("A");
+
+        when(request.getParameter(eq("project"))).thenReturn("B");
+        handler.handle("/api/v1/metadata/", baseRequest, request, response);
+        verify(onProject).accept("B");
     }
 
     private void verifyAuthenticated(boolean success) {

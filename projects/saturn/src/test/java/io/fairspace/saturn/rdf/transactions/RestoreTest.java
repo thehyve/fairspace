@@ -45,7 +45,7 @@ public class RestoreTest {
 
     @Test
     public void restoreWorksAsExpected() throws IOException {
-        var ds1 = SaturnDatasetFactory.connect(config, () -> null);
+        var ds1 = SaturnDatasetFactory.connect(config, "ds", () -> null);
 
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt1));
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt2));
@@ -56,7 +56,7 @@ public class RestoreTest {
         assertFalse(config.datasetPath.exists());
 
 
-        var ds2 = SaturnDatasetFactory.connect(config, () -> null);
+        var ds2 = SaturnDatasetFactory.connect(config, "ds", () -> null);
 
         try {
             executeRead(ds2, () -> {
@@ -74,14 +74,14 @@ public class RestoreTest {
         m.add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)));
         m.add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b")));
 
-        var ds1 = SaturnDatasetFactory.connect(config, () -> null);
+        var ds1 = SaturnDatasetFactory.connect(config, "ds", () -> null);
         executeWrite(ds1, () -> ds1.getDefaultModel().add(m));
 
         ds1.close();
 
         deleteDirectory(config.datasetPath);
 
-        var ds2 = SaturnDatasetFactory.connect(config, () -> null);
+        var ds2 = SaturnDatasetFactory.connect(config, "ds", () -> null);
 
         try {
             executeRead(ds2, () -> assertEquals(m.listStatements().toSet(), ds2.getDefaultModel().listStatements().toSet()));
