@@ -21,7 +21,6 @@ public class App {
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
         var rdf = new RDFConnectionDynamic(CONFIG.jena, SaturnSecurityHandler::userInfo);
-        rdf.connect("default");
 
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";

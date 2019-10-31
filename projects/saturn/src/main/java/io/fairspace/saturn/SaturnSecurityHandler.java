@@ -97,7 +97,11 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
                 }
             }
 
-            onProject.accept(request.getParameter("project"));
+            var project = request.getParameter("project");
+            if (project == null) {
+                project = request.getHeader("project");
+            }
+            onProject.accept(project);
 
             if (onAuthorized != null) {
                 onAuthorized.accept(userInfo);
