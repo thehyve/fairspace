@@ -44,7 +44,7 @@ public class SaturnDatasetFactory {
         if (config.elasticSearch.enabled) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, config, restoreNeeded);
+            dsg = enableElasticSearch(dsg, databaseName, config, restoreNeeded);
         }
 
         if (restoreNeeded) {
@@ -62,7 +62,7 @@ public class SaturnDatasetFactory {
         return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
-    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
+    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String databaseName, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
         Client client = null;
         try {
             // Setup ES client and index
@@ -70,7 +70,7 @@ public class SaturnDatasetFactory {
             ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
 
             // Create a dataset graph that updates ES with every triple update
-            var textIndex = new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, config.elasticSearch.settings.getIndexName());
+            var textIndex = new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, databaseName);
             var textDocProducer = new SingleTripleTextDocProducer(textIndex, !config.elasticSearch.required);
             return TextDatasetFactory.create(dsg, textIndex, true, textDocProducer);
         } catch (Exception e) {
