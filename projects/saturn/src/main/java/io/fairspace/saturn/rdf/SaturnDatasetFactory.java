@@ -63,6 +63,7 @@ public class SaturnDatasetFactory {
     }
 
     private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String databaseName, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
+        config.elasticSearch.settings.setIndexName(databaseName);
         Client client = null;
         try {
             // Setup ES client and index
@@ -70,7 +71,7 @@ public class SaturnDatasetFactory {
             ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
 
             // Create a dataset graph that updates ES with every triple update
-            var textIndex = new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, databaseName);
+            var textIndex = new TextIndexESBulk(new TextIndexConfig(new AutoEntityDefinition()), client, config.elasticSearch.settings.getIndexName());
             var textDocProducer = new SingleTripleTextDocProducer(textIndex, !config.elasticSearch.required);
             return TextDatasetFactory.create(dsg, textIndex, true, textDocProducer);
         } catch (Exception e) {
