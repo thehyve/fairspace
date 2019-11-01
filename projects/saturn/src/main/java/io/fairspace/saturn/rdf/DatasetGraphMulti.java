@@ -5,11 +5,14 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.search.ElasticSearchClientFactory;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphWrapper;
 import org.apache.jena.sparql.util.Context;
+import org.elasticsearch.client.Client;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -19,6 +22,7 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
     private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
     private final ThreadLocal<DatasetGraph> current = new ThreadLocal<>();
     private final LoadingCache<String, DatasetGraph> cache;
+    private Client client;
 
     public DatasetGraphMulti(Config.Jena config, Supplier<OAuthAuthenticationToken> userInfoSupplier) {
         super(null);
@@ -32,6 +36,8 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
                         return connectOrCreate(databaseName);
                     }
                 });
+
+        client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
     }
 
     @Override
@@ -54,7 +60,7 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
 
     private DatasetGraph connectOrCreate(String databaseName) {
         try {
-            return SaturnDatasetFactory.connect(config, databaseName, userInfoSupplier);
+            return SaturnDatasetFactory.connect(config, databaseName, userInfoSupplier, client);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,6 +69,9 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
     @Override
     public void close() {
         cache.cleanUp();
+        if (client != null) {
+            client.close();
+        }
     }
 
     @Override

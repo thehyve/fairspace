@@ -93,6 +93,6 @@ public class RestoreTest {
     }
 
     private Dataset newDataset() throws IOException {
-        return DatasetFactory.wrap(SaturnDatasetFactory.connect(config, "ds", () -> null));
+        return DatasetFactory.wrap(SaturnDatasetFactory.connect(config, "ds", () -> null, null));
     }
 }

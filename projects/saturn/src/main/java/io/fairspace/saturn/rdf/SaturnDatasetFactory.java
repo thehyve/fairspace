@@ -31,7 +31,7 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static DatasetGraph connect(Config.Jena config, String databaseName, Supplier<OAuthAuthenticationToken> userInfoSupplier) throws IOException {
+    public static DatasetGraph connect(Config.Jena config, String databaseName, Supplier<OAuthAuthenticationToken> userInfoSupplier, Client client) throws IOException {
         var dsDir = new File(config.datasetPath, databaseName);
         var restoreNeeded = isRestoreNeeded(dsDir);
 
@@ -43,7 +43,7 @@ public class SaturnDatasetFactory {
         if (config.elasticSearch.enabled) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, databaseName, config, restoreNeeded);
+            dsg = enableElasticSearch(dsg, databaseName, config, restoreNeeded, client);
         }
 
         if (restoreNeeded) {
@@ -62,12 +62,11 @@ public class SaturnDatasetFactory {
         return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
-    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String databaseName, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
+    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String databaseName, Config.Jena config, boolean recreateIndex, Client client ) throws UnknownHostException {
         config.elasticSearch.settings.setIndexName(databaseName);
-        Client client = null;
+
         try {
             // Setup ES client and index
-            client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
             ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
 
             // Create a dataset graph that updates ES with every triple update
@@ -79,9 +78,7 @@ public class SaturnDatasetFactory {
             if (config.elasticSearch.required) {
                 throw e; // Terminates Saturn
             }
-            if (client != null) {
-                client.close();
-            }
+
             return dsg;
         }
     }
