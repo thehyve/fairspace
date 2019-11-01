@@ -2,7 +2,6 @@ import React, {useContext} from 'react';
 import ReactMarkdown from "react-markdown";
 import Switch from "@material-ui/core/Switch";
 import {formatDateTime} from '@fairspace/shared-frontend';
-import ReactMarkdown from "react-markdown";
 
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from "../../../constants";

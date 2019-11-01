@@ -13,7 +13,9 @@ const Dropdown = ({options, placeholder, async, value, loadOptions, isOptionDisa
             loadOptions()
                 .then(setOptionsToShow);
         }
-    }, [async, loadOptions, options]);
+    }, []);
+
+    console.log({optionsToShow});
 
     const InputComponent = (props) => (
         <TextField
@@ -35,6 +37,7 @@ const Dropdown = ({options, placeholder, async, value, loadOptions, isOptionDisa
             options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : optionsToShow}
             getOptionDisabled={option => (isOptionDisabled && isOptionDisabled(option)) || option.disabled}
             getOptionLabel={option => option.label}
+            // getOptionLabel={option => console.log({option}) || option.label}
             {...otherProps}
             // renderInput={(props) => <TextField fullWidth {...props} />}
             renderInput={InputComponent}
