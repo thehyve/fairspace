@@ -19,6 +19,7 @@ import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
     const getIdentifier = () => {
         // If no localPart is specified, treat the identifier as not being entered
@@ -45,13 +46,15 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         addValue, updateValue, deleteValue,
         getUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid,
-        hasFormUpdates
+        hasFormUpdates, clearForm
     } = useFormData({});
-    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(hasFormUpdates);
+    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(!formSubmitted && hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
             .then(result => {
+                clearForm();
+                setFormSubmitted(true);
                 onCreate(result);
             }),
         getIdentifier()
@@ -117,6 +120,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         <>
             <Dialog
                 open
+                disableEnforceFocus
                 onClose={handleCloseDialog}
                 aria-labelledby="form-dialog-title"
                 fullWidth
@@ -153,17 +157,15 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     </Button>
                 </DialogActions>
             </Dialog>
-            {confirmationShown && (
-                <ConfirmationDialog
-                    open
-                    title="Close form"
-                    content="You have unsaved changes, are you sure you want to close the form?"
-                    agreeButtonText="Close form"
-                    disagreeButtonText="Go back to form"
-                    onAgree={() => onClose()}
-                    onDisagree={hideConfirmation}
-                />
-            )}
+            <ConfirmationDialog
+                open={confirmationShown}
+                title="Close form"
+                content="You have unsaved changes, are you sure you want to close the form?"
+                agreeButtonText="Close form"
+                disagreeButtonText="Go back to form"
+                onAgree={() => onClose()}
+                onDisagree={hideConfirmation}
+            />
         </>
     );
 };
