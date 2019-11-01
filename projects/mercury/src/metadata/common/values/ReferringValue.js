@@ -1,4 +1,5 @@
 import React, {useContext} from 'react';
+import ReactMarkdown from "react-markdown";
 import Switch from "@material-ui/core/Switch";
 import {formatDateTime} from '@fairspace/shared-frontend';
 
@@ -6,7 +7,6 @@ import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from "../../../constants";
 import Iri from "../../../common/components/Iri";
 import LinkedDataContext from "../../LinkedDataContext";
-import ReactMarkdown from "react-markdown";
 
 export const ReferringValue = ({property, entry, editorPath}) => {
     function extractDisplayValue(value) {

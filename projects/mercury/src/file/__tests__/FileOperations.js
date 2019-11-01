@@ -51,7 +51,6 @@ describe('FileOperations', () => {
     });
 
     it('should disable all buttons on when file operation is not finished yet', () => {
-
         clickHandler('Paste')({stopPropagation: () => {}});
 
         wrapper.find(IconButton)
@@ -144,5 +143,4 @@ describe('FileOperations', () => {
             expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
         });
     });
-
 });

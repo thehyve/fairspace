@@ -1,45 +1,66 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
-import {connect} from 'react-redux';
 import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
+import queryString from "query-string";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
 import {getDirectoryFromFullpath, getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
-import * as collectionActions from "../common/redux/actions/collectionActions";
 import * as consts from '../constants';
 import {getCollectionAbsolutePath} from "../common/utils/collectionUtils";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
+import CollectionsContext from "../common/contexts/CollectionsContext";
+import {useMultipleSelection} from "./UseSelection";
+import {LoadingOverlay} from "../common/components";
 
 export const FilesPage = ({
-    openedCollection, fetchCollectionsIfNeeded,
-    collectionsLoading, collectionsError,
-    openedPath, history, fileApi
+    match,
+    location,
+    history,
+    fileApi,
+    collections = [],
+    loading = false,
+    error = false
 }) => {
+    const {params} = match;
+    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
+    const collection = collections.find(c => c.location === collectionLocation) || {};
+    const selection = useMultipleSelection();
+    const [busy, setBusy] = useState(false);
+
+    // TODO: this code could be buggy, if the url had an invalid file name it will still be part of the selection.
+    // I suggest that the selection state be part of a context (FilesContext ?)..
+    //
+    // Check whether a filename is specified in the url for selection
+    // If so, select it on first render
+    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
+
+    useEffect(() => {
+        if (preselectedFile) {
+            selection.select(preselectedFile);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [preselectedFile]);
     // Determine breadcrumbs. If a collection is opened, show the full path
     // Otherwise, show a temporary breadcrumb
     const pathSegments = splitPathIntoArray(openedPath);
-    const breadcrumbSegments = (openedCollection && openedCollection.name)
+    const breadcrumbSegments = collection.name
         ? pathSegments.map((segment, idx) => ({
-            label: idx === 0 ? openedCollection.name : segment,
+            label: idx === 0 ? collection.name : segment,
             href: consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
         }))
         : [{label: '...', href: consts.COLLECTIONS_PATH + openedPath}];
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
-    // Fetch collections on mount
-    useEffect(() => {
-        fetchCollectionsIfNeeded();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const handleCollectionLocationChange = (location) => {
+    const handleCollectionLocationChange = (newLocation) => {
         // If the collection location changes, the URI for the current page should change as well
-        history.push(`${getCollectionAbsolutePath(location)}${getDirectoryFromFullpath(openedPath)}`);
+        history.push(`${getCollectionAbsolutePath(newLocation)}${getDirectoryFromFullpath(openedPath)}`);
     };
+
+    // Path for which metadata should be rendered
+    const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
 
     return (
         <CollectionBreadcrumbsContextProvider>
@@ -49,36 +70,39 @@ export const FilesPage = ({
             <Grid container spacing={8}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <FileBrowser
-                        openedCollection={openedCollection}
+                        data-testid="file-browser"
+                        openedCollection={collection}
                         openedPath={openedPath}
-                        collectionsLoading={collectionsLoading}
-                        collectionsError={collectionsError}
+                        collectionsLoading={loading}
+                        collectionsError={error}
                         fileApi={fileApi}
+                        selection={selection}
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                    <InformationDrawer onCollectionLocationChange={handleCollectionLocationChange} />
+                    <InformationDrawer
+                        onCollectionLocationChange={handleCollectionLocationChange}
+                        setBusy={setBusy}
+                        path={path}
+                        selectedCollectionIri={collection.iri}
+                    />
                 </Grid>
             </Grid>
+            <LoadingOverlay loading={busy} />
         </CollectionBreadcrumbsContextProvider>
     );
 };
 
-const mapStateToProps = (state, ownProps) => {
-    const {match: {params}} = ownProps;
-    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
-    const collection = (state.cache.collections.data && state.cache.collections.data.find(c => c.location === collectionLocation)) || {};
-
-    return {
-        collectionsLoading: state.cache.collections.pending,
-        collectionsError: state.cache.collections.error,
-        openedCollection: collection,
-        openedPath
-    };
+const ContextualFilesPage = (props) => {
+    const {collections, loading, error} = useContext(CollectionsContext);
+    return (
+        <FilesPage
+            collections={collections}
+            loading={loading}
+            error={error}
+            {...props}
+        />
+    );
 };
 
-const mapDispatchToProps = {
-    ...collectionActions,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(FilesPage));
+export default withRouter(ContextualFilesPage);
