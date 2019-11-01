@@ -7,7 +7,6 @@ import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
-import useSelection from "./UseSelection";
 import UploadList from "./UploadList";
 import useUploads from "./UseUploads";
 import {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
@@ -26,10 +25,10 @@ export const DisconnectedFileBrowser = ({
     loading = false,
     error = false,
     refreshFiles = () => {},
-    fileActions = {}
+    fileActions = {},
+    selection = {}
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
-    const {select, selectAll, deselectAll, toggle, isSelected, selected} = useSelection(files.map(f => f.filename));
 
     const existingFilenames = files ? files.map(file => file.basename) : [];
     const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
@@ -37,7 +36,7 @@ export const DisconnectedFileBrowser = ({
     // Deselect all files on history changes
     useEffect(() => {
         const historyListener = history.listen(() => {
-            deselectAll();
+            selection.deselectAll();
         });
 
         // Specify how to clean up after this effect:
@@ -55,8 +54,8 @@ export const DisconnectedFileBrowser = ({
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
-        deselectAll();
-        select(path.filename);
+        selection.deselectAll();
+        selection.select(path.filename);
     };
 
     const handlePathDoubleClick = (path) => {
@@ -103,20 +102,20 @@ export const DisconnectedFileBrowser = ({
                 <div data-testid="files-view">
                     <FileList
                         selectionEnabled
-                        files={files.map(item => ({...item, selected: isSelected(item.filename)}))}
-                        onPathCheckboxClick={path => toggle(path.filename)}
+                        files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                        onPathCheckboxClick={path => selection.toggle(path.filename)}
                         onPathHighlight={handlePathHighlight}
                         onPathDoubleClick={handlePathDoubleClick}
-                        onAllSelection={shouldSelectAll => (shouldSelectAll ? selectAll() : deselectAll())}
+                        onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
                     />
                     <div style={{marginTop: 8}}>
                         <FileOperations
-                            selectedPaths={selected}
+                            selectedPaths={selection.selected}
                             files={files}
                             openedPath={openedPath}
                             disabled={!openedCollection.canWrite}
                             fileActions={fileActions}
-                            clearSelection={deselectAll}
+                            clearSelection={selection.deselectAll}
                             refreshFiles={refreshFiles}
                         />
                     </div>
