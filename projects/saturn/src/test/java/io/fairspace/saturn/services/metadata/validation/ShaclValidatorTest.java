@@ -5,8 +5,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -37,7 +35,6 @@ public class ShaclValidatorTest {
     private static final Resource closedClassShape = createResource("http://example.com/ClosedClassShape");
 
     private Dataset ds = DatasetFactory.create();
-    private RDFConnection rdf = new RDFConnectionLocal(ds);
     private ShaclValidator validator;
     private Model vocabulary;
 
@@ -47,7 +44,7 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);
+        initVocabularies(ds.asDatasetGraph());
         vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
 
         ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI())

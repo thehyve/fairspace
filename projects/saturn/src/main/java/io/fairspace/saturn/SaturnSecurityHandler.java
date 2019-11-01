@@ -57,16 +57,19 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     @Override
     public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         var error = authorize(pathInContext, request);
-
-        if (error != null) {
-            response.setContentType(APPLICATION_JSON.asString());
-            response.setStatus(SC_UNAUTHORIZED);
-            response.getWriter().write(errorBody(SC_UNAUTHORIZED, error));
-            response.getWriter().flush();
-            response.getWriter().close();
-            baseRequest.setHandled(true);
-        } else {
-            getHandler().handle(pathInContext, baseRequest, request, response);
+        try {
+            if (error != null) {
+                response.setContentType(APPLICATION_JSON.asString());
+                response.setStatus(SC_UNAUTHORIZED);
+                response.getWriter().write(errorBody(SC_UNAUTHORIZED, error));
+                response.getWriter().flush();
+                response.getWriter().close();
+                baseRequest.setHandled(true);
+            } else {
+                getHandler().handle(pathInContext, baseRequest, request, response);
+            }
+        } finally {
+            onProject.accept(null);
         }
     }
 

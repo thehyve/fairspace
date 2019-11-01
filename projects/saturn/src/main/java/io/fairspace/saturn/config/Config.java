@@ -7,7 +7,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import org.apache.jena.query.text.es.ESSettings;
 
 import java.io.File;
@@ -42,6 +41,9 @@ public class Config {
         public File transactionLogPath = new File("data/log");
 
         public long maxTriplesToReturn = 50000;
+
+        public long inactiveDatabaseShutdownIntervalSec = 3600;
+
 
         public ElasticSearch elasticSearch = new ElasticSearch();
 

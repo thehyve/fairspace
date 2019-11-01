@@ -55,7 +55,7 @@ public class MetadataEntityLifeCycleManagerTest {
         model = ds.getNamedModel(graph.getURI());
 
         var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-        initVocabularies(rdf);
+        initVocabularies(ds.asDatasetGraph());
         lifeCycleManager = new MetadataEntityLifeCycleManager(rdf, graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
     }
 

@@ -10,6 +10,8 @@ jena:
   datasetPath: "data/db"
   # Path of the transaction log
   transactionLogPath: "data/log"
+
+  inactiveDatabaseShutdownIntervalSec: 3600
   elasticSearch:
     # Enables ElasticSearch integration
     enabled: true

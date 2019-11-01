@@ -2,6 +2,8 @@ package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +47,7 @@ public class RestoreTest {
 
     @Test
     public void restoreWorksAsExpected() throws IOException {
-        var ds1 = SaturnDatasetFactory.connect(config, "ds", () -> null);
+        var ds1 = newDataset();
 
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt1));
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt2));
@@ -56,7 +58,7 @@ public class RestoreTest {
         assertFalse(config.datasetPath.exists());
 
 
-        var ds2 = SaturnDatasetFactory.connect(config, "ds", () -> null);
+        var ds2 = newDataset();
 
         try {
             executeRead(ds2, () -> {
@@ -74,19 +76,23 @@ public class RestoreTest {
         m.add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)));
         m.add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b")));
 
-        var ds1 = SaturnDatasetFactory.connect(config, "ds", () -> null);
+        var ds1 = newDataset();
         executeWrite(ds1, () -> ds1.getDefaultModel().add(m));
 
         ds1.close();
 
         deleteDirectory(config.datasetPath);
 
-        var ds2 = SaturnDatasetFactory.connect(config, "ds", () -> null);
+        var ds2 = newDataset();
 
         try {
             executeRead(ds2, () -> assertEquals(m.listStatements().toSet(), ds2.getDefaultModel().listStatements().toSet()));
         } finally {
             ds2.close();
         }
+    }
+
+    private Dataset newDataset() throws IOException {
+        return DatasetFactory.wrap(SaturnDatasetFactory.connect(config, "ds", () -> null));
     }
 }

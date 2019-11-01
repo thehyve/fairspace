@@ -8,8 +8,6 @@ import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -21,6 +19,7 @@ import java.net.UnknownHostException;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
 @Slf4j
@@ -32,7 +31,7 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, String databaseName, Supplier<OAuthAuthenticationToken> userInfoSupplier) throws IOException {
+    public static DatasetGraph connect(Config.Jena config, String databaseName, Supplier<OAuthAuthenticationToken> userInfoSupplier) throws IOException {
         var dsDir = new File(config.datasetPath, databaseName);
         var restoreNeeded = isRestoreNeeded(dsDir);
 
@@ -54,8 +53,9 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog, userInfoSupplier, CommitMessages::getCommitMessage);
 
-        // Create a dataset
-        return DatasetFactory.wrap(dsg);
+        initVocabularies(dsg);
+
+        return dsg;
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {

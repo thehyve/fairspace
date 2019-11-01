@@ -51,7 +51,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);
+        initVocabularies(ds.asDatasetGraph());
 
         model.removeAll();
         vocabulary.add(TARGET_CLASS_SHAPE, SH.targetClass, TARGET_CLASS);

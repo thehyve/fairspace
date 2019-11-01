@@ -139,7 +139,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testInference() {
-        initVocabularies(rdf);
+        initVocabularies(ds.asDatasetGraph());
         ds.getDefaultModel()
                 .add(S1, RDF.type, FOAF.Person)
                 .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));
