@@ -2,57 +2,34 @@ import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {TextField} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {compareBy, MaterialReactSelect} from '@fairspace/shared-frontend';
+import {compareBy} from '@fairspace/shared-frontend';
 
-const Dropdown = ({options, placeholder, async, value, loadOptions, isOptionDisabled, onChange, ...otherProps}) => {
-    const [optionsToShow, setOptionsToShow] = useState(options);
-    const [textFieldValue, setTextFieldValue] = useState(placeholder);
+const Dropdown = ({options, placeholder, async, loadOptions, isOptionDisabled, onChange, ...otherProps}) => {
+    const [optionsToShow, setOptionsToShow] = useState([]);
 
     useEffect(() => {
         if (async && loadOptions) {
             loadOptions()
                 .then(setOptionsToShow);
+        } else {
+            setOptionsToShow(options);
         }
-    }, []);
-
-    console.log({optionsToShow});
-
-    const InputComponent = (props) => (
-        <TextField
-            // value={textFieldValue}
-            // onChange={e => setTextFieldValue(e.target.value)}
-            fullWidth
-            {...props}
-        />
-    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [options]);
 
     return (
         <Autocomplete
+            {...otherProps}
             onChange={(e, v) => {
                 onChange(v);
-                // clear textfield text after a selection is done
-                setTextFieldValue('');
             }}
-            value={value}
             options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : optionsToShow}
             getOptionDisabled={option => (isOptionDisabled && isOptionDisabled(option)) || option.disabled}
             getOptionLabel={option => option.label}
-            // getOptionLabel={option => console.log({option}) || option.label}
-            {...otherProps}
-            // renderInput={(props) => <TextField fullWidth {...props} />}
-            renderInput={InputComponent}
+            renderInput={(props) => <TextField fullWidth {...props} />}
         />
     );
 };
-
-// (
-//     <MaterialReactSelect
-//         style={{width: '100%'}}
-//         {...otherProps}
-//         options={options ? options.sort(compareBy('disabled')) : options}
-//     />
-// );
-
 
 Dropdown.propTypes = {
     onChange: PropTypes.func,

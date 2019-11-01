@@ -79,7 +79,11 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                                 property={property}
                                 currentValues={values}
                                 placeholder=""
-                                onChange={onAdd}
+                                onChange={val => {
+                                    if (val) {
+                                        onAdd(val);
+                                    }
+                                }}
                                 aria-labelledby={labelId}
                             />
                         </TableCell>
