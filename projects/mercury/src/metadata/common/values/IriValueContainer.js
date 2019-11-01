@@ -36,7 +36,7 @@ export const IriValue = ({
     }
 
     return (
-        <Grid container justify="space-between" spacing={8}>
+        <Grid container justify="space-between" spacing={1}>
             <Grid item xs={4}>
                 <MaterialReactSelect
                     options={namespaceOptions}

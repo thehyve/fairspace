@@ -86,7 +86,7 @@ const UploadList = ({uploads, enqueue}) => {
                                 direction="column"
                                 justify="center"
                                 alignItems="center"
-                                spacing={8}
+                                spacing={1}
                                 style={{padding: 20, minHeight: 200}}
                             >
                                 <Grid item>

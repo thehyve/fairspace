@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 
 import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
 import useLinkedData from '../UseLinkedData';
-import Iri from "../../common/components/Iri";
 import IriTooltip from "../../common/components/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {
@@ -11,6 +10,7 @@ import {
 } from "../../constants";
 import DeleteEntityButton from "./DeleteEntityButton";
 import CopyButton from "../../common/components/CopyButton";
+import UseNamespacedIri from '../../common/hooks/UseNamespacedIri';
 
 const styles = {
     iri: {
@@ -43,6 +43,7 @@ export const LinkedDataEntityHeader = ({
     const isDeleted = values[DATE_DELETED_URI];
     const isFixedShape = values[FIXED_SHAPE_URI];
     const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
+    const namespacedIri = UseNamespacedIri(subject);
 
     return !linkedDataError && !linkedDataLoading && (
         <>
@@ -50,7 +51,7 @@ export const LinkedDataEntityHeader = ({
                 <Grid item style={{display: "flex", alignItems: "center"}}>
                     <Typography variant="h5" className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}>
                         <IriTooltip title={subject}>
-                            <Iri iri={subject} />
+                            <span>{namespacedIri}</span>
                         </IriTooltip>
                     </Typography>
 
