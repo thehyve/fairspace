@@ -29,6 +29,9 @@ export const FilesPage = ({
     const selection = useMultipleSelection();
     const [busy, setBusy] = useState(false);
 
+    // TODO: this code could be buggy, if the url had an invalid file name it will still be part of the selection.
+    // I suggest that the selection state be part of a context (FilesContext ?)..
+    //
     // Check whether a filename is specified in the url for selection
     // If so, select it on first render
     const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;

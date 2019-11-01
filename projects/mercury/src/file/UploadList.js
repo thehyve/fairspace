@@ -31,7 +31,7 @@ const UploadList = ({uploads, enqueue}) => {
 
     return (
         <>
-            <Paper>
+            <Paper style={{overflowX: 'auto'}}>
                 {uploads.length > 0 && (
                     <>
                         <Table>
