@@ -79,4 +79,9 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
     public boolean supportsTransactionAbort() {
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Multi graph, current = " + current.get();
+    }
 }
