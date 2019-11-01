@@ -170,7 +170,7 @@ public class SaturnSecurityHandlerTest {
         when(authenticator.apply(eq(request))).thenReturn(token, token, token, token);
 
         handler.handle("/api/v1/metadata/", baseRequest, request, response);
-        verify(onProject).accept(null);
+        verify(onProject, times(2)).accept(null);
 
         when(request.getHeader(eq("project"))).thenReturn("A");
         handler.handle("/api/v1/metadata/?project=A", baseRequest, request, response);
