@@ -178,14 +178,16 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected void doMkdir(String path) throws IOException {
+    protected FileInfo doMkdir(String path) throws IOException {
         getFile(path).mkdir();
+        return stat(path);
     }
 
     @Override
-    protected void doCreate(String path, InputStream in) throws IOException {
+    protected FileInfo doCreate(String path, InputStream in) throws IOException {
         getFile(path).createNewFile();
         modify(path, in);
+        return stat(path);
     }
 
     @Override

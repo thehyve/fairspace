@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -35,18 +36,22 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
     static Resource getResource(VirtualFileSystem fs, String path) {
         try {
             var info = fs.stat(path);
-            if (info == null) {
-                return null;
-            }
-            if (info.isDirectory()) {
-                return new VfsBackedMiltonDirectoryResource(fs, info);
-            } else {
-                return new VfsBackedMiltonFileResource(fs, info);
-            }
+            return getResource(fs, info);
         } catch (FileNotFoundException e) {
             return null;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static Resource getResource(VirtualFileSystem fs, FileInfo info) {
+        if (info == null) {
+            return null;
+        }
+        if (info.isDirectory()) {
+            return new VfsBackedMiltonDirectoryResource(fs, info);
+        } else {
+            return new VfsBackedMiltonFileResource(fs, info);
         }
     }
 }

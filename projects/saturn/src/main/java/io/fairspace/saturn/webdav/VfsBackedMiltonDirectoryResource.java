@@ -43,8 +43,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         ensureIsWriteable();
         var newPath = normalizePath(info.getPath() + "/" + newName);
         try {
-            fs.mkdir(newPath);
-            return (CollectionResource) getResource(fs, newPath);
+            return (CollectionResource) getResource(fs, fs.mkdir(newPath));
         } catch (IOException e) {
             onException(e);
             return null;
@@ -55,8 +54,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
         ensureIsWriteable();
         var newPath = normalizePath(info.getPath() + "/" + newName);
-        fs.create(newPath, inputStream);
-        return getResource(fs, newPath);
+        return getResource(fs, fs.create(newPath, inputStream));
     }
 
     @Override
