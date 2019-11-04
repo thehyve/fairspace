@@ -102,7 +102,7 @@ class CollectionDetails extends React.Component {
                         )}
                     />
                     <CardContent style={{paddingTop: 0}}>
-                        <Typography component="p" style={{marginBottom: 8}}>
+                        <Typography component="p">
                             {collection.description}
                         </Typography>
 

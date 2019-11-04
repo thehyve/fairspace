@@ -4,9 +4,25 @@ import {shallow} from "enzyme";
 import {IconButton, Button} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
 
-function getPermissionAt(wrapper, at) {
-    return wrapper.find('WithStyles(ListItemText)').at(at).props('primary');
-}
+const testRenderingCollaborators = (wrapper) => {
+    expect(wrapper.find('[data-testid="collaborator"]').length).toBe(4);
+};
+
+const testOrderingOfCollaborators = (wrapper) => {
+    const collaborators = wrapper.find('[data-testid="collaborator"]');
+
+    expect(collaborators.at(0).props().primary).toEqual('Kurt Cobain');
+    expect(collaborators.at(0).props().secondary).toEqual('Manage');
+
+    expect(collaborators.at(1).props().primary).toEqual('Mariah Carey');
+    expect(collaborators.at(1).props().secondary).toEqual('Manage');
+
+    expect(collaborators.at(2).props().primary).toEqual('Michael Jackson');
+    expect(collaborators.at(2).props().secondary).toEqual('Write');
+
+    expect(collaborators.at(3).props().primary).toEqual('Bruno Mars');
+    expect(collaborators.at(3).props().secondary).toEqual('Read');
+};
 
 describe('PermissionsViewer', () => {
     const mockCollaborators = [
@@ -43,45 +59,31 @@ describe('PermissionsViewer', () => {
     const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockCreator = 'user4-id';
+    const mockFetchPermissionsFn = jest.fn();
+    const mockAlterPermissionFn = jest.fn();
 
     describe('Use Case 1: Current user is creator and can manage collection', () => {
-        const wrapper = shallow(
-            <PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                currentUser={mockcurrentUserCreatorCanManage}
-                canManage
-                permissions={mockCollaborators}
-                alterPermission={() => {}}
-                fetchPermissionsIfNeeded={() => {}}
-            />
-        );
+        let wrapper;
+        beforeAll(() => {
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    currentUser={mockcurrentUserCreatorCanManage}
+                    canManage
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
+            );
+        });
 
         it('should render all collaborators', () => {
-            expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
+            testRenderingCollaborators(wrapper);
         });
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
-            expect(getPermissionAt(wrapper, 0))
-                .toEqual({
-                    primary: 'Kurt Cobain',
-                    secondary: 'Manage'
-                });
-            expect(getPermissionAt(wrapper, 1))
-                .toEqual({
-                    primary: 'Mariah Carey',
-                    secondary: 'Manage'
-                });
-            expect(getPermissionAt(wrapper, 2))
-                .toEqual({
-                    primary: 'Michael Jackson',
-                    secondary: 'Write'
-                });
-            expect(getPermissionAt(wrapper, 3))
-                .toEqual({
-                    primary: 'Bruno Mars',
-                    secondary: 'Read'
-                });
+            testOrderingOfCollaborators(wrapper);
         });
 
         // user can see all 4 permissions (one is disabled not hidden)
@@ -95,43 +97,27 @@ describe('PermissionsViewer', () => {
     });
 
     describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
-        const wrapper = shallow(
-            <PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage={false}
-                currentUser={mockcurrentUserNotCreatorCannotManage}
-                permissions={mockCollaborators}
-                alterPermission={() => {}}
-                fetchPermissionsIfNeeded={() => {}}
-            />
-        );
-
-        it('should render all collaborators', () => {
-            expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
+        let wrapper;
+        beforeAll(() => {
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    canManage={false}
+                    currentUser={mockcurrentUserNotCreatorCannotManage}
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
+            );
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
-            expect(getPermissionAt(wrapper, 0))
-                .toEqual({
-                    primary: 'Kurt Cobain',
-                    secondary: 'Manage'
-                });
-            expect(getPermissionAt(wrapper, 1))
-                .toEqual({
-                    primary: 'Mariah Carey',
-                    secondary: 'Manage'
-                });
-            expect(getPermissionAt(wrapper, 2))
-                .toEqual({
-                    primary: 'Michael Jackson',
-                    secondary: 'Write'
-                });
-            expect(getPermissionAt(wrapper, 3))
-                .toEqual({
-                    primary: 'Bruno Mars',
-                    secondary: 'Read'
-                });
+        it('should render all collaborators', () => {
+            testRenderingCollaborators(wrapper);
+        });
+
+        it('should order permissions by the access rank (Manage-Write-Read)', () => {
+            testOrderingOfCollaborators(wrapper);
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {
@@ -144,43 +130,27 @@ describe('PermissionsViewer', () => {
     });
 
     describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
-        const wrapper = shallow(
-            <PermissionsViewer
-                creator={mockCreator}
-                iri={500}
-                canManage
-                currentUser={mockcurrentUserNotCreatorCanManage}
-                permissions={mockCollaborators}
-                alterPermission={() => {}}
-                fetchPermissionsIfNeeded={() => {}}
-            />
-        );
-
-        it('should render all collaborators', () => {
-            expect(wrapper.find('WithStyles(ListItemText)').length).toBe(4);
+        let wrapper;
+        beforeAll(() => {
+            wrapper = shallow(
+                <PermissionsViewer
+                    creator={mockCreator}
+                    iri={500}
+                    canManage
+                    currentUser={mockcurrentUserNotCreatorCanManage}
+                    permissions={mockCollaborators}
+                    alterPermission={mockAlterPermissionFn}
+                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
+                />
+            );
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read) and name', () => {
-            expect(getPermissionAt(wrapper, 0))
-                .toEqual({
-                    primary: 'Kurt Cobain',
-                    secondary: 'Manage'
-                });
-            expect(getPermissionAt(wrapper, 1))
-                .toEqual({
-                    primary: 'Mariah Carey',
-                    secondary: 'Manage'
-                });
-            expect(getPermissionAt(wrapper, 2))
-                .toEqual({
-                    primary: 'Michael Jackson',
-                    secondary: 'Write'
-                });
-            expect(getPermissionAt(wrapper, 3))
-                .toEqual({
-                    primary: 'Bruno Mars',
-                    secondary: 'Read'
-                });
+        it('should render all collaborators', () => {
+            testRenderingCollaborators(wrapper);
+        });
+
+        it('should order permissions by the access rank (Manage-Write-Read)', () => {
+            testOrderingOfCollaborators(wrapper);
         });
 
         it('should NOT enable current user to alter all collaborator\'s permissions', () => {

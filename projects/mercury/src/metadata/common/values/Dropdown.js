@@ -14,7 +14,7 @@ const Dropdown = ({options, placeholder, async, loadOptions, isOptionDisabled, o
         } else {
             setOptionsToShow(options);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [options]);
 
     return (

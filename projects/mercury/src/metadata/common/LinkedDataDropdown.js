@@ -5,7 +5,6 @@ import {LoadingInlay, MessageDisplay, SearchAPI, handleSearchError, SORT_ALPHABE
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE, ES_INDEX} from "../../constants";
-import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
 import Config from "../../common/services/Config";
 
@@ -16,7 +15,7 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, 
         .then(
             ({items}) => items.map(metadataItem => {
                 const {id, label, name} = metadataItem;
-                const displayLabel = (label && label[0]) || (name && name[0]) || <Iri iri={id} />;
+                const displayLabel = (label && label[0]) || (name && name[0]) || id;
 
                 return {
                     label: displayLabel,
