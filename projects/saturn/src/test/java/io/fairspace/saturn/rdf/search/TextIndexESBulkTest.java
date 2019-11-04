@@ -25,10 +25,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.currentThread;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,8 +50,6 @@ public class TextIndexESBulkTest {
 
     private volatile CountDownLatch latch;
 
-    private volatile Thread workerThread;
-
     private DatasetGraph dsg;
 
     @Before
@@ -60,7 +57,6 @@ public class TextIndexESBulkTest {
         when(config.getEntDef()).thenReturn(entityDefinition);
         when(client.bulk(any())).thenAnswer(invocation -> actionFuture);
         when(actionFuture.get()).thenAnswer(invocation -> {
-            workerThread = currentThread();
             latch.countDown();
             return new BulkResponse(new BulkItemResponse[0], 1);
         });
@@ -81,31 +77,6 @@ public class TextIndexESBulkTest {
         commitAndWait();
 
         verify(actionFuture).get();
-    }
-
-
-    @Test
-    public void bulkUpdatesAreSentInASeparateWorkerThread() throws InterruptedException, ExecutionException {
-        update();
-        commitAndWait();
-
-        assertNotNull(workerThread);
-        assertNotEquals(currentThread(), workerThread);
-    }
-
-    @Test
-    public void sameThreadForAllUpdates() throws InterruptedException, ExecutionException {
-        update();
-        commitAndWait();
-
-        var thread1 = workerThread;
-        workerThread = null;
-
-        when(client.bulk(any())).thenAnswer(invocation -> actionFuture);
-        update();
-        commitAndWait();
-
-        assertEquals(thread1, workerThread);
     }
 
     private void update() {

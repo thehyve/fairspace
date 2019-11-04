@@ -54,7 +54,7 @@ public class Config {
                     .clusterName("fairspace")
                     .hostAndPort("127.0.0.1", 9300)
                     .build();
-            public Map<String, String> advancedSettings = new HashMap<>(Map.of("transport.netty.worker_count", "1"));
+            public Map<String, String> advancedSettings = new HashMap<>();
         }
     }
 

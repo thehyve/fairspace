@@ -14,7 +14,7 @@ jena:
   inactiveDatabaseShutdownIntervalSec: 3600
   elasticSearch:
     # Enables ElasticSearch integration
-    enabled: true
+    enabled: false
     # Makes availability of ElasticSearch mandatory
     required: false
     settings:
@@ -30,7 +30,7 @@ jena:
       # Name of the index. Defaults to "fairspace"
       indexName: "fairspace"
     advancedSettings:
-      transport.netty.worker_count: 1
+      # transport.netty.worker_count: 1
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false
