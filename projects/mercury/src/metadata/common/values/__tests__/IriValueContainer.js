@@ -1,6 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
-import {MaterialReactSelect} from "@fairspace/shared-frontend";
+import Autocomplete from '@material-ui/lab/Autocomplete';
+
 import {IriValue} from "../IriValueContainer";
 
 describe('IriValueContainer', () => {
@@ -10,7 +11,7 @@ describe('IriValueContainer', () => {
             {id: 'b', label: 'Fairspace', namespace: 'http://fairspace.io/ontology#'}
         ];
         const wrapper = shallow(<IriValue namespaces={namespaces} />);
-        const select = wrapper.find(MaterialReactSelect);
+        const select = wrapper.find(Autocomplete);
 
         expect(select.length).toEqual(1);
         expect(select.prop('options')).toEqual([
@@ -34,7 +35,7 @@ describe('IriValueContainer', () => {
 
     it('should render a dropdown when no namespaces are given', () => {
         const wrapper = shallow(<IriValue />);
-        const select = wrapper.find(MaterialReactSelect);
+        const select = wrapper.find(Autocomplete);
 
         expect(select.length).toEqual(1);
         expect(select.prop('options')).toEqual([

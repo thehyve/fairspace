@@ -1004,10 +1004,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.4.tgz#622a72bebd1e3f48d921563b4b60a762295a81fc"
   integrity sha512-6PYY5DVdAY1ifaQW6XYTnOMihmBVT27elqSjEoodchsGjzYlEsTQMcEhSud99kVawatyTZRTiVkJ/c6lwbQ7nA==
 
-"@fairspace/shared-frontend@^1.0.3":
-  version "1.0.3"
-  resolved "https://dl.bintray.com//thehyve/fairspace-npm/fairspace-shared-frontend-v1.0.3.tgz#e3cc2b4f75629756f42bc90bea85032ff4e44f6e"
-  integrity sha1-48wrT3Vil1b0K8kL6oUDL/TkT24=
+"@fairspace/shared-frontend@^1.0.4":
+  version "1.0.4"
+  resolved "https://dl.bintray.com//thehyve/fairspace-npm/fairspace-shared-frontend-v1.0.4.tgz#13c25412d2ce3060eddf65ff886b45f6d6d9329c"
+  integrity sha1-E8JUEtLOMGDt32X/iGtF9tbZMpw=
   dependencies:
     "@babel/runtime" "^7.6.3"
     "@material-ui/core" "^4.5.2"
@@ -11316,9 +11316,9 @@ vis-network@^6.1.1:
   integrity sha512-i8QT5i0vfJGI3S7W/kKTcPzxYhDu/EtXgyv1ew5eb1H5VBoxB3QldRsrvZpzNYgCaYoto9/LAhAKIHZJins9Hg==
 
 vm-browserify@^1.0.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.1.tgz#9d81bf6c0a56ba3c6e787b2e56d48ac0b003574a"
-  integrity sha512-VdaJ/et1OKy9VDEqH6epLQ/DlNMuHvtDgwjPYvDvqNOlgFSMAL4ucZvyIpz0D4x5qT+8wCSK19YjWicJuc00hQ==
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
+  integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"

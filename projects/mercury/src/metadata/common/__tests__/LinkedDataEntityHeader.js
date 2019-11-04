@@ -1,5 +1,7 @@
 import React from 'react';
-import {shallow} from "enzyme";
+import {mount} from "enzyme";
+import {Provider} from "react-redux";
+import configureStore from 'redux-mock-store';
 
 import {LinkedDataEntityHeader} from "../LinkedDataEntityHeader";
 import DeleteEntityButton from "../DeleteEntityButton";
@@ -7,15 +9,25 @@ import {
     COLLECTION_URI, CREATED_BY_URI, DATE_DELETED_URI, DELETED_BY_URI, DIRECTORY_URI, FILE_URI, FIXED_SHAPE_URI
 } from "../../../constants";
 
+const mockStore = configureStore();
+
+const store = mockStore({
+    cache: {},
+});
+
 describe('LinkedDataEntityHeader', () => {
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
 
     describe('delete button', () => {
         const testDeleteButtonDeletableState = (values, expectedDeletableState) => {
-            const wrapper = shallow(<LinkedDataEntityHeader
-                subject={subject}
-                values={values}
-            />);
+            const wrapper = mount(
+                <Provider store={store}>
+                    <LinkedDataEntityHeader
+                        subject={subject}
+                        values={values}
+                    />
+                </Provider>
+            );
 
             const button = wrapper.find(DeleteEntityButton);
             expect(button.length).toBe(1);

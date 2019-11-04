@@ -2,6 +2,7 @@
 import React from 'react';
 import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+
 import {DisconnectedFileBrowser} from '../FileBrowser';
 import {UploadsProvider} from "../../common/contexts/UploadsContext";
 
@@ -48,7 +49,9 @@ const initialProps = {
     history: {
         listen: () => {}
     },
-    files: ['a'],
+    files: [{
+        filename: 'a'
+    }],
     selection: selectionMock
 };
 

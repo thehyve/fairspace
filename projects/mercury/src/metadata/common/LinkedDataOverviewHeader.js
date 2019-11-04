@@ -40,7 +40,7 @@ const LinkedDataOverviewHeader = ({classes, setQuery, selectedTypes, setSelected
                     {availableTypes.map(({targetClass, label}) => (
                         <MenuItem key={targetClass} value={targetClass}>
                             <Checkbox checked={selectedTypes.includes(targetClass)} />
-                            <ListItemText primary={label} secondary={targetClass} />
+                            <ListItemText style={{marginLeft: 4}} primary={label} secondary={targetClass} />
                         </MenuItem>
                     ))}
                 </Select>

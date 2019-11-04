@@ -25,7 +25,6 @@ const store = mockStore({
     uploads: []
 });
 
-
 const shape = {
     "@type": [
         "http://fairspace.io/ontology#ClassShape"

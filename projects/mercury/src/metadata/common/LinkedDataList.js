@@ -10,6 +10,8 @@ import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
 
+const ROWS_PER_PAGE = [5, 10, 25];
+
 const LinkedDataList = ({
     entities = [],
     total = 0,
@@ -87,8 +89,8 @@ const LinkedDataList = ({
                 <TableFooter>
                     <TableRow>
                         <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            rowsPerPage={size}
+                            rowsPerPageOptions={ROWS_PER_PAGE}
+                            rowsPerPage={ROWS_PER_PAGE.includes(size) ? size : ROWS_PER_PAGE[0]}
                             colSpan={hasHighlights ? 4 : 3}
                             count={total}
                             page={page}
