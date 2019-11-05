@@ -24,9 +24,9 @@ public class RabbitMQEventService implements EventService {
     @Setter
     private ConnectionFactory factory = new ConnectionFactory();
 
-    private Config.RabbitMQ config;
-    private String workspaceId;
-    private Supplier<OAuthAuthenticationToken> tokenSupplier;
+    private final Config.RabbitMQ config;
+    private final String workspaceId;
+    private final Supplier<OAuthAuthenticationToken> tokenSupplier;
     private Channel channel;
 
     public RabbitMQEventService(Config.RabbitMQ config, String workspaceId, Supplier<OAuthAuthenticationToken> tokenSupplier) {
