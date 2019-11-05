@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useRef} from 'react';
 import {PropTypes} from 'prop-types';
 import {LoadingInlay, MessageDisplay, SearchAPI, handleSearchError, SORT_ALPHABETICALLY} from '@fairspace/shared-frontend';
 
@@ -9,7 +9,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import Config from "../../common/services/Config";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
-    let fetchRequest = null;
+    const fetchRequest = useRef(null);
 
     const search = query => fetchItems({types, size: SEARCH_DROPDOWN_DEFAULT_SIZE, query})
         .then(
@@ -26,16 +26,16 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, 
         );
 
     const debouncedSearch = (query) => {
-        if (fetchRequest) {
-            clearTimeout(fetchRequest);
+        if (fetchRequest.current) {
+            clearTimeout(fetchRequest.current);
         }
 
         return new Promise((resolve, reject) => {
-            if (fetchRequest) {
-                clearTimeout(fetchRequest);
+            if (fetchRequest.current) {
+                clearTimeout(fetchRequest.current);
             }
 
-            fetchRequest = setTimeout(() => {
+            fetchRequest.current = setTimeout(() => {
                 search(query)
                     .then(resolve)
                     .catch(reject);

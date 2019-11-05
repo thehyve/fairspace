@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useRef} from "react";
 
 import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../constants";
 import KeycloakAPI from "./KeycloakAPI";
@@ -18,21 +18,22 @@ const UserSelect = ({debounce = 300, ...otherProps}) => {
             })
         );
 
-    let fetchRequest = null;
+    const fetchRequest = useRef(null);
+
 
     const search = query => fetchItems({size: SEARCH_DROPDOWN_DEFAULT_SIZE, query});
 
     const debouncedSearch = (query) => {
-        if (fetchRequest) {
-            clearTimeout(fetchRequest);
+        if (fetchRequest.current) {
+            clearTimeout(fetchRequest.current);
         }
 
         return new Promise((resolve, reject) => {
-            if (fetchRequest) {
-                clearTimeout(fetchRequest);
+            if (fetchRequest.current) {
+                clearTimeout(fetchRequest.current);
             }
 
-            fetchRequest = setTimeout(() => {
+            fetchRequest.current = setTimeout(() => {
                 search(query)
                     .then(resolve)
                     .catch(reject);
