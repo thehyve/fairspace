@@ -12,7 +12,6 @@ import org.apache.jena.sparql.util.Context;
 import org.elasticsearch.client.Client;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -22,7 +21,7 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
     private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
     private final ThreadLocal<DatasetGraph> current = new ThreadLocal<>();
     private final LoadingCache<String, DatasetGraph> cache;
-    private Client client;
+    private final Client client;
 
     public DatasetGraphMulti(Config.Jena config, Supplier<OAuthAuthenticationToken> userInfoSupplier) {
         super(null);
@@ -30,14 +29,16 @@ public class DatasetGraphMulti extends DatasetGraphWrapper {
         this.userInfoSupplier = userInfoSupplier;
         cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(config.inactiveDatabaseShutdownIntervalSec, TimeUnit.SECONDS)
-                .removalListener(notification -> ((DatasetGraph)notification.getValue()).close())
+                .removalListener(notification -> ((DatasetGraph) notification.getValue()).close())
                 .build(new CacheLoader<>() {
                     public DatasetGraph load(String databaseName) {
                         return connectOrCreate(databaseName);
                     }
                 });
 
-        client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
+        client = config.elasticSearch.enabled
+                ? ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings)
+                : null;
     }
 
     @Override
