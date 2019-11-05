@@ -92,7 +92,7 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
                     content={'You have unsaved changes, are you sure you want to navigate away?'
                         + ' Your pending changes will be lost.'}
                     agreeButtonText="Navigate"
-                    disagreeButtonText="Go back to form"
+                    disagreeButtonText="back to form"
                     onAgree={() => executeNavigation()}
                     onDisagree={hideConfirmation}
                 />
