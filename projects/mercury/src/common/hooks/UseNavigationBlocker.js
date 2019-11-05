@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {useHistory} from "react-router-dom";
 
-const UseNavigationBlocker = (hasPendingChanges) => {
+const UseNavigationBlocker = (shouldBlock) => {
     const history = useHistory();
     const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
     const [locationToNavigateTo, setLocationToNavigateTo] = useState(null);
@@ -18,7 +18,7 @@ const UseNavigationBlocker = (hasPendingChanges) => {
             e.returnValue = '';
         };
 
-        if (hasPendingChanges) {
+        if (shouldBlock) {
             window.addEventListener('beforeunload', beforeunloadHandler);
         } else {
             window.removeEventListener('beforeunload', beforeunloadHandler);
@@ -27,7 +27,7 @@ const UseNavigationBlocker = (hasPendingChanges) => {
         return () => {
             window.removeEventListener('beforeunload', beforeunloadHandler);
         };
-    }, [hasPendingChanges]);
+    }, [shouldBlock]);
 
     const unblockRef = useRef(null);
 
@@ -38,7 +38,7 @@ const UseNavigationBlocker = (hasPendingChanges) => {
             unblockRef.current();
         }
 
-        if (hasPendingChanges) {
+        if (shouldBlock) {
             unblockRef.current = history.block(({pathname}) => {
                 // If the confirmation is already shown and another navigation is fired then it should be allowed
                 // The 2nd navigation can only be comming from the 'Navigate' confrimation button.
@@ -57,7 +57,7 @@ const UseNavigationBlocker = (hasPendingChanges) => {
                 unblockRef.current();
             }
         };
-    }, [history, hasPendingChanges, showCloseConfirmation]);
+    }, [history, shouldBlock, showCloseConfirmation]);
 
     const executeNavigation = () => {
         if (locationToNavigateTo) {

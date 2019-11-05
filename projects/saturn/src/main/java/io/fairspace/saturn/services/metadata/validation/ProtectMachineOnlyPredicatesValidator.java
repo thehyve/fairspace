@@ -11,9 +11,6 @@ import static io.fairspace.saturn.vocabulary.Inference.getPropertyShapeForStatem
  */
 public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator {
 
-    public ProtectMachineOnlyPredicatesValidator() {
-    }
-
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         validateModelAgainstMachineOnlyPredicates(removed, vocabulary, violationHandler);

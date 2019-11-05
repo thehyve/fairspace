@@ -24,7 +24,11 @@ const columns = {
 };
 
 const CollectionList = ({
-    collections = [], selectedCollectionLocation, onCollectionClick, onCollectionDoubleClick, classes
+    collections = [],
+    isSelected = () => false,
+    onCollectionClick,
+    onCollectionDoubleClick,
+    classes
 }) => {
     // Extend collections with displayName to avoid computing it when sorting
     const collectionsWithDisplayName = collections.map(collection => ({
@@ -69,7 +73,7 @@ const CollectionList = ({
                 </TableHead>
                 <TableBody>
                     {pagedItems.map((collection) => {
-                        const selected = selectedCollectionLocation && (collection.location === selectedCollectionLocation);
+                        const selected = isSelected(collection);
 
                         return (
                             <TableRow

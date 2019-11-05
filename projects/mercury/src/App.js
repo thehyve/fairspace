@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {MuiPickersUtilsProvider} from "material-ui-pickers";
 import useIsMounted from "react-is-mounted-hook";
 import {
     ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, UsersProvider, VersionProvider
@@ -15,6 +15,8 @@ import theme from './App.theme';
 import Menu from "./common/components/Menu";
 import Routes from "./routes/Routes";
 import WorkspaceTopBar from "./common/components/WorkspaceTopBar";
+import {UploadsProvider} from "./common/contexts/UploadsContext";
+import {CollectionsProvider} from "./common/contexts/CollectionsContext";
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -44,23 +46,27 @@ const App = () => {
                 >
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <MuiThemeProvider theme={theme}>
-                            <Provider store={store}>
-                                <ErrorDialog>
-                                    <Router>
-                                        <Layout
-                                            requiredAuthorization={requiredRole}
-                                            renderMenu={() => <Menu />}
-                                            renderMain={() => (
-                                                <UsersProvider url={users}>
-                                                    <Routes />
-                                                </UsersProvider>
-                                            )}
-                                            renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                            renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                        />
-                                    </Router>
-                                </ErrorDialog>
-                            </Provider>
+                            <UploadsProvider>
+                                <CollectionsProvider>
+                                    <Provider store={store}>
+                                        <ErrorDialog>
+                                            <Router>
+                                                <Layout
+                                                    requiredAuthorization={requiredRole}
+                                                    renderMenu={() => <Menu />}
+                                                    renderMain={() => (
+                                                        <UsersProvider url={users}>
+                                                            <Routes />
+                                                        </UsersProvider>
+                                                    )}
+                                                    renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                                    renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                                />
+                                            </Router>
+                                        </ErrorDialog>
+                                    </Provider>
+                                </CollectionsProvider>
+                            </UploadsProvider>
                         </MuiThemeProvider>
                     </MuiPickersUtilsProvider>
                 </LogoutContextProvider>

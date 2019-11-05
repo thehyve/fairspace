@@ -1,14 +1,17 @@
 import React from 'react';
-import {createShallow} from '@material-ui/core/test-utils';
-import {mount} from 'enzyme';
+import {createShallow, createMount} from '@material-ui/core/test-utils';
+import {Button} from '@material-ui/core';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
 import UserSelect from "../UserSelect";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
+    let mount;
+
     const mockAlterPermissionFn = jest.fn();
     const mockUsers = [
+
         {name: 'Mariah Carey', iri: 'http://localhost/iri/user1-id'},
         {name: 'Michael Jackson', iri: 'http://localhost/iri/user2-id'},
         {name: 'Bruno Mars', iri: 'http://localhost/iri/user3-id'},
@@ -40,6 +43,11 @@ describe('AlterPermissionDialog', () => {
 
     beforeAll(() => {
         shallow = createShallow({dive: true});
+        mount = createMount();
+    });
+
+    afterAll(() => {
+        mount.cleanUp();
     });
 
     it('should render initial state of the dialog correctly', () => {
@@ -54,26 +62,27 @@ describe('AlterPermissionDialog', () => {
             users={mockUsers}
         />);
 
+        // console.log(wrapper.debug());
         // initial state if it's open or not
-        expect(wrapper.find('Dialog').prop('open')).toBeFalsy();
+        expect(wrapper.find('[data-testid="permissions-dialog"]').prop('open')).toBeFalsy();
 
         // title =Share with
-        expect(wrapper.find('WithStyles(DialogTitle)').childAt(0).text()).toEqual('Share with');
+        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Share with');
 
         // render collacborator selector
         expect(wrapper.find(UserSelect).prop('value')).toBe(null);
 
         // initial value of the access right is "Read"
-        expect(wrapper.find('RadioGroup').prop('value')).toEqual('Read');
+        expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('Read');
         // populate radio group with 3 access options
-        expect(wrapper.find('RadioGroup').childAt(0).prop('value')).toEqual('Read');
-        expect(wrapper.find('RadioGroup').childAt(1).prop('value')).toEqual('Write');
-        expect(wrapper.find('RadioGroup').childAt(2).prop('value')).toEqual('Manage');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(0).prop('value')).toEqual('Read');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(1).prop('value')).toEqual('Write');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Manage');
 
         // render cancel and submit buttons
-        expect(wrapper.find('WithStyles(Button)').at(0).childAt(0).text()).toEqual('Cancel');
-        expect(wrapper.find('WithStyles(Button)').at(1).childAt(0).text()).toEqual('Submit');
-        expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeTruthy();
+        expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Cancel');
+        expect(wrapper.find(Button).at(1).childAt(0).text()).toEqual('Submit');
+        expect(wrapper.find(Button).at(1).prop('disabled')).toBeTruthy();
     });
 
     it('should not render user selector and render selected user fullname instead when user is provided', () => {
@@ -89,13 +98,13 @@ describe('AlterPermissionDialog', () => {
                 currentUser={mockCurrentLoggedUser}
                 alterPermission={mockAlterPermissionFn}
                 users={mockUsers}
-                loading={false}
             />
         );
+
         wrapper.setState({selectedUser: mockPermission.user});
 
-        expect(wrapper.find('WithStyles(MaterialReactSelect)')).toHaveLength(0);
-        expect(wrapper.find('WithStyles(Typography)').at(1).text()).toEqual('Michael Jackson');
-        expect(wrapper.find('WithStyles(Button)').at(1).prop('disabled')).toBeFalsy(); // submit button enabled
+        expect(wrapper.find(UserSelect)).toHaveLength(0);
+        expect(wrapper.find('[data-testid="user"]').at(0).text()).toEqual('Michael Jackson');
+        expect(wrapper.find('[data-testid="submit"]').at(0).prop('disabled')).toBeFalsy(); // submit button enabled
     });
 });

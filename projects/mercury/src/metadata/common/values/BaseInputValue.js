@@ -28,6 +28,7 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
     return (
         <TextField
             {...otherProps}
+            margin="dense"
             multiline={property.multiLine}
             value={localValue}
             onChange={handleChange}
@@ -43,7 +44,6 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
                     }
                 }
             }}
-            margin="normal"
             style={{...style, marginTop: 0, width: '100%'}}
         />
     );

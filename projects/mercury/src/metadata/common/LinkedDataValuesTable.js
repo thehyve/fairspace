@@ -74,16 +74,20 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
             {canAdd && AddComponent ? (
                 <TableFooter>
                     <TableRow>
-                        <TableCell colSpan={columnDefinitions.length}>
+                        <TableCell colSpan={columnDefinitions.length} style={{borderBottom: 'none'}}>
                             <AddComponent
                                 property={property}
                                 currentValues={values}
                                 placeholder=""
-                                onChange={onAdd}
+                                onChange={val => {
+                                    if (val) {
+                                        onAdd(val);
+                                    }
+                                }}
                                 aria-labelledby={labelId}
                             />
                         </TableCell>
-                        {property.isEditable ? <TableCell className={classes.buttonColumn} /> : undefined}
+                        {property.isEditable ? <TableCell className={classes.buttonColumn} style={{borderBottom: 'none'}} /> : undefined}
                     </TableRow>
                 </TableFooter>
             ) : undefined}

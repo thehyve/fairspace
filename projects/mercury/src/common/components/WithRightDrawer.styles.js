@@ -5,7 +5,7 @@ const styles = theme => ({
     },
     content: {
         flexGrow: 1,
-        paddingRight: theme.spacing.unit * 3,
+        paddingRight: theme.spacing(3),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -18,18 +18,18 @@ const styles = theme => ({
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginRight: drawerWidth + 3 * theme.spacing.unit,
+        marginRight: drawerWidth + 3 * theme.spacing(1),
         minWidth: drawerWidth
     },
 
     infoDrawerPaper: {
         width: drawerWidth,
-        padding: theme.spacing.unit * 3
+        padding: theme.spacing(3)
     },
     closeButton: {
         position: 'absolute',
-        right: theme.spacing.unit,
-        top: theme.mixins.toolbar.minHeight + 3 * theme.spacing.unit
+        right: theme.spacing(1),
+        top: theme.mixins.toolbar.minHeight + 3 * theme.spacing(1)
     },
     toolbar: theme.mixins.toolbar
 });

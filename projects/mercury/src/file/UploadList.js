@@ -8,8 +8,9 @@ import {usePagination} from '@fairspace/shared-frontend';
 
 import {
     UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
-} from "../common/redux/reducers/uploadsReducers";
+} from "../common/contexts/UploadsContext";
 
+const ROWS_PER_PAGE = [5, 10, 25];
 
 const progress = upload => {
     switch (upload.status) {
@@ -31,7 +32,7 @@ const UploadList = ({uploads, enqueue}) => {
 
     return (
         <>
-            <Paper>
+            <Paper style={{overflowX: 'auto'}}>
                 {uploads.length > 0 && (
                     <>
                         <Table>
@@ -63,10 +64,10 @@ const UploadList = ({uploads, enqueue}) => {
                             </TableBody>
                         </Table>
                         <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
+                            rowsPerPageOptions={ROWS_PER_PAGE}
+                            rowsPerPage={ROWS_PER_PAGE.includes(rowsPerPage) ? rowsPerPage : ROWS_PER_PAGE[0]}
                             component="div"
                             count={uploads.length}
-                            rowsPerPage={rowsPerPage}
                             page={page}
                             onChangePage={(e, p) => setPage(p)}
                             onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
@@ -86,7 +87,7 @@ const UploadList = ({uploads, enqueue}) => {
                                 direction="column"
                                 justify="center"
                                 alignItems="center"
-                                spacing={8}
+                                spacing={1}
                                 style={{padding: 20, minHeight: 200}}
                             >
                                 <Grid item>

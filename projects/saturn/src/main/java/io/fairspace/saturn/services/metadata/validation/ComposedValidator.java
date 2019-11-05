@@ -9,7 +9,7 @@ import org.apache.jena.rdf.model.Resource;
  * Combines a few validators into one. Stops on a first failing validator.
  */
 public class ComposedValidator implements MetadataRequestValidator {
-    private MetadataRequestValidator[] validators;
+    private final MetadataRequestValidator[] validators;
 
     public ComposedValidator(MetadataRequestValidator... validators) {
         this.validators = validators;

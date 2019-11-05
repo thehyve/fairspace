@@ -6,10 +6,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.topbraid.shacl.vocabulary.SH;
 
 public class MachineOnlyClassesValidator implements MetadataRequestValidator {
-
-    public MachineOnlyClassesValidator() {
-    }
-
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         vocabulary.listSubjectsWithProperty(SH.targetClass)

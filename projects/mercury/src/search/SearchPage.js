@@ -11,7 +11,6 @@ import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
 import {searchCollections} from '../common/redux/actions/searchActions';
 import * as vocabularyActions from '../common/redux/actions/vocabularyActions';
-import * as collectionBrowserActions from "../common/redux/actions/collectionBrowserActions";
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
@@ -19,6 +18,7 @@ import {getCollectionsSearchResults} from "../common/redux/reducers/searchReduce
 const styles = {
     tableRoot: {
         width: '100%',
+        maxHeight: 'calc(100% - 60px)',
         overflowX: 'auto'
     },
     table: {
@@ -29,7 +29,7 @@ const styles = {
 // Exporting here to be able to test the component outside of Redux
 export const SearchPage = ({
     classes, location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
-    history, selectPath, deselectAllPaths, results, vocabulary, loading, error
+    history, results, vocabulary, loading, error
 }) => {
     useEffect(() => {
         fetchVocabularyIfNeeded();
@@ -60,10 +60,9 @@ export const SearchPage = ({
      */
     const handleResultDoubleClick = (result) => {
         const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
+        const selectionQueryString = "?selection=" + encodeURIComponent('/' + result.filePath);
 
-        history.push(navigationPath);
-        deselectAllPaths();
-        selectPath('/' + result.filePath);
+        history.push(navigationPath + selectionQueryString);
     };
 
     if (loading) {
@@ -79,7 +78,7 @@ export const SearchPage = ({
     }
 
     return (
-        <Paper className={classes.root} data-testid="results-table">
+        <Paper className={classes.tableRoot} data-testid="results-table">
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
@@ -132,9 +131,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     performSearch: searchCollections,
-    fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded,
-    selectPath: collectionBrowserActions.selectPath,
-    deselectAllPaths: collectionBrowserActions.deselectAllPaths
+    fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded
 };
 
 SearchPage.propTypes = {

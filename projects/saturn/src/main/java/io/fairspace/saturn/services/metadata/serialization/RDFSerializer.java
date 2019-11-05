@@ -13,7 +13,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @Slf4j
 public class RDFSerializer implements Serializer {
-    private RDFFormat format;
+    private final RDFFormat format;
 
     public RDFSerializer(RDFFormat format) {
         this.format = format;

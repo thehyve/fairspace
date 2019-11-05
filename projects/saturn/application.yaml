@@ -47,9 +47,6 @@ auth:
   dataStewardRole: "datasteward"
   # Role name for users who are allowed to perform SPARQL queries
   sparqlRole: "sparql"
-  # Role name for users with full access. Those users can do anything
-  fullAccessRole: "coordinator"
-  userUrlTemplate: "http://localhost:5100/auth/admin/realms/ci/users/%s"
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
@@ -62,8 +59,6 @@ mail:
   mail.smtp.host: host
   mail.smtp.port: 587
   mail.smtp.starttls.enable: true
-rabbitMQ:
-  enabled: false
-  required: false
-  username: fairspace
-  password: test
+workspace:
+  name: Workspace
+  version: "1.0.0"

@@ -52,7 +52,7 @@ const InputWithAddition = ({
     };
 
     return (
-        <Grid container justify="space-between" spacing={8}>
+        <Grid container justify="space-between" spacing={1}>
             <Grid item xs={10}>
                 {children}
             </Grid>

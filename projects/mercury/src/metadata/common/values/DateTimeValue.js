@@ -1,5 +1,5 @@
 import React from 'react';
-import {DateTimePicker} from "material-ui-pickers";
+import {DateTimePicker} from "@material-ui/pickers";
 import {DATE_FORMAT} from '../../../constants';
 
 class DateTimeValue extends React.Component {

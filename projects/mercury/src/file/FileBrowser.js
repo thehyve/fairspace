@@ -1,31 +1,34 @@
 import React, {useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
-import {Button, Tabs, Tab} from "@material-ui/core";
+import {Button, Tab, Tabs} from "@material-ui/core";
 import Play from "mdi-material-ui/Play";
 import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
-import useSelection from "./UseSelection";
 import UploadList from "./UploadList";
 import useUploads from "./UseUploads";
-import {UPLOAD_STATUS_INITIAL} from "../common/redux/reducers/uploadsReducers";
+import {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
+import {useFiles} from "./UseFiles";
 
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
 
-export const FileBrowser = ({
+export const DisconnectedFileBrowser = ({
     history,
-    files = [],
     openedCollection,
+    collectionsLoading = false,
+    collectionsError = false,
     openedPath,
-    fetchFilesIfNeeded,
-    loading,
-    error
+    files = [],
+    loading = false,
+    error = false,
+    refreshFiles = () => {},
+    fileActions = {},
+    selection = {}
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
-    const {select, selectAll, deselectAll, toggle, isSelected, selected} = useSelection(files.map(f => f.filename));
 
     const existingFilenames = files ? files.map(file => file.basename) : [];
     const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
@@ -33,7 +36,7 @@ export const FileBrowser = ({
     // Deselect all files on history changes
     useEffect(() => {
         const historyListener = history.listen(() => {
-            deselectAll();
+            selection.deselectAll();
         });
 
         // Specify how to clean up after this effect:
@@ -44,15 +47,15 @@ export const FileBrowser = ({
 
     // Reload the files after returning from the upload tab
     useEffect(() => {
-        fetchFilesIfNeeded(openedPath);
+        refreshFiles(openedPath);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentTab, openedPath]);
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
-        deselectAll();
-        select(path.filename);
+        selection.deselectAll();
+        selection.select(path.filename);
     };
 
     const handlePathDoubleClick = (path) => {
@@ -63,7 +66,7 @@ export const FileBrowser = ({
         }
     };
 
-    if (loading) {
+    if (loading || collectionsLoading) {
         return <LoadingInlay />;
     }
 
@@ -78,7 +81,7 @@ export const FileBrowser = ({
         );
     }
 
-    if (error) {
+    if (error || collectionsError) {
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
@@ -99,19 +102,21 @@ export const FileBrowser = ({
                 <div data-testid="files-view">
                     <FileList
                         selectionEnabled
-                        files={files.map(item => ({...item, selected: isSelected(item.filename)}))}
-                        onPathCheckboxClick={path => toggle(path.filename)}
+                        files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                        onPathCheckboxClick={path => selection.toggle(path.filename)}
                         onPathHighlight={handlePathHighlight}
                         onPathDoubleClick={handlePathDoubleClick}
-                        onAllSelection={shouldSelectAll => (shouldSelectAll ? selectAll() : deselectAll())}
+                        onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
                     />
                     <div style={{marginTop: 8}}>
                         <FileOperations
-                            selectedPaths={selected}
+                            selectedPaths={selection.selected}
+                            files={files}
                             openedPath={openedPath}
                             disabled={!openedCollection.canWrite}
-                            getDownloadLink={FileAPI.getDownloadLink}
-                            fetchFilesIfNeeded={fetchFilesIfNeeded}
+                            fileActions={fileActions}
+                            clearSelection={selection.deselectAll}
+                            refreshFiles={refreshFiles}
                         />
                     </div>
                 </div>
@@ -138,4 +143,18 @@ export const FileBrowser = ({
     );
 };
 
-export default withRouter(FileBrowser);
+export default withRouter(({openedPath, fileApi, ...props}) => {
+    const {files, loading, error, refresh, fileActions} = useFiles(openedPath, fileApi);
+    return (
+        <DisconnectedFileBrowser
+            files={files}
+            loading={loading}
+            error={error}
+            refreshFiles={refresh}
+            fileActions={fileActions}
+            openedPath={openedPath}
+            fileApi={fileApi}
+            {...props}
+        />
+    );
+});

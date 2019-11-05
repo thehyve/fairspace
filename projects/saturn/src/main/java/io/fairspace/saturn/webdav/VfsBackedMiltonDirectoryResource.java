@@ -90,7 +90,7 @@ public class VfsBackedMiltonDirectoryResource extends VfsBackedMiltonResource im
         w.open("table");
         for (var r : getChildren()) {
             w.open("tr");
-            w.open("td");;
+            w.open("td");
             w.begin("a").writeAtt("href", link(r)).open().writeText(r.getName()).close();
             w.close("td");
             w.begin("td").open().writeText(r.getModifiedDate() + "").close();

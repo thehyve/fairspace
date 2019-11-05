@@ -67,7 +67,11 @@ const PermissionsViewer = ({
                     <ListItem
                         key={key}
                     >
-                        <ListItemText primary={permission.userName} secondary={permission.access} />
+                        <ListItemText
+                            primary={permission.userName}
+                            secondary={permission.access}
+                            data-testid="collaborator"
+                        />
                         <ListItemSecondaryAction>
                             <IconButton
                                 onClick={e => handleMenuClick(e, permission)}

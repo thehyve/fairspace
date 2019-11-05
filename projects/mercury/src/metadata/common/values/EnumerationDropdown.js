@@ -21,6 +21,7 @@ function EnumerationDropdown({property, currentValues, ...otherProps}) {
     return (
         <Dropdown
             options={options}
+            isOptionDisabled={({disabled}) => disabled}
             {...otherProps}
         />
     );

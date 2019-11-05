@@ -1,64 +1,47 @@
 import React from 'react';
-import {shallow, mount} from "enzyme";
-import {MemoryRouter} from "react-router-dom";
-import {Provider} from "react-redux";
-import configureStore from 'redux-mock-store';
+import {shallow} from "enzyme";
+import {act} from 'react-dom/test-utils';
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
 
-function shallowRender(history, openedPath) {
-    const openedCollection = {
+const collections = [
+    {
+        iri: 'http://test',
         name: 'My collection',
         description: 'description',
         location: 'location1'
-    };
+    }
+];
 
-    return shallow(<FilesPage
-        fetchFilesIfNeeded={() => {}}
-        openedPath={openedPath}
-        openedCollection={openedCollection}
-        history={history}
-        selectCollection={() => {}}
-        fetchCollectionsIfNeeded={() => {}}
-    />);
+function shallowRender(history, openedPath, locationSearch = '') {
+    return shallow(
+        <FilesPage
+            match={{
+                params: {
+                    collection: 'location1',
+                    path: openedPath
+                }
+            }}
+            location={{
+                search: locationSearch
+            }}
+            history={history}
+            selectCollection={() => {}}
+            collections={collections}
+        />
+    );
 }
 
 describe('FilesPage', () => {
-    it('fetchs collections once on render', () => {
-        const fetchCollectionsIfNeeded = jest.fn();
-        const mockStore = configureStore();
-        const store = mockStore({
-            cache: {
-                collections: {
-                    data: [],
-                }
-            },
-            collectionBrowser: {
-                selectedPaths: []
-            },
-            uploads: []
-        });
-
-        mount((
-            <MemoryRouter>
-                <Provider store={store}>
-                    <FilesPage
-                        fetchFilesIfNeeded={() => {}}
-                        openedPath="''"
-                        openedCollection={{}}
-                        fetchCollectionsIfNeeded={fetchCollectionsIfNeeded}
-                    />
-                </Provider>
-            </MemoryRouter>
-        ));
-
-        expect(fetchCollectionsIfNeeded).toHaveBeenCalledTimes(1);
-    });
+    let wrapper;
 
     it('updates url after collection location has changed', () => {
         const history = [];
-        const wrapper = shallowRender(history, 'location1/subdirectory/something-else');
+
+        act(() => {
+            wrapper = shallowRender(history, 'subdirectory/something-else');
+        });
 
         const collectionChangeHandler = wrapper.find(InformationDrawer).prop("onCollectionLocationChange");
         collectionChangeHandler('new-location');
@@ -69,7 +52,10 @@ describe('FilesPage', () => {
 
     it('can handle an empty openedPath', () => {
         const history = [];
-        const wrapper = shallowRender(history, 'location1');
+
+        act(() => {
+            wrapper = shallowRender(history, '');
+        });
 
         const collectionChangeHandler = wrapper.find(InformationDrawer).prop("onCollectionLocationChange");
         collectionChangeHandler('new-location');

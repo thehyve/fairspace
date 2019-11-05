@@ -261,7 +261,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         return fileToCollectionPath
                 .entrySet()
                 .stream()
-                .collect(toMap(e -> e.getKey(), e -> collectionsByPath.get(e.getValue())));
+                .collect(toMap(Map.Entry::getKey, e -> collectionsByPath.get(e.getValue())));
     }
 
     private static String collectionPath(String filePath) {

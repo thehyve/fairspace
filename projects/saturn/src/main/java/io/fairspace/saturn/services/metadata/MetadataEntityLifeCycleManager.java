@@ -4,22 +4,18 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
+import static java.util.stream.Collectors.toSet;
 
 @AllArgsConstructor
 public
@@ -110,13 +106,13 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private Set<Resource> determineNewEntities(Model model) {
-        Set<Resource> allUris = getAllUriResources(model);
+        var allUris = model.listSubjects().filterKeep(RDFNode::isURIResource).toSet();
 
         // Filter the list of Uris that we already know
         // in the current graph
         return allUris.stream()
                 .filter(uri -> !exists(uri))
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     /**
@@ -129,26 +125,5 @@ class MetadataEntityLifeCycleManager {
      */
     private boolean exists(Resource resource) {
         return rdf.queryAsk(storedQuery("exists", graph, resource, null, null));
-    }
-
-    /**
-     * Returns a set of all URIs that are used in the model
-     *
-     * @param model
-     * @return
-     */
-    private static Set<Resource> getAllUriResources(Model model) {
-        Set<Resource> modelUris = new HashSet<>();
-
-        model.listStatements().forEachRemaining(statement -> {
-            if (statement.getSubject().isURIResource()) {
-                modelUris.add(statement.getSubject());
-            }
-            if (statement.getObject().isURIResource()) {
-                modelUris.add(statement.getResource());
-            }
-        });
-
-        return modelUris;
     }
 }

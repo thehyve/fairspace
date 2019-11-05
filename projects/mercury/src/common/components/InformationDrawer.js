@@ -1,25 +1,35 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {
-    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
-    Typography, withStyles, Grid
+    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid, Typography, withStyles
 } from '@material-ui/core';
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
 import {connect} from 'react-redux';
-import {ErrorDialog, UsersContext, MessageDisplay} from '@fairspace/shared-frontend';
+import {ErrorDialog, MessageDisplay, UsersContext} from '@fairspace/shared-frontend';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "../../collections/CollectionDetails";
 import LinkedDataEntityFormContainer from "../../metadata/common/LinkedDataEntityFormContainer";
 import PathMetadata from "../../metadata/metadata/PathMetadata";
 import * as metadataActions from "../redux/actions/metadataActions";
-import * as collectionActions from '../redux/actions/collectionActions';
-import {getPathInfoFromParams} from "../utils/fileUtils";
 import getDisplayName from "../utils/userUtils";
+import CollectionsContext from "../contexts/CollectionsContext";
 
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
+
+const pathHierarchy = (fullPath) => {
+    if (!fullPath) return [];
+
+    const paths = [];
+    let path = fullPath;
+    while (path && path.lastIndexOf('/') > 0) {
+        paths.push(path);
+        path = path.substring(0, path.lastIndexOf('/'));
+    }
+    return paths.reverse();
+};
 
 export class InformationDrawer extends React.Component {
     handleDetailsChange = ({iri, location}, locationChanged) => {
@@ -34,26 +44,27 @@ export class InformationDrawer extends React.Component {
     };
 
     handleCollectionDelete = (collection) => {
-        const {deleteCollection, fetchCollectionsIfNeeded} = this.props;
+        const {deleteCollection, setBusy = () => {}} = this.props;
+        setBusy(true);
         deleteCollection(collection.iri, collection.location)
-            .then(fetchCollectionsIfNeeded)
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",
                 this.handleCollectionDelete
-            ));
-    }
+            ))
+            .finally(() => setBusy(false));
+    };
 
     handleUpdateCollection = (name, description, location, connectionString) => {
-        const oldCollection = this.props.collection;
+        const {collection: oldCollection, setBusy = () => {}} = this.props;
+        setBusy(true);
 
-        if ((name !== this.props.collection.name
-            || description !== this.props.collection.description
+        if ((name !== oldCollection.name
+            || description !== oldCollection.description
             || location !== oldCollection.location
             || connectionString !== oldCollection.connectionString)
             && (name !== '') && (location !== '')) {
-            return this.props.updateCollection(this.props.collection.iri, name, description, connectionString, location, oldCollection.location)
-                .then(this.props.fetchCollectionsIfNeeded)
+            return this.props.updateCollection(oldCollection.iri, name, description, connectionString, location, oldCollection.location)
                 .then(() => {
                     const locationChanged = oldCollection.location !== location;
                     this.handleDetailsChange({iri: oldCollection.iri, location}, locationChanged);
@@ -61,15 +72,18 @@ export class InformationDrawer extends React.Component {
                 .catch(err => {
                     const message = err && err.message ? err.message : "An error occurred while creating a collection";
                     ErrorDialog.showError(err, message, () => {}, false);
-                });
+                })
+                .finally(() => setBusy(false));
         }
 
         return Promise.resolve();
     };
 
     render() {
-        const {classes, collection, loading, atLeastSingleCollectionExists, inCollectionsBrowser = false} = this.props;
+        const {classes, collection, loading, atLeastSingleCollectionExists, inCollectionsBrowser = false, path} = this.props;
         const {users} = this.context;
+
+        const paths = pathHierarchy(path);
 
         const getUsernameByIri = iri => getDisplayName(getUserObject(users, iri));
 
@@ -93,8 +107,8 @@ export class InformationDrawer extends React.Component {
                 );
         }
 
-        const isMetaDataEditable = collection && collection.canManage && this.props.paths.length === 0;
-        const relativePath = path => path.split('/').slice(2).join('/');
+        const isMetaDataEditable = collection && collection.canManage && paths.length === 0;
+        const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
 
         return (
             <>
@@ -122,9 +136,9 @@ export class InformationDrawer extends React.Component {
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
                 {
-                    this.props.paths.map(path => (
+                    paths.map(metadataPath => (
                         <ExpansionPanel
-                            key={path}
+                            key={metadataPath}
                             defaultExpanded
                         >
                             <ExpansionPanelSummary
@@ -133,13 +147,13 @@ export class InformationDrawer extends React.Component {
                                 <Typography
                                     className={classes.heading}
                                 >
-                                    Metadata for {relativePath(path)}
+                                    Metadata for {relativePath(metadataPath)}
                                 </Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <PathMetadata
-                                    path={path}
-                                    isEntityEditable={collection.canManage && path === this.props.paths[this.props.paths.length - 1]}
+                                    path={metadataPath}
+                                    isEntityEditable={collection.canManage && metadataPath === paths[paths.length - 1]}
                                     style={{width: '100%'}}
                                 />
                             </ExpansionPanelDetails>
@@ -151,51 +165,37 @@ export class InformationDrawer extends React.Component {
     }
 }
 
-function pathHierarchy(fullPath) {
-    const paths = [];
-    let path = fullPath;
-    while (path && path.lastIndexOf('/') > 0) {
-        paths.push(path);
-        path = path.substring(0, path.lastIndexOf('/'));
-    }
-    return paths.reverse();
-}
-
 InformationDrawer.contextType = UsersContext;
 
 InformationDrawer.propTypes = {
     fetchMetadata: PropTypes.func,
     updateCollection: PropTypes.func,
     deleteCollection: PropTypes.func,
-    fetchCollectionsIfNeeded: PropTypes.func,
     onCollectionLocationChange: PropTypes.func,
 
     collection: PropTypes.object,
     loading: PropTypes.bool
 };
 
-const mapStateToProps = ({cache: {collections},
-    collectionBrowser: {selectedPaths, selectedCollectionLocation}}, ownProps) => {
-    const {match: {params}} = ownProps;
-    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
-    const location = collectionLocation || selectedCollectionLocation;
-    const collection = (collections.data && collections.data.find(c => c.location === location));
-    const atLeastSingleCollectionExists = !!(collections.data && collections.data.length > 0);
+const ContextualInformationDrawer = ({selectedCollectionIri, ...props}) => {
+    const {loading, collections, updateCollection, deleteCollection} = useContext(CollectionsContext);
+    const collection = collections.find(c => c.iri === selectedCollectionIri);
+    const atLeastSingleCollectionExists = collections.length > 0;
 
-    return {
-        collection,
-        paths: pathHierarchy((selectedPaths.length === 1) ? selectedPaths[0] : openedPath),
-        loading: collections.pending,
-        atLeastSingleCollectionExists
-    };
+    return (
+        <InformationDrawer
+            {...props}
+            loading={loading}
+            collection={collection}
+            updateCollection={updateCollection}
+            deleteCollection={deleteCollection}
+            atLeastSingleCollectionExists={atLeastSingleCollectionExists}
+        />
+    );
 };
 
 const mapDispatchToProps = {
     fetchMetadata: metadataActions.fetchMetadataBySubjectIfNeeded,
-
-    updateCollection: collectionActions.updateCollection,
-    deleteCollection: collectionActions.deleteCollection,
-    fetchCollectionsIfNeeded: collectionActions.fetchCollectionsIfNeeded
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(InformationDrawer)));
+export default withRouter(connect(null, mapDispatchToProps)(withStyles(styles)(ContextualInformationDrawer)));

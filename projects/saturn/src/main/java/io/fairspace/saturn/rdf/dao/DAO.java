@@ -209,13 +209,11 @@ public class DAO {
             Iterable<Resource> subjects = model::listSubjects;
             for (var resource : subjects) {
                 var entity = createEntity(type, resource);
-                if (entity != null) {
-                    if (entity instanceof LifecycleAwarePersistentEntity && ((LifecycleAwarePersistentEntity) entity).getDateDeleted() != null) {
-                        continue;
-                    }
-
-                    entities.add(entity);
+                if (entity instanceof LifecycleAwarePersistentEntity && ((LifecycleAwarePersistentEntity) entity).getDateDeleted() != null) {
+                    continue;
                 }
+
+                entities.add(entity);
             }
 
             return entities;
