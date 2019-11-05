@@ -8,7 +8,7 @@ const styles = theme => ({
         flexWrap: 'wrap',
     },
     chip: {
-        margin: theme.spacing.unit / 4,
+        margin: theme.spacing(1) / 4,
     }
 });
 
@@ -40,7 +40,7 @@ const LinkedDataOverviewHeader = ({classes, setQuery, selectedTypes, setSelected
                     {availableTypes.map(({targetClass, label}) => (
                         <MenuItem key={targetClass} value={targetClass}>
                             <Checkbox checked={selectedTypes.includes(targetClass)} />
-                            <ListItemText primary={label} secondary={targetClass} />
+                            <ListItemText style={{marginLeft: 4}} primary={label} secondary={targetClass} />
                         </MenuItem>
                     ))}
                 </Select>

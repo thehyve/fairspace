@@ -67,7 +67,7 @@ export const FilesPage = ({
             <div style={{position: 'relative', zIndex: 1}}>
                 <BreadCrumbs additionalSegments={breadcrumbSegments} />
             </div>
-            <Grid container spacing={8}>
+            <Grid container spacing={1}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <FileBrowser
                         data-testid="file-browser"

@@ -18,6 +18,7 @@ import {getCollectionsSearchResults} from "../common/redux/reducers/searchReduce
 const styles = {
     tableRoot: {
         width: '100%',
+        maxHeight: 'calc(100% - 60px)',
         overflowX: 'auto'
     },
     table: {
@@ -77,7 +78,7 @@ export const SearchPage = ({
     }
 
     return (
-        <Paper className={classes.root} data-testid="results-table">
+        <Paper className={classes.tableRoot} data-testid="results-table">
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>

@@ -18,7 +18,7 @@ const styles = theme => ({
     media: {
         height: 140,
         backgroundSize: 'contain',
-        margin: theme.spacing.unit
+        margin: theme.spacing(1)
     },
 });
 

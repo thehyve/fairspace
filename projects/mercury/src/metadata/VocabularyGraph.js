@@ -65,7 +65,7 @@ const VocabularyGraph = ({history}) => {
     return (
         <Grid container direction="column">
             <Grid item>
-                <Grid container spacing={32} alignItems="center">
+                <Grid container spacing={4} alignItems="center">
                     <Grid item>
                         <FormControlLabel
                             control={(

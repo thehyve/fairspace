@@ -15,7 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import {AccessRights} from "../common/utils/permissionUtils";
 import UserSelect from "./UserSelect";
 
-export const styles = () => ({
+export const styles = {
     root: {
         width: 400,
         height: 350,
@@ -35,7 +35,7 @@ export const styles = () => ({
     autocomplete: {
         width: '100%'
     },
-});
+};
 
 export class AlterPermissionDialog extends React.Component {
     constructor(props) {
@@ -118,6 +118,7 @@ export class AlterPermissionDialog extends React.Component {
                     <Typography
                         variant="subtitle1"
                         gutterBottom
+                        data-testid="user"
                     >
                         {this.getName(user)}
                     </Typography>
@@ -148,7 +149,12 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, accessRight} = this.state;
 
         return (
-            <Dialog open={open} onEnter={this.handleOnEnter} onClose={this.handleClose}>
+            <Dialog
+                open={open}
+                onEnter={this.handleOnEnter}
+                onClose={this.handleClose}
+                data-testid="permissions-dialog"
+            >
                 <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
                 <DialogContent>
                     <div className={user ? classes.rootEdit : classes.root}>
@@ -184,7 +190,8 @@ export class AlterPermissionDialog extends React.Component {
                     <Button
                         onClick={this.handleSubmit}
                         color="primary"
-                        disabled={!selectedUser || loading || error}
+                        disabled={Boolean(!selectedUser || loading || error)}
+                        data-testid="submit"
                     >
                         Submit
                     </Button>
@@ -203,4 +210,4 @@ AlterPermissionDialog.propTypes = {
     iri: PropTypes.string,
 };
 
-export default withStyles(styles, {withTheme: true})(AlterPermissionDialog);
+export default withStyles(styles)(AlterPermissionDialog);

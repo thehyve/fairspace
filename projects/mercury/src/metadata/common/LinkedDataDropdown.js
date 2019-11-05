@@ -1,22 +1,21 @@
-import React, {useContext} from 'react';
+import React, {useContext, useRef} from 'react';
 import {PropTypes} from 'prop-types';
 import {LoadingInlay, MessageDisplay, SearchAPI, handleSearchError, SORT_ALPHABETICALLY} from '@fairspace/shared-frontend';
 
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE, ES_INDEX} from "../../constants";
-import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
 import Config from "../../common/services/Config";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
-    let fetchRequest = null;
+    const fetchRequest = useRef(null);
 
     const search = query => fetchItems({types, size: SEARCH_DROPDOWN_DEFAULT_SIZE, query})
         .then(
             ({items}) => items.map(metadataItem => {
                 const {id, label, name} = metadataItem;
-                const displayLabel = (label && label[0]) || (name && name[0]) || <Iri iri={id} />;
+                const displayLabel = (label && label[0]) || (name && name[0]) || id;
 
                 return {
                     label: displayLabel,
@@ -27,16 +26,16 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, 
         );
 
     const debouncedSearch = (query) => {
-        if (fetchRequest) {
-            clearTimeout(fetchRequest);
+        if (fetchRequest.current) {
+            clearTimeout(fetchRequest.current);
         }
 
         return new Promise((resolve, reject) => {
-            if (fetchRequest) {
-                clearTimeout(fetchRequest);
+            if (fetchRequest.current) {
+                clearTimeout(fetchRequest.current);
             }
 
-            fetchRequest = setTimeout(() => {
+            fetchRequest.current = setTimeout(() => {
                 search(query)
                     .then(resolve)
                     .catch(reject);

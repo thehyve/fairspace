@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {MuiPickersUtilsProvider} from "material-ui-pickers";
 import useIsMounted from "react-is-mounted-hook";
 import {
     ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, UsersProvider, VersionProvider

@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import PropTypes from 'prop-types';
-import {Grid} from "@material-ui/core";
-import {MaterialReactSelect} from "@fairspace/shared-frontend";
+import {Grid, TextField} from "@material-ui/core";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import BaseInputValue from "./BaseInputValue";
 import LinkedDataContext from "../../LinkedDataContext";
@@ -36,12 +36,17 @@ export const IriValue = ({
     }
 
     return (
-        <Grid container justify="space-between" spacing={8}>
+        <Grid container alignItems="flex-end" justify="space-between" spacing={1}>
             <Grid item xs={4}>
-                <MaterialReactSelect
+                <Autocomplete
                     options={namespaceOptions}
                     value={namespace || defaultNamespace}
-                    onChange={onNamespaceChange}
+                    onChange={(e, v) => {
+                        onNamespaceChange(v);
+                    }}
+                    getOptionDisabled={option => option.disabled}
+                    getOptionLabel={option => option.label}
+                    renderInput={(props) => <TextField fullWidth {...props} />}
                 />
             </Grid>
             <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>

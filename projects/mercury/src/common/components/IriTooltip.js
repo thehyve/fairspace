@@ -1,6 +1,5 @@
-import Tooltip from "@material-ui/core/Tooltip";
 import React from "react";
-import {withStyles} from "@material-ui/core";
+import {withStyles, Tooltip} from "@material-ui/core";
 
 const styles = theme => ({
     tooltip: {
@@ -11,6 +10,7 @@ const styles = theme => ({
     }
 });
 
-export default withStyles(styles)(
-    ({classes, children, ...otherProps}) => (<Tooltip classes={classes} {...otherProps}>{children}</Tooltip>)
-);
+// This is to avoid the warning similar to: Invalid prop component supplied to ComponentName. Expected an element type that can hold a ref.
+const IriTooltip = React.forwardRef(({classes, children, ...otherProps}, ref) => (<Tooltip ref={ref} classes={classes} {...otherProps}>{children}</Tooltip>));
+
+export default withStyles(styles)(IriTooltip);

@@ -18,7 +18,7 @@ const CollectionsPage = () => {
     return (
         <CollectionBreadcrumbsContextProvider>
             <BreadCrumbs />
-            <Grid container spacing={8}>
+            <Grid container spacing={1}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <CollectionBrowser
                         isSelected={collection => isSelected(collection.iri)}

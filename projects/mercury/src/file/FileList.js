@@ -61,12 +61,12 @@ const FileList = ({
 
     return (
         <Paper className={classes.root}>
-            <Table>
+            <Table size="small">
                 <TableHead>
                     <TableRow>
                         {checkboxHeader}
                         <TableCell padding="none" />
-                        <TableCell padding="none">
+                        <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'name'}
                                 direction={orderAscending ? 'asc' : 'desc'}
@@ -125,18 +125,18 @@ const FileList = ({
                                     ) : null
                                 }
 
-                                <TableCell align="left" padding="checkbox">
+                                <TableCell padding="none" align="left">
                                     <Icon>
                                         {file.type === 'directory' ? 'folder_open' : 'note_open'}
                                     </Icon>
                                 </TableCell>
-                                <TableCell padding="none">
+                                <TableCell>
                                     {file.basename}
                                 </TableCell>
-                                <TableCell padding="none" align="right">
+                                <TableCell align="right">
                                     {file.type === 'file' ? filesize(file.size) : ''}
                                 </TableCell>
-                                <TableCell padding="checkbox" align="right">
+                                <TableCell align="right">
                                     {file.lastmod ? formatDateTime(file.lastmod) : null}
                                 </TableCell>
                             </TableRow>
