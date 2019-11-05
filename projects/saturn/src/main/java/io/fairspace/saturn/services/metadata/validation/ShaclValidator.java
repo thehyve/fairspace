@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import lombok.AllArgsConstructor;
 import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
@@ -19,7 +18,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
 
-@AllArgsConstructor
 public class ShaclValidator implements MetadataRequestValidator {
     private static final int NUM_THREADS = availableProcessors();
     private final ExecutorService executorService = newFixedThreadPool(NUM_THREADS);

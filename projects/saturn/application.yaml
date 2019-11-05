@@ -7,12 +7,14 @@ jena:
   # Base IRI for all vocabulary entities
   vocabularyBaseIRI: "http://localhost/vocabulary/"
   # Jena's TDB2 database path
-  datasetPath: "data/db"
+  datasetPath: "/data/db"
   # Path of the transaction log
-  transactionLogPath: "data/log"
+  transactionLogPath: "/data/log"
+
+#  inactiveDatabaseShutdownIntervalSec: 3600
   elasticSearch:
     # Enables ElasticSearch integration
-    enabled: true
+    enabled: false
     # Makes availability of ElasticSearch mandatory
     required: false
     settings:
@@ -52,7 +54,7 @@ auth:
   userUrlTemplate: "http://localhost:5100/auth/admin/realms/ci/users/%s"
 webDAV:
   # Path of the WebDAV's local blob store
-  blobStorePath: "data/blobs"
+  blobStorePath: "/data/blobs"
 mail:
   mail.from: info@fairspace.com
   mail.user: user

@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -78,7 +79,7 @@ public class SparqlUtils {
     private static String load(String name) {
         return "PREFIX ws: " + str(createURI(CONFIG.jena.metadataBaseIRI)) + '\n' +
                "PREFIX vocabulary: " + str(createURI(CONFIG.jena.vocabularyBaseIRI)) + '\n' +
-                IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), "UTF-8");
+                IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), StandardCharsets.UTF_8);
     }
 
     public static Node generateMetadataIri() {

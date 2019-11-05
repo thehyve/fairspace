@@ -8,9 +8,7 @@ import static spark.Spark.before;
 @Slf4j
 public class PerformanceMeasurer {
     public static void applyPerformanceMeasuring() {
-        before((request, response) ->{
-            request.attribute("startTime", System.currentTimeMillis());
-        });
+        before((request, response) -> request.attribute("startTime", System.currentTimeMillis()));
         afterAfter((request, response) ->{
             Long startTime = request.attribute("startTime");
 

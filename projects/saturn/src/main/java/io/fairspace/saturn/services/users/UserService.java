@@ -22,7 +22,7 @@ import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 public class UserService {
     private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final String userUrlTemplate;
-    private DAO dao;
+    private final DAO dao;
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
 
     public UserService(String userUrlTemplate, DAO dao) {

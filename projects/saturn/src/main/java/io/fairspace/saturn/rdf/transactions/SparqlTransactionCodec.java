@@ -30,7 +30,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
     @Override
     public TransactionListener write(OutputStream out) throws IOException {
         return new TransactionListener() {
-            private OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
+            private final OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
 
             @Override
             public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
