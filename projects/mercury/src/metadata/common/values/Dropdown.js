@@ -24,7 +24,7 @@ const Dropdown = ({options, placeholder, async, loadOptions, isOptionDisabled, o
                 onChange(v);
             }}
             options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : optionsToShow}
-            getOptionDisabled={option => (isOptionDisabled && isOptionDisabled(option)) || option.disabled}
+            getOptionDisabled={option => (isOptionDisabled && isOptionDisabled(option))}
             getOptionLabel={option => option.label}
             renderInput={(props) => <TextField fullWidth {...props} />}
         />
