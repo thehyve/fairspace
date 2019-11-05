@@ -5,7 +5,9 @@ import KeycloakAPI from "./KeycloakAPI";
 import Dropdown from "../metadata/common/values/Dropdown";
 
 const UserSelect = ({debounce = 300, ...otherProps}) => {
-    const fetchItems = ({size = SEARCH_DROPDOWN_DEFAULT_SIZE, query}) => KeycloakAPI.searchUsers({size, query})
+    const fetchRequest = useRef(null);
+
+    const search = (query, size = SEARCH_DROPDOWN_DEFAULT_SIZE) => KeycloakAPI.searchUsers({size, query})
         .then(
             items => items.map(user => {
                 const {iri, firstName, lastName} = user;
@@ -17,11 +19,6 @@ const UserSelect = ({debounce = 300, ...otherProps}) => {
                 };
             })
         );
-
-    const fetchRequest = useRef(null);
-
-
-    const search = query => fetchItems({size: SEARCH_DROPDOWN_DEFAULT_SIZE, query});
 
     const debouncedSearch = (query) => {
         if (fetchRequest.current) {
@@ -44,8 +41,8 @@ const UserSelect = ({debounce = 300, ...otherProps}) => {
     return (
         <Dropdown
             {...otherProps}
-            style={{width: '100%'}}
             async
+            clearTextOnSelection={false}
             loadOptions={debouncedSearch}
         />
     );

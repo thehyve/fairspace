@@ -5,8 +5,11 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import {compareBy} from '@fairspace/shared-frontend';
 import useIsMounted from 'react-is-mounted-hook';
 
-const Dropdown = ({options, placeholder, async, loadOptions, isOptionDisabled, onChange, ...otherProps}) => {
-    const [optionsToShow, setOptionsToShow] = useState([]);
+const Dropdown = ({
+    options, clearTextOnSelection = true, placeholder, async,
+    loadOptions, isOptionDisabled, onChange, value, ...otherProps
+}) => {
+    const [optionsToShow, setOptionsToShow] = useState(async && options ? options : []);
     const [searchText, setSearchText] = useState('');
 
     const isMounted = useIsMounted();
@@ -14,21 +17,28 @@ const Dropdown = ({options, placeholder, async, loadOptions, isOptionDisabled, o
     useEffect(() => {
         if (isMounted()) {
             if (async && loadOptions) {
-                loadOptions()
+                loadOptions(searchText)
                     .then(setOptionsToShow);
             } else {
                 setOptionsToShow(options);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [options, searchText]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [async, searchText, options]);
+
+    const inputProps = (params) => ({
+        ...params.inputProps,
+        value: searchText,
+        onChange: (e) => isMounted() && setSearchText(e.target.value)
+    });
 
     return (
         <Autocomplete
             {...otherProps}
+            value={value}
             onChange={(e, v) => {
                 onChange(v);
-                if (isMounted()) {
+                if (clearTextOnSelection && isMounted()) {
                     setSearchText('');
                 }
             }}
@@ -39,12 +49,7 @@ const Dropdown = ({options, placeholder, async, loadOptions, isOptionDisabled, o
                 <TextField
                     fullWidth
                     {...params}
-                    inputProps={{
-                        ...params.inputProps,
-                        value: searchText
-                    }}
-                    value={searchText}
-                    onChange={(e) => isMounted() && setSearchText(e.target.value)}
+                    inputProps={clearTextOnSelection ? inputProps(params) : params.inputProps}
                 />
             )}
         />
