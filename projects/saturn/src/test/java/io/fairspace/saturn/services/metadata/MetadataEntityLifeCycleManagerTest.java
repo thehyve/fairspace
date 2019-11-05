@@ -75,16 +75,13 @@ public class MetadataEntityLifeCycleManagerTest {
     }
 
     @Test
-    public void testCreationInformationStorageForObjects() {
+    public void testNoCreationInformationStorageForObjects() {
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
 
         lifeCycleManager.updateLifecycleMetadata(delta);
 
-        assertTrue(model.contains(otherResource, createdBy, userResource));
-
-        String dateCreatedValue = model.getRequiredProperty(otherResource, dateCreated).getString();
-        ensureRecentInstant(Instant.parse(dateCreatedValue));
+        assertFalse(model.contains(otherResource, createdBy, userResource));
     }
 
     @Test
@@ -129,7 +126,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         lifeCycleManager.updateLifecycleMetadata(delta);
 
-        verify(permissionsService).createResources(Set.of(resource, otherResource));
+        verify(permissionsService).createResources(Set.of(resource));
     }
 
     @Test
@@ -143,7 +140,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         // Ensure correct storage of creation information
         assertTrue(model.contains(resource, createdBy, userResource));
-        assertTrue(model.contains(otherResource, createdBy, userResource));
+        assertFalse(model.contains(otherResource, createdBy, userResource));
 
         // Ensure any permissions are ignored
         verifyZeroInteractions(permissionsService);
