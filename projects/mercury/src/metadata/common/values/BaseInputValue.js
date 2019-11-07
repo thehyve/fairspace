@@ -32,7 +32,12 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
             multiline={property.multiLine}
             value={localValue}
             onChange={handleChange}
-            onBlur={() => updateOuterState(localValue)}
+            onBlur={(e) => {
+                updateOuterState(localValue);
+                if (otherProps.onBlur) {
+                    otherProps.onBlur(e);
+                }
+            }}
             onKeyDown={(e) => {
                 if (e.key === "Enter") {
                     // If multiline and with ctrl key or if both are false
