@@ -1,16 +1,16 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.config.ApiFilterFactory;
-import io.fairspace.saturn.config.SecurityHandlerFactory;
 import io.fairspace.saturn.config.Services;
-import io.fairspace.saturn.config.WebDAVServletFactory;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
+import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.config.SecurityHandlerFactory.getSecurityHandler;
+import static io.fairspace.saturn.config.WebDAVServletFactory.initWebDAVServlet;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 
 @Slf4j
@@ -33,10 +33,10 @@ public class App {
         var svc = new Services(CONFIG, rdf, SaturnSecurityHandler::userInfo);
 
         FusekiServer.create()
-                .securityHandler(SecurityHandlerFactory.getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
+                .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)
-                .addFilter(apiPathPrefix + "/*", ApiFilterFactory.createApiFilter(apiPathPrefix, svc, CONFIG))
-                .addServlet(webDavPathPrefix + "*", WebDAVServletFactory.initWebDAVServlet(webDavPathPrefix, rdf, svc, CONFIG.webDAV))
+                .addFilter(apiPathPrefix + "/*", createApiFilter(apiPathPrefix, svc, CONFIG))
+                .addServlet(webDavPathPrefix + "*", initWebDAVServlet(webDavPathPrefix, rdf, svc, CONFIG.webDAV))
                 .port(CONFIG.port)
                 .build()
                 .start();
