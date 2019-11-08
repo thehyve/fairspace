@@ -26,8 +26,6 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
             queue.drainTo(tasks);
 
             while (!tryExecute(tasks));
-
-            tasks.forEach(Task::batchCompleted);  // mark all tasks as committed
         }
     }, "Batch transaction processor");
 
@@ -59,15 +57,16 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
         return tasks.isEmpty() || calculateWrite(this, () -> {
             for (var it = tasks.iterator(); it.hasNext(); ) {
                 var task = it.next();
-                try {
-                    task.apply();
-                } catch (Exception e) {
-                    // abort the transaction, exclude the failed task and retry
+                if(!task.perform()) {
                     abort();
+                }
+                if (!isInTransaction()) { // aborted
                     it.remove();
+                    task.completed(); // task failed, no need to wait for other tasks
                     return false;
                 }
             }
+            tasks.forEach(Task::completed);  // mark all tasks as committed
             return true; // success
         });
     }
@@ -84,22 +83,22 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
             this.action = action;
         }
 
-        void apply() throws Exception {
+        boolean perform() {
             try {
                 setThreadContext(context);
                 grabTransactionMetadataFromContext();
 
                 result = action.get();
+                return true;
             } catch (Exception e) {
                 error = e;
-                canBeRead.countDown(); // No need to wait until the transaction is committed
-                throw e;
+                return false;
             } finally {
                 cleanThreadContext();
             }
         }
 
-        void batchCompleted() {
+        void completed() {
             canBeRead.countDown();
         }
 
