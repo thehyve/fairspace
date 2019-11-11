@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.function.BooleanSupplier;
@@ -49,7 +50,7 @@ public class Services {
     private final ReadableMetadataService metaVocabularyService;
 
 
-    public Services(@NonNull Config config, @NonNull RDFConnection rdf, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
+    public Services(@NonNull Config config, @NonNull Dataset dataset, @NonNull RDFConnection rdf, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
         this.config = config;
         this.rdf = rdf;
         this.userInfoSupplier = userInfoSupplier;
@@ -81,7 +82,7 @@ public class Services {
                         .build()
                 );
 
-        metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
+        metadataService = new ChangeableMetadataService(rdf, dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -100,7 +101,7 @@ public class Services {
                         .build()
                 );
 
-        userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
+        userVocabularyService = new ChangeableMetadataService(rdf, dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, 0, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
         metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
     }
 

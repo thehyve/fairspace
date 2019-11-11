@@ -14,14 +14,19 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 
 public class Inference {
     public static Model applyInference(Model vocabulary, Model model) {
-        return model.add(getInferredStatements(vocabulary, model));
+        return model.add(getInferredStatements(vocabulary, model, model));
     }
 
-    public static Model getInferredStatements(Model vocabulary, Model model) {
+    public static Model applyInference(Model vocabulary, Model base, Model changes) {
+        return changes.add(getInferredStatements(vocabulary, base, changes));
+    }
+
+    public static Model getInferredStatements(Model vocabulary, Model base, Model changes) {
         var inferred = createDefaultModel();
 
-         model.listStatements()
+         changes.listStatements()
                 .filterKeep(stmt -> stmt.getObject().isResource())
+                 .mapWith(stmt -> base.createStatement(stmt.getSubject(), stmt.getPredicate(), stmt.getObject()))
                 .forEachRemaining(stmt -> getInversePropertyForStatement(stmt, vocabulary)
                         .map(inverseProperty -> stmt.getModel().createStatement(stmt.getObject().asResource(), inverseProperty, stmt.getSubject()))
                         .ifPresent(inferred::add)

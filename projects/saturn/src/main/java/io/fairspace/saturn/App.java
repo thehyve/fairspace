@@ -27,11 +27,10 @@ public class App {
         var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
         initVocabularies(rdf);
 
+        var svc = new Services(CONFIG, ds, rdf, SaturnSecurityHandler::userInfo);
+
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";
-
-        var svc = new Services(CONFIG, rdf, SaturnSecurityHandler::userInfo);
-
         FusekiServer.create()
                 .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)

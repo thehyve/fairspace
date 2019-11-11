@@ -19,4 +19,8 @@ public class TestUtils {
     public static Model isomorphic(Model m) {
         return argThat(m::isIsomorphicWith);
     }
+
+    public static Model contains(Model m) {
+        return argThat(a -> a.containsAll(m));
+    }
 }

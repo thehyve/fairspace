@@ -1,6 +1,7 @@
 package io.fairspace.saturn.config;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,9 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(MockitoJUnitRunner.class)
 public class ServicesTest {
     @Mock
+    private Dataset dataset;
+
+    @Mock
     private RDFConnection rdf;
 
     @Mock
@@ -28,7 +32,7 @@ public class ServicesTest {
 
     @Before
     public void before() throws Exception {
-        svc = new Services(config, rdf, userInfoSupplier);
+        svc = new Services(config, dataset, rdf, userInfoSupplier);
     }
 
     @Test

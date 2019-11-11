@@ -53,7 +53,7 @@ public class ChangeableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        api = new ChangeableMetadataService(rdf, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
+        api = new ChangeableMetadataService(rdf, ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator(), event -> {});
     }
 
     @Test

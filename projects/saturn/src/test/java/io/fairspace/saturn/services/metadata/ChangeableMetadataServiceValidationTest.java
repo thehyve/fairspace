@@ -30,7 +30,6 @@ import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
@@ -67,7 +66,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new ChangeableMetadataService(rdf, createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
+        api = new ChangeableMetadataService(rdf, ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator, event -> {});
     }
 
     @Test
@@ -109,14 +108,6 @@ public class ChangeableMetadataServiceValidationTest {
     }
 
     @Test
-    public void patchShouldNotValidateExistingTriples() {
-        ds.getNamedModel(GRAPH).add(STMT1);
-        api.patch(modelOf(STMT1));
-
-        verify(validator).validate(any(), any(), argThat(Model::isEmpty), argThat(Model::isEmpty), any(), any());
-    }
-
-    @Test
     public void testSoftDeleteShouldSucceedOnValidationSuccess() {
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
 
@@ -154,7 +145,10 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, createTypedLiteral(1));
 
-        api.put(toAdd);
+        executeWrite(ds, () -> {
+            api.put(toAdd);
+            ds.abort();
+        });
 
         verify(validator).validate(
                 isomorphic(modelOf(resource1, RDF.type, class1)),
@@ -173,10 +167,13 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, resource2);
 
-        api.put(toAdd);
+        executeWrite(ds, () -> {
+            api.put(toAdd);
+            ds.abort();
+        });
 
         verify(validator).validate(
-                isomorphic(EMPTY_MODEL),
+                isomorphic(modelOf(resource2, RDF.type, class2)),
                 isomorphic(modelOf(
                         resource2, RDF.type, class2,
                         resource1, property1, resource2)),
@@ -208,7 +205,10 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, resource2);
 
-        api.put(toAdd);
+        executeWrite(ds, () -> {
+            api.put(toAdd);
+            ds.abort();
+        });
 
         verify(validator).validate(
                 isomorphic(modelOf(
@@ -247,7 +247,10 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property2, resource2);
 
-        api.put(toAdd);
+        executeWrite(ds, () -> {
+            api.put(toAdd);
+            ds.abort();
+        });
 
         verify(validator).validate(
                 isomorphic(modelWithList),
