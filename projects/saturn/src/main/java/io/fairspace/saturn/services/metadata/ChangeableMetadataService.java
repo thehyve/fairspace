@@ -115,8 +115,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             });
 
             update(toDelete, model.removeAll(null, null, NIL));
-            eventConsumer.accept(MetadataEvent.Type.UPDATED);
         });
+
+        eventConsumer.accept(MetadataEvent.Type.UPDATED);
     }
 
     private void update(Model modelToRemove, Model modelToAdd) {
