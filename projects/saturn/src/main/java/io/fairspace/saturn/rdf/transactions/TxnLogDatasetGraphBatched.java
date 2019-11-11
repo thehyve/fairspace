@@ -89,8 +89,10 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
                 grabTransactionMetadataFromContext();
 
                 result = action.get();
+                error = null;
                 return true;
             } catch (Exception e) {
+                result = null;
                 error = e;
                 return false;
             } finally {
@@ -98,6 +100,7 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
             }
         }
 
+        // Either committed or failed
         void completed() {
             canBeRead.countDown();
         }
