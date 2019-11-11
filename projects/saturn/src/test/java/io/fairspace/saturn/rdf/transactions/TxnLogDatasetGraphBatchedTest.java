@@ -52,7 +52,12 @@ public class TxnLogDatasetGraphBatchedTest {
 
     @Test
     public void nestedCallsAreAllowed() {
-        assertEquals("blah", dsg.write(() -> dsg.write(() -> dsg.write(() -> "blah"))));
+        try {
+            assertEquals("blah", dsg.write(() -> dsg.write(() -> dsg.write(() -> "blah"))));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Test
