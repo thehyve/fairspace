@@ -39,7 +39,7 @@ const UseNavigationBlocker = (shouldBlock) => {
         }
 
         if (shouldBlock) {
-            unblockRef.current = history.block(({pathname}) => {
+            unblockRef.current = history.block(({pathname, search}) => {
                 // If the confirmation is already shown and another navigation is fired then it should be allowed
                 // The 2nd navigation can only be comming from the 'Navigate' confrimation button.
                 if (showCloseConfirmation) {
@@ -47,7 +47,7 @@ const UseNavigationBlocker = (shouldBlock) => {
                 }
 
                 setShowCloseConfirmation(true);
-                setLocationToNavigateTo(pathname);
+                setLocationToNavigateTo(pathname + (search || ''));
                 return false;
             });
         }

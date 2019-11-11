@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Badge, Icon, IconButton} from "@material-ui/core";
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
@@ -11,7 +11,7 @@ import {CreateDirectoryButton, RenameButton} from "./buttons";
 import {getParentPath, joinPaths} from "../common/utils/fileUtils";
 import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
-import useClipboard from "../common/hooks/useClipboard";
+import ClipboardContext from '../common/contexts/ClipboardContext';
 
 export const Operations = {
     PASTE: 'PASTE',
@@ -212,7 +212,7 @@ export const FileOperations = ({
 };
 
 const ContextualFileOperations = props => {
-    const clipboard = useClipboard();
+    const clipboard = useContext(ClipboardContext);
     return <FileOperations clipboard={clipboard} {...props} />;
 };
 

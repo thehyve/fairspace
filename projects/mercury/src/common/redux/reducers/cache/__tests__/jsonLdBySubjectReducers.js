@@ -1,6 +1,6 @@
 import {testNoChangedOnUnknownActionType} from "@fairspace/shared-frontend";
 import reducer from "../jsonLdBySubjectReducers";
-import {FETCH_METADATA, UPDATE_METADATA, UPDATE_COLLECTION_FULFILLED} from '../../../actions/actionTypes';
+import {FETCH_METADATA, UPDATE_METADATA} from '../../../actions/actionTypes';
 
 testNoChangedOnUnknownActionType('Metadata reducer', reducer);
 
@@ -69,19 +69,6 @@ describe('Metadata reducers', () => {
             const action = {
                 type: `${UPDATE_METADATA}_FULFILLED`,
                 meta: {subject: 'my-subject'}
-            };
-
-            const newState = reducer(previousState, action);
-
-            expect(newState['previous-subject']).toEqual('test');
-            expect(newState['my-subject'].invalidated).toBeTruthy();
-        });
-
-        it('should invalidate metadata when a collection is updated', () => {
-            const previousState = {'previous-subject': 'test'};
-            const action = {
-                type: UPDATE_COLLECTION_FULFILLED,
-                meta: {id: 'my-subject'}
             };
 
             const newState = reducer(previousState, action);
