@@ -60,7 +60,7 @@ public class ShaclValidatorTest {
         doAnswer(invocation -> {
             System.err.println(Arrays.toString(invocation.getArguments()));
             return null;
-        }).when(violationHandler).onViolation(any(),any(), any(), any());
+        }).when(violationHandler).onViolation(any(), any(), any(), any());
     }
 
     @Test
@@ -86,12 +86,12 @@ public class ShaclValidatorTest {
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
                 vocabulary, violationHandler);
 
-        verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+        verify(violationHandler).onViolation("Value does not have datatype http://www.w3.org/2001/XMLSchema#string",
                 resource1,
                 RDFS.comment,
                 createTypedLiteral(123));
 
-        verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+        verify(violationHandler).onViolation("Value does not have datatype http://www.w3.org/2001/XMLSchema#string",
                 resource1,
                 RDFS.label,
                 createTypedLiteral(123));
@@ -108,9 +108,9 @@ public class ShaclValidatorTest {
                 vocabulary, violationHandler);
 
         verify(violationHandler).onViolation("Predicate <http://example.com#unknown> is not allowed (closed shape)",
-                resource1,
-                createProperty("http://example.com#unknown"),
-                createTypedLiteral(123));
+                createStatement(resource1,
+                        createProperty("http://example.com#unknown"),
+                        createTypedLiteral(123)));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ShaclValidatorTest {
                 resource1, FS.filePath, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
-        verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+        verify(violationHandler).onViolation("Value does not have datatype http://www.w3.org/2001/XMLSchema#string",
                 resource1,
                 FS.filePath,
                 createTypedLiteral(123));
@@ -155,7 +155,7 @@ public class ShaclValidatorTest {
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
 
-        verify(violationHandler).onViolation("Value does not have class fs:User",
+        verify(violationHandler).onViolation("Value does not have class http://fairspace.io/ontology#User",
                 resource1,
                 FS.createdBy,
                 resource2);
@@ -173,9 +173,9 @@ public class ShaclValidatorTest {
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
         verify(violationHandler).onViolation("Predicate <http://fairspace.io/ontology#md5> is not allowed (closed shape)",
-                blankNode,
-                FS.md5,
-                createStringLiteral("test"));
+                createStatement(blankNode,
+                        FS.md5,
+                        createStringLiteral("test")));
     }
 
     @Test
@@ -240,7 +240,7 @@ public class ShaclValidatorTest {
 
         validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler);
 
-        verify(violationHandler).onViolation("Value does not have class fs:User",
+        verify(violationHandler).onViolation("Value does not have class http://fairspace.io/ontology#User",
                 resource1,
                 FS.createdBy,
                 newBlankNode);
@@ -257,7 +257,7 @@ public class ShaclValidatorTest {
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
         model.listSubjects().forEachRemaining(resource ->
-                verify(violationHandler).onViolation("Value does not have datatype xsd:string",
+                verify(violationHandler).onViolation("Value does not have datatype http://www.w3.org/2001/XMLSchema#string",
                         resource,
                         FS.filePath,
                         createTypedLiteral(123)));

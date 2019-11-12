@@ -11,12 +11,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataDelete;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -136,18 +132,9 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     }
 
     private void persist(Model modelToRemove, Model modelToAdd) {
-        rdf.update(new UpdateDataDelete(new QuadDataAcc(toQuads(modelToRemove))));
-
         // Store information on the lifecycle of the entities
         lifeCycleManager.updateLifecycleMetadata(modelToAdd);
 
-        // Store the actual update
-        rdf.load(graph.getURI(), modelToAdd);
-    }
-
-    private List<Quad> toQuads(Model model) {
-        return model.listStatements()
-                .mapWith(s -> new Quad(graph, s.asTriple()))
-                .toList();
+        dataset.getNamedModel(graph.getURI()).remove(modelToRemove).add(modelToAdd);
     }
 }

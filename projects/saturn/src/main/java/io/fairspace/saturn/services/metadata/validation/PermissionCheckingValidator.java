@@ -7,7 +7,8 @@ import lombok.AllArgsConstructor;
 import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
+
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 @AllArgsConstructor
 public class PermissionCheckingValidator implements MetadataRequestValidator {
@@ -25,7 +26,7 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
                     Access.Write
             );
         } catch (MetadataAccessDeniedException e) {
-            violationHandler.onViolation("Cannot modify read-only resource", ResourceFactory.createResource(e.getSubject().getURI()), null, null);
+            violationHandler.onViolation("Cannot modify read-only resource", createResource(e.getSubject().getURI()), null, null);
         }
     }
 }
