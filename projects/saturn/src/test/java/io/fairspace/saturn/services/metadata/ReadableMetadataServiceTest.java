@@ -6,7 +6,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -45,7 +44,7 @@ public class ReadableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI));
+        api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI));
     }
 
     @Test
@@ -217,7 +216,7 @@ public class ReadableMetadataServiceTest {
 
     @Test(expected = TooManyTriplesException.class)
     public void testTripleLimit() {
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
+        api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI), 1);
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.get(null, null, null, false);
@@ -225,7 +224,7 @@ public class ReadableMetadataServiceTest {
 
     @Test(expected = TooManyTriplesException.class)
     public void testTripleLimitByType() {
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
+        api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI), 1);
         setupModelForTypes();
 
         api.getByType(null, false);

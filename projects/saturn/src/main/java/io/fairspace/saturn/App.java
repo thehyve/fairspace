@@ -2,7 +2,6 @@ package io.fairspace.saturn;
 
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.rdf.transactions.RDFConnectionBatched;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 
@@ -22,13 +21,9 @@ public class App {
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
-        // The RDF connection is supposed to be thread-safe and can
-        // be reused in all the application
-        var rdf = new RDFConnectionBatched(ds);
+        initVocabularies(ds);
 
-        initVocabularies(rdf);
-
-        var svc = new Services(CONFIG, ds, rdf, () -> getThreadContext().getUserInfo());
+        var svc = new Services(CONFIG, ds, () -> getThreadContext().getUserInfo());
 
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";
@@ -36,7 +31,7 @@ public class App {
                 .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", createApiFilter(apiPathPrefix, svc, CONFIG))
-                .addServlet(webDavPathPrefix + "*", initWebDAVServlet(webDavPathPrefix, rdf, svc, CONFIG.webDAV))
+                .addServlet(webDavPathPrefix + "*", initWebDAVServlet(webDavPathPrefix, ds, svc, CONFIG.webDAV))
                 .port(CONFIG.port)
                 .build()
                 .start();

@@ -7,14 +7,14 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import java.util.Optional;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 /**
@@ -23,7 +23,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 @AllArgsConstructor
 @Slf4j
 public class PermissionNotificationHandler implements PermissionChangeEventHandler {
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final UserService userService;
     private final MailService mailService;
     private final String publicUrl;
@@ -58,16 +58,16 @@ public class PermissionNotificationHandler implements PermissionChangeEventHandl
     }
 
     private boolean isCollection(Node resource) {
-        return rdf.queryAsk(storedQuery("is_collection", resource));
+        return queryAsk(dataset, storedQuery("is_collection", resource));
     }
 
     private String getLabel(Node node) {
-        var stmts = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label, null)).listStatements();
+        var stmts = queryConstruct(dataset, storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label, null)).listStatements();
         return stmts.hasNext() ? stmts.nextStatement().getString() : "";
     }
 
     private String getLocation(Node collection) {
-        var stmts = rdf.queryConstruct(storedQuery("select_by_mask", defaultGraphIRI, collection, FS.filePath, null)).listStatements();
+        var stmts = queryConstruct(dataset, storedQuery("select_by_mask", defaultGraphIRI, collection, FS.filePath, null)).listStatements();
         return stmts.hasNext() ? stmts.nextStatement().getString() : "";
     }
 }

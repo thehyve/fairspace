@@ -6,8 +6,8 @@ import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -33,8 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
@@ -45,17 +44,17 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
     public static final String FAIRSPACE_IRI_ATTRIBUTE = "FairspaceIRI";
     private final IRODSFileSystem fs;
-    private final RDFConnection rdf;
+    private final Dataset dataset;
 
-    public IRODSVirtualFileSystem(RDFConnection rdf, CollectionsService collections) throws JargonException {
-        this(rdf, collections, IRODSFileSystem.instance());
+    public IRODSVirtualFileSystem(Dataset dataset, CollectionsService collections) throws JargonException {
+        this(dataset, collections, IRODSFileSystem.instance());
     }
 
-    IRODSVirtualFileSystem(RDFConnection rdf, CollectionsService collections, IRODSFileSystem fs) {
+    IRODSVirtualFileSystem(Dataset dataset, CollectionsService collections, IRODSFileSystem fs) {
         super(collections);
 
         this.fs = fs;
-        this.rdf = rdf;
+        this.dataset = dataset;
     }
 
     @Override
@@ -143,8 +142,8 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        commit("Generate an IRI for an external resource", rdf, () ->
-                rdf.update(storedQuery("register_external_resource", iri, type)));
+        commit("Generate an IRI for an external resource", dataset, () ->
+                update(dataset, storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }
 

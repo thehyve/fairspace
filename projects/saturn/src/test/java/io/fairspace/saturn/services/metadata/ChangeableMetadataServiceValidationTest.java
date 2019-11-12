@@ -9,7 +9,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -65,8 +64,7 @@ public class ChangeableMetadataServiceValidationTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        RDFConnectionLocal rdf = new RDFConnectionLocal(ds);
-        api = new ChangeableMetadataService(rdf, ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator, event -> {});
+        api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator, event -> {});
     }
 
     @Test

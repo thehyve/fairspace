@@ -4,8 +4,6 @@ import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.util.FileManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,14 +20,13 @@ public class VocabulariesTest {
     private static final Model SHACL_FOR_SHACL = FileManager.get().loadModel("default-vocabularies/shacl-shacl.ttl");
 
     private final Dataset ds = DatasetFactory.create();
-    private final RDFConnection rdf = new RDFConnectionLocal(ds);
 
     private ViolationHandler violationHandler;
     private boolean isValid = true;
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);
+        initVocabularies(ds);
         isValid = true;
 
         violationHandler = (message, subject, predicate, object) -> {

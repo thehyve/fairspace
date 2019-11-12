@@ -2,24 +2,23 @@ package io.fairspace.saturn.services.metadata;
 
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdfconnection.RDFConnection;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.limit;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
 @AllArgsConstructor
 public
 class ReadableMetadataService {
-    protected final RDFConnection rdf;
+    protected final Dataset dataset;
     protected final Node graph;
     protected final Node vocabulary;
     protected final long tripleLimit;
 
-    public ReadableMetadataService(RDFConnection rdf, Node graph, Node vocabulary) {
-        this(rdf, graph, vocabulary, 0);
+    public ReadableMetadataService(Dataset dataset, Node graph, Node vocabulary) {
+        this(dataset, graph, vocabulary, 0);
     }
 
     /**
@@ -67,7 +66,7 @@ class ReadableMetadataService {
 
     private Model runWithLimit(String query) {
         if (tripleLimit > 0) {
-            Model model = rdf.queryConstruct(limit(query, tripleLimit + 1));
+            Model model = queryConstruct(dataset, limit(query, tripleLimit + 1));
 
             if (model.size() > tripleLimit) {
                 throw new TooManyTriplesException();
@@ -75,7 +74,7 @@ class ReadableMetadataService {
 
             return model;
         } else {
-            return rdf.queryConstruct(query);
+            return queryConstruct(dataset, query);
         }
     }
 

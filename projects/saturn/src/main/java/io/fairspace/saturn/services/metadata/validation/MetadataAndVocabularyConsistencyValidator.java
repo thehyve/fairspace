@@ -3,17 +3,18 @@ package io.fairspace.saturn.services.metadata.validation;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.querySelect;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static java.lang.String.format;
@@ -37,12 +38,12 @@ import static org.topbraid.spin.util.JenaUtil.getListProperty;
 @AllArgsConstructor
 @Slf4j
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
+    private final Dataset dataset;
 
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         // We first determine which shapes were modified and how the updated vocabulary will look like.
-        var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
+        var oldVocabulary = dataset.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
         var newVocabulary = oldVocabulary.difference(removed).union(added);
         var actuallyAdded = newVocabulary.difference(oldVocabulary);
 
@@ -150,7 +151,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateDataType(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
         var dataType = propertyShape.getPropertyResourceValue(SH.datatype);
         if (dataType != null) {
-            rdf.querySelect(storedQuery("find_wrong_data_type", property, subjectClasses, dataType), row ->
+            querySelect(dataset, storedQuery("find_wrong_data_type", property, subjectClasses, dataType), row ->
                     violationHandler.onViolation("Value does not have datatype " + dataType, row.getResource("subject"), property, row.get("object")));
         }
     }
@@ -158,7 +159,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateClass(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
         var theClass = propertyShape.getPropertyResourceValue(SH.class_);
         if (theClass != null) {
-            rdf.querySelect(storedQuery("find_wrong_class", property, subjectClasses, theClass), row ->
+            querySelect(dataset, storedQuery("find_wrong_class", property, subjectClasses, theClass), row ->
                     violationHandler.onViolation("Value needs to have class " + theClass, row.getResource("subject"), property, row.get("object")));
         }
     }
@@ -166,7 +167,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateMaxLength(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
         var maxLength = getIntegerProperty(propertyShape, SH.maxLength);
         if (maxLength != null) {
-            rdf.querySelect(storedQuery("find_too_long", property, subjectClasses, maxLength), row ->
+            querySelect(dataset, storedQuery("find_too_long", property, subjectClasses, maxLength), row ->
                     violationHandler.onViolation(format("Value has more than %d characters", maxLength), row.getResource("subject"), property, row.get("object")));
         }
     }
@@ -174,7 +175,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateMinLength(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
         var minLength = getIntegerProperty(propertyShape, SH.minLength);
         if (minLength != null) {
-            rdf.querySelect(storedQuery("find_too_short", property, subjectClasses, minLength), row ->
+            querySelect(dataset, storedQuery("find_too_short", property, subjectClasses, minLength), row ->
                     violationHandler.onViolation(format("Value has less than %d characters", minLength), row.getResource("subject"), property, row.get("object")));
         }
     }
@@ -183,7 +184,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateMinCount(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
         var minCount = getIntegerProperty(propertyShape, SH.minCount);
         if (minCount != null) {
-            rdf.querySelect(storedQuery("find_too_few", property, subjectClasses, minCount), row ->
+            querySelect(dataset, storedQuery("find_too_few", property, subjectClasses, minCount), row ->
                     violationHandler.onViolation(format("Less than %d values", minCount), row.getResource("subject"), property, null));
         }
     }
@@ -191,7 +192,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validateMaxCount(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
         var maxCount = getIntegerProperty(propertyShape, SH.maxCount);
         if (maxCount != null) {
-            rdf.querySelect(storedQuery("find_too_many", property, subjectClasses, maxCount), row ->
+            querySelect(dataset, storedQuery("find_too_many", property, subjectClasses, maxCount), row ->
                     violationHandler.onViolation(format("More than %d values", maxCount), row.getResource("subject"), property, null));
         }
     }
@@ -200,7 +201,7 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
         var values = getListProperty(propertyShape, SH.in);
 
         if (values != null) {
-            rdf.querySelect(storedQuery("find_not_in", property, subjectClasses, values), row ->
+            querySelect(dataset, storedQuery("find_not_in", property, subjectClasses, values), row ->
                     violationHandler.onViolation("Value is not in " + SparqlUtils.toString(values), row.getResource("subject"), property, row.get("object")));
         }
     }

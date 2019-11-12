@@ -5,9 +5,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,8 +31,7 @@ public class InverseForUsedPropertiesValidatorTest {
     private static final Resource CLASS2 = createResource("http://ex.com/class2");
 
     private Dataset ds = DatasetFactory.create();
-    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-    private final InverseForUsedPropertiesValidator validator = new InverseForUsedPropertiesValidator(rdf);
+    private final InverseForUsedPropertiesValidator validator = new InverseForUsedPropertiesValidator(ds);
 
     @Mock
     private ViolationHandler violationHandler;

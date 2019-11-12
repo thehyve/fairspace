@@ -10,7 +10,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -30,8 +29,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private final MetadataRequestValidator validator;
     private final Consumer<MetadataEvent.Type> eventConsumer;
 
-    public ChangeableMetadataService(RDFConnection rdf, Dataset dataset, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
-        super(rdf, graph, vocabulary, tripleLimit);
+    public ChangeableMetadataService(Dataset dataset, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+        super(dataset, graph, vocabulary, tripleLimit);
         this.dataset = dataset;
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
@@ -47,7 +46,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        commit("Store metadata", rdf, () -> update(EMPTY_MODEL, model));
+        commit("Store metadata", dataset, () -> update(EMPTY_MODEL, model));
         eventConsumer.accept(MetadataEvent.Type.CREATED);
     }
 
@@ -57,7 +56,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if(commit("Mark <" + subject + "> as deleted", rdf, () -> lifeCycleManager.softDelete(subject))) {
+        if(commit("Mark <" + subject + "> as deleted", dataset, () -> lifeCycleManager.softDelete(subject))) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
@@ -73,7 +72,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        commit("Delete metadata", rdf, () -> update(model, EMPTY_MODEL));
+        commit("Delete metadata", dataset, () -> update(model, EMPTY_MODEL));
         eventConsumer.accept(MetadataEvent.Type.DELETED);
     }
 
@@ -92,7 +91,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        commit("Update metadata", rdf, () -> {
+        commit("Update metadata", dataset, () -> {
             var before = dataset.getNamedModel(graph.getURI());
             var toDelete = createDefaultModel();
             model.listStatements()
@@ -108,7 +107,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private void update(Model modelToRemove, Model modelToAdd) {
         var before = dataset.getNamedModel(graph.getURI());
-        var vocabularyModel = rdf.fetch(vocabulary.getURI());
+        var vocabularyModel = dataset.getNamedModel(vocabulary.getURI());
 
         applyInference(vocabularyModel, before, modelToRemove);
         applyInference(vocabularyModel, unionView(before, modelToAdd), modelToAdd);

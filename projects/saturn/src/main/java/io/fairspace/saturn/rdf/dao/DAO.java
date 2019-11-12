@@ -5,9 +5,9 @@ import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.Getter;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.modify.request.QuadAcc;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -76,11 +76,11 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final Supplier<Node> userIriSupplier;
 
-    public DAO(RDFConnection rdf, Supplier<Node> userIriSupplier) {
-        this.rdf = rdf;
+    public DAO(Dataset dataset, Supplier<Node> userIriSupplier) {
+        this.dataset = dataset;
         this.userIriSupplier = userIriSupplier;
     }
 
@@ -128,7 +128,7 @@ public class DAO {
                 setProperty(update, entity.getIri(), propertyNode, value);
             });
 
-            rdf.update(update);
+            update(dataset, update);
 
             return entity;
         });
@@ -162,7 +162,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null));
+        update(dataset, storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null));
     }
 
     /**
@@ -204,7 +204,7 @@ public class DAO {
      */
     public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
         return safely(() -> {
-            var model = rdf.queryConstruct(query);
+            var model = queryConstruct(dataset, query);
             var entities = new ArrayList<T>();
             Iterable<Resource> subjects = model::listSubjects;
             for (var resource : subjects) {

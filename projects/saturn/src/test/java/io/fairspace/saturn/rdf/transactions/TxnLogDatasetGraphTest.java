@@ -4,7 +4,6 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +33,6 @@ public class TxnLogDatasetGraphTest {
     @Mock
     private TransactionLog log;
     private Dataset ds;
-    private RDFConnection rdf;
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
@@ -45,13 +43,12 @@ public class TxnLogDatasetGraphTest {
         getThreadContext().setUserCommitMessage("message");
         getThreadContext().setSystemCommitMessage("system");
         ds = DatasetFactory.wrap(new TxnLogDatasetGraphBatched(createTxnMem(), log));
-        rdf = new RDFConnectionBatched(ds);
     }
 
 
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        commit("system", rdf, () -> ds.getNamedModel("http://example.com/g1")
+        commit("system", ds, () -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
@@ -65,7 +62,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
-        commit("system", rdf, () -> {
+        commit("system", ds, () -> {
             ds.getNamedModel("http://example.com/g1")
                     .add(statement)
                     .remove(statement);
@@ -90,7 +87,7 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
-            commit("system", rdf, () -> {
+            commit("system", ds, () -> {
                 ds.getNamedModel("http://example.com/g1")
                         .add(statement)
                         .remove(statement);

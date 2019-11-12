@@ -14,8 +14,8 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,13 +37,13 @@ import static org.apache.commons.codec.binary.Hex.encodeHexString;
 public class ManagedFileSystem extends BaseFileSystem {
     public static final String TYPE = "";
 
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
 
-    public ManagedFileSystem(RDFConnection rdf, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
+    public ManagedFileSystem(Dataset dataset, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
         super(collections);
-        this.rdf = rdf;
+        this.dataset = dataset;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         eventBus.register(this);
@@ -51,7 +51,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo statRegularFile(String path) throws IOException {
-        return selectSingle(rdf, storedQuery("fs_stat", path), this::fileInfo)
+        return selectSingle(dataset, storedQuery("fs_stat", path), this::fileInfo)
                 .map(fileInfo -> {
                     var collection = collections.getByLocation(splitPath(path)[0]);
                     if (collection == null) {
@@ -71,16 +71,16 @@ public class ManagedFileSystem extends BaseFileSystem {
             throw new AccessDeniedException("User has no access to collection " + collectionLocation);
         }
         var readOnly = !collection.canWrite();
-        var files = select(rdf, storedQuery("fs_ls", path + '/'), this::fileInfo);
+        var files = select(dataset, storedQuery("fs_ls", path + '/'), this::fileInfo);
         files.forEach(f -> f.setReadOnly(readOnly));
         return files;
     }
 
     @Override
     protected FileInfo doMkdir(String path) throws IOException {
-        return commit("Create directory " + path, rdf, () -> {
+        return commit("Create directory " + path, dataset, () -> {
             ensureCanCreate(path);
-            rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
+            update(dataset, storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
             return stat(path);
         });
     }
@@ -89,9 +89,9 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected FileInfo doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        return commit("Create file " + path, rdf, () -> {
+        return commit("Create file " + path, dataset, () -> {
             ensureCanCreate(path);
-            rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
+            update(dataset, storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
             return stat(path);
         });
     }
@@ -100,7 +100,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Modify file " + path, rdf, () -> {
+        commit("Modify file " + path, dataset, () -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -111,13 +111,13 @@ public class ManagedFileSystem extends BaseFileSystem {
             if (info.isReadOnly()) {
                 throw new IOException("File is read-only: " + path);
             }
-            rdf.update(storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5()));
+            update(dataset, storedQuery("fs_modify", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), blobInfo.getMd5()));
         });
     }
 
     @Override
     public void read(String path, OutputStream out) throws IOException {
-        var blobId = selectSingle(rdf, storedQuery("fs_get_blobid", path),
+        var blobId = selectSingle(dataset, storedQuery("fs_get_blobid", path),
                 row -> row.getLiteral("blobId").getString())
                 .orElseThrow(() -> new FileNotFoundException(path));
         store.read(blobId, out);
@@ -135,7 +135,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void doDelete(String path) throws IOException {
-        commit("Delete " + path, rdf, () -> {
+        commit("Delete " + path, dataset, () -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -143,13 +143,13 @@ public class ManagedFileSystem extends BaseFileSystem {
             if (info.isReadOnly()) {
                 throw new IOException("Cannot delete " + path);
             }
-            rdf.update(storedQuery("fs_delete_" + (info.isDirectory() ? "dir" : "file"), path, userIriSupplier.get()));
+            update(dataset, storedQuery("fs_delete_" + (info.isDirectory() ? "dir" : "file"), path, userIriSupplier.get()));
         });
     }
 
     @Override
     protected String fileOrDirectoryIri(String path) throws IOException {
-        return selectSingle(rdf, storedQuery("fs_stat", path), row -> row.getResource("iri").getURI())
+        return selectSingle(dataset, storedQuery("fs_stat", path), row -> row.getResource("iri").getURI())
                 .orElse(null);    
     }
 
@@ -159,12 +159,12 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Subscribe
     public void onCollectionDeleted(CollectionDeletedEvent e) {
-        rdf.update(storedQuery("fs_delete_dir", e.getCollection().getLocation(), userIriSupplier.get()));
+        update(dataset, storedQuery("fs_delete_dir", e.getCollection().getLocation(), userIriSupplier.get()));
     }
 
     @Subscribe
     public void onCollectionMoved(CollectionMovedEvent e) {
-        rdf.update(storedQuery("fs_move_dir", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
+        update(dataset, storedQuery("fs_move_dir", e.getOldLocation(), e.getCollection().getLocation(), e.getCollection().getName()));
     }
 
     private FileInfo fileInfo(QuerySolution row) {
@@ -197,10 +197,10 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        commit(verb + " data from " + from + " to " + to, rdf, () -> {
+        commit(verb + " data from " + from + " to " + to, dataset, () -> {
             ensureCanCreate(to);
             var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
-            rdf.update(storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));
+            update(dataset, storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));
         });
     }
 

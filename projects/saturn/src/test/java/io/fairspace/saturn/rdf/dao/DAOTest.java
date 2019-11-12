@@ -21,7 +21,6 @@ import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
 
@@ -36,7 +35,7 @@ public class DAOTest {
     @Before
     public void before() {
         dataset = createTxnMem();
-        dao = new DAO(connect(dataset), () -> createURI("http://example.com/" + randomUUID()));
+        dao = new DAO(dataset, () -> createURI("http://example.com/" + randomUUID()));
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();

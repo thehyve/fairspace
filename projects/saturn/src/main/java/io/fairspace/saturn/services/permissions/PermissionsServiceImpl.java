@@ -8,11 +8,11 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.util.*;
 import java.util.function.BooleanSupplier;
@@ -20,8 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.partition;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
@@ -37,7 +36,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     private static final int BATCH_SIZE = 100;
     private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final Supplier<Node> userIriSupplier;
     private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
@@ -45,7 +44,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public void createResource(Node resource) {
-        rdf.update(storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
+        update(dataset, storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
                 .resource(resource.getURI())
@@ -58,14 +57,14 @@ public class PermissionsServiceImpl implements PermissionsService {
         Model resourcePermissions = createDefaultModel();
         Resource user = ResourceFactory.createResource(userIriSupplier.get().getURI());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
-        rdf.load(PERMISSIONS_GRAPH, resourcePermissions);
+        dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions);
     }
 
     @Override
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = userIriSupplier.get();
 
-        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), rdf, () -> {
+        commit(format("Setting permission for resource %s, user %s to %s", resource, user, access), dataset, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
             if (!isCollection(resource)) {
@@ -77,10 +76,10 @@ public class PermissionsServiceImpl implements PermissionsService {
 
             PermissionEvent.Type eventType;
             if (access == Access.None) {
-                rdf.update(storedQuery("permissions_delete", resource, user));
+                update(dataset, storedQuery("permissions_delete", resource, user));
                 eventType = PermissionEvent.Type.DELETED;
             } else {
-                rdf.update(storedQuery("permissions_set", resource, user, toNode(access)));
+                update(dataset, storedQuery("permissions_set", resource, user, toNode(access)));
                 eventType = PermissionEvent.Type.UPDATED;
             }
 
@@ -113,12 +112,12 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public Map<Node, Access> getPermissions(Node resource) {
-        return calculateRead(rdf, () -> {
+        return calculateRead(dataset, () -> {
             var authority = getAuthority(resource);
             ensureAccess(authority, Access.Read);
 
             var result = new HashMap<Node, Access>();
-            rdf.querySelect(storedQuery("permissions_get_all", authority), row ->
+            querySelect(dataset, storedQuery("permissions_get_all", authority), row ->
                     result.put(row.getResource("user").asNode(), getAccess(row)));
             return result;
         });
@@ -126,16 +125,16 @@ public class PermissionsServiceImpl implements PermissionsService {
 
     @Override
     public boolean isWriteRestricted(Node resource) {
-        return rdf.queryAsk(storedQuery("permissions_is_restricted", resource));
+        return queryAsk(dataset, storedQuery("permissions_is_restricted", resource));
     }
 
     @Override
     public void setWriteRestricted(Node resource, boolean restricted) {
-        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), rdf, () -> {
+        commit(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), dataset, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {
-                rdf.update(storedQuery("permissions_set_restricted", resource, restricted));
+                update(dataset, storedQuery("permissions_set_restricted", resource, restricted));
 
                 eventService.emitEvent(PermissionEvent.builder()
                         .eventType(PermissionEvent.Type.UPDATED)
@@ -175,7 +174,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     @Override
     public Map<Node, Access> getPermissions(Collection<Node> nodes) {
         var result = new HashMap<Node, Access>();
-        executeRead(rdf, () -> partition(nodes, BATCH_SIZE)
+        executeRead(dataset, () -> partition(nodes, BATCH_SIZE)
                 .forEach(batch -> result.putAll(getPermissionsWithoutBatch(batch))));
         return result;
     }
@@ -218,13 +217,13 @@ public class PermissionsServiceImpl implements PermissionsService {
             return result;
         }
 
-        rdf.querySelect(storedQuery("permissions_get_for_user", authorities, userIriSupplier.get()),
+        querySelect(dataset, storedQuery("permissions_get_for_user", authorities, userIriSupplier.get()),
                 row -> result.put(row.getResource("subject").asNode(), getAccess(row)));
         return result;
     }
 
     private boolean isCollection(Node resource) {
-        return rdf.queryAsk(storedQuery("is_collection", resource));
+        return queryAsk(dataset, storedQuery("is_collection", resource));
     }
 
     /**
@@ -247,7 +246,7 @@ public class PermissionsServiceImpl implements PermissionsService {
         var fileToCollectionPath = new HashMap<Node, String>(fileNodes.size());
         var collectionPaths = new HashSet<String>();
 
-        rdf.querySelect(storedQuery("get_file_paths", fileNodes), row -> {
+        querySelect(dataset, storedQuery("get_file_paths", fileNodes), row -> {
             var path = collectionPath(row.getLiteral("filePath").getString());
             fileToCollectionPath.put(row.get("subject").asNode(), path);
             collectionPaths.add(path);
@@ -255,7 +254,7 @@ public class PermissionsServiceImpl implements PermissionsService {
 
         var collectionsByPath = new HashMap<String, Node>();
 
-        rdf.querySelect(storedQuery("get_collections_by_paths", collectionPaths), row ->
+        querySelect(dataset, storedQuery("get_collections_by_paths", collectionPaths), row ->
                 collectionsByPath.put(row.getLiteral("path").getString(), row.getResource("collection").asNode()));
 
         return fileToCollectionPath

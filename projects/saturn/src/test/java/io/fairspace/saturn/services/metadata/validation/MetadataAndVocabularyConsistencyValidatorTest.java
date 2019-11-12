@@ -5,9 +5,6 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
@@ -39,8 +36,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
     private static final Resource CLASS2 = createResource(NS + "Class2");
 
     private Dataset ds = DatasetFactory.create();
-    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
-    private MetadataAndVocabularyConsistencyValidator validator = new MetadataAndVocabularyConsistencyValidator(rdf);
+    private MetadataAndVocabularyConsistencyValidator validator = new MetadataAndVocabularyConsistencyValidator(ds);
 
     private Model model = ds.getDefaultModel();
     private Model vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
@@ -51,7 +47,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(rdf);
+        initVocabularies(ds);
 
         model.removeAll();
         vocabulary.add(TARGET_CLASS_SHAPE, SH.targetClass, TARGET_CLASS);

@@ -2,11 +2,12 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.topbraid.shacl.vocabulary.SH;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.queryAsk;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.util.Optional.ofNullable;
 
@@ -19,7 +20,7 @@ import static java.util.Optional.ofNullable;
  */
 @AllArgsConstructor
 public class InverseForUsedPropertiesValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
+    private final Dataset dataset;
 
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
@@ -31,7 +32,7 @@ public class InverseForUsedPropertiesValidator implements MetadataRequestValidat
                     .orElse(null);
 
             if (property != null && domain != null) {
-                if (rdf.queryAsk(storedQuery("is_property_used", property, domain))) {
+                if (queryAsk(dataset, storedQuery("is_property_used", property, domain))) {
                     violationHandler.onViolation("Cannot set fs:inverseRelation for a property that has been used already", stmt);
                 }
             }

@@ -4,15 +4,14 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.rdfconnection.RDFConnection;
 
 import java.time.Instant;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;
@@ -20,7 +19,7 @@ import static java.util.stream.Collectors.toSet;
 @AllArgsConstructor
 public
 class MetadataEntityLifeCycleManager {
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final Node graph;
     private final Node vocabulary;
     private final Supplier<Node> userIriSupplier;
@@ -28,12 +27,12 @@ class MetadataEntityLifeCycleManager {
 
     /**
      * Instantiates a lifecycle manager without a reference for the permissions
-     * @param rdf
+     * @param dataset
      * @param graph
      * @param userIriSupplier
      */
-    public MetadataEntityLifeCycleManager(RDFConnection rdf, Node graph, Node vocabulary, Supplier<Node> userIriSupplier) {
-        this(rdf, graph, vocabulary, userIriSupplier, null);
+    public MetadataEntityLifeCycleManager(Dataset dataset, Node graph, Node vocabulary, Supplier<Node> userIriSupplier) {
+        this(dataset, graph, vocabulary, userIriSupplier, null);
     }
 
     /**
@@ -62,7 +61,7 @@ class MetadataEntityLifeCycleManager {
         // If there are new entities, updateLifecycleMetadata creation information for them
         // as well as permissions
         if (!newEntities.isEmpty()) {
-            rdf.load(graph.getURI(), generateCreationInformation(newEntities));
+            dataset.getNamedModel(graph.getURI()).add(generateCreationInformation(newEntities));
 
             if(permissionsService != null) {
                 permissionsService.createResources(newEntities);
@@ -74,11 +73,11 @@ class MetadataEntityLifeCycleManager {
         if (permissionsService != null) {
             permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
         }
-        if (rdf.queryAsk(storedQuery("is_machine_only", resource, graph, vocabulary))) {
+        if (queryAsk(dataset, storedQuery("is_machine_only", resource, graph, vocabulary))) {
             throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
         }
-        if (rdf.queryAsk(storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
-            rdf.update(storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userIriSupplier.get(), graph));
+        if (queryAsk(dataset, storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
+            update(dataset, storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userIriSupplier.get(), graph));
             return true;
         }
         return false;
@@ -124,6 +123,6 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private boolean exists(Resource resource) {
-        return rdf.queryAsk(storedQuery("exists", graph, resource, null, null));
+        return queryAsk(dataset, storedQuery("exists", graph, resource, null, null));
     }
 }

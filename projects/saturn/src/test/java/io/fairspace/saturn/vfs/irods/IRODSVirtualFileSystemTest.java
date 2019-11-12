@@ -4,10 +4,8 @@ import io.fairspace.saturn.rdf.transactions.TransactionLog;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.*;
 import org.irods.jargon.core.pub.domain.ObjStat;
@@ -71,7 +69,7 @@ public class IRODSVirtualFileSystemTest {
 
     private IRODSVirtualFileSystem vfs;
 
-    private final RDFConnection rdf = new RDFConnectionLocal(DatasetFactory.createTxnMem(), Isolation.COPY);
+    private final Dataset ds = DatasetFactory.createTxnMem();
 
 
     @Before
@@ -109,7 +107,7 @@ public class IRODSVirtualFileSystemTest {
 
         when(aof.getDataObjectAO(any())).thenReturn(doao);
 
-        vfs = new IRODSVirtualFileSystem(rdf, collections, fs);
+        vfs = new IRODSVirtualFileSystem(ds, collections, fs);
     }
 
     @Test

@@ -6,9 +6,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
@@ -45,7 +42,6 @@ public class ChangeableMetadataServiceTest {
 
 
     private Dataset ds = createTxnMem();
-    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
     private ChangeableMetadataService api;
 
     @Mock
@@ -53,7 +49,7 @@ public class ChangeableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        api = new ChangeableMetadataService(rdf, ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator(), event -> {});
+        api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator(), event -> {});
     }
 
     @Test
@@ -139,7 +135,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testInference() {
-        initVocabularies(rdf);
+        initVocabularies(ds);
         ds.getDefaultModel()
                 .add(S1, RDF.type, FOAF.Person)
                 .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));
