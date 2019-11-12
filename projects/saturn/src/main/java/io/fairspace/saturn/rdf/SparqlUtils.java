@@ -11,7 +11,6 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.system.Txn;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
@@ -33,8 +32,10 @@ import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
+import static org.apache.jena.system.Txn.*;
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
@@ -171,7 +172,7 @@ public class SparqlUtils {
      * @param resultSetAction
      */
     public static void queryResultSet(Dataset dataset, String query, Consumer<ResultSet> resultSetAction) {
-        Txn.executeRead(dataset, () -> {
+        executeRead(dataset, () -> {
             try (QueryExecution qExec = query(dataset, query)) {
                 ResultSet rs = qExec.execSelect();
                 resultSetAction.accept(rs);
@@ -187,7 +188,7 @@ public class SparqlUtils {
      * @param rowAction
      */
     public static void querySelect(Dataset dataset, String query, Consumer<QuerySolution> rowAction) {
-        Txn.executeRead(dataset, () -> {
+        executeRead(dataset, () -> {
             try (QueryExecution qExec = query(dataset, query)) {
                 qExec.execSelect().forEachRemaining(rowAction);
             }
@@ -198,41 +199,40 @@ public class SparqlUtils {
      * Execute a CONSTRUCT query and return as a Model
      */
     public static Model queryConstruct(Dataset dataset, String query) {
-        return
-                Txn.calculateRead(dataset, () -> {
-                    try (QueryExecution qExec = query(dataset, query)) {
-                        return qExec.execConstruct();
-                    }
-                });
+        var wasInTransaction = dataset.isInTransaction();
+
+        return calculateRead(dataset, () -> {
+            try (QueryExecution qExec = query(dataset, query)) {
+                var model = qExec.execConstruct();
+                return wasInTransaction ? model : createDefaultModel().add(model);
+            }
+        });
     }
 
     /**
      * Execute a DESCRIBE query and return as a Model
      */
-
     public static Model queryDescribe(Dataset dataset, String query) {
-        return
-                Txn.calculateRead(dataset, () -> {
-                    try (QueryExecution qExec = query(dataset, query)) {
-                        return qExec.execDescribe();
-                    }
-                });
+        return calculateRead(dataset, () -> {
+            try (QueryExecution qExec = query(dataset, query)) {
+                return qExec.execDescribe();
+            }
+        });
     }
 
     /**
      * Execute a ASK query and return a boolean
      */
     public static boolean queryAsk(Dataset dataset, String query) {
-        return
-                Txn.calculateRead(dataset, () -> {
-                    try (QueryExecution qExec = query(dataset, query)) {
-                        return qExec.execAsk();
-                    }
-                });
+        return calculateRead(dataset, () -> {
+            try (QueryExecution qExec = query(dataset, query)) {
+                return qExec.execAsk();
+            }
+        });
     }
 
     public static void update(Dataset dataset, UpdateRequest update) {
-        Txn.executeWrite(dataset, ()-> UpdateExecutionFactory.create(update, dataset).execute() );
+        executeWrite(dataset, () -> UpdateExecutionFactory.create(update, dataset).execute());
     }
 
     public static void update(Dataset dataset, String updateString) {
@@ -240,7 +240,6 @@ public class SparqlUtils {
     }
 
     private static QueryExecution query(Dataset dataset, String query) {
-
         return QueryExecutionFactory.create(QueryFactory.create(query), dataset);
     }
 
