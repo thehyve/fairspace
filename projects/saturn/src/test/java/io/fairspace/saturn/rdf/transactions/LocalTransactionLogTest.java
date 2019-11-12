@@ -44,10 +44,12 @@ public class LocalTransactionLogTest {
 
     @Test
     public void logContinuesNumbering() throws IOException {
-        log.onBegin(null, null, null, 0);
+        log.onBegin();
+        log.onMetadata(null, null, null, null, 0);
         log.onCommit();
         var newLog = new LocalTransactionLog(logDir, codec);
-        newLog.onBegin(null, null, null, 1);
+        newLog.onBegin();
+        newLog.onMetadata(null, null, null, null, 1);
         newLog.onCommit();
 
         assertEquals(2L, newLog.size());
@@ -58,7 +60,8 @@ public class LocalTransactionLogTest {
     @Test
     public void storageSchemaWorksAsExpected() throws IOException {
         for (int i = 0; i < 1001; i++) {
-            log.onBegin(null, null, null, 0);
+            log.onBegin();
+            log.onMetadata(null, null,null, null, 0);
             log.onCommit();
         }
         assertEquals(1001L, log.size());
@@ -67,7 +70,8 @@ public class LocalTransactionLogTest {
 
     @Test
     public void doesNotLogAbortedTransactions() throws IOException {
-        log.onBegin(null, null, null, 0);
+        log.onBegin();
+        log.onMetadata(null, null,null, null, 0);
         log.onAbort();
 
         assertEquals(0L, log.size());

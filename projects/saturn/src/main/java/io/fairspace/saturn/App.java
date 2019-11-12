@@ -2,11 +2,11 @@ package io.fairspace.saturn;
 
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.rdf.transactions.RDFConnectionBatched;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.SecurityHandlerFactory.getSecurityHandler;
@@ -20,14 +20,15 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, SaturnSecurityHandler::userInfo);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
         // The RDF connection is supposed to be thread-safe and can
         // be reused in all the application
-        var rdf = new RDFConnectionLocal(ds, Isolation.COPY);
+        var rdf = new RDFConnectionBatched(ds);
+
         initVocabularies(rdf);
 
-        var svc = new Services(CONFIG, ds, rdf, SaturnSecurityHandler::userInfo);
+        var svc = new Services(CONFIG, ds, rdf, () -> getThreadContext().getUserInfo());
 
         var apiPathPrefix = "/api/" + API_VERSION;
         var webDavPathPrefix = "/webdav/" + API_VERSION + "/";

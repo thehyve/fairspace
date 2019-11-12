@@ -43,13 +43,13 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected void doMkdir(String path) throws IOException {
-        fileSystemByPath(path, true).mkdir(path);
+    protected FileInfo doMkdir(String path) throws IOException {
+        return fileSystemByPath(path, true).mkdir(path);
     }
 
     @Override
-    protected void doCreate(String path, InputStream in) throws IOException {
-        fileSystemByPath(path, true).create(path, in);
+    protected FileInfo doCreate(String path, InputStream in) throws IOException {
+        return fileSystemByPath(path, true).create(path, in);
     }
 
     @Override
