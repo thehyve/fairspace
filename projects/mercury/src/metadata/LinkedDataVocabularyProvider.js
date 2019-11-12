@@ -7,13 +7,11 @@ import {
     createVocabularyEntity, deleteVocabularyEntity, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded,
     submitVocabularyChanges
 } from "../common/redux/actions/vocabularyActions";
-import {searchVocabulary} from "../common/redux/actions/searchActions";
 // Reducers
 import {
     getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
     isVocabularyPending
 } from "../common/redux/reducers/cache/vocabularyReducers";
-import {getVocabularySearchResults} from "../common/redux/reducers/searchReducers";
 // Utils
 import {isDataSteward} from "../common/utils/userUtils";
 import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
@@ -22,7 +20,7 @@ import {
 } from "../common/utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
-import LinkedDataContext from './LinkedDataContext';
+import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
 import Config from "../common/services/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
@@ -30,8 +28,7 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 const LinkedDataVocabularyProvider = ({
     children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
     metaVocabulary, vocabulary, authorizations, createEntity,
-    shapesError, hasLinkedDataErrorForSubject, dispatchDeleteEntity,
-    getLinkedDataSearchResults, searchVocabularyDispatch, ...otherProps
+    shapesError, hasLinkedDataErrorForSubject, dispatchDeleteEntity, ...otherProps
 }) => {
     if (!shapesError) {
         fetchMetaVocabulary();
@@ -76,7 +73,7 @@ const LinkedDataVocabularyProvider = ({
 
                 // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataVocabulary,
-                searchLinkedData: searchVocabularyDispatch,
+                searchLinkedData,
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,
@@ -100,7 +97,6 @@ const LinkedDataVocabularyProvider = ({
 
                 // Generic methods without reference to shapes
                 extendProperties,
-                getSearchResults: getLinkedDataSearchResults,
                 valueComponentFactory,
 
                 vocabulary
@@ -119,7 +115,6 @@ const mapStateToProps = (state) => {
     const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
     const isLinkedDataLoading = () => isVocabularyPending(state);
     const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
-    const getLinkedDataSearchResults = () => getVocabularySearchResults(state);
 
     return {
         shapesLoading,
@@ -128,7 +123,6 @@ const mapStateToProps = (state) => {
         shapesError,
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
-        getLinkedDataSearchResults,
     };
 };
 
@@ -138,7 +132,6 @@ const mapDispatchToProps = {
     dispatchSubmitVocabularyChanges: submitVocabularyChanges,
     createEntity: createVocabularyEntity,
     dispatchDeleteEntity: deleteVocabularyEntity,
-    searchVocabularyDispatch: searchVocabulary,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataVocabularyProvider);

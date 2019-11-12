@@ -1,19 +1,18 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from "prop-types";
 import {connect} from 'react-redux';
 import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow, withStyles
 } from '@material-ui/core';
-import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString, SORT_DATE_CREATED, handleSearchError, SearchAPI} from '@fairspace/shared-frontend';
 
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
-import {searchCollections} from '../common/redux/actions/searchActions';
 import * as vocabularyActions from '../common/redux/actions/vocabularyActions';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, ES_INDEX, SEARCH_MAX_SIZE} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
-import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
+import Config from '../common/services/Config';
 
 const styles = {
     tableRoot: {
@@ -26,14 +25,31 @@ const styles = {
     }
 };
 
+const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
+
 // Exporting here to be able to test the component outside of Redux
 export const SearchPage = ({
-    classes, location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
-    history, results, vocabulary, loading, error
+    classes, location: {search}, query = getSearchQueryFromString(search), vocabularyPending, fetchVocabularyIfNeeded,
+    history, vocabulary,
 }) => {
+    const [items, setItems] = useState([]);
+    const [total, setTotal] = useState();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState();
+
     useEffect(() => {
         fetchVocabularyIfNeeded();
-        performSearch(query);
+
+        SearchAPI(Config.get(), ES_INDEX)
+            .search({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED})
+            .catch(handleSearchError)
+            .then(data => {
+                setItems(data.items);
+                setTotal(data.total);
+                setError(undefined);
+            })
+            .catch((e) => setError(e || true))
+            .finally(() => setLoading(false));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, query]);
 
@@ -65,7 +81,7 @@ export const SearchPage = ({
         history.push(navigationPath + selectionQueryString);
     };
 
-    if (loading) {
+    if (vocabularyPending || loading) {
         return <LoadingInlay />;
     }
 
@@ -73,7 +89,7 @@ export const SearchPage = ({
         return <MessageDisplay message={error.message} />;
     }
 
-    if (!results || results.total === 0) {
+    if (!total || total === 0) {
         return <MessageDisplay message="No results found!" isError={false} />;
     }
 
@@ -89,7 +105,7 @@ export const SearchPage = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {results.items
+                    {items
                         .map((item) => (
                             <TableRow
                                 hover
@@ -117,20 +133,16 @@ export const SearchPage = ({
 };
 
 const mapStateToProps = (state) => {
-    const results = getCollectionsSearchResults(state);
-    const loading = results.pending || isVocabularyPending(state);
+    const vocabularyPending = isVocabularyPending(state);
     const vocabulary = getVocabulary(state);
 
     return {
-        loading,
-        results,
-        error: results.error,
+        vocabularyPending,
         vocabulary
     };
 };
 
 const mapDispatchToProps = {
-    performSearch: searchCollections,
     fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded
 };
 
@@ -138,7 +150,6 @@ SearchPage.propTypes = {
     location: PropTypes.shape({
         search: PropTypes.string.isRequired
     }),
-    performSearch: PropTypes.func.isRequired,
     fetchVocabularyIfNeeded: PropTypes.func.isRequired
 };
 
