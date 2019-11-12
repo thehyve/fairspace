@@ -26,6 +26,8 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
             queue.drainTo(tasks);
 
             while (!tryExecute(tasks));
+
+            tasks.forEach(Task::completed);  // mark all tasks as committed
         }
     }, "Batch transaction processor");
 
@@ -66,7 +68,6 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
                     return false;
                 }
             }
-            tasks.forEach(Task::completed);  // mark all tasks as committed
             return true; // success
         });
     }
