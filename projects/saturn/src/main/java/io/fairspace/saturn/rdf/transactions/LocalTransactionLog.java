@@ -55,12 +55,16 @@ public class LocalTransactionLog implements TransactionLog {
     }
 
     @Override
-    public void onBegin(String commitMessage, String userId, String userName, long timestamp) throws IOException {
+    public void onBegin() throws IOException {
         currentTransactionFile.delete();
 
         outputStream = new BufferedOutputStream(new FileOutputStream(currentTransactionFile));
         writingListener = codec.write(outputStream);
-        writingListener.onBegin(commitMessage, userId, userName, timestamp);
+    }
+
+    @Override
+    public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) throws IOException {
+        writingListener.onMetadata(userCommitMessage, systemCommitMessage, userId, userName, timestamp);
     }
 
     @Override

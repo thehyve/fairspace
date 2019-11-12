@@ -2,27 +2,30 @@ package io.fairspace.saturn.rdf;
 
 import com.pivovarit.function.ThrowingRunnable;
 import com.pivovarit.function.ThrowingSupplier;
-import lombok.SneakyThrows;
-import org.apache.jena.sparql.core.Transactional;
+import io.fairspace.saturn.rdf.transactions.WriteTransactionSupport;
+import org.apache.jena.rdfconnection.RDFConnection;
 
-import static io.fairspace.saturn.commits.CommitMessages.withCommitMessage;
+import static com.pivovarit.function.ThrowingSupplier.sneaky;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static org.apache.jena.system.Txn.calculateWrite;
-import static org.apache.jena.system.Txn.executeWrite;
 
 public class TransactionUtils {
-    public static void commit(String message, Transactional transactional, ThrowingRunnable<?> action) {
-        withCommitMessage(message, () -> executeWrite(transactional, () -> sneaky(() -> {
+    private static final boolean USE_BATCHING = true;
+
+    public static <T, E extends Exception> T commit(String message, RDFConnection rdf, ThrowingSupplier<T, E> action) throws E {
+        getThreadContext().setSystemCommitMessage(message);
+
+        if (USE_BATCHING && rdf instanceof WriteTransactionSupport) {
+            return ((WriteTransactionSupport) rdf).write(action);
+        }
+
+        return calculateWrite(rdf, sneaky(action));
+    }
+
+    public static <E extends Exception> void commit(String message, RDFConnection rdf, ThrowingRunnable<E> action) throws E {
+        commit(message, rdf, () -> {
             action.run();
             return null;
-        })));
-    }
-
-    public static <T> T commit(String message, Transactional transactional, ThrowingSupplier<T, ?> action) {
-        return withCommitMessage(message, () -> calculateWrite(transactional, () -> sneaky(action)));
-    }
-
-    @SneakyThrows(Exception.class)
-    private static <R> R sneaky(ThrowingSupplier<R, ?> action) {
-        return action.get();
+        });
     }
 }

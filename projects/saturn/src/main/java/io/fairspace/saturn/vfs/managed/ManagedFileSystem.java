@@ -77,20 +77,22 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected void doMkdir(String path) throws IOException {
-        commit("Create directory " + path, rdf, () -> {
+    protected FileInfo doMkdir(String path) throws IOException {
+        return commit("Create directory " + path, rdf, () -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
+            return stat(path);
         });
     }
 
     @Override
-    protected void doCreate(String path, InputStream in) throws IOException {
+    protected FileInfo doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Create file " + path, rdf, () -> {
+        return commit("Create file " + path, rdf, () -> {
             ensureCanCreate(path);
             rdf.update(storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
+            return stat(path);
         });
     }
 

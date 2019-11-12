@@ -86,17 +86,17 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void mkdir(String path) throws IOException {
+    public FileInfo mkdir(String path) throws IOException {
         ensureValidPath(path);
 
-        doMkdir(path);
+        return doMkdir(path);
     }
 
     @Override
-    public void create(String path, InputStream in) throws IOException {
+    public FileInfo create(String path, InputStream in) throws IOException {
         ensureValidPath(path);
 
-        doCreate(path, in);
+        return doCreate(path, in);
     }
 
     @Override
@@ -131,9 +131,9 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     protected abstract List<FileInfo> listCollectionOrDirectory(String parentPath) throws IOException;
 
-    protected abstract void doMkdir(String path) throws IOException;
+    protected abstract FileInfo doMkdir(String path) throws IOException;
 
-    protected abstract void doCreate(String path, InputStream in) throws IOException;
+    protected abstract FileInfo doCreate(String path, InputStream in) throws IOException;
 
     protected abstract void doCopy(String from, String to) throws IOException;
 
