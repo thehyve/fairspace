@@ -15,7 +15,6 @@ import io.fairspace.saturn.services.metadata.ReadableMetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import lombok.Getter;
 import lombok.NonNull;
@@ -62,7 +61,7 @@ public class Services {
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsServiceImpl(dataset, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
+        permissionsService = new PermissionsService(dataset, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
         collectionsService = new CollectionsService(new DAO(dataset, userIriSupplier), eventBus::post, permissionsService, eventService);
 

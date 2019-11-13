@@ -9,7 +9,6 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -67,7 +66,7 @@ public class WebDAVIT {
 
         var eventBus = new EventBus();
 
-        permissions = new PermissionsServiceImpl(ds, () -> currentUser, () -> false,null, event -> {});
+        permissions = new PermissionsService(ds, () -> currentUser, () -> false,null, event -> {});
         collections = new CollectionsService(new DAO(ds, () -> currentUser), eventBus::post, permissions, eventService);
         fs = new ManagedFileSystem(ds, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
         milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)), null);

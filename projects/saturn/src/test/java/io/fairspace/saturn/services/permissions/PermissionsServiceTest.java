@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PermissionsServiceImplTest {
+public class PermissionsServiceTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
     private static final Node RESOURCE2 = createURI("http://example.com/resource2");
     private static final Node USER1 = createURI("http://example.com/user1");
@@ -53,7 +53,7 @@ public class PermissionsServiceImplTest {
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsServiceImpl(ds, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
+        service = new PermissionsService(ds, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
         service.createResource(RESOURCE);
 
         currentUser = USER1;
