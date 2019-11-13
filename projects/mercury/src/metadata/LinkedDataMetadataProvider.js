@@ -5,22 +5,20 @@ import {fetchMetadataVocabularyIfNeeded} from "../common/redux/actions/vocabular
 import {
     createMetadataEntity, deleteMetadataEntity, fetchMetadataBySubjectIfNeeded, submitMetadataChanges
 } from "../common/redux/actions/metadataActions";
-import {searchMetadata} from "../common/redux/actions/searchActions";
 // Reducers
 import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import {getMetadataForSubject, hasMetadataError, isMetadataPending} from "../common/redux/reducers/cache/jsonLdBySubjectReducers";
-import {getMetadataSearchResults} from "../common/redux/reducers/searchReducers";
 // Utils
 import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
-import LinkedDataContext from './LinkedDataContext';
+import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 
 const LinkedDataMetadataProvider = ({
     children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
-    vocabulary, createEntity, getLinkedDataSearchResults, searchMetadataDispatch,
+    vocabulary, createEntity,
     getLinkedDataForSubject, shapesError, dispatchDeleteEntity,
     ...otherProps
 }) => {
@@ -54,7 +52,7 @@ const LinkedDataMetadataProvider = ({
 
                 // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataBySubject,
-                searchLinkedData: searchMetadataDispatch,
+                searchLinkedData,
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,
@@ -74,7 +72,6 @@ const LinkedDataMetadataProvider = ({
 
                 // Generic methods without reference to shapes
                 extendProperties,
-                getSearchResults: getLinkedDataSearchResults,
                 valueComponentFactory,
 
                 shapes: vocabulary,
@@ -94,7 +91,6 @@ const mapStateToProps = (state) => {
     const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
     const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
     const getLinkedDataForSubject = subject => getMetadataForSubject(state, subject);
-    const getLinkedDataSearchResults = () => getMetadataSearchResults(state);
 
     return {
         shapesLoading,
@@ -103,7 +99,6 @@ const mapStateToProps = (state) => {
         isLinkedDataLoading,
         hasLinkedDataErrorForSubject,
         getLinkedDataForSubject,
-        getLinkedDataSearchResults,
     };
 };
 
@@ -113,7 +108,6 @@ const mapDispatchToProps = {
     dispatchSubmitMetadataChanges: submitMetadataChanges,
     createEntity: createMetadataEntity,
     dispatchDeleteEntity: deleteMetadataEntity,
-    searchMetadataDispatch: searchMetadata,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataMetadataProvider);
