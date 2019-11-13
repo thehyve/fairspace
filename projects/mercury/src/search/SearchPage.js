@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import PropTypes from "prop-types";
 import {connect} from 'react-redux';
 import {
     Paper, Table, TableBody,
@@ -27,32 +26,7 @@ const styles = {
 
 const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
-// Exporting here to be able to test the component outside of Redux
-export const SearchPage = ({
-    classes, location: {search}, query = getSearchQueryFromString(search), vocabularyPending, fetchVocabularyIfNeeded,
-    history, vocabulary,
-}) => {
-    const [items, setItems] = useState([]);
-    const [total, setTotal] = useState();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
-
-    useEffect(() => {
-        fetchVocabularyIfNeeded();
-
-        SearchAPI(Config.get(), ES_INDEX)
-            .search({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED})
-            .catch(handleSearchError)
-            .then(data => {
-                setItems(data.items);
-                setTotal(data.total);
-                setError(undefined);
-            })
-            .catch((e) => setError(e || true))
-            .finally(() => setLoading(false));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, query]);
-
+export const SearchPage = ({classes, items, total, loading, error, history, vocabulary}) => {
     const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {
             case COLLECTION_URI:
@@ -81,7 +55,7 @@ export const SearchPage = ({
         history.push(navigationPath + selectionQueryString);
     };
 
-    if (vocabularyPending || loading) {
+    if (loading) {
         return <LoadingInlay />;
     }
 
@@ -132,13 +106,52 @@ export const SearchPage = ({
     );
 };
 
+// This separation/wrapping of compontents is mostly for unit testing purposes (much harder if it's 1 component)
+export const SearchPageContainer = ({
+    location: {search}, query = getSearchQueryFromString(search), vocabularyPending,
+    fetchVocabularyIfNeeded, classes, history, vocabulary, searchFunction
+}) => {
+    const [items, setItems] = useState([]);
+    const [total, setTotal] = useState();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState();
+
+    useEffect(() => {
+        fetchVocabularyIfNeeded();
+        searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
+            .catch(handleSearchError)
+            .then(data => {
+                setItems(data.items);
+                setTotal(data.total);
+                setError(undefined);
+            })
+            .catch((e) => setError(e || true))
+            .finally(() => setLoading(false));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search, query]);
+
+    return (
+        <SearchPage
+            items={items}
+            total={total}
+            loading={loading || vocabularyPending}
+            error={error}
+            classes={classes}
+            history={history}
+            vocabulary={vocabulary}
+        />
+    );
+};
+
 const mapStateToProps = (state) => {
     const vocabularyPending = isVocabularyPending(state);
     const vocabulary = getVocabulary(state);
+    const searchFunction = SearchAPI(Config.get(), ES_INDEX).search;
 
     return {
         vocabularyPending,
-        vocabulary
+        vocabulary,
+        searchFunction
     };
 };
 
@@ -146,11 +159,4 @@ const mapDispatchToProps = {
     fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded
 };
 
-SearchPage.propTypes = {
-    location: PropTypes.shape({
-        search: PropTypes.string.isRequired
-    }),
-    fetchVocabularyIfNeeded: PropTypes.func.isRequired
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(SearchPage));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(SearchPageContainer));
