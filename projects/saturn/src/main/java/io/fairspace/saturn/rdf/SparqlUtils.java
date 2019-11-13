@@ -173,7 +173,7 @@ public class SparqlUtils {
      */
     public static void queryResultSet(Dataset dataset, String query, Consumer<ResultSet> resultSetAction) {
         executeRead(dataset, () -> {
-            try (QueryExecution qExec = query(dataset, query)) {
+            try (var qExec = query(dataset, query)) {
                 ResultSet rs = qExec.execSelect();
                 resultSetAction.accept(rs);
             }
@@ -189,7 +189,7 @@ public class SparqlUtils {
      */
     public static void querySelect(Dataset dataset, String query, Consumer<QuerySolution> rowAction) {
         executeRead(dataset, () -> {
-            try (QueryExecution qExec = query(dataset, query)) {
+            try (var qExec = query(dataset, query)) {
                 qExec.execSelect().forEachRemaining(rowAction);
             }
         });
@@ -199,12 +199,9 @@ public class SparqlUtils {
      * Execute a CONSTRUCT query and return as a Model
      */
     public static Model queryConstruct(Dataset dataset, String query) {
-        var wasInTransaction = dataset.isInTransaction();
-
         return calculateRead(dataset, () -> {
-            try (QueryExecution qExec = query(dataset, query)) {
-                var model = qExec.execConstruct();
-                return wasInTransaction ? model : createDefaultModel().add(model);
+            try (var qExec = query(dataset, query)) {
+                return detachModel(qExec.execConstruct());
             }
         });
     }
@@ -214,8 +211,8 @@ public class SparqlUtils {
      */
     public static Model queryDescribe(Dataset dataset, String query) {
         return calculateRead(dataset, () -> {
-            try (QueryExecution qExec = query(dataset, query)) {
-                return qExec.execDescribe();
+            try (var qExec = query(dataset, query)) {
+                return detachModel(qExec.execDescribe());
             }
         });
     }
@@ -225,7 +222,7 @@ public class SparqlUtils {
      */
     public static boolean queryAsk(Dataset dataset, String query) {
         return calculateRead(dataset, () -> {
-            try (QueryExecution qExec = query(dataset, query)) {
+            try (var qExec = query(dataset, query)) {
                 return qExec.execAsk();
             }
         });
@@ -237,6 +234,10 @@ public class SparqlUtils {
 
     public static void update(Dataset dataset, String updateString) {
         update(dataset, UpdateFactory.create(updateString));
+    }
+
+    public static Model detachModel(Model m) {
+        return createDefaultModel().add(m);
     }
 
     private static QueryExecution query(Dataset dataset, String query) {
