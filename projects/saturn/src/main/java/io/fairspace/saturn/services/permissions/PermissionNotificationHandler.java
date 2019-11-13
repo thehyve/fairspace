@@ -8,14 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
-import java.util.Optional;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.queryConstruct;
+import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static java.util.Optional.ofNullable;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
+import static org.apache.jena.system.Txn.calculateRead;
 
 /**
  * Sends an email to a user that gets access to a certain resource
@@ -29,18 +32,21 @@ public class PermissionNotificationHandler implements PermissionChangeEventHandl
     private final String publicUrl;
 
     public void onPermissionChange(Node currentUser, Node resource, Node user, Access access) {
-        Optional.ofNullable(userService.getUser(user))
+        ofNullable(userService.getUser(user))
                 .map(User::getEmail)
                 .ifPresent(email -> {
                     try {
                         var msg = mailService.newMessage();
                         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
                         msg.setSubject("Your access permissions changed");
-                        msg.setText("Your access level for " +
-                                (isCollection(resource)
-                                        ? "collection " + getLabel(resource) + " (" + getCollectionUrl(resource) + ")"
-                                        : "resource " + getLabel(resource) + " (" + resource.getURI() + ")") +
-                                " was set to " + access + " by " + userService.getUser(currentUser).getName() + ".");
+                        msg.setText(calculateRead(dataset, () ->
+                            "Your access level for " +
+                                    (isCollection(resource)
+                                            ? "collection " + getLabel(resource) + " (" + getCollectionUrl(resource) + ")"
+                                            : "resource " + getLabel(resource) + " (" + resource.getURI() + ")") +
+                                    " was set to " + access + " by " + userService.getUser(currentUser).getName() + "."
+                        ));
+
                         mailService.send(msg);
                     } catch (Exception e) {
                         log.error("Error sending an email", e);
@@ -58,7 +64,7 @@ public class PermissionNotificationHandler implements PermissionChangeEventHandl
     }
 
     private boolean isCollection(Node resource) {
-        return queryAsk(dataset, storedQuery("is_collection", resource));
+        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Collection);
     }
 
     private String getLabel(Node node) {

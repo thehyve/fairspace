@@ -13,6 +13,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
 import java.util.function.BooleanSupplier;
@@ -29,6 +30,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.system.Txn.calculateRead;
 import static org.apache.jena.system.Txn.executeRead;
+import static org.topbraid.spin.util.JenaUtil.getStringProperty;
 
 @AllArgsConstructor
 @Slf4j
@@ -90,13 +92,13 @@ public class PermissionsService {
 
         });
 
-        if(permissionChangeEventHandler != null)
+        if (permissionChangeEventHandler != null)
             permissionChangeEventHandler.onPermissionChange(userIriSupplier.get(), resource, user, access);
     }
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if(hasFullAccessSupplier.getAsBoolean()) {
+        if (hasFullAccessSupplier.getAsBoolean()) {
             return;
         }
 
@@ -119,7 +121,8 @@ public class PermissionsService {
     }
 
     boolean isWriteRestricted(Node resource) {
-        return queryAsk(dataset, storedQuery("permissions_is_restricted", resource));
+        return calculateRead(dataset, () ->
+                dataset.getNamedModel(PERMISSIONS_GRAPH).createResource(resource.getURI()).hasLiteral(FS.writeRestricted, true));
     }
 
     void setWriteRestricted(Node resource, boolean restricted) {
@@ -150,7 +153,7 @@ public class PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if(hasFullAccessSupplier.getAsBoolean()) {
+        if (hasFullAccessSupplier.getAsBoolean()) {
             return;
         }
 
@@ -165,6 +168,7 @@ public class PermissionsService {
 
     /**
      * Retrieves the permissions of the current user for the given resources
+     *
      * @param nodes
      * @return
      */
@@ -176,15 +180,16 @@ public class PermissionsService {
     }
 
     private Map<Node, Access> getPermissionsWithoutBatch(Collection<Node> nodes) {
-            var authorities = getAuthorities(nodes);
-            var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());
-            var result = new HashMap<Node, Access>();
-            authorities.forEach((authority, node) -> result.put(node, permissionsForAuthorities.get(authority)));
-            return result;
+        var authorities = getAuthorities(nodes);
+        var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());
+        var result = new HashMap<Node, Access>();
+        authorities.forEach((authority, node) -> result.put(node, permissionsForAuthorities.get(authority)));
+        return result;
     }
 
     /**
      * Ensure that the current user has the requested access level for all nodes
+     *
      * @param nodes
      * @param requestedAccess
      */
@@ -200,6 +205,7 @@ public class PermissionsService {
 
     /**
      * Retrieves the permissions of the current user for the given authorities
+     *
      * @param authorities
      * @return
      */
@@ -208,7 +214,7 @@ public class PermissionsService {
 
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource
-        if(hasFullAccessSupplier.getAsBoolean()) {
+        if (hasFullAccessSupplier.getAsBoolean()) {
             authorities.forEach(node -> result.put(node, Access.Manage));
             return result;
         }
@@ -219,7 +225,7 @@ public class PermissionsService {
     }
 
     private boolean isCollection(Node resource) {
-        return queryAsk(dataset, storedQuery("is_collection", resource));
+        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Collection);
     }
 
     /**
@@ -232,9 +238,10 @@ public class PermissionsService {
 
     /**
      * Return a list of enclosing collections for the given nodes
-     *
+     * <p>
      * If any node is given that does not belong to a collection, it will not
      * be included in the resulting set of authorities.
+     *
      * @param fileNodes List of file/directory nodes
      * @return
      */
@@ -242,16 +249,25 @@ public class PermissionsService {
         var fileToCollectionPath = new HashMap<Node, String>(fileNodes.size());
         var collectionPaths = new HashSet<String>();
 
-        querySelect(dataset, storedQuery("get_file_paths", fileNodes), row -> {
-            var path = collectionPath(row.getLiteral("filePath").getString());
-            fileToCollectionPath.put(row.get("subject").asNode(), path);
-            collectionPaths.add(path);
+        var model = dataset.getDefaultModel();
+        fileNodes.forEach(node -> {
+            var resource = model.createResource(node.getURI());
+            if (resource.hasProperty(RDF.type, FS.File) || resource.hasProperty(RDF.type, FS.Directory)) {
+                var filePath = getStringProperty(resource, FS.filePath);
+                if (filePath != null) {
+                    var path = collectionPath(filePath);
+                    fileToCollectionPath.put(node, path);
+                    collectionPaths.add(path);
+                }
+            }
         });
 
         var collectionsByPath = new HashMap<String, Node>();
 
-        querySelect(dataset, storedQuery("get_collections_by_paths", collectionPaths), row ->
-                collectionsByPath.put(row.getLiteral("path").getString(), row.getResource("collection").asNode()));
+        collectionPaths.forEach(path -> dataset.getDefaultModel().listSubjectsWithProperty(FS.filePath, path)
+                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .forEachRemaining(r -> collectionsByPath.put(path, r.asNode())));
 
         return fileToCollectionPath
                 .entrySet()
@@ -265,11 +281,10 @@ public class PermissionsService {
     }
 
     /**
-     *
      * @param nodes
      * @return A multimap from authority to the related nodes (one authority can control multiple resources)
-     *         The authority could be the original nodes for metadata entities, or the enclosing collection
-     *         for files or directories
+     * The authority could be the original nodes for metadata entities, or the enclosing collection
+     * for files or directories
      */
     private Multimap<Node, Node> getAuthorities(Collection<Node> nodes) {
         var result = HashMultimap.<Node, Node>create();
