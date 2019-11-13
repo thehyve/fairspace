@@ -62,7 +62,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S1, P2, S3,
         S3, P2, S2);
 
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, testModel, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
 
         verify(violationHandler).onViolation("The given model contains a machine-only predicate",
                 createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
