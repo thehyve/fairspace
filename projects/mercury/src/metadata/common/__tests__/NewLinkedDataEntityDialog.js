@@ -7,7 +7,6 @@ import configureStore from 'redux-mock-store';
 import {MemoryRouter} from "react-router-dom";
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
-import '../__mocks__/crypto.mock';
 import LinkedDataContext from '../../LinkedDataContext';
 
 const mockStore = configureStore();

@@ -5,6 +5,7 @@ import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import CollectionsContext from "../../common/contexts/CollectionsContext";
 import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
+import {act} from 'react-dom/test-utils';
 
 let collectionBrowser;
 
@@ -23,7 +24,7 @@ beforeEach(() => {
 });
 
 describe('<CollectionBrowser />', () => {
-    it('should dispatch an action on collection save', () => {
+    it('should dispatch an action on collection save', async () => {
         const wrapper = mount(collectionBrowser);
 
         const addButton = wrapper.find('[aria-label="Add"]').first();

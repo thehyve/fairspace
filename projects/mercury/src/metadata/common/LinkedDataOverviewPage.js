@@ -87,7 +87,8 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                             color="primary"
                             selected={showGraph}
                             value
-                            onChange={() => setShowGraph(!showGraph)}>
+                            onChange={() => setShowGraph(!showGraph)}
+                        >
                             Show Graph
                         </ToggleButton>
                     </Grid>
