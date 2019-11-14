@@ -9,8 +9,8 @@ import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.sparql.path.P_Link;
-import org.apache.jena.vocabulary.RDF;
 
+import static io.fairspace.saturn.rdf.ModelUtils.getType;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.shacl.validation.ValidationProc.execValidateShape;
 
@@ -20,6 +20,7 @@ public class ShaclValidator implements MetadataRequestValidator {
         var affected = removed.listSubjects()
                 .filterKeep(after::containsResource)
                 .andThen(added.listSubjects())
+                .mapWith(resource -> resource.inModel(after))
                 .toSet();
 
         if (affected.isEmpty()) {
@@ -29,7 +30,7 @@ public class ShaclValidator implements MetadataRequestValidator {
         var vCxt = new ValidationContext(Shapes.parse(vocabulary.getGraph()), after.getGraph());
 
         affected.forEach(resource -> {
-            var typeResource = resource.inModel(after).getPropertyResourceValue(RDF.type);
+            var typeResource = getType(resource);
             if (typeResource != null) {
                 var type = typeResource.asNode();
                 vCxt.getShapes().forEach(shape -> {

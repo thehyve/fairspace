@@ -216,16 +216,6 @@ public class ModelUtils {
         return results;
     }
 
-    public static Resource getResourceProperty(Resource subject, Property predicate) {
-        Statement s = subject.getProperty(predicate);
-        if(s != null && s.getObject().isResource()) {
-            return s.getResource();
-        }
-        else {
-            return null;
-        }
-    }
-
     public static Resource getResourcePropertyWithType(Resource subject, Property predicate, Resource type) {
         StmtIterator it = subject.listProperties(predicate);
         while(it.hasNext()) {
@@ -272,7 +262,7 @@ public class ModelUtils {
     }
 
     public static Resource getType(Resource instance) {
-        return getResourceProperty(instance, RDF.type);
+        return instance.getPropertyResourceValue(RDF.type);
     }
 
     public static List<Resource> getTypes(Resource instance) {
