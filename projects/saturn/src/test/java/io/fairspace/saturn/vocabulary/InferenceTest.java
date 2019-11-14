@@ -2,11 +2,11 @@ package io.fairspace.saturn.vocabulary;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
-import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -27,15 +27,15 @@ public class InferenceTest {
     @Test
     public void applyInference() {
         var vocabulary = modelOf(
-                classShape1, SH.targetClass, class1,
-                classShape1, SH.property, propertyShape,
-                classShape2, SH.targetClass, class2,
-                classShape2, SH.property, inverseProperty,
+                classShape1, SHACLM.targetClass, class1,
+                classShape1, SHACLM.property, propertyShape,
+                classShape2, SHACLM.targetClass, class2,
+                classShape2, SHACLM.property, inverseProperty,
                 propertyShape, RDF.type, FS.RelationShape,
-                propertyShape, SH.path, property,
+                propertyShape, SHACLM.path, property,
                 propertyShape, FS.inverseRelation, inversePropertyShape,
                 inversePropertyShape, RDF.type, FS.RelationShape,
-                inversePropertyShape, SH.path, inverseProperty);
+                inversePropertyShape, SHACLM.path, inverseProperty);
 
         Inference.applyInference(META_VOCABULARY, vocabulary);
         assertTrue("fs:inverseRelation is inverse to itself", vocabulary.contains(inversePropertyShape, FS.inverseRelation, propertyShape));

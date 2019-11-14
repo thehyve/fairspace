@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Iterables.partition;
+import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
@@ -30,7 +31,6 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.system.Txn.calculateRead;
 import static org.apache.jena.system.Txn.executeRead;
-import static org.topbraid.spin.util.JenaUtil.getStringProperty;
 
 @AllArgsConstructor
 @Slf4j

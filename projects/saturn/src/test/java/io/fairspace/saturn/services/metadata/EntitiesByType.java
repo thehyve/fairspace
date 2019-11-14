@@ -5,11 +5,11 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
-import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.Set;
 
@@ -53,12 +53,12 @@ public class EntitiesByType {
         ds.getNamedModel(VOCABULARY.getURI())
                 .add(CLASS_2, RDFS.subClassOf, CLASS_1)
                 .add(CLASS_3, RDFS.subClassOf, CLASS_2)
-                .add(CLASS_SHAPE_1, SH.targetClass, CLASS_1)
-                .add(CLASS_SHAPE_2, SH.targetClass, CLASS_2)
+                .add(CLASS_SHAPE_1, SHACLM.targetClass, CLASS_1)
+                .add(CLASS_SHAPE_2, SHACLM.targetClass, CLASS_2)
                 .addLiteral(CLASS_SHAPE_2, FS.machineOnly, true)
-                .add(CLASS_SHAPE_3, SH.targetClass, CLASS_3)
-                .add(CLASS_SHAPE_4, SH.targetClass, CLASS_4)
-                .add(CLASS_SHAPE_5, SH.targetClass, CLASS_5)
+                .add(CLASS_SHAPE_3, SHACLM.targetClass, CLASS_3)
+                .add(CLASS_SHAPE_4, SHACLM.targetClass, CLASS_4)
+                .add(CLASS_SHAPE_5, SHACLM.targetClass, CLASS_5)
                 .addLiteral(CLASS_SHAPE_5, FS.machineOnly, true);
 
         ds.getNamedModel(GRAPH.getURI())

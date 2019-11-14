@@ -5,15 +5,15 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 
@@ -40,8 +40,8 @@ public class InverseForUsedPropertiesValidatorTest {
     @Test
     public void settingAnInverseForAnUnusedPropertyIsAllowed() {
         var model = modelOf(
-                PROPERTY_SHAPE1, SH.path, PROPERTY1,
-                PROPERTY_SHAPE2, SH.path, PROPERTY2,
+                PROPERTY_SHAPE1, SHACLM.path, PROPERTY1,
+                PROPERTY_SHAPE2, SHACLM.path, PROPERTY2,
                 PROPERTY_SHAPE1, FS.inverseRelation, PROPERTY_SHAPE2,
                 PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
@@ -58,13 +58,13 @@ public class InverseForUsedPropertiesValidatorTest {
                 .add(ENTITY2, PROPERTY2, ENTITY1);
 
         var toAdd = modelOf(
-                CLASS_SHAPE1, SH.targetClass, CLASS1,
-                CLASS_SHAPE2, SH.targetClass, CLASS2,
-                CLASS_SHAPE1, SH.property, PROPERTY_SHAPE1,
-                CLASS_SHAPE2, SH.property, PROPERTY_SHAPE2,
-                PROPERTY_SHAPE1, SH.path, PROPERTY1,
+                CLASS_SHAPE1, SHACLM.targetClass, CLASS1,
+                CLASS_SHAPE2, SHACLM.targetClass, CLASS2,
+                CLASS_SHAPE1, SHACLM.property, PROPERTY_SHAPE1,
+                CLASS_SHAPE2, SHACLM.property, PROPERTY_SHAPE2,
+                PROPERTY_SHAPE1, SHACLM.path, PROPERTY1,
                 PROPERTY_SHAPE1, FS.domainIncludes, CLASS_SHAPE1,
-                PROPERTY_SHAPE2, SH.path, PROPERTY2,
+                PROPERTY_SHAPE2, SHACLM.path, PROPERTY2,
                 PROPERTY_SHAPE2, FS.domainIncludes, CLASS_SHAPE2,
                 PROPERTY_SHAPE1, FS.inverseRelation, PROPERTY_SHAPE2,
                 PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1);
@@ -80,13 +80,13 @@ public class InverseForUsedPropertiesValidatorTest {
     @Test
     public void unsettingAnInverseIsAlwaysAllowed() {
         var vocabulary = modelOf(
-                CLASS_SHAPE1, SH.targetClass, CLASS1,
-                CLASS_SHAPE2, SH.targetClass, CLASS2,
-                CLASS_SHAPE1, SH.property, PROPERTY_SHAPE1,
-                CLASS_SHAPE2, SH.property, PROPERTY_SHAPE2,
-                PROPERTY_SHAPE1, SH.path, PROPERTY1,
+                CLASS_SHAPE1, SHACLM.targetClass, CLASS1,
+                CLASS_SHAPE2, SHACLM.targetClass, CLASS2,
+                CLASS_SHAPE1, SHACLM.property, PROPERTY_SHAPE1,
+                CLASS_SHAPE2, SHACLM.property, PROPERTY_SHAPE2,
+                PROPERTY_SHAPE1, SHACLM.path, PROPERTY1,
                 PROPERTY_SHAPE1, FS.domainIncludes, CLASS_SHAPE1,
-                PROPERTY_SHAPE2, SH.path, PROPERTY2,
+                PROPERTY_SHAPE2, SHACLM.path, PROPERTY2,
                 PROPERTY_SHAPE2, FS.domainIncludes, CLASS_SHAPE2,
                 PROPERTY_SHAPE1, FS.inverseRelation, PROPERTY_SHAPE2,
                 PROPERTY_SHAPE2, FS.inverseRelation, PROPERTY_SHAPE1);

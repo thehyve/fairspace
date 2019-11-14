@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
-import org.topbraid.shacl.vocabulary.SH;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
@@ -19,7 +19,7 @@ public class SystemVocabularyProtectingValidator implements MetadataRequestValid
 
         added.listStatements()
                 .filterKeep(statement -> SYSTEM_VOCABULARY.contains(statement.getSubject(), null))
-                .filterDrop(statement -> statement.getPredicate().equals(SH.property))
+                .filterDrop(statement -> statement.getPredicate().equals(SHACLM.property))
                 .forEachRemaining(statement -> {
                     if (statement.getPredicate().equals(FS.domainIncludes)) {
                         if (SYSTEM_VOCABULARY.contains(statement.getSubject(), FS.machineOnly, createTypedLiteral(true))) {

@@ -6,6 +6,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -13,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -268,10 +268,10 @@ public class ReadableMetadataServiceTest {
         Resource md5Shape = createResource("http://md5Shape");
 
         ds.getNamedModel(userVocabularyURI).add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
-        ds.getNamedModel(userVocabularyURI).add(labelShape, SH.path, RDFS.label);
+        ds.getNamedModel(userVocabularyURI).add(labelShape, SHACLM.path, RDFS.label);
         ds.getNamedModel(userVocabularyURI).add(createdByShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
-        ds.getNamedModel(userVocabularyURI).add(createdByShape, SH.path, FS.createdBy);
+        ds.getNamedModel(userVocabularyURI).add(createdByShape, SHACLM.path, FS.createdBy);
         ds.getNamedModel(userVocabularyURI).add(md5Shape, FS.importantProperty, createTypedLiteral(Boolean.FALSE));
-        ds.getNamedModel(userVocabularyURI).add(md5Shape, SH.path, FS.md5);
+        ds.getNamedModel(userVocabularyURI).add(md5Shape, SHACLM.path, FS.md5);
     }
 }

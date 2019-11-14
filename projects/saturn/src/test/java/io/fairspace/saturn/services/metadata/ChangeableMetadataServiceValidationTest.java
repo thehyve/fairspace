@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -16,11 +17,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
-import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -189,14 +189,14 @@ public class ChangeableMetadataServiceValidationTest {
                 resource2, RDF.type, class2));
 
         ds.replaceNamedModel(VOCABULARY, modelOf(
-                classShape1, SH.targetClass, class1,
-                classShape2, SH.targetClass, class2,
-                classShape1, SH.property, propertyShape1,
-                classShape2, SH.property, propertyShape2,
-                propertyShape1, SH.path, property1,
+                classShape1, SHACLM.targetClass, class1,
+                classShape2, SHACLM.targetClass, class2,
+                classShape1, SHACLM.property, propertyShape1,
+                classShape2, SHACLM.property, propertyShape2,
+                propertyShape1, SHACLM.path, property1,
                 propertyShape1, FS.domainIncludes, classShape1,
                 propertyShape1, FS.inverseRelation, propertyShape2,
-                propertyShape2, SH.path, property2,
+                propertyShape2, SHACLM.path, property2,
                 propertyShape1, FS.domainIncludes, classShape2,
                 propertyShape2, FS.inverseRelation, propertyShape1
         ));

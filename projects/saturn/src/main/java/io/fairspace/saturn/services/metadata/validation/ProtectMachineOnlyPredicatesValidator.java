@@ -4,16 +4,17 @@ import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
-import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.HashMap;
 import java.util.Set;
 
+import static io.fairspace.saturn.rdf.ModelUtils.getBooleanProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.vocabulary.Inference.getClassShapeForClass;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.topbraid.spin.util.JenaUtil.getResourceProperties;
 
 /**
  * This validator checks whether the requested action will modify any machine-only
@@ -37,10 +38,10 @@ public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestVal
                     if (type != null) {
                         var props = machineOnlyPropertiesByType.computeIfAbsent(type, t ->
                                 getClassShapeForClass(t, vocabulary)
-                                        .map(classShape -> getResourceProperties(classShape, SH.property)
+                                        .map(classShape -> getResourceProperties(classShape, SHACLM.property)
                                                 .stream()
-                                                .filter(p -> p.hasLiteral(FS.machineOnly, true))
-                                                .map(p -> createProperty(p.getPropertyResourceValue(SH.path).getURI()))
+                                                .filter(p -> getBooleanProperty(p, FS.machineOnly))
+                                                .map(p -> createProperty(p.getPropertyResourceValue(SHACLM.path).getURI()))
                                                 .collect(toSet())
                                         )
                                         .orElse(Set.of()));

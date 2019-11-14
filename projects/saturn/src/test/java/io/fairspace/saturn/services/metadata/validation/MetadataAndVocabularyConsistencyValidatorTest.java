@@ -5,6 +5,7 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
@@ -12,10 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -50,15 +50,15 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
         initVocabularies(ds);
 
         model.removeAll();
-        vocabulary.add(TARGET_CLASS_SHAPE, SH.targetClass, TARGET_CLASS);
-        vocabulary.add(TARGET_CLASS_SHAPE, SH.property, PROPERTY_SHAPE);
-        vocabulary.add(PROPERTY_SHAPE, SH.path, PROPERTY);
+        vocabulary.add(TARGET_CLASS_SHAPE, SHACLM.targetClass, TARGET_CLASS);
+        vocabulary.add(TARGET_CLASS_SHAPE, SHACLM.property, PROPERTY_SHAPE);
+        vocabulary.add(PROPERTY_SHAPE, SHACLM.path, PROPERTY);
         model.add(ENTITY1, RDF.type, TARGET_CLASS);
     }
 
     @Test
     public void testValidateDataType() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.datatype, XSD.xint);
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.datatype, XSD.xint);
         model.add(ENTITY1, PROPERTY, createTypedLiteral(123));
 
         validateNewConstraints(constraints);
@@ -74,7 +74,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateClass() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.class_, CLASS1);
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.class_, CLASS1);
 
         model.add(ENTITY1, PROPERTY, ENTITY2)
          .add(ENTITY2, RDF.type, CLASS1);
@@ -93,7 +93,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateMinCount() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.minCount, createTypedLiteral(2));
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.minCount, createTypedLiteral(2));
 
         validateNewConstraints(constraints);
 
@@ -114,7 +114,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateMaxCount() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.maxCount, createTypedLiteral(1));
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.maxCount, createTypedLiteral(1));
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(1));
 
@@ -131,7 +131,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateMinLength() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.minLength, createTypedLiteral(2));
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.minLength, createTypedLiteral(2));
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("12"));
 
@@ -148,7 +148,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateMaxLength() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.maxLength, createTypedLiteral(2));
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.maxLength, createTypedLiteral(2));
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral("12"));
 
@@ -165,7 +165,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
     @Test
     public void testValidateIn() {
-        var constraints = modelOf(PROPERTY_SHAPE, SH.in, vocabulary.createList(createStringLiteral("a"), createStringLiteral("b")));
+        var constraints = modelOf(PROPERTY_SHAPE, SHACLM.in, vocabulary.createList(createStringLiteral("a"), createStringLiteral("b")));
 
         model.add(ENTITY1, PROPERTY, createStringLiteral("a"));
 

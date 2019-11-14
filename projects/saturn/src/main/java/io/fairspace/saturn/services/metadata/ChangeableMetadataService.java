@@ -15,8 +15,8 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
-import static io.fairspace.saturn.util.ModelUtils.*;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
