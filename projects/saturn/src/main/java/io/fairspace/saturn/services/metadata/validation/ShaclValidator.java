@@ -8,8 +8,10 @@ import org.apache.jena.shacl.engine.TargetType;
 import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
+import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.vocabulary.RDF;
 
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.shacl.validation.ValidationProc.execValidateShape;
 
 public class ShaclValidator implements MetadataRequestValidator {
@@ -27,7 +29,7 @@ public class ShaclValidator implements MetadataRequestValidator {
         var vCxt = new ValidationContext(Shapes.parse(vocabulary.getGraph()), after.getGraph());
 
         affected.forEach(resource -> {
-            var typeResource = resource.getPropertyResourceValue(RDF.type);
+            var typeResource = resource.inModel(after).getPropertyResourceValue(RDF.type);
             if (typeResource != null) {
                 var type = typeResource.asNode();
                 vCxt.getShapes().forEach(shape -> {
@@ -42,7 +44,14 @@ public class ShaclValidator implements MetadataRequestValidator {
                 .getEntries()
                 .forEach(entry -> {
                     if (entry.severity().level() == SHACL.Violation) {
-                        violationHandler.onViolation(entry.message(), new ResourceImpl(entry.focusNode(), null), null, null);
+                        var subject = new ResourceImpl(entry.focusNode(), null);
+                        var predicate = (entry.resultPath() instanceof P_Link)
+                                ? createProperty(((P_Link)entry.resultPath()).getNode().getURI())
+                                : null;
+                        var object = entry.value() != null
+                                ? before.asRDFNode(entry.value())
+                                : null;
+                        violationHandler.onViolation(entry.message(), subject, predicate, object);
                     }
                 });
     }
