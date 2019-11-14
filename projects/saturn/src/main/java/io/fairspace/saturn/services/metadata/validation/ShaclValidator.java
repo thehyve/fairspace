@@ -20,7 +20,6 @@ public class ShaclValidator implements MetadataRequestValidator {
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         var affected = removed.listSubjects()
                 .andThen(added.listSubjects())
-                .filterKeep(RDFNode::isResource)
                 .toSet();
 
         if (affected.isEmpty()) {
