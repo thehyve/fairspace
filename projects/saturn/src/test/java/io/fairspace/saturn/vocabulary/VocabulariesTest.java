@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VocabulariesTest {
-    private static final Model SHACL_FOR_SHACL = FileManager.get().loadModel("default-vocabularies/shacl-shacl.ttl");
+    private static final Model SHACL_FOR_SHACL = FileManager.get().loadModel("std/shacl-shacl.ttl");
 
     private final Dataset ds = DatasetFactory.create();
 
@@ -23,7 +23,6 @@ public class VocabulariesTest {
     @Before
     public void setUp() {
         initVocabularies(ds);
-
     }
 
     @Test
