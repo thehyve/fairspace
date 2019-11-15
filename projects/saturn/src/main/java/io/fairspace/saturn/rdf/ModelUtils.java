@@ -22,7 +22,6 @@ public class ModelUtils {
     public static final Model EMPTY_MODEL = new ModelCom(GraphZero.instance());
 
     /**
-     *
      * @param statements
      * @return A mutable model initialized with statements
      */
@@ -59,18 +58,17 @@ public class ModelUtils {
 
     private static void addTransitiveObjects(Set<Resource> reached, Resource subject, Property predicate) {
         reached.add(subject);
-        StmtIterator it = subject.listProperties(predicate);
+        var it = subject.listProperties(predicate);
         try {
             while (it.hasNext()) {
-                RDFNode object = it.next().getObject();
+                var object = it.next().getObject();
                 if (object instanceof Resource) {
                     if (!reached.contains(object)) {
-                        addTransitiveObjects(reached, (Resource)object, predicate);
+                        addTransitiveObjects(reached, (Resource) object, predicate);
                     }
                 }
             }
-        }
-        finally {
+        } finally {
             it.close();
         }
     }
@@ -78,26 +76,23 @@ public class ModelUtils {
     private static void addTransitiveSubjects(Set<Resource> reached, Resource object, Property predicate) {
         if (object != null) {
             reached.add(object);
-            StmtIterator it = object.getModel().listStatements(null, predicate, object);
+            var it = object.getModel().listStatements(null, predicate, object);
             try {
                 while (it.hasNext()) {
-                    Resource subject = it.next().getSubject();
+                    var subject = it.next().getSubject();
                     if (!reached.contains(subject)) {
                         addTransitiveSubjects(reached, subject, predicate);
                     }
                 }
-            }
-            finally {
+            } finally {
                 it.close();
             }
         }
     }
 
     public static Set<Resource> getAllTransitiveSubjects(Resource object, Property predicate) {
-        Set<Resource> set = new HashSet<Resource>();
-
+        var set = new HashSet<Resource>();
         addTransitiveSubjects(set, object, predicate);
-
         set.remove(object);
         return set;
     }
@@ -105,22 +100,22 @@ public class ModelUtils {
     public static Property asProperty(Resource resource) {
         return (resource instanceof Property)
                 ? (Property) resource
-                : new PropertyImpl(resource.asNode(), (EnhGraph)resource.getModel());
+                : new PropertyImpl(resource.asNode(), (EnhGraph) resource.getModel());
 
     }
 
     public static Set<Resource> getAllInstances(Resource cls) {
-            Model model = cls.getModel();
-            Set<Resource> classes = getAllSubClasses(cls);
-            classes.add(cls);
-            Set<Resource> results = new HashSet<Resource>();
-            for(Resource subClass : classes) {
-                StmtIterator it = model.listStatements(null, RDF.type, subClass);
-                while (it.hasNext()) {
-                    results.add(it.next().getSubject());
-                }
+        var model = cls.getModel();
+        var classes = getAllSubClasses(cls);
+        classes.add(cls);
+        var results = new HashSet<Resource>();
+        for (var subClass : classes) {
+            var it = model.listStatements(null, RDF.type, subClass);
+            while (it.hasNext()) {
+                results.add(it.next().getSubject());
             }
-            return results;
+        }
+        return results;
     }
 
     public static Set<Resource> getAllSubClasses(Resource cls) {
@@ -159,16 +154,15 @@ public class ModelUtils {
     }
 
     public static Set<Resource> getAllTypes(Resource instance) {
-        Set<Resource> types = new HashSet<Resource>();
-        StmtIterator it = instance.listProperties(RDF.type);
+        var types = new HashSet<Resource>();
+        var it = instance.listProperties(RDF.type);
         try {
             while (it.hasNext()) {
-                Resource type = it.next().getResource();
+                var type = it.next().getResource();
                 types.add(type);
                 types.addAll(getAllSuperClasses(type));
             }
-        }
-        finally {
+        } finally {
             it.close();
         }
         return types;
@@ -181,21 +175,20 @@ public class ModelUtils {
     }
 
     public static RDFList getListProperty(Resource subject, Property predicate) {
-        Statement s = subject.getProperty(predicate);
-        if(s != null && s.getObject().canAs(RDFList.class)) {
+        var s = subject.getProperty(predicate);
+        if (s != null && s.getObject().canAs(RDFList.class)) {
             return s.getResource().as(RDFList.class);
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     public static List<Literal> getLiteralProperties(Resource subject, Property predicate) {
-        List<Literal> results = new ArrayList<Literal>();
-        StmtIterator it = subject.listProperties(predicate);
-        while(it.hasNext()) {
-            Statement s = it.next();
-            if(s.getObject().isLiteral()) {
+        var results = new ArrayList<Literal>();
+        var it = subject.listProperties(predicate);
+        while (it.hasNext()) {
+            var s = it.next();
+            if (s.getObject().isLiteral()) {
                 results.add(s.getLiteral());
             }
         }
@@ -208,20 +201,20 @@ public class ModelUtils {
     }
 
     public static List<Resource> getReferences(Property predicate, Resource object) {
-        List<Resource> results = new ArrayList<Resource>();
-        StmtIterator it = object.getModel().listStatements(null, predicate, object);
-        while(it.hasNext()) {
-            Statement s = it.next();
+        var results = new ArrayList<Resource>();
+        var it = object.getModel().listStatements(null, predicate, object);
+        while (it.hasNext()) {
+            var s = it.next();
             results.add(s.getSubject());
         }
         return results;
     }
 
     public static Resource getResourcePropertyWithType(Resource subject, Property predicate, Resource type) {
-        StmtIterator it = subject.listProperties(predicate);
-        while(it.hasNext()) {
-            Statement s = it.next();
-            if(s.getObject().isResource() && hasIndirectType(s.getResource(), type)) {
+        var it = subject.listProperties(predicate);
+        while (it.hasNext()) {
+            var s = it.next();
+            if (s.getObject().isResource() && hasIndirectType(s.getResource(), type)) {
                 it.close();
                 return s.getResource();
             }
@@ -237,11 +230,10 @@ public class ModelUtils {
     }
 
     public static String getStringProperty(Resource subject, Property predicate) {
-        Statement s = subject.getProperty(predicate);
-        if(s != null && s.getObject().isLiteral()) {
+        var s = subject.getProperty(predicate);
+        if (s != null && s.getObject().isLiteral()) {
             return s.getString();
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -251,12 +243,12 @@ public class ModelUtils {
     }
 
     public static Collection<Resource> getSuperClasses(Resource subClass) {
-        NodeIterator it = subClass.getModel().listObjectsOfProperty(subClass, RDFS.subClassOf);
-        Set<Resource> results = new HashSet<>();
+        var it = subClass.getModel().listObjectsOfProperty(subClass, RDFS.subClassOf);
+        var results = new HashSet<Resource>();
         while (it.hasNext()) {
-            RDFNode node = it.nextNode();
+            var node = it.nextNode();
             if (node instanceof Resource) {
-                results.add((Resource)node);
+                results.add((Resource) node);
             }
         }
         return results;
@@ -272,16 +264,16 @@ public class ModelUtils {
 
     public static boolean hasIndirectType(Resource instance, Resource expectedType) {
 
-        if(expectedType.getModel() == null) {
+        if (expectedType.getModel() == null) {
             expectedType = expectedType.inModel(instance.getModel());
         }
 
-        StmtIterator it = instance.listProperties(RDF.type);
-        while(it.hasNext()) {
-            Statement s = it.next();
-            if(s.getObject().isResource()) {
+        var it = instance.listProperties(RDF.type);
+        while (it.hasNext()) {
+            var s = it.next();
+            if (s.getObject().isResource()) {
                 Resource actualType = s.getResource();
-                if(actualType.equals(expectedType) || hasSuperClass(actualType, expectedType)) {
+                if (actualType.equals(expectedType) || hasSuperClass(actualType, expectedType)) {
                     it.close();
                     return true;
                 }
