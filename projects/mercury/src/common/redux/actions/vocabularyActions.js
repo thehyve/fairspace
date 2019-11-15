@@ -1,13 +1,7 @@
-import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../../utils/redux";
-import {MetaVocabularyAPI, VocabularyAPI} from "../../../metadata/LinkedDataAPI";
+import {VocabularyAPI} from "../../../metadata/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {SHACL_NAMESPACE, SHACL_PATH, SHACL_TARGET_CLASS} from "../../../constants";
 import {getFirstPredicateProperty} from "../../utils/linkeddata/jsonLdUtils";
-
-export const invalidateMetadata = subject => ({
-    type: actionTypes.INVALIDATE_FETCH_METADATA,
-    meta: {subject}
-});
 
 export const submitVocabularyChanges = (subject, values, metaVocabulary) => ({
     type: actionTypes.UPDATE_VOCABULARY,
@@ -52,23 +46,3 @@ export const deleteVocabularyEntity = (subject) => ({
         subject
     }
 });
-
-const fetchVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: actionTypes.FETCH_VOCABULARY,
-    payload: VocabularyAPI.get()
-}));
-
-export const fetchMetadataVocabularyIfNeeded = () => dispatchIfNeeded(
-    fetchVocabulary,
-    state => (state && state.cache && state.cache.vocabulary)
-);
-
-const fetchMetaVocabulary = createErrorHandlingPromiseAction(() => ({
-    type: actionTypes.FETCH_META_VOCABULARY,
-    payload: MetaVocabularyAPI.get()
-}));
-
-export const fetchMetaVocabularyIfNeeded = () => dispatchIfNeeded(
-    fetchMetaVocabulary,
-    state => (state && state.cache && state.cache.metaVocabulary)
-);

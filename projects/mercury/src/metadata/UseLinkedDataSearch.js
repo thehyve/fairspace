@@ -41,7 +41,7 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
 
         // Due to current setup of how vocabulary/meta-vocab is being store, getClassesInCatalog can't be added as dependency
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [query, shapesLoading, selectedTypes.length, size, page]);
+    }, [query, shapesLoading, selectedTypes.length, size, page, availableTypes.length]);
 
     return {
         searchPending: loading,

@@ -1,12 +1,6 @@
-import {createErrorHandlingPromiseAction, dispatchIfNeeded} from "../../utils/redux";
 import {MetadataAPI} from "../../../metadata/LinkedDataAPI";
 import * as actionTypes from "./actionTypes";
 import {getFirstPredicateValue} from "../../utils/linkeddata/jsonLdUtils";
-
-export const invalidateMetadata = subject => ({
-    type: actionTypes.INVALIDATE_FETCH_METADATA,
-    meta: {subject}
-});
 
 export const submitMetadataChanges = (subject, values, vocabulary) => ({
     type: actionTypes.UPDATE_METADATA,
@@ -41,16 +35,3 @@ export const deleteMetadataEntity = (subject) => ({
         subject
     }
 });
-
-const fetchMetadataBySubject = createErrorHandlingPromiseAction(subject => ({
-    type: actionTypes.FETCH_METADATA,
-    payload: MetadataAPI.get({subject, includeObjectProperties: true}),
-    meta: {
-        subject
-    }
-}));
-
-export const fetchMetadataBySubjectIfNeeded = subject => dispatchIfNeeded(
-    () => fetchMetadataBySubject(subject),
-    state => (state && state.cache && state.cache.jsonLdBySubject ? state.cache.jsonLdBySubject[subject] : undefined)
-);

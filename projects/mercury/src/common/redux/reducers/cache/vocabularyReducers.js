@@ -1,12 +1,9 @@
 import reduceReducers from "reduce-reducers";
 
-import {promiseReducerFactory} from "../../../utils/redux";
 import {vocabularyUtils} from "../../../utils/linkeddata/vocabularyUtils";
 import * as actionTypes from '../../actions/actionTypes';
 
 const defaultState = {invalidated: true, data: []};
-
-const fetchVocabularyReducer = promiseReducerFactory(actionTypes.FETCH_VOCABULARY, defaultState);
 
 const updateVocabularyReducer = (state = defaultState, action) => {
     switch (action.type) {
@@ -21,7 +18,7 @@ const updateVocabularyReducer = (state = defaultState, action) => {
     }
 };
 
-export default reduceReducers(fetchVocabularyReducer, updateVocabularyReducer, defaultState);
+export default reduceReducers(updateVocabularyReducer, defaultState);
 
 /**
  * Returns an object representing the vocabulary

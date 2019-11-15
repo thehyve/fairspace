@@ -13,7 +13,7 @@ import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 
 const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
-    const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject);
+    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
     const {
         addValue, updateValue, deleteValue, clearForm,
@@ -24,7 +24,10 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
-            .then(() => clearForm()),
+            .then(() => {
+                clearForm();
+                updateLinkedData();
+            }),
         subject
     );
 

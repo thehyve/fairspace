@@ -1,13 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
+
 // Actions
-import {fetchMetadataVocabularyIfNeeded} from "../common/redux/actions/vocabularyActions";
-import {
-    createMetadataEntity, deleteMetadataEntity, fetchMetadataBySubjectIfNeeded, submitMetadataChanges
-} from "../common/redux/actions/metadataActions";
-// Reducers
-import {getVocabulary, hasVocabularyError, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
-import {getMetadataForSubject, hasMetadataError, isMetadataPending} from "../common/redux/reducers/cache/jsonLdBySubjectReducers";
+import {createMetadataEntity, deleteMetadataEntity, submitMetadataChanges} from "../common/redux/actions/metadataActions";
 // Utils
 import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
@@ -15,20 +10,25 @@ import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
+import UseVocabulary from './UseVocabulary';
+import UseMetadata from './UseMetadata';
 
 const LinkedDataMetadataProvider = ({
-    children, fetchMetadataVocabulary, fetchMetadataBySubject, dispatchSubmitMetadataChanges,
-    vocabulary, createEntity,
-    getLinkedDataForSubject, shapesError, dispatchDeleteEntity,
+    children, dispatchSubmitMetadataChanges, createEntity,
+    getLinkedDataForSubject, dispatchDeleteEntity,
     ...otherProps
 }) => {
-    if (!shapesError) {
-        fetchMetadataVocabulary();
-    }
+    const {vocabulary, vocabularyLoading, vocabularyError, fetchVocabulary} = UseVocabulary();
+
+    useEffect(() => {
+        fetchVocabulary();
+    }, [fetchVocabulary]);
+
+    const {metadata, metadataLoading, metadataError, fetchMetadataBySubject} = UseMetadata();
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
-    const submitLinkedDataChanges = (subject, values) => dispatchSubmitMetadataChanges(subject, values, vocabulary)
-        .then(() => fetchMetadataBySubject(subject));
+
+    const submitLinkedDataChanges = (subject, values) => dispatchSubmitMetadataChanges(subject, values, vocabulary);
 
     const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)
         .then(() => fetchMetadataBySubject(subject));
@@ -41,9 +41,11 @@ const LinkedDataMetadataProvider = ({
 
     const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI));
 
-    const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, vocabulary);
+    const getTypeInfoForLinkedData = (data) => getTypeInfo(data, vocabulary);
 
     const getClassesInCatalog = () => vocabulary.getClassesInCatalog();
+
+    const shapesError = !vocabularyLoading && vocabularyError && 'An error occurred while loading the metadata';
 
     return (
         <LinkedDataContext.Provider
@@ -56,7 +58,7 @@ const LinkedDataMetadataProvider = ({
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,
-                getLinkedDataForSubject,
+                getLinkedDataForSubject: () => metadata,
 
                 // Fixed properties
                 hasEditRight: true,
@@ -75,7 +77,9 @@ const LinkedDataMetadataProvider = ({
                 valueComponentFactory,
 
                 shapes: vocabulary,
-                shapesError
+                shapesError,
+                isLinkedDataLoading: () => metadataLoading,
+                hasLinkedDataErrorForSubject: () => !!metadataError,
             }}
         >
             {children}
@@ -83,31 +87,10 @@ const LinkedDataMetadataProvider = ({
     );
 };
 
-const mapStateToProps = (state) => {
-    const shapesLoading = isVocabularyPending(state);
-    const vocabulary = getVocabulary(state);
-    const hasShapesError = hasVocabularyError(state);
-    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the metadata';
-    const isLinkedDataLoading = (subject) => isMetadataPending(state, subject);
-    const hasLinkedDataErrorForSubject = (subject) => hasMetadataError(state, subject);
-    const getLinkedDataForSubject = subject => getMetadataForSubject(state, subject);
-
-    return {
-        shapesLoading,
-        vocabulary,
-        shapesError,
-        isLinkedDataLoading,
-        hasLinkedDataErrorForSubject,
-        getLinkedDataForSubject,
-    };
-};
-
 const mapDispatchToProps = {
-    fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
-    fetchMetadataBySubject: fetchMetadataBySubjectIfNeeded,
     dispatchSubmitMetadataChanges: submitMetadataChanges,
     createEntity: createMetadataEntity,
     dispatchDeleteEntity: deleteMetadataEntity,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataMetadataProvider);
+export default connect(null, mapDispatchToProps)(LinkedDataMetadataProvider);

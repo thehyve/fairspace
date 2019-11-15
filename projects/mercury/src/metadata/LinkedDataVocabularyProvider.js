@@ -1,51 +1,42 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {connect} from 'react-redux';
 import {UserContext} from '@fairspace/shared-frontend';
 
 // Actions
-import {
-    createVocabularyEntity, deleteVocabularyEntity, fetchMetadataVocabularyIfNeeded, fetchMetaVocabularyIfNeeded,
-    submitVocabularyChanges
-} from "../common/redux/actions/vocabularyActions";
-// Reducers
-import {
-    getMetaVocabulary, getVocabulary, hasMetaVocabularyError, hasVocabularyError, isMetaVocabularyPending,
-    isVocabularyPending
-} from "../common/redux/reducers/cache/vocabularyReducers";
+import {createVocabularyEntity, deleteVocabularyEntity, submitVocabularyChanges} from "../common/redux/actions/vocabularyActions";
 // Utils
 import {isDataSteward} from "../common/utils/userUtils";
 import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
-import {
-    extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape
-} from "../common/utils/linkeddata/vocabularyUtils";
+import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../common/utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
 import Config from "../common/services/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
+import useVocabulary from './UseVocabulary';
+import UseMetaVocabulary from './UseMetaVocabulary';
 
 const LinkedDataVocabularyProvider = ({
-    children, fetchMetaVocabulary, fetchMetadataVocabulary, dispatchSubmitVocabularyChanges,
-    metaVocabulary, vocabulary, authorizations, createEntity,
-    shapesError, hasLinkedDataErrorForSubject, dispatchDeleteEntity, ...otherProps
+    children, dispatchSubmitVocabularyChanges,
+    authorizations, createEntity, dispatchDeleteEntity, ...otherProps
 }) => {
-    if (!shapesError) {
-        fetchMetaVocabulary();
-    }
+    const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = UseMetaVocabulary();
 
-    if (!hasLinkedDataErrorForSubject()) {
-        fetchMetadataVocabulary();
-    }
+    useEffect(() => {
+        fetchMetaVocabulary();
+    }, [fetchMetaVocabulary]);
+
+    const {vocabulary, vocabularyLoading, vocabularyError, fetchVocabulary} = useVocabulary();
 
     const {currentUser} = useContext(UserContext);
 
     const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
-    const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary)
-        .then(fetchMetadataVocabulary);
+
+    const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary);
 
     const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)
-        .then(fetchMetadataVocabulary);
+        .then(fetchVocabulary);
 
     const extendProperties = ({properties, isEntityEditable = true, subject}) => {
         const shape = vocabulary.get(subject);
@@ -72,13 +63,12 @@ const LinkedDataVocabularyProvider = ({
                 ...otherProps,
 
                 // Backend interactions
-                fetchLinkedDataForSubject: fetchMetadataVocabulary,
+                fetchLinkedDataForSubject: fetchVocabulary,
                 searchLinkedData,
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,
                 getLinkedDataForSubject,
-                hasLinkedDataErrorForSubject,
 
                 // Fixed properties
                 namespaces,
@@ -92,6 +82,7 @@ const LinkedDataVocabularyProvider = ({
                 getTypeInfoForLinkedData,
                 getClassesInCatalog,
 
+                shapesLoading,
                 shapesError,
                 shapes: metaVocabulary,
 
@@ -99,7 +90,9 @@ const LinkedDataVocabularyProvider = ({
                 extendProperties,
                 valueComponentFactory,
 
-                vocabulary
+                vocabulary,
+                isLinkedDataLoading: () => vocabularyLoading,
+                hasLinkedDataErrorForSubject: () => !!vocabularyError,
             }}
         >
             {children}
@@ -107,31 +100,10 @@ const LinkedDataVocabularyProvider = ({
     );
 };
 
-const mapStateToProps = (state) => {
-    const shapesLoading = isMetaVocabularyPending(state);
-    const hasShapesError = hasMetaVocabularyError(state);
-    const metaVocabulary = getMetaVocabulary(state);
-    const vocabulary = getVocabulary(state);
-    const shapesError = !shapesLoading && hasShapesError && 'An error occurred while loading the vocbulary';
-    const isLinkedDataLoading = () => isVocabularyPending(state);
-    const hasLinkedDataErrorForSubject = () => hasVocabularyError(state);
-
-    return {
-        shapesLoading,
-        metaVocabulary,
-        vocabulary,
-        shapesError,
-        isLinkedDataLoading,
-        hasLinkedDataErrorForSubject,
-    };
-};
-
 const mapDispatchToProps = {
-    fetchMetaVocabulary: fetchMetaVocabularyIfNeeded,
-    fetchMetadataVocabulary: fetchMetadataVocabularyIfNeeded,
     dispatchSubmitVocabularyChanges: submitVocabularyChanges,
     createEntity: createVocabularyEntity,
     dispatchDeleteEntity: deleteVocabularyEntity,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LinkedDataVocabularyProvider);
+export default connect(null, mapDispatchToProps)(LinkedDataVocabularyProvider);
