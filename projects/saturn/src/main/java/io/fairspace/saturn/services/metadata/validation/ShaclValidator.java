@@ -4,14 +4,13 @@ import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.Path;
 
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.shacl.lib.G.hasType;
 import static org.apache.jena.shacl.lib.G.isOfType;
 import static org.apache.jena.shacl.validation.ValidationProc.execValidateShape;
@@ -29,28 +28,21 @@ public class ShaclValidator implements MetadataRequestValidator {
             return;
         }
 
+        var shapes = Shapes.parse(vocabulary.getGraph());
         var data = after.getGraph();
-        var vCxt = new ValidationContext(Shapes.parse(vocabulary.getGraph()), data);
+        var vCxt = new ValidationContext(shapes, data);
 
         affected.forEach(node ->
-                vCxt.getShapes().forEach(shape -> {
+                shapes.forEach(shape -> {
                     if (isTarget(shape, data, node)) {
                         execValidateShape(vCxt, after.getGraph(), shape, node);
                     }
                 }));
 
-        vCxt.generateReport()
-                .getEntries()
+        vCxt.generateReport().getEntries()
                 .forEach(entry -> {
                     if (entry.severity().level() == SHACL.Violation) {
-                        var subject = new ResourceImpl(entry.focusNode(), null);
-                        var predicate = (entry.resultPath() instanceof P_Link)
-                                ? createProperty(((P_Link) entry.resultPath()).getNode().getURI())
-                                : null;
-                        var object = entry.value() != null
-                                ? before.asRDFNode(entry.value())
-                                : null;
-                        violationHandler.onViolation(entry.message(), subject, predicate, object);
+                        violationHandler.onViolation(entry.message(), entry.focusNode(), pathToNode(entry.resultPath()), entry.value());
                     }
                 });
     }
@@ -75,5 +67,9 @@ public class ShaclValidator implements MetadataRequestValidator {
                             return false;
                     }
                 });
+    }
+
+    private static Node pathToNode(Path path) {
+        return (path instanceof P_Link) ? ((P_Link) path).getNode() : null;
     }
 }

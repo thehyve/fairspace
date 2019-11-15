@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf;
 
 import org.apache.jena.enhanced.EnhGraph;
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.Difference;
 import org.apache.jena.graph.compose.Union;
 import org.apache.jena.rdf.model.*;
@@ -304,6 +305,17 @@ public class ModelUtils {
         } finally {
             it.close();
         }
-
     }
+
+    public static Node asNode(RDFNode rdfNode) {
+        return rdfNode != null ? rdfNode.asNode() : null;
+    }
+
+    public static RDFNode asRdfNode(Node node) {
+        return node != null ? DUMMY_MODEL.asRDFNode(node) : null;
+    }
+
+    private static final Model DUMMY_MODEL = createDefaultModel();
+
+
 }

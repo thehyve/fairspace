@@ -1,9 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 
 /**
  * Combines a few validators into one. Stops on a first failing validator.
@@ -38,7 +36,7 @@ public class ComposedValidator implements MetadataRequestValidator {
         }
 
         @Override
-        public void onViolation(String message, Resource subject, Property predicate, RDFNode object) {
+        public void onViolation(String message, Node subject, Node predicate, Node object) {
             hasViolations = true;
             violationHandler.onViolation(message, subject, predicate, object);
         }

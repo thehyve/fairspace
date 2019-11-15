@@ -69,7 +69,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation(any(), any(Resource.class), any(), any());
     }
 
     @Test
@@ -97,13 +97,13 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation(any(), any(Resource.class), any(), any());
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(1));
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler, times(2)).onViolation(any(), any(), any(), any());
+        verify(violationHandler, times(2)).onViolation(any(), any(Resource.class), any(), any());
 
         model.add(ENTITY1, PROPERTY, createTypedLiteral(2));
 
@@ -126,7 +126,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation(any(), any(Resource.class), any(), any());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation(any(), any(Resource.class), any(), any());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation(any(), any(Resource.class), any(), any());
     }
 
     @Test
@@ -177,7 +177,7 @@ public class MetadataAndVocabularyConsistencyValidatorTest {
 
         validateNewConstraints(constraints);
 
-        verify(violationHandler).onViolation(any(), any(), any(), any());
+        verify(violationHandler).onViolation(any(), any(Resource.class), any(), any());
     }
 
     private void validateNewConstraints(Model constraints) {

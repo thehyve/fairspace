@@ -17,16 +17,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
-
-import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,11 +51,6 @@ public class ShaclValidatorTest {
                 .add(closedClassShape, SHACLM.closed, createTypedLiteral(true));
 
         validator = new ShaclValidator();
-
-        doAnswer(invocation -> {
-            System.err.println(Arrays.toString(invocation.getArguments()));
-            return null;
-        }).when(violationHandler).onViolation(any(), any(), any(), any());
     }
 
     @Test
@@ -143,10 +134,7 @@ public class ShaclValidatorTest {
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
 
-        verify(violationHandler).onViolation(anyString(),
-                eq(resource1),
-                eq(FS.createdBy),
-                eq(resource2));
+        expect(resource1, FS.createdBy, resource2);
 
         verifyNoMoreInteractions(violationHandler);
     }
@@ -247,6 +235,6 @@ public class ShaclValidatorTest {
     }
 
     private void expect(Resource subject, Property predicate, RDFNode object) {
-        verify(violationHandler).onViolation(anyString(), eq(subject), eq(predicate), eq(object));
+        verify(violationHandler).onViolation(anyString(), eq(asNode(subject)), eq(asNode(predicate)), eq(asNode(object)));
     }
 }
