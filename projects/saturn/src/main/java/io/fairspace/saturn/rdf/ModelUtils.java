@@ -263,7 +263,6 @@ public class ModelUtils {
     }
 
     public static boolean hasIndirectType(Resource instance, Resource expectedType) {
-
         if (expectedType.getModel() == null) {
             expectedType = expectedType.inModel(instance.getModel());
         }
