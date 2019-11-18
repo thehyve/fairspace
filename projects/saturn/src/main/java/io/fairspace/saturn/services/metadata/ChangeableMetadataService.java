@@ -95,7 +95,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             var before = dataset.getNamedModel(graph.getURI());
             var toDelete = createDefaultModel();
             model.listStatements()
-                    .filterKeep(stmt -> stmt.getObject().isURIResource())
+                    .filterKeep(stmt -> stmt.getSubject().isURIResource())
                     .mapWith(stmt -> Pair.of(stmt.getSubject(), stmt.getPredicate()))
                     .toSet()
                     .forEach(pair -> toDelete.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
