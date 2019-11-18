@@ -2,7 +2,6 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingSupplier;
 import io.fairspace.saturn.ThreadContext;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.sparql.core.DatasetGraph;
 
 import java.util.ArrayList;
@@ -36,13 +35,6 @@ public final class TxnLogDatasetGraphBatched extends TxnLogDatasetGraph {
         super(dsg, transactionLog);
 
         worker.start();
-    }
-
-    @Override
-    public void begin(ReadWrite readWrite) {
-        assert readWrite == ReadWrite.READ || currentThread() == worker;
-
-        super.begin(readWrite);
     }
 
     @Override
