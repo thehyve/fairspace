@@ -53,7 +53,7 @@ public class Services {
         this.dataset = dataset;
         this.userInfoSupplier = userInfoSupplier;
 
-        userService = new UserService(config.auth.userUrlTemplate, new DAO(dataset, null));
+        userService = new UserService(config.auth.userUrlTemplate, dataset);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
         BooleanSupplier hasFullAccessSupplier = () -> userInfoSupplier.get().getAuthorities().contains(config.auth.fullAccessRole);
 

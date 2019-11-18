@@ -5,6 +5,7 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
@@ -14,6 +15,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static io.fairspace.saturn.auth.SecurityUtil.authorizationHeader;
 import static io.fairspace.saturn.rdf.SparqlUtils.extractIdFromIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static java.lang.String.format;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
@@ -22,12 +24,14 @@ import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 public class UserService {
     private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final String userUrlTemplate;
+    private final Dataset dataset;
     private final DAO dao;
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
 
-    public UserService(String userUrlTemplate, DAO dao) {
+    public UserService(String userUrlTemplate, Dataset dataset) {
         this.userUrlTemplate = userUrlTemplate;
-        this.dao = dao;
+        this.dataset = dataset;
+        this.dao = new DAO(dataset, null);
     }
 
     public List<User> getUsers() {
@@ -35,18 +39,19 @@ public class UserService {
     }
 
     public User getUser(Node iri) {
-        User localUser = dao.read(User.class, iri);
+        var user = dao.read(User.class, iri);
 
-        if (localUser == null) {
+        if (user == null) {
             // Fetch user from keycloak and store locally for future reference
-            localUser = fetchUserFromKeycloak(iri);
+            var userFromKeycloak = fetchUserFromKeycloak(iri);
 
-            if(localUser != null) {
-                dao.write(localUser);
+            if(userFromKeycloak != null) {
+                commit("Adding a user from Keycloak", dataset, () -> dao.write(userFromKeycloak));
             }
+            user = userFromKeycloak;
         }
 
-        return localUser;
+        return user;
     }
 
     /**
@@ -63,7 +68,7 @@ public class UserService {
                 user.setIri(iri);
                 user.setName(token.getFullName());
                 user.setEmail(token.getEmail());
-                dao.write(user);
+                commit("Adding a user from the authentication token", dataset, () -> dao.write(user));
             }
         }
     }

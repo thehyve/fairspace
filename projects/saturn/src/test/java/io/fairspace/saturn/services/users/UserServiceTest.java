@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
-import io.fairspace.saturn.rdf.dao.DAO;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -48,7 +47,7 @@ public class UserServiceTest {
         });
         mockServer.start();
 
-        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users/%s", new DAO(ds, null));
+        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users/%s", ds);
         userIri = userService.getUserIri(keycloakUser.getId());
     }
 
