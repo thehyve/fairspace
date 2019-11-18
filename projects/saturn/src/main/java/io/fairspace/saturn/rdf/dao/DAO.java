@@ -1,20 +1,14 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.modify.request.QuadAcc;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataInsert;
-import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
 
 import java.lang.reflect.Field;
@@ -33,11 +27,11 @@ import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
+import static org.apache.jena.system.Txn.executeWrite;
 import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
 /**
@@ -110,25 +104,31 @@ public class DAO {
             }
 
             if (entity.getIri() == null) {
-                entity.setIri(SparqlUtils.generateMetadataIri());
+                entity.setIri(generateMetadataIri());
             }
 
-            var update = new UpdateRequest();
+            executeWrite(dataset, () -> {
+                var graph = dataset.getDefaultModel().getGraph();
 
-            setProperty(update, entity.getIri(), RDF.type.asNode(), type);
+                graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
 
-            processFields(entity.getClass(), (field, annotation) -> {
-                var propertyNode = createURI(annotation.value());
-                var value = field.get(entity);
+                processFields(entity.getClass(), (field, annotation) -> {
+                    var propertyNode = createURI(annotation.value());
+                    var value = field.get(entity);
 
-                if (value == null && annotation.required()) {
-                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
-                }
+                    if (value == null && annotation.required()) {
+                        throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
+                    }
 
-                setProperty(update, entity.getIri(), propertyNode, value);
+                    graph.remove(entity.getIri(), propertyNode, null);
+
+                    if (value instanceof Iterable) {
+                        ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
+                    } else if (value != null) {
+                        graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
+                    }
+                });
             });
-
-            update(dataset, update);
 
             return entity;
         });
@@ -260,7 +260,8 @@ public class DAO {
         return entity;
     }
 
-    private static void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) throws Exception {
+    @SneakyThrows
+    private static void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) {
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
             for (var field : c.getDeclaredFields()) {
                 var annotation = field.getAnnotation(RDFProperty.class);
@@ -270,28 +271,6 @@ public class DAO {
                 }
             }
         }
-    }
-
-    private static void setProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-        update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
-                defaultGraphIRI,
-                entityNode,
-                propertyNode,
-                Var.alloc("o"))))));
-
-        if (value instanceof Iterable) {
-            ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
-        } else if (value != null) {
-            addProperty(update, entityNode, propertyNode, value);
-        }
-    }
-
-    private static void addProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-        update.add(new UpdateDataInsert(new QuadDataAcc(singletonList(new Quad(
-                defaultGraphIRI,
-                entityNode,
-                propertyNode,
-                valueToNode(value))))));
     }
 
     private static Node valueToNode(Object value) {
