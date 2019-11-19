@@ -4,7 +4,9 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdfconnection.Isolation;
 import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,8 +46,8 @@ public class TxnLogDatasetGraphTest {
         getThreadContext().setUserInfo( new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")));
         getThreadContext().setUserCommitMessage("message");
         getThreadContext().setSystemCommitMessage("system");
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraphBatched(createTxnMem(), log));
-        rdf = new RDFConnectionBatched(ds);
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
+        rdf = new RDFConnectionLocal(ds, Isolation.COPY);
     }
 
 
