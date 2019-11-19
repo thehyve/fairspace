@@ -91,18 +91,20 @@ describe('getDirectoryFromFullpath', () => {
 });
 
 describe('getPathInfoFromParams', () => {
-    expect(getPathInfoFromParams({collection: '', path: ''})).toEqual({
-        collectionLocation: '',
-        openedPath: '/'
-    });
+    it('gets path info properly', () => {
+        expect(getPathInfoFromParams({collection: '', path: ''})).toEqual({
+            collectionLocation: '',
+            openedPath: '/'
+        });
 
-    expect(getPathInfoFromParams({collection: undefined, path: undefined})).toEqual({
-        collectionLocation: undefined,
-        openedPath: '/'
-    });
+        expect(getPathInfoFromParams({collection: undefined, path: undefined})).toEqual({
+            collectionLocation: undefined,
+            openedPath: '/'
+        });
 
-    expect(getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})).toEqual({
-        collectionLocation: 'collectionX',
-        openedPath: '/collectionX/something/something'
+        expect(getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})).toEqual({
+            collectionLocation: 'collectionX',
+            openedPath: '/collectionX/something/something'
+        });
     });
 });

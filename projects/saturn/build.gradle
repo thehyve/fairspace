@@ -66,6 +66,7 @@ dependencies {
     implementation "io.fairspace:oidc-auth-base:${oidcAuthVersion}"
 
     implementation "com.rabbitmq:amqp-client:5.7.3"
+    implementation 'net.bytebuddy:byte-buddy:1.10.3'
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"

@@ -1,19 +1,17 @@
-import React, {useEffect} from 'react';
-import PropTypes from "prop-types";
+import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow, withStyles
 } from '@material-ui/core';
-import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString, SORT_DATE_CREATED, handleSearchError, SearchAPI} from '@fairspace/shared-frontend';
 
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
-import {searchCollections} from '../common/redux/actions/searchActions';
 import * as vocabularyActions from '../common/redux/actions/vocabularyActions';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, ES_INDEX, SEARCH_MAX_SIZE} from "../constants";
 import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
-import {getCollectionsSearchResults} from "../common/redux/reducers/searchReducers";
+import Config from '../common/services/Config';
 
 const styles = {
     tableRoot: {
@@ -26,17 +24,9 @@ const styles = {
     }
 };
 
-// Exporting here to be able to test the component outside of Redux
-export const SearchPage = ({
-    classes, location: {search}, query = getSearchQueryFromString(search), performSearch, fetchVocabularyIfNeeded,
-    history, results, vocabulary, loading, error
-}) => {
-    useEffect(() => {
-        fetchVocabularyIfNeeded();
-        performSearch(query);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, query]);
+const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
+export const SearchPage = ({classes, items, total, loading, error, history, vocabulary}) => {
     const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {
             case COLLECTION_URI:
@@ -73,7 +63,7 @@ export const SearchPage = ({
         return <MessageDisplay message={error.message} />;
     }
 
-    if (!results || results.total === 0) {
+    if (!total || total === 0) {
         return <MessageDisplay message="No results found!" isError={false} />;
     }
 
@@ -89,7 +79,7 @@ export const SearchPage = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {results.items
+                    {items
                         .map((item) => (
                             <TableRow
                                 hover
@@ -116,30 +106,57 @@ export const SearchPage = ({
     );
 };
 
+// This separation/wrapping of compontents is mostly for unit testing purposes (much harder if it's 1 component)
+export const SearchPageContainer = ({
+    location: {search}, query = getSearchQueryFromString(search), vocabularyPending,
+    fetchVocabularyIfNeeded, classes, history, vocabulary, searchFunction
+}) => {
+    const [items, setItems] = useState([]);
+    const [total, setTotal] = useState();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState();
+
+    useEffect(() => {
+        fetchVocabularyIfNeeded();
+        searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
+            .catch(handleSearchError)
+            .then(data => {
+                setItems(data.items);
+                setTotal(data.total);
+                setError(undefined);
+            })
+            .catch((e) => setError(e || true))
+            .finally(() => setLoading(false));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search, query]);
+
+    return (
+        <SearchPage
+            items={items}
+            total={total}
+            loading={loading || vocabularyPending}
+            error={error}
+            classes={classes}
+            history={history}
+            vocabulary={vocabulary}
+        />
+    );
+};
+
 const mapStateToProps = (state) => {
-    const results = getCollectionsSearchResults(state);
-    const loading = results.pending || isVocabularyPending(state);
+    const vocabularyPending = isVocabularyPending(state);
     const vocabulary = getVocabulary(state);
+    const searchFunction = SearchAPI(Config.get(), ES_INDEX).search;
 
     return {
-        loading,
-        results,
-        error: results.error,
-        vocabulary
+        vocabularyPending,
+        vocabulary,
+        searchFunction
     };
 };
 
 const mapDispatchToProps = {
-    performSearch: searchCollections,
     fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded
 };
 
-SearchPage.propTypes = {
-    location: PropTypes.shape({
-        search: PropTypes.string.isRequired
-    }),
-    performSearch: PropTypes.func.isRequired,
-    fetchVocabularyIfNeeded: PropTypes.func.isRequired
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(SearchPage));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(SearchPageContainer));

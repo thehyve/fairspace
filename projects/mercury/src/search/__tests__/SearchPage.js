@@ -1,8 +1,9 @@
 import React from 'react';
 import {shallow, mount} from 'enzyme';
+import {act} from 'react-dom/test-utils';
 import {MessageDisplay} from '@fairspace/shared-frontend';
 
-import {SearchPage} from '../SearchPage';
+import {SearchPage, SearchPageContainer} from '../SearchPage';
 
 describe('<SearchPage />', () => {
     let wrapper;
@@ -10,10 +11,9 @@ describe('<SearchPage />', () => {
     beforeEach(() => {
         wrapper = shallow(<SearchPage
             classes={{}}
-            results={{total: 1, items: []}}
-            fetchVocabularyIfNeeded={() => {}}
-            location={{search: ''}}
-            performSearch={() => {}}
+            total={1}
+            items={[]}
+            loading={false}
         />);
     });
 
@@ -30,49 +30,57 @@ describe('<SearchPage />', () => {
         expect(wrapper.find(MessageDisplay)).toHaveLength(1);
     });
 
-    it('should perform search on component first mount', () => {
-        const search = jest.fn();
-        mount(<SearchPage
-            classes={{}}
-            fetchVocabularyIfNeeded={() => {}}
-            location={{search: ''}}
-            query="theQuery"
-            performSearch={search}
-        />);
+    it('should perform search on component first mount', async () => {
+        const searchFunction = jest.fn(() => Promise.resolve());
 
-        expect(search).toHaveBeenCalledTimes(1);
-        expect(search).toHaveBeenCalledWith('theQuery');
+        await act(async () => {
+            mount(<SearchPageContainer
+                classes={{}}
+                fetchVocabularyIfNeeded={() => {}}
+                location={{search: ''}}
+                query="theQuery"
+                searchFunction={searchFunction}
+            />);
+        });
+
+        expect(searchFunction).toHaveBeenCalledTimes(1);
+        expect(searchFunction).toHaveBeenCalledWith(expect.objectContaining({query: 'theQuery'}));
     });
 
-    it('should fetch vocabulary on component first mount', () => {
+    it('should fetch vocabulary on component first mount', async () => {
         const fetchVocabularyIfNeeded = jest.fn();
 
-        mount(<SearchPage
-            classes={{}}
-            fetchVocabularyIfNeeded={fetchVocabularyIfNeeded}
-            location={{search: ''}}
-            performSearch={() => {}}
-        />);
+        await act(async () => {
+            mount(<SearchPageContainer
+                classes={{}}
+                fetchVocabularyIfNeeded={fetchVocabularyIfNeeded}
+                location={{search: ''}}
+                searchFunction={() => Promise.resolve()}
+            />);
+        });
 
         expect(fetchVocabularyIfNeeded).toHaveBeenCalledTimes(1);
     });
 
-    it('should perform search after search query change', () => {
-        const localWrapper = mount(<SearchPage
-            classes={{}}
-            fetchVocabularyIfNeeded={() => {}}
-            location={{search: ''}}
-            performSearch={() => {}}
-        />);
-        const search = jest.fn();
+    it('should perform search after search query change', async () => {
+        const searchFunction = jest.fn(() => Promise.resolve());
 
-        localWrapper.setProps(
-            {
-                location: {search: 'A new Search'},
-                performSearch: search
-            }
-        );
+        await act(async () => {
+            const localWrapper = mount(<SearchPageContainer
+                classes={{}}
+                fetchVocabularyIfNeeded={() => {}}
+                location={{search: ''}}
+                searchFunction={() => Promise.resolve()}
+            />);
 
-        expect(search).toHaveBeenCalledTimes(1);
+            localWrapper.setProps(
+                {
+                    location: {search: 'A new Search'},
+                    searchFunction
+                }
+            );
+        });
+
+        expect(searchFunction).toHaveBeenCalledTimes(1);
     });
 });
