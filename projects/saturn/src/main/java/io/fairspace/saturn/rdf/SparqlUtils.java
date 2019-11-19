@@ -1,5 +1,6 @@
 package io.fairspace.saturn.rdf;
 
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -34,7 +35,8 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
-import static org.apache.jena.system.Txn.*;
+import static org.apache.jena.system.Txn.calculateRead;
+import static org.apache.jena.system.Txn.executeRead;
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
@@ -228,7 +230,7 @@ public class SparqlUtils {
     }
 
     public static void update(Dataset dataset, String updateString) {
-        executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
+        Transactions.executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
     }
 
     public static Model detachModel(Model m) {

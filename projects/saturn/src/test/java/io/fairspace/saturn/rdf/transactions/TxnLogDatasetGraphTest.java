@@ -5,6 +5,7 @@ import io.fairspace.saturn.ThreadContext;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.system.Txn;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,12 +19,10 @@ import java.util.Map;
 
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +49,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        commit("system", ds, () -> ds.getNamedModel("http://example.com/g1")
+        Transactions.calculateWrite("system", ds, () -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
@@ -64,7 +63,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
-        commit("system", ds, () -> {
+        Transactions.executeWrite("system", ds, () -> {
             ds.getNamedModel("http://example.com/g1")
                     .add(statement)
                     .remove(statement);
@@ -89,7 +88,7 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
-            commit("system", ds, () -> {
+            Transactions.calculateWrite("system", ds, () -> {
                 ds.getNamedModel("http://example.com/g1")
                         .add(statement)
                         .remove(statement);
@@ -104,13 +103,14 @@ public class TxnLogDatasetGraphTest {
         verify(log).onAbort();
     }
 
+   // @Ignore
     @Test
     public void errorOnCommitCausesSystemExit() throws IOException {
         exit.expectSystemExit();
 
         doThrow(IOException.class).when(log).onCommit();
 
-        executeWrite(ds, () -> {
+        Txn.executeWrite(ds, () -> {
         });
     }
 }

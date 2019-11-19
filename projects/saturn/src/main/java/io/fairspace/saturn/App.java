@@ -2,7 +2,6 @@ package io.fairspace.saturn;
 
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.rdf.transactions.BatchTransactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 
@@ -19,8 +18,6 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
-
-        BatchTransactions.install();
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 

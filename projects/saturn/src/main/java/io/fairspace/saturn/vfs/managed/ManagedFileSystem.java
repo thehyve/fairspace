@@ -2,6 +2,7 @@ package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
@@ -78,7 +79,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo doMkdir(String path) throws IOException {
-        return commit("Create directory " + path, dataset, () -> {
+        return Transactions.calculateWrite("Create directory " + path, dataset, () -> {
             ensureCanCreate(path);
             update(dataset, storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
             return stat(path);
@@ -89,7 +90,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected FileInfo doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        return commit("Create file " + path, dataset, () -> {
+        return Transactions.calculateWrite("Create file " + path, dataset, () -> {
             ensureCanCreate(path);
             update(dataset, storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
             return stat(path);
@@ -100,7 +101,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        commit("Modify file " + path, dataset, () -> {
+        executeWrite("Modify file " + path, dataset, () -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -135,7 +136,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void doDelete(String path) throws IOException {
-        commit("Delete " + path, dataset, () -> {
+        executeWrite("Delete " + path, dataset, () -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -197,7 +198,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        commit(verb + " data from " + from + " to " + to, dataset, () -> {
+        executeWrite(verb + " data from " + from + " to " + to, dataset, () -> {
             ensureCanCreate(to);
             var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
             update(dataset, storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));

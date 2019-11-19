@@ -3,8 +3,7 @@ package io.fairspace.saturn.rdf.transactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.DatasetGraph;
-
-import static org.apache.jena.system.Txn.executeWrite;
+import org.apache.jena.system.Txn;
 
 @Slf4j
 public class Restore {
@@ -17,7 +16,7 @@ public class Restore {
 
         log.warn("Your metadata database is gone. Restoring from the transaction log containing {} transactions", logSize);
 
-        executeWrite(dsg, () -> {
+        Txn.executeWrite(dsg, () -> {
             var prevProgress = -1L;
             for (var i = 0; i < logSize; i++) {
                 var progress = (100 * i) / logSize;
