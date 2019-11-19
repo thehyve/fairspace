@@ -42,7 +42,7 @@ public class TxnLogDatasetGraphTest {
         getThreadContext().setUserInfo( new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")));
         getThreadContext().setUserCommitMessage("message");
         getThreadContext().setSystemCommitMessage("system");
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraphBatched(createTxnMem(), log));
+        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
     }
 
 
