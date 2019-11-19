@@ -8,12 +8,11 @@ import lombok.Setter;
 
 import java.util.function.Consumer;
 
-import static java.lang.ThreadLocal.withInitial;
 
 @NoArgsConstructor
 @AllArgsConstructor
 public class ThreadContext {
-    private static final ThreadLocal<ThreadContext> threadContext = withInitial(ThreadContext::new);
+    private static final ThreadLocal<ThreadContext> threadContext = new ThreadLocal<>();
 
     private static final ThreadLocal<Consumer<? super ThreadContext>> threadContextListener = new ThreadLocal<>();
 

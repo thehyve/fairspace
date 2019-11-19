@@ -2,6 +2,7 @@ package io.fairspace.saturn.auth;
 
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.ThreadContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.function.Function;
@@ -19,7 +20,8 @@ public class SecurityUtil {
     }
 
     public static String authorizationHeader() {
-        return ofNullable(getThreadContext().getUserInfo())
+        return ofNullable(getThreadContext())
+                .map(ThreadContext::getUserInfo)
                 .map(info -> "Bearer " + info.getAccessToken())
                 .orElse(null);
     }

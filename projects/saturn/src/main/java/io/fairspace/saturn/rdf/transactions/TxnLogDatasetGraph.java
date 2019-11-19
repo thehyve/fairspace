@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -21,7 +22,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private static final String ERROR_MSG =
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
-    protected final TransactionLog transactionLog;
+    private final TransactionLog transactionLog;
 
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
@@ -61,17 +62,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
             critical(() -> {
                 transactionLog.onBegin();
-                setThreadContextListener(context -> {
-                    if (isInWriteTransaction()) {
-                        var userName = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getFullName).orElse(null);
-                        var userId = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
-                        try {
-                            transactionLog.onMetadata(context.getUserCommitMessage(), context.getSystemCommitMessage(), userId, userName, currentTimeMillis());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
+                setThreadContextListener(this::onThreadContextChanged);
             });
         }
     }
@@ -81,6 +72,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         if (isInWriteTransaction()) {
             critical(() -> {
                 transactionLog.onCommit();
+                setThreadContextListener(null);
                 super.commit();
             });
         } else {
@@ -92,6 +84,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     public void abort() {
         if (isInWriteTransaction()) {
             critical(transactionLog::onAbort);
+            setThreadContextListener(null);
         }
 
         super.abort();
@@ -118,6 +111,18 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             // There's no log.flush() :-(
 
             System.exit(1);
+        }
+    }
+
+    private void onThreadContextChanged(ThreadContext context) {
+        if (isInWriteTransaction()) {
+            var userName = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getFullName).orElse(null);
+            var userId = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
+            try {
+                transactionLog.onMetadata(context.getUserCommitMessage(), context.getSystemCommitMessage(), userId, userName, currentTimeMillis());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

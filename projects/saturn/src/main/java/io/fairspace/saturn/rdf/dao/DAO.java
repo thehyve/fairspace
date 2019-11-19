@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -163,7 +162,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        commit("Delete " + iri, dataset, () ->
+        executeWrite(dataset, () ->
                 dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
     }
 

@@ -57,12 +57,14 @@ public class BatchTransactions {
             txn.commit();
             txn.end();
             return true;
-        }  catch (Throwable th) {
+        } catch (Throwable th) {
             try {
-                txn.abort() ;
-                txn.end() ;
-            } catch (Throwable th2) { th.addSuppressed(th2); }
-            throw th ;
+                txn.abort();
+                txn.end();
+            } catch (Throwable th2) {
+                th.addSuppressed(th2);
+            }
+            throw th;
         }
     }
 
@@ -71,8 +73,7 @@ public class BatchTransactions {
         var type = TypePool.Default.of(classLoader).describe("org.apache.jena.system.Txn").resolve();
         new ByteBuddy()
                 .redefine(type, ClassFileLocator.ForClassLoader.of(classLoader))
-                .method(named("executeWrite")).intercept(to(BatchTransactions.class))
-                .method(named("calculateWrite")).intercept(to(BatchTransactions.class))
+                .method(named("executeWrite").or(named("calculateWrite"))).intercept(to(BatchTransactions.class))
                 .make()
                 .load(classLoader, ClassLoadingStrategy.Default.INJECTION);
 
@@ -123,7 +124,6 @@ public class BatchTransactions {
         boolean perform() {
             try {
                 setThreadContext(context);
-                //grabTransactionMetadataFromContext();
 
                 result = action.get();
                 error = null;

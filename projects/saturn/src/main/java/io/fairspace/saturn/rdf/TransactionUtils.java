@@ -10,7 +10,10 @@ import static org.apache.jena.system.Txn.calculateWrite;
 
 public class TransactionUtils {
     public static <T, E extends Exception> T commit(String message, Dataset ds, ThrowingSupplier<T, E> action) throws E {
-        getThreadContext().setSystemCommitMessage(message);
+        var ctx = getThreadContext();
+        if (ctx != null) {
+          ctx.setSystemCommitMessage(message);
+        }
         return calculateWrite(ds, sneaky(action));
     }
 

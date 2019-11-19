@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.ThreadContext;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.TransactionUtils.commit;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -39,9 +40,10 @@ public class TxnLogDatasetGraphTest {
 
     @Before
     public void before() {
-        getThreadContext().setUserInfo( new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")));
-        getThreadContext().setUserCommitMessage("message");
-        getThreadContext().setSystemCommitMessage("system");
+        setThreadContext(new ThreadContext(
+                new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email"))
+                , "message"
+                , "system"));
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
     }
 

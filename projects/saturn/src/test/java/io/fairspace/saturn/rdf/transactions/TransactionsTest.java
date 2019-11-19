@@ -51,7 +51,7 @@ public class TransactionsTest {
             ds.commit();
         });
         anotherThread.start();
-        anotherThread.join(10_000);
+        anotherThread.join(1_000);
         assertTrue("The other thread should be still waiting on ds.begin(WRITE)", anotherThread.isAlive());
         ds.commit();
         // Now the other thread can start a transaction
