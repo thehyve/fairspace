@@ -13,7 +13,6 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateRequest;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -228,12 +227,8 @@ public class SparqlUtils {
         });
     }
 
-    public static void update(Dataset dataset, UpdateRequest update) {
-        executeWrite(dataset, () -> UpdateExecutionFactory.create(update, dataset).execute());
-    }
-
     public static void update(Dataset dataset, String updateString) {
-        update(dataset, UpdateFactory.create(updateString));
+        executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
     }
 
     public static Model detachModel(Model m) {

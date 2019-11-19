@@ -45,7 +45,9 @@ public class PermissionsService {
     private final EventService eventService;
 
     public void createResource(Node resource) {
-        update(dataset, storedQuery("permissions_create_resource", resource, userIriSupplier.get()));
+        var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(userIriSupplier.get()));
+
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
                 .resource(resource.getURI())
