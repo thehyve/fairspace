@@ -1,6 +1,5 @@
 import * as constants from "../../../../constants";
 import {fromJsonLd, getJsonLdForSubject, normalizeTypes, toJsonLd} from "../jsonLdConverter";
-import {vocabularyUtils} from "../vocabularyUtils";
 
 describe('jsonLdConverter', () => {
     describe('fromJsonLd', () => {
@@ -205,14 +204,12 @@ describe('jsonLdConverter', () => {
     });
 
     describe('toJsonLd', () => {
-        const vocabulary = vocabularyUtils([]);
-
         it('should creates a valid json-ld (@value)', () => {
             const subject = "some-subject";
             const predicate = "some-predicate";
             const values = [{value: "some-value"}];
 
-            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+            const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
                 "@id": "some-subject",
@@ -227,7 +224,7 @@ describe('jsonLdConverter', () => {
             const predicate = "some-predicate";
             const values = [{id: "some-id"}];
 
-            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+            const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
                 "@id": "some-subject",
@@ -240,7 +237,7 @@ describe('jsonLdConverter', () => {
         it('returns null if no valid predicate is provided', () => {
             const subject = "some-subject";
             const values = [{id: "some-id"}];
-            const jsonLd = toJsonLd(subject, null, values, vocabulary);
+            const jsonLd = toJsonLd(subject, null, values, []);
 
             expect(jsonLd).toEqual(null);
         });
@@ -248,7 +245,7 @@ describe('jsonLdConverter', () => {
         it('returns null if no valid values are provided', () => {
             const subject = "some-subject";
             const predicate = "some-predicate";
-            const jsonLd = toJsonLd(subject, predicate, null, vocabulary);
+            const jsonLd = toJsonLd(subject, predicate, null, []);
 
             expect(jsonLd).toEqual(null);
         });
@@ -256,7 +253,7 @@ describe('jsonLdConverter', () => {
         it('serializes a an empty list as fs:NIL', () => {
             const subject = "some-subject";
             const predicate = "some-predicate";
-            const jsonLd = toJsonLd(subject, predicate, [], vocabulary);
+            const jsonLd = toJsonLd(subject, predicate, [], []);
 
             const expected = {
                 "@id": "some-subject",
@@ -270,7 +267,7 @@ describe('jsonLdConverter', () => {
             const subject = "some-subject";
             const predicate = "some-predicate";
             const values = [{value: ''}, {value: undefined}, {value: null}];
-            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+            const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
                 "@id": "some-subject",
@@ -284,7 +281,7 @@ describe('jsonLdConverter', () => {
             const subject = "some-subject";
             const predicate = "some-predicate";
             const values = [{value: ''}, {value: undefined}, {value: null}, {value: 'some-value'}, {value: 'some-other-value'}];
-            const jsonLd = toJsonLd(subject, predicate, values, vocabulary);
+            const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
                 "@id": "some-subject",
@@ -297,7 +294,7 @@ describe('jsonLdConverter', () => {
         it('returns null if no valid subject is provided', () => {
             const predicate = "some-predicate";
             const values = [{id: "some-id"}];
-            const jsonLd = toJsonLd(null, predicate, values, vocabulary);
+            const jsonLd = toJsonLd(null, predicate, values, []);
 
             expect(jsonLd).toEqual(null);
         });
@@ -306,27 +303,6 @@ describe('jsonLdConverter', () => {
             const jsonLd = toJsonLd();
 
             expect(jsonLd).toEqual(null);
-        });
-
-        it('should generate a valid json-ld for rdf:List', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const values = [{value: "some-value"}, {value: "some-other-value"}];
-
-            const vocabularyMock = {
-                determineShapeForProperty: () => ({
-                    [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
-                })
-            };
-
-            const jsonLd = toJsonLd(subject, predicate, values, vocabularyMock);
-
-            const expected = {
-                "@id": "some-subject",
-                "some-predicate": {"@list": [{"@value": "some-value"}, {"@value": "some-other-value"}]}
-            };
-
-            expect(jsonLd).toEqual(expected);
         });
     });
 

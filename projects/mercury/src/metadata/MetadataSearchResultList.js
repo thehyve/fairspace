@@ -6,12 +6,13 @@ import {getLabel} from "../common/utils/linkeddata/metadataUtils";
 import LinkedDataList from "./common/LinkedDataList";
 import LinkedDataLink from "./common/LinkedDataLink";
 import {VOCABULARY_PATH} from "../constants";
+import {determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
 
 export default ({items, ...otherProps}) => {
-    const {determineShapeForTypes} = useContext(LinkedDataContext);
+    const {shapes} = useContext(LinkedDataContext);
 
     const entities = items.map(({id, label, comment, type, highlights}) => {
-        const shape = determineShapeForTypes(type);
+        const shape = determineShapeForTypes(shapes, type);
         const typeLabel = getLabel(shape, true);
         const shapeUrl = shape['@id'];
 

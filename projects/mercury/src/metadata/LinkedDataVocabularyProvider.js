@@ -3,8 +3,7 @@ import {UserContext} from '@fairspace/shared-frontend';
 
 // Utils
 import {isDataSteward} from "../common/utils/userUtils";
-import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape} from "../common/utils/linkeddata/vocabularyUtils";
+import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape, get, getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
@@ -22,8 +21,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
     }, [fetchMetaVocabulary]);
 
     const {
-        vocabulary, rawVocabulary, vocabularyLoading, vocabularyError, fetchVocabulary,
-        submitVocabularyChanges, createVocabularyEntity, deleteVocabularyEntity
+        vocabulary, fetchVocabulary, submitVocabularyChanges, createVocabularyEntity, deleteVocabularyEntity
     } = useContext(VocabularyContext);
 
     const {currentUser} = useContext(UserContext);
@@ -36,7 +34,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
         .then(fetchVocabulary);
 
     const extendProperties = ({properties, isEntityEditable = true, subject}) => {
-        const shape = vocabulary.get(subject);
+        const shape = get(vocabulary, subject);
 
         return extendPropertiesWithVocabularyEditingInfo({
             properties,
@@ -46,13 +44,9 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
         });
     };
 
-    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, USABLE_IN_VOCABULARY_URI));
+    const namespaces = getNamespaces(vocabulary, namespace => getFirstPredicateValue(namespace, USABLE_IN_VOCABULARY_URI));
 
-    const getTypeInfoForLinkedData = (metadata) => getTypeInfo(metadata, metaVocabulary);
-
-    const getClassesInCatalog = () => metaVocabulary.getClassesInCatalog();
-
-    const fetchLinkedDataForSubject = useCallback(() => Promise.resolve(rawVocabulary), [rawVocabulary]);
+    const fetchLinkedDataForSubject = useCallback(() => Promise.resolve(vocabulary), [vocabulary]);
 
     return (
         <LinkedDataContext.Provider
@@ -72,12 +66,6 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 hasEditRight: isDataSteward(currentUser.authorizations, Config.get()),
                 editorPath: VOCABULARY_PATH,
 
-                // Methods based on shapes
-                getDescendants: metaVocabulary.getDescendants,
-                determineShapeForTypes: metaVocabulary.determineShapeForTypes,
-                getTypeInfoForLinkedData,
-                getClassesInCatalog,
-
                 shapesLoading,
                 shapesError,
                 shapes: metaVocabulary,
@@ -87,8 +75,6 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 valueComponentFactory,
 
                 vocabulary,
-                isLinkedDataLoading: () => vocabularyLoading,
-                hasLinkedDataErrorForSubject: () => !!vocabularyError,
             }}
         >
             {children}

@@ -2,6 +2,8 @@ import {useCallback, useContext, useEffect, useState} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
 import {fromJsonLd, getJsonLdForSubject} from "../common/utils/linkeddata/jsonLdConverter";
+import {determinePropertyShapesForTypes, getProperties} from '../common/utils/linkeddata/vocabularyUtils';
+import {getTypeInfo} from '../common/utils/linkeddata/metadataUtils';
 
 /**
  * This custom hook is a helper for many Linked Data functions, such as fetching, searching and transforming/parsing metadata.
@@ -22,27 +24,23 @@ export const useLinkedData = (subject, context = {}) => {
     const [typeInfo, setTypeInfo] = useState({});
     const [errorToDisplay, setErrorToDisplay] = useState();
 
-    const {
-        shapes,
-        shapesLoading = false,
-        shapesError = false,
-        fetchLinkedDataForSubject = () => {},
-        getTypeInfoForLinkedData = () => {}
-    } = context;
+    const {shapes, shapesLoading, shapesError, fetchLinkedDataForSubject} = context;
 
     const updateLinkedData = useCallback(() => {
         setLoading(true);
+
         fetchLinkedDataForSubject(subject)
             .then(ld => {
                 if (ld && ld.length > 0) {
                     const linkedDataItem = getJsonLdForSubject(ld, subject);
-                    setTypeInfo(getTypeInfoForLinkedData(linkedDataItem));
+                    setTypeInfo(getTypeInfo(linkedDataItem, shapes));
 
                     if (!Array.isArray(linkedDataItem['@type'])) {
                         console.warn("Can not get values from metadata without a type or that is not expanded");
                     } else {
-                        const propertyShapes = shapes.determinePropertyShapesForTypes(linkedDataItem['@type']);
-                        setProperties(shapes.getProperties(propertyShapes));
+                        const propertyShapes = determinePropertyShapesForTypes(shapes, linkedDataItem['@type']);
+                        const props = getProperties(shapes, propertyShapes);
+                        setProperties(props);
                         setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
                     }
                 }
@@ -51,12 +49,11 @@ export const useLinkedData = (subject, context = {}) => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [fetchLinkedDataForSubject, getTypeInfoForLinkedData, shapes, subject]);
+    }, [fetchLinkedDataForSubject, shapes, subject]);
 
     useEffect(() => {
         updateLinkedData();
     }, [updateLinkedData]);
-
 
     useEffect(() => {
         const linkedDataLoading = shapesLoading || loading;

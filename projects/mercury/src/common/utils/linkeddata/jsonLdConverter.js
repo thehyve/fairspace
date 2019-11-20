@@ -2,7 +2,7 @@ import {compareBy, comparing, flattenShallow, isNonEmptyValue} from '@fairspace/
 
 import * as constants from "../../../constants";
 import {getFirstPredicateId, normalizeJsonLdResource} from "./jsonLdUtils";
-import {isRdfList} from "./vocabularyUtils";
+import {isRdfList, determineShapeForProperty} from "./vocabularyUtils";
 import {simplifyUriPredicates} from "./metadataUtils";
 
 /**
@@ -113,7 +113,7 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
 
     return {
         '@id': subject,
-        [predicate]: jsonLdWrapper(validValues, vocabulary.determineShapeForProperty(predicate))
+        [predicate]: jsonLdWrapper(validValues, determineShapeForProperty(vocabulary, predicate))
     };
 };
 

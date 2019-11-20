@@ -16,7 +16,6 @@ import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import useSubject from '../common/hooks/UseSubject';
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import {VocabularyProvider} from '../metadata/VocabularyContext';
-import {MetadataProvider} from '../metadata/MetadataContext';
 
 const routes = () => (
     <>
@@ -27,11 +26,9 @@ const routes = () => (
             exact
             render={() => (
                 <VocabularyProvider>
-                    <MetadataProvider>
-                        <LinkedDataMetadataProvider>
-                            <Collections />
-                        </LinkedDataMetadataProvider>
-                    </MetadataProvider>
+                    <LinkedDataMetadataProvider>
+                        <Collections />
+                    </LinkedDataMetadataProvider>
                 </VocabularyProvider>
             )}
         />
@@ -40,11 +37,9 @@ const routes = () => (
             path="/collections/:collection/:path(.*)?"
             render={(props) => (
                 <VocabularyProvider>
-                    <MetadataProvider>
-                        <LinkedDataMetadataProvider>
-                            <FilesPage {...props} />
-                        </LinkedDataMetadataProvider>
-                    </MetadataProvider>
+                    <LinkedDataMetadataProvider>
+                        <FilesPage {...props} />
+                    </LinkedDataMetadataProvider>
                 </VocabularyProvider>
             )}
         />
@@ -59,11 +54,9 @@ const routes = () => (
 
                 return (
                     <VocabularyProvider>
-                        <MetadataProvider>
-                            <MetadataWrapper>
-                                {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataOverviewPage />}
-                            </MetadataWrapper>
-                        </MetadataProvider>
+                        <MetadataWrapper>
+                            {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataOverviewPage />}
+                        </MetadataWrapper>
                     </VocabularyProvider>
                 );
             }}

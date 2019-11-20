@@ -1,7 +1,6 @@
 import mockAxios from 'axios';
 
 import {MetadataAPI} from "../LinkedDataAPI";
-import {vocabularyUtils} from "../../common/utils/linkeddata/vocabularyUtils";
 
 beforeEach(() => {
     mockAxios.get.mockClear();
@@ -34,7 +33,7 @@ describe('LinkedDataApi', () => {
                 hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
                 hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
             },
-            vocabularyUtils([]),
+            [],
             'http://examle.com/Company'
         );
 

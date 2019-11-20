@@ -5,6 +5,7 @@ import {ErrorDialog} from "@fairspace/shared-frontend";
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors, getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
 import VocabularyContext from "./VocabularyContext";
+import {getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
 
 export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);
@@ -44,7 +45,7 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
 
 const useStatefulFormSubmission = (submitFunc, subject) => {
     const {vocabulary} = useContext(VocabularyContext);
-    return useFormSubmission(submitFunc, subject, vocabulary.getNamespaces());
+    return useFormSubmission(submitFunc, subject, getNamespaces(vocabulary));
 };
 
 export default useStatefulFormSubmission;

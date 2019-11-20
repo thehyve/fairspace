@@ -6,6 +6,7 @@ import {MemoryRouter} from "react-router-dom";
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LinkedDataContext from '../../LinkedDataContext';
+import VocabularyContext from '../../VocabularyContext';
 
 const shape = {
     "@type": [
@@ -19,10 +20,6 @@ const shape = {
     ]
 };
 
-const shapes = {
-    getPropertiesForNodeShape: () => []
-};
-
 const extendProperties = () => [];
 
 const createLinkedDataEntity = jest.fn(() => Promise.resolve());
@@ -31,20 +28,26 @@ describe('<NewLinkedDataEntityDialog />', () => {
     it('initilises the values/updates with the type', async () => {
         const {getByTestId} = render(
             <MemoryRouter>
-                <LinkedDataContext.Provider
+                <VocabularyContext.Provider
                     value={{
-                        shapes,
-                        extendProperties,
-                        createLinkedDataEntity
+                        vocabulary: []
                     }}
                 >
-                    <NewLinkedDataEntityDialog
-                        shape={shape}
-                        requireIdentifier={false}
-                        onCreate={() => {}}
-                        onClose={() => {}}
-                    />
-                </LinkedDataContext.Provider>
+                    <LinkedDataContext.Provider
+                        value={{
+                            shapes: [],
+                            extendProperties,
+                            createLinkedDataEntity
+                        }}
+                    >
+                        <NewLinkedDataEntityDialog
+                            shape={shape}
+                            requireIdentifier={false}
+                            onCreate={() => {}}
+                            onClose={() => {}}
+                        />
+                    </LinkedDataContext.Provider>
+                </VocabularyContext.Provider>
             </MemoryRouter>
         );
 

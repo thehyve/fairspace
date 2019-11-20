@@ -7,6 +7,7 @@ import DeleteEntityButton from "../DeleteEntityButton";
 import {
     COLLECTION_URI, CREATED_BY_URI, DATE_DELETED_URI, DELETED_BY_URI, DIRECTORY_URI, FILE_URI, FIXED_SHAPE_URI
 } from "../../../constants";
+import VocabularyContext from '../../VocabularyContext';
 
 describe('LinkedDataEntityHeader', () => {
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
@@ -14,10 +15,16 @@ describe('LinkedDataEntityHeader', () => {
     describe('delete button', () => {
         const testDeleteButtonDeletableState = (values, expectedDeletableState) => {
             const wrapper = mount(
-                <LinkedDataEntityHeader
-                    subject={subject}
-                    values={values}
-                />
+                <VocabularyContext.Provider
+                    value={{
+                        vocabulary: []
+                    }}
+                >
+                    <LinkedDataEntityHeader
+                        subject={subject}
+                        values={values}
+                    />
+                </VocabularyContext.Provider>
             );
 
             const button = wrapper.find(DeleteEntityButton);

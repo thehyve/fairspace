@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from 'react';
 
-import {vocabularyUtils} from "../common/utils/linkeddata/vocabularyUtils";
 import {VocabularyAPI} from './LinkedDataAPI';
 import {getFirstPredicateProperty} from '../common/utils/linkeddata/jsonLdUtils';
 import {SHACL_PATH, SHACL_TARGET_CLASS, SHACL_NAMESPACE} from '../constants';
 
-const VocabularyContext = React.createContext({vocabulary: vocabularyUtils([])});
+const VocabularyContext = React.createContext();
 
 export const VocabularyProvider = ({children}) => {
     const [vocabulary, setVocabulary] = useState([]);
@@ -53,8 +52,7 @@ export const VocabularyProvider = ({children}) => {
     return (
         <VocabularyContext.Provider
             value={{
-                vocabulary: vocabularyUtils(vocabulary || []),
-                rawVocabulary: vocabulary,
+                vocabulary,
                 vocabularyLoading,
                 vocabularyError,
                 submitVocabularyChanges,

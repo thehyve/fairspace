@@ -1,25 +1,38 @@
-import React, {useContext} from 'react';
+import React, {useContext, useCallback} from 'react';
 
 // Utils
-import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
-import MetadataContext from './MetadataContext';
+import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
+import {MetadataAPI} from './LinkedDataAPI';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
 
-    const {fetchMetadataBySubject, submitMetadataChanges, createMetadataEntity, deleteMetadataEntity} = useContext(MetadataContext);
+    const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, includeObjectProperties: true})
+        .catch(() => {
+            throw new Error('An error occurred while loading the metadata');
+        }), []);
 
-    const createLinkedDataEntity = (subject, values, type) => createMetadataEntity(subject, values, vocabulary, type).then(({value}) => value);
+    const submitLinkedDataChanges = useCallback((subject, values) => MetadataAPI.get({subject})
+        .then(meta => (meta.length && getFirstPredicateValue(meta[0], '@type')))
+        .then(type => MetadataAPI.updateEntity(subject, values, vocabulary, type)), [vocabulary]);
 
-    const submitLinkedDataChanges = (subject, values) => submitMetadataChanges(subject, values, vocabulary);
+    const createLinkedDataEntity = useCallback((subject, values, type) => MetadataAPI.get({subject})
+        .then((meta) => {
+            if (meta.length) {
+                throw Error(`Entity already exists: ${subject}`);
+            }
+        })
+        .then(() => MetadataAPI.updateEntity(subject, values, vocabulary, type))
+        .then(() => ({subject, type, values})), [vocabulary]);
 
-    const deleteLinkedDataEntity = subject => deleteMetadataEntity(subject);
+    const deleteLinkedDataEntity = (subject) => MetadataAPI.delete(subject)
+        .then(fetchMetadataBySubject);
 
     const extendProperties = ({properties, isEntityEditable = true}) => properties
         .map(p => ({
@@ -27,13 +40,9 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
             isEditable: isEntityEditable && !p.machineOnly
         }));
 
-    const namespaces = vocabulary.getNamespaces(namespace => getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI));
+    const namespaces = getNamespaces(vocabulary, namespace => getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI));
 
-    const getTypeInfoForLinkedData = (data) => getTypeInfo(data, vocabulary);
-
-    const getClassesInCatalog = () => vocabulary.getClassesInCatalog();
-
-    const shapesError = !vocabularyLoading && vocabularyError && 'An error occurred while loading the metadata';
+    const shapesError = !vocabularyLoading && vocabularyError && 'An error occurred while loading the vocabulary';
 
     return (
         <LinkedDataContext.Provider
@@ -52,12 +61,6 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,
-
-                // Get information from shapes
-                getDescendants: vocabulary.getDescendants,
-                determineShapeForTypes: vocabulary.determineShapeForTypes,
-                getTypeInfoForLinkedData,
-                getClassesInCatalog,
 
                 // Generic methods without reference to shapes
                 extendProperties,

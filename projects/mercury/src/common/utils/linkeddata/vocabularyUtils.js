@@ -91,237 +91,210 @@ export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditabl
         };
     });
 
-export const vocabularyUtils = (vocabulary = []) => {
-    /**
-     * Returns a list of classes marked as fairspace entities.
-     *
-     * This is a list of entities that is not marked as machine-only, but does contain a targetClass predicate.
-     * Deleted entries are excluded from the list
-     */
-    const getClassesInCatalog = () => vocabulary
-        .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))
-        .filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI))
-        .filter(entry => !getFirstPredicateValue(entry, constants.DATE_DELETED_URI));
+/**
+ * Returns a list of classes marked as fairspace entities.
+ *
+ * This is a list of entities that is not marked as machine-only, but does contain a targetClass predicate.
+ * Deleted entries are excluded from the list
+ */
+export const getClassesInCatalog = (vocabulary) => vocabulary
+    .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))
+    .filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI))
+    .filter(entry => !getFirstPredicateValue(entry, constants.DATE_DELETED_URI));
 
-    /**
-     * Returns a list of classes marked as fairspace entities
-     * @param namespaceFilter   Optional filter function on the jsonLD representation of the namespaces. By defaults passes everything
-     * @returns {{isDefault: *, prefix: *, namespace: *, id: *, label: *}[]}
-     */
-    const getNamespaces = (namespaceFilter = () => true) => vocabulary
-        .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
-        .filter(namespaceFilter)
-        .map(namespace => ({
-            id: namespace['@id'],
-            label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
-            prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
-            namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE),
-            isDefault: getFirstPredicateValue(namespace, constants.DEFAULT_NAMESPACE_URI, false)
-        }));
+/**
+ * Returns a list of classes marked as fairspace entities
+ * @param namespaceFilter   Optional filter function on the jsonLD representation of the namespaces. By defaults passes everything
+ * @returns {{isDefault: *, prefix: *, namespace: *, id: *, label: *}[]}
+ */
+export const getNamespaces = (vocabulary, namespaceFilter = () => true) => vocabulary
+    .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
+    .filter(namespaceFilter)
+    .map(namespace => ({
+        id: namespace['@id'],
+        label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
+        prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
+        namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE),
+        isDefault: getFirstPredicateValue(namespace, constants.DEFAULT_NAMESPACE_URI, false)
+    }));
 
-    /**
-     * Checks whether the vocabulary contains the given identifier
-     * @param id
-     * @returns {boolean}
-     */
-    const contains = (id) => vocabulary.some(el => el['@id'] === id);
+/**
+ * Checks whether the vocabulary contains the given identifier
+ * @param id
+ * @returns {boolean}
+ */
+export const contains = (vocabulary, id) => vocabulary.some(el => el['@id'] === id);
 
-    /**
-     * Returns the json-ld entry for the given identifier
-     * @param id
-     * @returns {array}
-     */
-    const get = (id) => vocabulary.find(el => el['@id'] === id) || [];
+/**
+ * Returns the json-ld entry for the given identifier
+ * @param id
+ * @returns {array}
+ */
+export const get = (vocabulary, id) => vocabulary.find(el => el['@id'] === id) || [];
 
-    /**
-     * Determines the SHACL shape to be applied to the given types
-     * @param typeUris
-     */
-    const determineShapeForTypes = (typeUris) => vocabulary.find(entry => typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
+/**
+ * Determines the SHACL shape to be applied to the given types
+ * @param typeUris
+ */
+export const determineShapeForTypes = (vocabulary, typeUris) => vocabulary.find(entry => typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
 
-    /**
-     * Determines the SHACL shape to be applied to the given type.
-     *
-     * This method filters out any node that does not have a required SHACL name. This avoid an issue where
-     * there could be a blank node in the vocabulary referring the same sh:path, but only used to define a required field.
-     *
-     * See VRE-752 for more details
-     *
-     * @param propertyUri
-     */
-    const determineShapeForProperty = (propertyUri) => vocabulary.find(
-        entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
-            && getFirstPredicateValue(entry, constants.SHACL_NAME)
-    );
+/**
+ * Determines the SHACL shape to be applied to the given type.
+ *
+ * This method filters out any node that does not have a required SHACL name. This avoid an issue where
+ * there could be a blank node in the vocabulary referring the same sh:path, but only used to define a required field.
+ *
+ * See VRE-752 for more details
+ *
+ * @param propertyUri
+ */
+export const determineShapeForProperty = (vocabulary, propertyUri) => vocabulary.find(
+    entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
+        && getFirstPredicateValue(entry, constants.SHACL_NAME)
+);
 
-    /**
-     * Returns a human readable label for the given predicate or the uri if no label is specified
-     * @param uri
-     * @returns {string}
-     */
-    const getLabelForPredicate = (uri) => getFirstPredicateValue(determineShapeForProperty(uri), constants.SHACL_NAME) || uri;
+/**
+ * Returns a human readable label for the given predicate or the uri if no label is specified
+ * @param uri
+ * @returns {string}
+ */
+export const getLabelForPredicate = (vocabulary, uri) => getFirstPredicateValue(determineShapeForProperty(vocabulary, uri), constants.SHACL_NAME) || uri;
 
-    /**
-     * Returns a list of property shapes that are in given node shape
-     * @param shape
-     */
-    const determinePropertyShapesForNodeShape = (shape) => {
-        if (!shape) {
-            return [];
-        }
+/**
+ * Returns a list of property shapes that are in given node shape
+ * @param shape
+ */
+const determinePropertyShapesForNodeShape = (vocabulary, shape) => {
+    if (!shape) {
+        return [];
+    }
 
-        const propertyShapes = shape[constants.SHACL_PROPERTY];
-        const propertyShapeIds = propertyShapes ? propertyShapes.map(propertyShape => propertyShape['@id']) : [];
+    const propertyShapes = shape[constants.SHACL_PROPERTY];
+    const propertyShapeIds = propertyShapes ? propertyShapes.map(propertyShape => propertyShape['@id']) : [];
 
-        return vocabulary
-            .filter(entry => propertyShapeIds.includes(entry['@id']));
+    return vocabulary
+        .filter(entry => propertyShapeIds.includes(entry['@id']));
+};
+
+/**
+ * Returns a list of property shapes that are in the shape of the given types
+ * @param types
+ */
+export const determinePropertyShapesForTypes = (vocabulary, types) => determinePropertyShapesForNodeShape(vocabulary, determineShapeForTypes(vocabulary, types));
+
+/**
+ * Returns a list of property shapes for the given type, where the properties are marked as fs:importantProperty
+ * @param type
+ */
+export const determineImportantPropertyShapes = (vocabulary, type) => determinePropertyShapesForTypes(vocabulary, [type])
+    .filter(shape => getFirstPredicateValue(shape, constants.IMPORTANT_PROPERTY_URI, false));
+
+/**
+ * Determines whether the given class URI is a fairspace class
+ */
+const isFairspaceClass = (vocabulary, className) => {
+    if (!className) {
+        return false;
+    }
+
+    return getClassesInCatalog(vocabulary)
+        .some(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
+};
+
+/**
+ * Generates a list entry for a single property
+ * @param predicate
+ * @param shape
+ * @returns {{key: string, label: string, datatype: string, className: string, maxValuesCount: number, machineOnly: boolean, multiLine: boolean}}
+ * @private
+ */
+const generatePropertyEntry = (vocabulary, predicate, shape) => {
+    const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+    const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
+    const multiLine = (datatype === constants.STRING_URI && !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false)) || datatype === constants.MARKDOWN_URI;
+    const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
+    const path = getFirstPredicateId(shape, constants.SHACL_PATH);
+    const shapeIsRelationShape = isRelationShape(shape);
+    const importantPropertyShapes = shapeIsRelationShape && className ? determineImportantPropertyShapes(vocabulary, className) : [];
+
+    return {
+        key: predicate,
+        label: getFirstPredicateValue(shape, constants.SHACL_NAME),
+        description,
+        path,
+        shape,
+        datatype,
+        multiLine,
+        className,
+        order: getFirstPredicateValue(shape, constants.SHACL_ORDER),
+        minValuesCount: getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT),
+        maxValuesCount: getMaxCount(shape),
+        machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
+        isRdfList: isRdfList(shape),
+        allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
+        isGenericIriResource: isGenericIriResource(shape),
+        isExternalLink: isExternalLink(shape),
+        allowAdditionOfEntities: isFairspaceClass(vocabulary, className),
+        isRelationShape: shapeIsRelationShape,
+        importantPropertyShapes
     };
+};
 
-    /**
-     * Returns a list of property shapes that are in the shape of the given types
-     * @param types
-     */
-    const determinePropertyShapesForTypes = (types) => determinePropertyShapesForNodeShape(determineShapeForTypes(types));
+/**
+ * Converts the propertyshapes into a list of properties to be used for form building
+ *
+ * Please note that only the metadata for the first subject will be used
+ *
+ * @param propertyShapes    List of propertyshapes that apply to a certain entity
+ * @returns {array}         A list of properties that can be used to show a form. The format is similar to this
+ * {
+ *      key: "http://fairspace.io/ontology#description",
+ *      label: "Description",
+ *      ...
+ *  }
+ * @see {generatePropertyEntry}
+ */
+export const getProperties = (vocabulary, propertyShapes) => {
+    if (!propertyShapes) {
+        return [];
+    }
 
-    /**
-     * Returns a list of property shapes for the given type, where the properties are marked as fs:importantProperty
-     * @param type
-     */
-    const determineImportantPropertyShapes = type => determinePropertyShapesForTypes([type])
-        .filter(shape => getFirstPredicateValue(shape, constants.IMPORTANT_PROPERTY_URI, false));
+    const properties = propertyShapes
+        .map(shape => {
+            const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
+            return generatePropertyEntry(vocabulary, predicateUri, shape);
+        });
 
-    /**
-     * Determines whether the given class URI is a fairspace class
-     */
-    const isFairspaceClass = (className) => {
-        if (!className) {
-            return false;
-        }
+    return [...properties, TYPE_PROPERTY];
+};
 
-        return getClassesInCatalog(vocabulary)
-            .some(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
-    };
+/**
+ * Returns a list of properties for a certain shape to be used for form building
+ * @param nodeShape
+ * @returns {Array}
+ * @see {getProperties}
+ */
+export const getPropertiesForNodeShape = (vocabulary, nodeShape) => {
+    const propertyShapes = determinePropertyShapesForNodeShape(vocabulary, nodeShape);
+    return getProperties(vocabulary, propertyShapes);
+};
 
-    /**
-     * Generates a list entry for a single property
-     * @param predicate
-     * @param shape
-     * @returns {{key: string, label: string, datatype: string, className: string, maxValuesCount: number, machineOnly: boolean, multiLine: boolean}}
-     * @private
-     */
-    const generatePropertyEntry = (predicate, shape) => {
-        const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
-        const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
-        const multiLine = (datatype === constants.STRING_URI && !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false)) || datatype === constants.MARKDOWN_URI;
-        const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
-        const path = getFirstPredicateId(shape, constants.SHACL_PATH);
-        const shapeIsRelationShape = isRelationShape(shape);
-        const importantPropertyShapes = shapeIsRelationShape && className ? determineImportantPropertyShapes(className) : [];
+export const getChildSubclasses = (vocabulary, type) => vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
 
-        return {
-            key: predicate,
-            label: getFirstPredicateValue(shape, constants.SHACL_NAME),
-            description,
-            path,
-            shape,
-            datatype,
-            multiLine,
-            className,
-            order: getFirstPredicateValue(shape, constants.SHACL_ORDER),
-            minValuesCount: getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT),
-            maxValuesCount: getMaxCount(shape),
-            machineOnly: getFirstPredicateValue(shape, constants.MACHINE_ONLY_URI, false),
-            isRdfList: isRdfList(shape),
-            allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
-            isGenericIriResource: isGenericIriResource(shape),
-            isExternalLink: isExternalLink(shape),
-            allowAdditionOfEntities: isFairspaceClass(className),
-            isRelationShape: shapeIsRelationShape,
-            importantPropertyShapes
-        };
-    };
+/**
+ * Returns an array of the types that are subclasses of the provided type including indirect subclasses
+ * @param {string} type
+ */
+export const getDescendants = (vocabulary, type) => {
+    let queue = [type];
+    let found = [];
 
-    /**
-     * Converts the propertyshapes into a list of properties to be used for form building
-     *
-     * Please note that only the metadata for the first subject will be used
-     *
-     * @param propertyShapes    List of propertyshapes that apply to a certain entity
-     * @returns {array}         A list of properties that can be used to show a form. The format is similar to this
-     * {
-     *      key: "http://fairspace.io/ontology#description",
-     *      label: "Description",
-     *      ...
-     *  }
-     * @see {generatePropertyEntry}
-     */
-    const getProperties = (propertyShapes) => {
-        if (!propertyShapes) {
-            return [];
-        }
+    while (queue.length > 0) {
+        const head = queue.shift();
+        const subClasses = getChildSubclasses(vocabulary, head);
+        queue = queue.concat(subClasses);
+        found = found.concat(subClasses);
+    }
 
-        const properties = propertyShapes
-            .map(shape => {
-                const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
-                return generatePropertyEntry(predicateUri, shape);
-            });
-
-        return [...properties, TYPE_PROPERTY];
-    };
-
-    /**
-     * Returns a list of properties for a certain shape to be used for form building
-     * @param nodeShape
-     * @returns {Array}
-     * @see {getProperties}
-     */
-    const getPropertiesForNodeShape = (nodeShape) => {
-        const propertyShapes = determinePropertyShapesForNodeShape(nodeShape);
-        return getProperties(propertyShapes, vocabulary);
-    };
-
-    /**
-     * @returns {array}     The vocabulary in json-ld format
-     */
-    const getRaw = () => vocabulary;
-
-    const getChildSubclasses = type => vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
-
-    /**
-     * Returns an array of the types that are subclasses of the provided type including indirect subclasses
-     * @param {string} type
-     */
-    const getDescendants = type => {
-        let queue = [type];
-        let found = [];
-
-        while (queue.length > 0) {
-            const head = queue.shift();
-            const subClasses = getChildSubclasses(head);
-            queue = queue.concat(subClasses);
-            found = found.concat(subClasses);
-        }
-
-        return found;
-    };
-
-    return Object.freeze({
-        contains,
-        get,
-        determineShapeForProperty,
-        determineShapeForTypes,
-        determinePropertyShapesForTypes,
-        determinePropertyShapesForNodeShape,
-
-        getProperties,
-        getPropertiesForNodeShape,
-
-        getRaw,
-        getLabelForPredicate,
-        getClassesInCatalog,
-        getNamespaces,
-        getChildSubclasses,
-        getDescendants,
-
-    });
+    return found;
 };

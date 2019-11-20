@@ -10,6 +10,7 @@ import {getParentPath} from '../common/utils/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, ES_INDEX, SEARCH_MAX_SIZE} from "../constants";
 import Config from '../common/services/Config';
 import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
+import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';
 
 const styles = {
     tableRoot: {
@@ -40,7 +41,7 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
 
     // If vocabulary has not been loaded, we can not
     // retrieve the label. Just return the URI in that (rare) case
-    const generateTypeLabel = (typeUri) => (vocabulary ? vocabulary.getLabelForPredicate(typeUri) : typeUri);
+    const generateTypeLabel = (typeUri) => (vocabulary ? getLabelForPredicate(vocabulary, typeUri) : typeUri);
 
     /**
      * Handles a click on a search result.
