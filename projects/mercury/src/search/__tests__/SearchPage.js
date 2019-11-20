@@ -36,7 +36,6 @@ describe('<SearchPage />', () => {
         await act(async () => {
             mount(<SearchPageContainer
                 classes={{}}
-                fetchVocabulary={() => {}}
                 location={{search: ''}}
                 query="theQuery"
                 searchFunction={searchFunction}
@@ -47,28 +46,12 @@ describe('<SearchPage />', () => {
         expect(searchFunction).toHaveBeenCalledWith(expect.objectContaining({query: 'theQuery'}));
     });
 
-    it('should fetch vocabulary on component first mount', async () => {
-        const fetchVocabulary = jest.fn();
-
-        await act(async () => {
-            mount(<SearchPageContainer
-                classes={{}}
-                fetchVocabulary={fetchVocabulary}
-                location={{search: ''}}
-                searchFunction={() => Promise.resolve()}
-            />);
-        });
-
-        expect(fetchVocabulary).toHaveBeenCalledTimes(1);
-    });
-
     it('should perform search after search query change', async () => {
         const searchFunction = jest.fn(() => Promise.resolve());
 
         await act(async () => {
             const localWrapper = mount(<SearchPageContainer
                 classes={{}}
-                fetchVocabulary={() => {}}
                 location={{search: ''}}
                 searchFunction={() => Promise.resolve()}
             />);

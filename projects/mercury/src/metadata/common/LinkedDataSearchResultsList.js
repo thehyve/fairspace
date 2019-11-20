@@ -19,8 +19,6 @@ export default ({
         items, total, hasHighlights,
     } = useLinkedDataSearch(selectedTypes, query, size, page, availableTypes);
 
-    console.log({availableTypes, shapesLoading, searchPending});
-
     return (
         <ListComponent
             pending={shapesLoading || searchPending}

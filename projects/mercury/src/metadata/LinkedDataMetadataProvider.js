@@ -1,8 +1,5 @@
-import React, {useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, {useContext} from 'react';
 
-// Actions
-import {createMetadataEntity, deleteMetadataEntity, submitMetadataChanges} from "../common/redux/actions/metadataActions";
 // Utils
 import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
@@ -10,28 +7,19 @@ import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
-import UseVocabulary from './UseVocabulary';
-import UseMetadata from './UseMetadata';
+import VocabularyContext from './VocabularyContext';
+import MetadataContext from './MetadataContext';
 
-const LinkedDataMetadataProvider = ({
-    children, dispatchSubmitMetadataChanges, createEntity,
-    getLinkedDataForSubject, dispatchDeleteEntity,
-    ...otherProps
-}) => {
-    const {vocabulary, vocabularyLoading, vocabularyError, fetchVocabulary} = UseVocabulary();
+const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
+    const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
 
-    useEffect(() => {
-        fetchVocabulary();
-    }, [fetchVocabulary]);
+    const {fetchMetadataBySubject, submitMetadataChanges, createMetadataEntity, deleteMetadataEntity} = useContext(MetadataContext);
 
-    const {metadata, metadataLoading, metadataError, fetchMetadataBySubject} = UseMetadata();
+    const createLinkedDataEntity = (subject, values, type) => createMetadataEntity(subject, values, vocabulary, type).then(({value}) => value);
 
-    const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, vocabulary, type).then(({value}) => value);
+    const submitLinkedDataChanges = (subject, values) => submitMetadataChanges(subject, values, vocabulary);
 
-    const submitLinkedDataChanges = (subject, values) => dispatchSubmitMetadataChanges(subject, values, vocabulary);
-
-    const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)
-        .then(() => fetchMetadataBySubject(subject));
+    const deleteLinkedDataEntity = subject => deleteMetadataEntity(subject);
 
     const extendProperties = ({properties, isEntityEditable = true}) => properties
         .map(p => ({
@@ -58,7 +46,6 @@ const LinkedDataMetadataProvider = ({
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,
-                getLinkedDataForSubject: () => metadata,
 
                 // Fixed properties
                 hasEditRight: true,
@@ -78,8 +65,6 @@ const LinkedDataMetadataProvider = ({
 
                 shapes: vocabulary,
                 shapesError,
-                isLinkedDataLoading: () => metadataLoading,
-                hasLinkedDataErrorForSubject: () => !!metadataError,
             }}
         >
             {children}
@@ -87,10 +72,4 @@ const LinkedDataMetadataProvider = ({
     );
 };
 
-const mapDispatchToProps = {
-    dispatchSubmitMetadataChanges: submitMetadataChanges,
-    createEntity: createMetadataEntity,
-    dispatchDeleteEntity: deleteMetadataEntity,
-};
-
-export default connect(null, mapDispatchToProps)(LinkedDataMetadataProvider);
+export default LinkedDataMetadataProvider;

@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect} from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
 import {fromJsonLd, getJsonLdForSubject} from "../common/utils/linkeddata/jsonLdConverter";
@@ -15,55 +15,63 @@ export const useLinkedData = (subject, context = {}) => {
         throw new Error('Please provide a valid subject.');
     }
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState();
+    const [properties, setProperties] = useState([]);
+    const [values, setValues] = useState({});
+    const [typeInfo, setTypeInfo] = useState({});
+    const [errorToDisplay, setErrorToDisplay] = useState();
+
     const {
         shapes,
         shapesLoading = false,
         shapesError = false,
         fetchLinkedDataForSubject = () => {},
-        isLinkedDataLoading = () => false,
-        hasLinkedDataErrorForSubject = () => false,
-        getLinkedDataForSubject = () => {},
         getTypeInfoForLinkedData = () => {}
     } = context;
 
-    // useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
     const updateLinkedData = useCallback(() => {
-        fetchLinkedDataForSubject(subject);
-    }, [fetchLinkedDataForSubject, subject]);
+        setLoading(true);
+        fetchLinkedDataForSubject(subject)
+            .then(ld => {
+                if (ld && ld.length > 0) {
+                    const linkedDataItem = getJsonLdForSubject(ld, subject);
+                    setTypeInfo(getTypeInfoForLinkedData(linkedDataItem));
+
+                    if (!Array.isArray(linkedDataItem['@type'])) {
+                        console.warn("Can not get values from metadata without a type or that is not expanded");
+                    } else {
+                        const propertyShapes = shapes.determinePropertyShapesForTypes(linkedDataItem['@type']);
+                        setProperties(shapes.getProperties(propertyShapes));
+                        setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
+                    }
+                }
+            })
+            .catch(setError)
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [fetchLinkedDataForSubject, getTypeInfoForLinkedData, shapes, subject]);
 
     useEffect(() => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    const linkedData = getLinkedDataForSubject(subject);
-    let properties = [];
-    let values = {};
-    let typeInfo = {};
 
-    if (linkedData && linkedData.length > 0) {
-        const linkedDataItem = getJsonLdForSubject(linkedData, subject);
-        typeInfo = getTypeInfoForLinkedData(linkedDataItem);
+    useEffect(() => {
+        const linkedDataLoading = shapesLoading || loading;
+        let err = shapesError || (error && `Unable to load metadata for ${subject}`) || '';
 
-        if (!Array.isArray(linkedDataItem['@type'])) {
-            console.warn("Can not get values from metadata without a type or that is not expanded");
-        } else {
-            const propertyShapes = shapes.determinePropertyShapesForTypes(linkedDataItem['@type']);
-            properties = shapes.getProperties(propertyShapes);
-            values = fromJsonLd(linkedDataItem, propertyShapes, linkedData, shapes);
+        if (!err && !linkedDataLoading && !(properties && properties.length > 0)) {
+            err = 'No metadata found for this subject';
         }
-    }
 
-    const linkedDataLoading = shapesLoading || isLinkedDataLoading(subject);
-
-    let error = shapesError || (hasLinkedDataErrorForSubject(subject) && `Unable to load metadata for ${subject}`) || '';
-
-    if (!error && !linkedDataLoading && !(properties && properties.length > 0)) {
-        error = 'No metadata found for this subject';
-    }
+        setErrorToDisplay(err);
+    }, [error, loading, properties, shapesError, shapesLoading, subject]);
 
     return {
-        linkedDataLoading,
-        linkedDataError: error,
+        linkedDataLoading: shapesLoading || loading,
+        linkedDataError: errorToDisplay,
         properties,
         values,
         typeInfo,

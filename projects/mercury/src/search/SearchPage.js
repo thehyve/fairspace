@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow, withStyles
@@ -9,7 +9,7 @@ import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, ES_INDEX, SEARCH_MAX_SIZE} from "../constants";
 import Config from '../common/services/Config';
-import UseVocabulary from '../metadata/UseVocabulary';
+import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
 
 const styles = {
     tableRoot: {
@@ -107,7 +107,7 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
 // This separation/wrapping of compontents is mostly for unit testing purposes (much harder if it's 1 component)
 export const SearchPageContainer = ({
     location: {search}, query = getSearchQueryFromString(search),
-    vocabulary, vocabularyLoading, vocabularyError, fetchVocabulary,
+    vocabulary, vocabularyLoading, vocabularyError,
     classes, history, searchFunction = SearchAPI(Config.get(), ES_INDEX).search
 }) => {
     const [items, setItems] = useState([]);
@@ -116,9 +116,6 @@ export const SearchPageContainer = ({
     const [error, setError] = useState();
 
     useEffect(() => {
-        if (!vocabulary || !vocabulary.getRaw().length) {
-            fetchVocabulary();
-        }
         searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
             .catch(handleSearchError)
             .then(data => {
@@ -128,8 +125,7 @@ export const SearchPageContainer = ({
             })
             .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, query, fetchVocabulary, searchFunction]);
+    }, [search, query, searchFunction]);
 
     return (
         <SearchPage
@@ -145,16 +141,17 @@ export const SearchPageContainer = ({
 };
 
 const SearchPageWithVocabulary = (props) => {
-    const {vocabulary, vocabularyLoading, vocabularyError, fetchVocabulary} = UseVocabulary();
+    const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
 
     return (
-        <SearchPageContainer
-            {...props}
-            vocabulary={vocabulary}
-            vocabularyLoading={vocabularyLoading}
-            vocabularyError={vocabularyError}
-            fetchVocabulary={fetchVocabulary}
-        />
+        <VocabularyProvider>
+            <SearchPageContainer
+                {...props}
+                vocabulary={vocabulary}
+                vocabularyLoading={vocabularyLoading}
+                vocabularyError={vocabularyError}
+            />
+        </VocabularyProvider>
     );
 };
 

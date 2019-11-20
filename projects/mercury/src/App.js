@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
@@ -9,7 +8,6 @@ import {
     ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, UsersProvider, VersionProvider
 } from '@fairspace/shared-frontend';
 
-import configureStore from "./common/redux/store/configureStore";
 import Config from "./common/services/Config";
 import theme from './App.theme';
 import Menu from "./common/components/Menu";
@@ -32,9 +30,6 @@ const App = () => {
         return <LoadingInlay />;
     }
 
-    // Initialize the store after configuration has loaded
-    const store = configureStore();
-
     const {version: versionUrl, users, userInfo, logout, jupyterhub} = Config.get().urls;
     const requiredRole = Config.get().roles.user;
 
@@ -50,23 +45,21 @@ const App = () => {
                             <UploadsProvider>
                                 <ClipboardProvider>
                                     <CollectionsProvider>
-                                        <Provider store={store}>
-                                            <ErrorDialog>
-                                                <Router>
-                                                    <Layout
-                                                        requiredAuthorization={requiredRole}
-                                                        renderMenu={() => <Menu />}
-                                                        renderMain={() => (
-                                                            <UsersProvider url={users}>
-                                                                <Routes />
-                                                            </UsersProvider>
-                                                        )}
-                                                        renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                                        renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                                    />
-                                                </Router>
-                                            </ErrorDialog>
-                                        </Provider>
+                                        <ErrorDialog>
+                                            <Router>
+                                                <Layout
+                                                    requiredAuthorization={requiredRole}
+                                                    renderMenu={() => <Menu />}
+                                                    renderMain={() => (
+                                                        <UsersProvider url={users}>
+                                                            <Routes />
+                                                        </UsersProvider>
+                                                    )}
+                                                    renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                                    renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                                />
+                                            </Router>
+                                        </ErrorDialog>
                                     </CollectionsProvider>
                                 </ClipboardProvider>
                             </UploadsProvider>

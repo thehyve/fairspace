@@ -4,8 +4,6 @@ import UploadsContext, {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsC
 
 /**
  * This hook contains logic about uploads for a certain directory.
- *
- * Information about uploaded files is stored in redux
  */
 export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqueueUploads, startUpload) => {
     const uploads = allUploads.filter(upload => upload.destinationPath === path);

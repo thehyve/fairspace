@@ -1,11 +1,10 @@
-import {useState} from "react";
-import {useSelector} from "react-redux";
+import {useState, useContext} from "react";
 import useIsMounted from "react-is-mounted-hook";
 import {ErrorDialog} from "@fairspace/shared-frontend";
 
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
 import {partitionErrors, getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
-import {getVocabulary} from "../common/redux/reducers/cache/vocabularyReducers";
+import VocabularyContext from "./VocabularyContext";
 
 export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);
@@ -44,8 +43,8 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
 };
 
 const useStatefulFormSubmission = (submitFunc, subject) => {
-    const namespaces = useSelector(state => getVocabulary(state).getNamespaces());
-    return useFormSubmission(submitFunc, subject, namespaces);
+    const {vocabulary} = useContext(VocabularyContext);
+    return useFormSubmission(submitFunc, subject, vocabulary.getNamespaces());
 };
 
 export default useStatefulFormSubmission;

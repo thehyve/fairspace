@@ -1,9 +1,6 @@
-import React, {useContext, useEffect} from 'react';
-import {connect} from 'react-redux';
+import React, {useContext, useEffect, useCallback} from 'react';
 import {UserContext} from '@fairspace/shared-frontend';
 
-// Actions
-import {createVocabularyEntity, deleteVocabularyEntity, submitVocabularyChanges} from "../common/redux/actions/vocabularyActions";
 // Utils
 import {isDataSteward} from "../common/utils/userUtils";
 import {getTypeInfo} from "../common/utils/linkeddata/metadataUtils";
@@ -14,28 +11,28 @@ import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
 import Config from "../common/services/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
-import useVocabulary from './UseVocabulary';
-import UseMetaVocabulary from './UseMetaVocabulary';
+import VocabularyContext from './VocabularyContext';
+import useMetaVocabulary from './UseMetaVocabulary';
 
-const LinkedDataVocabularyProvider = ({
-    children, dispatchSubmitVocabularyChanges,
-    authorizations, createEntity, dispatchDeleteEntity, ...otherProps
-}) => {
-    const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = UseMetaVocabulary();
+const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps}) => {
+    const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = useMetaVocabulary();
 
     useEffect(() => {
         fetchMetaVocabulary();
     }, [fetchMetaVocabulary]);
 
-    const {vocabulary, vocabularyLoading, vocabularyError, fetchVocabulary} = useVocabulary();
+    const {
+        vocabulary, rawVocabulary, vocabularyLoading, vocabularyError, fetchVocabulary,
+        submitVocabularyChanges, createVocabularyEntity, deleteVocabularyEntity
+    } = useContext(VocabularyContext);
 
     const {currentUser} = useContext(UserContext);
 
-    const createLinkedDataEntity = (subject, values, type) => createEntity(subject, values, metaVocabulary, type).then(({value}) => value);
+    const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type).then(({value}) => value);
 
-    const submitLinkedDataChanges = (subject, values) => dispatchSubmitVocabularyChanges(subject, values, metaVocabulary);
+    const submitLinkedDataChanges = (subject, values) => submitVocabularyChanges(subject, values, metaVocabulary);
 
-    const deleteLinkedDataEntity = subject => dispatchDeleteEntity(subject)
+    const deleteLinkedDataEntity = subject => deleteVocabularyEntity(subject)
         .then(fetchVocabulary);
 
     const extendProperties = ({properties, isEntityEditable = true, subject}) => {
@@ -55,7 +52,7 @@ const LinkedDataVocabularyProvider = ({
 
     const getClassesInCatalog = () => metaVocabulary.getClassesInCatalog();
 
-    const getLinkedDataForSubject = () => vocabulary.getRaw();
+    const fetchLinkedDataForSubject = useCallback(() => Promise.resolve(rawVocabulary), [rawVocabulary]);
 
     return (
         <LinkedDataContext.Provider
@@ -63,12 +60,11 @@ const LinkedDataVocabularyProvider = ({
                 ...otherProps,
 
                 // Backend interactions
-                fetchLinkedDataForSubject: fetchVocabulary,
+                fetchLinkedDataForSubject,
                 searchLinkedData,
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,
-                getLinkedDataForSubject,
 
                 // Fixed properties
                 namespaces,
@@ -100,10 +96,4 @@ const LinkedDataVocabularyProvider = ({
     );
 };
 
-const mapDispatchToProps = {
-    dispatchSubmitVocabularyChanges: submitVocabularyChanges,
-    createEntity: createVocabularyEntity,
-    dispatchDeleteEntity: deleteVocabularyEntity,
-};
-
-export default connect(null, mapDispatchToProps)(LinkedDataVocabularyProvider);
+export default LinkedDataVocabularyProvider;
