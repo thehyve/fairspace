@@ -2,7 +2,6 @@ package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
@@ -79,7 +79,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo doMkdir(String path) throws IOException {
-        return Transactions.calculateWrite("Create directory " + path, dataset, () -> {
+        return calculateWrite("Create directory " + path, dataset, () -> {
             ensureCanCreate(path);
             update(dataset, storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
             return stat(path);
@@ -90,7 +90,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected FileInfo doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        return Transactions.calculateWrite("Create file " + path, dataset, () -> {
+        return calculateWrite("Create file " + path, dataset, () -> {
             ensureCanCreate(path);
             update(dataset, storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
             return stat(path);

@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.events.CollectionEvent;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -15,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
@@ -43,7 +43,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        Collection storedCollection = Transactions.calculateWrite("Create collection " + collection.getName(), dao.getDataset(), () -> {
+        Collection storedCollection = calculateWrite("Create collection " + collection.getName(), dao.getDataset(), () -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -137,7 +137,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return Transactions.calculateWrite("Update collection " + patch.getName(), dao.getDataset(), () -> {
+        return calculateWrite("Update collection " + patch.getName(), dao.getDataset(), () -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());

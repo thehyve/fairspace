@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -16,6 +15,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static io.fairspace.saturn.auth.SecurityUtil.authorizationHeader;
 import static io.fairspace.saturn.rdf.SparqlUtils.extractIdFromIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
 import static java.lang.String.format;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
@@ -46,7 +46,7 @@ public class UserService {
             var userFromKeycloak = fetchUserFromKeycloak(iri);
 
             if(userFromKeycloak != null) {
-                Transactions.calculateWrite("Adding a user from Keycloak", dataset, () -> dao.write(userFromKeycloak));
+                calculateWrite("Adding a user from Keycloak", dataset, () -> dao.write(userFromKeycloak));
             }
             user = userFromKeycloak;
         }
@@ -68,7 +68,7 @@ public class UserService {
                 user.setIri(iri);
                 user.setName(token.getFullName());
                 user.setEmail(token.getEmail());
-                Transactions.calculateWrite("Adding a user from the authentication token", dataset, () -> dao.write(user));
+                calculateWrite("Adding a user from the authentication token", dataset, () -> dao.write(user));
             }
         }
     }

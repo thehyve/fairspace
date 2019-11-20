@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -25,6 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -107,7 +107,7 @@ public class DAO {
                 entity.setIri(generateMetadataIri());
             }
 
-            Transactions.executeWrite(dataset, () -> {
+            executeWrite(dataset, () -> {
                 var graph = dataset.getDefaultModel().getGraph();
 
                 graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
@@ -162,7 +162,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        Transactions.executeWrite(dataset, () ->
+        executeWrite(dataset, () ->
                 dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
     }
 

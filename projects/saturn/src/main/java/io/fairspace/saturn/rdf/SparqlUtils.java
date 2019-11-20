@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -26,8 +25,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.*;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
@@ -231,7 +229,7 @@ public class SparqlUtils {
     }
 
     public static void update(Dataset dataset, String updateString) {
-        Transactions.executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
+        executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
     }
 
     public static Model detachModel(Model m) {

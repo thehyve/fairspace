@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.events.MetadataEvent;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
@@ -17,6 +16,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -57,7 +57,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if(Transactions.calculateWrite("Mark <" + subject + "> as deleted", dataset, () -> lifeCycleManager.softDelete(subject))) {
+        if(calculateWrite("Mark <" + subject + "> as deleted", dataset, () -> lifeCycleManager.softDelete(subject))) {
             eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
             return true;
         } else {
