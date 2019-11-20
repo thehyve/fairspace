@@ -1,12 +1,14 @@
 package io.fairspace.saturn.vocabulary;
 
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
-import org.topbraid.shacl.vocabulary.SH;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -14,14 +16,19 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 
 public class Inference {
     public static Model applyInference(Model vocabulary, Model model) {
-        return model.add(getInferredStatements(vocabulary, model));
+        return model.add(getInferredStatements(vocabulary, model, model));
     }
 
-    public static Model getInferredStatements(Model vocabulary, Model model) {
+    public static Model applyInference(Model vocabulary, Model base, Model changes) {
+        return changes.add(getInferredStatements(vocabulary, base, changes));
+    }
+
+    public static Model getInferredStatements(Model vocabulary, Model base, Model changes) {
         var inferred = createDefaultModel();
 
-         model.listStatements()
+         changes.listStatements()
                 .filterKeep(stmt -> stmt.getObject().isResource())
+                 .mapWith(stmt -> base.createStatement(stmt.getSubject(), stmt.getPredicate(), stmt.getObject()))
                 .forEachRemaining(stmt -> getInversePropertyForStatement(stmt, vocabulary)
                         .map(inverseProperty -> stmt.getModel().createStatement(stmt.getObject().asResource(), inverseProperty, stmt.getSubject()))
                         .ifPresent(inferred::add)
@@ -32,25 +39,25 @@ public class Inference {
 
     public static Optional<Resource> getClassShapeForResource(Resource resource, Model vocabulary) {
         return ofNullable(resource.getPropertyResourceValue(RDF.type))
-                .map(type -> vocabulary.listSubjectsWithProperty(SH.targetClass, type))
-                .filter(Iterator::hasNext)
-                .map(Iterator::next);
+                .flatMap(type -> getClassShapeForClass(type, vocabulary));
     }
 
-    public static Set<Resource> getPropertyShapesForResource(Resource resource, Model vocabulary) {
+    public static Optional<Resource> getClassShapeForClass(Resource type, Model vocabulary) {
+        return vocabulary.listSubjectsWithProperty(SHACLM.targetClass, type).nextOptional();
+    }
+
+    public static List<Resource> getPropertyShapesForResource(Resource resource, Model vocabulary) {
         return getClassShapeForResource(resource, vocabulary)
-                .map(classShape -> classShape.listProperties(SH.property)
-                        .mapWith(Statement::getObject)
-                        .filterKeep(RDFNode::isResource)
-                        .mapWith(RDFNode::asResource)
-                        .toSet()
-                ).orElse(Set.of());
+                .map(classShape -> classShape.listProperties(SHACLM.property)
+                        .mapWith(stmt -> stmt.getObject().asResource())
+                        .toList())
+                .orElse(List.of());
     }
 
     public static Optional<Resource> getPropertyShapeForStatement(Statement statement, Model vocabulary) {
         return getPropertyShapesForResource(statement.getSubject(), vocabulary)
                 .stream()
-                .filter(ps -> ps.hasProperty(SH.path, statement.getPredicate()))
+                .filter(ps -> ps.hasProperty(SHACLM.path, statement.getPredicate()))
                 .findFirst();
     }
 
@@ -61,7 +68,7 @@ public class Inference {
 
     public static Optional<Property> getInversePropertyForStatement(Statement statement, Model vocabulary) {
         return getInversePropertyShapeForStatement(statement, vocabulary)
-                .map(shape -> shape.getPropertyResourceValue(SH.path))
+                .map(shape -> shape.getPropertyResourceValue(SHACLM.path))
                 .map(resource -> createProperty(resource.getURI()));
     }
 }

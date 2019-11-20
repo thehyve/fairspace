@@ -1,15 +1,15 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -32,7 +32,7 @@ public class SystemVocabularyProtectingValidatorTest {
 
     @Test
     public void itShouldBePossibleToAddNewShapes() {
-        var model = modelOf(createResource("http://example.com/NewShape"), SH.property, createResource(FS.NS + "ClassShape"));
+        var model = modelOf(createResource("http://example.com/NewShape"), SHACLM.property, createResource(FS.NS + "ClassShape"));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
 
         verifyZeroInteractions(violationHandler);
@@ -40,7 +40,7 @@ public class SystemVocabularyProtectingValidatorTest {
 
     @Test
     public void itShouldBePossibleToAddNewPropertiesToSystemShapes() {
-        var model = modelOf(createResource(FS.NS + "FileShape"), SH.property, createProperty("http://example.com/property"));
+        var model = modelOf(createResource(FS.NS + "FileShape"), SHACLM.property, createProperty("http://example.com/property"));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
 
         verifyZeroInteractions(violationHandler);

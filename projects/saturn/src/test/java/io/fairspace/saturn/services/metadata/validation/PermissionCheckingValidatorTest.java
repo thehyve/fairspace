@@ -14,8 +14,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.Set;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 

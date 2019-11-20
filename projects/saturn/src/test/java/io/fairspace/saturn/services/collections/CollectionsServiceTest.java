@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,13 +18,11 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionsServiceTest {
-    private RDFConnection rdf;
     private CollectionsService collections;
     @Mock
     private Consumer<Object> eventListener;
@@ -36,9 +33,8 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        rdf = connect(createTxnMem());
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(rdf, userIriSupplier), eventListener, permissions, eventService);
+        collections = new CollectionsService(new DAO(createTxnMem(), userIriSupplier), eventListener, permissions, eventService);
     }
 
     @Test

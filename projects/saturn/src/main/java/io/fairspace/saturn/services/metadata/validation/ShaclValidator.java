@@ -1,58 +1,75 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import org.apache.jena.graph.FrontsNode;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.topbraid.shacl.validation.ValidationEngine;
+import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.engine.ValidationContext;
+import org.apache.jena.shacl.parser.Shape;
+import org.apache.jena.shacl.vocabulary.SHACL;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.Path;
 
-import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.createEngine;
-import static io.fairspace.saturn.services.metadata.validation.ShaclUtil.getViolations;
-import static java.lang.Math.min;
-import static java.lang.Thread.currentThread;
-import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
+import static org.apache.jena.shacl.lib.G.hasType;
+import static org.apache.jena.shacl.lib.G.isOfType;
+import static org.apache.jena.shacl.validation.ValidationProc.execValidateShape;
 
 public class ShaclValidator implements MetadataRequestValidator {
-    private static final int NUM_THREADS = availableProcessors();
-    private final ExecutorService executorService = newFixedThreadPool(NUM_THREADS);
-
+    @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
-        var affectedNodes = removed.listSubjects()
+        var affected = removed.listSubjects()
+                .filterKeep(after::containsResource)
                 .andThen(added.listSubjects())
                 .mapWith(FrontsNode::asNode)
                 .toSet();
-        if (affectedNodes.isEmpty()) {
+
+        if (affected.isEmpty()) {
             return;
         }
-        var nodeQueue = new ArrayBlockingQueue<>(affectedNodes.size(), false, affectedNodes);
-        var futures = new ArrayList<Future<ValidationEngine>>();
-        var numberOfTasks = min(NUM_THREADS, nodeQueue.size());
-        for (int i = 0; i < numberOfTasks; i++) {
-            var validationEngine = createEngine(after, vocabulary); // must be on the main thread
-            futures.add(executorService.submit(() -> {
-                Node node;
-                while ((node = nodeQueue.poll()) != null) {
-                    validationEngine.validateNode(node);
-                }
-                return validationEngine;
-            }));
-        }
 
-        try {
-            for (var future: futures) {
-                getViolations(future.get(), violationHandler);
-            }
-        } catch (InterruptedException e) {
-            currentThread().interrupt();
-            throw new RuntimeException("SHACL validation was interrupted", e);
-        } catch(ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        var shapes = Shapes.parse(vocabulary.getGraph());
+        var data = after.getGraph();
+        var vCxt = new ValidationContext(shapes, data);
+
+        affected.forEach(node ->
+                shapes.forEach(shape -> {
+                    if (isTarget(shape, data, node)) {
+                        execValidateShape(vCxt, after.getGraph(), shape, node);
+                    }
+                }));
+
+        vCxt.generateReport().getEntries()
+                .forEach(entry -> {
+                    if (entry.severity().level() == SHACL.Violation) {
+                        violationHandler.onViolation(entry.message(), entry.focusNode(), pathToNode(entry.resultPath()), entry.value());
+                    }
+                });
+    }
+
+    private static boolean isTarget(Shape shape, Graph data, Node node) {
+        return shape.getTargets()
+                .stream()
+                .anyMatch(target -> {
+                    var targetObject = target.getObject();
+                    switch (target.getTargetType()) {
+                        case targetClass:
+                            return hasType(data, node, targetObject);
+                        case targetNode:
+                            return targetObject.equals(node);
+                        case targetObjectsOf:
+                            return data.contains(null, targetObject, node);
+                        case targetSubjectsOf:
+                            return data.contains(node, targetObject, null);
+                        case implicitClass:
+                            return isOfType(data, node, targetObject);
+                        default:
+                            return false;
+                    }
+                });
+    }
+
+    private static Node pathToNode(Path path) {
+        return (path instanceof P_Link) ? ((P_Link) path).getNode() : null;
     }
 }

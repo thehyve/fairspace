@@ -3,11 +3,11 @@ package io.fairspace.saturn.services.metadata.serialization;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
-import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,11 +55,11 @@ public class GraphVizSerializerTest {
     @Test
     public void testSerializationOfNodes() {
         model.add(RESOURCE, RDF.type, FS.ClassShape);
-        model.add(RESOURCE, SH.targetClass, RESOURCE);
-        model.add(RESOURCE, SH.name, "My first resource");
+        model.add(RESOURCE, SHACLM.targetClass, RESOURCE);
+        model.add(RESOURCE, SHACLM.name, "My first resource");
         model.add(RESOURCE2, RDF.type, FS.ClassShape);
-        model.add(RESOURCE2, SH.targetClass, RESOURCE2);
-        model.add(RESOURCE2, SH.name, "My second resource");
+        model.add(RESOURCE2, SHACLM.targetClass, RESOURCE2);
+        model.add(RESOURCE2, SHACLM.name, "My second resource");
 
         String dotNotation = serializer.serialize(model);
 
@@ -85,9 +85,9 @@ public class GraphVizSerializerTest {
     @Test
     public void testHandlingOfMissingDataForEdges() {
         model.add(RESOURCE, RDF.type, FS.ClassShape);
-        model.add(RESOURCE, SH.targetClass, RESOURCE);
-        model.add(RESOURCE, SH.name, "My first resource");
-        model.add(RESOURCE, SH.property, RELATION_SHAPE);
+        model.add(RESOURCE, SHACLM.targetClass, RESOURCE);
+        model.add(RESOURCE, SHACLM.name, "My first resource");
+        model.add(RESOURCE, SHACLM.property, RELATION_SHAPE);
         String dotNotation = serializer.serialize(model);
 
         assertFalse(getNodes(dotNotation).isEmpty());
@@ -97,20 +97,20 @@ public class GraphVizSerializerTest {
     @Test
     public void testSerializationOfEdges() {
         model.add(RESOURCE, RDF.type, FS.ClassShape);
-        model.add(RESOURCE, SH.targetClass, RESOURCE);
-        model.add(RESOURCE, SH.name, "My first resource");
+        model.add(RESOURCE, SHACLM.targetClass, RESOURCE);
+        model.add(RESOURCE, SHACLM.name, "My first resource");
         model.add(RESOURCE2, RDF.type, FS.ClassShape);
-        model.add(RESOURCE2, SH.targetClass, RESOURCE2);
-        model.add(RESOURCE2, SH.name, "My second resource");
-        model.add(RESOURCE, SH.property, RELATION_SHAPE);
+        model.add(RESOURCE2, SHACLM.targetClass, RESOURCE2);
+        model.add(RESOURCE2, SHACLM.name, "My second resource");
+        model.add(RESOURCE, SHACLM.property, RELATION_SHAPE);
         model.add(RELATION_SHAPE, RDF.type, FS.RelationShape);
-        model.add(RELATION_SHAPE, SH.name, "Relation");
-        model.add(RELATION_SHAPE, SH.class_, RESOURCE2);
+        model.add(RELATION_SHAPE, SHACLM.name, "Relation");
+        model.add(RELATION_SHAPE, SHACLM.class_, RESOURCE2);
 
-        model.add(RESOURCE2, SH.property, RELATION_SHAPE2);
+        model.add(RESOURCE2, SHACLM.property, RELATION_SHAPE2);
         model.add(RELATION_SHAPE2, RDF.type, FS.RelationShape);
-        model.add(RELATION_SHAPE2, SH.name, "Parent");
-        model.add(RELATION_SHAPE2, SH.class_, RESOURCE2);
+        model.add(RELATION_SHAPE2, SHACLM.name, "Parent");
+        model.add(RELATION_SHAPE2, SHACLM.class_, RESOURCE2);
 
         String dotNotation = serializer.serialize(model);
 
@@ -132,20 +132,20 @@ public class GraphVizSerializerTest {
     @Test
     public void testSerializationOfBidirectionalEdges() {
         model.add(RESOURCE, RDF.type, FS.ClassShape);
-        model.add(RESOURCE, SH.targetClass, RESOURCE);
-        model.add(RESOURCE, SH.name, "My first resource");
-        model.add(RESOURCE, SH.property, RELATION_SHAPE);
+        model.add(RESOURCE, SHACLM.targetClass, RESOURCE);
+        model.add(RESOURCE, SHACLM.name, "My first resource");
+        model.add(RESOURCE, SHACLM.property, RELATION_SHAPE);
         model.add(RESOURCE2, RDF.type, FS.ClassShape);
-        model.add(RESOURCE2, SH.targetClass, RESOURCE2);
-        model.add(RESOURCE2, SH.name, "My second resource");
-        model.add(RESOURCE2, SH.property, RELATION_SHAPE2);
+        model.add(RESOURCE2, SHACLM.targetClass, RESOURCE2);
+        model.add(RESOURCE2, SHACLM.name, "My second resource");
+        model.add(RESOURCE2, SHACLM.property, RELATION_SHAPE2);
         model.add(RELATION_SHAPE, RDF.type, FS.RelationShape);
-        model.add(RELATION_SHAPE, SH.name, "Relation");
-        model.add(RELATION_SHAPE, SH.class_, RESOURCE2);
+        model.add(RELATION_SHAPE, SHACLM.name, "Relation");
+        model.add(RELATION_SHAPE, SHACLM.class_, RESOURCE2);
         model.add(RELATION_SHAPE, FS.inverseRelation, RELATION_SHAPE2);
         model.add(RELATION_SHAPE2, RDF.type, FS.RelationShape);
-        model.add(RELATION_SHAPE2, SH.name, "Relation2");
-        model.add(RELATION_SHAPE2, SH.class_, RESOURCE);
+        model.add(RELATION_SHAPE2, SHACLM.name, "Relation2");
+        model.add(RELATION_SHAPE2, SHACLM.class_, RESOURCE);
 
         String dotNotation = serializer.serialize(model);
 

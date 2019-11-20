@@ -4,7 +4,7 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
-import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraphBatched;
+import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -48,7 +48,7 @@ public class SaturnDatasetFactory {
         }
 
         // Add transaction log
-        dsg = new TxnLogDatasetGraphBatched(dsg, txnLog);
+        dsg = new TxnLogDatasetGraph(dsg, txnLog);
 
         // Create a dataset
         return DatasetFactory.wrap(dsg);

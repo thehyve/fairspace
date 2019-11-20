@@ -10,13 +10,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.*;
 
 public class RestoreTest {

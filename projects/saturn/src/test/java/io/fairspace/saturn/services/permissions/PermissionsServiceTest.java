@@ -7,7 +7,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PermissionsServiceImplTest {
+public class PermissionsServiceTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
     private static final Node RESOURCE2 = createURI("http://example.com/resource2");
     private static final Node USER1 = createURI("http://example.com/user1");
@@ -54,7 +53,7 @@ public class PermissionsServiceImplTest {
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsServiceImpl(new RDFConnectionLocal(ds), () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
+        service = new PermissionsService(ds, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
         service.createResource(RESOURCE);
 
         currentUser = USER1;

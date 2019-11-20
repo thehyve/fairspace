@@ -11,13 +11,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.util.UUID.randomUUID;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
-import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.apache.jena.tdb2.TDB2Factory.connectDataset;
 
 public class TransactionsTest {
@@ -51,7 +51,7 @@ public class TransactionsTest {
             ds.commit();
         });
         anotherThread.start();
-        anotherThread.join(10_000);
+        anotherThread.join(1_000);
         assertTrue("The other thread should be still waiting on ds.begin(WRITE)", anotherThread.isAlive());
         ds.commit();
         // Now the other thread can start a transaction

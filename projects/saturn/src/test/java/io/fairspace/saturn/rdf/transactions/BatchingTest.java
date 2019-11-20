@@ -4,55 +4,39 @@ import com.pivovarit.function.ThrowingSupplier;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDFS;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.system.Txn.executeRead;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TxnLogDatasetGraphBatchedTest {
-    public static final Resource RESOURCE = createResource("http://example.com/1");
+public class BatchingTest {
+    private static final Resource RESOURCE = createResource("http://example.com/1");
     private Dataset ds = createTxnMem();
-    private TxnLogDatasetGraphBatched dsg;
 
-    @Mock
-    private TransactionLog txnLog;
-
-    @Before
-    public void before() {
-        dsg = new TxnLogDatasetGraphBatched(ds.asDatasetGraph(), txnLog);
-    }
-
-    @After
-    public void after() {
-        dsg.close();
-    }
 
     @Test
     public void tasksReturnResults() {
-        assertEquals("blah", dsg.write(() -> "blah"));
+        assertEquals("blah", Transactions.calculateWrite(ds, () -> "blah"));
     }
 
     @Test(expected = IOException.class)
     public void tasksThrowExceptions() throws IOException {
-        dsg.write(() -> {
+        Transactions.calculateWrite(ds, () -> {
             throw new IOException();
         });
     }
 
     @Test
     public void nestedCallsAreAllowed() throws Exception {
-        assertEquals("blah", dsg.write(() -> dsg.write(() -> dsg.write(() -> "blah"))));
+        assertEquals("blah",  Transactions.calculateWrite(ds, () ->  Transactions.calculateWrite(ds, () ->  Transactions.calculateWrite(ds, () -> "blah"))));
     }
 
     @Test
@@ -61,7 +45,7 @@ public class TxnLogDatasetGraphBatchedTest {
         batch(
                 () -> {
                     model.add(RESOURCE, RDFS.label, "success");
-                    dsg.write(() -> model.add(RESOURCE, RDFS.label, "nested"));
+                    Transactions.calculateWrite(ds, () -> model.add(RESOURCE, RDFS.label, "nested"));
                     return null;
                 },
                 () -> {
@@ -91,7 +75,7 @@ public class TxnLogDatasetGraphBatchedTest {
         try {
             // First submit a long-running task to get other tasks batched
             var latch1 = new CountDownLatch(1);
-            dsg.write(() -> {
+            Transactions.calculateWrite(ds, () -> {
                 latch1.countDown();
                 Thread.sleep(500);
                 return null;
@@ -103,7 +87,7 @@ public class TxnLogDatasetGraphBatchedTest {
             for (var action : actions) {
                 new Thread(() -> {
                     try {
-                        dsg.write(action);
+                        Transactions.calculateWrite(ds, action);
                     } catch (Exception ignore) {
                     } finally {
                         latch2.countDown();

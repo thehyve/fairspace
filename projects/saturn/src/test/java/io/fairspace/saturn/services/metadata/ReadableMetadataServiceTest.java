@@ -6,7 +6,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -14,12 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.topbraid.shacl.vocabulary.SH;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -45,7 +44,7 @@ public class ReadableMetadataServiceTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI));
+        api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI));
     }
 
     @Test
@@ -217,7 +216,7 @@ public class ReadableMetadataServiceTest {
 
     @Test(expected = TooManyTriplesException.class)
     public void testTripleLimit() {
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
+        api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI), 1);
         executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.get(null, null, null, false);
@@ -225,7 +224,7 @@ public class ReadableMetadataServiceTest {
 
     @Test(expected = TooManyTriplesException.class)
     public void testTripleLimitByType() {
-        api = new ReadableMetadataService(new RDFConnectionLocal(ds), createURI(GRAPH), createURI(userVocabularyURI), 1);
+        api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI), 1);
         setupModelForTypes();
 
         api.getByType(null, false);
@@ -269,10 +268,10 @@ public class ReadableMetadataServiceTest {
         Resource md5Shape = createResource("http://md5Shape");
 
         ds.getNamedModel(userVocabularyURI).add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
-        ds.getNamedModel(userVocabularyURI).add(labelShape, SH.path, RDFS.label);
+        ds.getNamedModel(userVocabularyURI).add(labelShape, SHACLM.path, RDFS.label);
         ds.getNamedModel(userVocabularyURI).add(createdByShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
-        ds.getNamedModel(userVocabularyURI).add(createdByShape, SH.path, FS.createdBy);
+        ds.getNamedModel(userVocabularyURI).add(createdByShape, SHACLM.path, FS.createdBy);
         ds.getNamedModel(userVocabularyURI).add(md5Shape, FS.importantProperty, createTypedLiteral(Boolean.FALSE));
-        ds.getNamedModel(userVocabularyURI).add(md5Shape, SH.path, FS.md5);
+        ds.getNamedModel(userVocabularyURI).add(md5Shape, SHACLM.path, FS.md5);
     }
 }

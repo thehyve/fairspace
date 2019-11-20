@@ -9,8 +9,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.util.ModelUtils.EMPTY_MODEL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.verify;
@@ -62,7 +62,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S1, P2, S3,
         S3, P2, S2);
 
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, testModel, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
 
         verify(violationHandler).onViolation("The given model contains a machine-only predicate",
                 createStatement(S3, MACHINE_ONLY_PROPERTY, S1));

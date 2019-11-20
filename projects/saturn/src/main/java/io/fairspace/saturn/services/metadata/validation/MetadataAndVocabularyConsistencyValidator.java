@@ -3,46 +3,47 @@ package io.fairspace.saturn.services.metadata.validation;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.topbraid.shacl.vocabulary.SH;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static io.fairspace.saturn.rdf.ModelUtils.getIntegerProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
+import static io.fairspace.saturn.rdf.SparqlUtils.querySelect;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static java.lang.String.format;
-import static org.topbraid.spin.util.JenaUtil.getIntegerProperty;
-import static org.topbraid.spin.util.JenaUtil.getListProperty;
 
 /**
  * Checks if existing metadata remains valid after changes in the vocabulary.
  *
  * Supported constraints:
- * sh:datatype
- * sh:class
- * sh:minCount
- * sh:maxCount
- * sh:minLength
- * sh:maxLength
- * sh:in
+ * SHACLM:datatype
+ * SHACLM:class
+ * SHACLM:minCount
+ * SHACLM:maxCount
+ * SHACLM:minLength
+ * SHACLM:maxLength
+ * SHACLM:in
  *
- * It also detects changes in sh:property (a new property added to a specific class), sh:targetClass and sh:path
+ * It also detects changes in SHACLM:property (a new property added to a specific class), SHACLM:targetClass and SHACLM:path
  */
 @AllArgsConstructor
 @Slf4j
 public class MetadataAndVocabularyConsistencyValidator implements MetadataRequestValidator {
-    private final RDFConnection rdf;
+    private final Dataset dataset;
 
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         // We first determine which shapes were modified and how the updated vocabulary will look like.
-        var oldVocabulary = rdf.fetch(VOCABULARY_GRAPH_URI.getURI());
+        var oldVocabulary = dataset.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
         var newVocabulary = oldVocabulary.difference(removed).union(added);
         var actuallyAdded = newVocabulary.difference(oldVocabulary);
 
@@ -51,22 +52,22 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
             var predicate = stmt.getPredicate().inModel(newVocabulary);
             var object = stmt.getObject().inModel(newVocabulary);
 
-            if (subject.getPropertyResourceValue(SH.targetClass) != null) {
+            if (subject.getPropertyResourceValue(SHACLM.targetClass) != null) {
                 validateClassShapeChanges(subject, predicate, object, violationHandler);
-            } else if (subject.getPropertyResourceValue(SH.path) != null) {
+            } else if (subject.getPropertyResourceValue(SHACLM.path) != null) {
                 validatePropertyShapeChanges(subject, subject.inModel(oldVocabulary), predicate, violationHandler);
             }
         });
     }
 
     private void validateClassShapeChanges(Resource classShape, Property predicate, RDFNode object, ViolationHandler violationHandler) {
-        var targetClass = classShape.getPropertyResourceValue(SH.targetClass);
+        var targetClass = classShape.getPropertyResourceValue(SHACLM.targetClass);
 
-        if (predicate.equals(SH.property)) {
+        if (predicate.equals(SHACLM.property)) {
             var propertyShape = object.asResource();
                 validateProperty(propertyShape, getTargetProperty(propertyShape), List.of(targetClass), violationHandler);
-        } else if (predicate.equals(SH.targetClass)) {
-            classShape.listProperties(SH.property)
+        } else if (predicate.equals(SHACLM.targetClass)) {
+            classShape.listProperties(SHACLM.property)
                     .forEachRemaining(s -> {
                                 var newPropertyShape = s.getResource();
                                 validateProperty(newPropertyShape, getTargetProperty(newPropertyShape), List.of(targetClass), violationHandler);
@@ -78,56 +79,56 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     private void validatePropertyShapeChanges(Resource newPropertyShape, Resource oldPropertyShape, Property predicate, ViolationHandler violationHandler) {
         var property = getTargetProperty(newPropertyShape);
 
-        if (predicate.equals(SH.datatype)) {
+        if (predicate.equals(SHACLM.datatype)) {
             validateDataType(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
-        } else if (predicate.equals(SH.class_)) {
+        } else if (predicate.equals(SHACLM.class_)) {
             validateClass(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
-        } else if (predicate.equals(SH.minCount)) {
-            var newMinCount = getIntegerProperty(newPropertyShape, SH.minCount);
-            var oldMinCount = getIntegerProperty(oldPropertyShape, SH.minCount);
+        } else if (predicate.equals(SHACLM.minCount)) {
+            var newMinCount = getIntegerProperty(newPropertyShape, SHACLM.minCount);
+            var oldMinCount = getIntegerProperty(oldPropertyShape, SHACLM.minCount);
             if (newMinCount != null && (oldMinCount == null || oldMinCount < newMinCount)) {
                 validateMinCount(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
             }
-        } else if (predicate.equals(SH.maxCount)) {
-            var newMaxCount = getIntegerProperty(newPropertyShape, SH.maxCount);
-            var oldMaxCount = getIntegerProperty(oldPropertyShape, SH.maxCount);
+        } else if (predicate.equals(SHACLM.maxCount)) {
+            var newMaxCount = getIntegerProperty(newPropertyShape, SHACLM.maxCount);
+            var oldMaxCount = getIntegerProperty(oldPropertyShape, SHACLM.maxCount);
             if (newMaxCount != null && (oldMaxCount == null || oldMaxCount > newMaxCount)) {
                 validateMaxCount(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
             }
-        } else if (predicate.equals(SH.maxLength)) {
-            var newMaxLength = getIntegerProperty(newPropertyShape, SH.maxLength);
-            var oldMaxLength = getIntegerProperty(oldPropertyShape, SH.maxLength);
+        } else if (predicate.equals(SHACLM.maxLength)) {
+            var newMaxLength = getIntegerProperty(newPropertyShape, SHACLM.maxLength);
+            var oldMaxLength = getIntegerProperty(oldPropertyShape, SHACLM.maxLength);
             if (newMaxLength != null && (oldMaxLength == null || oldMaxLength > newMaxLength)) {
                 validateMaxLength(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
             }
-        } else if (predicate.equals(SH.minLength)) {
-            var newMinLength = getIntegerProperty(newPropertyShape, SH.minLength);
-            var oldMinLength = getIntegerProperty(oldPropertyShape, SH.minLength);
+        } else if (predicate.equals(SHACLM.minLength)) {
+            var newMinLength = getIntegerProperty(newPropertyShape, SHACLM.minLength);
+            var oldMinLength = getIntegerProperty(oldPropertyShape, SHACLM.minLength);
             if (newMinLength != null && (oldMinLength == null || oldMinLength < newMinLength)) {
                 validateMinLength(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
             }
-        } else if (predicate.equals(SH.in)) {
-            var newIn = getListProperty(newPropertyShape, SH.in);
-            var oldIn = getListProperty(oldPropertyShape, SH.in);
+        } else if (predicate.equals(SHACLM.in)) {
+            var newIn = getListProperty(newPropertyShape, SHACLM.in);
+            var oldIn = getListProperty(oldPropertyShape, SHACLM.in);
             if (newIn != null && (oldIn == null || !newIn.asJavaList().containsAll(oldIn.asJavaList()))) {
                 validateIn(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
             }
-        } else if (predicate.equals(SH.path)) {
+        } else if (predicate.equals(SHACLM.path)) {
             validateProperty(newPropertyShape, property, getClassesWithProperty(newPropertyShape), violationHandler);
         }
     }
 
     private static Property getTargetProperty(Resource propertyShape) {
-        return propertyShape.getModel().createProperty(propertyShape.getPropertyResourceValue(SH.path).getURI());
+        return propertyShape.getModel().createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());
     }
 
     private static List<Resource> getClassesWithProperty(Resource propertyShape) {
         var classes = new ArrayList<Resource>();
-        var propertyResource = propertyShape.getPropertyResourceValue(SH.path);
+        var propertyResource = propertyShape.getPropertyResourceValue(SHACLM.path);
         if (propertyResource != null) {
-            propertyShape.getModel().listSubjectsWithProperty(SH.property, propertyShape)
+            propertyShape.getModel().listSubjectsWithProperty(SHACLM.property, propertyShape)
                     .forEachRemaining(classShape -> {
-                                var subjectClass = classShape.getPropertyResourceValue(SH.targetClass);
+                                var subjectClass = classShape.getPropertyResourceValue(SHACLM.targetClass);
                                 if (subjectClass != null) {
                                     classes.add(subjectClass);
                                 }
@@ -148,59 +149,59 @@ public class MetadataAndVocabularyConsistencyValidator implements MetadataReques
     }
 
     private void validateDataType(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var dataType = propertyShape.getPropertyResourceValue(SH.datatype);
+        var dataType = propertyShape.getPropertyResourceValue(SHACLM.datatype);
         if (dataType != null) {
-            rdf.querySelect(storedQuery("find_wrong_data_type", property, subjectClasses, dataType), row ->
+            querySelect(dataset, storedQuery("find_wrong_data_type", property, subjectClasses, dataType), row ->
                     violationHandler.onViolation("Value does not have datatype " + dataType, row.getResource("subject"), property, row.get("object")));
         }
     }
 
     private void validateClass(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var theClass = propertyShape.getPropertyResourceValue(SH.class_);
+        var theClass = propertyShape.getPropertyResourceValue(SHACLM.class_);
         if (theClass != null) {
-            rdf.querySelect(storedQuery("find_wrong_class", property, subjectClasses, theClass), row ->
+            querySelect(dataset, storedQuery("find_wrong_class", property, subjectClasses, theClass), row ->
                     violationHandler.onViolation("Value needs to have class " + theClass, row.getResource("subject"), property, row.get("object")));
         }
     }
 
     private void validateMaxLength(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var maxLength = getIntegerProperty(propertyShape, SH.maxLength);
+        var maxLength = getIntegerProperty(propertyShape, SHACLM.maxLength);
         if (maxLength != null) {
-            rdf.querySelect(storedQuery("find_too_long", property, subjectClasses, maxLength), row ->
+            querySelect(dataset, storedQuery("find_too_long", property, subjectClasses, maxLength), row ->
                     violationHandler.onViolation(format("Value has more than %d characters", maxLength), row.getResource("subject"), property, row.get("object")));
         }
     }
 
     private void validateMinLength(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var minLength = getIntegerProperty(propertyShape, SH.minLength);
+        var minLength = getIntegerProperty(propertyShape, SHACLM.minLength);
         if (minLength != null) {
-            rdf.querySelect(storedQuery("find_too_short", property, subjectClasses, minLength), row ->
+            querySelect(dataset, storedQuery("find_too_short", property, subjectClasses, minLength), row ->
                     violationHandler.onViolation(format("Value has less than %d characters", minLength), row.getResource("subject"), property, row.get("object")));
         }
     }
 
 
     private void validateMinCount(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var minCount = getIntegerProperty(propertyShape, SH.minCount);
+        var minCount = getIntegerProperty(propertyShape, SHACLM.minCount);
         if (minCount != null) {
-            rdf.querySelect(storedQuery("find_too_few", property, subjectClasses, minCount), row ->
+            querySelect(dataset, storedQuery("find_too_few", property, subjectClasses, minCount), row ->
                     violationHandler.onViolation(format("Less than %d values", minCount), row.getResource("subject"), property, null));
         }
     }
 
     private void validateMaxCount(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var maxCount = getIntegerProperty(propertyShape, SH.maxCount);
+        var maxCount = getIntegerProperty(propertyShape, SHACLM.maxCount);
         if (maxCount != null) {
-            rdf.querySelect(storedQuery("find_too_many", property, subjectClasses, maxCount), row ->
+            querySelect(dataset, storedQuery("find_too_many", property, subjectClasses, maxCount), row ->
                     violationHandler.onViolation(format("More than %d values", maxCount), row.getResource("subject"), property, null));
         }
     }
 
     private void validateIn(Resource propertyShape, Property property, Collection<Resource> subjectClasses, ViolationHandler violationHandler) {
-        var values = getListProperty(propertyShape, SH.in);
+        var values = getListProperty(propertyShape, SHACLM.in);
 
         if (values != null) {
-            rdf.querySelect(storedQuery("find_not_in", property, subjectClasses, values), row ->
+            querySelect(dataset, storedQuery("find_not_in", property, subjectClasses, values), row ->
                     violationHandler.onViolation("Value is not in " + SparqlUtils.toString(values), row.getResource("subject"), property, row.get("object")));
         }
     }

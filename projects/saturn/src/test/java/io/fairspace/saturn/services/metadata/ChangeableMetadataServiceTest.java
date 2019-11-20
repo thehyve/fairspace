@@ -6,9 +6,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdfconnection.Isolation;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionLocal;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
@@ -19,15 +16,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
-import static io.fairspace.saturn.util.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -45,7 +42,6 @@ public class ChangeableMetadataServiceTest {
 
 
     private Dataset ds = createTxnMem();
-    private RDFConnection rdf = new RDFConnectionLocal(ds, Isolation.COPY);
     private ChangeableMetadataService api;
 
     @Mock
@@ -53,7 +49,7 @@ public class ChangeableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        api = new ChangeableMetadataService(rdf, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
+        api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator(), event -> {});
     }
 
     @Test
@@ -139,7 +135,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testInference() {
-        initVocabularies(rdf);
+        initVocabularies(ds);
         ds.getDefaultModel()
                 .add(S1, RDF.type, FOAF.Person)
                 .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));

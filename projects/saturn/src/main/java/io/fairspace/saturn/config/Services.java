@@ -15,13 +15,12 @@ import io.fairspace.saturn.services.metadata.ReadableMetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.services.users.UserService;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.query.Dataset;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -35,7 +34,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 @Getter
 public class Services {
     private final Config config;
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
 
     private final EventBus eventBus = new EventBus();
@@ -49,24 +48,24 @@ public class Services {
     private final ReadableMetadataService metaVocabularyService;
 
 
-    public Services(@NonNull Config config, @NonNull RDFConnection rdf, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
+    public Services(@NonNull Config config, @NonNull Dataset dataset, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
         this.config = config;
-        this.rdf = rdf;
+        this.dataset = dataset;
         this.userInfoSupplier = userInfoSupplier;
 
-        userService = new UserService(config.auth.userUrlTemplate, new DAO(rdf, null));
+        userService = new UserService(config.auth.userUrlTemplate, dataset);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
         BooleanSupplier hasFullAccessSupplier = () -> userInfoSupplier.get().getAuthorities().contains(config.auth.fullAccessRole);
 
         eventService = setupEventService();
 
         mailService = new MailService(config.mail);
-        var permissionNotificationHandler = new PermissionNotificationHandler(rdf, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsServiceImpl(rdf, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
+        var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
+        permissionsService = new PermissionsService(dataset, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
 
-        collectionsService = new CollectionsService(new DAO(rdf, userIriSupplier), eventBus::post, permissionsService, eventService);
+        collectionsService = new CollectionsService(new DAO(dataset, userIriSupplier), eventBus::post, permissionsService, eventService);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissionsService);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissionsService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
@@ -81,17 +80,17 @@ public class Services {
                         .build()
                 );
 
-        metadataService = new ChangeableMetadataService(rdf, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
+        metadataService = new ChangeableMetadataService(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
                 new ShaclValidator(),
                 new SystemVocabularyProtectingValidator(),
-                new MetadataAndVocabularyConsistencyValidator(rdf),
-                new InverseForUsedPropertiesValidator(rdf)
+                new MetadataAndVocabularyConsistencyValidator(dataset),
+                new InverseForUsedPropertiesValidator(dataset)
         );
 
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
 
         Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
                 eventService.emitEvent(MetadataEvent.builder()
@@ -100,8 +99,8 @@ public class Services {
                         .build()
                 );
 
-        userVocabularyService = new ChangeableMetadataService(rdf, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
-        metaVocabularyService = new ReadableMetadataService(rdf, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
+        userVocabularyService = new ChangeableMetadataService(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, 0, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
+        metaVocabularyService = new ReadableMetadataService(dataset, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
     }
 
     private EventService setupEventService() throws Exception {

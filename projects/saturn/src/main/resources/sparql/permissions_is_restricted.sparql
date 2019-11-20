@@ -1,6 +1,0 @@
-# Checks whether a resource is read-only
-# 0 - the resource
-
-PREFIX fs: <http://fairspace.io/ontology#>
-
-ASK WHERE { GRAPH ws:permissions { %1$s fs:writeRestricted true . }}

@@ -6,11 +6,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.FrontsNode;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.update.UpdateExecutionFactory;
+import org.apache.jena.update.UpdateFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -19,17 +21,21 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.rdf.transactions.Transactions.*;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
+
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();
@@ -41,15 +47,15 @@ public class SparqlUtils {
             var arg = args[i];
             String param;
 
-            if(arg == null) {
+            if (arg == null) {
                 param = "?" + i;
-            } else if(arg instanceof Collection) {
+            } else if (arg instanceof Collection) {
                 param = ((Collection<?>) arg).stream()
                         .filter(Objects::nonNull)
                         .map(SparqlUtils::toSerializableNode)
                         .map(SparqlUtils::toString)
                         .collect(joining(" "));
-            } else if(arg instanceof RDFList) {
+            } else if (arg instanceof RDFList) {
                 param = toString((RDFList) arg);
             } else {
                 param = toString(toSerializableNode(arg));
@@ -68,7 +74,7 @@ public class SparqlUtils {
         if (value instanceof Resource) {
             value = ((Resource) value).asNode();
         }
-        if (value instanceof Node && ((Node)value).isURI()) {
+        if (value instanceof Node && ((Node) value).isURI()) {
             validateIRI(((Node) value).getURI());
         }
 
@@ -78,7 +84,7 @@ public class SparqlUtils {
     @SneakyThrows(IOException.class)
     private static String load(String name) {
         return "PREFIX ws: " + str(createURI(CONFIG.jena.metadataBaseIRI)) + '\n' +
-               "PREFIX vocabulary: " + str(createURI(CONFIG.jena.vocabularyBaseIRI)) + '\n' +
+                "PREFIX vocabulary: " + str(createURI(CONFIG.jena.vocabularyBaseIRI)) + '\n' +
                 IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), StandardCharsets.UTF_8);
     }
 
@@ -131,20 +137,20 @@ public class SparqlUtils {
         return GregorianCalendar.from(ZonedDateTime.ofInstant(value, ZoneId.systemDefault()));
     }
 
-    public static <T> List<T> select(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+    public static <T> List<T> select(Dataset dataset, String query, Function<QuerySolution, T> valueExtractor) {
         var values = new ArrayList<T>();
-        rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
+        querySelect(dataset, query, row -> values.add(valueExtractor.apply(row)));
         return values;
     }
 
-    public static <T> Set<T> selectDistinct(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
+    public static <T> Set<T> selectDistinct(Dataset dataset, String query, Function<QuerySolution, T> valueExtractor) {
         var values = new HashSet<T>();
-        rdf.querySelect(query, row -> values.add(valueExtractor.apply(row)));
+        querySelect(dataset, query, row -> values.add(valueExtractor.apply(row)));
         return values;
     }
 
-    public static <T> Optional<T> selectSingle(RDFConnection rdf, String query, Function<QuerySolution, T> valueExtractor) {
-        var values = selectDistinct(rdf, query, valueExtractor);
+    public static <T> Optional<T> selectSingle(Dataset dataset, String query, Function<QuerySolution, T> valueExtractor) {
+        var values = selectDistinct(dataset, query, valueExtractor);
         if (values.size() > 1) {
             throw new IllegalStateException("Too many values: " + values.size());
         }
@@ -158,4 +164,80 @@ public class SparqlUtils {
                 .map(SparqlUtils::toString)
                 .collect(joining(", ", "(", ")"));
     }
+
+    /**
+     * Execute a SELECT query and process the ResultSet with the handler code.
+     *
+     * @param query
+     * @param resultSetAction
+     */
+    public static void queryResultSet(Dataset dataset, String query, Consumer<ResultSet> resultSetAction) {
+        executeRead(dataset, () -> {
+            try (var qExec = query(dataset, query)) {
+                ResultSet rs = qExec.execSelect();
+                resultSetAction.accept(rs);
+            }
+        });
+    }
+
+
+    /**
+     * Execute a SELECT query and process the rows of the results with the handler code.
+     *
+     * @param query
+     * @param rowAction
+     */
+    public static void querySelect(Dataset dataset, String query, Consumer<QuerySolution> rowAction) {
+        executeRead(dataset, () -> {
+            try (var qExec = query(dataset, query)) {
+                qExec.execSelect().forEachRemaining(rowAction);
+            }
+        });
+    }
+
+    /**
+     * Execute a CONSTRUCT query and return as a Model
+     */
+    public static Model queryConstruct(Dataset dataset, String query) {
+        return calculateRead(dataset, () -> {
+            try (var qExec = query(dataset, query)) {
+                return detachModel(qExec.execConstruct());
+            }
+        });
+    }
+
+    /**
+     * Execute a DESCRIBE query and return as a Model
+     */
+    public static Model queryDescribe(Dataset dataset, String query) {
+        return calculateRead(dataset, () -> {
+            try (var qExec = query(dataset, query)) {
+                return detachModel(qExec.execDescribe());
+            }
+        });
+    }
+
+    /**
+     * Execute a ASK query and return a boolean
+     */
+    public static boolean queryAsk(Dataset dataset, String query) {
+        return calculateRead(dataset, () -> {
+            try (var qExec = query(dataset, query)) {
+                return qExec.execAsk();
+            }
+        });
+    }
+
+    public static void update(Dataset dataset, String updateString) {
+        executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
+    }
+
+    public static Model detachModel(Model m) {
+        return createDefaultModel().add(m);
+    }
+
+    private static QueryExecution query(Dataset dataset, String query) {
+        return QueryExecutionFactory.create(QueryFactory.create(query), dataset);
+    }
+
 }

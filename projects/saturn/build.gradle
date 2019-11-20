@@ -55,7 +55,6 @@ dependencies {
     implementation "com.sparkjava:spark-core:2.9.0"
     implementation 'com.pivovarit:throwing-function:1.5.0'
     implementation 'com.google.guava:guava:27.1-jre'
-    implementation 'org.topbraid:shacl:1.0.1'
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.11.1'
     implementation 'com.io-informatics.oss:jackson-jsonld:0.1.1'
     implementation('org.irods.jargon:jargon-core:4.3.0.1-RELEASE') {

@@ -9,7 +9,6 @@ import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.permissions.PermissionsServiceImpl;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -30,9 +29,7 @@ import java.util.Map;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdfconnection.RDFConnectionFactory.connect;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -61,19 +58,17 @@ public class WebDAVIT {
 
     @Before
     public void before() {
-        var rdf = connect(createTxnMem());
+        var ds = createTxnMem();
 
-        rdf.load(
-                createDefaultModel()
+        ds.getDefaultModel()
                     .add(createResource(defaultUser.getURI()), RDFS.label, "current-user")
-                    .add(createResource(anotherUser.getURI()), RDFS.label, "another-user")
-        );
+                    .add(createResource(anotherUser.getURI()), RDFS.label, "another-user");
 
         var eventBus = new EventBus();
 
-        permissions = new PermissionsServiceImpl(rdf, () -> currentUser, () -> false,null, event -> {});
-        collections = new CollectionsService(new DAO(rdf, () -> currentUser), eventBus::post, permissions, eventService);
-        fs = new ManagedFileSystem(rdf, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
+        permissions = new PermissionsService(ds, () -> currentUser, () -> false,null, event -> {});
+        collections = new CollectionsService(new DAO(ds, () -> currentUser), eventBus::post, permissions, eventService);
+        fs = new ManagedFileSystem(ds, new MemoryBlobStore(), () -> currentUser, collections, eventBus);
         milton = new MiltonWebDAVServlet("/webdav/", new CompoundFileSystem(collections, Map.of(ManagedFileSystem.TYPE, fs)), null);
         var coll = new Collection();
         coll.setName("My Collection");

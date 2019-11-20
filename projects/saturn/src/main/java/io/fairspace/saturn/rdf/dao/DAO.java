@@ -1,20 +1,14 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.rdf.SparqlUtils;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.modify.request.QuadAcc;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataInsert;
-import org.apache.jena.sparql.modify.request.UpdateDeleteWhere;
-import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.vocabulary.RDF;
 
 import java.lang.reflect.Field;
@@ -29,11 +23,11 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -76,11 +70,11 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final RDFConnection rdf;
+    private final Dataset dataset;
     private final Supplier<Node> userIriSupplier;
 
-    public DAO(RDFConnection rdf, Supplier<Node> userIriSupplier) {
-        this.rdf = rdf;
+    public DAO(Dataset dataset, Supplier<Node> userIriSupplier) {
+        this.dataset = dataset;
         this.userIriSupplier = userIriSupplier;
     }
 
@@ -110,25 +104,31 @@ public class DAO {
             }
 
             if (entity.getIri() == null) {
-                entity.setIri(SparqlUtils.generateMetadataIri());
+                entity.setIri(generateMetadataIri());
             }
 
-            var update = new UpdateRequest();
+            executeWrite(dataset, () -> {
+                var graph = dataset.getDefaultModel().getGraph();
 
-            setProperty(update, entity.getIri(), RDF.type.asNode(), type);
+                graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
 
-            processFields(entity.getClass(), (field, annotation) -> {
-                var propertyNode = createURI(annotation.value());
-                var value = field.get(entity);
+                processFields(entity.getClass(), (field, annotation) -> {
+                    var propertyNode = createURI(annotation.value());
+                    var value = field.get(entity);
 
-                if (value == null && annotation.required()) {
-                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
-                }
+                    if (value == null && annotation.required()) {
+                        throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
+                    }
 
-                setProperty(update, entity.getIri(), propertyNode, value);
+                    graph.remove(entity.getIri(), propertyNode, null);
+
+                    if (value instanceof Iterable) {
+                        ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
+                    } else if (value != null) {
+                        graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
+                    }
+                });
             });
-
-            rdf.update(update);
 
             return entity;
         });
@@ -162,7 +162,8 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        rdf.update(storedQuery("delete_by_mask", defaultGraphIRI, iri, null, null));
+        executeWrite(dataset, () ->
+                dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
     }
 
     /**
@@ -204,7 +205,7 @@ public class DAO {
      */
     public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
         return safely(() -> {
-            var model = rdf.queryConstruct(query);
+            var model = queryConstruct(dataset, query);
             var entities = new ArrayList<T>();
             Iterable<Resource> subjects = model::listSubjects;
             for (var resource : subjects) {
@@ -260,7 +261,8 @@ public class DAO {
         return entity;
     }
 
-    private static void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) throws Exception {
+    @SneakyThrows
+    private static void processFields(Class<?> type, ThrowingBiConsumer<Field, RDFProperty, Exception> action) {
         for (Class<?> c = type; c != null; c = c.getSuperclass()) {
             for (var field : c.getDeclaredFields()) {
                 var annotation = field.getAnnotation(RDFProperty.class);
@@ -270,28 +272,6 @@ public class DAO {
                 }
             }
         }
-    }
-
-    private static void setProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-        update.add(new UpdateDeleteWhere(new QuadAcc(singletonList(new Quad(
-                defaultGraphIRI,
-                entityNode,
-                propertyNode,
-                Var.alloc("o"))))));
-
-        if (value instanceof Iterable) {
-            ((Iterable<?>) value).forEach(item -> addProperty(update, entityNode, propertyNode, item));
-        } else if (value != null) {
-            addProperty(update, entityNode, propertyNode, value);
-        }
-    }
-
-    private static void addProperty(UpdateRequest update, Node entityNode, Node propertyNode, Object value) {
-        update.add(new UpdateDataInsert(new QuadDataAcc(singletonList(new Quad(
-                defaultGraphIRI,
-                entityNode,
-                propertyNode,
-                valueToNode(value))))));
     }
 
     private static Node valueToNode(Object value) {

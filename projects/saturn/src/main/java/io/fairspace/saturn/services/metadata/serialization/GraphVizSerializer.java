@@ -4,12 +4,12 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
-import org.topbraid.shacl.vocabulary.SH;
 
 import java.util.HashSet;
 
-import static org.topbraid.spin.util.JenaUtil.*;
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 
 /**
  * This serializer will render a DOT graph file for the SHACL classes
@@ -34,8 +34,8 @@ public class GraphVizSerializer implements Serializer {
 
         var addedRelationShapes = new HashSet<>();
         model.listSubjectsWithProperty(RDF.type, FS.ClassShape).forEachRemaining(classShape-> {
-            var classLabel = getStringProperty(classShape, SH.name);
-            var targetClassResource = getResourceProperty(classShape, SH.targetClass);
+            var classLabel = getStringProperty(classShape, SHACLM.name);
+            var targetClassResource = classShape.getPropertyResourceValue(SHACLM.targetClass);
 
             // If label or targetclass are missing, don't add the node
             if(classLabel == null || targetClassResource == null) {
@@ -46,14 +46,14 @@ public class GraphVizSerializer implements Serializer {
             addNode(stringBuilder, classLabel, targetClass);
 
             // Add relation properties as edges
-            getResourceProperties(classShape, SH.property).forEach(propertyShape -> {
+            getResourceProperties(classShape, SHACLM.property).forEach(propertyShape -> {
                 // Skip everything but relationshapes
                 var type = getType(propertyShape);
                 if(type == null || !type.equals(FS.RelationShape))
                     return;
 
-                var propertyLabel = getStringProperty(propertyShape, SH.name);
-                var otherClassResource = getResourceProperty(propertyShape, SH.class_);
+                var propertyLabel = getStringProperty(propertyShape, SHACLM.name);
+                var otherClassResource = propertyShape.getPropertyResourceValue(SHACLM.class_);
 
                 // If label or class are missing, don't add the node
                 if(classLabel == null || otherClassResource == null) {

@@ -14,7 +14,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.TransactionUtils.commit;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Comparator.comparing;
@@ -42,7 +43,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        Collection storedCollection = commit("Create collection " + collection.getName(), dao.getRdf(), () -> {
+        Collection storedCollection = calculateWrite("Create collection " + collection.getName(), dao.getDataset(), () -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -106,7 +107,7 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        commit("Delete collection " + iri, dao.getRdf(), () -> {
+        executeWrite("Delete collection " + iri, dao.getDataset(), () -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -136,7 +137,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return commit("Update collection " + patch.getName(), dao.getRdf(), () -> {
+        return calculateWrite("Update collection " + patch.getName(), dao.getDataset(), () -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());
