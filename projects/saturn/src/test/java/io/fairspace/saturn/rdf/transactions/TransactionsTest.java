@@ -84,4 +84,19 @@ public class TransactionsTest {
     public void writeToReadDemotionIsPossible() {
         executeWrite(ds, () -> executeRead(ds, () -> {}));
     }
+
+//    @Test
+//    public void testVisibility() {
+//        var property = createProperty("http://example.com/prop");
+//        var i = 0;
+//        while (true) {
+//            var resource = createResource("http://example.com/" + (++i));
+//            var value = createTypedLiteral(i);
+//            executeWrite(ds, () -> ds.getDefaultModel().add(resource, property, value));
+//            var fouund = calculateRead(ds, () -> ds.getDefaultModel().contains(resource, property, value));
+//            if (!fouund) {
+//                return;
+//            }
+//        }
+//    }
 }
