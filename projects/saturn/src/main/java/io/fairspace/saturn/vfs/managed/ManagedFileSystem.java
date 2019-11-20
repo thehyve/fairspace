@@ -175,6 +175,8 @@ public class ManagedFileSystem extends BaseFileSystem {
                 .isDirectory(row.getLiteral("isDirectory").getBoolean())
                 .created(parseXSDDateTimeLiteral(row.getLiteral("created")))
                 .modified(parseXSDDateTimeLiteral(row.getLiteral("modified")))
+                .createdBy(row.getResource("createdBy").asNode())
+                .modifiedBy(row.getResource("modifiedBy").asNode())
                 .customProperties(generateCustomProperties(row))
                 .build();
     }

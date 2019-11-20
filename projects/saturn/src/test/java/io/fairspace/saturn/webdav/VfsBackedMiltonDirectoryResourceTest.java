@@ -29,9 +29,7 @@ public class VfsBackedMiltonDirectoryResourceTest {
 
     private FileInfo fileInfo = FileInfo.builder()
             .created(Instant.now())
-            .createdBy("Test")
             .modified(Instant.now())
-            .modifiedBy("Test")
             .path("collection/dir")
             .isDirectory(true)
             .build();

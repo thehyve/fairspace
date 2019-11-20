@@ -26,17 +26,13 @@ public class VfsBackedMiltonFileResourceTest {
 
     private FileInfo fileInfo = FileInfo.builder()
             .created(Instant.now())
-            .createdBy("Test")
             .modified(Instant.now())
-            .modifiedBy("Test")
             .path("collection/dir/file.txt")
             .build();
 
     private FileInfo readOnly = FileInfo.builder()
             .created(Instant.now())
-            .createdBy("Test")
             .modified(Instant.now())
-            .modifiedBy("Test")
             .path("collection/dir")
             .readOnly(true)
             .build();
