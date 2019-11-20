@@ -12,7 +12,7 @@ import {getTypeInfo} from '../common/utils/linkeddata/metadataUtils';
  *
  * @param {string} subject
  */
-export const useLinkedData = (subject, context = {}) => {
+export const useLinkedDataNoContext = (subject, context = {}) => {
     if (!subject) {
         throw new Error('Please provide a valid subject.');
     }
@@ -74,4 +74,4 @@ export const useLinkedData = (subject, context = {}) => {
 };
 
 // Export a custom hook attached to the context by default
-export default (subject) => useLinkedData(subject, useContext(LinkedDataContext));
+export default (subject) => useLinkedDataNoContext(subject, useContext(LinkedDataContext));

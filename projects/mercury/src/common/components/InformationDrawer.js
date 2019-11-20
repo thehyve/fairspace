@@ -10,11 +10,10 @@ import {ErrorDialog, MessageDisplay, UsersContext} from '@fairspace/shared-front
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "../../collections/CollectionDetails";
-import LinkedDataEntityFormContainer from "../../metadata/common/LinkedDataEntityFormContainer";
 import PathMetadata from "../../metadata/metadata/PathMetadata";
 import getDisplayName from "../utils/userUtils";
 import CollectionsContext from "../contexts/CollectionsContext";
-import useLinkedData from '../../metadata/UseLinkedData';
+import {LinkedDataEntityFormWithLinkedData} from '../../metadata/common/LinkedDataEntityFormContainer';
 
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 
@@ -28,22 +27,6 @@ const pathHierarchy = (fullPath) => {
         path = path.substring(0, path.lastIndexOf('/'));
     }
     return paths.reverse();
-};
-
-const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}) => {
-    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
-
-    return (
-        <LinkedDataEntityFormContainer
-            subject={subject}
-            isEntityEditable={isMetaDataEditable}
-            properties={properties}
-            values={values}
-            linkedDataLoading={linkedDataLoading}
-            linkedDataError={linkedDataError}
-            updateLinkedData={updateLinkedData}
-        />
-    );
 };
 
 export class InformationDrawer extends React.Component {

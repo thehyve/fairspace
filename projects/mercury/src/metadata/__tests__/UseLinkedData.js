@@ -1,5 +1,5 @@
 import {renderHook} from "@testing-library/react-hooks";
-import {useLinkedData} from '../UseLinkedData';
+import {useLinkedDataNoContext} from '../UseLinkedData';
 import {
     COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS
 } from '../../constants';
@@ -21,7 +21,7 @@ describe('useLinkedData', () => {
             shapes: [{aShapeKey: 'aValue'}]
         };
 
-        const {waitForNextUpdate} = renderHook(() => useLinkedData('http://subject', context));
+        const {waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('http://subject', context));
 
         await waitForNextUpdate();
 
@@ -29,7 +29,7 @@ describe('useLinkedData', () => {
     });
 
     it('should handle missing linkedData', async () => {
-        const {result} = renderHook(() => useLinkedData('my-subject', defaultContext));
+        const {result} = renderHook(() => useLinkedDataNoContext('my-subject', defaultContext));
 
         expect(result.current.properties).toEqual([]);
         expect(result.current.values).toEqual({});
@@ -38,13 +38,13 @@ describe('useLinkedData', () => {
 
     describe('loading state', () => {
         it('should not be loading by default', async () => {
-            const {result} = renderHook(() => useLinkedData('my-subject', defaultContext));
+            const {result} = renderHook(() => useLinkedDataNoContext('my-subject', defaultContext));
 
             expect(result.current.linkedDataLoading).toBe(false);
         });
 
         it('should be loading if shapes are loading', async () => {
-            const {result} = renderHook(() => useLinkedData('my-subject', {...defaultContext, shapesLoading: true}));
+            const {result} = renderHook(() => useLinkedDataNoContext('my-subject', {...defaultContext, shapesLoading: true}));
 
             expect(result.current.linkedDataLoading).toBe(true);
         });
@@ -52,13 +52,13 @@ describe('useLinkedData', () => {
 
     describe('error state', () => {
         it('should show some message for no metadata', async () => {
-            const {result} = renderHook(() => useLinkedData('my-subject', defaultContext));
+            const {result} = renderHook(() => useLinkedDataNoContext('my-subject', defaultContext));
 
             expect(result.current.linkedDataError).toMatch(/no metadata found/i);
         });
 
         it('should be in error state if shapes are in error state', async () => {
-            const {result} = renderHook(() => useLinkedData('my-subject', {...defaultContext, shapesError: true}));
+            const {result} = renderHook(() => useLinkedDataNoContext('my-subject', {...defaultContext, shapesError: true}));
 
             expect(result.current.linkedDataError).toBeTruthy();
         });
@@ -91,7 +91,7 @@ describe('useLinkedData', () => {
             }])
         };
 
-        const {result, waitForNextUpdate} = renderHook(() => useLinkedData('http://subject', context));
+        const {result, waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('http://subject', context));
 
         await waitForNextUpdate();
 
@@ -105,7 +105,7 @@ describe('useLinkedData', () => {
             shapes: [{[SHACL_TARGET_CLASS]: [{"@id": "http://type"}]}]
         };
 
-        const {result, waitForNextUpdate} = renderHook(() => useLinkedData('http://subject', context));
+        const {result, waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('http://subject', context));
 
         await waitForNextUpdate();
 

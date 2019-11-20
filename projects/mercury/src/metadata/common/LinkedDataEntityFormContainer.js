@@ -9,6 +9,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
+import useLinkedData from "../UseLinkedData";
 
 const LinkedDataEntityFormContainer = ({
     subject, isEntityEditable = true, fullpage = false,
@@ -108,6 +109,23 @@ const LinkedDataEntityFormContainer = ({
 LinkedDataEntityFormContainer.propTypes = {
     subject: PropTypes.string.isRequired,
     isEditable: PropTypes.bool,
+};
+
+
+export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}) => {
+    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
+
+    return (
+        <LinkedDataEntityFormContainer
+            subject={subject}
+            isEntityEditable={isMetaDataEditable}
+            properties={properties}
+            values={values}
+            linkedDataLoading={linkedDataLoading}
+            linkedDataError={linkedDataError}
+            updateLinkedData={updateLinkedData}
+        />
+    );
 };
 
 export default LinkedDataEntityFormContainer;

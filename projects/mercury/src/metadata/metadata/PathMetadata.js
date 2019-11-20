@@ -2,7 +2,7 @@ import React, {useCallback} from "react";
 import {Grid} from "@material-ui/core";
 import {isNonEmptyValue, MessageDisplay, useAsync} from '@fairspace/shared-frontend';
 
-import LinkedDataEntityFormContainer from "../common/LinkedDataEntityFormContainer";
+import {LinkedDataEntityFormWithLinkedData} from '../../metadata/common/LinkedDataEntityFormContainer';
 import TechnicalMetadata from "../../file/TechnicalMetadata";
 import FileAPI from "../../file/FileAPI";
 
@@ -43,7 +43,7 @@ const PathMetadata = ({
                 />
             </Grid>
             <Grid item xs={12}>
-                <LinkedDataEntityFormContainer
+                <LinkedDataEntityFormWithLinkedData
                     subject={fileProps.iri}
                     {...otherProps}
                 />
