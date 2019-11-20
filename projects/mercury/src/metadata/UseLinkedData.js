@@ -22,53 +22,50 @@ export const useLinkedData = (subject, context = {}) => {
     const [properties, setProperties] = useState([]);
     const [values, setValues] = useState({});
     const [typeInfo, setTypeInfo] = useState({});
-    const [errorToDisplay, setErrorToDisplay] = useState();
 
     const {shapes, shapesLoading, shapesError, fetchLinkedDataForSubject} = context;
 
     const updateLinkedData = useCallback(() => {
-        setLoading(true);
+        if (Array.isArray(shapes) && shapes.length > 0) {
+            setLoading(true);
 
-        fetchLinkedDataForSubject(subject)
-            .then(ld => {
-                if (ld && ld.length > 0) {
-                    const linkedDataItem = getJsonLdForSubject(ld, subject);
-                    setTypeInfo(getTypeInfo(linkedDataItem, shapes));
+            fetchLinkedDataForSubject(subject)
+                .then(ld => {
+                    if (ld && ld.length > 0) {
+                        const linkedDataItem = getJsonLdForSubject(ld, subject);
+                        setTypeInfo(getTypeInfo(linkedDataItem, shapes));
 
-                    if (!Array.isArray(linkedDataItem['@type'])) {
-                        console.warn("Can not get values from metadata without a type or that is not expanded");
-                    } else {
-                        const propertyShapes = determinePropertyShapesForTypes(shapes, linkedDataItem['@type']);
-                        const props = getProperties(shapes, propertyShapes);
-                        setProperties(props);
-                        setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
+                        if (!Array.isArray(linkedDataItem['@type'])) {
+                            console.warn("Can not get values from metadata without a type or that is not expanded");
+                        } else {
+                            const propertyShapes = determinePropertyShapesForTypes(shapes, linkedDataItem['@type']);
+                            setProperties(getProperties(shapes, propertyShapes));
+                            setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
+                        }
                     }
-                }
-            })
-            .catch(setError)
-            .finally(() => {
-                setLoading(false);
-            });
+                })
+                .catch(setError)
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
     }, [fetchLinkedDataForSubject, shapes, subject]);
 
     useEffect(() => {
         updateLinkedData();
     }, [updateLinkedData]);
 
-    useEffect(() => {
-        const linkedDataLoading = shapesLoading || loading;
-        let err = shapesError || (error && `Unable to load metadata for ${subject}`) || '';
+    const linkedDataLoading = shapesLoading || loading;
 
-        if (!err && !linkedDataLoading && !(properties && properties.length > 0)) {
-            err = 'No metadata found for this subject';
-        }
+    let err = shapesError || (error && `Unable to load metadata for ${subject}`) || '';
 
-        setErrorToDisplay(err);
-    }, [error, loading, properties, shapesError, shapesLoading, subject]);
+    if (!err && !linkedDataLoading && !(properties && properties.length > 0)) {
+        err = 'No metadata found for this subject';
+    }
 
     return {
-        linkedDataLoading: shapesLoading || loading,
-        linkedDataError: errorToDisplay,
+        linkedDataLoading,
+        linkedDataError: err,
         properties,
         values,
         typeInfo,

@@ -14,21 +14,21 @@ import {determineShapeForTypes, determinePropertyShapesForTypes} from "../common
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
 const VocabularyGraph = ({history}) => {
-    const {shapes, editorPath} = useContext(LinkedDataContext);
+    const {vocabulary, editorPath} = useContext(LinkedDataContext);
     const {data, error, loading} = useAsync(useCallback(() => VocabularyAPI.graph(), []));
     const [showEdgesLabels, setShowEdgesLabels] = useState(false);
     const [edgesLength, setEdgesLength] = useState(EDGE_LENGTH_SMALL);
 
     const handleNodeDoubleClick = useCallback(
         (id) => {
-            const shape = determineShapeForTypes(shapes, [id]);
+            const shape = determineShapeForTypes(vocabulary, [id]);
             const url = getEntityRelativeUrl(editorPath, shape['@id']);
             history.push(url);
-        }, [editorPath, history, shapes]
+        }, [editorPath, history, vocabulary]
     );
 
-    const getRelationShape = useCallback((from, to) => determinePropertyShapesForTypes(shapes, [from])
-        .find(propertyShape => getFirstPredicateId(propertyShape, SHACL_CLASS) === to), [shapes]);
+    const getRelationShape = useCallback((from, to) => determinePropertyShapesForTypes(vocabulary, [from])
+        .find(propertyShape => getFirstPredicateId(propertyShape, SHACL_CLASS) === to), [vocabulary]);
 
     const getRelationShapes = useCallback(edge => {
         const relationShapes = [];

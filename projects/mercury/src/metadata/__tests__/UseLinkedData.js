@@ -17,7 +17,8 @@ describe('useLinkedData', () => {
 
     it('should fetch linked data when first loaded', async () => {
         const context = {
-            fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([]))
+            fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([])),
+            shapes: [{aShapeKey: 'aValue'}]
         };
 
         const {waitForNextUpdate} = renderHook(() => useLinkedData('http://subject', context));
@@ -28,9 +29,7 @@ describe('useLinkedData', () => {
     });
 
     it('should handle missing linkedData', async () => {
-        const {result, waitForNextUpdate} = renderHook(() => useLinkedData('my-subject', defaultContext));
-
-        await waitForNextUpdate();
+        const {result} = renderHook(() => useLinkedData('my-subject', defaultContext));
 
         expect(result.current.properties).toEqual([]);
         expect(result.current.values).toEqual({});
@@ -39,17 +38,13 @@ describe('useLinkedData', () => {
 
     describe('loading state', () => {
         it('should not be loading by default', async () => {
-            const {result, waitForNextUpdate} = renderHook(() => useLinkedData('my-subject', defaultContext));
-
-            await waitForNextUpdate();
+            const {result} = renderHook(() => useLinkedData('my-subject', defaultContext));
 
             expect(result.current.linkedDataLoading).toBe(false);
         });
 
         it('should be loading if shapes are loading', async () => {
-            const {result, waitForNextUpdate} = renderHook(() => useLinkedData('my-subject', {...defaultContext, shapesLoading: true}));
-
-            await waitForNextUpdate();
+            const {result} = renderHook(() => useLinkedData('my-subject', {...defaultContext, shapesLoading: true}));
 
             expect(result.current.linkedDataLoading).toBe(true);
         });
@@ -57,17 +52,13 @@ describe('useLinkedData', () => {
 
     describe('error state', () => {
         it('should show some message for no metadata', async () => {
-            const {result, waitForNextUpdate} = renderHook(() => useLinkedData('my-subject', defaultContext));
-
-            await waitForNextUpdate();
+            const {result} = renderHook(() => useLinkedData('my-subject', defaultContext));
 
             expect(result.current.linkedDataError).toMatch(/no metadata found/i);
         });
 
         it('should be in error state if shapes are in error state', async () => {
-            const {result, waitForNextUpdate} = renderHook(() => useLinkedData('my-subject', {...defaultContext, shapesError: true}));
-
-            await waitForNextUpdate();
+            const {result} = renderHook(() => useLinkedData('my-subject', {...defaultContext, shapesError: true}));
 
             expect(result.current.linkedDataError).toBeTruthy();
         });
@@ -108,17 +99,16 @@ describe('useLinkedData', () => {
         expect(result.current.properties.map(p => p.key)).toEqual(expect.arrayContaining([LABEL_URI, COMMENT_URI, '@type']));
     });
 
-    // TODO: coudn't fix this test
-    // it('should return type info from linked data', async () => {
-    //     const context = {
-    //         fetchLinkedDataForSubject: () => Promise.resolve(defaultJsonLd),
-    //         shapes: [],
-    //     };
+    it('should return type info from linked data', async () => {
+        const context = {
+            fetchLinkedDataForSubject: () => Promise.resolve(defaultJsonLd),
+            shapes: [{[SHACL_TARGET_CLASS]: [{"@id": "http://type"}]}]
+        };
 
-    //     const {result, waitForNextUpdate} = renderHook(() => useLinkedData('http://subject', context));
+        const {result, waitForNextUpdate} = renderHook(() => useLinkedData('http://subject', context));
 
-    //     await waitForNextUpdate();
+        await waitForNextUpdate();
 
-    //     expect(result.current.typeInfo).toEqual('type-info');
-    // });
+        expect(result.current.typeInfo.typeIri).toEqual('http://type');
+    });
 });

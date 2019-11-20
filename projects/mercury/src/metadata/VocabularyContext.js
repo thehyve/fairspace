@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 
 import {VocabularyAPI} from './LinkedDataAPI';
 import {getFirstPredicateProperty} from '../common/utils/linkeddata/jsonLdUtils';
@@ -11,7 +11,7 @@ export const VocabularyProvider = ({children}) => {
     const [vocabularyLoading, setVocabularyLoading] = useState(false);
     const [vocabularyError, setVocabularyError] = useState(false);
 
-    useEffect(() => {
+    const fetchVocabulary = useCallback(() => {
         setVocabularyLoading(true);
         VocabularyAPI.get()
             .then(data => {
@@ -23,6 +23,10 @@ export const VocabularyProvider = ({children}) => {
                 setVocabularyError('An error occurred while loading the vocbulary');
             });
     }, []);
+
+    useEffect(() => {
+        fetchVocabulary();
+    }, [fetchVocabulary]);
 
     const submitVocabularyChanges = (subject, values, metaVocabulary) => VocabularyAPI.updateEntity(subject, values, metaVocabulary);
 
@@ -44,6 +48,7 @@ export const VocabularyProvider = ({children}) => {
                 }
             })
             .then(() => VocabularyAPI.updateEntity(subject, values, metaVocabulary, type))
+            .then(fetchVocabulary)
             .then(() => ({subject, type, values}));
     };
 
@@ -58,6 +63,7 @@ export const VocabularyProvider = ({children}) => {
                 submitVocabularyChanges,
                 createVocabularyEntity,
                 deleteVocabularyEntity,
+                fetchVocabulary,
             }}
         >
             {children}

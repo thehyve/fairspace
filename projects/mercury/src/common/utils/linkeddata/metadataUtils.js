@@ -154,6 +154,7 @@ export const getTypeInfo = (linkedDataItem, vocabulary) => {
     }
 
     const shape = determineShapeForTypes(vocabulary, types);
+
     return {
         typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS),
         label: getFirstPredicateValue(shape, consts.SHACL_NAME),

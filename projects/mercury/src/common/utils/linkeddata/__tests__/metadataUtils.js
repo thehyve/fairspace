@@ -3,7 +3,7 @@ import nodeCrypto from "crypto";
 import {
     generateUuid, getLabel, getLocalPart, getNamespacedIri, hasValue, linkLabel, normalizeMetadataResource,
     partitionErrors, propertiesToShow, relativeLink, shouldPropertyBeHidden,
-    simplifyUriPredicates, url2iri, valuesContainsValueOrId
+    simplifyUriPredicates, url2iri, valuesContainsValueOrId, getTypeInfo
 } from "../metadataUtils";
 import * as constants from "../../../../constants";
 import {normalizeJsonLdResource} from "../jsonLdUtils";
@@ -206,32 +206,32 @@ describe('Metadata Utils', () => {
 
 
     // TODO: Could'nt fix this test!
-    // describe('getTypeInfo', () => {
-    //     const vocabulary = [{
-    //         [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
-    //         [constants.SHACL_NAME]: [{'@value': 'Name'}],
-    //         [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
-    //     }];
+    describe('getTypeInfo', () => {
+        const vocabulary = [{
+            [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
+            [constants.SHACL_NAME]: [{'@value': 'Name'}],
+            [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
+        }];
 
-    //     it('retrieves information on the type of the entity', () => {
-    //         const metadata = {
-    //             '@type': [{
-    //                 '@id': 'http://example.com/123'
-    //             }]
-    //         };
+        it('retrieves information on the type of the entity', () => {
+            const metadata = {
+                '@type': ['http://example.com/123'],
+                [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
+            };
 
-    //         expect(getTypeInfo(metadata, vocabulary)).toEqual({
-    //             label: 'Name',
-    //             description: 'Description'
-    //         });
-    //     });
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({
+                label: 'Name',
+                description: 'Description',
+                typeIri: 'http://example.com/123'
+            });
+        });
 
-    //     it('returns empty object if type is not present', () => {
-    //         const metadata = [];
+        it('returns empty object if type is not present', () => {
+            const metadata = [];
 
-    //         expect(getTypeInfo(metadata, vocabulary)).toEqual({});
-    //     });
-    // });
+            expect(getTypeInfo(metadata, vocabulary)).toEqual({});
+        });
+    });
 
     describe('partitionErrors', () => {
         it('returns 2 arrays one for errors of the given subjects other is the rest of errors', () => {

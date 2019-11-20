@@ -31,10 +31,9 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
         .then(() => MetadataAPI.updateEntity(subject, values, vocabulary, type))
         .then(() => ({subject, type, values})), [vocabulary]);
 
-    const deleteLinkedDataEntity = (subject) => MetadataAPI.delete(subject)
-        .then(fetchMetadataBySubject);
+    const deleteLinkedDataEntity = (subject) => MetadataAPI.delete(subject);
 
-    const extendProperties = ({properties, isEntityEditable = true}) => properties
+    const extendProperties = ({properties = [], isEntityEditable = true}) => properties
         .map(p => ({
             ...p,
             isEditable: isEntityEditable && !p.machineOnly

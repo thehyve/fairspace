@@ -4,16 +4,17 @@ import {Button, CircularProgress, Grid} from "@material-ui/core";
 import {ConfirmationDialog} from '@fairspace/shared-frontend';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
-import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
 import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 
-const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
+const LinkedDataEntityFormContainer = ({
+    subject, isEntityEditable = true, fullpage = false,
+    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
+}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
-    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
     const {
         addValue, updateValue, deleteValue, clearForm,

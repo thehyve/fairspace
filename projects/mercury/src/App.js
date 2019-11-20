@@ -16,6 +16,7 @@ import WorkspaceTopBar from "./common/components/WorkspaceTopBar";
 import {UploadsProvider} from "./common/contexts/UploadsContext";
 import {CollectionsProvider} from "./common/contexts/CollectionsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';
+import {VocabularyProvider} from './metadata/VocabularyContext';
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -46,19 +47,21 @@ const App = () => {
                                 <ClipboardProvider>
                                     <CollectionsProvider>
                                         <ErrorDialog>
-                                            <Router>
-                                                <Layout
-                                                    requiredAuthorization={requiredRole}
-                                                    renderMenu={() => <Menu />}
-                                                    renderMain={() => (
-                                                        <UsersProvider url={users}>
-                                                            <Routes />
-                                                        </UsersProvider>
-                                                    )}
-                                                    renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                                    renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                                />
-                                            </Router>
+                                            <VocabularyProvider>
+                                                <Router>
+                                                    <Layout
+                                                        requiredAuthorization={requiredRole}
+                                                        renderMenu={() => <Menu />}
+                                                        renderMain={() => (
+                                                            <UsersProvider url={users}>
+                                                                <Routes />
+                                                            </UsersProvider>
+                                                        )}
+                                                        renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                                        renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                                    />
+                                                </Router>
+                                            </VocabularyProvider>
                                         </ErrorDialog>
                                     </CollectionsProvider>
                                 </ClipboardProvider>

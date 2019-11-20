@@ -26,9 +26,10 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
 
     const {currentUser} = useContext(UserContext);
 
-    const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type).then(({value}) => value);
+    const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type);
 
-    const submitLinkedDataChanges = (subject, values) => submitVocabularyChanges(subject, values, metaVocabulary);
+    const submitLinkedDataChanges = (subject, values) => submitVocabularyChanges(subject, values, metaVocabulary)
+        .then(fetchVocabulary);
 
     const deleteLinkedDataEntity = subject => deleteVocabularyEntity(subject)
         .then(fetchVocabulary);

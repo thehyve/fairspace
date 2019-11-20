@@ -14,6 +14,7 @@ import LinkedDataEntityFormContainer from "../../metadata/common/LinkedDataEntit
 import PathMetadata from "../../metadata/metadata/PathMetadata";
 import getDisplayName from "../utils/userUtils";
 import CollectionsContext from "../contexts/CollectionsContext";
+import useLinkedData from '../../metadata/UseLinkedData';
 
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 
@@ -27,6 +28,22 @@ const pathHierarchy = (fullPath) => {
         path = path.substring(0, path.lastIndexOf('/'));
     }
     return paths.reverse();
+};
+
+const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}) => {
+    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
+
+    return (
+        <LinkedDataEntityFormContainer
+            subject={subject}
+            isEntityEditable={isMetaDataEditable}
+            properties={properties}
+            values={values}
+            linkedDataLoading={linkedDataLoading}
+            linkedDataError={linkedDataError}
+            updateLinkedData={updateLinkedData}
+        />
+    );
 };
 
 export class InformationDrawer extends React.Component {
@@ -125,7 +142,7 @@ export class InformationDrawer extends React.Component {
                         <Typography>Metadata for {collection.name}</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <LinkedDataEntityFormContainer
+                        <LinkedDataEntityFormWithLinkedData
                             subject={collection.iri}
                             isEntityEditable={isMetaDataEditable}
                         />
