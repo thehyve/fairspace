@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

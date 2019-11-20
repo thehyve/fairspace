@@ -11,13 +11,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.util.UUID.randomUUID;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
-import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
 import static org.apache.jena.tdb2.TDB2Factory.connectDataset;
 
 public class TransactionsTest {

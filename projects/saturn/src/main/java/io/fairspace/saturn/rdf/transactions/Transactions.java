@@ -3,6 +3,8 @@ package io.fairspace.saturn.rdf.transactions;
 import com.pivovarit.function.ThrowingRunnable;
 import com.pivovarit.function.ThrowingSupplier;
 import io.fairspace.saturn.ThreadContext;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.sparql.core.Transactional;
 import org.apache.jena.system.Txn;
 
@@ -47,7 +49,10 @@ public class Transactions {
     public static <X, E extends Exception> X calculateWrite(Transactional txn, ThrowingSupplier<X, E> r) throws E {
         try {
             if (txn.isInTransaction()) {
-                return r.get();
+                if (txn.transactionMode() == ReadWrite.WRITE) {
+                    return r.get();
+                }
+                throw new JenaTransactionException("Can't promote to a write transaction");
             }
 
             var task = new Task<>(getThreadContext(), txn, r);
@@ -67,6 +72,14 @@ public class Transactions {
     public static <E extends Exception> void executeWrite(String systemCommitMessage, Transactional txn, ThrowingRunnable<E> action) throws E {
         withSystemCommitMessage(systemCommitMessage);
         executeWrite(txn, action);
+    }
+
+    public static <E extends Exception> void executeRead(Transactional txn, ThrowingRunnable<E> r) throws E {
+        Txn.executeRead(txn, ThrowingRunnable.sneaky(r));
+    }
+
+    public static <X, E extends Exception> X calculateRead(Transactional txn, ThrowingSupplier<X, E> r) throws E {
+        return Txn.calculateRead(txn, ThrowingSupplier.sneaky(r));
     }
 
     private static void withSystemCommitMessage(String systemCommitMessage) {

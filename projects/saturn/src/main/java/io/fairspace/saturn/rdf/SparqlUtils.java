@@ -26,6 +26,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
@@ -35,8 +37,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.out.NodeFmtLib.str;
-import static org.apache.jena.system.Txn.calculateRead;
-import static org.apache.jena.system.Txn.executeRead;
+
 
 public class SparqlUtils {
     private static final ConcurrentHashMap<String, String> storedQueries = new ConcurrentHashMap<>();

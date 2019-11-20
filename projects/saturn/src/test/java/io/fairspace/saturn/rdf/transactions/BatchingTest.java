@@ -11,14 +11,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.system.Txn.executeRead;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BatchingTest {
-    public static final Resource RESOURCE = createResource("http://example.com/1");
+    private static final Resource RESOURCE = createResource("http://example.com/1");
     private Dataset ds = createTxnMem();
 
 

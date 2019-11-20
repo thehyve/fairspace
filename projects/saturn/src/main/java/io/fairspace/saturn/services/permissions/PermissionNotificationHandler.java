@@ -16,9 +16,9 @@ import javax.mail.internet.InternetAddress;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.queryConstruct;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.apache.jena.system.Txn.calculateRead;
 
 /**
  * Sends an email to a user that gets access to a certain resource

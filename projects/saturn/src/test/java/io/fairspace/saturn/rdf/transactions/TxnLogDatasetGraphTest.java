@@ -5,8 +5,8 @@ import io.fairspace.saturn.ThreadContext;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.system.Txn;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -19,10 +19,11 @@ import java.util.Map;
 
 import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
-import static org.apache.jena.system.Txn.executeRead;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -63,7 +64,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
-        Transactions.executeWrite("system", ds, () -> {
+        executeWrite("system", ds, () -> {
             ds.getNamedModel("http://example.com/g1")
                     .add(statement)
                     .remove(statement);
@@ -103,14 +104,14 @@ public class TxnLogDatasetGraphTest {
         verify(log).onAbort();
     }
 
-   // @Ignore
+    @Ignore
     @Test
     public void errorOnCommitCausesSystemExit() throws IOException {
         exit.expectSystemExit();
 
         doThrow(IOException.class).when(log).onCommit();
 
-        Txn.executeWrite(ds, () -> {
+        executeWrite(ds, () -> {
         });
     }
 }
