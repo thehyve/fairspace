@@ -62,7 +62,6 @@ describe('AlterPermissionDialog', () => {
             users={mockUsers}
         />);
 
-        // console.log(wrapper.debug());
         // initial state if it's open or not
         expect(wrapper.find('[data-testid="permissions-dialog"]').prop('open')).toBeFalsy();
 

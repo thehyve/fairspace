@@ -15,8 +15,6 @@ describe('InformationDrawer', () => {
     const defaultProps = {
         collection,
         updateCollection: () => Promise.resolve(),
-        invalidateMetadata: () => {},
-        fetchMetadata: () => {},
         paths: []
     };
 

@@ -4,16 +4,18 @@ import {Button, CircularProgress, Grid} from "@material-ui/core";
 import {ConfirmationDialog} from '@fairspace/shared-frontend';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
-import useLinkedData from '../UseLinkedData';
 import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
 import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
+import useLinkedData from "../UseLinkedData";
 
-const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpage = false, ...otherProps}) => {
+const LinkedDataEntityFormContainer = ({
+    subject, isEntityEditable = true, fullpage = false,
+    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
+}) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
-    const {properties, values, linkedDataLoading, linkedDataError} = useLinkedData(subject);
 
     const {
         addValue, updateValue, deleteValue, clearForm,
@@ -24,7 +26,10 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
-            .then(() => clearForm()),
+            .then(() => {
+                clearForm();
+                updateLinkedData();
+            }),
         subject
     );
 
@@ -104,6 +109,23 @@ const LinkedDataEntityFormContainer = ({subject, isEntityEditable = true, fullpa
 LinkedDataEntityFormContainer.propTypes = {
     subject: PropTypes.string.isRequired,
     isEditable: PropTypes.bool,
+};
+
+
+export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}) => {
+    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
+
+    return (
+        <LinkedDataEntityFormContainer
+            subject={subject}
+            isEntityEditable={isMetaDataEditable}
+            properties={properties}
+            values={values}
+            linkedDataLoading={linkedDataLoading}
+            linkedDataError={linkedDataError}
+            updateLinkedData={updateLinkedData}
+        />
+    );
 };
 
 export default LinkedDataEntityFormContainer;

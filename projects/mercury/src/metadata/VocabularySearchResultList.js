@@ -5,12 +5,13 @@ import {getLabel} from "../common/utils/linkeddata/metadataUtils";
 import LinkedDataList from "./common/LinkedDataList";
 import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../constants";
+import {determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
 
 export default ({items, ...otherProps}) => {
-    const {determineShapeForTypes} = useContext(LinkedDataContext);
+    const {shapes} = useContext(LinkedDataContext);
 
     const entities = items.map(({id, name, description, type, highlights}) => {
-        const shape = determineShapeForTypes(type) || {};
+        const shape = determineShapeForTypes(shapes, type) || {};
         const typeLabel = getLabel(shape, true);
         const typeUrl = getFirstPredicateId(shape, SHACL_TARGET_CLASS);
 

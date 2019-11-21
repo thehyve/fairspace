@@ -1,20 +1,13 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
 import {mount} from "enzyme";
-import {Provider} from "react-redux";
-import configureStore from 'redux-mock-store';
 
-import {LinkedDataEntityHeader} from "../LinkedDataEntityHeader";
+import LinkedDataEntityHeader from "../LinkedDataEntityHeader";
 import DeleteEntityButton from "../DeleteEntityButton";
 import {
     COLLECTION_URI, CREATED_BY_URI, DATE_DELETED_URI, DELETED_BY_URI, DIRECTORY_URI, FILE_URI, FIXED_SHAPE_URI
 } from "../../../constants";
-
-const mockStore = configureStore();
-
-const store = mockStore({
-    cache: {},
-});
+import VocabularyContext from '../../VocabularyContext';
 
 describe('LinkedDataEntityHeader', () => {
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
@@ -22,12 +15,16 @@ describe('LinkedDataEntityHeader', () => {
     describe('delete button', () => {
         const testDeleteButtonDeletableState = (values, expectedDeletableState) => {
             const wrapper = mount(
-                <Provider store={store}>
+                <VocabularyContext.Provider
+                    value={{
+                        vocabulary: []
+                    }}
+                >
                     <LinkedDataEntityHeader
                         subject={subject}
                         values={values}
                     />
-                </Provider>
+                </VocabularyContext.Provider>
             );
 
             const button = wrapper.find(DeleteEntityButton);

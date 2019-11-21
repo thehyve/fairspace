@@ -1,9 +1,10 @@
-import {useSelector} from "react-redux";
+import {useContext} from 'react';
 import {getNamespacedIri} from "../utils/linkeddata/metadataUtils";
-import {getVocabulary} from "../redux/reducers/cache/vocabularyReducers";
+import VocabularyContext from '../../metadata/VocabularyContext';
+import {getNamespaces} from '../utils/linkeddata/vocabularyUtils';
 
 export default (iri) => {
-    const namespaces = useSelector(state => getVocabulary(state).getNamespaces());
+    const {vocabulary} = useContext(VocabularyContext);
 
-    return !!iri && getNamespacedIri(iri, namespaces);
+    return !!iri && getNamespacedIri(iri, getNamespaces(vocabulary));
 };
