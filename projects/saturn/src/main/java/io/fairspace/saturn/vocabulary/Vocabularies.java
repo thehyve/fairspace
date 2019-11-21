@@ -26,7 +26,7 @@ public class Vocabularies {
         setThreadContext(new ThreadContext());
         try {
             executeWrite("Initializing the vocabularies", ds, () -> {
-                ds.addNamedModel(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
+                ds.replaceNamedModel(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
 
                 var oldSystemVocabulary = ds.getNamedModel(SYSTEM_VOCABULARY_GRAPH_BACKUP);
 
@@ -39,8 +39,8 @@ public class Vocabularies {
 
                     applyInference(META_VOCABULARY, userVocabulary);
 
-                    ds.addNamedModel(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
-                    ds.addNamedModel(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
+                    ds.replaceNamedModel(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
+                    ds.replaceNamedModel(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
                 }
             });
         } finally {
