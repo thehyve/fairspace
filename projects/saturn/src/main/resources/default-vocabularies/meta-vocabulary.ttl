@@ -12,7 +12,7 @@
    rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
               fs:fixedShape fs:systemProperties sh:closed fs:createdBy
               fs:dateCreated fs:modifiedBy fs:dateModified
-              fs:deletedBy fs:dateDeleted ) .
+              fs:deletedBy fs:dateDeleted sh:order ) .
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
