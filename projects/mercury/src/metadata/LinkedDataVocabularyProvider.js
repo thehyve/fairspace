@@ -3,7 +3,7 @@ import {UserContext} from '@fairspace/shared-frontend';
 
 // Utils
 import {isDataSteward} from "../common/utils/userUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape, get, getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
+import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape, getShape, getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
@@ -35,7 +35,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
         .then(fetchVocabulary);
 
     const extendProperties = ({properties, isEntityEditable = true, subject}) => {
-        const shape = get(vocabulary, subject);
+        const shape = getShape(vocabulary, subject);
 
         return extendPropertiesWithVocabularyEditingInfo({
             properties,

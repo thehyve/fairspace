@@ -130,7 +130,7 @@ export const contains = (vocabulary, id) => vocabulary.some(el => el['@id'] === 
  * @param id
  * @returns {object}
  */
-export const get = (vocabulary, id) => vocabulary.find(el => el['@id'] === id) || {};
+export const getShape = (vocabulary, id) => vocabulary.find(el => el['@id'] === id) || {};
 
 /**
  * Determines the SHACL shape to be applied to the given types
