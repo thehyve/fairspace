@@ -10,12 +10,10 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
+import static io.fairspace.saturn.rdf.transactions.Transactions.*;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 
@@ -27,20 +25,20 @@ public class RestoreTest {
             createProperty("http://example.com/property2"),
             createResource("http://example.com/object2"));
 
-    private Config.Jena config;
+    private Config config;
 
     @Before
     public void before() {
-        config = new Config.Jena();
-        config.elasticSearch.enabled = false;
-        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config = new Config();
+        config.jena.elasticSearch.enabled = false;
+        config.jena.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
     }
 
     @After
     public void after() {
-        config.transactionLogPath.delete();
-        config.datasetPath.delete();
+        config.jena.transactionLogPath.delete();
+        config.jena.datasetPath.delete();
     }
 
     @Test
@@ -52,8 +50,8 @@ public class RestoreTest {
 
         ds1.close();
 
-        deleteDirectory(config.datasetPath);
-        assertFalse(config.datasetPath.exists());
+        deleteDirectory(config.jena.datasetPath);
+        assertFalse(config.jena.datasetPath.exists());
 
         var ds2 = SaturnDatasetFactory.connect(config);
 
@@ -69,21 +67,21 @@ public class RestoreTest {
 
     @Test
     public void restoreListsWorksAsExpected() throws IOException {
-        var m = createDefaultModel();
-        m.add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)));
-        m.add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b")));
-
         var ds1 = SaturnDatasetFactory.connect(config);
-        executeWrite(ds1, () -> ds1.getDefaultModel().add(m));
+        executeWrite(ds1, () -> ds1.getDefaultModel()
+                .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), ds1.getDefaultModel().createList(createTypedLiteral(1), createTypedLiteral(2)))
+                .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), ds1.getDefaultModel().createList(createTypedLiteral("a"), createTypedLiteral("b"))));
+
+        var before  = calculateRead(ds1, () -> ds1.getDefaultModel().listStatements().toSet());
 
         ds1.close();
 
-        deleteDirectory(config.datasetPath);
+        deleteDirectory(config.jena.datasetPath);
 
         var ds2 = SaturnDatasetFactory.connect(config);
 
         try {
-            executeRead(ds2, () -> assertEquals(m.listStatements().toSet(), ds2.getDefaultModel().listStatements().toSet()));
+            executeRead(ds2, () -> assertEquals(before, ds2.getDefaultModel().listStatements().toSet()));
         } finally {
             ds2.close();
         }
