@@ -38,7 +38,7 @@ export const LinkedDataEntityForm = ({
             }}
             noValidate
         >
-            <List dense>
+            <List>
                 {
                     properties
                         // Some properties are always hidden (e.g. @type) or hidden based on the type of entity (e.g. label for collection)
