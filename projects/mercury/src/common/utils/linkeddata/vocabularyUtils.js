@@ -128,9 +128,9 @@ export const contains = (vocabulary, id) => vocabulary.some(el => el['@id'] === 
 /**
  * Returns the json-ld entry for the given identifier
  * @param id
- * @returns {array}
+ * @returns {object}
  */
-export const get = (vocabulary, id) => vocabulary.find(el => el['@id'] === id) || [];
+export const get = (vocabulary, id) => vocabulary.find(el => el['@id'] === id) || {};
 
 /**
  * Determines the SHACL shape to be applied to the given types
