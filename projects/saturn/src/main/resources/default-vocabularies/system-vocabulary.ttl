@@ -193,6 +193,35 @@ fs:UserShape a fs:ClassShape ;
         fs:commentShape,
         fs:userEmailShape .
 
+fs:WorkspaceInstance a fs:ClassShape ;
+  sh:description "Resource description for the current workspace."
+  sh:name "Workspace" ;
+  sh:targetClass fs:WorkspaceInstance ;
+  fs:machineOnly true ;
+  fs:fixedShape true ;
+  sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+  sh:property [
+    a fs:DatatypePropertyShape ;
+    sh:path fs:workspaceTitle ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:order 1 ;
+  ], [
+    a fs:DatatypePropertyShape ;
+    sh:path fs:workspaceDescription ;
+    sh:datatype fs:markdown
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:order 2 ;
+  ], [
+    a fs:ExternalIRIPropertyShape ;
+    sh:path fs:workspaceExternalLink ; 
+    sh:datatype fs:markdown
+    sh:order 3 ;
+  ] ;
+.
+
 ## Property Shapes
 
 fs:blobIdShape a fs:DatatypePropertyShape ;
