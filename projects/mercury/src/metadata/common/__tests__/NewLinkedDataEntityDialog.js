@@ -2,27 +2,11 @@ import React from 'react';
 import {render, fireEvent} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 import '@testing-library/jest-dom/extend-expect';
-import {Provider} from "react-redux";
-import configureStore from 'redux-mock-store';
 import {MemoryRouter} from "react-router-dom";
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LinkedDataContext from '../../LinkedDataContext';
-
-const mockStore = configureStore();
-
-const store = mockStore({
-    cache: {
-        filesByPath: []
-    },
-    clipboard: {
-        fileNames: []
-    },
-    collectionBrowser: {
-        selectedPaths: []
-    },
-    uploads: []
-});
+import VocabularyContext from '../../VocabularyContext';
 
 const shape = {
     "@type": [
@@ -36,10 +20,6 @@ const shape = {
     ]
 };
 
-const shapes = {
-    getPropertiesForNodeShape: () => []
-};
-
 const extendProperties = () => [];
 
 const createLinkedDataEntity = jest.fn(() => Promise.resolve());
@@ -47,11 +27,15 @@ const createLinkedDataEntity = jest.fn(() => Promise.resolve());
 describe('<NewLinkedDataEntityDialog />', () => {
     it('initilises the values/updates with the type', async () => {
         const {getByTestId} = render(
-            <Provider store={store}>
-                <MemoryRouter>
+            <MemoryRouter>
+                <VocabularyContext.Provider
+                    value={{
+                        vocabulary: []
+                    }}
+                >
                     <LinkedDataContext.Provider
                         value={{
-                            shapes,
+                            shapes: [],
                             extendProperties,
                             createLinkedDataEntity
                         }}
@@ -63,8 +47,8 @@ describe('<NewLinkedDataEntityDialog />', () => {
                             onClose={() => {}}
                         />
                     </LinkedDataContext.Provider>
-                </MemoryRouter>
-            </Provider>
+                </VocabularyContext.Provider>
+            </MemoryRouter>
         );
 
         const submitButton = getByTestId('submit-button');

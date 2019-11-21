@@ -5,7 +5,6 @@ import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
 
 import CollectionsContext from "../../common/contexts/CollectionsContext";
 import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
-import {act} from 'react-dom/test-utils';
 
 let collectionBrowser;
 

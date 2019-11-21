@@ -15,6 +15,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../UseFormSubmission";
 import FormContext from "./FormContext";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
+import {getPropertiesForNodeShape} from "../../common/utils/linkeddata/vocabularyUtils";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -36,7 +37,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     };
 
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
-    const properties = shapes.getPropertiesForNodeShape(shape);
+    const properties = getPropertiesForNodeShape(shapes, shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
 
     // Apply context-specific logic to the properties and filter on visibility

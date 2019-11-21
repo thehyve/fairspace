@@ -1,9 +1,9 @@
 import nodeCrypto from "crypto";
 
 import {
-    generateUuid, getLabel, getLocalPart, getNamespacedIri, getTypeInfo, hasValue, linkLabel, normalizeMetadataResource,
+    generateUuid, getLabel, getLocalPart, getNamespacedIri, hasValue, linkLabel, normalizeMetadataResource,
     partitionErrors, propertiesToShow, relativeLink, shouldPropertyBeHidden,
-    simplifyUriPredicates, url2iri, valuesContainsValueOrId
+    simplifyUriPredicates, url2iri, valuesContainsValueOrId, getTypeInfo
 } from "../metadataUtils";
 import * as constants from "../../../../constants";
 import {normalizeJsonLdResource} from "../jsonLdUtils";
@@ -204,25 +204,25 @@ describe('Metadata Utils', () => {
         });
     });
 
+
+    // TODO: Could'nt fix this test!
     describe('getTypeInfo', () => {
-        const vocabulary = {
-            determineShapeForTypes: (typeIris) => ({
-                [constants.SHACL_TARGET_CLASS]: typeIris[0],
-                [constants.SHACL_NAME]: [{'@value': 'Name'}],
-                [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
-            })
-        };
+        const vocabulary = [{
+            [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
+            [constants.SHACL_NAME]: [{'@value': 'Name'}],
+            [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
+        }];
 
         it('retrieves information on the type of the entity', () => {
             const metadata = {
-                '@type': [{
-                    '@id': 'http://example.com/123'
-                }]
+                '@type': ['http://example.com/123'],
+                [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
             };
 
             expect(getTypeInfo(metadata, vocabulary)).toEqual({
                 label: 'Name',
-                description: 'Description'
+                description: 'Description',
+                typeIri: 'http://example.com/123'
             });
         });
 

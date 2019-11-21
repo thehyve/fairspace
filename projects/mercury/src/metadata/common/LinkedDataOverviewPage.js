@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useState, useEffect, useCallback} from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {Grid} from "@material-ui/core";
@@ -12,14 +12,12 @@ import useLinkedDataSearchParams from "../UseLinkedDataSearchParams";
 import {getFirstPredicateId} from "../../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
+import {getClassesInCatalog} from '../../common/utils/linkeddata/vocabularyUtils';
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
 const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent, showGraphSelection = false}) => {
-    const {
-        requireIdentifier, editorPath,
-        hasEditRight, getClassesInCatalog, shapesLoading, shapesError
-    } = useContext(LinkedDataContext);
+    const {requireIdentifier, editorPath, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
 
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
@@ -41,11 +39,16 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
         }
     }, [setQuery, setSelectedTypes, showGraph]);
 
-    const availableTypes = getClassesInCatalog().map(type => {
-        const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
-        const label = getLabel(type);
-        return {targetClass, label};
-    });
+    const getClassesInCatalogToDisplay = useCallback(() => getClassesInCatalog(shapes), [shapes]);
+
+    const getAvailableTypes = useCallback(() => getClassesInCatalogToDisplay()
+        .map(type => {
+            const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
+            const label = getLabel(type);
+            return {targetClass, label};
+        }), [getClassesInCatalogToDisplay]);
+
+    const availableTypes = getAvailableTypes();
 
     usePageTitleUpdater(title);
 
@@ -67,7 +70,6 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
             onOpen={(id) => history.push(getEntityRelativeUrl(editorPath, id))}
         />
     );
-
 
     return (
         <>
@@ -106,7 +108,7 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
                         shapesError={shapesError}
-                        shapes={getClassesInCatalog()}
+                        shapes={getClassesInCatalogToDisplay()}
                         requireIdentifier={requireIdentifier}
                         onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}
                     >

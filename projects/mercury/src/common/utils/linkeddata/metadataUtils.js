@@ -3,6 +3,7 @@ import {isNonEmptyValue} from '@fairspace/shared-frontend';
 
 import * as consts from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {determineShapeForTypes} from './vocabularyUtils';
 
 /**
  * Returns the local part of the given uri
@@ -152,7 +153,8 @@ export const getTypeInfo = (linkedDataItem, vocabulary) => {
         return {};
     }
 
-    const shape = vocabulary.determineShapeForTypes(types);
+    const shape = determineShapeForTypes(vocabulary, types);
+
     return {
         typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS),
         label: getFirstPredicateValue(shape, consts.SHACL_NAME),

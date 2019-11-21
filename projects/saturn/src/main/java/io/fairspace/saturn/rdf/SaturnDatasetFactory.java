@@ -5,19 +5,26 @@ import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.vocabulary.RDF;
 import org.elasticsearch.client.Client;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
+import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
+import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
 
 @Slf4j
@@ -29,18 +36,18 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config) throws IOException {
-        var restoreNeeded = isRestoreNeeded(config.datasetPath);
+    public static Dataset connect(Config config) throws IOException {
+        var restoreNeeded = isRestoreNeeded(config.jena.datasetPath);
 
         // Create a TDB2 dataset graph
-        var dsg = connectDatasetGraph(config.datasetPath.getAbsolutePath());
+        var dsg = connectDatasetGraph(config.jena.datasetPath.getAbsolutePath());
 
-        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(config.jena.transactionLogPath, new SparqlTransactionCodec());
 
-        if (config.elasticSearch.enabled) {
+        if (config.jena.elasticSearch.enabled) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, config, restoreNeeded);
+            dsg = enableElasticSearch(dsg, config.jena, restoreNeeded);
         }
 
         if (restoreNeeded) {
@@ -51,7 +58,19 @@ public class SaturnDatasetFactory {
         dsg = new TxnLogDatasetGraph(dsg, txnLog);
 
         // Create a dataset
-        return DatasetFactory.wrap(dsg);
+        var ds = DatasetFactory.wrap(dsg);
+
+        TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
+
+        if (!calculateRead(ds, () -> ds.getDefaultModel().containsResource(FS.theWorkspace))) {
+            executeWrite("Workspace initialization", ds, () -> ds.getDefaultModel()
+                    .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
+                    .add(FS.theWorkspace, FS.workspaceTitle, config.workspace.name)
+                    .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE))
+            );
+        }
+
+        return ds;
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {

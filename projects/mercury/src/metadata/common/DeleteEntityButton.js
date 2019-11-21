@@ -6,7 +6,7 @@ import {ConfirmationButton, ErrorDialog} from "@fairspace/shared-frontend";
 import {ProgressButton} from '../../common/components';
 import LinkedDataContext from "../LinkedDataContext";
 
-const DeleteEntityButton = ({subject, isDeletable}) => {
+const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
     const {deleteLinkedDataEntity, hasEditRight} = useContext(LinkedDataContext);
     const [isDeleting, setDeleting] = useState(false);
 
@@ -17,6 +17,7 @@ const DeleteEntityButton = ({subject, isDeletable}) => {
 
         deleteLinkedDataEntity(subject)
             .catch(e => ErrorDialog.showError(e, "An error occurred deleting the entity"))
+            .then(updateLinkedData)
             .then(() => isMounted() && setDeleting(false));
     };
 

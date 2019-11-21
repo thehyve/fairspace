@@ -7,6 +7,7 @@ import Dropdown from './values/Dropdown';
 import {SEARCH_DROPDOWN_DEFAULT_SIZE, ES_INDEX} from "../../constants";
 import LinkedDataContext from "../LinkedDataContext";
 import Config from "../../common/services/Config";
+import {getDescendants} from '../../common/utils/linkeddata/vocabularyUtils';
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);
@@ -68,7 +69,7 @@ LinkedDataDropdown.defaultProps = {
 };
 
 export default props => {
-    const {getDescendants, shapesLoading, shapesError} = useContext(LinkedDataContext);
+    const {shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
 
     if (shapesError) {
         return <MessageDisplay withIcon={false} message="Unable to fetch options" />;
@@ -79,7 +80,7 @@ export default props => {
     }
 
     const {className} = props.property;
-    const types = [className, ...getDescendants(className)];
+    const types = [className, ...getDescendants(shapes, className)];
 
     return (
         <LinkedDataDropdown

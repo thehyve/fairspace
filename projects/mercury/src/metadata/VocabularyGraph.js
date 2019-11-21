@@ -9,6 +9,7 @@ import NetworkGraphVisualization, {EDGE_LENGTH_SMALL, EDGE_LENGTH_MEDIUM, EDGE_L
 import LinkedDataContext from "./LinkedDataContext";
 import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_CLASS} from "../constants";
+import {determineShapeForTypes, determinePropertyShapesForTypes} from "../common/utils/linkeddata/vocabularyUtils";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 
@@ -20,14 +21,13 @@ const VocabularyGraph = ({history}) => {
 
     const handleNodeDoubleClick = useCallback(
         (id) => {
-            const shape = vocabulary.determineShapeForTypes([id]);
+            const shape = determineShapeForTypes(vocabulary, [id]);
             const url = getEntityRelativeUrl(editorPath, shape['@id']);
             history.push(url);
         }, [editorPath, history, vocabulary]
     );
 
-    const getRelationShape = useCallback((from, to) => vocabulary
-        .determinePropertyShapesForTypes([from])
+    const getRelationShape = useCallback((from, to) => determinePropertyShapesForTypes(vocabulary, [from])
         .find(propertyShape => getFirstPredicateId(propertyShape, SHACL_CLASS) === to), [vocabulary]);
 
     const getRelationShapes = useCallback(edge => {

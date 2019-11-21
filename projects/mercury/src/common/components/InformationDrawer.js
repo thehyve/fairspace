@@ -6,16 +6,14 @@ import {
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
-import {connect} from 'react-redux';
 import {ErrorDialog, MessageDisplay, UsersContext} from '@fairspace/shared-frontend';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "../../collections/CollectionDetails";
-import LinkedDataEntityFormContainer from "../../metadata/common/LinkedDataEntityFormContainer";
 import PathMetadata from "../../metadata/metadata/PathMetadata";
-import * as metadataActions from "../redux/actions/metadataActions";
 import getDisplayName from "../utils/userUtils";
 import CollectionsContext from "../contexts/CollectionsContext";
+import {LinkedDataEntityFormWithLinkedData} from '../../metadata/common/LinkedDataEntityFormContainer';
 
 const getUserObject = (users, iri) => users.find(user => user.iri === iri);
 
@@ -32,9 +30,7 @@ const pathHierarchy = (fullPath) => {
 };
 
 export class InformationDrawer extends React.Component {
-    handleDetailsChange = ({iri, location}, locationChanged) => {
-        this.props.fetchMetadata(iri);
-
+    handleDetailsChange = (location, locationChanged) => {
         // If the location of a collection has changed, the URI where it
         // can be found may also change. For that reason we need to redirect
         // the user there.
@@ -67,7 +63,7 @@ export class InformationDrawer extends React.Component {
             return this.props.updateCollection(oldCollection.iri, name, description, connectionString, location, oldCollection.location)
                 .then(() => {
                     const locationChanged = oldCollection.location !== location;
-                    this.handleDetailsChange({iri: oldCollection.iri, location}, locationChanged);
+                    this.handleDetailsChange(location, locationChanged);
                 })
                 .catch(err => {
                     const message = err && err.message ? err.message : "An error occurred while creating a collection";
@@ -129,7 +125,7 @@ export class InformationDrawer extends React.Component {
                         <Typography>Metadata for {collection.name}</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <LinkedDataEntityFormContainer
+                        <LinkedDataEntityFormWithLinkedData
                             subject={collection.iri}
                             isEntityEditable={isMetaDataEditable}
                         />
@@ -168,7 +164,6 @@ export class InformationDrawer extends React.Component {
 InformationDrawer.contextType = UsersContext;
 
 InformationDrawer.propTypes = {
-    fetchMetadata: PropTypes.func,
     updateCollection: PropTypes.func,
     deleteCollection: PropTypes.func,
     onCollectionLocationChange: PropTypes.func,
@@ -194,8 +189,4 @@ const ContextualInformationDrawer = ({selectedCollectionIri, ...props}) => {
     );
 };
 
-const mapDispatchToProps = {
-    fetchMetadata: metadataActions.fetchMetadataBySubjectIfNeeded,
-};
-
-export default withRouter(connect(null, mapDispatchToProps)(withStyles(styles)(ContextualInformationDrawer)));
+export default withRouter(withStyles(styles)(ContextualInformationDrawer));

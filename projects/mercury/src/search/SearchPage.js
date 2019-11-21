@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {connect} from 'react-redux';
+import React, {useEffect, useState, useContext} from 'react';
 import {
     Paper, Table, TableBody,
     TableCell, TableHead, TableRow, withStyles
@@ -8,10 +7,10 @@ import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFrom
 
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
-import * as vocabularyActions from '../common/redux/actions/vocabularyActions';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, ES_INDEX, SEARCH_MAX_SIZE} from "../constants";
-import {getVocabulary, isVocabularyPending} from "../common/redux/reducers/cache/vocabularyReducers";
 import Config from '../common/services/Config';
+import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
+import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';
 
 const styles = {
     tableRoot: {
@@ -42,7 +41,7 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
 
     // If vocabulary has not been loaded, we can not
     // retrieve the label. Just return the URI in that (rare) case
-    const generateTypeLabel = (typeUri) => (vocabulary ? vocabulary.getLabelForPredicate(typeUri) : typeUri);
+    const generateTypeLabel = (typeUri) => (vocabulary ? getLabelForPredicate(vocabulary, typeUri) : typeUri);
 
     /**
      * Handles a click on a search result.
@@ -108,8 +107,9 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
 
 // This separation/wrapping of compontents is mostly for unit testing purposes (much harder if it's 1 component)
 export const SearchPageContainer = ({
-    location: {search}, query = getSearchQueryFromString(search), vocabularyPending,
-    fetchVocabularyIfNeeded, classes, history, vocabulary, searchFunction
+    location: {search}, query = getSearchQueryFromString(search),
+    vocabulary, vocabularyLoading, vocabularyError,
+    classes, history, searchFunction = SearchAPI(Config.get(), ES_INDEX).search
 }) => {
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState();
@@ -117,7 +117,6 @@ export const SearchPageContainer = ({
     const [error, setError] = useState();
 
     useEffect(() => {
-        fetchVocabularyIfNeeded();
         searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
             .catch(handleSearchError)
             .then(data => {
@@ -127,15 +126,14 @@ export const SearchPageContainer = ({
             })
             .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, query]);
+    }, [search, query, searchFunction]);
 
     return (
         <SearchPage
             items={items}
             total={total}
-            loading={loading || vocabularyPending}
-            error={error}
+            loading={loading || vocabularyLoading}
+            error={vocabularyError || error}
             classes={classes}
             history={history}
             vocabulary={vocabulary}
@@ -143,20 +141,19 @@ export const SearchPageContainer = ({
     );
 };
 
-const mapStateToProps = (state) => {
-    const vocabularyPending = isVocabularyPending(state);
-    const vocabulary = getVocabulary(state);
-    const searchFunction = SearchAPI(Config.get(), ES_INDEX).search;
+const SearchPageWithVocabulary = (props) => {
+    const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
 
-    return {
-        vocabularyPending,
-        vocabulary,
-        searchFunction
-    };
+    return (
+        <VocabularyProvider>
+            <SearchPageContainer
+                {...props}
+                vocabulary={vocabulary}
+                vocabularyLoading={vocabularyLoading}
+                vocabularyError={vocabularyError}
+            />
+        </VocabularyProvider>
+    );
 };
 
-const mapDispatchToProps = {
-    fetchVocabularyIfNeeded: vocabularyActions.fetchMetadataVocabularyIfNeeded
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(SearchPageContainer));
+export default withStyles(styles)(SearchPageWithVocabulary);

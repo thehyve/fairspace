@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from "prop-types";
 
 import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
-import useLinkedData from '../UseLinkedData';
 import IriTooltip from "../../common/components/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {
@@ -32,13 +31,14 @@ const styles = {
 
 const PROTECTED_ENTITY_TYPES = [COLLECTION_URI, FILE_URI, DIRECTORY_URI];
 
-export const LinkedDataEntityHeader = ({
+const LinkedDataEntityHeader = ({
     subject,
     classes = {},
     linkedDataLoading = false,
     linkedDataError = false,
     values = {},
-    typeInfo = {}
+    typeInfo = {},
+    updateLinkedData,
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
     const isFixedShape = values[FIXED_SHAPE_URI];
@@ -61,6 +61,7 @@ export const LinkedDataEntityHeader = ({
                     <DeleteEntityButton
                         subject={subject}
                         isDeletable={!isDeleted && !isFixedShape && !isProtectedEntity}
+                        updateLinkedData={updateLinkedData}
                     />
 
                     <CollectionBrowserLink
@@ -96,11 +97,4 @@ LinkedDataEntityHeader.propTypes = {
     subject: PropTypes.string.isRequired
 };
 
-const ContextualLinkedDataEntityHeader = props => (
-    <LinkedDataEntityHeader
-        {...props}
-        {...useLinkedData(props.subject)}
-    />
-);
-
-export default withStyles(styles)(ContextualLinkedDataEntityHeader);
+export default withStyles(styles)(LinkedDataEntityHeader);
