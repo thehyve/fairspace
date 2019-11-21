@@ -16,7 +16,8 @@ export const LinkedDataEntityForm = ({
     loading = false,
     onChange = () => {},
     onAdd = () => {},
-    onDelete = () => {}
+    onDelete = () => {},
+    editable = false,
 }) => {
     if (error) {
         return <MessageDisplay message={error} />;
@@ -34,7 +35,9 @@ export const LinkedDataEntityForm = ({
             onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onSubmit();
+                if (!editable) {
+                    onSubmit();
+                }
             }}
             noValidate
         >
@@ -57,12 +60,13 @@ export const LinkedDataEntityForm = ({
                                 style={{display: 'block'}}
                             >
                                 <LinkedDataProperty
+                                    formEditable={editable}
                                     property={p}
                                     values={values[p.key]}
                                     validationErrors={validationErrors[p.key]}
-                                    onAdd={(value) => onAdd(p, value)}
-                                    onChange={(value, index) => onChange(p, value, index)}
-                                    onDelete={(index) => onDelete(p, index)}
+                                    onAdd={editable ? (value) => onAdd(p, value) : () => {}}
+                                    onChange={editable ? (value, index) => onChange(p, value, index) : () => {}}
+                                    onDelete={editable ? (index) => onDelete(p, index) : () => {}}
                                 />
                             </ListItem>
                         ))
@@ -82,7 +86,8 @@ LinkedDataEntityForm.propTypes = {
     loading: PropTypes.bool,
     properties: PropTypes.array,
     values: PropTypes.object,
-    validationErrors: PropTypes.object
+    validationErrors: PropTypes.object,
+    editable: PropTypes.bool
 };
 
 export default LinkedDataEntityForm;
