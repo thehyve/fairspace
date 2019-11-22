@@ -99,6 +99,8 @@ public class Transactions {
                 var task = it.next();
                 if (!task.perform()) {
                     txn.abort();
+                }
+                if (!txn.isInTransaction()) {
                     it.remove();
                     task.completed(); // task failed, no need to wait for other tasks
                     return false;
