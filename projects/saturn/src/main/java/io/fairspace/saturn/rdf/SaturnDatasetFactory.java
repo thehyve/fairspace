@@ -67,7 +67,7 @@ public class SaturnDatasetFactory {
                     .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
                     .add(FS.theWorkspace, FS.workspaceTitle, config.workspace.name)
                     .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE))
-            );
+                    .add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true)));
         }
 
         return ds;
