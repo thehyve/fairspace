@@ -22,7 +22,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({formEditable, property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -31,12 +31,12 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
     // Do not show an add component if no multiples are allowed
     // and there is already a value
     const maxValuesReached = (maxValuesCount && (values.length >= maxValuesCount)) || false;
-    const canAdd = property.isEditable && !machineOnly && !maxValuesReached;
+    const canAdd = !formEditable && property.isEditable && !machineOnly && !maxValuesReached;
     const labelId = `label-${key}`;
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
-    const disableEditing = !property.isEditable || disallowEditingOfExistingValues(property);
+    const disableEditing = formEditable || !property.isEditable || disallowEditingOfExistingValues(property);
     const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
     const addInputComponent = valueComponentFactory.addComponent(property);
 
@@ -44,8 +44,8 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
 
     return (
         <FormControl
-            required={minValuesCount > 0}
-            error={hasErrors}
+            required={!formEditable && minValuesCount > 0}
+            error={formEditable && hasErrors}
             component="fieldset"
             style={{
                 width: '100%',
@@ -85,7 +85,7 @@ const LinkedDataProperty = ({property, values = [], validationErrors = [], onAdd
                     )
                 }
             </FormGroup>
-            {hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
+            {formEditable && hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
         </FormControl>
     );
 };
