@@ -33,12 +33,25 @@ const CopyButton = ({
     return (
         clipboardSupported && (
             <Tooltip
+                data-testid="tooltip"
                 title={justCopied ? labelAfterCopy : labelPreCopy}
                 onClick={handleCopy}
                 style={{...style, cursor: 'pointer'}}
             >
                 <span>
-                    {justCopied ? <AssignmentTurnedInOutlined color="action" /> : <AssignmentOutlined color="action" />}
+                    {justCopied ? (
+                        <span data-testid="copied">
+                            <AssignmentTurnedInOutlined
+                                color="action"
+                            />
+                        </span>
+                    ) : (
+                        <span data-testid="uncopied">
+                            <AssignmentOutlined
+                                color="action"
+                            />
+                        </span>
+                    )}
                 </span>
             </Tooltip>
         ));

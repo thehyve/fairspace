@@ -1,10 +1,9 @@
 import React from 'react';
 import {act} from 'react-dom/test-utils';
-import {mount, shallow} from "enzyme";
-import {Tooltip} from "@material-ui/core";
-import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
-import AssignmentTurnedInOutlined from '@material-ui/icons/AssignmentTurnedInOutlined';
+import {render, fireEvent} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 
+// eslint-disable-next-line jest/no-mocks-import
 import '../__mocks__/clipboard.mock';
 import CopyButton from "../CopyButton";
 
@@ -12,35 +11,37 @@ describe('<CopyButton />', () => {
     jest.useFakeTimers();
 
     it('changes the icon and title after copying', () => {
-        const wrapper = shallow(<CopyButton
+        const {getByTestId, getByTitle} = render(<CopyButton
             labelPreCopy="Copy full IRI"
             labelAfterCopy="Copied!"
         />);
 
-        expect(wrapper.find(AssignmentOutlined).length).toEqual(1);
-        expect(wrapper.find(Tooltip).at(0).prop("title")).toBe('Copy full IRI');
+        const uncopiedIcon = getByTestId('uncopied');
 
-        // Simulate copying
-        wrapper.find(Tooltip).simulate('click');
+        expect(getByTitle(/Copy full IRI/i)).toBeInTheDocument();
+        expect(uncopiedIcon).toBeInTheDocument();
 
-        expect(wrapper.find(Tooltip).length).toEqual(1);
-        expect(wrapper.find(Tooltip).at(0).prop("title")).toBe('Copied!');
-        expect(wrapper.find(AssignmentTurnedInOutlined).length).toEqual(1);
+
+        fireEvent.click(getByTestId('tooltip'));
+
+        const copiedIcon = getByTestId('copied');
+        expect(getByTitle(/Copied!/i)).toBeInTheDocument();
+        expect(copiedIcon).toBeInTheDocument();
     });
 
     it('changes restores the original icon icon after some timeout', () => {
-        const wrapper = mount(<CopyButton timeout={50} />);
+        const {getByTestId} = render(<CopyButton timeout={50} />);
 
-        // Simulate copying
-        wrapper.find(Tooltip).simulate('click');
+        fireEvent.click(getByTestId('tooltip'));
 
-        expect(wrapper.find(AssignmentTurnedInOutlined).length).toEqual(1);
+        const copiedIcon = getByTestId('copied');
+        expect(copiedIcon).toBeInTheDocument();
 
         act(() => {
             jest.advanceTimersByTime(100);
         });
 
-        wrapper.update();
-        expect(wrapper.find(AssignmentOutlined).length).toEqual(1);
+        const uncopiedIcon = getByTestId('uncopied');
+        expect(uncopiedIcon).toBeInTheDocument();
     });
 });
