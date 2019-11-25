@@ -6,6 +6,8 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphMonitor;
 import org.apache.jena.sparql.core.QuadAction;
 
+import static java.lang.Integer.toHexString;
+import static java.lang.System.identityHashCode;
 import static org.apache.jena.sparql.core.GraphView.createNamedGraph;
 import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
 
@@ -39,5 +41,10 @@ public abstract class AbstractChangesAwareDatasetGraph extends DatasetGraphMonit
     @Override
     public Graph getGraph(Node graphNode) {
         return createNamedGraph(this, graphNode);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "@" + toHexString(identityHashCode(this));
     }
 }
