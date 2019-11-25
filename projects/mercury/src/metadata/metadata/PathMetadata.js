@@ -2,7 +2,7 @@ import React, {useCallback} from "react";
 import {Grid} from "@material-ui/core";
 import {isNonEmptyValue, MessageDisplay, useAsync} from '@fairspace/shared-frontend';
 
-import {LinkedDataEntityFormWithLinkedData} from '../../metadata/common/LinkedDataEntityFormContainer';
+import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
 import TechnicalMetadata from "../../file/TechnicalMetadata";
 import FileAPI from "../../file/FileAPI";
 

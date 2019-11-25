@@ -38,7 +38,6 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
             })
             .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-
     }, [query, shapesLoading, size, page, availableTypes, searchLinkedData, selectedTypes]);
 
     return {
