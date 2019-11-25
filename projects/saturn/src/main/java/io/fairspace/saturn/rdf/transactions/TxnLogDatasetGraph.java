@@ -91,7 +91,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     }
 
     private boolean isInWriteTransaction() {
-        return isInTransaction() && transactionMode() == ReadWrite.WRITE;
+        return transactionMode() == ReadWrite.WRITE;
     }
 
     private void critical(ThrowingRunnable<Exception> action) {
@@ -125,5 +125,4 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             }
         }
     }
-
 }
