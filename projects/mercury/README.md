@@ -50,7 +50,7 @@ To run the test scripts:
 Jest is the main testing framework and runner. Some (older) tests use [Enzyme](https://airbnb.io/enzyme/) as the main testing utility. However, there is a newer and simpler utility that is encouraged to be used now, it is [React Testing Library](https://github.com/testing-library/react-testing-library) 
 
 ## Debugging
-One helpful tool to assis in figuring out the components tree structure is the [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en)
+One helpful tool to assist in figuring out the components tree structure is the [React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en).
 
 ## Search
 In order for the search functionality to work, docker has to be installed and running on your machine. If you are having an issue running the search, try to stop the container running the Elasticsearch image (`docker ps` to see running containers and docker stop <CONTAINER_ID>) and rerun the app again.
