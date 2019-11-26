@@ -31,12 +31,12 @@ const LinkedDataProperty = ({formEditable, property, values = [], validationErro
     // Do not show an add component if no multiples are allowed
     // and there is already a value
     const maxValuesReached = (maxValuesCount && (values.length >= maxValuesCount)) || false;
-    const canAdd = !formEditable && property.isEditable && !machineOnly && !maxValuesReached;
+    const canAdd = formEditable && property.isEditable && !machineOnly && !maxValuesReached;
     const labelId = `label-${key}`;
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
-    const disableEditing = formEditable || !property.isEditable || disallowEditingOfExistingValues(property);
+    const disableEditing = !formEditable || !property.isEditable || disallowEditingOfExistingValues(property);
     const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
     const addInputComponent = valueComponentFactory.addComponent(property);
 
