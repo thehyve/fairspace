@@ -22,7 +22,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({formEditable, property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -70,19 +70,19 @@ const LinkedDataProperty = ({formEditable, property, values = [], validationErro
                             editorPath={editorPath}
                         />
                     ) : (
-                        <LinkedDataInputFieldsTable
-                            property={property}
-                            values={values}
-                            validationErrors={validationErrors}
-                            canAdd={canAdd}
-                            onAdd={onAdd}
-                            onChange={onChange}
-                            onDelete={onDelete}
-                            labelId={labelId}
-                            editComponent={editInputComponent}
-                            addComponent={addInputComponent}
-                        />
-                    )
+                            <LinkedDataInputFieldsTable
+                                property={property}
+                                values={values}
+                                validationErrors={validationErrors}
+                                canAdd={canAdd}
+                                onAdd={onAdd}
+                                onChange={onChange}
+                                onDelete={onDelete}
+                                labelId={labelId}
+                                editComponent={editInputComponent}
+                                addComponent={addInputComponent}
+                            />
+                        )
                 }
             </FormGroup>
             {formEditable && hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
