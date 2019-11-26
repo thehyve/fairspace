@@ -68,9 +68,6 @@ describe('InformationDrawer', () => {
             {...defaultProps}
         />);
 
-        // Verify that updating a collection without callback
-        // does not throw an error
-        return wrapper.instance()
-            .handleDetailsChange(collection, true);
+        expect(() => wrapper.instance().handleDetailsChange(collection, true)).not.toThrow();
     });
 });

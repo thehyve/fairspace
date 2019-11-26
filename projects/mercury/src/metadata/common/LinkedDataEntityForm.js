@@ -17,7 +17,7 @@ export const LinkedDataEntityForm = ({
     onChange = () => {},
     onAdd = () => {},
     onDelete = () => {},
-    editable = false,
+    editable = true,
 }) => {
     if (error) {
         return <MessageDisplay message={error} />;

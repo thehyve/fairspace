@@ -2,7 +2,6 @@ import {useState, useCallback} from 'react';
 
 import {MetaVocabularyAPI} from './LinkedDataAPI';
 
-// TODO: This should be in a context to avoid refetching more than required
 const UseMetaVocabulary = () => {
     const [metaVocabulary, setMetaVocabulary] = useState([]);
     const [shapesLoading, setShapesLoading] = useState(false);

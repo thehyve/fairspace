@@ -22,7 +22,7 @@ const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, all
     || isGenericIriResource
     || allowedValues;
 
-const LinkedDataProperty = ({formEditable, property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = ({formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -31,12 +31,12 @@ const LinkedDataProperty = ({formEditable, property, values = [], validationErro
     // Do not show an add component if no multiples are allowed
     // and there is already a value
     const maxValuesReached = (maxValuesCount && (values.length >= maxValuesCount)) || false;
-    const canAdd = !formEditable && property.isEditable && !machineOnly && !maxValuesReached;
+    const canAdd = formEditable && property.isEditable && !machineOnly && !maxValuesReached;
     const labelId = `label-${key}`;
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
-    const disableEditing = formEditable || !property.isEditable || disallowEditingOfExistingValues(property);
+    const disableEditing = !formEditable || !property.isEditable || disallowEditingOfExistingValues(property);
     const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
     const addInputComponent = valueComponentFactory.addComponent(property);
 
@@ -70,19 +70,19 @@ const LinkedDataProperty = ({formEditable, property, values = [], validationErro
                             editorPath={editorPath}
                         />
                     ) : (
-                        <LinkedDataInputFieldsTable
-                            property={property}
-                            values={values}
-                            validationErrors={validationErrors}
-                            canAdd={canAdd}
-                            onAdd={onAdd}
-                            onChange={onChange}
-                            onDelete={onDelete}
-                            labelId={labelId}
-                            editComponent={editInputComponent}
-                            addComponent={addInputComponent}
-                        />
-                    )
+                            <LinkedDataInputFieldsTable
+                                property={property}
+                                values={values}
+                                validationErrors={validationErrors}
+                                canAdd={canAdd}
+                                onAdd={onAdd}
+                                onChange={onChange}
+                                onDelete={onDelete}
+                                labelId={labelId}
+                                editComponent={editInputComponent}
+                                addComponent={addInputComponent}
+                            />
+                        )
                 }
             </FormGroup>
             {formEditable && hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
