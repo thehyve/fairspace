@@ -12,7 +12,7 @@ import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "../UseLinkedData";
 
 const LinkedDataEntityFormContainer = ({
-    subject, isEntityEditable = true, fullpage = false,
+    subject, editable = true, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
 }) => {
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
@@ -37,7 +37,7 @@ const LinkedDataEntityFormContainer = ({
         confirmationShown, hideConfirmation, executeNavigation
     } = useNavigationBlocker(hasFormUpdates);
 
-    const canEdit = isEntityEditable && hasEditRight;
+    const canEdit = editable && hasEditRight;
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
@@ -76,6 +76,7 @@ const LinkedDataEntityFormContainer = ({
                         <LinkedDataEntityForm
                             {...otherProps}
                             id={formId}
+                            editable={canEdit}
                             onSubmit={validateAndSubmit}
                             error={linkedDataError}
                             loading={linkedDataLoading}

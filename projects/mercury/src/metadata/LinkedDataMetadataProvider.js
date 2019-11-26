@@ -1,4 +1,5 @@
 import React, {useContext, useCallback} from 'react';
+import {UserContext} from '@fairspace/shared-frontend';
 
 // Utils
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
@@ -9,9 +10,12 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 import VocabularyContext from './VocabularyContext';
 import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
 import {MetadataAPI} from './LinkedDataAPI';
+import {isCoordinator} from '../common/utils/userUtils';
+import Config from '../common/services/Config';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
+    const {currentUser} = useContext(UserContext);
 
     const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, includeObjectProperties: true})
         .catch(() => {
@@ -57,6 +61,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
 
                 // Fixed properties
                 hasEditRight: true,
+                isCoordinator: isCoordinator(currentUser.authorizations, Config.get()),
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,
