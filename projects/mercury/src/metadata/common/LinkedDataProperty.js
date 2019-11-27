@@ -44,7 +44,7 @@ const LinkedDataProperty = ({formEditable = true, property, values = [], validat
 
     return (
         <FormControl
-            required={!formEditable && minValuesCount > 0}
+            required={formEditable && minValuesCount > 0}
             error={formEditable && hasErrors}
             component="fieldset"
             style={{
@@ -70,19 +70,19 @@ const LinkedDataProperty = ({formEditable = true, property, values = [], validat
                             editorPath={editorPath}
                         />
                     ) : (
-                            <LinkedDataInputFieldsTable
-                                property={property}
-                                values={values}
-                                validationErrors={validationErrors}
-                                canAdd={canAdd}
-                                onAdd={onAdd}
-                                onChange={onChange}
-                                onDelete={onDelete}
-                                labelId={labelId}
-                                editComponent={editInputComponent}
-                                addComponent={addInputComponent}
-                            />
-                        )
+                        <LinkedDataInputFieldsTable
+                            property={property}
+                            values={values}
+                            validationErrors={validationErrors}
+                            canAdd={canAdd}
+                            onAdd={onAdd}
+                            onChange={onChange}
+                            onDelete={onDelete}
+                            labelId={labelId}
+                            editComponent={editInputComponent}
+                            addComponent={addInputComponent}
+                        />
+                    )
                 }
             </FormGroup>
             {formEditable && hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
