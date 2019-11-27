@@ -30,6 +30,7 @@ import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.lang.String.format;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDlong;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -129,6 +130,9 @@ public class SparqlUtils {
         }
         if (value instanceof String) {
             return createLiteral((String) value);
+        }
+        if (value instanceof Long) {
+            return createTypedLiteral(value.toString(), XSDlong).asNode();
         }
         return createTypedLiteral(value instanceof Instant ? toCalendar((Instant) value) : value).asNode();
     }
