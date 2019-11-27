@@ -33,11 +33,12 @@ const LinkedDataEntityFormContainer = ({
         subject
     );
 
+    const canEdit = editable && hasEditRight;
+
     const {
         confirmationShown, hideConfirmation, executeNavigation
-    } = useNavigationBlocker(hasFormUpdates);
+    } = useNavigationBlocker(hasFormUpdates && canEdit);
 
-    const canEdit = editable && hasEditRight;
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
