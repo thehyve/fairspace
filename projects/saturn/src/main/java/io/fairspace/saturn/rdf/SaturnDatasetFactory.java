@@ -62,7 +62,7 @@ public class SaturnDatasetFactory {
 
         TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
-        if (!calculateRead(ds, () -> ds.getDefaultModel().containsResource(FS.theWorkspace))) {
+        if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theWorkspace, null))) {
             executeWrite("Workspace initialization", ds, () -> ds.getDefaultModel()
                     .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
                     .add(FS.theWorkspace, FS.workspaceTitle, config.workspace.name)

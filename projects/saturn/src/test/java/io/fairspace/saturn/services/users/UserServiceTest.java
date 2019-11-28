@@ -60,8 +60,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void usersGetPersisted() throws InterruptedException {
+    public void usersGetPersisted() {
         userService.getUser(userIri);
-        assertTrue(ds.getDefaultModel().containsResource(createResource(userIri.getURI())));
+        assertTrue(ds.getDefaultModel().contains(createResource(userIri.getURI()), null));
     }
 }

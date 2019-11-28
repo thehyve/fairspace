@@ -19,7 +19,7 @@ public class ShaclValidator implements MetadataRequestValidator {
     @Override
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         var affected = removed.listSubjects()
-                .filterKeep(after::containsResource)
+                .filterKeep(s -> after.contains(s, null))
                 .andThen(added.listSubjects())
                 .mapWith(FrontsNode::asNode)
                 .toSet();

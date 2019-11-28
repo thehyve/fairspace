@@ -123,6 +123,6 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private boolean exists(Resource resource) {
-        return dataset.getNamedModel(graph.getURI()).containsResource(resource);
+        return dataset.getNamedModel(graph.getURI()).contains(resource, null);
     }
 }
