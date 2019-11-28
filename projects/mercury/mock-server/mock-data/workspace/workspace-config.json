@@ -5,7 +5,8 @@
   },
   "roles": {
     "user": "user-workspace",
-    "dataSteward": "datasteward"
+    "dataSteward": "datasteward",
+    "coordinator": "coordinator"
   },
   "elasticsearch": {
     "host": "http://localhost:3000/api/v1/search"
