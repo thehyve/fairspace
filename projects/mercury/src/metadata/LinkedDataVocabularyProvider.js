@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useCallback} from 'react';
 import {UserContext} from '@fairspace/shared-frontend';
 
 // Utils
-import {isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward, isCoordinator} from "../common/utils/userUtils";
 import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape, getShape, getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
@@ -65,6 +65,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 namespaces,
                 requireIdentifier: false,
                 hasEditRight: isDataSteward(currentUser.authorizations, Config.get()),
+                isCoordinator: isCoordinator(currentUser.authorizations, Config.get()),
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,
