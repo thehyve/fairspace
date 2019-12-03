@@ -8,6 +8,7 @@ import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
@@ -25,7 +26,7 @@ import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
-import static org.apache.jena.tdb2.DatabaseMgr.connectDatasetGraph;
+import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
 @Slf4j
 public class SaturnDatasetFactory {
@@ -40,7 +41,7 @@ public class SaturnDatasetFactory {
         var restoreNeeded = isRestoreNeeded(config.jena.datasetPath);
 
         // Create a TDB2 dataset graph
-        var dsg = connectDatasetGraph(config.jena.datasetPath.getAbsolutePath());
+        var dsg = connectCreate(Location.create(config.jena.datasetPath.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
 
         var txnLog = new LocalTransactionLog(config.jena.transactionLogPath, new SparqlTransactionCodec());
 

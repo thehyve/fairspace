@@ -1,8 +1,5 @@
 package io.fairspace.saturn.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -13,7 +10,7 @@ public class ConfigLoader {
         var settingsFile = new File("application.yaml");
         if (settingsFile.exists()) {
             try {
-                return new ObjectMapper(new YAMLFactory()).readValue(settingsFile, Config.class);
+                return Config.MAPPER.readValue(settingsFile, Config.class);
             } catch (IOException e) {
                 throw new RuntimeException("Error loading configuration", e);
             }
