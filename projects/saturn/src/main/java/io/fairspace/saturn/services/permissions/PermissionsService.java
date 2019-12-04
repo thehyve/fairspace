@@ -34,7 +34,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 @Slf4j
 public class PermissionsService {
     private static final int BATCH_SIZE = 100;
-    private static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
+    public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final Dataset dataset;
     private final Supplier<Node> userIriSupplier;

@@ -25,6 +25,7 @@ import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
+import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
@@ -64,11 +65,13 @@ public class SaturnDatasetFactory {
         TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
         if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theWorkspace, null))) {
-            executeWrite("Workspace initialization", ds, () -> ds.getDefaultModel()
-                    .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
-                    .add(FS.theWorkspace, FS.workspaceTitle, config.workspace.name)
-                    .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE))
-                    .add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true)));
+            executeWrite("Workspace initialization", ds, () -> {
+                ds.getDefaultModel()
+                        .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
+                        .add(FS.theWorkspace, FS.workspaceTitle, config.workspace.name)
+                        .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
+                ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true))
+            });
         }
 
         return ds;
