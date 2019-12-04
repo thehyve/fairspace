@@ -11,8 +11,6 @@ import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
 
-import java.io.IOException;
-
 import static io.fairspace.saturn.ThreadContext.setThreadContextListener;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
@@ -118,11 +116,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
         if (isInWriteTransaction()) {
             var userName = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getFullName).orElse(null);
             var userId = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
-            try {
-                transactionLog.onMetadata(context.getUserCommitMessage(), context.getSystemCommitMessage(), userId, userName, currentTimeMillis());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            transactionLog.onMetadata(context.getUserCommitMessage(), context.getSystemCommitMessage(), userId, userName, currentTimeMillis());
         }
     }
 }

@@ -55,45 +55,57 @@ public class LocalTransactionLog implements TransactionLog {
     }
 
     @Override
-    public void onBegin() throws IOException {
+    public void onBegin() {
         currentTransactionFile.delete();
 
-        outputStream = new BufferedOutputStream(new FileOutputStream(currentTransactionFile));
-        writingListener = codec.write(outputStream);
+        try {
+            outputStream = new BufferedOutputStream(new FileOutputStream(currentTransactionFile));
+            writingListener = codec.write(outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) throws IOException {
+    public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) {
         writingListener.onMetadata(userCommitMessage, systemCommitMessage, userId, userName, timestamp);
     }
 
     @Override
-    public void onAdd(Node graph, Node subject, Node predicate, Node object) throws IOException {
+    public void onAdd(Node graph, Node subject, Node predicate, Node object) {
         writingListener.onAdd(graph, subject, predicate, object);
     }
 
     @Override
-    public void onDelete(Node graph, Node subject, Node predicate, Node object) throws IOException {
+    public void onDelete(Node graph, Node subject, Node predicate, Node object) {
         writingListener.onDelete(graph, subject, predicate, object);
     }
 
     @Override
-    public void onCommit() throws IOException {
-        writingListener.onCommit();
-        outputStream.close();
-        move(currentTransactionFile.toPath(), file(count).toPath(), ATOMIC_MOVE);
-        count++;
-        writingListener = null;
-        outputStream = null;
+    public void onCommit() {
+        try {
+            writingListener.onCommit();
+            outputStream.close();
+            move(currentTransactionFile.toPath(), file(count).toPath(), ATOMIC_MOVE);
+            count++;
+            writingListener = null;
+            outputStream = null;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void onAbort() throws IOException {
+    public void onAbort() {
+        try {
         writingListener.onAbort();
         outputStream.close();
         currentTransactionFile.delete();
         writingListener = null;
         outputStream = null;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -102,9 +114,11 @@ public class LocalTransactionLog implements TransactionLog {
     }
 
     @Override
-    public void read(long index, TransactionListener listener) throws IOException {
+    public void read(long index, TransactionListener listener) {
         try (var in = new BufferedInputStream(new FileInputStream(file(index)))) {
             codec.read(in, listener);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

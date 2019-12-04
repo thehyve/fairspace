@@ -18,7 +18,6 @@ import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 
 public class RDFPatchTransactionCodec implements TransactionCodec {
-
     private static final String USER_COMMIT_MESSAGE_FIELD = "userCommitMessage";
     private static final String SYSTEM_COMMIT_MESSAGE_FIELD = "systemCommitMessage";
     private static final String USER_ID_FIELD = "userId";
@@ -30,7 +29,8 @@ public class RDFPatchTransactionCodec implements TransactionCodec {
         // Prevents unnecessary flushes by RDFChangesWriter
         var nonFlushingOutputStream = new FilterOutputStream(out) {
             @Override
-            public void flush() { }
+            public void flush() {
+            }
         };
 
         return new TransactionListener() {
@@ -38,7 +38,7 @@ public class RDFPatchTransactionCodec implements TransactionCodec {
             private boolean first = true;
 
             @Override
-            public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) throws IOException {
+            public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) {
                 if (first) {
                     first = false;
                 } else {
@@ -63,29 +63,29 @@ public class RDFPatchTransactionCodec implements TransactionCodec {
             }
 
             @Override
-            public void onAdd(Node graph, Node subject, Node predicate, Node object) throws IOException {
+            public void onAdd(Node graph, Node subject, Node predicate, Node object) {
                 changes.add(graph, subject, predicate, object);
             }
 
             @Override
-            public void onDelete(Node graph, Node subject, Node predicate, Node object) throws IOException {
+            public void onDelete(Node graph, Node subject, Node predicate, Node object) {
                 changes.delete(graph, subject, predicate, object);
             }
 
             @Override
-            public void onCommit() throws IOException {
+            public void onCommit() {
                 changes.txnCommit();
             }
 
             @Override
-            public void onAbort() throws IOException {
+            public void onAbort() {
                 changes.txnAbort();
             }
         };
     }
 
     @Override
-    public void read(InputStream in, TransactionListener listener) throws IOException {
+    public void read(InputStream in, TransactionListener listener) {
         listener.onBegin();
 
         var reader = new RDFPatchReaderText(in);
@@ -120,20 +120,12 @@ public class RDFPatchTransactionCodec implements TransactionCodec {
 
             @Override
             public void add(Node g, Node s, Node p, Node o) {
-                try {
-                    listener.onAdd(g, s, p, o);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                listener.onAdd(g, s, p, o);
             }
 
             @Override
             public void delete(Node g, Node s, Node p, Node o) {
-                try {
-                    listener.onDelete(g, s, p, o);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                listener.onDelete(g, s, p, o);
             }
 
             @Override
@@ -148,11 +140,7 @@ public class RDFPatchTransactionCodec implements TransactionCodec {
 
             @Override
             public void txnBegin() {
-                try {
-                    listener.onMetadata(userCommitMessage, systemCommitMessage, userId, userName, timestamp);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                listener.onMetadata(userCommitMessage, systemCommitMessage, userId, userName, timestamp);
 
                 timestamp = 0L;
                 userName = null;

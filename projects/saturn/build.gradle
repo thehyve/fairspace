@@ -68,7 +68,7 @@ dependencies {
     implementation "io.fairspace:oidc-auth-base:${oidcAuthVersion}"
 
     implementation "com.rabbitmq:amqp-client:5.7.3"
-    compile group: 'org.seaborne.rdf-delta', name: 'rdf-patch', version: '0.8.1'
+    implementation 'org.seaborne.rdf-delta:rdf-patch:0.8.1'
 
 
     testImplementation "junit:junit:4.12"
