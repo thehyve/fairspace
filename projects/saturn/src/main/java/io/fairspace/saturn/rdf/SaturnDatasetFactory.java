@@ -3,7 +3,7 @@ package io.fairspace.saturn.rdf;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
+import io.fairspace.saturn.rdf.transactions.RDFPatchTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class SaturnDatasetFactory {
         // Create a TDB2 dataset graph
         var dsg = connectCreate(Location.create(config.jena.datasetPath.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(config.jena.transactionLogPath, new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(config.jena.transactionLogPath, new RDFPatchTransactionCodec());
 
         if (config.jena.elasticSearch.enabled) {
             // When a restore is needed, we instruct ES to delete the index first
