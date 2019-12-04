@@ -97,6 +97,10 @@ Scheme to access workspace components (http or https)
 {{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
 {{- end -}}
 
+{{- define "jupyter.url" -}}
+{{ template "workspace.scheme" . }}://jupyter.{{ template "pluto.hostname" . }}
+{{- end -}}
+
 {{- define "storage.url" -}}
 {{ template "workspace.scheme" . }}://{{ template "storage.hostname" . }}
 {{- end -}}
