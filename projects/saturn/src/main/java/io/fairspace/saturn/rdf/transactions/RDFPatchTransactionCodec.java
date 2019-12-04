@@ -9,7 +9,6 @@ import org.seaborne.patch.text.RDFPatchReaderText;
 import org.seaborne.patch.text.TokenWriterText;
 
 import java.io.FilterOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Instant;
@@ -25,7 +24,7 @@ public class RDFPatchTransactionCodec implements TransactionCodec {
     private static final String TIMESTAMP_FIELD = "timestamp";
 
     @Override
-    public TransactionListener write(OutputStream out) throws IOException {
+    public TransactionListener write(OutputStream out) {
         // Prevents unnecessary flushes by RDFChangesWriter
         var nonFlushingOutputStream = new FilterOutputStream(out) {
             @Override
