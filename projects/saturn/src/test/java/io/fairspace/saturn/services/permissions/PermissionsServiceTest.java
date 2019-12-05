@@ -257,6 +257,9 @@ public class PermissionsServiceTest {
 
         currentUser = USER2;
 
+        service.ensureAccess(Set.of(FILE_1), Access.Read);
+        service.ensureAccess(Set.of(COLLECTION_2), Access.Read);
+        service.ensureAccess(Set.of(FILE_2), Access.Read);
         service.ensureAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
     }
 

@@ -1,5 +1,0 @@
-# Deletes a permission
-# 0 - the resource
-# 1 - the user
-
-DELETE { GRAPH ws:permissions { %1$s ?p %2$s}} WHERE { GRAPH ws:permissions { %1$s ?p %2$s}}
