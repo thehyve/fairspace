@@ -1,10 +1,12 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 
-@Value
+@RequiredArgsConstructor
+@Getter
 public class ValidationException extends RuntimeException {
     private final Set<Violation> violations;
 }
