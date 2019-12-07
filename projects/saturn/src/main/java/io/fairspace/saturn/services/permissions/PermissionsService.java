@@ -278,7 +278,7 @@ public class PermissionsService {
 
         var collectionsByPath = new HashMap<String, Node>();
 
-        collectionPaths.forEach(path -> dataset.getDefaultModel().listSubjectsWithProperty(FS.filePath, path)
+        collectionPaths.forEach(path -> model.listSubjectsWithProperty(FS.filePath, path)
                 .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
                 .filterDrop(r -> r.hasProperty(FS.dateDeleted))
                 .forEachRemaining(r -> collectionsByPath.put(path, r.asNode())));
