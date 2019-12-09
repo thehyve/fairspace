@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class MiltonMapPropertySource<T> {
-    protected static String DEFAULT_NAMESPACE = FS.NS;
+    protected static final String DEFAULT_NAMESPACE = FS.NS;
     protected final String namespace;
 
     @Delegate
