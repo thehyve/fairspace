@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -19,7 +18,6 @@ import org.apache.jena.vocabulary.RDF;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
@@ -160,11 +158,6 @@ public class PermissionsService {
                 );
             }
         });
-    }
-
-    private static Access getAccess(QuerySolution row) {
-        var access = row.getResource("access").getLocalName();
-        return Stream.of(Access.values()).filter(e -> e.name().equalsIgnoreCase(access)).findFirst().orElse(Access.None);
     }
 
     private void ensureAccess(Node resource, Access access) {
