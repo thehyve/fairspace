@@ -94,14 +94,14 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     void patch(Model model) {
         executeWrite("Update metadata", dataset, () -> {
             var before = dataset.getNamedModel(graph.getURI());
-            var toDelete = createDefaultModel();
+            var existing = createDefaultModel();
             model.listStatements()
                     .filterKeep(stmt -> stmt.getSubject().isURIResource())
                     .mapWith(stmt -> Pair.of(stmt.getSubject(), stmt.getPredicate()))
                     .toSet()
-                    .forEach(pair -> toDelete.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
+                    .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
-            update(toDelete.remove(model), model.removeAll(null, null, NIL));
+            update(existing.difference(model), model.remove(existing).removeAll(null, null, NIL));
         });
         eventConsumer.accept(MetadataEvent.Type.UPDATED);
     }
