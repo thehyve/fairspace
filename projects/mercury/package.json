@@ -44,7 +44,8 @@
     "react-select": "^3.0.8",
     "vis-network": "^6.4.4",
     "wait-on": "^3.3.0",
-    "webdav": "^2.10.0"
+    "webdav": "^2.10.0",
+    "serialize-javascript@^2.1.1": "^2.1.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
