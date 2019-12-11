@@ -89,13 +89,15 @@ public class ElasticSearchIndexConfigurer {
     }
 
     private static String getMappings() throws IOException {
-        try(var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/mappings.json")) {
+        try (var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/mappings.json")) {
             return new String(is.readAllBytes(), UTF_8);
         }
     }
 
     private static Settings.Builder getSettings() throws IOException {
-        return Settings.builder()
-                .loadFromStream("es-settings.json", ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/settings.json"), false);
+        try (var is = ElasticSearchIndexConfigurer.class.getResourceAsStream("/elasticsearch/settings.json")) {
+            return Settings.builder()
+                    .loadFromStream("es-settings.json", is, false);
+        }
     }
 }
