@@ -31,7 +31,7 @@ public class App {
                 .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", createApiFilter(apiPathPrefix, svc, CONFIG))
-                .addServlet(webDavPathPrefix + "*", initWebDAVServlet(webDavPathPrefix, ds, svc, CONFIG.webDAV))
+                .addServlet(webDavPathPrefix + "*", initWebDAVServlet(webDavPathPrefix, svc, CONFIG.webDAV))
                 .port(CONFIG.port)
                 .build()
                 .start();
