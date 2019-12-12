@@ -34,16 +34,6 @@ public class WebdavEventEmitterTest {
     }
 
     @Test
-    public void eventIncludesMethodAndPath() {
-        when(request.getAbsolutePath()).thenReturn(ABSOLUTE_PATH);
-        when(request.getMethod()).thenReturn(Request.Method.PROPFIND);
-
-        emitter.accept(request);
-
-        assertEquals(List.of(new FileSystemEvent(FileSystemEvent.FileEventType.LISTED, ABSOLUTE_PATH, null)), events);
-    }
-
-    @Test
     public void copyEventIncludesDestination() {
         when(request.getAbsolutePath()).thenReturn(ABSOLUTE_PATH);
         when(request.getMethod()).thenReturn(Request.Method.COPY);

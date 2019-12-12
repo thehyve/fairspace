@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 public class WebdavEventEmitter implements Consumer<Request> {
     private static Map<Request.Method, FileSystemEvent.FileEventType> httpMethodToEventTypeMap = Map.of(
             Request.Method.MKCOL, FileSystemEvent.FileEventType.DIRECTORY_CREATED,
-            Request.Method.PROPFIND, FileSystemEvent.FileEventType.LISTED,
             Request.Method.COPY, FileSystemEvent.FileEventType.COPIED,
             Request.Method.MOVE, FileSystemEvent.FileEventType.MOVED,
             Request.Method.DELETE, FileSystemEvent.FileEventType.DELETED,

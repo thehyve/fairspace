@@ -19,7 +19,6 @@ public class FileSystemEvent extends BaseEvent<FileSystemEvent.FileEventType> {
 
     public enum FileEventType {
         DIRECTORY_CREATED,
-        LISTED,
         COPIED,
         MOVED,
         DELETED,
