@@ -9,7 +9,6 @@ import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.SecurityHandlerFactory.getSecurityHandler;
-import static io.fairspace.saturn.config.WebDAVServletFactory.initWebDAVServlet;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 
 @Slf4j
@@ -31,7 +30,6 @@ public class App {
                 .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)
                 .addFilter(apiPathPrefix + "/*", createApiFilter(apiPathPrefix, svc, CONFIG))
-                .addServlet(webDavPathPrefix + "*", initWebDAVServlet(webDavPathPrefix, svc, CONFIG.webDAV))
                 .port(CONFIG.port)
                 .build()
                 .start();

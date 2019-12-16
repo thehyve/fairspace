@@ -16,12 +16,20 @@ import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vfs.CompoundFileSystem;
+import io.fairspace.saturn.vfs.VirtualFileSystem;
+import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
+import io.fairspace.saturn.vfs.managed.BlobStore;
+import io.fairspace.saturn.vfs.managed.LocalBlobStore;
+import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 
+import java.io.File;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -46,6 +54,8 @@ public class Services {
     private final ChangeableMetadataService metadataService;
     private final ChangeableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
+    private final BlobStore blobStore;
+    private final VirtualFileSystem fileSystem;
 
 
     public Services(@NonNull Config config, @NonNull Dataset dataset, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
@@ -101,6 +111,11 @@ public class Services {
 
         userVocabularyService = new ChangeableMetadataService(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, 0, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
         metaVocabularyService = new ReadableMetadataService(dataset, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
+
+        blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
+        fileSystem = new CompoundFileSystem(collectionsService, Map.of(
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim()), collectionsService, eventBus),
+                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService)));
     }
 
     private EventService setupEventService() throws Exception {

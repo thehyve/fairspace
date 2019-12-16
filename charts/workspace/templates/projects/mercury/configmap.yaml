@@ -11,8 +11,8 @@ data:
   config.json: |-
     {
       "urls": {
-        "download": "{{ template "workspace.url" . }}/zuul/webdav/v1",
-        "files": "{{ template "storage.url" . }}/webdav/v1"
+        "download": "{{ template "workspace.url" . }}/zuul/api/v1/webdav",
+        "files": "{{ template "storage.url" . }}/api/v1/webdav"
         {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
         {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
       },

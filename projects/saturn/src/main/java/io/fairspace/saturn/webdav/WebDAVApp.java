@@ -1,7 +1,6 @@
 package io.fairspace.saturn.webdav;
 
-
-import io.fairspace.saturn.vfs.VirtualFileSystem;
+import io.fairspace.saturn.config.Services;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.RequestEvent;
 import io.milton.http.*;
@@ -13,48 +12,28 @@ import io.milton.http.http11.Http11ResponseHandler;
 import io.milton.http.http11.PartialGetHelper;
 import io.milton.resource.GetableResource;
 import io.milton.resource.Resource;
+import io.milton.servlet.ServletRequest;
+import io.milton.servlet.ServletResponse;
+import spark.servlet.SparkApplication;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
+import static spark.Spark.before;
 
-public class MiltonWebDAVServlet extends HttpServlet {
+public class WebDAVApp implements SparkApplication {
     private final HttpManager httpManager;
 
-    public MiltonWebDAVServlet(String pathPrefix, VirtualFileSystem fs, Consumer<Request> requestEventListener) {
-        httpManager = setupHttpManager(pathPrefix, fs, requestEventListener);
-    }
-
-    @Override
-    public void service(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) throws ServletException, IOException {
-        var req = (HttpServletRequest) servletRequest;
-        var resp = (HttpServletResponse) servletResponse;
-
-        try {
-            setThreadlocals(req, resp);
-            var request = new io.milton.servlet.ServletRequest(req, req.getServletContext());
-            var response = new io.milton.servlet.ServletResponse(resp);
-            httpManager.process(request, response);
-        } finally {
-            clearThreadlocals();
-            servletResponse.getOutputStream().flush();
-            servletResponse.flushBuffer();
-        }
-    }
-
-    static HttpManager setupHttpManager(String pathPrefix, VirtualFileSystem fs, Consumer<Request> requestEventListener) {
-        return new HttpManagerBuilder() {{
-            setResourceFactory(new VfsBackedMiltonResourceFactory(pathPrefix, fs));
+    public WebDAVApp(String pathPrefix, Services svc) {
+        httpManager =  new HttpManagerBuilder() {{
+            setResourceFactory(new VfsBackedMiltonResourceFactory(pathPrefix, svc.getFileSystem()));
             setMultiNamespaceCustomPropertySourceEnabled(true);
             setAuthenticationService(new AuthenticationService(singletonList(new SaturnAuthenticationHandler())));
             setValueWriters(new NullSafeValueWriters());
@@ -79,9 +58,25 @@ public class MiltonWebDAVServlet extends HttpServlet {
                 }
             });
 
-            if(requestEventListener != null) {
-                eventManager.registerEventListener(e -> requestEventListener.accept(((RequestEvent) e).getRequest()), RequestEvent.class);
-            }
+            var requestEventListener = new WebdavEventEmitter(svc.getEventService());
+            eventManager.registerEventListener(e -> requestEventListener.accept(((RequestEvent) e).getRequest()), RequestEvent.class);
         }}.buildHttpManager();
+    }
+
+    @Override
+    public void init() {
+        before("/webdav/*", (req, res) -> {
+            var servletRequest = (HttpServletRequest) req.raw();
+            var servletResponse = (HttpServletResponse) res.raw();
+
+            try {
+                setThreadlocals(servletRequest, servletResponse);
+                httpManager.process(new ServletRequest(servletRequest, servletRequest.getServletContext()), new ServletResponse(servletResponse));
+            } finally {
+                clearThreadlocals();
+                servletResponse.getOutputStream().flush();
+                servletResponse.flushBuffer();
+            }
+        });
     }
 }

@@ -110,7 +110,7 @@ Currently a collection has the following fields, all represented as strings:
 
  ### File storage API
  
- A file storage API is exposed via the WebDAV protocol. It runs on `:8080/webdav/v1/`. All visible collections in the system are exposed as top-level directories.
+ A file storage API is exposed via the WebDAV protocol. It runs on `:8080/api/v1/webdav/`. All visible collections in the system are exposed as top-level directories.
  Creating a top-level directory via WebDAV will result in an error message.
 
 ## How to build

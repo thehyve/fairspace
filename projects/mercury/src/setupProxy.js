@@ -19,5 +19,5 @@ module.exports = (app) => {
     }));
 
     app.use(proxy('/api/v1', {target: BACKEND_URL}));
-    app.use(proxy('/webdav/v1', {target: BACKEND_URL}));
+    app.use(proxy('/api/v1/webdav', {target: BACKEND_URL}));
 };
