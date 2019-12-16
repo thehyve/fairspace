@@ -73,10 +73,7 @@ dependencies {
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation group: 'com.mockrunner', name: 'mockrunner', version: '2.0.1', ext: 'pom'
-    testImplementation(group: 'com.mockrunner', name: 'mockrunner-servlet', version: '2.0.1') {
-        exclude group: 'org.apache.tomcat'
-    }
+
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 
