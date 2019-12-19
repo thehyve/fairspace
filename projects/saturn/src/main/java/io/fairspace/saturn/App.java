@@ -25,7 +25,6 @@ public class App {
         var svc = new Services(CONFIG, ds, () -> getThreadContext().getUserInfo());
 
         var apiPathPrefix = "/api/" + API_VERSION;
-        var webDavPathPrefix = "/webdav/" + API_VERSION + "/";
         FusekiServer.create()
                 .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
                 .add(apiPathPrefix + "/rdf/", ds, false)
