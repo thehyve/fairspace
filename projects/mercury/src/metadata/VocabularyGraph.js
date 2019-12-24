@@ -1,15 +1,19 @@
 import React, {useCallback, useContext, useState} from "react";
 import {withRouter} from "react-router-dom";
-import {LoadingInlay, MessageDisplay, useAsync} from "@fairspace/shared-frontend";
-import {Grid, RadioGroup, FormControlLabel, Radio, Checkbox} from "@material-ui/core";
+import {Checkbox, FormControlLabel, Grid, Radio, RadioGroup} from "@material-ui/core";
 import {uniqBy} from 'lodash';
 
+import {LoadingInlay, MessageDisplay, useAsync} from "../common";
 import {VocabularyAPI} from "./LinkedDataAPI";
-import NetworkGraphVisualization, {EDGE_LENGTH_SMALL, EDGE_LENGTH_MEDIUM, EDGE_LENGTH_LARGE} from "../common/components/NetworkGraphVisualization";
+import NetworkGraphVisualization, {
+    EDGE_LENGTH_LARGE,
+    EDGE_LENGTH_MEDIUM,
+    EDGE_LENGTH_SMALL
+} from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
 import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_CLASS} from "../constants";
-import {determineShapeForTypes, determinePropertyShapesForTypes} from "../common/utils/linkeddata/vocabularyUtils";
+import {determinePropertyShapesForTypes, determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
 

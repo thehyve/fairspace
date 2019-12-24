@@ -49,6 +49,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
                     setLoading(false);
                 });
         }
+        return null;
     }, [fetchLinkedDataForSubject, shapes, subject]);
 
     useEffect(() => {

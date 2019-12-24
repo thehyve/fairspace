@@ -9,6 +9,6 @@
     "coordinator": "coordinator"
   },
   "elasticsearch": {
-    "host": "http://localhost:3000/api/v1/search"
+    "host": "http://localhost:9200"
   }
 }

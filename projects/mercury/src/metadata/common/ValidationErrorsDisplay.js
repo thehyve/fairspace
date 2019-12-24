@@ -1,8 +1,14 @@
 import React from 'react';
 import {
-    Table, TableBody, TableHead, TableRow,
-    TableCell, Typography, ExpansionPanel,
-    ExpansionPanelSummary, ExpansionPanelDetails
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Typography
 } from "@material-ui/core";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 

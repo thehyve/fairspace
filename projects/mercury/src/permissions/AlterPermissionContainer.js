@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {UsersContext} from '@fairspace/shared-frontend';
+import {UsersContext} from '../common';
 
 import AlterPermissionDialog from "./AlterPermissionDialog";
 import PermissionContext from "../common/contexts/PermissionContext";

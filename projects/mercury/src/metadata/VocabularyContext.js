@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {VocabularyAPI} from './LinkedDataAPI';
 import {getFirstPredicateProperty} from '../common/utils/linkeddata/jsonLdUtils';
-import {SHACL_PATH, SHACL_TARGET_CLASS, SHACL_NAMESPACE} from '../constants';
+import {SHACL_NAMESPACE, SHACL_PATH, SHACL_TARGET_CLASS} from '../constants';
 
 const VocabularyContext = React.createContext();
 

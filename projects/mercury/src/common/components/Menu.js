@@ -1,6 +1,6 @@
 import React from 'react';
-import {withRouter, NavLink} from "react-router-dom";
-import {List, ListItem, ListItemIcon, ListItemText, Divider, Icon} from "@material-ui/core";
+import {NavLink, withRouter} from "react-router-dom";
+import {Divider, Icon, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 
 import Config from '../services/Config';
 

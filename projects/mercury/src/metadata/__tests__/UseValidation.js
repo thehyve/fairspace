@@ -1,5 +1,5 @@
 import {act} from 'react-dom/test-utils';
-import {testHook} from "@fairspace/shared-frontend";
+import {testHook} from "../../common";
 import useValidation from "../UseValidation";
 import {SHACL_MIN_COUNT} from "../../constants";
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Card, CardContent, CardHeader, Icon, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {ConfirmationDialog, LoadingInlay} from '@fairspace/shared-frontend';
+import {ConfirmationDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
 import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";

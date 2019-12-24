@@ -1,9 +1,9 @@
-import {useState, useContext} from "react";
+import {useContext, useState} from "react";
 import useIsMounted from "react-is-mounted-hook";
-import {ErrorDialog} from "@fairspace/shared-frontend";
+import {ErrorDialog} from "../common";
 
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
-import {partitionErrors, getNamespacedIri} from "../common/utils/linkeddata/metadataUtils";
+import {getNamespacedIri, partitionErrors} from "../common/utils/linkeddata/metadataUtils";
 import VocabularyContext from "./VocabularyContext";
 import {getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
 

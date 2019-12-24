@@ -1,13 +1,18 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
 import {
-    Paper, Table, TableBody,
-    TableCell, TableHead, TableRow, withStyles
-} from '@material-ui/core';
-import {LoadingInlay, MessageDisplay, SearchResultHighlights, getSearchQueryFromString, SORT_DATE_CREATED, handleSearchError, SearchAPI} from '@fairspace/shared-frontend';
+    getSearchQueryFromString,
+    handleSearchError,
+    LoadingInlay,
+    MessageDisplay,
+    SearchAPI,
+    SearchResultHighlights,
+    SORT_DATE_CREATED
+} from '../common';
 
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, ES_INDEX, SEARCH_MAX_SIZE} from "../constants";
+import {COLLECTION_URI, DIRECTORY_URI, ES_INDEX, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import Config from '../common/services/Config';
 import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
 import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';

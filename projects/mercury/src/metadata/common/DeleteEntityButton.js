@@ -2,7 +2,7 @@ import React, {useContext, useState} from 'react';
 import {IconButton} from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
 import useIsMounted from "react-is-mounted-hook";
-import {ConfirmationButton, ErrorDialog} from "@fairspace/shared-frontend";
+import {ConfirmationButton, ErrorDialog} from "../../common";
 import {ProgressButton} from '../../common/components';
 import LinkedDataContext from "../LinkedDataContext";
 

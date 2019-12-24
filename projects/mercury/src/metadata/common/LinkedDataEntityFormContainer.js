@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid} from "@material-ui/core";
-import {ConfirmationDialog} from '@fairspace/shared-frontend';
+import {ConfirmationDialog} from '../../common';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from '../UseFormData';

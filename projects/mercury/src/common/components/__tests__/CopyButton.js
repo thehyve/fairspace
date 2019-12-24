@@ -1,8 +1,7 @@
 import React from 'react';
 import {act} from 'react-dom/test-utils';
-import {render, fireEvent} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-
 // eslint-disable-next-line jest/no-mocks-import
 import '../__mocks__/clipboard.mock';
 import CopyButton from "../CopyButton";

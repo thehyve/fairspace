@@ -1,4 +1,4 @@
-import {isNonEmptyValue} from '@fairspace/shared-frontend';
+import {isNonEmptyValue} from '..';
 
 import {getFirstPredicateValue} from "./linkeddata/jsonLdUtils";
 import * as constants from "../../constants";

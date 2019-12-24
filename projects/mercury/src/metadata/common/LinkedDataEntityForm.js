@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {List, ListItem} from '@material-ui/core';
-import {LoadingInlay, MessageDisplay, compareBy, comparing} from '@fairspace/shared-frontend';
+import {compareBy, comparing, LoadingInlay, MessageDisplay} from '../../common';
 
 import LinkedDataProperty from "./LinkedDataProperty";
 import {hasValue, shouldPropertyBeHidden} from "../../common/utils/linkeddata/metadataUtils";

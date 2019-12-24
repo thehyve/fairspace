@@ -9,9 +9,9 @@ import {
     ListItem,
     ListItemText
 } from "@material-ui/core";
-import {LoadingInlay, compareBy} from '@fairspace/shared-frontend';
-
 import * as PropTypes from "prop-types";
+import {compareBy, LoadingInlay} from '../../common';
+
 import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";
 import * as consts from "../../constants";

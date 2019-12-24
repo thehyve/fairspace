@@ -1,4 +1,4 @@
-import {compareBy, comparing} from '@fairspace/shared-frontend';
+import {compareBy, comparing} from "..";
 
 export const AccessRights = ['Read', 'Write', 'Manage'];
 

@@ -1,5 +1,5 @@
 import _, {mapValues} from 'lodash';
-import {isNonEmptyValue} from '@fairspace/shared-frontend';
+import {isNonEmptyValue} from "../..";
 
 import * as consts from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";

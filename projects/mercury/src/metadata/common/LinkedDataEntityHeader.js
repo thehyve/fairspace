@@ -5,7 +5,12 @@ import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui
 import IriTooltip from "../../common/components/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {
-    COLLECTION_URI, DATE_DELETED_URI, DIRECTORY_URI, FILE_PATH_URI, FILE_URI, FIXED_SHAPE_URI
+    COLLECTION_URI,
+    DATE_DELETED_URI,
+    DIRECTORY_URI,
+    FILE_PATH_URI,
+    FILE_URI,
+    FIXED_SHAPE_URI
 } from "../../constants";
 import DeleteEntityButton from "./DeleteEntityButton";
 import CopyButton from "../../common/components/CopyButton";

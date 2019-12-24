@@ -5,8 +5,15 @@ import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import useIsMounted from "react-is-mounted-hook";
 import {
-    ErrorDialog, Footer, Layout, LoadingInlay, LogoutContextProvider, UserProvider, UsersProvider, VersionProvider
-} from '@fairspace/shared-frontend';
+    ErrorDialog,
+    Footer,
+    Layout,
+    LoadingInlay,
+    LogoutContextProvider,
+    UserProvider,
+    UsersProvider,
+    VersionProvider
+} from './common';
 
 import Config from "./common/services/Config";
 import theme from './App.theme';

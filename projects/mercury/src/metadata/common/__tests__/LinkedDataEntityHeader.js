@@ -5,7 +5,13 @@ import {mount} from "enzyme";
 import LinkedDataEntityHeader from "../LinkedDataEntityHeader";
 import DeleteEntityButton from "../DeleteEntityButton";
 import {
-    COLLECTION_URI, CREATED_BY_URI, DATE_DELETED_URI, DELETED_BY_URI, DIRECTORY_URI, FILE_URI, FIXED_SHAPE_URI
+    COLLECTION_URI,
+    CREATED_BY_URI,
+    DATE_DELETED_URI,
+    DELETED_BY_URI,
+    DIRECTORY_URI,
+    FILE_URI,
+    FIXED_SHAPE_URI
 } from "../../../constants";
 import VocabularyContext from '../../VocabularyContext';
 

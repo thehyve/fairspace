@@ -1,5 +1,5 @@
 import React from 'react';
-import {SearchAPI, SORT_DATE_CREATED, handleSearchError} from '@fairspace/shared-frontend';
+import {handleSearchError, SearchAPI, SORT_DATE_CREATED} from '../common';
 
 import StringValue from "./common/values/StringValue";
 import {ES_INDEX} from '../constants';

@@ -1,6 +1,5 @@
-import React, {useContext, useCallback} from 'react';
-import {UserContext} from '@fairspace/shared-frontend';
-
+import React, {useCallback, useContext} from 'react';
+import {UserContext} from '../common';
 // Utils
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other

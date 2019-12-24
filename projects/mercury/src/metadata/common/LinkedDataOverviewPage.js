@@ -1,9 +1,9 @@
-import React, {useContext, useState, useEffect, useCallback} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {Grid} from "@material-ui/core";
 import ToggleButton from '@material-ui/lab/ToggleButton';
-import {BreadCrumbs, usePageTitleUpdater} from '@fairspace/shared-frontend';
+import {BreadCrumbs, usePageTitleUpdater} from '../../common';
 
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';

@@ -4,7 +4,10 @@ import {mount} from "enzyme";
 import {act} from "@testing-library/react";
 import UploadsContext, {
     UPLOAD_STATUS_ERROR,
-    UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL, UploadsProvider
+    UPLOAD_STATUS_FINISHED,
+    UPLOAD_STATUS_IN_PROGRESS,
+    UPLOAD_STATUS_INITIAL,
+    UploadsProvider
 } from "../UploadsContext";
 
 const getUploadsProviderValue = props => {

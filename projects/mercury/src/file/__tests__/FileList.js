@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {render, cleanup, fireEvent} from '@testing-library/react';
+import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import FileList from '../FileList';

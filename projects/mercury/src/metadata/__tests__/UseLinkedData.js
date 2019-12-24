@@ -1,8 +1,6 @@
 import {renderHook} from "@testing-library/react-hooks";
 import {useLinkedDataNoContext} from '../UseLinkedData';
-import {
-    COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS
-} from '../../constants';
+import {COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS} from '../../constants';
 
 describe('useLinkedData', () => {
     const defaultJsonLd = [{

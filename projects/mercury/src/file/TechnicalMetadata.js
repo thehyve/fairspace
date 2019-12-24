@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import {List, ListItem, ListItemText} from "@material-ui/core";
 import filesize from "filesize";
-import {isNonEmptyValue, formatDateTime} from '@fairspace/shared-frontend';
+import {formatDateTime, isNonEmptyValue} from '../common';
 
 const ItemData = ({primary, secondary}) => (primary && secondary ? (
     <ListItem disableGutters style={{paddingTop: 4, paddingBottom: 4}}>

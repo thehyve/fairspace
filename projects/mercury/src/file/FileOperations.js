@@ -1,10 +1,10 @@
-import React, {useState, useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Badge, Icon, IconButton} from "@material-ui/core";
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
-import {ConfirmationButton, ErrorDialog} from "@fairspace/shared-frontend";
+import {ConfirmationButton, ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";

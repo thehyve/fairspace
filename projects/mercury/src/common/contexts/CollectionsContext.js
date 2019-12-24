@@ -1,5 +1,5 @@
 import React from 'react';
-import {useAsync} from '@fairspace/shared-frontend';
+import {useAsync} from '../hooks';
 import CollectionAPI from "../../collections/CollectionAPI";
 
 const CollectionsContext = React.createContext({});

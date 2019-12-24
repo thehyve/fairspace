@@ -1,7 +1,7 @@
 import React from 'react';
-import {shallow, mount} from 'enzyme';
+import {mount, shallow} from 'enzyme';
 import {act} from 'react-dom/test-utils';
-import {MessageDisplay} from '@fairspace/shared-frontend';
+import {MessageDisplay} from '../../common';
 
 import {SearchPage, SearchPageContainer} from '../SearchPage';
 

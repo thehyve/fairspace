@@ -1,13 +1,25 @@
 import React from 'react';
 import {
-    Grid, Icon, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow
+    Grid,
+    Icon,
+    LinearProgress,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TablePagination,
+    TableRow
 } from "@material-ui/core";
 import Dropzone from "react-dropzone";
 import filesize from "filesize";
-import {usePagination} from '@fairspace/shared-frontend';
+import {usePagination} from '../common';
 
 import {
-    UPLOAD_STATUS_ERROR, UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UPLOAD_STATUS_INITIAL
+    UPLOAD_STATUS_ERROR,
+    UPLOAD_STATUS_FINISHED,
+    UPLOAD_STATUS_IN_PROGRESS,
+    UPLOAD_STATUS_INITIAL
 } from "../common/contexts/UploadsContext";
 
 const ROWS_PER_PAGE = [5, 10, 25];

@@ -1,7 +1,7 @@
 import React from 'react';
 import {mount, shallow} from "enzyme";
 import {MemoryRouter} from "react-router-dom";
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay} from '../../common';
 
 import CollectionsContext from "../../common/contexts/CollectionsContext";
 import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";

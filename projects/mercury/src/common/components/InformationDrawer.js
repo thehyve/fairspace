@@ -1,12 +1,17 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {
-    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid, Typography, withStyles
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
+    Grid,
+    Typography,
+    withStyles
 } from '@material-ui/core';
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from "react-router-dom";
-import {ErrorDialog, MessageDisplay, UsersContext} from '@fairspace/shared-frontend';
+import {ErrorDialog, MessageDisplay, UsersContext} from '..';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "../../collections/CollectionDetails";

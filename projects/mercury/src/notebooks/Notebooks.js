@@ -7,7 +7,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core";
-import {BreadCrumbs, BreadcrumbsContext} from "@fairspace/shared-frontend";
+import {BreadCrumbs, BreadcrumbsContext} from "../common";
 
 import Config from "../common/services/Config";
 

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {Paper, Grid, Button} from '@material-ui/core';
+import {Button, Grid, Paper} from '@material-ui/core';
 
 import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';

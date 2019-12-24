@@ -1,8 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
-import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
 import queryString from "query-string";
+import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';

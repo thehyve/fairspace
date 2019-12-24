@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 
-import {UsersContext} from "@fairspace/shared-frontend";
 import {mount} from "enzyme";
 import {act} from "@testing-library/react";
+import {UsersContext} from "..";
 import PermissionContext, {PermissionProvider} from "../PermissionContext";
 
 const defaultPermissions = [

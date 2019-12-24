@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '@fairspace/shared-frontend';
+import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';

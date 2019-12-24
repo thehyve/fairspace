@@ -1,6 +1,6 @@
 import React from 'react';
 import {mount} from "enzyme";
-import {TableHead, TableBody, TableRow, TableCell} from "@material-ui/core";
+import {TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 import LinkedDataList from "../LinkedDataList";
 
 describe('LinkedDataList', () => {

@@ -1,9 +1,21 @@
 import nodeCrypto from "crypto";
 
 import {
-    generateUuid, getLabel, getLocalPart, getNamespacedIri, hasValue, linkLabel, normalizeMetadataResource,
-    partitionErrors, propertiesToShow, relativeLink, shouldPropertyBeHidden,
-    simplifyUriPredicates, url2iri, valuesContainsValueOrId, getTypeInfo
+    generateUuid,
+    getLabel,
+    getLocalPart,
+    getNamespacedIri,
+    getTypeInfo,
+    hasValue,
+    linkLabel,
+    normalizeMetadataResource,
+    partitionErrors,
+    propertiesToShow,
+    relativeLink,
+    shouldPropertyBeHidden,
+    simplifyUriPredicates,
+    url2iri,
+    valuesContainsValueOrId
 } from "../metadataUtils";
 import * as constants from "../../../../constants";
 import {normalizeJsonLdResource} from "../jsonLdUtils";

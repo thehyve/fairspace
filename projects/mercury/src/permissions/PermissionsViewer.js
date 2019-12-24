@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Button, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Menu} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import MoreIcon from '@material-ui/icons/MoreVert';
-import {ConfirmationDialog, LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {ConfirmationDialog, LoadingInlay, MessageDisplay} from '../common';
 
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import {canAlterPermission, sortPermissions} from '../common/utils/permissionUtils';

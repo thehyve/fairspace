@@ -1,5 +1,5 @@
 import React from 'react';
-import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
+import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import WithRightDrawer from "../common/components/WithRightDrawer";
 import RecentActivity from "./RecentActivity";

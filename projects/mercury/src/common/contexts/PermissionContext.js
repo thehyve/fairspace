@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {UsersContext} from '@fairspace/shared-frontend';
+import {UsersContext} from "..";
 
 import PermissionAPI from "../../permissions/PermissionAPI";
 import getDisplayName from "../utils/userUtils";

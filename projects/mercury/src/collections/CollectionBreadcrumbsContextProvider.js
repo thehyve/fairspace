@@ -1,5 +1,5 @@
 import React from "react";
-import {BreadcrumbsContext} from "@fairspace/shared-frontend";
+import {BreadcrumbsContext} from "../common";
 
 export default ({children}) => (
     <BreadcrumbsContext.Provider value={{segments: [

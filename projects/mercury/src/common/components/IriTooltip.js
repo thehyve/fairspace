@@ -1,5 +1,5 @@
 import React from "react";
-import {withStyles, Tooltip} from "@material-ui/core";
+import {Tooltip, withStyles} from "@material-ui/core";
 
 const styles = theme => ({
     tooltip: {

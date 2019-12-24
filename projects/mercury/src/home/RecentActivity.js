@@ -1,10 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
-import {
-    List, ListItem, ListItemText,
-    ListItemIcon, Icon, Typography, withStyles
-} from "@material-ui/core";
-import {formatDateTime} from '@fairspace/shared-frontend';
+import {Icon, List, ListItem, ListItemIcon, ListItemText, Typography, withStyles} from "@material-ui/core";
+import {formatDateTime} from '../common';
 
 const styles = theme => ({
     listItemIcon: {

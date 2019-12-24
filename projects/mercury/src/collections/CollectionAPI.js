@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {handleHttpError, extractJsonData} from '@fairspace/shared-frontend';
+import {extractJsonData, handleHttpError} from '../common';
 
 import Config from "../common/services/Config";
 

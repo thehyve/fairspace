@@ -1,8 +1,8 @@
-import {compareBy, comparing, flattenShallow, isNonEmptyValue} from '@fairspace/shared-frontend';
+import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../..";
 
 import * as constants from "../../../constants";
 import {getFirstPredicateId, normalizeJsonLdResource} from "./jsonLdUtils";
-import {isRdfList, determineShapeForProperty} from "./vocabularyUtils";
+import {determineShapeForProperty, isRdfList} from "./vocabularyUtils";
 import {simplifyUriPredicates} from "./metadataUtils";
 
 /**

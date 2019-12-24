@@ -1,5 +1,5 @@
 import {useCallback} from "react";
-import {useAsync} from "@fairspace/shared-frontend";
+import {useAsync} from "../common";
 import FileAPI from "./FileAPI";
 import {joinPaths} from "../common/utils/fileUtils";
 

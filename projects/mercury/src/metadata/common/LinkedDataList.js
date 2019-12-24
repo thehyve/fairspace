@@ -1,9 +1,17 @@
 import React from "react";
 import {
-    ListItemText, Paper, Table, TableBody, TableCell, TableFooter,
-    TableHead, TablePagination, TableRow, withStyles,
+    ListItemText,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TablePagination,
+    TableRow,
+    withStyles,
 } from "@material-ui/core";
-import {SearchResultHighlights, LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay, SearchResultHighlights} from '../../common';
 
 import styles from './LinkedDataList.styles';
 import {TOOLTIP_ENTER_DELAY} from "../../constants";

@@ -1,5 +1,5 @@
 import React from 'react';
-import {BreadcrumbsContext} from "@fairspace/shared-frontend";
+import {BreadcrumbsContext} from "../common";
 import LinkedDataVocabularyProvider from './LinkedDataVocabularyProvider';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {createShallow, createMount} from '@material-ui/core/test-utils';
+import {createMount, createShallow} from '@material-ui/core/test-utils';
 import {Button} from '@material-ui/core';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";

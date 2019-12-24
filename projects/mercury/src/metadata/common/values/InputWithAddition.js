@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Grid, IconButton} from "@material-ui/core";
 import Add from '@material-ui/icons/Add';
-import {LoadingInlay, MessageDisplay} from '@fairspace/shared-frontend';
+import {LoadingInlay, MessageDisplay} from '../../../common';
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import {normalizeMetadataResource, simplifyUriPredicates} from "../../../common/utils/linkeddata/metadataUtils";

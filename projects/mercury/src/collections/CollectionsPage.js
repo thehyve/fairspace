@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import Grid from '@material-ui/core/Grid';
-import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
+import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";

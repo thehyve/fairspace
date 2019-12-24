@@ -1,12 +1,12 @@
 import * as constants from "../../../constants";
 import {
+    iriValidation,
+    maxCountValidation,
     maxLengthValidation,
     minCountValidation,
-    maxCountValidation,
-    validateValuesAgainstShape,
-    removeWhitespaceValues,
     pushNonEmpty,
-    iriValidation
+    removeWhitespaceValues,
+    validateValuesAgainstShape
 } from '../validationUtils';
 
 describe('Validation Utils', () => {

@@ -1,7 +1,19 @@
 import {
-    extendPropertiesWithVocabularyEditingInfo, getMaxCount, getSystemProperties, isGenericIriResource, isRdfList,
-    isRelationShape, getClassesInCatalog, getLabelForPredicate, determineShapeForProperty, getChildSubclasses,
-    getDescendants, getNamespaces, determinePropertyShapesForTypes, getProperties, contains,
+    contains,
+    determinePropertyShapesForTypes,
+    determineShapeForProperty,
+    extendPropertiesWithVocabularyEditingInfo,
+    getChildSubclasses,
+    getClassesInCatalog,
+    getDescendants,
+    getLabelForPredicate,
+    getMaxCount,
+    getNamespaces,
+    getProperties,
+    getSystemProperties,
+    isGenericIriResource,
+    isRdfList,
+    isRelationShape,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from '../test.vocabulary.json';
 import * as constants from "../../../../constants";

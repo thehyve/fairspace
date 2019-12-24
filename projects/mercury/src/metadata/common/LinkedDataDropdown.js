@@ -1,10 +1,10 @@
 import React, {useContext, useRef} from 'react';
 import {PropTypes} from 'prop-types';
-import {LoadingInlay, MessageDisplay, SearchAPI, handleSearchError, SORT_ALPHABETICALLY} from '@fairspace/shared-frontend';
+import {handleSearchError, LoadingInlay, MessageDisplay, SearchAPI, SORT_ALPHABETICALLY} from '../../common';
 
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
-import {SEARCH_DROPDOWN_DEFAULT_SIZE, ES_INDEX} from "../../constants";
+import {ES_INDEX, SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
 import LinkedDataContext from "../LinkedDataContext";
 import Config from "../../common/services/Config";
 import {getDescendants} from '../../common/utils/linkeddata/vocabularyUtils';

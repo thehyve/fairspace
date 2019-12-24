@@ -2,7 +2,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
 
-import {IconButton, Button} from "@material-ui/core";
+import {Button, IconButton} from "@material-ui/core";
 import PermissionsViewer from "../PermissionsViewer";
 
 const testRenderingCollaborators = (wrapper) => {

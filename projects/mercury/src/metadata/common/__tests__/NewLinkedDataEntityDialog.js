@@ -1,5 +1,5 @@
 import React from 'react';
-import {render, fireEvent} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 import '@testing-library/jest-dom/extend-expect';
 import {MemoryRouter} from "react-router-dom";

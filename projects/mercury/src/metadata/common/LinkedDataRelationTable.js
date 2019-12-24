@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
-import {compareBy, joinWithSeparator} from '@fairspace/shared-frontend';
+import {compareBy, joinWithSeparator} from '../../common';
 
 import {SHACL_NAME, SHACL_ORDER, SHACL_PATH, TOOLTIP_ENTER_DELAY} from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";

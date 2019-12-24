@@ -1,9 +1,15 @@
 import React, {useContext, useState} from "react";
 import PropTypes from 'prop-types';
 import {
-    Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Typography
 } from "@material-ui/core";
-import {ConfirmationDialog} from '@fairspace/shared-frontend';
+import {ConfirmationDialog} from '../../common';
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../common/utils/linkeddata/metadataUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";

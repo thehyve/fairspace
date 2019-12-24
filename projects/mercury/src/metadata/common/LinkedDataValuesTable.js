@@ -1,9 +1,6 @@
 import React, {useState} from 'react';
 import PropTypes from "prop-types";
-import {
-    Table, TableBody, TableCell, TableHead, TableRow,
-    TableFooter, withStyles, IconButton
-} from '@material-ui/core';
+import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, withStyles} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
 import {canDelete} from "../../common/utils/linkeddata/metadataUtils";

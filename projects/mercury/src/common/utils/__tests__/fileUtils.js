@@ -1,6 +1,9 @@
 import {
-    getFileName, getDirectoryFromFullpath,
-    getParentPath, generateUniqueFileName, getBaseNameAndExtension,
+    generateUniqueFileName,
+    getBaseNameAndExtension,
+    getDirectoryFromFullpath,
+    getFileName,
+    getParentPath,
     getPathInfoFromParams
 } from '../fileUtils';
 

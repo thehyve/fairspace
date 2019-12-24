@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {TextField} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {compareBy} from '@fairspace/shared-frontend';
 import useIsMounted from 'react-is-mounted-hook';
+import {compareBy} from '../../../common';
 
 const Dropdown = ({
     options, clearTextOnSelection = true, placeholder, async,

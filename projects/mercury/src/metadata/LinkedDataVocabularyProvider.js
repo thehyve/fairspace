@@ -1,9 +1,14 @@
-import React, {useContext, useEffect, useCallback} from 'react';
-import {UserContext} from '@fairspace/shared-frontend';
-
+import React, {useCallback, useContext, useEffect} from 'react';
+import {UserContext} from '../common';
 // Utils
-import {isDataSteward, isCoordinator} from "../common/utils/userUtils";
-import {extendPropertiesWithVocabularyEditingInfo, getSystemProperties, isFixedShape, getShape, getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
+import {isCoordinator, isDataSteward} from "../common/utils/userUtils";
+import {
+    extendPropertiesWithVocabularyEditingInfo,
+    getNamespaces,
+    getShape,
+    getSystemProperties,
+    isFixedShape
+} from "../common/utils/linkeddata/vocabularyUtils";
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
