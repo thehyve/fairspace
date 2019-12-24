@@ -10,7 +10,7 @@ app.use(proxy(['/api/keycloak'], {
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/ci'}
 }));
 
-app.use(proxy(['/api/v1/search/fairspace/_search/'], {
+app.use(proxy(['/api/v1/search/fairspace/_search'], {
     target: 'http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200',
     pathRewrite: {'^/api/v1/search/fairspace/_search/': '/workspace-ci/_search'}
 }));
