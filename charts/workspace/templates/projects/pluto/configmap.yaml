@@ -61,17 +61,6 @@ data:
         # The elasticsearch route must be defined before
         # saturn, which must be defined before ui, because of the
         # paths they listen to
-        elasticsearch:
-          # The path contains 'fairspace' in the url, wheres the upstream url contain
-          # the actual index name. This allows the clients to be unaware of the specific
-          # index name and just use 'fairspace'
-          path: /api/${app.apiVersion.elasticSearch}/search/fairspace/_search/**
-          url: {{ template "elasticsearch.resturl" . }}
-          strip-prefix: true
-        keycloak:
-          path: /api/keycloak/**
-          url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}
-          strip-prefix: true
         ui:
           path: /**
           url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
