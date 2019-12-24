@@ -32,7 +32,7 @@ spec:
         - containerPort: {{ .Values.mercury.service.internalPort }}
         volumeMounts:
           - name: config-storage
-            mountPath: /usr/share/nginx/html/config/
+            mountPath: /usr/src/client/config/
         livenessProbe:
           httpGet:
             path: {{ .Values.mercury.probePath }}

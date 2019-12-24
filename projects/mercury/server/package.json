@@ -1,0 +1,12 @@
+{
+  "name": "organisation-portal-server",
+  "version": "0.0.0-RELEASEVERSION",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^0.20.0"
+  }
+}

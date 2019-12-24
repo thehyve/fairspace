@@ -8,7 +8,7 @@
     "server": "wait-on http://localhost:9200/ && cd ../saturn/ && ./gradlew run",
     "elasticsearch": "./start-elasticsearch",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && cd server && npm install",
     "test": "react-scripts test --env=jsdom",
     "test:coverage": "react-scripts test --env=jsdom --coverage --watchAll=false",
     "eject": "react-scripts eject",
