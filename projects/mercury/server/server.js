@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(proxy(['/api/keycloak'], {
-    target: 'https://keycloak.ci.fairway.app',
+    target: 'http://hyperspace-ci-keycloak.hyperspace-ci.svc.cluster.local',
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/ci'}
 }));
 
