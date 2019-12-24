@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(proxy('/api/keycloak', {
-    target: 'https://keycloak.ci.fairway.app/auth/admin/realms/ci/users',
+    target: 'https://keycloak.ci.fairway.app',
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/ci'},
     changeOrigin: true
 }));
