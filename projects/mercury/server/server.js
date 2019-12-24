@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-// const proxy = require('http-proxy-middleware');
+const proxy = require('http-proxy-middleware');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -15,7 +15,7 @@ const port = process.env.PORT || 5000;
 //     pathRewrite: {'^/api/v1/search/fairspace/_search/': '/workspace-ci/_search'}
 // }));
 //
-// app.use(proxy(['/api/v1'], {target: 'http://workspace-ci-saturn.workspace-ci.svc.cluster.local'}));
+app.use(proxy(['/api/v1'], {target: 'http://workspace-ci-saturn.workspace-ci.svc.cluster.local'}));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');
 // Serve any static files

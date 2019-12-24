@@ -72,14 +72,6 @@ data:
           path: /api/keycloak/**
           url: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}
           strip-prefix: true
-        storage:
-          path: /api/${app.apiVersion.saturn}/webdav/**
-          strip-prefix: false
-          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
-        saturn:
-          path: /api/${app.apiVersion.saturn}/**
-          strip-prefix: false
-          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
         ui:
           path: /**
           url: {{ .Values.pluto.backends.ui | default (printf "http://%s-mercury.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
