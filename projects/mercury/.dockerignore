@@ -1,7 +1,7 @@
 draft.toml
 charts/
 node_modules/
-server/
+mock-server/
 NOTICE
 LICENSE
 README.md
