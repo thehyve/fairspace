@@ -45,7 +45,7 @@ app.use(session({
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
-app.use('/**', keycloak.protect(), (res, req, next) => next());
+//app.use('/**', keycloak.protect(), (res, req, next) => next());
 
 const {workspaces} = config.urls;
 
