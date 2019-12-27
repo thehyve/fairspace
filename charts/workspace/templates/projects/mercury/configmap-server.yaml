@@ -13,5 +13,5 @@ data:
         elasticsearch:
           {{ template "elasticsearch.baseurl" . }}
         workspaces:
-          {{ toYaml .Values.mercury.workspaces | indent 6 }}
+          {{ toYaml .Values.mercury.workspaces }}
 
