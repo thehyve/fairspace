@@ -1,0 +1,7 @@
+urls:
+  workspaces:
+    - http://localhost:8080
+  elasticsearch: http://localhost:9200
+  keycloak: http://localhost:5000
+keycloak:
+  realm: ci

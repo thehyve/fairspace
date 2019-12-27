@@ -8,9 +8,12 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 8081;
 
-const configPath = path.join(__dirname, 'config', 'config.yaml');
-const devConfig = {urls: {workspaces: ['http://localhost:8080'], elasticsearch: 'http://localhost:9200'}};
-const config = fs.existsSync(configPath) ? YAML.parse(fs.readFileSync(configPath, 'utf8')) : devConfig;
+let configPath = path.join(__dirname, 'config', 'config.yaml');
+if (!fs.existsSync(configPath)) {
+    configPath = path.join(__dirname, 'devconfig.yaml');
+}
+
+const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 const {workspaces} = config.urls;
 
 const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/')
@@ -20,13 +23,17 @@ const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1
     .then(responses => responses.reduce((x, y) => [...x, ...y], []));
 
 // TODO: implement
-const projectNameByPath = (url) => "project1";
+const projectNameByPath = (url) => "Project1";
 
 const workspaceByPath = (url) => {
     const project = projectNameByPath(url);
     return allProjects()
         .then(all => all.find(p => p.name === project))
-        .then(p => p && p.workspace);
+        .then(p => p && p.workspace)
+        .then(w => {
+            console.log(w);
+            return w;
+        });
 };
 
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
@@ -36,8 +43,8 @@ app.get('/api/v1/projects', (req, res) => allProjects().then(all => res.send(all
 
 
 app.use(proxy('/api/keycloak', {
-    target: 'https://keycloak.ci.fairway.app',
-    pathRewrite: {'^/api/keycloak': '/auth/admin/realms/ci'},
+    target: config.urls.keycloak,
+    pathRewrite: {'^/api/keycloak': '/auth/admin/realms/' + config.keycloak.realm},
     changeOrigin: true
 }));
 
@@ -46,9 +53,15 @@ app.use(proxy('/api/v1/search', {
     pathRewrite: {'^/api/v1/search/': '/'}
 }));
 
+app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path)
+    .then(target => {
+        req.target = target;
+        next();
+    }));
+
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
-    router: req => workspaceByPath(req.path)
+    router: req => req.target
 }));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');
