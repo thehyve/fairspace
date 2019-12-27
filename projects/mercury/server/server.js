@@ -27,6 +27,7 @@ const keycloak = new Keycloak(
     {
         'auth-server-url': config.urls.keycloak + '/auth',
         'realm': config.keycloak.realm,
+        'ssl-required': 'external',
         'resource': config.keycloak.clientId,
         'credentials': {
             secret: config.keycloak.clientSecret
