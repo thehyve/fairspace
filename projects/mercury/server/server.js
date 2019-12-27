@@ -77,9 +77,9 @@ app.use(proxy('/api/keycloak', {
     changeOrigin: true
 }));
 
-app.use(proxy('/api/v1/search', {
+app.use(proxy('/api/v1/search/fairspace/_search', {
     target: config.urls.elasticsearch,
-    pathRewrite: (url) => '/' + projectNameByPath(url)
+    pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
 }));
 
 app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path, req.header('Authorization'))
