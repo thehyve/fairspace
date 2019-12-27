@@ -52,6 +52,7 @@ app.use(proxy('/api/v1/search', {
 app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path)
     .then(target => {
         req.target = target;
+        console.log(`Proxying ${req.path} to ${target}`);
         next();
     }));
 
