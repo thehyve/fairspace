@@ -70,7 +70,8 @@ saturn:
 mercury:
   image:
     pullPolicy: Always
-
+  workspaces:
+    - http://workspace-ci-saturn.workspace-ci.svc.cluster.local
 # Specific settings for Mercury subchart
 docs:
   image:

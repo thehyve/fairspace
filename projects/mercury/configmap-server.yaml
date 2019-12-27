@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ template "mercury.fullname" . }}-server
+    labels:
+        app: mercury
+        chart: {{ template "workspace.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+data:
+    config.json: |-
+        {
+          "urls": {
+            "download": "{{ template "workspace.url" . }}/zuul/api/v1/webdav",
+            "files": "{{ template "storage.url" . }}/api/v1/webdav"
+            {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
+            {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
+          },
+          "roles": {
+            "user": "{{ template "workspace.roles.user" . }}",
+            "dataSteward": "{{ template "workspace.roles.datasteward" . }}",
+            "coordinator": "{{ template "workspace.roles.coordinator" . }}"
+          },
+          "enableExperimentalFeatures": {{ .Values.workspace.enableExperimentalFeatures }}
+        }
+    version.json: |-
+        {
+          "id": "{{ .Release.Name }}",
+          "name": "{{ .Values.workspace.name }}",
+          "version": "{{ .Chart.Version }}",
+          "description": "{{ .Values.workspace.description }}"
+        }

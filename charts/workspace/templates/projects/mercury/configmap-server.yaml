@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ template "mercury.fullname" . }}-server
+    labels:
+        app: mercury
+        chart: {{ template "workspace.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+data:
+    config.yaml: |-
+      urls:
+        elasticsearch:
+          {{ template "elasticsearch.baseurl" . }}
+        workspaces:
+          {{ toYaml .Values.mercury.workspaces | indent 6 }}
+

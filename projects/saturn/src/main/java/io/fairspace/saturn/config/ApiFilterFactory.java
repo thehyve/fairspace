@@ -5,6 +5,7 @@ import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
 import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
+import io.fairspace.saturn.services.projects.ProjectsApp;
 import io.fairspace.saturn.services.users.UserApp;
 import io.fairspace.saturn.webdav.WebDAVApp;
 
@@ -20,6 +21,7 @@ public class ApiFilterFactory {
                 new PermissionsApp("/permissions", svc.getPermissionsService()),
                 new UserApp("/users", svc.getUserService()),
                 new WebDAVApp(apiPathPrefix + "/webdav/", svc),
-                new HealthApp("/health"));
+                new HealthApp("/health"),
+                new ProjectsApp("/projects"));
     }
 }

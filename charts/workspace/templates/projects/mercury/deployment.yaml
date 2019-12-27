@@ -31,8 +31,10 @@ spec:
         ports:
         - containerPort: {{ .Values.mercury.service.internalPort }}
         volumeMounts:
-          - name: config-storage
+          - name: client-config-storage
             mountPath: /usr/src/client/config/
+          - name: server-config-storage
+            mountPath: /usr/src/server/config/
         livenessProbe:
           httpGet:
             path: {{ .Values.mercury.probePath }}
@@ -56,6 +58,9 @@ spec:
 {{ toYaml . | indent 8 }}
       {{- end }}
       volumes:
-      - name: config-storage
+      - name: client-config-storage
         configMap:
-          name: {{ template "mercury.fullname" . }}
+          name: {{ template "mercury.fullname" . }}-client
+      - name: server-config-storage
+        configMap:
+          name: {{ template "mercury.fullname" . }}-server

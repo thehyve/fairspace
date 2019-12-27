@@ -122,6 +122,11 @@ Scheme to access workspace components (http or https)
 {{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
 {{- end -}}
 
+{{- define "elasticsearch.baseurl" -}}
+{{- printf "%s://%s:%s/" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) -}}
+{{- end -}}
+
+
 {{- define "elasticsearch.resturl" -}}
 {{- printf "%s://%s:%s/%s/_search" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) .Values.external.elasticsearch.indexName -}}
 {{- end -}}

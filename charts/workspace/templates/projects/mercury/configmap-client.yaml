@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "mercury.fullname" . }}
+  name: {{ template "mercury.fullname" . }}-client
   labels:
     app: mercury
     chart: {{ template "workspace.chart" . }}
