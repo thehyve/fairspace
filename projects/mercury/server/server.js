@@ -42,11 +42,14 @@ app.use(proxy('/api/keycloak', {
 }));
 
 app.use(proxy('/api/v1/search', {
-    target: config.elasticsaerch,
+    target: config.elasticsearch,
     pathRewrite: {'^/api/v1/search/fairspace': '/workspace-ci'}
 }));
 
-app.use(proxy('/api/v1', {router: req => workspaceByPath(req.path)}));
+app.use(proxy('/api/v1', {
+    target: 'http://never.ever',
+    router: req => workspaceByPath(req.path)
+}));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');
 
