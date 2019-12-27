@@ -56,7 +56,7 @@ const allProjects = (auth) => Promise.all(workspaces.map(url => fetch(url + '/ap
     .then(responses => responses.reduce((x, y) => [...x, ...y], []));
 
 // TODO: implement
-const projectNameByPath = (url) => "Project1";
+const projectNameByPath = (url) => "workspace-ci";
 
 const workspaceByPath = (url, auth) => {
     const project = projectNameByPath(url);
@@ -79,7 +79,7 @@ app.use(proxy('/api/keycloak', {
 
 app.use(proxy('/api/v1/search', {
     target: config.urls.elasticsearch,
-    pathRewrite: {'^/api/v1/search/': '/'}
+    pathRewrite: (url) => '/' + projectNameByPath(url)
 }));
 
 app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path, req.header('Authorization'))
