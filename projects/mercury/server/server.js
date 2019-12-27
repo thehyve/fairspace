@@ -9,7 +9,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 const configPath = path.join(__dirname, 'config', 'config.yaml');
-const config = fs.existsSync(configPath) ? YAML.parse(fs.readFileSync()) : {workspaces: ['http://localhost:8080']};
+const devConfig = {workspaces: ['http://localhost:8080'], elasticsearch: 'http://localhost:9200'};
+const config = fs.existsSync(configPath) ? YAML.parse(fs.readFileSync(configPath)) : devConfig;
 const {workspaces} = config;
 
 const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/')
@@ -40,8 +41,8 @@ app.use(proxy('/api/keycloak', {
     changeOrigin: true
 }));
 
-app.use(proxy('/api/v1/search/fairspace', {
-    target: 'http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200',
+app.use(proxy('/api/v1/search', {
+    target: config.elasticsaerch,
     pathRewrite: {'^/api/v1/search/fairspace': '/workspace-ci'}
 }));
 
