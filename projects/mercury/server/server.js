@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 
 const configPath = path.join(__dirname, 'config', 'config.yaml');
 const devConfig = {workspaces: ['http://localhost:8080'], elasticsearch: 'http://localhost:9200'};
-const config = fs.existsSync(configPath) ? YAML.parse(fs.readFileSync(configPath)) : devConfig;
+const config = fs.existsSync(configPath) ? YAML.parse(fs.readFileSync(configPath), 'utf8') : devConfig;
 const {workspaces} = config;
 
 const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/')
@@ -19,15 +19,15 @@ const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1
     .catch(() => [])))
     .then(responses => responses.reduce((x, y) => [...x, ...y], []));
 
-// // TODO: implement
-// const projectNameByPath = (url) => "project1";
-//
-// const workspaceByPath = (url) => {
-//     const project = projectNameByPath(url);
-//     return allProjects()
-//         .then(all => all.find(p => p.name === project))
-//         .then(p => p && p.workspace);
-// };
+// TODO: implement
+const projectNameByPath = (url) => "project1";
+
+const workspaceByPath = (url) => {
+    const project = projectNameByPath(url);
+    return allProjects()
+        .then(all => all.find(p => p.name === project))
+        .then(p => p && p.workspace);
+};
 
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
