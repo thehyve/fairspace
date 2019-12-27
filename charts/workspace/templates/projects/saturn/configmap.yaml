@@ -16,31 +16,7 @@ data:
       vocabularyBaseIRI: http://{{ template "pluto.hostname" . }}/vocabulary/
       datasetPath: "/data/saturn/db"
       storeParams:
-        tdb.file_mode: "mapped"
-        tdb.block_size: 8192
-        tdb.block_read_cache_size: 5000
-        tdb.block_write_cache_size: 1000
-        tdb.node2nodeid_cache_size: 200000
-        tdb.nodeid2node_cache_size: 750000
-        tdb.node_miss_cache_size: 1000
-        tdb.nodetable: "nodes"
-        tdb.triple_index_primary: "SPO"
-        tdb.triple_indexes:
-          - "SPO"
-          - "POS"
-          - "OSP"
-        tdb.quad_index_primary: "GSPO"
-        tdb.quad_indexes:
-          - "GSPO"
-          - "GPOS"
-          - "GOSP"
-          - "POSG"
-          - "OSPG"
-          - "SPOG"
-        tdb.prefixtable: "prefixes"
-        tdb.prefix_index_primary: "GPU"
-        tdb.prefix_indexes:
-          - "GPU"
+{{ toYaml .Values.saturn.storeParams | indent 6 }}
       transactionLogPath: "/data/saturn/files/log"
       maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
       elasticSearch:
