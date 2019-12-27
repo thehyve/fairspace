@@ -123,7 +123,7 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 
 {{- define "elasticsearch.baseurl" -}}
-{{- printf "%s://%s:%s/" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) -}}
+{{- printf "%s://%s:%s" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) -}}
 {{- end -}}
 
 

@@ -10,8 +10,7 @@ metadata:
 data:
     config.yaml: |-
       urls:
-        elasticsearch:
-          {{ template "elasticsearch.baseurl" . }}
+        elasticsearch: {{ template "elasticsearch.baseurl" . }}
         workspaces:
           {{ toYaml .Values.mercury.workspaces }}
 

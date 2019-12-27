@@ -43,7 +43,7 @@ app.use(proxy('/api/keycloak', {
 
 app.use(proxy('/api/v1/search', {
     target: config.elasticsearch,
-    pathRewrite: {'^/api/v1/search/fairspace': '/workspace-ci'}
+    pathRewrite: {'^/api/v1/search/': '/'}
 }));
 
 app.use(proxy('/api/v1', {
