@@ -29,11 +29,7 @@ const workspaceByPath = (url) => {
     const project = projectNameByPath(url);
     return allProjects()
         .then(all => all.find(p => p.name === project))
-        .then(p => p && p.workspace)
-        .then(w => {
-            console.log(w);
-            return w;
-        });
+        .then(p => p && p.workspace);
 };
 
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
