@@ -45,7 +45,7 @@ app.use(session({
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
-//app.use('/**', keycloak.protect(), (res, req, next) => next());
+// app.use('/**', keycloak.protect(), (res, req, next) => next());
 
 const {workspaces} = config.urls;
 
@@ -82,15 +82,9 @@ app.use(proxy('/api/v1/search/fairspace/_search', {
     pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
 }));
 
-app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path, req.header('Authorization'))
-    .then(target => {
-        req.target = target;
-        next();
-    }));
-
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
-    router: req => req.target
+    router: req => workspaceByPath(req.path, req.header('Authorization'))
 }));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');
