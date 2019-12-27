@@ -16,7 +16,7 @@ if (!fs.existsSync(configPath)) {
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 const {workspaces} = config.urls;
 
-const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/')
+const allProjects = (auth) => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/', {headers: {Authorization: auth}})
     .then(response => response.json())
     .then(projects => projects.map(p => ({workspace: url, ...p})))
     .catch(() => [])))
@@ -25,9 +25,9 @@ const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1
 // TODO: implement
 const projectNameByPath = (url) => "Project1";
 
-const workspaceByPath = (url) => {
+const workspaceByPath = (url, auth) => {
     const project = projectNameByPath(url);
-    return allProjects()
+    return allProjects(auth)
         .then(all => all.find(p => p.name === project))
         .then(p => p && p.workspace);
 };
@@ -35,7 +35,7 @@ const workspaceByPath = (url) => {
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
 // All projects from all workspaces
-app.get('/api/v1/projects', (req, res) => allProjects().then(all => res.send(all)));
+app.get('/api/v1/projects', (req, res) => allProjects(req.header('Authorization')).then(all => res.send(all)));
 
 
 app.use(proxy('/api/keycloak', {
@@ -49,7 +49,7 @@ app.use(proxy('/api/v1/search', {
     pathRewrite: {'^/api/v1/search/': '/'}
 }));
 
-app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path)
+app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path, req.header('Authorization'))
     .then(target => {
         req.target = target;
         console.log(`Proxying ${req.path} to ${target}`);
