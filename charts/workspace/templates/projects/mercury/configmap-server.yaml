@@ -10,6 +10,7 @@ metadata:
 data:
     config.yaml: |-
       urls:
+        keycloak: {{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}
         elasticsearch: {{ template "elasticsearch.baseurl" . }}
         workspaces:
           {{ toYaml .Values.mercury.workspaces }}

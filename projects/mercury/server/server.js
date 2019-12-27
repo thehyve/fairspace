@@ -6,12 +6,12 @@ const YAML = require('yaml');
 const fs = require('fs');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8081;
 
 const configPath = path.join(__dirname, 'config', 'config.yaml');
-const devConfig = {workspaces: ['http://localhost:8080'], elasticsearch: 'http://localhost:9200'};
+const devConfig = {urls: {workspaces: ['http://localhost:8080'], elasticsearch: 'http://localhost:9200'}};
 const config = fs.existsSync(configPath) ? YAML.parse(fs.readFileSync(configPath, 'utf8')) : devConfig;
-const {workspaces} = config;
+const {workspaces} = config.urls;
 
 const allProjects = () => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/')
     .then(response => response.json())
@@ -42,7 +42,7 @@ app.use(proxy('/api/keycloak', {
 }));
 
 app.use(proxy('/api/v1/search', {
-    target: config.elasticsearch,
+    target: config.urls.elasticsearch,
     pathRewrite: {'^/api/v1/search/': '/'}
 }));
 
