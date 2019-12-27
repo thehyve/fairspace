@@ -4,6 +4,9 @@ const proxy = require('http-proxy-middleware');
 const fetch = require("node-fetch");
 const YAML = require('yaml');
 const fs = require('fs');
+const Keycloak = require('keycloak-connect');
+const session = require('express-session');
+const cryptoRandomString = require('crypto-random-string');
 
 const app = express();
 const port = process.env.PORT || 8081;
@@ -14,6 +17,35 @@ if (!fs.existsSync(configPath)) {
 }
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
+
+const store = new session.MemoryStore();
+
+const keycloak = new Keycloak(
+    {
+        store
+    },
+    {
+        'auth-server-url': config.urls.keycloak + '/auth',
+        'realm': config.keycloak.realm,
+        'resource': config.keycloak.clientId,
+        'credentials': {
+            secret: config.keycloak.clientSecret
+        },
+        'confidential-port': 0
+    }
+);
+
+app.use(session({
+    secret: cryptoRandomString({length: 32}),
+    resave: false,
+    saveUninitialized: true,
+    store
+}));
+
+app.use(keycloak.middleware({logout: '/logout'}));
+
+app.use('/**', keycloak.protect(), (res, req, next) => next());
+
 const {workspaces} = config.urls;
 
 const allProjects = (auth) => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/', {headers: {Authorization: auth}})
@@ -52,7 +84,6 @@ app.use(proxy('/api/v1/search', {
 app.use('/api/v1/**', (req, res, next) => workspaceByPath(req.path, req.header('Authorization'))
     .then(target => {
         req.target = target;
-        console.log(`Proxying ${req.path} to ${target}`);
         next();
     }));
 
