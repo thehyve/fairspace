@@ -16,7 +16,7 @@ data:
       vocabularyBaseIRI: http://{{ template "pluto.hostname" . }}/vocabulary/
       datasetPath: "/data/saturn/db"
       storeParams:
-{{ toYaml .Values.saturn.storeParams | indent 6 }}
+{{ toYaml .Values.saturn.storeParams | indent 8 }}
       transactionLogPath: "/data/saturn/files/log"
       maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
       elasticSearch:
