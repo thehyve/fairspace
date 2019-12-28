@@ -7,6 +7,7 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
+const NodeCache = require("node-cache");
 
 const app = express();
 const port = process.env.PORT || 8081;
@@ -49,11 +50,36 @@ app.use(keycloak.middleware({logout: '/logout'}));
 
 const {workspaces} = config.urls;
 
-const allProjects = (auth) => Promise.all(workspaces.map(url => fetch(url + '/api/v1/projects/', {headers: {Authorization: auth}})
+const projectsCache = new NodeCache({stdTTL: 30});
+let projectsPromise = null;
+
+const workspaceProjects = (url, auth) => fetch(url + '/api/v1/projects/', {headers: {Authorization: auth}})
     .then(response => response.json())
     .then(projects => projects.map(p => ({workspace: url, ...p})))
-    .catch(() => [])))
-    .then(responses => responses.reduce((x, y) => [...x, ...y], []));
+    .catch(e => {
+        console.error(`Error retrieving projects for workspace ${url}:`, e);
+        return [];
+    });
+
+const allProjects = (auth) => {
+    const cached = projectsCache.get("");
+    if (cached) {
+        return Promise.resolve(cached);
+    }
+
+    if (!projectsPromise) {
+        projectsPromise = Promise.all(workspaces.map(url => workspaceProjects(url, auth)))
+            .then(responses => {
+                const result = responses.reduce((x, y) => [...x, ...y], []);
+                projectsCache.set("", result);
+                projectsPromise = undefined;
+                return result;
+            });
+    }
+
+    return projectsPromise;
+};
+
 
 // TODO: implement
 const projectNameByPath = (url) => "workspace-ci";
