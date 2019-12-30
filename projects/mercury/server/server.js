@@ -111,14 +111,15 @@ const workspaceByPath = (url, auth) => {
 
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
+const authorization = (req) => {
+    console.log(`Session: ${req.session}`)
+    return req.get('Authorization') || (req.session['keycloak-token'] && `Bearer ${req.session['keycloak-token'].access_token}`);
+};
+
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => {
-    const auth = req.get('Authorization') || (req.session['keycloak-token'] && `Bearer ${req.session['keycloak-token'].access_token}`);
-    console.log(`Authorization: ${auth}`);
-    allProjects(auth).then(all => res.send(all));
+    allProjects(authorization(req)).then(all => res.send(all));
 });
-
-
 
 app.use(proxy('/api/keycloak', {
     target: config.urls.keycloak,
@@ -133,7 +134,7 @@ app.use(proxy('/api/v1/search/fairspace/_search', {
 
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
-    router: req => workspaceByPath(req.path, req.header('Authorization'))
+    router: req => workspaceByPath(req.path, authorization(req))
 }));
 
 // Serve any static files
