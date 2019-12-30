@@ -46,7 +46,7 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    Object.defineProperty(req, "protocol", {value: 'https'});
+    Object.defineProperty(req, "protocol", {value: 'https', writable: true});
     next();
 });
 
@@ -55,7 +55,7 @@ app.use(keycloak.middleware({logout: '/logout'}));
 app.use('/login', keycloak.protect(), (res, req, next) => next());
 
 app.use((req, res, next) => {
-    Object.defineProperty(req, "protocol", {value: 'http'});
+    req.protocol = 'http';
     next();
 });
 
