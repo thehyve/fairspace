@@ -78,8 +78,8 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 
 
-{{/* Pluto external hostname */}}
-{{- define "pluto.hostname" -}}
+{{/* Mercury external hostname */}}
+{{- define "mercury.hostname" -}}
 {{- .Values.workspace.ingress.domain -}}
 {{- end -}}
 
@@ -94,11 +94,11 @@ Scheme to access workspace components (http or https)
 {{- end -}}
 
 {{- define "workspace.url" -}}
-{{ template "workspace.scheme" . }}://{{ template "pluto.hostname" . }}
+{{ template "workspace.scheme" . }}://{{ template "mercury.hostname" . }}
 {{- end -}}
 
 {{- define "jupyter.url" -}}
-{{ template "workspace.scheme" . }}://jupyter.{{ template "pluto.hostname" . }}
+{{ template "workspace.scheme" . }}://jupyter.{{ template "mercury.hostname" . }}
 {{- end -}}
 
 {{- define "storage.url" -}}

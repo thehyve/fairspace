@@ -12,8 +12,8 @@ data:
     port: 8080
     publicUrl: {{ template "workspace.url" . }}
     jena:
-      metadataBaseIRI: http://{{ template "pluto.hostname" . }}/iri/
-      vocabularyBaseIRI: http://{{ template "pluto.hostname" . }}/vocabulary/
+      metadataBaseIRI: http://{{ template "mercury.hostname" . }}/iri/
+      vocabularyBaseIRI: http://{{ template "mercury.hostname" . }}/vocabulary/
       datasetPath: "/data/saturn/db"
       storeParams:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}

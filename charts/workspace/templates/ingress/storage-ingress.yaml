@@ -26,7 +26,7 @@ spec:
         paths:
           - path: /(.*)
             backend:
-              serviceName: {{ .Release.Name }}-pluto
+              serviceName: {{ .Release.Name }}-mercury
               servicePort: 80
 {{- end -}}
 

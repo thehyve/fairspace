@@ -53,7 +53,7 @@ workspace:
         enabled: true
         domain:
         annotations:
-          pluto:
+          mercury:
             kubernetes.io/ingress.class: nginx
           docs:
             kubernetes.io/ingress.class: nginx
