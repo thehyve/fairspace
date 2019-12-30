@@ -54,7 +54,7 @@ app.use(keycloak.middleware({logout: '/logout'}));
 
 app.use('/**', keycloak.protect(), (res, req, next) => next());
 
-app.use('/api/**', keycloak.enforcer(['user-workspace-ci'], {response_mode: 'token'}), (req, res, next) => next());
+app.use('/api/**', keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
 app.use((req, res, next) => {
     req.protocol = 'http';
