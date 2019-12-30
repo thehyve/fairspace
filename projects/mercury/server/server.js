@@ -54,7 +54,7 @@ app.use(keycloak.middleware({logout: '/logout'}));
 
 app.use('/**', keycloak.protect(), (res, req, next) => next());
 
-app.use('/api/**', keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
+app.use('/api/**', keycloak.enforcer(['user-workspace-ci'], {response_mode: 'token'}), (req, res, next) => next());
 
 app.use((req, res, next) => {
     req.protocol = 'http';
@@ -113,8 +113,9 @@ app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => {
-    console.log(`Authorization: ${req.header('Authorization')}`);
-    allProjects(req.header('Authorization')).then(all => res.send(all));
+    const auth = req.get('Authorization') || (req.session['keycloak-token'] && `Bearer ${req.session['keycloak-token']}`);
+    console.log(`Authorization: ${auth}`);
+    allProjects(auth).then(all => res.send(all));
 });
 
 
