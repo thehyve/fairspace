@@ -52,7 +52,12 @@ app.use((req, res, next) => {
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
-app.use('/**', keycloak.protect(), (res, req, next) => next());
+let accessToken = undefined;
+
+app.use('/**', keycloak.protect((token) => {
+    accessToken = token;
+    return true;
+}), (res, req, next) => next());
 
 app.use('/api/**', keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
@@ -111,10 +116,9 @@ const workspaceByPath = (url, auth) => {
 
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
-const authorization = (req) => {
-    console.log(`'keycloak-token: ${req.session['keycloak-token']}`)
-    return req.get('Authorization') || (req.session['keycloak-token'] && `Bearer ${req.session['keycloak-token'].access_token}`);
-};
+const token = (req) => req.session['keycloak-token'].access_token;
+
+const authorization = (req) => `Bearer ${token(req)}`;
 
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => {
@@ -131,6 +135,17 @@ app.use(proxy('/api/v1/search/fairspace/_search', {
     target: config.urls.elasticsearch,
     pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
 }));
+
+app.get('/api/v1/account', (req, res) => {
+    res.json({
+        id: accessToken.content.sub,
+        username: accessToken.content.preferred_username,
+        fullName: accessToken.content.name,
+        firstName: accessToken.content.given_name,
+        lastName: accessToken.content.family_name,
+        authorizations: accessToken.content.realm_access.roles
+    });
+});
 
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
