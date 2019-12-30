@@ -132,20 +132,21 @@ app.use(proxy('/api/v1/search/fairspace/_search', {
     pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
 }));
 
-app.get('/api/v1/account', (req, res) => {
-    res.json({
-        id: accessToken.content.sub,
-        username: accessToken.content.preferred_username,
-        fullName: accessToken.content.name,
-        firstName: accessToken.content.given_name,
-        lastName: accessToken.content.family_name,
-        authorizations: accessToken.content.realm_access.roles
-    });
-});
+app.get('/api/v1/account', (req, res) => res.json({
+    id: accessToken.content.sub,
+    username: accessToken.content.preferred_username,
+    fullName: accessToken.content.name,
+    firstName: accessToken.content.given_name,
+    lastName: accessToken.content.family_name,
+    authorizations: accessToken.content.realm_access.roles
+}));
 
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
-    router: req => workspaceByPath(req.path)
+    router: req => workspaceByPath(req.path),
+    onProxyReq: (proxyRes) => {
+        proxyRes.headers.Authorization = `Bearer ${accessToken.token}`;
+    }
 }));
 
 // Serve any static files
