@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
-let accessToken = undefined;
+let accessToken;
 
 app.use('/**', keycloak.protect((token) => {
     accessToken = token;
@@ -71,7 +71,7 @@ const {workspaces} = config.urls;
 const projectsCache = new NodeCache({stdTTL: 30});
 let projectsPromise = null;
 
-const workspaceProjects = (url, auth) => fetch(url + '/api/v1/projects/', {headers: {Authorization: auth}})
+const workspaceProjects = (url) => fetch(url + '/api/v1/projects/', {headers: {Authorization: `Bearer ${accessToken.token}`}})
     .then(response => {
         if (!response.ok) {
             throw new Error(`${response.status} ${response.statusText}`);
@@ -84,14 +84,14 @@ const workspaceProjects = (url, auth) => fetch(url + '/api/v1/projects/', {heade
         return [];
     });
 
-const allProjects = (auth) => {
+const allProjects = () => {
     const cached = projectsCache.get("");
     if (cached) {
         return Promise.resolve(cached);
     }
 
     if (!projectsPromise) {
-        projectsPromise = Promise.all(workspaces.map(url => workspaceProjects(url, auth)))
+        projectsPromise = Promise.all(workspaces.map(url => workspaceProjects(url)))
             .then(responses => {
                 const result = responses.reduce((x, y) => [...x, ...y], []);
                 projectsCache.set("", result);
@@ -107,22 +107,18 @@ const allProjects = (auth) => {
 // TODO: implement
 const projectNameByPath = (url) => "workspace-ci";
 
-const workspaceByPath = (url, auth) => {
+const workspaceByPath = (url) => {
     const project = projectNameByPath(url);
-    return allProjects(auth)
+    return allProjects()
         .then(all => all.find(p => p.name === project))
         .then(p => p && p.workspace);
 };
 
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
-const token = (req) => req.session['keycloak-token'].access_token;
-
-const authorization = (req) => `Bearer ${token(req)}`;
-
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => {
-    allProjects(authorization(req)).then(all => res.send(all));
+    allProjects().then(all => res.send(all));
 });
 
 app.use(proxy('/api/keycloak', {
@@ -149,7 +145,7 @@ app.get('/api/v1/account', (req, res) => {
 
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
-    router: req => workspaceByPath(req.path, authorization(req))
+    router: req => workspaceByPath(req.path)
 }));
 
 // Serve any static files
