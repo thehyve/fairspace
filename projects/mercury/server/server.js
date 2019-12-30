@@ -112,7 +112,7 @@ const workspaceByPath = (url, auth) => {
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
 const authorization = (req) => {
-    console.log(`Session: ${req.session}`)
+    console.log(`'keycloak-token: ${req.session['keycloak-token']}`)
     return req.get('Authorization') || (req.session['keycloak-token'] && `Bearer ${req.session['keycloak-token'].access_token}`);
 };
 
