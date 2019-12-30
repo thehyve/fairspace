@@ -65,7 +65,12 @@ const projectsCache = new NodeCache({stdTTL: 30});
 let projectsPromise = null;
 
 const workspaceProjects = (url, auth) => fetch(url + '/api/v1/projects/', {headers: {Authorization: auth}})
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(projects => projects.map(p => ({workspace: url, ...p})))
     .catch(e => {
         console.error(`Error retrieving projects for workspace ${url}:`, e);
