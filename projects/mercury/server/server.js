@@ -4,9 +4,9 @@ const proxy = require('http-proxy-middleware');
 const fetch = require("node-fetch");
 const YAML = require('yaml');
 const fs = require('fs');
-const Keycloak = require('keycloak-connect');
-const session = require('express-session');
-const cryptoRandomString = require('crypto-random-string');
+// const Keycloak = require('keycloak-connect');
+// const session = require('express-session');
+// const cryptoRandomString = require('crypto-random-string');
 const NodeCache = require("node-cache");
 
 const app = express();
@@ -19,32 +19,32 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const store = new session.MemoryStore();
-
-const keycloak = new Keycloak(
-    {
-        store
-    },
-    {
-        'auth-server-url': config.urls.keycloak + '/auth',
-        'realm': config.keycloak.realm,
-        'ssl-required': 'external',
-        'resource': config.keycloak.clientId,
-        'credentials': {
-            secret: config.keycloak.clientSecret
-        },
-        'confidential-port': 0
-    }
-);
-
-app.use(session({
-    secret: cryptoRandomString({length: 32}),
-    resave: false,
-    saveUninitialized: true,
-    store
-}));
-
-app.use(keycloak.middleware({logout: '/logout'}));
+// const store = new session.MemoryStore();
+//
+// const keycloak = new Keycloak(
+//     {
+//         store
+//     },
+//     {
+//         'auth-server-url': config.urls.keycloak + '/auth',
+//         'realm': config.keycloak.realm,
+//         'ssl-required': 'external',
+//         'resource': config.keycloak.clientId,
+//         'credentials': {
+//             secret: config.keycloak.clientSecret
+//         },
+//         'confidential-port': 0
+//     }
+// );
+//
+// app.use(session({
+//     secret: cryptoRandomString({length: 32}),
+//     resave: false,
+//     saveUninitialized: true,
+//     store
+// }));
+//
+// app.use(keycloak.middleware({logout: '/logout'}));
 
 // app.use('/**', keycloak.protect(), (res, req, next) => next());
 
