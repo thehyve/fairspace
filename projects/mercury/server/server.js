@@ -110,7 +110,11 @@ const workspaceByPath = (url, auth) => {
 app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
 
 // All projects from all workspaces
-app.get('/api/v1/projects', (req, res) => allProjects(req.header('Authorization')).then(all => res.send(all)));
+app.get('/api/v1/projects', (req, res) => {
+    console.log(`Authorization: ${req.header('Authorization')}`);
+    allProjects(req.header('Authorization')).then(all => res.send(all));
+});
+
 
 
 app.use(proxy('/api/keycloak', {
