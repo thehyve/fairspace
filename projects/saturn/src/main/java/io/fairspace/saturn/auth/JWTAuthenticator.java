@@ -21,7 +21,13 @@ class JWTAuthenticator {
     OAuthAuthenticationToken getUserInfo(HttpServletRequest request) {
         var authorizationHeader = request.getHeader(AUTHORIZATION);
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+        if (authorizationHeader == null) {
+            log.warn("No authorization header was provided for {}", request.getRequestURI());
+            return null;
+        }
+
+        if (!authorizationHeader.startsWith(BEARER_PREFIX)) {
+            log.warn("Invalid authorization header was provided for {}", request.getRequestURI());
             return null;
         }
 
