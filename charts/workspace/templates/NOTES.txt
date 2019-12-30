@@ -25,7 +25,7 @@ Your workspace is named {{ template "workspace.name" . }} and can be accessed vi
 
 {{- end }}
 
-The installation contains instances of Mercury, Pluto and Saturn.
+The installation contains instances of Mercury and Saturn.
 
 {{- if not .Values.workspace.ingress.enabled }}
 ----------------------------

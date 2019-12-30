@@ -115,9 +115,6 @@ Scheme to access workspace components (http or https)
 {{- define "mercury.fullname" -}}
 {{- .Values.mercury.nameOverride | default (printf "%s-mercury" .Release.Name) -}}
 {{- end -}}
-{{- define "pluto.fullname" -}}
-{{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}
 {{- define "docs.fullname" -}}
 {{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
 {{- end -}}

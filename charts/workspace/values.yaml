@@ -122,59 +122,6 @@ services:
   cbioportal:
 
 #####################################################################
-# Specific settings for Pluto subchart
-# Default configuration points to mercury and saturn
-# in the same workspace
-#####################################################################
-pluto:
-  replicaCount: 1
-  rollingUpdate:
-    maxUnavailable: 25%
-    maxSurge: 25%
-  image:
-    image: eu.gcr.io/fairspace-207108/pluto
-    tag: 0.6.10
-    pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
-    externalPort: 80
-    internalPort: 8080
-  resources:
-    limits:
-      cpu: 1
-      memory: 1024Mi
-    requests:
-      cpu: 50m
-      memory: 300Mi
-  probePath: /actuator/health
-  livenessProbe:
-    initialDelaySeconds: 20
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  readinessProbe:
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  terminationGracePeriodSeconds: 10
-
-  # Keycloak configuration for authentication
-  keycloak:
-    client:
-      id:
-      secret:
-    redirectAfterLogoutUrl:
-
-  # Where to find the backends for this proxy
-  backends:
-    ui:
-    saturn:
-
-  # Zuul timeouts when connecting to upstream services
-  socketTimeoutMillis: 15000
-  connectTimeoutMillis: 2000
-
-#####################################################################
 # Specific settings for Saturn subchart
 #####################################################################
 saturn:

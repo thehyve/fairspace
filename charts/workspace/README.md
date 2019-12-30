@@ -3,7 +3,6 @@ This helm chart will install and setup a single VRE workspace.
 
 Contains:
 - Mercury
-- Pluto
 - Saturn
 
 A workspace within Fairspace is always associated with a hyperspace. The
@@ -30,11 +29,7 @@ hyperspace:
         username: keycloak
         password: abcdefghi
         realm: hyperspace
-
-pluto:
-    keycloak:
-        baseUrl: https://keycloak.hyperspace.ci.test.fairdev.app
-        realm: hyperspace     
+     
 
 ```
 
@@ -59,14 +54,6 @@ workspace:
     description: "Demo workspace"
     ingress:
         enabled: false
-
-pluto:
-    service:
-        type: NodePort
-    keycloak:
-        # Provide your own keycloak settings here
-        baseUrl: http://192.168.99.100:30867
-        realm: hyperspace
 ```
 
 We currently don't have a tested script for Minikube deployments. The steps should largely be
@@ -94,22 +81,11 @@ installation.
 | `external.keycloak.baseUrl` | Base url for keycloak installation  | https://keycloak.ci.fairway.app  |
 | `external.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
 | `external.keycloak.password`  | Password used for setting up keycloak users. | |
-| `external.keycloak.realm`  | Keycloak realm that is used for this hyperspace. Also set this variable in `pluto.keycloak.realm`| |
-| `external.keycloak.clientSecret`  | UUID that is used as client secret in communication between pluto and keycloak.| <random uuid> |
-
-#### Pluto parameters
-| Parameter  | Description  | Default |
-|---|---|---|
-| `pluto.keycloak.baseUrl` | Base url of the keycloak installation, with scheme, without /auth. For example: `https://keycloak.hyperspace.fairspace.app`  |   |
-| `pluto.keycloak.realm`   | Keycloak realm that is used for this hyperspace.  |   |
-| `pluto.keycloak.redirectAfterLogoutUrl`   | URL to redirect the user to after logging out  |   |
+| `external.keycloak.realm`  | Keycloak realm that is used for this hyperspace.| |
+| `external.keycloak.clientSecret`  | UUID that is used as client secret in communication between Mercury and keycloak.| <random uuid> |
 
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
-
-* Pluto
-Settings for Pluto should be in the section `pluto`.
-See [the Pluto README](https://github.com/fairspace/workspace/blob/dev/projects/pluto/README.md) for more information on the specific settings
 
 * Mercury
 Settings for Mercury should be in the section `mercury`.
@@ -125,7 +101,7 @@ To use the secret for installing a workspace, follow these steps:
       imagePullSecrets:
       - name: <secret-name>
     ```
-    This configuration should be added for each fairspace service (mercury, pluto, saturn), so for example:
+    This configuration should be added for each fairspace service (mercury, saturn), so for example:
     ```yaml
       mercury:
         imagePullSecrets:

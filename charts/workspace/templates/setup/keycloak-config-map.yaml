@@ -15,5 +15,4 @@ data:
   redirect.urls: |-
     {{ template "workspace.url" . }}/*
     {{ template "jupyter.url" . }}/*
-    {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}/*
 {{- end -}}
