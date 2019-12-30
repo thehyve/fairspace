@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
-app.use('/login', keycloak.protect(), (res, req, next) => next());
+app.use('/**', keycloak.protect(), (res, req, next) => next());
 
 app.use((req, res, next) => {
     req.protocol = 'http';
