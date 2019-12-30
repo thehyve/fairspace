@@ -91,7 +91,7 @@ const allProjects = () => {
     }
 
     if (!projectsPromise) {
-        projectsPromise = Promise.all(workspaces.map(url => workspaceProjects(url)))
+        projectsPromise = Promise.all(workspaces.map(workspaceProjects))
             .then(responses => {
                 const result = responses.reduce((x, y) => [...x, ...y], []);
                 projectsCache.set("", result);
@@ -144,9 +144,7 @@ app.get('/api/v1/account', (req, res) => res.json({
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
     router: req => workspaceByPath(req.path),
-    onProxyReq: (proxyRes) => {
-        proxyRes.headers.Authorization = `Bearer ${accessToken.token}`;
-    }
+    onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`)
 }));
 
 // Serve any static files
