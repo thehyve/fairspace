@@ -17,4 +17,4 @@ data:
       keycloak:
         realm: {{ .Values.external.keycloak.realm }}
         clientId: {{ .Values.external.keycloak.clientId }}
-        clientSsecret: {{ .Values.external.keycloak.clientSecret }}
+        clientSecret: {{ .Values.external.keycloak.clientSecret }}
