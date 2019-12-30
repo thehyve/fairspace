@@ -45,19 +45,19 @@ app.use(session({
     store
 }));
 
-// app.use((req, res, next) => {
-//     Object.defineProperty(req, "protocol", {value: 'https', writable: true});
-//     next();
-// });
+app.use((req, res, next) => {
+    Object.defineProperty(req, "protocol", {value: 'https', writable: true});
+    next();
+});
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
 app.use('/**', keycloak.protect(), (res, req, next) => next());
 
-// app.use((req, res, next) => {
-//     req.protocol = 'http';
-//     next();
-// });
+app.use((req, res, next) => {
+    req.protocol = 'http';
+    next();
+});
 
 const {workspaces} = config.urls;
 
