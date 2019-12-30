@@ -124,6 +124,7 @@ app.get('/api/v1/projects', (req, res) => {
 app.use(proxy('/api/keycloak', {
     target: config.urls.keycloak,
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/' + config.keycloak.realm},
+    onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`),
     changeOrigin: true
 }));
 
