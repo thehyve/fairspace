@@ -2,7 +2,6 @@ import {expand} from 'jsonld';
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../common';
 
-import Config from "../common/services/Config";
 import {normalizeTypes, toJsonLd} from "../common/utils/linkeddata/jsonLdConverter";
 
 const requestOptions = {
@@ -12,15 +11,11 @@ const requestOptions = {
 class LinkedDataAPI {
     /**
      *
-     * @param configParserFunc Function to retrieve the right urls from configuration.
-     *                         The configuration is not available when constructing the object, so
-     *                         we provide this function to be able to extract the right information
-     *
-     *                         Function input: config
-     *                         Function output: {statements: ..., entities: ...}
+     * @param graph Either 'metadata' or 'vocabulary' or 'meta-vocabulary'
      */
-    constructor(configParserFunc) {
-        this.configParserFunc = configParserFunc;
+    constructor(graph) {
+        this.statementsUrl = `/api/v1/${graph}/`;
+        this.entitiesUrl = `/api/v1/${graph}/entities/`;
     }
 
     /**
@@ -28,7 +23,7 @@ class LinkedDataAPI {
      * @returns {string}
      */
     getStatementsUrl() {
-        return this.configParserFunc(Config.get()).statements;
+        return this.statementsUrl;
     }
 
     /**
@@ -36,7 +31,7 @@ class LinkedDataAPI {
      * @returns {string}
      */
     getEntitiesUrl() {
-        return this.configParserFunc(Config.get()).entities;
+        return this.entitiesUrl;
     }
 
     get(params = {}) {
@@ -115,6 +110,6 @@ class LinkedDataAPI {
     }
 }
 
-export const MetadataAPI = new LinkedDataAPI(config => config.urls.metadata);
-export const VocabularyAPI = new LinkedDataAPI(config => config.urls.vocabulary);
-export const MetaVocabularyAPI = new LinkedDataAPI(config => config.urls.metaVocabulary);
+export const MetadataAPI = new LinkedDataAPI('metadata');
+export const VocabularyAPI = new LinkedDataAPI('vocabulary');
+export const MetaVocabularyAPI = new LinkedDataAPI('meta-vocabulary');

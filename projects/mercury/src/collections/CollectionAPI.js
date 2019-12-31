@@ -1,20 +1,20 @@
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../common';
 
-import Config from "../common/services/Config";
 
+const collectionsUrl = "/api/v1/collections/";
 const headers = {'Content-Type': 'application/json'};
 
 class CollectionAPI {
     getCollections() {
-        return axios.get(Config.get().urls.collections, {headers: {Accept: 'application/json'}})
+        return axios.get(collectionsUrl, {headers: {Accept: 'application/json'}})
             .catch(handleHttpError("Failure when retrieving a list of collections"))
             .then(extractJsonData);
     }
 
     addCollection(name, description, connectionString, location) {
         return axios.put(
-            Config.get().urls.collections,
+            collectionsUrl,
             JSON.stringify({name, description, connectionString, location}),
             {headers}
         ).catch(handleHttpError("Failure while saving a collection"));
@@ -22,7 +22,7 @@ class CollectionAPI {
 
     updateCollection(iri, name, description, connectionString, location) {
         return axios.patch(
-            Config.get().urls.collections,
+            collectionsUrl,
             JSON.stringify({iri, name, description, location, connectionString}),
             {headers}
         ).catch(handleHttpError("Failure while updating a collection"));
@@ -30,7 +30,7 @@ class CollectionAPI {
 
     deleteCollection(id) {
         return axios.delete(
-            `${Config.get().urls.collections}?iri=${encodeURIComponent(id)}`,
+            `${collectionsUrl}?iri=${encodeURIComponent(id)}`,
             {headers}
         ).catch(handleHttpError("Failure while deleting collection"));
     }

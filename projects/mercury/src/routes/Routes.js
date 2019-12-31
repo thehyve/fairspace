@@ -85,7 +85,7 @@ const routes = () => (
         <Route
             path="/logout"
             render={() => logout({
-                logoutUrl: Config.get().urls.logout,
+                logoutUrl: '/logout',
                 jupyterhubUrl: Config.get().urls.jupyterhub
             })}
         />

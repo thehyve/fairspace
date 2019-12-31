@@ -26,6 +26,11 @@ import {ClipboardProvider} from './common/contexts/ClipboardContext';
 import {VocabularyProvider} from './metadata/VocabularyContext';
 
 const App = () => {
+    const userInfo = '/api/v1/account';
+    const logout = '/logout';
+    const versionUrl = '/config/version.json';
+    const usersUrl = '/api/v1/users/';
+
     const isMounted = useIsMounted();
     const [configLoaded, setConfigLoaded] = useState(false);
 
@@ -38,7 +43,8 @@ const App = () => {
         return <LoadingInlay />;
     }
 
-    const {version: versionUrl, users, userInfo, logout, jupyterhub} = Config.get().urls;
+
+    const {jupyterhub} = Config.get().urls;
     const requiredRole = Config.get().roles.user;
 
     return (
@@ -60,7 +66,7 @@ const App = () => {
                                                         requiredAuthorization={requiredRole}
                                                         renderMenu={() => <Menu />}
                                                         renderMain={() => (
-                                                            <UsersProvider url={users}>
+                                                            <UsersProvider url={usersUrl}>
                                                                 <Routes />
                                                             </UsersProvider>
                                                         )}

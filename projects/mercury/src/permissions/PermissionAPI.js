@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../common';
 
-import Config from '../common/services/Config';
+const permissionsUrl = '/api/v1/permissions/'
 
 class PermissionAPI {
     /**
@@ -12,7 +12,7 @@ class PermissionAPI {
      */
     getPermissions(iri) {
         return axios.get(
-            `${Config.get().urls.permissions}?${queryString.stringify({iri, all: true})}`,
+            `${permissionsUrl}?${queryString.stringify({iri, all: true})}`,
             {
                 headers: {
                     'Accept': 'application/json',
@@ -31,7 +31,7 @@ class PermissionAPI {
         const payload = {user: userIri, access};
 
         return axios.put(
-            `${Config.get().urls.permissions}?${queryString.stringify({iri})}`,
+            `${permissionsUrl}?${queryString.stringify({iri})}`,
             JSON.stringify(payload),
             {headers: {'Content-Type': 'application/json'}}
         ).catch(handleHttpError("Failure while altering a collection's permission"))

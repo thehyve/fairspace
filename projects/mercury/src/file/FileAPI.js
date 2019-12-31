@@ -2,8 +2,9 @@ import {createClient} from "webdav";
 import axios from 'axios';
 import {compareBy, comparing} from '../common';
 
-import Config from "../common/services/Config";
 import {generateUniqueFileName, getFileName, joinPaths} from '../common/utils/fileUtils';
+
+const filesUrl = '/api/v1/webdav';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -25,7 +26,7 @@ axios.interceptors.request.use((config) => {
 class FileAPI {
     client() {
         if (!this.webDavClient) {
-            this.webDavClient = createClient(Config.get().urls.files);
+            this.webDavClient = createClient(filesUrl);
         }
         return this.webDavClient;
     }
@@ -109,7 +110,7 @@ class FileAPI {
     /**
      * It creates a full download like to the path provided
      */
-    getDownloadLink = (path = '') => Config.get().urls.download + path;
+    getDownloadLink = (path = '') => filesUrl + path;
 
     /**
      * Deletes the file given by path

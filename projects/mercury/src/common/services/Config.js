@@ -2,6 +2,8 @@ import merge from 'deepmerge';
 import axios from 'axios';
 import internalConfig from "../../config";
 
+const externalConfigurationFiles = ['/config/config.json'];
+
 class Config {
     static instance;
 
@@ -42,7 +44,7 @@ class Config {
         // not to contain the same properties.
         if (this.internalConfig.externalConfigurationFiles) {
             this.loadingPromise = Promise.all(
-                this.internalConfig.externalConfigurationFiles.map(file => axios.get(file)
+                externalConfigurationFiles.map(file => axios.get(file)
                     .catch(({response}) => Promise.reject(Error(`Error loading configuration file ${file} ${response ? response.data : ''}`)))
                     .then((response) => {
                         // eslint-disable-next-line no-console
