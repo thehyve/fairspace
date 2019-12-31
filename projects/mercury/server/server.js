@@ -19,7 +19,8 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const clientDir = path.join(path.dirname(__dirname), 'client');
+// Liveness probe
+app.get('/status', (req, res) => res.status(200).send('Mercury is up and running.').end());
 
 const store = new session.MemoryStore();
 
@@ -143,8 +144,7 @@ app.use(proxy('/api/v1', {
     onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`)
 }));
 
-// Liveness probe
-app.get('/status', (req, res) => res.status(200).send('Mercury is up and running.').end());
+const clientDir = path.join(path.dirname(__dirname), 'client');
 
 // Serve any static files
 app.use(express.static(clientDir));
