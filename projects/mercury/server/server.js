@@ -21,9 +21,6 @@ const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');
 
-// Liveness probe
-app.get('/', (req, res) => res.sendFile(path.join(clientDir, 'index.html')));
-
 const store = new session.MemoryStore();
 
 const keycloak = new Keycloak(
@@ -126,9 +123,7 @@ app.use(proxy('/api/keycloak', {
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/' + config.keycloak.realm},
     onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`),
     changeOrigin: true
-}));
-
-app.use(proxy('/api/v1/search/fairspace/_search', {
+}));app.use(proxy('/api/v1/search/fairspace/_search', {
     target: config.urls.elasticsearch,
     pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
 }));
@@ -147,6 +142,9 @@ app.use(proxy('/api/v1', {
     router: req => workspaceByPath(req.path),
     onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`)
 }));
+
+// Liveness probe
+app.get('/status', (req, res) => res.status(200).send('Mercury is up and running.').end());
 
 // Serve any static files
 app.use(express.static(clientDir));
