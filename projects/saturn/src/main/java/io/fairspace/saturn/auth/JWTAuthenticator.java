@@ -1,7 +1,5 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;

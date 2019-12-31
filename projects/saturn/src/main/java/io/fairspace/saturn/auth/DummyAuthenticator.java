@@ -1,6 +1,5 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import lombok.AllArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
+import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
+
 
 // For local development only
 @AllArgsConstructor

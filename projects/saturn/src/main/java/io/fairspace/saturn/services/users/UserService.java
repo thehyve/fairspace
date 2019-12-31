@@ -1,7 +1,7 @@
 package io.fairspace.saturn.services.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;

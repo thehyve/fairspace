@@ -4,7 +4,6 @@ buildscript {
         milton_version = '2.7.4.9'
         mockitoVersion = '2.23.0'
         jacksonVersion = '2.10.1' // check what version is used by Jena
-        oidcAuthVersion = '0.6.8-SNAPSHOT'
     }
 }
 
@@ -67,7 +66,7 @@ dependencies {
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
     }
     implementation('org.bouncycastle:bcprov-jdk15on:1.64')
-    implementation "io.fairspace:oidc-auth-base:${oidcAuthVersion}"
+    implementation 'com.nimbusds:nimbus-jose-jwt:7.1'
 
     implementation "com.rabbitmq:amqp-client:5.7.3"
 

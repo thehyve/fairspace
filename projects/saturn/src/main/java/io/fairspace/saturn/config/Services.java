@@ -1,7 +1,7 @@
 package io.fairspace.saturn.config;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.events.EventCategory;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.MetadataEvent;

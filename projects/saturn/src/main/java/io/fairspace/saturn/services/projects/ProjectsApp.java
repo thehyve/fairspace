@@ -1,11 +1,11 @@
 package io.fairspace.saturn.services.projects;
 
-import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.*;
-
 import io.fairspace.saturn.services.BaseApp;
 
 import java.util.List;
+
+import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
+import static spark.Spark.get;
 
 public class ProjectsApp extends BaseApp {
     public ProjectsApp(String basePath) {

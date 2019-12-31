@@ -1,6 +1,6 @@
 package io.fairspace.saturn;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

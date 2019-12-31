@@ -1,8 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;

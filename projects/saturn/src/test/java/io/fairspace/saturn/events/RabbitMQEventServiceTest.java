@@ -4,7 +4,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
+import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)

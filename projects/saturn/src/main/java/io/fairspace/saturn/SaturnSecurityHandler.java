@@ -1,6 +1,6 @@
 package io.fairspace.saturn;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.Request;

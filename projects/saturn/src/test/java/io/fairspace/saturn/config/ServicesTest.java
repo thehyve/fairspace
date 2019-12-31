@@ -1,6 +1,6 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import org.apache.jena.query.Dataset;
 import org.junit.Before;
 import org.junit.Test;

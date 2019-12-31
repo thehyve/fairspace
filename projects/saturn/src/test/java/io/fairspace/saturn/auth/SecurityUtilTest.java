@@ -1,7 +1,5 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
+import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;

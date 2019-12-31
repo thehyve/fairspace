@@ -1,7 +1,5 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.ThreadContext;
 
 import javax.servlet.http.HttpServletRequest;

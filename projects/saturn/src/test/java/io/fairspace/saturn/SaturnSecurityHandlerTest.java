@@ -1,7 +1,7 @@
 package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.ConfigLoader;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.Handler;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.AUTHORITIES_CLAIM;
+import static io.fairspace.saturn.auth.OAuthAuthenticationToken.AUTHORITIES_CLAIM;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

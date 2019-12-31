@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -17,8 +17,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.Map;
 
-import static io.fairspace.oidc_auth.model.OAuthAuthenticationToken.*;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.graph.NodeFactory.createURI;
