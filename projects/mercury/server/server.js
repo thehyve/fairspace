@@ -124,7 +124,9 @@ app.use(proxy('/api/keycloak', {
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/' + config.keycloak.realm},
     onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`),
     changeOrigin: true
-}));app.use(proxy('/api/v1/search/fairspace/_search', {
+}));
+
+app.use(proxy('/api/v1/search/fairspace/_search', {
     target: config.urls.elasticsearch,
     pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
 }));
