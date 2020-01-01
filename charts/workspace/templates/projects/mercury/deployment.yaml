@@ -37,7 +37,7 @@ spec:
             mountPath: /usr/src/server/config/
         livenessProbe:
           httpGet:
-            path: {{ .Values.mercury.probePath }}status
+            path: {{ .Values.mercury.probePath }}liveness
             port: {{ .Values.mercury.service.internalPort }}
           initialDelaySeconds: {{ .Values.mercury.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.mercury.livenessProbe.periodSeconds }}
@@ -45,7 +45,7 @@ spec:
           timeoutSeconds: {{ .Values.mercury.livenessProbe.timeoutSeconds }}
         readinessProbe:
           httpGet:
-            path: {{ .Values.mercury.probePath }}status
+            path: {{ .Values.mercury.probePath }}readiness
             port: {{ .Values.mercury.service.internalPort }}
           periodSeconds: {{ .Values.mercury.readinessProbe.periodSeconds }}
           successThreshold: {{ .Values.mercury.readinessProbe.successThreshold }}

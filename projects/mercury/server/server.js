@@ -7,7 +7,6 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
-const NodeCache = require("node-cache");
 
 const app = express();
 const port = process.env.PORT || 8081;
@@ -19,8 +18,35 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-// Liveness probe
-app.get('/status', (req, res) => res.status(200).send('Mercury is up and running.').end());
+const {workspaces} = config.urls;
+
+const workspaceProjects = (url) => fetch(url + '/api/v1/projects/')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Got ${response.status} ${response.statusText} from ${url}`);
+        }
+        return response.json();
+    })
+    .then(projects => projects.map(p => ({workspace: url, ...p})));
+
+let allProjects;
+
+Promise.all(workspaces.map(workspaceProjects))
+    .then(responses => { allProjects = responses.reduce((x, y) => [...x, ...y], []); })
+    .catch(e => {
+        console.error('Error retrieving projects', e);
+        process.exit(1);
+    });
+
+app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and running.').end());
+
+app.get('/readiness', (req, res) => {
+    if (allProjects) {
+        res.status(200).send('Ready.').end();
+    } else {
+        res.status(503).send('Initializing.').end();
+    }
+});
 
 const store = new session.MemoryStore();
 
@@ -64,44 +90,6 @@ app.use((req, res, next) => {
     next();
 });
 
-const {workspaces} = config.urls;
-
-const projectsCache = new NodeCache({stdTTL: 30});
-let projectsPromise = null;
-
-const workspaceProjects = (url) => fetch(url + '/api/v1/projects/', {headers: {Authorization: `Bearer ${accessToken.token}`}})
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`${response.status} ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then(projects => projects.map(p => ({workspace: url, ...p})))
-    .catch(e => {
-        console.error(`Error retrieving projects for workspace ${url}:`, e);
-        return [];
-    });
-
-const allProjects = () => {
-    const cached = projectsCache.get("");
-    if (cached) {
-        return Promise.resolve(cached);
-    }
-
-    if (!projectsPromise) {
-        projectsPromise = Promise.all(workspaces.map(workspaceProjects))
-            .then(responses => {
-                const result = responses.reduce((x, y) => [...x, ...y], []);
-                projectsCache.set("", result);
-                projectsPromise = undefined;
-                return result;
-            });
-    }
-
-    return projectsPromise;
-};
-
-
 // TODO: implement
 const projectNameByPath = (url) => "workspace-ci";
 
@@ -112,12 +100,10 @@ const workspaceByPath = (url) => {
         .then(p => p && p.workspace);
 };
 
-app.get('/api/v1/workspaces', (req, res) => res.send(workspaces));
+app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 
 // All projects from all workspaces
-app.get('/api/v1/projects', (req, res) => {
-    allProjects().then(all => res.send(all));
-});
+app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
 
 app.use(proxy('/api/keycloak', {
     target: config.urls.keycloak,
