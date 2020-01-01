@@ -94,10 +94,9 @@ app.use((req, res, next) => {
 const projectNameByPath = (url) => "workspace-ci";
 
 const workspaceByPath = (url) => {
-    const project = projectNameByPath(url);
-    return allProjects()
-        .then(all => all.find(p => p.name === project))
-        .then(p => p && p.workspace);
+    const projectName = projectNameByPath(url);
+    const project = allProjects.find(p => p.name === projectName);
+    return project && project.workspace;
 };
 
 app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
