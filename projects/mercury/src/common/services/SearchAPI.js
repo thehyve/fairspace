@@ -128,4 +128,4 @@ export class SearchAPI {
     } : {});
 }
 
-export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search/', log: 'error'}), 'fairspace');
+export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search', log: 'error'}), 'fairspace');
