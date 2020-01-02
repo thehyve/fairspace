@@ -13,8 +13,9 @@ import {getFirstPredicateId} from "../../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
 import {getClassesInCatalog} from '../../common/utils/linkeddata/vocabularyUtils';
+import {projectPrefix} from "../../projects/projects";
 
-const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=` + encodeURIComponent(id);
+const getEntityRelativeUrl = (editorPath, id) => `${projectPrefix()}${editorPath}?iri=` + encodeURIComponent(id);
 
 const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent, showGraphSelection = false}) => {
     const {requireIdentifier, editorPath, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);

@@ -3,6 +3,8 @@ import {NavLink, withRouter} from "react-router-dom";
 import {Divider, Icon, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 
 import Config from '../services/Config';
+import {projectPrefix} from "../../projects/projects";
+
 
 const Menu = ({location: {pathname}}) => (
     <>
@@ -21,9 +23,9 @@ const Menu = ({location: {pathname}}) => (
             </ListItem>
             <ListItem
                 component={NavLink}
-                to="/collections"
+                to={projectPrefix() + "/collections"}
                 button
-                selected={pathname.startsWith('/collections')}
+                selected={pathname.startsWith(projectPrefix() + '/collections')}
             >
                 <ListItemIcon>
                     <Icon>folder_open</Icon>
@@ -33,21 +35,20 @@ const Menu = ({location: {pathname}}) => (
             {Config.get().urls.jupyterhub ? (
                 <ListItem
                     component={NavLink}
-                    to="/notebooks"
+                    to={projectPrefix() + "/notebooks"}
                     button
-                    selected={pathname.startsWith('/notebooks')}
+                    selected={pathname.startsWith(projectPrefix() + '/notebooks')}
                 >
                     <ListItemIcon>
                         <Icon>bar_chart</Icon>
                     </ListItemIcon>
                     <ListItemText primary="Notebooks" />
                 </ListItem>
-            ) : null }
+            ) : null}
             <ListItem
                 component={NavLink}
-                to="/metadata"
+                to={projectPrefix() + "/metadata"}
                 button
-                selected={pathname.startsWith('/metadata')}
             >
                 <ListItemIcon>
                     <Icon>assignment</Icon>
@@ -56,9 +57,9 @@ const Menu = ({location: {pathname}}) => (
             </ListItem>
             <ListItem
                 component={NavLink}
-                to="/vocabulary"
+                to={projectPrefix() + "/vocabulary"}
                 button
-                selected={pathname.startsWith('/vocabulary')}
+                selected={pathname.startsWith(projectPrefix() + '/vocabulary')}
             >
                 <ListItemIcon>
                     <Icon>code</Icon>
@@ -75,7 +76,7 @@ const Menu = ({location: {pathname}}) => (
                     </ListItemIcon>
                     <ListItemText primary="Dataverse" />
                 </ListItem>
-            ) : null }
+            ) : null}
             {Config.get().urls.cbioportal ? (
                 <ListItem component="a" href={Config.get().urls.cbioportal} button>
                     <ListItemIcon>
@@ -83,7 +84,7 @@ const Menu = ({location: {pathname}}) => (
                     </ListItemIcon>
                     <ListItemText primary="cBioportal" />
                 </ListItem>
-            ) : null }
+            ) : null}
         </List>
     </>
 );

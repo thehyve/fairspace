@@ -21,7 +21,7 @@ const routes = () => (
         <Route path="/" exact component={Home} />
 
         <Route
-            path="/collections"
+            path="/projects/:project/collections"
             exact
             render={() => (
                 <LinkedDataMetadataProvider>
@@ -31,7 +31,7 @@ const routes = () => (
         />
 
         <Route
-            path="/collections/:collection/:path(.*)?"
+            path="/projects/:project/collections/:collection/:path(.*)?"
             render={(props) => (
                 <LinkedDataMetadataProvider>
                     <FilesPage {...props} />
@@ -39,10 +39,10 @@ const routes = () => (
             )}
         />
 
-        <Route path="/notebooks" exact component={Notebooks} />
+        <Route path="/projects/:project/notebooks" exact component={Notebooks} />
 
         <Route
-            path="/metadata"
+            path="/projects/:project/metadata"
             exact
             render={() => {
                 const subject = useSubject();
@@ -57,12 +57,12 @@ const routes = () => (
 
         <Route
             /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/iri/**"
+            path="/projects/:project/iri/**"
             render={({match}) => (<Redirect to={"/metadata?iri=" + encodeURIComponent(createMetadataIri(match.params[0]))} />)}
         />
 
         <Route
-            path="/vocabulary"
+            path="/projects/:project/vocabulary"
             exact
             render={() => {
                 const subject = useSubject();
@@ -77,7 +77,7 @@ const routes = () => (
 
         <Route
             /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/vocabulary/**"
+            path="/projects/:project/vocabulary/**"
             render={({match}) => (<Redirect to={"/vocabulary?iri=" + encodeURIComponent(createVocabularyIri(match.params[0]))} />)}
         />
 
@@ -90,7 +90,7 @@ const routes = () => (
             })}
         />
         <Route
-            path="/search"
+            path="/projects/:project/search"
             render={({location, history}) => <SearchPage location={location} history={history} />}
         />
     </>

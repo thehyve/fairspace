@@ -93,12 +93,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// TODO: implement
-const projectNameByPath = (url) => "workspace-ci";
-
-const workspaceByPath = (url) => {
-    const projectName = projectNameByPath(url);
-    const project = allProjects.find(p => p.name === projectName);
+const getWorkspaceUrl = (req) => {
+    const projectName = req.query.project;
+    const project = allProjects.find(p => p.id === projectName);
     return project && project.workspace;
 };
 
@@ -116,9 +113,9 @@ app.use(proxy('/api/keycloak', {
     changeOrigin: true
 }));
 
-app.use(proxy('/api/v1/search/fairspace/_search', {
+app.use(proxy('/api/v1/search', {
     target: config.urls.elasticsearch,
-    pathRewrite: (url) => `/${projectNameByPath(url)}/_search`
+    pathRewrite: {'^/api/v1/search': ''}
 }));
 
 app.get('/api/v1/account', (req, res) => res.json({
@@ -132,7 +129,7 @@ app.get('/api/v1/account', (req, res) => res.json({
 
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
-    router: req => workspaceByPath(req.path),
+    router: req => getWorkspaceUrl(req),
     onProxyReq
 }));
 

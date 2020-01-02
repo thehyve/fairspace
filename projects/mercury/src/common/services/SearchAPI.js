@@ -2,6 +2,7 @@
 import elasticsearch from "elasticsearch";
 
 import {SEARCH_DEFAULT_SIZE} from '../constants';
+import {currentProject} from "../../projects/projects";
 
 const SORT_SCORE = ["_score"];
 
@@ -17,9 +18,8 @@ export const SORT_ALPHABETICALLY = [
 ];
 
 export class SearchAPI {
-    constructor(client, index) {
+    constructor(client) {
         this.client = client;
-        this.index = index;
     }
 
     /**
@@ -56,7 +56,7 @@ export class SearchAPI {
 
         // Send the query to the backend and transform the results
         return this.client.search({
-            index: this.index,
+            index: currentProject(),
             body: {
                 size,
                 from,
@@ -128,4 +128,4 @@ export class SearchAPI {
     } : {});
 }
 
-export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search', log: 'error'}), 'fairspace');
+export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search', log: 'error'}));
