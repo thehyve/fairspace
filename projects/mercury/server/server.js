@@ -139,9 +139,7 @@ const clientDir = path.join(path.dirname(__dirname), 'client');
 app.use(express.static(clientDir));
 
 // Handle React routing, return all requests to React app
-app.get('*', (req, res) => {
-    res.sendFile(path.join(clientDir, 'index.html'));
-});
+app.get('*', (req, res) => res.sendFile(path.join(clientDir, 'index.html')));
 
 // eslint-disable-next-line no-console
 app.listen(port, () => console.log(`Listening on port ${port}`));
