@@ -15,7 +15,6 @@ export const TOOLTIP_ENTER_DELAY = 350;
 export const DATE_FORMAT = 'dd/MM/yyyy';
 
 // Search
-export const ES_INDEX = 'fairspace';
 export const COLLECTION_SEARCH_TYPE = 'collections';
 export const FILES_SEARCH_TYPE = 'files';
 export const SEARCH_MAX_SIZE = 10000;

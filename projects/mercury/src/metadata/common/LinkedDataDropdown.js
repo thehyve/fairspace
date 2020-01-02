@@ -4,9 +4,8 @@ import {handleSearchError, LoadingInlay, MessageDisplay, SearchAPI, SORT_ALPHABE
 
 import {valuesContainsValueOrId} from "../../common/utils/linkeddata/metadataUtils";
 import Dropdown from './values/Dropdown';
-import {ES_INDEX, SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
+import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
 import LinkedDataContext from "../LinkedDataContext";
-import Config from "../../common/services/Config";
 import {getDescendants} from '../../common/utils/linkeddata/vocabularyUtils';
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
@@ -62,7 +61,7 @@ LinkedDataDropdown.propTypes = {
 };
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({types, size, query}) => SearchAPI(Config.get(), ES_INDEX)
+    fetchItems: ({types, size, query}) => SearchAPI
         .searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY})
         .catch(handleSearchError),
     debounce: 300

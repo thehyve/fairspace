@@ -12,11 +12,9 @@ import {
 
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import {getParentPath} from '../common/utils/fileUtils';
-import {COLLECTION_URI, DIRECTORY_URI, ES_INDEX, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
 import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';
-
-const searchUrl = '/api/v1/search';
 
 const styles = {
     tableRoot: {
@@ -111,11 +109,11 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
     );
 };
 
-// This separation/wrapping of compontents is mostly for unit testing purposes (much harder if it's 1 component)
+// This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const SearchPageContainer = ({
     location: {search}, query = getSearchQueryFromString(search),
     vocabulary, vocabularyLoading, vocabularyError,
-    classes, history, searchFunction = SearchAPI(searchUrl, ES_INDEX).search
+    classes, history, searchFunction = SearchAPI.search
 }) => {
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState();

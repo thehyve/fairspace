@@ -2,8 +2,6 @@ import React from 'react';
 import {handleSearchError, SearchAPI, SORT_DATE_CREATED} from '../common';
 
 import StringValue from "./common/values/StringValue";
-import {ES_INDEX} from '../constants';
-import Config from '../common/services/Config';
 
 const LinkedDataContext = React.createContext({
     valueComponentFactory: {
@@ -13,7 +11,7 @@ const LinkedDataContext = React.createContext({
     }
 });
 
-export const searchLinkedData = ({query, types, size, page}) => SearchAPI(Config.get(), ES_INDEX)
+export const searchLinkedData = ({query, types, size, page}) => SearchAPI
     .searchLinkedData({types, query, size, page, sort: SORT_DATE_CREATED})
     .catch(handleSearchError);
 

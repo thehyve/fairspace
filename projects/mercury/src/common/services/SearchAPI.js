@@ -128,24 +128,4 @@ export class SearchAPI {
     } : {});
 }
 
-// Expose the API as a singleton.
-// Please note that the client is instantiated only when needed. That way, we are
-// sure that the configuration has been loaded already.
-let api;
-export default (configs, index) => {
-    if (!api) {
-        let config = configs.elasticsearch;
-
-        // ES cannot handle relative urls, as it will default to localhost in that case
-        if (config.host.startsWith("/")) {
-            config = {
-                ...config,
-                host: window.location.origin + config.host
-            };
-        }
-
-        api = new SearchAPI(new elasticsearch.Client(config), index);
-    }
-
-    return api;
-};
+export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search/', log: 'error'}), 'fairspace');
