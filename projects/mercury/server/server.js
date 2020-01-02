@@ -69,6 +69,7 @@ app.use(session({
     store
 }));
 
+// A hack to make proxying work
 app.use((req, res, next) => {
     Object.defineProperty(req, "protocol", {value: 'https', writable: true});
     next();
@@ -78,6 +79,7 @@ app.use(keycloak.middleware({logout: '/logout'}));
 
 let accessToken;
 
+// Grab a parsed token
 app.use('/**', keycloak.protect((token) => {
     accessToken = token;
     return true;
@@ -85,6 +87,7 @@ app.use('/**', keycloak.protect((token) => {
 
 app.use('/api/**', keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
+// Restore protocol
 app.use((req, res, next) => {
     req.protocol = 'http';
     next();
@@ -104,10 +107,12 @@ app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
 
+const onProxyReq = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
+
 app.use(proxy('/api/keycloak', {
     target: config.urls.keycloak,
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/' + config.keycloak.realm},
-    onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`),
+    onProxyReq,
     changeOrigin: true
 }));
 
@@ -128,7 +133,7 @@ app.get('/api/v1/account', (req, res) => res.json({
 app.use(proxy('/api/v1', {
     target: 'http://never.ever',
     router: req => workspaceByPath(req.path),
-    onProxyReq: (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`)
+    onProxyReq
 }));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');
