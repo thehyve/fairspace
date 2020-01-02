@@ -42,28 +42,23 @@ class Config {
         // if multiple files are provided, there is no guarantee
         // about ordering, so it is best for the configuration files
         // not to contain the same properties.
-        if (this.internalConfig.externalConfigurationFiles) {
-            this.loadingPromise = Promise.all(
-                externalConfigurationFiles.map(file => axios.get(file)
-                    .catch(({response}) => Promise.reject(Error(`Error loading configuration file ${file} ${response ? response.data : ''}`)))
-                    .then((response) => {
-                        // eslint-disable-next-line no-console
-                        console.info("Loaded external configuration from", file);
-                        this.externalConfig = merge(this.externalConfig, response.data);
-                    }))
-            ).catch((msg) => {
-                // Log error message and continue with the default configuration
-                console.warn(msg);
-            }).then(() => {
-                this.loaded = true;
-                this.fullConfig = merge({...this.internalConfig}, this.externalConfig);
-                return this.fullConfig;
-            });
-        } else {
+
+        this.loadingPromise = Promise.all(
+            externalConfigurationFiles.map(file => axios.get(file)
+                .catch(({response}) => Promise.reject(Error(`Error loading configuration file ${file} ${response ? response.data : ''}`)))
+                .then((response) => {
+                    // eslint-disable-next-line no-console
+                    console.info("Loaded external configuration from", file);
+                    this.externalConfig = merge(this.externalConfig, response.data);
+                }))
+        ).catch((msg) => {
+            // Log error message and continue with the default configuration
+            console.warn(msg);
+        }).then(() => {
             this.loaded = true;
-            this.fullConfig = this.internalConfig;
-            this.loadingPromise = Promise.resolve(this.fullConfig);
-        }
+            this.fullConfig = merge({...this.internalConfig}, this.externalConfig);
+            return this.fullConfig;
+        });
 
         return this.loadingPromise;
     }
