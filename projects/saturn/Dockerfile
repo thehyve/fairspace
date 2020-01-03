@@ -1,4 +1,4 @@
-FROM openjdk:11-jre
+FROM openjdk:12-jre
 
 ADD build/distributions/*.tar /opt/
 EXPOSE 8080
