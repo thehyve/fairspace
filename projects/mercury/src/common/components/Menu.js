@@ -12,14 +12,14 @@ const Menu = ({location: {pathname}}) => (
             <ListItem
                 component={NavLink}
                 exact
-                to="/"
+                to={projectPrefix() + "/"}
                 button
-                selected={pathname === '/'}
+                selected={pathname === projectPrefix() + "/"}
             >
                 <ListItemIcon>
                     <Icon>home</Icon>
                 </ListItemIcon>
-                <ListItemText primary="Home" />
+                <ListItemText primary="Overview" />
             </ListItem>
             <ListItem
                 component={NavLink}

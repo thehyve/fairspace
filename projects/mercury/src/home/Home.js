@@ -4,10 +4,10 @@ import {BreadCrumbs, usePageTitleUpdater} from "../common";
 import WithRightDrawer from "../common/components/WithRightDrawer";
 import RecentActivity from "./RecentActivity";
 import Config from "../common/services/Config";
-import WorkspaceInfo from './WorkspaceInfo';
+import ProjectInfo from './WorkspaceInfo';
 
 export default () => {
-    usePageTitleUpdater("Home");
+    usePageTitleUpdater("Project Overview");
 
     return (
         <>
@@ -22,7 +22,7 @@ export default () => {
                     )
                     : <BreadCrumbs />
             }
-            <WorkspaceInfo />
+            <ProjectInfo />
         </>
     );
 };

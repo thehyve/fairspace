@@ -8,13 +8,13 @@ import {WORKSPACE_INFO_URI} from '../constants';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import LinkedDataContext from '../metadata/LinkedDataContext';
 
-const WorkspaceInfoWithProvider = () => (
+const ProjectInfoWithProvider = () => (
     <LinkedDataMetadataProvider>
-        <WorkspaceInfo />
+        <ProjectInfo />
     </LinkedDataMetadataProvider>
 );
 
-const WorkspaceInfo = () => {
+const ProjectInfo = () => {
     const {isCoordinator} = useContext(LinkedDataContext);
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(WORKSPACE_INFO_URI);
     const [editingEnabled, setEditingEnabled] = useState(false);
@@ -56,4 +56,4 @@ const WorkspaceInfo = () => {
     );
 };
 
-export default WorkspaceInfoWithProvider;
+export default ProjectInfoWithProvider;

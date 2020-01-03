@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 const BreadcrumbsContext = React.createContext({
     segments: [{
-        label: 'Home',
+        label: 'ProjectOverview',
         href: '/',
         icon: 'home'
     }]
