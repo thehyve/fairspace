@@ -105,7 +105,7 @@ const getWorkspaceUrl = (url) => {
 app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 
 // All projects from all workspaces
-app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
+app.get('/api/v1/all-projects', (req, res) => res.json(allProjects).end());
 
 const addToken = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
 

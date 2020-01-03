@@ -120,6 +120,6 @@ describe('FileAPI', () => {
 
     it('Generates proper download link', () => {
         const downloadLink = FileAPI.getDownloadLink('/filePath');
-        expect(downloadLink).toEqual('/webdav/filePath');
+        expect(downloadLink).toEqual('webdav/filePath');
     });
 });

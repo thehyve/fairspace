@@ -9,9 +9,11 @@ export const currentProject = () => {
 export const projectPrefix = () => (currentProject() && `/projects/${currentProject()}`) || '';
 
 axios.interceptors.request.use((config) => {
-    const project = currentProject();
-    if (project) {
-        config.baseURL = '/api/v1/projects/' + project;
+    if (!config.url.startsWith('/')) {
+        const project = currentProject();
+        if (project) {
+            config.baseURL = `/api/v1/projects/${project}/`;
+        }
     }
     return config;
 }, Promise.reject);
