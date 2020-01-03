@@ -18,7 +18,7 @@ import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 
 const routes = () => (
     <>
-        <Route path="/" exact component={Home} />
+        <Route path="/projects/:project" exact component={Home} />
 
         <Route
             path="/projects/:project/collections"
