@@ -1,10 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {projectPrefix} from "../../projects/projects";
 
 const BreadcrumbsContext = React.createContext({
     segments: [{
-        label: 'ProjectOverview',
-        href: '/',
+        label: 'Project Overview',
+        href: projectPrefix(),
         icon: 'home'
     }]
 });

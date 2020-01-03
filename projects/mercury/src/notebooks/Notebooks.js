@@ -10,6 +10,7 @@ import {withStyles} from "@material-ui/core";
 import {BreadCrumbs, BreadcrumbsContext} from "../common";
 
 import Config from "../common/services/Config";
+import {projectPrefix} from "../projects/projects";
 
 const styles = theme => ({
     card: {
@@ -27,7 +28,7 @@ const Notebooks = ({classes}) => (
         segments: [{
             label: 'Notebooks',
             icon: 'bar_chart',
-            href: '/notebooks'
+            href: projectPrefix() + '/notebooks'
         }]
     }}
     >
