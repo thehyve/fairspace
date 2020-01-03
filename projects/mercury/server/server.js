@@ -93,9 +93,12 @@ app.use((req, res, next) => {
     next();
 });
 
-const getWorkspaceUrl = (req) => {
-    const projectName = req.query.project;
-    const project = allProjects.find(p => p.id === projectName);
+// '/api/v1/projects/project/collections/' -> ['', 'api', 'v1', 'projects', 'project', 'collections', '']
+const getProjectId = (url) => url.split('/')[4];
+
+const getWorkspaceUrl = (url) => {
+    const projectId = getProjectId(url);
+    const project = allProjects.find(p => p.id === projectId);
     return project && project.workspace;
 };
 
@@ -104,18 +107,18 @@ app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
 
-const onProxyReq = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
+const addToken = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
 
 app.use(proxy('/api/keycloak', {
     target: config.urls.keycloak,
     pathRewrite: {'^/api/keycloak': '/auth/admin/realms/' + config.keycloak.realm},
-    onProxyReq,
+    onProxyReq: addToken,
     changeOrigin: true
 }));
 
-app.use(proxy('/api/v1/search', {
+app.use(proxy('/api/v1/*/search', {
     target: config.urls.elasticsearch,
-    pathRewrite: {'^/api/v1/search': ''}
+    pathRewrite: (url) => `/${getProjectId(url)}/_search`
 }));
 
 app.get('/api/v1/account', (req, res) => res.json({
@@ -127,10 +130,19 @@ app.get('/api/v1/account', (req, res) => res.json({
     authorizations: accessToken.content.realm_access.roles
 }));
 
-app.use(proxy('/api/v1', {
+app.use(proxy('/api/v1/projects/', {
     target: 'http://never.ever',
-    router: req => getWorkspaceUrl(req),
-    onProxyReq
+    router: req => getWorkspaceUrl(req.originalUrl),
+    // '/api/v1/projects/project/collections/' -> '/api/v1/collections'
+    pathRewrite: (url) => {
+        const parts = url.split('/');
+        parts.splice(4, 2);
+        return parts.join('/');
+    },
+    onProxyReq: (proxyReq, req) => {
+        addToken(proxyReq);
+        proxyReq.setHeader('X-Fairspace-Project', getProjectId(req.originalUrl));
+    }
 }));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');

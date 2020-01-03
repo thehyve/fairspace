@@ -100,7 +100,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
             }
         }
 
-        var project = request.getParameter("project");
+        var project = request.getHeader("X-Fairspace-Project");
         // TODO: Apply project, check permissions
 
         setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null));

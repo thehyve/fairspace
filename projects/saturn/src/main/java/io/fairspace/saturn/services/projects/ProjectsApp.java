@@ -16,7 +16,7 @@ public class ProjectsApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(List.of(new Project("fairspace")));
+            return mapper.writeValueAsString(List.of(new Project("fairspace"), new Project("workspace-ci")));
         });
     }
 }
