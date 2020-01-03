@@ -29,7 +29,7 @@ const App = () => {
     const userInfo = '/api/v1/account';
     const logout = '/logout';
     const versionUrl = '/config/version.json';
-    const usersUrl = '/api/v1/users/';
+    const usersUrl = 'users/';
 
     const isMounted = useIsMounted();
     const [configLoaded, setConfigLoaded] = useState(false);

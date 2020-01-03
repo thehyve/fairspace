@@ -11,8 +11,9 @@ data:
   config.json: |-
     {
       "urls": {
-        {{ if ( and .Values.services .Values.services.jupyterhub  ) }}"jupyterhub": "{{ .Values.services.jupyterhub }}",{{ end }}
-        {{ if ( and .Values.services .Values.services.cbioportal  ) }}"cbioportal": "{{ .Values.services.cbioportal }}",{{ end }}
+        "thehyve": "https://thehyve.nl/"
+        {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
+        {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
       },
       "roles": {
         "user": "{{ template "workspace.roles.user" . }}",
