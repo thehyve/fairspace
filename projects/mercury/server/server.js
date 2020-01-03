@@ -116,7 +116,7 @@ app.use(proxy('/api/keycloak', {
     changeOrigin: true
 }));
 
-app.use(proxy('/api/v1/*/search', {
+app.use(proxy('/api/v1/projects/*/search', {
     target: config.urls.elasticsearch,
     pathRewrite: (url) => `/${getProjectId(url)}/_search`
 }));
@@ -136,7 +136,7 @@ app.use(proxy('/api/v1/projects/', {
     // '/api/v1/projects/project/collections/' -> '/api/v1/collections'
     pathRewrite: (url) => {
         const parts = url.split('/');
-        parts.splice(4, 2);
+        parts.splice(3, 2);
         return parts.join('/');
     },
     onProxyReq: (proxyReq, req) => {
