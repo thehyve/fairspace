@@ -22,6 +22,8 @@ app.get('/config/version.json', (req, res) => res.sendFile(`${mockDataDir}/works
 // Account API
 app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
 
+app.get('/api/v1/workspaces', (req, res) => res.json(['http://localhost:8080']).end());
+
 const MOCKED_USERS_LOCATION = `${mockDataDir}/keycloak-users.json`;
 
 // Users search
