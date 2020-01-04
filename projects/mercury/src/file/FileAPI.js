@@ -25,7 +25,7 @@ axios.interceptors.request.use((config) => {
 
 class FileAPI {
     client() {
-        return createClient(`/api/v1/${projectPrefix()}/webdav`);
+        return createClient(`/api/v1${projectPrefix()}/webdav`);
     }
 
     stat(path) {
@@ -107,7 +107,7 @@ class FileAPI {
     /**
      * It creates a full download like to the path provided
      */
-    getDownloadLink = (path = '') => `/api/v1/${projectPrefix()}/webdav${path}`;
+    getDownloadLink = (path = '') => `/api/v1${projectPrefix()}/webdav${path}`;
 
     /**
      * Deletes the file given by path
