@@ -4,7 +4,7 @@ import {compareBy, comparing} from '../common';
 
 import {generateUniqueFileName, getFileName, joinPaths} from '../common/utils/fileUtils';
 
-const filesUrl = '/api/v1/webdav';
+const filesUrl = 'webdav';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
