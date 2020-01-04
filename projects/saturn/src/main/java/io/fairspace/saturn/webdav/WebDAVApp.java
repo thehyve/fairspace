@@ -31,9 +31,9 @@ import static spark.Spark.before;
 public class WebDAVApp implements SparkApplication {
     private final HttpManager httpManager;
 
-    public WebDAVApp(String pathPrefix, Services svc) {
+    public WebDAVApp(Services svc) {
         httpManager =  new HttpManagerBuilder() {{
-            setResourceFactory(new VfsBackedMiltonResourceFactory(pathPrefix, svc.getFileSystem()));
+            setResourceFactory(new VfsBackedMiltonResourceFactory(svc.getFileSystem()));
             setMultiNamespaceCustomPropertySourceEnabled(true);
             setAuthenticationService(new AuthenticationService(singletonList(new SaturnAuthenticationHandler())));
             setValueWriters(new NullSafeValueWriters());
@@ -65,7 +65,7 @@ public class WebDAVApp implements SparkApplication {
 
     @Override
     public void init() {
-        before("/webdav/*", (req, res) -> {
+        before("/projects/*/webdav/*", (req, res) -> {
             var servletRequest = (HttpServletRequest) req.raw();
             var servletResponse = (HttpServletResponse) res.raw();
 

@@ -20,7 +20,7 @@ public class ApiFilterFactory {
                 new CollectionsApp("/collections", svc.getCollectionsService()),
                 new PermissionsApp("/permissions", svc.getPermissionsService()),
                 new UserApp("/users", svc.getUserService()),
-                new WebDAVApp(apiPathPrefix + "/webdav/", svc),
+                new WebDAVApp(svc),
                 new HealthApp("/health"),
                 new ProjectsApp("/projects"));
     }

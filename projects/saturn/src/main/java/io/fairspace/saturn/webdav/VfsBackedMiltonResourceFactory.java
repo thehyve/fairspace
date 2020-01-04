@@ -9,28 +9,26 @@ import io.milton.resource.Resource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.util.stream.Collectors.joining;
 
 public class VfsBackedMiltonResourceFactory implements ResourceFactory {
-    private final String pathPrefix;
     private final VirtualFileSystem fs;
 
-    VfsBackedMiltonResourceFactory(String pathPrefix, VirtualFileSystem fs) {
-        this.pathPrefix = pathPrefix;
+    VfsBackedMiltonResourceFactory(VirtualFileSystem fs) {
         this.fs = fs;
     }
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
-        if (normalizePath(path).equals(normalizePath(pathPrefix))) {
-            return getResource(fs, "");
-        }
-
-        if (!path.startsWith(pathPrefix)) {
-            throw new BadRequestException("Invalid resource path: " + path);
-        }
-        return getResource(fs, normalizePath(path.substring(pathPrefix.length())));
+        // /api/v1/projects/*/webdav/relPath -> relPath
+        var relPath = Stream.of(splitPath(path))
+                .skip(5)
+                .collect(joining("/"));
+        return getResource(fs, relPath);
     }
 
     static Resource getResource(VirtualFileSystem fs, String path) {

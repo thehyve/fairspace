@@ -19,12 +19,14 @@ module.exports = (app) => {
         pathRewrite: (url) => `/${getProjectId(url)}/_search`
     }));
 
-    app.use(proxy('/api/v1/projects/', {
+    app.use(proxy('/api/v1/projects/*/**', {
         target: BACKEND_URL,
         // '/api/v1/projects/project/collections/' -> '/api/v1/collections'
         pathRewrite: (url) => {
             const parts = url.split('/');
-            parts.splice(3, 2);
+            if (parts[5] !== 'webdav') {
+                parts.splice(3, 2);
+            }
             return parts.join('/');
         },
         onProxyReq: (proxyReq, req) => {
