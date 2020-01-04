@@ -14,11 +14,11 @@ import javax.servlet.Filter;
 public class ApiFilterFactory {
     public static Filter createApiFilter(String apiPathPrefix, Services svc, Config config) {
         return new SaturnSparkFilter(apiPathPrefix,
-                new ChangeableMetadataApp("/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
-                new ChangeableMetadataApp("/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
-                new ReadableMetadataApp("/meta-vocabulary", svc.getMetaVocabularyService()),
-                new CollectionsApp("/collections", svc.getCollectionsService()),
-                new PermissionsApp("/permissions", svc.getPermissionsService()),
+                new ChangeableMetadataApp("/projects/:project/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
+                new ChangeableMetadataApp("/projects/:project/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
+                new ReadableMetadataApp("/projects/:project/meta-vocabulary", svc.getMetaVocabularyService()),
+                new CollectionsApp("/projects/:project/collections", svc.getCollectionsService()),
+                new PermissionsApp("/projects/:project/permissions", svc.getPermissionsService()),
                 new UserApp("/users", svc.getUserService()),
                 new WebDAVApp(svc),
                 new HealthApp("/health"),

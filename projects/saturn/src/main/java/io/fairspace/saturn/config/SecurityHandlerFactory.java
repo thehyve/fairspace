@@ -9,7 +9,7 @@ import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 
 @Slf4j
 public class SecurityHandlerFactory {
-    public static SecurityHandler getSecurityHandler(String apiPathPrefix, Config.Auth authConfig, Services svc) {
+    public static SecurityHandler getSecurityHandler(Config.Auth authConfig, Services svc) {
         if (!authConfig.enabled) {
             log.warn("Authentication is disabled");
         }
@@ -17,6 +17,6 @@ public class SecurityHandlerFactory {
                 ? createAuthenticator(authConfig.jwksUrl, authConfig.jwtAlgorithm)
                 : new DummyAuthenticator(authConfig.developerRoles);
 
-        return new SaturnSecurityHandler(apiPathPrefix, authConfig, authenticator, svc.getUserService()::onAuthorized);
+        return new SaturnSecurityHandler(authConfig, authenticator, svc.getUserService()::onAuthorized);
     }
 }

@@ -133,19 +133,7 @@ app.get('/api/v1/account', (req, res) => res.json({
 app.use(proxy('/api/v1/projects/*/**', {
     target: 'http://never.ever',
     router: req => getWorkspaceUrl(req.originalUrl),
-    // '/api/v1/projects/project/collections/' -> '/api/v1/collections'
-    // '/api/v1/projects/project/webdav/path'  -> '/api/v1/projects/project/webdav/path' (unchanged)
-    pathRewrite: (url) => {
-        const parts = url.split('/');
-        if (parts[5] !== 'webdav') {
-            parts.splice(3, 2);
-        }
-        return parts.join('/');
-    },
-    onProxyReq: (proxyReq, req) => {
-        addToken(proxyReq);
-        proxyReq.setHeader('X-Fairspace-Project', getProjectId(req.originalUrl));
-    }
+    onProxyReq: addToken
 }));
 
 const clientDir = path.join(path.dirname(__dirname), 'client');

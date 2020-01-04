@@ -13,7 +13,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 
 @Slf4j
 public class App {
-    private static final String API_VERSION = "v1";
+    public static final String API_PREFIX = "/api/v1";
 
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
@@ -24,11 +24,10 @@ public class App {
 
         var svc = new Services(CONFIG, ds, () -> getThreadContext().getUserInfo());
 
-        var apiPathPrefix = "/api/" + API_VERSION;
         FusekiServer.create()
-                .securityHandler(getSecurityHandler(apiPathPrefix, CONFIG.auth, svc))
-                .add(apiPathPrefix + "/rdf/", ds, false)
-                .addFilter(apiPathPrefix + "/*", createApiFilter(apiPathPrefix, svc, CONFIG))
+                .securityHandler(getSecurityHandler(CONFIG.auth, svc))
+                .add(API_PREFIX + "/rdf/", ds, false)
+                .addFilter(API_PREFIX + "/*", createApiFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port)
                 .build()
                 .start();
