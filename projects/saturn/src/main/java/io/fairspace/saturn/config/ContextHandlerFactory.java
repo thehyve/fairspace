@@ -1,6 +1,6 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.SaturnSecurityHandler;
+import io.fairspace.saturn.SaturnContextHandler;
 import io.fairspace.saturn.auth.DummyAuthenticator;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.security.SecurityHandler;
@@ -8,8 +8,8 @@ import org.eclipse.jetty.security.SecurityHandler;
 import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 
 @Slf4j
-public class SecurityHandlerFactory {
-    public static SecurityHandler getSecurityHandler(Config.Auth authConfig, Services svc) {
+public class ContextHandlerFactory {
+    public static SecurityHandler getContextHandler(Config.Auth authConfig, Services svc) {
         if (!authConfig.enabled) {
             log.warn("Authentication is disabled");
         }
@@ -17,6 +17,6 @@ public class SecurityHandlerFactory {
                 ? createAuthenticator(authConfig.jwksUrl, authConfig.jwtAlgorithm)
                 : new DummyAuthenticator(authConfig.developerRoles);
 
-        return new SaturnSecurityHandler(authConfig, authenticator, svc.getUserService()::onAuthorized);
+        return new SaturnContextHandler(authConfig, authenticator, svc.getUserService()::onAuthorized);
     }
 }

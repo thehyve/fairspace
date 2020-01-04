@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SaturnSecurityHandlerTest {
+public class SaturnContextHandlerTest {
     @Mock
     private Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
     @Mock
@@ -38,21 +39,24 @@ public class SaturnSecurityHandlerTest {
     @Mock
     private HttpServletResponse response;
     @Mock
+    private RequestDispatcher requestDispatcher;
+    @Mock
     private Handler nextHandler;
     @Mock
     private Consumer<OAuthAuthenticationToken> onAuthorized;
 
     private StringWriter writer;
 
-    private SaturnSecurityHandler handler;
+    private SaturnContextHandler handler;
 
     @Before
     public void before() throws IOException {
-        handler = new SaturnSecurityHandler("/api/v1", ConfigLoader.CONFIG.auth, authenticator, onAuthorized);
+        handler = new SaturnContextHandler(ConfigLoader.CONFIG.auth, authenticator, onAuthorized);
         handler.setHandler(nextHandler);
 
         writer = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(writer));
+        when(request.getRequestDispatcher(any())).thenReturn(requestDispatcher);
     }
 
     @Test
@@ -76,15 +80,15 @@ public class SaturnSecurityHandlerTest {
     public void sparqlRequiresSparqlRole() throws IOException, ServletException {
         when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
 
-        handler.handle("/api/v1/rdf/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
 
         verifyAuthenticated(false);
 
         when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user", "sparql"))));
 
-        handler.handle("/api/v1/rdf/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
 
-        verifyAuthenticated(true);
+        verify(requestDispatcher).forward(request, response);
     }
 
     @Test
@@ -92,7 +96,7 @@ public class SaturnSecurityHandlerTest {
         when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
         when(request.getMethod()).thenReturn("GET");
 
-        handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(true);
     }
@@ -102,14 +106,14 @@ public class SaturnSecurityHandlerTest {
         when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
         when(request.getMethod()).thenReturn("PUT");
 
-        handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(false);
 
         when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user", "datasteward"))));
         when(request.getMethod()).thenReturn("PUT");
 
-        handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(true);
     }
@@ -128,19 +132,19 @@ public class SaturnSecurityHandlerTest {
         var token = new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("coordinator")));
         when(authenticator.apply(eq(request))).thenReturn(token, token, token, token);
 
-        handler.handle("/api/v1/metadata/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/metadata/", baseRequest, request, response);
         verifyAuthenticated(true);
         reset(onAuthorized, nextHandler);
 
-        handler.handle("/webdav/v1/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/webdav/path/", baseRequest, request, response);
         verifyAuthenticated(true);
         reset(onAuthorized, nextHandler);
 
-        handler.handle("/api/v1/rdf/", baseRequest, request, response);
-        verifyAuthenticated(true);
+        handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
+        verify(requestDispatcher).forward(request, response);
         reset(onAuthorized, nextHandler);
 
-        handler.handle("/api/v1/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
         verifyAuthenticated(true);
     }
 

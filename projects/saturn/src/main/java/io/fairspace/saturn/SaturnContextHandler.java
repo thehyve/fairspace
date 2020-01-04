@@ -1,5 +1,6 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -17,12 +18,13 @@ import java.util.stream.Stream;
 
 import static io.fairspace.saturn.App.API_PREFIX;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static java.util.stream.Collectors.joining;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
-public class SaturnSecurityHandler extends ConstraintSecurityHandler {
+public class SaturnContextHandler extends ConstraintSecurityHandler {
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
     public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
     public static final String PROJECTS_PREFIX = "/api/v1/projects/";
@@ -40,8 +42,10 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
      * @param authenticator Authenticator returning a UserInfo for an incoming request
      * @param onAuthorized  An optional callback, called on successful authorization
      */
-    public SaturnSecurityHandler(Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
-        this.authenticator = authenticator;
+    public SaturnContextHandler(Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
+        this.authenticator = config.enabled
+                ? createAuthenticator(config.jwksUrl, config.jwtAlgorithm)
+                : new DummyAuthenticator(config.developerRoles);;
         this.onAuthorized = onAuthorized;
         this.workspaceUserRole = config.workspaceUserRole;
         this.sparqlRole = config.sparqlRole;
