@@ -130,13 +130,16 @@ app.get('/api/v1/account', (req, res) => res.json({
     authorizations: accessToken.content.realm_access.roles
 }));
 
-app.use(proxy('/api/v1/projects/', {
+app.use(proxy('/api/v1/projects/*/**', {
     target: 'http://never.ever',
     router: req => getWorkspaceUrl(req.originalUrl),
     // '/api/v1/projects/project/collections/' -> '/api/v1/collections'
+    // '/api/v1/projects/project/webdav/path'  -> '/api/v1/projects/project/webdav/path' (unchanged)
     pathRewrite: (url) => {
         const parts = url.split('/');
-        parts.splice(3, 2);
+        if (parts[5] !== 'webdav') {
+            parts.splice(3, 2);
+        }
         return parts.join('/');
     },
     onProxyReq: (proxyReq, req) => {
