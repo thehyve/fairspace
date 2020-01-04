@@ -1,6 +1,5 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.DummyAuthenticator;
 import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -18,7 +17,6 @@ import java.util.stream.Stream;
 
 import static io.fairspace.saturn.App.API_PREFIX;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
-import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static java.util.stream.Collectors.joining;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
@@ -43,9 +41,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
      * @param onAuthorized  An optional callback, called on successful authorization
      */
     public SaturnContextHandler(Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
-        this.authenticator = config.enabled
-                ? createAuthenticator(config.jwksUrl, config.jwtAlgorithm)
-                : new DummyAuthenticator(config.developerRoles);;
+        this.authenticator = authenticator;;
         this.onAuthorized = onAuthorized;
         this.workspaceUserRole = config.workspaceUserRole;
         this.sparqlRole = config.sparqlRole;
