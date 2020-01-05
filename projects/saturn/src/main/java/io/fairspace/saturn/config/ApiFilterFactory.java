@@ -19,7 +19,7 @@ public class ApiFilterFactory {
                 new ReadableMetadataApp("/projects/:project/meta-vocabulary", svc.getMetaVocabularyService()),
                 new CollectionsApp("/projects/:project/collections", svc.getCollectionsService()),
                 new PermissionsApp("/projects/:project/permissions", svc.getPermissionsService()),
-                new UserApp("/users", svc.getUserService()),
+                new UserApp("/projects/:project/users", svc.getUserService()),
                 new WebDAVApp(svc),
                 new HealthApp("/health"),
                 new ProjectsApp("/projects"));
