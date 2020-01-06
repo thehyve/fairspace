@@ -112,9 +112,12 @@ app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
 
+const projectsBeingCreated = new Set();
+
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
     const project = req.body;
+
     if (!workspaces.includes(project.workspace)) {
         res.status(400).send('Unknown workspace URL');
         return;
@@ -127,6 +130,12 @@ app.put('/api/v1/projects', (req, res) => {
         res.status(400).send('This project id is already taken: ' + project.id);
         return;
     }
+    if (projectsBeingCreated.has(project.id)) {
+        res.status(400).send('A project with this id is already being created: ' + project.id);
+        return;
+    }
+
+    projectsBeingCreated.add(project.id);
 
     // TODO: Check user's permissions
 
@@ -137,7 +146,8 @@ app.put('/api/v1/projects', (req, res) => {
                 allProjects.push(project);
             }
             res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text());
-        });
+        })
+        .finally(() => projectsBeingCreated.delete(project.id));
 });
 
 const addToken = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
