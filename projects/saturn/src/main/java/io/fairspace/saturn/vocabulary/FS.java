@@ -113,20 +113,17 @@ public class FS {
     public static final String ERROR_MESSAGE_URI = NS + "errorMessage";
     public static final String ERROR_DETAILS_URI = NS + "errorDetails";
 
-    public static final String THE_WORKSPACE_URI = NS + "theWorkspace";
-    public static final Resource theWorkspace = createResource(THE_WORKSPACE_URI);
+    public static final String THE_WORKSPACE_URI = NS + "theProject";
+    public static final Resource theProject = createResource(THE_WORKSPACE_URI);
 
-    public static final String WORKSPACE_INSTANCE_URI = NS + "WorkspaceInstance";
-    public static final Resource WorkspaceInstance = createResource(WORKSPACE_INSTANCE_URI);
+    public static final String PROJECT_URI = NS + "Project";
+    public static final Resource Project = createResource(PROJECT_URI);
 
-    public static final String WORKSPACE_TITLE_URI = NS + "workspaceTitle";
-    public static final Property workspaceTitle = createProperty(WORKSPACE_TITLE_URI);
+    public static final String PROJECT_DESCRIPTION_URI = NS + "projectDescription";
+    public static final Property projectDescription = createProperty(PROJECT_DESCRIPTION_URI);
 
-    public static final String WORKSPACE_DESCRIPTION_URI = NS + "workspaceDescription";
-    public static final Property workspaceDescription = createProperty(WORKSPACE_DESCRIPTION_URI);
-
-    public static final String WORKSPACE_EXTERNAL_LINK_URI = NS + "workspaceExternalLink";
-    public static final Property workspaceExternalLink = createProperty(WORKSPACE_EXTERNAL_LINK_URI);
+    public static final String PROJECT_EXTERNAL_LINK_URI = NS + "projectExternalLink";
+    public static final Property projectExternalLink = createProperty(PROJECT_EXTERNAL_LINK_URI);
 
     public static final String MARKDOWN_URI = NS + "markdown";
     public static final Property markdown = createProperty(MARKDOWN_URI);

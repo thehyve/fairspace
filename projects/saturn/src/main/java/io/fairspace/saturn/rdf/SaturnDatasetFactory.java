@@ -10,12 +10,12 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.elasticsearch.client.Client;
 
 import java.io.File;
@@ -69,14 +69,14 @@ public class SaturnDatasetFactory {
 
         TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
-        if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theWorkspace, null))) {
+        if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theProject, null))) {
             setThreadContext(new ThreadContext(null, null, null, projectName));
             executeWrite("Workspace initialization", ds, () -> {
                 ds.getDefaultModel()
-                        .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
-                        .add(FS.theWorkspace, FS.workspaceTitle, projectName)
-                        .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
-                ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true));
+                        .add(FS.theProject, RDF.type, FS.Project)
+                        .add(FS.theProject, RDFS.label, projectName)
+                        .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
+                ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
             });
             cleanThreadContext();
         }
