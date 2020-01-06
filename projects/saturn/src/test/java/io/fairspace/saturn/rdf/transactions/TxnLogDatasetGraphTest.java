@@ -41,9 +41,8 @@ public class TxnLogDatasetGraphTest {
     @Before
     public void before() {
         setThreadContext(new ThreadContext(
-                new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email"))
-                , "message"
-                , "system"));
+                new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")),
+                "message"    , "system", "project"));
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
     }
 

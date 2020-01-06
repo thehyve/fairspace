@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.App.API_PREFIX;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static java.util.stream.Collectors.joining;
@@ -26,7 +27,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
     public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
     public static final String PROJECTS_PREFIX = "/api/v1/projects/";
-    public static final String PROJECT_ATTRIBUTE = "Project";
+    public static final String FORWARDED_ATTRIBUTE = "forwarded";
 
 
     private final Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
@@ -52,7 +53,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
     @Override
     public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // A second pass after forwarding?
-        if (request.getAttribute(PROJECT_ATTRIBUTE) != null) {
+        if (request.getAttribute(FORWARDED_ATTRIBUTE) != null) {
             baseRequest.setDispatcherType(DispatcherType.REQUEST);
             getHandler().handle(pathInContext, baseRequest, request, response);
             return;
@@ -71,12 +72,12 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
             if (pathInContext.startsWith(PROJECTS_PREFIX) && pathInContext.length() > PROJECTS_PREFIX.length()) {
                 var parts = pathInContext.split("/");
                 var project = parts[4];
-                request.setAttribute(PROJECT_ATTRIBUTE, project);
-                // TODO: Apply project
+                getThreadContext().setProject(project);
 
                 // Fuseki doesn't like path parameters, so we handle it separately
                 if (parts.length > 5 && parts[5].equals("rdf")) {
                     var newPath = Stream.of(parts).skip(5).collect(joining("/", API_PREFIX + "/", pathInContext.endsWith("/") ? "/" : ""));
+                    request.setAttribute(FORWARDED_ATTRIBUTE, true);
                     request.getRequestDispatcher(newPath).forward(request, response);
                     return;
                 }
@@ -121,7 +122,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                     onAuthorized.accept(userInfo);
                 }
 
-                setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null));
+                setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null, null));
         }
 
         return null;

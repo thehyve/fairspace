@@ -29,6 +29,7 @@ import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
@@ -78,6 +79,8 @@ public class SaturnDatasetFactory {
             });
             cleanThreadContext();
         }
+
+        initVocabularies(ds);
 
         return ds;
     }

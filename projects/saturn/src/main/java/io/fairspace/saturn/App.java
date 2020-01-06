@@ -9,7 +9,6 @@ import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ContextHandlerFactory.getContextHandler;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 
 @Slf4j
 public class App {
@@ -19,8 +18,6 @@ public class App {
         log.info("Saturn is starting");
 
         var ds = SaturnDatasetFactory.connect(CONFIG);
-
-        initVocabularies(ds);
 
         var svc = new Services(CONFIG, ds, () -> getThreadContext().getUserInfo());
 
