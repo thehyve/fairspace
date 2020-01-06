@@ -87,7 +87,9 @@ public class SaturnDatasetFactory {
 
         setThreadContext(ctx);
 
-        getThreadContext().setSystemCommitMessage(null);
+        if (ctx != null) {
+            ctx.setSystemCommitMessage(null);
+        }
 
         return dsg;
     }
