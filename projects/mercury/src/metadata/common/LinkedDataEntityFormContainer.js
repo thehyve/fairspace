@@ -1,10 +1,9 @@
 import React, {useContext, useState} from "react";
 import PropTypes from "prop-types";
-import {Button, CircularProgress, Grid} from "@material-ui/core";
-import IconButton from "@material-ui/core/IconButton";
-import Icon from "@material-ui/core/Icon";
-import {ConfirmationDialog} from '../../common';
+import {Button, CircularProgress, Grid, IconButton} from "@material-ui/core";
+import {Edit} from '@material-ui/icons';
 
+import {ConfirmationDialog} from '../../common';
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
@@ -124,7 +123,7 @@ const LinkedDataEntityFormContainer = ({
                             onClick={() => {
                                 setEditingEnabled(true);
                             }}
-                        ><Icon>edit</Icon>
+                        ><Edit />
                         </IconButton>
                     )}
                 </Grid>

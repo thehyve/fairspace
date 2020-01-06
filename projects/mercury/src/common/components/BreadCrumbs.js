@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import {Link as RouterLink} from 'react-router-dom';
-import {Breadcrumbs, Icon, Link, Typography, withStyles} from '@material-ui/core';
+import {Breadcrumbs, Link, SvgIcon, Typography, withStyles} from '@material-ui/core';
 import BreadcrumbsContext from "../contexts/BreadcrumbsContext";
 
 /**
@@ -25,7 +25,7 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
                     className={classes.link}
                     color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}
                 >
-                    { icon ? <Icon className={classes.icon}>{icon}</Icon> : undefined }
+                    { <div className={classes.icon}>{icon}</div> || undefined }
                     { idx === allSegments.length - 1
                         ? label
                         : (
@@ -47,7 +47,7 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
 BreadCrumbs.propTypes = {
     additionalSegments: PropTypes.arrayOf(
         PropTypes.shape({
-            icon: PropTypes.string,
+            icon: PropTypes.instanceOf(SvgIcon),
             href: PropTypes.string.isRequired,
             label: PropTypes.string.isRequired
         })

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
     Checkbox,
     Grid,
-    Icon,
     Paper,
     Table,
     TableBody,
@@ -14,6 +13,7 @@ import {
     Typography,
     withStyles
 } from "@material-ui/core";
+import {FolderOpen, NoteOutlined} from "@material-ui/icons";
 import filesize from 'filesize';
 import {compareBy, formatDateTime, stableSort, usePagination, useSorting} from '../common';
 
@@ -137,10 +137,9 @@ const FileList = ({
                                 }
 
                                 <TableCell padding="none" align="left">
-                                    <Icon>
-                                        {file.type === 'directory' ? 'folder_open' : 'note_open'}
-                                    </Icon>
+                                    {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                 </TableCell>
+                                <TableCell align="left" padding="checkbox" />
                                 <TableCell>
                                     {file.basename}
                                 </TableCell>

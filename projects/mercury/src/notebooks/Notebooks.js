@@ -7,6 +7,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core";
+import {BarChart} from "@material-ui/icons";
 import {BreadCrumbs, BreadcrumbsContext} from "../common";
 
 import Config from "../common/services/Config";
@@ -27,7 +28,7 @@ const Notebooks = ({classes}) => (
     <BreadcrumbsContext.Provider value={{
         segments: [{
             label: 'Notebooks',
-            icon: 'bar_chart',
+            icon: <BarChart />,
             href: projectPrefix() + '/notebooks'
         }]
     }}

@@ -4,13 +4,12 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Icon,
     IconButton,
     Menu,
     MenuItem,
     Typography
 } from '@material-ui/core';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
 import {withRouter, useHistory} from 'react-router-dom';
 import {ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
@@ -27,10 +26,10 @@ import UsersContext from '../common/contexts/UsersContext';
 import getDisplayName from '../common/utils/userUtils';
 
 export const ICONS = {
-    LOCAL_STORAGE: 'folder_open',
-    AZURE_BLOB_STORAGE: 'cloud_open',
-    S3_BUCKET: 'cloud_open',
-    GOOGLE_CLOUD_BUCKET: 'cloud_open'
+    LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
+    AZURE_BLOB_STORAGE: <CloudDownload />,
+    S3_BUCKET: <CloudDownload />,
+    GOOGLE_CLOUD_BUCKET: <CloudDownload />
 };
 
 const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
@@ -139,7 +138,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                     aria-haspopup="true"
                                     onClick={this.handleMenuClick}
                                 >
-                                    <MoreVertIcon />
+                                    <MoreVert />
                                 </IconButton>
                                 <Menu
                                     id="simple-menu"
@@ -158,11 +157,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                         )}
                         titleTypographyProps={{variant: 'h6'}}
                         title={collection.name}
-                        avatar={(
-                            <Icon>
-                                {ICONS[iconName]}
-                            </Icon>
-                        )}
+                        avatar={ICONS[iconName]}
                     />
                     <CardContent style={{paddingTop: 0}}>
                         <Typography component="p">

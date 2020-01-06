@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Drawer from "@material-ui/core/Drawer/Drawer";
 import IconButton from "@material-ui/core/IconButton/IconButton";
-import Icon from "@material-ui/core/Icon/Icon";
+import {Close} from "@material-ui/icons";
 import styles from "./WithRightDrawer.styles";
 
 function WithRightDrawer({
@@ -36,7 +36,7 @@ function WithRightDrawer({
                         <div>
                             <div className={classes.toolbar} />
                             <IconButton onClick={onCloseDrawer} title="Close drawer" className={classes.closeButton}>
-                                <Icon>close</Icon>
+                                <Close />
                             </IconButton>
                         </div>
                     ) : null}

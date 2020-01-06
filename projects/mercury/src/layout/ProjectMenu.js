@@ -1,6 +1,7 @@
 import React from 'react';
 import {NavLink, withRouter} from "react-router-dom";
-import {Divider, Icon, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
+import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
+import {Assignment, BarChart, Code, FolderOpen, Group, Home, OpenInNew, Widgets} from "@material-ui/icons";
 
 import Config from '../common/services/Config';
 import {projectPrefix} from "../projects/projects";
@@ -17,7 +18,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                 selected={pathname === '/projects'}
             >
                 <ListItemIcon>
-                    <Icon>widgets</Icon>
+                    <Widgets />
                 </ListItemIcon>
                 <ListItemText primary="Projects" />
             </ListItem>
@@ -32,7 +33,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                 selected={pathname === projectPrefix() + "/"}
             >
                 <ListItemIcon>
-                    <Icon>home</Icon>
+                    <Home />
                 </ListItemIcon>
                 <ListItemText primary="Overview" />
             </ListItem>
@@ -44,7 +45,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                     selected={pathname.startsWith(projectPrefix() + '/collections')}
                 >
                     <ListItemIcon>
-                        <Icon>folder_open</Icon>
+                        <FolderOpen />
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
@@ -56,7 +57,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                         selected={pathname.startsWith(projectPrefix() + '/notebooks')}
                     >
                         <ListItemIcon>
-                            <Icon>bar_chart</Icon>
+                            <BarChart />
                         </ListItemIcon>
                         <ListItemText primary="Notebooks" />
                     </ListItem>
@@ -67,7 +68,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                     button
                 >
                     <ListItemIcon>
-                        <Icon>assignment</Icon>
+                        <Assignment />
                     </ListItemIcon>
                     <ListItemText primary="Metadata" />
                 </ListItem>
@@ -78,7 +79,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                     selected={pathname.startsWith(projectPrefix() + '/vocabulary')}
                 >
                     <ListItemIcon>
-                        <Icon>code</Icon>
+                        <Code />
                     </ListItemIcon>
                     <ListItemText primary="Vocabulary" />
                 </ListItem>
@@ -90,7 +91,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                 selected={pathname.startsWith(projectPrefix() + '/users')}
             >
                 <ListItemIcon>
-                    <Icon>group</Icon>
+                    <Group />
                 </ListItemIcon>
                 <ListItemText primary="Users" />
             </ListItem>
@@ -101,7 +102,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                 {Config.get().urls.dataverse ? (
                     <ListItem button component="a" href={Config.get().urls.dataverse}>
                         <ListItemIcon>
-                            <Icon>open_in_new</Icon>
+                            <OpenInNew />
                         </ListItemIcon>
                         <ListItemText primary="Dataverse" />
                     </ListItem>
@@ -109,7 +110,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                 {Config.get().urls.cbioportal ? (
                     <ListItem component="a" href={Config.get().urls.cbioportal} button>
                         <ListItemIcon>
-                            <Icon>open_in_new</Icon>
+                            <OpenInNew />
                         </ListItemIcon>
                         <ListItemText primary="cBioportal" />
                     </ListItem>

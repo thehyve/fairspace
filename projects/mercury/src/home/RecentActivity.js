@@ -1,6 +1,10 @@
 import React from 'react';
 import {Link} from "react-router-dom";
-import {Icon, List, ListItem, ListItemIcon, ListItemText, Typography, withStyles} from "@material-ui/core";
+import {
+    List, ListItem, ListItemText,
+    ListItemIcon, Typography, withStyles
+} from "@material-ui/core";
+import {Delete, FolderOpen, Info, LockOpen} from "@material-ui/icons";
 import {formatDateTime} from '../common';
 
 const styles = theme => ({
@@ -34,7 +38,7 @@ function RecentActivity({classes}) {
                     </Link>
                     &nbsp;has 4 new files.
                 </span>,
-            icon: 'folder_open',
+            icon: <FolderOpen />,
             date: justnow
         },
         {
@@ -50,7 +54,7 @@ function RecentActivity({classes}) {
                     </Link>
                     .
                 </span>,
-            icon: 'lock_open',
+            icon: <LockOpen />,
             date: hourago
         },
         {
@@ -74,7 +78,7 @@ function RecentActivity({classes}) {
                     {' '}
                     to restore.
                 </span>,
-            icon: 'delete',
+            icon: <Delete />,
             date: twohoursago
         },
         {
@@ -97,7 +101,7 @@ function RecentActivity({classes}) {
                     </a>
                     .
                 </span>,
-            icon: 'info',
+            icon: <Info />,
             date: yesterday
         }
     ];
@@ -109,9 +113,7 @@ function RecentActivity({classes}) {
                 {activity.map(item => (
                     <ListItem key={item.id} disableGutters>
                         <ListItemIcon classes={{root: classes.listItemIcon}}>
-                            <Icon>
-                                {item.icon}
-                            </Icon>
+                            {item.icon}
                         </ListItemIcon>
                         <ListItemText primary={item.message} secondary={formatDateTime(item.date)} />
                     </ListItem>
