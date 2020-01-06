@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
@@ -66,6 +68,9 @@ public class SaturnDatasetFactory {
 
         TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
+        // Preserve the contest through multiple transactions
+        var ctx = getThreadContext();
+
         if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theProject, null))) {
             executeWrite("Workspace initialization", ds, () -> {
                 ds.getDefaultModel()
@@ -76,7 +81,13 @@ public class SaturnDatasetFactory {
             });
         }
 
+        setThreadContext(ctx);
+
         initVocabularies(ds);
+
+        setThreadContext(ctx);
+
+        getThreadContext().setSystemCommitMessage(null);
 
         return dsg;
     }

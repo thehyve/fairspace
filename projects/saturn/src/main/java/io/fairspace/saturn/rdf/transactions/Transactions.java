@@ -139,6 +139,8 @@ public class Transactions {
                 result = null;
                 error = e;
                 return false;
+            } finally {
+                cleanThreadContext();
             }
         }
 

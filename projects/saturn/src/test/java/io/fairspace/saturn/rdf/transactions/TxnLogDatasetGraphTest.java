@@ -43,7 +43,6 @@ public class TxnLogDatasetGraphTest {
                 new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")),
                 "message"    , "system", "project"));
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
-        reset(log);
     }
 
 
