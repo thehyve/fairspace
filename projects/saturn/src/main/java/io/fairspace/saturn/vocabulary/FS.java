@@ -113,8 +113,8 @@ public class FS {
     public static final String ERROR_MESSAGE_URI = NS + "errorMessage";
     public static final String ERROR_DETAILS_URI = NS + "errorDetails";
 
-    public static final String THE_WORKSPACE_URI = NS + "theProject";
-    public static final Resource theProject = createResource(THE_WORKSPACE_URI);
+    public static final String THE_PROJECT_URI = NS + "theProject";
+    public static final Resource theProject = createResource(THE_PROJECT_URI);
 
     public static final String PROJECT_URI = NS + "Project";
     public static final Resource Project = createResource(PROJECT_URI);
