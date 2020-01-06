@@ -119,7 +119,7 @@ app.put('/api/v1/projects', (req, res) => {
         res.status(400).send('Unknown workspace URL');
         return;
     }
-    if (!project.id || (/^[a-z][a-z_0-9]*$/i).test(project.id)) {
+    if (!project.id || !(/^[a-z][a-z_0-9]*$/i).test(project.id)) {
         res.status(400).send('Invalid project id: ' + project.id);
         return;
     }
