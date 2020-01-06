@@ -9,6 +9,9 @@ const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
 
 const app = express();
+
+app.use(express.json());
+
 const port = process.env.PORT || 8081;
 
 let configPath = path.join(__dirname, 'config', 'config.yaml');
@@ -108,6 +111,34 @@ app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
+
+// Create a new project
+app.put('/api/v1/projects', (req, res) => {
+    const project = req.body;
+    if (!workspaces.includes(project.workspace)) {
+        res.status(400).send('Unknown workspace URL');
+        return;
+    }
+    if (!project.id || (/^[a-z][a-z_0-9]*$/i).test(project.id)) {
+        res.status(400).send('Invalid project id: ' + project.id);
+        return;
+    }
+    if (allProjects.find(p => p.id === project.id)) {
+        res.status(400).send('This project id is already taken: ' + project.id);
+        return;
+    }
+
+    // TODO: Check user's permissions
+
+    // A project is created when it is accessed for the first time
+    fetch(`${project.workspace}/api/v1/projects/${project.id}/metadata/?subject=http%3A%2F%2Ffairspace.io%2Fontology%23theProject`)
+        .then(saturnsResponse => {
+            if (res.ok) {
+                allProjects.push(project);
+            }
+            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text());
+        });
+});
 
 const addToken = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
 
