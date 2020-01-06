@@ -15,6 +15,7 @@ import io.fairspace.saturn.services.metadata.ReadableMetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.projects.ProjectsService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -46,6 +47,7 @@ public class Services {
     private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
 
     private final EventBus eventBus = new EventBus();
+    private final ProjectsService projectsService;
     private final UserService userService;
     private final EventService eventService;
     private final MailService mailService;
@@ -63,6 +65,7 @@ public class Services {
         this.dataset = dataset;
         this.userInfoSupplier = userInfoSupplier;
 
+        projectsService = new ProjectsService(config.jena.datasetPath);
         userService = new UserService(config.auth.userUrlTemplate, dataset);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
         BooleanSupplier hasFullAccessSupplier = () -> userInfoSupplier.get().getAuthorities().contains(config.auth.fullAccessRole);

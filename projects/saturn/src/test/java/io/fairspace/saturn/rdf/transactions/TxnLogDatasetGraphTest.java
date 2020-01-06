@@ -19,8 +19,7 @@ import java.util.Map;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
+import static io.fairspace.saturn.rdf.transactions.Transactions.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -44,12 +43,13 @@ public class TxnLogDatasetGraphTest {
                 new OAuthAuthenticationToken("", Map.of(SUBJECT_CLAIM, "userId", USERNAME_CLAIM, "userName", FULLNAME_CLAIM, "fullName", EMAIL_CLAIM, "email")),
                 "message"    , "system", "project"));
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
+        reset(log);
     }
 
 
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        Transactions.calculateWrite("system", ds, () -> ds.getNamedModel("http://example.com/g1")
+        calculateWrite("system", ds, () -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
@@ -88,7 +88,7 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
-            Transactions.calculateWrite("system", ds, () -> {
+            calculateWrite("system", ds, () -> {
                 ds.getNamedModel("http://example.com/g1")
                         .add(statement)
                         .remove(statement);

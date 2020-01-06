@@ -27,7 +27,7 @@ const workspaceProjects = (url) => fetch(url + '/api/v1/projects/')
         }
         return response.json();
     })
-    .then(projects => projects.map(p => ({workspace: url, ...p})));
+    .then(projects => projects.map(id => ({id, workspace: url})));
 
 let allProjects;
 
@@ -99,8 +99,10 @@ const getProjectId = (url) => url.split('/')[4];
 const getWorkspaceUrl = (url) => {
     const projectId = getProjectId(url);
     const project = allProjects.find(p => p.id === projectId);
-    return project && project.workspace;
+    return (project && project.workspace) || ('/unknown-project/' + projectId);
 };
+
+app.use('/unknown-project/:project', (req, res) => res.status(404).send('Unknown project: ' + req.params.project))
 
 app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 

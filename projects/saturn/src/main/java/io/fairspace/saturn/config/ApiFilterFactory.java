@@ -14,6 +14,7 @@ import javax.servlet.Filter;
 public class ApiFilterFactory {
     public static Filter createApiFilter(String apiPathPrefix, Services svc, Config config) {
         return new SaturnSparkFilter(apiPathPrefix,
+                new ProjectsApp("/projects", svc.getProjectsService()),
                 new ChangeableMetadataApp("/projects/:project/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
                 new ChangeableMetadataApp("/projects/:project/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
                 new ReadableMetadataApp("/projects/:project/meta-vocabulary", svc.getMetaVocabularyService()),
@@ -21,7 +22,6 @@ public class ApiFilterFactory {
                 new PermissionsApp("/projects/:project/permissions", svc.getPermissionsService()),
                 new UserApp("/projects/:project/users", svc.getUserService()),
                 new WebDAVApp(svc),
-                new HealthApp("/health"),
-                new ProjectsApp("/projects"));
+                new HealthApp("/health"));
     }
 }

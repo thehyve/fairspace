@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
@@ -22,8 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static io.fairspace.saturn.ThreadContext.cleanThreadContext;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
@@ -70,7 +67,6 @@ public class SaturnDatasetFactory {
         TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
         if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theProject, null))) {
-            setThreadContext(new ThreadContext(null, null, null, projectName));
             executeWrite("Workspace initialization", ds, () -> {
                 ds.getDefaultModel()
                         .add(FS.theProject, RDF.type, FS.Project)
@@ -78,7 +74,6 @@ public class SaturnDatasetFactory {
                         .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
                 ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
             });
-            cleanThreadContext();
         }
 
         initVocabularies(ds);

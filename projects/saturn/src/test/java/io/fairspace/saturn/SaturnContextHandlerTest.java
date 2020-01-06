@@ -21,7 +21,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.fairspace.saturn.auth.OAuthAuthenticationToken.AUTHORITIES_CLAIM;
@@ -42,8 +41,6 @@ public class SaturnContextHandlerTest {
     private RequestDispatcher requestDispatcher;
     @Mock
     private Handler nextHandler;
-    @Mock
-    private Consumer<OAuthAuthenticationToken> onAuthorized;
 
     private StringWriter writer;
 
@@ -51,7 +48,7 @@ public class SaturnContextHandlerTest {
 
     @Before
     public void before() throws IOException {
-        handler = new SaturnContextHandler(ConfigLoader.CONFIG.auth, authenticator, onAuthorized);
+        handler = new SaturnContextHandler(ConfigLoader.CONFIG.auth, authenticator);
         handler.setHandler(nextHandler);
 
         writer = new StringWriter();
@@ -134,15 +131,12 @@ public class SaturnContextHandlerTest {
 
         handler.handle("/api/v1/projects/project/metadata/", baseRequest, request, response);
         verifyAuthenticated(true);
-        reset(onAuthorized, nextHandler);
 
         handler.handle("/api/v1/projects/project/webdav/path/", baseRequest, request, response);
         verifyAuthenticated(true);
-        reset(onAuthorized, nextHandler);
 
         handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
         verify(requestDispatcher).forward(request, response);
-        reset(onAuthorized, nextHandler);
 
         handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
         verifyAuthenticated(true);
@@ -168,12 +162,12 @@ public class SaturnContextHandlerTest {
 
     private void verifyAuthenticated(boolean success) {
         verifyIfRequestWasPassedToNextHandler(success);
-        verify(onAuthorized, times(success ? 1 : 0)).accept(any());
     }
 
     private void verifyIfRequestWasPassedToNextHandler(boolean success) {
         try {
             verify(nextHandler, times(success ? 1 : 0)).handle(any(), any(), any(), any());
+            reset(nextHandler);
         } catch (Exception e) {
             fail();
         }

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -35,15 +34,12 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
     private final String sparqlRole;
     private final String dataStewardRole;
     private final String fullAccessRole;
-    private final Consumer<OAuthAuthenticationToken> onAuthorized;
 
     /**
      * @param authenticator Authenticator returning a UserInfo for an incoming request
-     * @param onAuthorized  An optional callback, called on successful authorization
      */
-    public SaturnContextHandler(Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator, Consumer<OAuthAuthenticationToken> onAuthorized) {
+    public SaturnContextHandler(Config.Auth config, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator) {
         this.authenticator = authenticator;;
-        this.onAuthorized = onAuthorized;
         this.workspaceUserRole = config.workspaceUserRole;
         this.sparqlRole = config.sparqlRole;
         this.dataStewardRole = config.dataStewardRole;
@@ -117,9 +113,6 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                             }
                         }
                     }
-                }
-                if (onAuthorized != null) {
-                    onAuthorized.accept(userInfo);
                 }
 
                 setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null, null));
