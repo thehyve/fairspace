@@ -8,6 +8,7 @@ jena:
   vocabularyBaseIRI: "http://localhost/vocabulary/"
   # Jena's TDB2 database path
   datasetPath: "data/db"
+  inactiveConnectionShutdownIntervalSec: 600
   storeParams:
     tdb.file_mode: "mapped"
     tdb.block_size: 8192
@@ -54,7 +55,6 @@ jena:
       # Name of the index. Defaults to "fairspace"
       indexName: "fairspace"
     advancedSettings:
-      transport.netty.worker_count: 1
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: false

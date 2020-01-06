@@ -25,19 +25,22 @@ public class ElasticSearchClientFactory {
      * @throws UnknownHostException
      * @see org.apache.jena.query.text.es.TextIndexES
      */
-    public static Client build(ESSettings esSettings, Map<String, String> advancedSettings) throws UnknownHostException {
+    public static Client build(ESSettings esSettings, Map<String, String> advancedSettings) {
         log.debug("Initializing the Elastic Search Java Client with settings: " + esSettings);
         var settingsBuilder = Settings.builder();
         if (advancedSettings != null) {
             advancedSettings.forEach(settingsBuilder::put);
         }
-        settingsBuilder.put("cluster.name", esSettings.getClusterName())     ;
+        settingsBuilder.put("cluster.name", esSettings.getClusterName());
         var settings = settingsBuilder.build();
 
         List<TransportAddress> addresses = new ArrayList<>();
         for (String host : esSettings.getHostToPortMapping().keySet()) {
-            TransportAddress addr = new TransportAddress(InetAddress.getByName(host), esSettings.getHostToPortMapping().get(host));
-            addresses.add(addr);
+            try {
+                addresses.add(new TransportAddress(InetAddress.getByName(host), esSettings.getHostToPortMapping().get(host)));
+            } catch (UnknownHostException e) {
+                log.warn("Unknown host: {}", host, e);
+            }
         }
 
         TransportAddress socketAddresses[] = new TransportAddress[addresses.size()];

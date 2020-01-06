@@ -5,6 +5,7 @@ import org.apache.jena.query.text.TextIndex;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.query.text.es.TextIndexES;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
@@ -16,10 +17,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutionException;
 
 import static com.google.common.collect.Iterables.partition;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.lang.Thread.currentThread;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
@@ -48,9 +49,6 @@ public class TextIndexESBulk extends TextIndexES {
     private final String indexName;
     private final List<UpdateRequest> updates = new ArrayList<>();
 
-    // Needed to avoid reordering or interference of bulk updates
-    private final ExecutorService singleThreadExecutor = newSingleThreadExecutor();
-
 
     /**
      * Constructor used mainly for performing Integration tests
@@ -70,26 +68,29 @@ public class TextIndexESBulk extends TextIndexES {
             return;
         }
 
-        partition(updates, BULK_SIZE).forEach(bulk -> {
-            var bulkRequest = new BulkRequest();
-            bulk.forEach(bulkRequest::add);
-            singleThreadExecutor.submit(() -> processBulkRequest(bulkRequest));
-        });
-
-        updates.clear();
-    }
-
-    private void processBulkRequest(BulkRequest bulk) {
         try {
-            var response = client.bulk(bulk).get();
-            LOGGER.debug("Indexing {} updates in ElasticSearch took {} ms",
-                    response.getItems().length,
-                    response.getIngestTook().millis() + response.getTook().millis());
-            if (response.hasFailures()) {
-                LOGGER.error(response.buildFailureMessage());
+            for (var bulk : partition(updates, BULK_SIZE)) {
+                var bulkRequest = new BulkRequest();
+                bulk.forEach(bulkRequest::add);
+                BulkResponse response;
+                try {
+                    response = client.bulk(bulkRequest).get();
+                } catch (InterruptedException e) {
+                    currentThread().interrupt();
+                    return;
+                } catch (ExecutionException e) {
+                    LOGGER.error("Error indexing in ElasticSearch", e.getCause());
+                    throw new RuntimeException(e.getCause());
+                }
+                LOGGER.debug("Indexing {} updates in ElasticSearch took {} ms",
+                        response.getItems().length,
+                        response.getIngestTook().millis() + response.getTook().millis());
+                if (response.hasFailures()) {
+                    LOGGER.error(response.buildFailureMessage());
+                }
             }
-        } catch (Exception e) {
-            LOGGER.error("Error indexing in ElasticSearch", e);
+        } finally {
+            updates.clear();
         }
     }
 
@@ -101,7 +102,6 @@ public class TextIndexESBulk extends TextIndexES {
     @Override
     public void close() {
         updates.clear();
-        singleThreadExecutor.shutdown();
     }
 
     /**
