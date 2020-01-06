@@ -20,18 +20,7 @@ module.exports = (app) => {
     }));
 
     app.use(proxy('/api/v1/projects/*/**', {
-        target: BACKEND_URL,
-        // '/api/v1/projects/project/collections/' -> '/api/v1/collections'
-        pathRewrite: (url) => {
-            const parts = url.split('/');
-            if (parts[5] !== 'webdav') {
-                parts.splice(3, 2);
-            }
-            return parts.join('/');
-        },
-        onProxyReq: (proxyReq, req) => {
-            proxyReq.setHeader('X-Fairspace-Project', getProjectId(req.originalUrl));
-        }
+        target: BACKEND_URL
     }));
 
     app.use(proxy('/api/v1', {target: BACKEND_URL}));
