@@ -196,7 +196,7 @@ fs:UserShape a fs:ClassShape ;
 fs:Project a fs:ClassShape ;
   sh:description "Resource description for the current project." ;
   sh:name "Project" ;
-  sh:targetClass fs:WorkspaceInstance ;
+  sh:targetClass fs:Project ;
   fs:machineOnly true ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
