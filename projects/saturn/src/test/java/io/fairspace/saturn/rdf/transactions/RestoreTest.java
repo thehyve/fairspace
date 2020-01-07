@@ -2,6 +2,8 @@ package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
@@ -25,35 +27,35 @@ public class RestoreTest {
             createProperty("http://example.com/property2"),
             createResource("http://example.com/object2"));
 
-    private Config config;
+    private Config.Jena config;
 
     @Before
     public void before() {
-        config = new Config();
-        config.jena.elasticSearch.enabled = false;
-        config.jena.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config = new Config.Jena();
+        config.elasticSearch.enabled = false;
+        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
     }
 
     @After
     public void after() {
-        config.jena.transactionLogPath.delete();
-        config.jena.datasetPath.delete();
+        config.transactionLogPath.delete();
+        config.datasetPath.delete();
     }
 
     @Test
     public void restoreWorksAsExpected() throws IOException {
-        var ds1 = SaturnDatasetFactory.connect(config);
+        var ds1 = newDataset();
 
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt1));
         executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt2));
 
         ds1.close();
 
-        deleteDirectory(config.jena.datasetPath);
-        assertFalse(config.jena.datasetPath.exists());
+        deleteDirectory(config.datasetPath);
+        assertFalse(config.datasetPath.exists());
 
-        var ds2 = SaturnDatasetFactory.connect(config);
+        var ds2 = newDataset();
 
         try {
             executeRead(ds2, () -> {
@@ -67,7 +69,7 @@ public class RestoreTest {
 
     @Test
     public void restoreListsWorksAsExpected() throws IOException {
-        var ds1 = SaturnDatasetFactory.connect(config);
+        var ds1 = newDataset();
         executeWrite(ds1, () -> ds1.getDefaultModel()
                 .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), ds1.getDefaultModel().createList(createTypedLiteral(1), createTypedLiteral(2)))
                 .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), ds1.getDefaultModel().createList(createTypedLiteral("a"), createTypedLiteral("b"))));
@@ -76,14 +78,18 @@ public class RestoreTest {
 
         ds1.close();
 
-        deleteDirectory(config.jena.datasetPath);
+        deleteDirectory(config.datasetPath);
 
-        var ds2 = SaturnDatasetFactory.connect(config);
+        var ds2 = newDataset();
 
         try {
             executeRead(ds2, () -> assertEquals(before, ds2.getDefaultModel().listStatements().toSet()));
         } finally {
             ds2.close();
         }
+    }
+
+    private Dataset newDataset() throws IOException {
+        return DatasetFactory.wrap(SaturnDatasetFactory.connect(config, "ds", null));
     }
 }

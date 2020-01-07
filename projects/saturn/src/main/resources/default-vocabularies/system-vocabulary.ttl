@@ -193,40 +193,34 @@ fs:UserShape a fs:ClassShape ;
         fs:commentShape,
         fs:userEmailShape .
 
-fs:WorkspaceInstance a fs:ClassShape ;
-  sh:description "Resource description for the current workspace." ;
-  sh:name "Workspace" ;
-  sh:targetClass fs:WorkspaceInstance ;
+fs:Project a fs:ClassShape ;
+  sh:description "Resource description for the current project." ;
+  sh:name "Project" ;
+  sh:targetClass fs:Project ;
   fs:machineOnly true ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-  sh:property [
-    a fs:DatatypePropertyShape ;
-    sh:path fs:workspaceTitle ;
-    sh:name "Title" ;
-    sh:description "A human title for this workspace." ;
-    sh:datatype xsd:string ;
-    sh:maxCount 1 ;
-    sh:minCount 1 ;
-    sh:order 0 ;
-  ], [
-    a fs:DatatypePropertyShape ;
-    sh:path fs:workspaceDescription ;
-    sh:name "Workspace description" ;
-    sh:description "A markdown formatted description for the workspace homepage." ;
-    sh:datatype fs:markdown ;
-    sh:maxCount 1 ;
-    sh:minCount 1 ;
-    sh:order 1 ;
-  ], [
-    a fs:ExternalIRIPropertyShape ;
-    sh:path fs:workspaceExternalLink ;
-    sh:name "External links" ;
-    sh:description "External links that will be availble from the homepage." ;
-    fs:externalLink true ;
-    sh:nodeKind sh:IRI ;
-    sh:order 2 ;
-  ]
+  sh:property
+      fs:labelShape,
+      [
+        a fs:DatatypePropertyShape ;
+        sh:path fs:projectDescription ;
+        sh:name "Project description" ;
+        sh:description "A markdown formatted description for the project homepage." ;
+        sh:datatype fs:markdown ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:order 1 ;
+      ],
+      [
+        a fs:ExternalIRIPropertyShape ;
+        sh:path fs:projectExternalLink ;
+        sh:name "External links" ;
+        sh:description "External links that will be available from the homepage." ;
+        fs:externalLink true ;
+        sh:nodeKind sh:IRI ;
+        sh:order 2 ;
+      ]
 .
 
 ## Property Shapes

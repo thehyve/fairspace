@@ -53,4 +53,7 @@ public class ThreadContext {
     @Getter
     @Setter
     private String systemCommitMessage;
+    @Getter
+    @Setter
+    private String project;
 }

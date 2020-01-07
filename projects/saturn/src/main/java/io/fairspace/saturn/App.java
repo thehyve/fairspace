@@ -1,15 +1,15 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.config.Services;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.rdf.DatasetGraphMulti;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
+import org.apache.jena.query.DatasetFactory;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ContextHandlerFactory.getContextHandler;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 
 @Slf4j
 public class App {
@@ -18,9 +18,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG);
-
-        initVocabularies(ds);
+        var ds =  DatasetFactory.wrap(new DatasetGraphMulti(CONFIG.jena));
 
         var svc = new Services(CONFIG, ds, () -> getThreadContext().getUserInfo());
 

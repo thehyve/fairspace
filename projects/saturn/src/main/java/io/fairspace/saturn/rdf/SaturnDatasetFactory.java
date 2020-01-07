@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
@@ -10,25 +9,26 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.elasticsearch.client.Client;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static io.fairspace.saturn.ThreadContext.cleanThreadContext;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
+import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
@@ -41,18 +41,19 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config config) throws IOException {
-        var restoreNeeded = isRestoreNeeded(config.jena.datasetPath);
+    public static DatasetGraph connect(Config.Jena config, String projectName, Client elasticsearchClient) throws IOException {
+        var dsDir = new File(config.datasetPath, projectName);
+        var restoreNeeded = isRestoreNeeded(dsDir);
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(config.jena.datasetPath.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
+        var dsg = connectCreate(Location.create(dsDir.getAbsolutePath()), config.storeParams).getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(config.jena.transactionLogPath, new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath, projectName), new SparqlTransactionCodec());
 
-        if (config.jena.elasticSearch.enabled) {
+        if (elasticsearchClient != null) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, config.jena, restoreNeeded);
+            dsg = enableElasticSearch(dsg, projectName, config, restoreNeeded, elasticsearchClient);
         }
 
         if (restoreNeeded) {
@@ -67,30 +68,40 @@ public class SaturnDatasetFactory {
 
         TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
-        if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theWorkspace, null))) {
-            setThreadContext(new ThreadContext());
+        // Preserve the contest through multiple transactions
+        var ctx = getThreadContext();
+
+        if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theProject, null))) {
             executeWrite("Workspace initialization", ds, () -> {
                 ds.getDefaultModel()
-                        .add(FS.theWorkspace, RDF.type, FS.WorkspaceInstance)
-                        .add(FS.theWorkspace, FS.workspaceTitle, config.workspace.name)
-                        .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
-                ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true));
+                        .add(FS.theProject, RDF.type, FS.Project)
+                        .add(FS.theProject, RDFS.label, projectName)
+                        .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
+                ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
             });
-            cleanThreadContext();
         }
 
-        return ds;
+        setThreadContext(ctx);
+
+        initVocabularies(ds);
+
+        setThreadContext(ctx);
+
+        if (ctx != null) {
+            ctx.setSystemCommitMessage(null);
+        }
+
+        return dsg;
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {
         return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
-    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex) throws UnknownHostException {
-        Client client = null;
+    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String projectName, Config.Jena config, boolean recreateIndex, Client client) throws UnknownHostException {
         try {
             // Setup ES client and index
-            client = ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings);
+            config.elasticSearch.settings.setIndexName(projectName);
             ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
 
             // Create a dataset graph that updates ES with every triple update
@@ -101,9 +112,6 @@ public class SaturnDatasetFactory {
             log.error("Error connecting to ElasticSearch", e);
             if (config.elasticSearch.required) {
                 throw e; // Terminates Saturn
-            }
-            if (client != null) {
-                client.close();
             }
             return dsg;
         }

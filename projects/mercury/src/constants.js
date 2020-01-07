@@ -90,6 +90,6 @@ export const DEFAULT_NAMESPACE_URI = FAIRSPACE_NS + 'defaultNamespace';
 export const USABLE_IN_METADATA_URI = FAIRSPACE_NS + 'usableInMetadata';
 export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
 export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
-export const WORKSPACE_INFO_URI = FAIRSPACE_NS + 'theWorkspace';
+export const PROJECT_INFO_URI = FAIRSPACE_NS + 'theProject';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

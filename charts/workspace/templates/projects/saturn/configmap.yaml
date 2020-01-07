@@ -15,6 +15,7 @@ data:
       metadataBaseIRI: http://{{ template "mercury.hostname" . }}/iri/
       vocabularyBaseIRI: http://{{ template "mercury.hostname" . }}/vocabulary/
       datasetPath: "/data/saturn/db"
+      inactiveConnectionShutdownIntervalSec: 600
       storeParams:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}
       transactionLogPath: "/data/saturn/files/log"

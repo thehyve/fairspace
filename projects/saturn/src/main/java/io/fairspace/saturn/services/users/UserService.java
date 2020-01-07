@@ -54,25 +54,6 @@ public class UserService {
         return user;
     }
 
-    /**
-     * Stores user information in local database on login
-     * @param token
-     */
-    public void onAuthorized(OAuthAuthenticationToken token) {
-        if(token != null) {
-            var iri = getUserIri(token.getSubjectClaim());
-
-            // Only write user information if no information is present yet
-            if(dao.read(User.class, iri) == null) {
-                var user = new User();
-                user.setIri(iri);
-                user.setName(token.getFullName());
-                user.setEmail(token.getEmail());
-                calculateWrite("Adding a user from the authentication token", dataset, () -> dao.write(user));
-            }
-        }
-    }
-
     private User fetchUserFromKeycloak(Node iri) {
         var userId = getUserId(iri);
         var authorization = authorizationHeader();
