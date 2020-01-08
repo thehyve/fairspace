@@ -47,21 +47,22 @@ public class Transactions {
     }
 
     public static <X, E extends Exception> X calculateWrite(Transactional txn, ThrowingSupplier<X, E> r) throws E {
-        try {
-            if (txn.isInTransaction()) {
-                if (txn.transactionMode() == ReadWrite.WRITE) {
-                    return r.get();
-                }
-                throw new JenaTransactionException("Can't promote to a write transaction");
-            }
-
-            var task = new Task<>(getThreadContext(), txn, r);
-
-            queue.offer(task);
-            return task.get();
-        } catch (Throwable t) {
-            return sneakyThrow(t);
-        }
+        return Txn.calculateWrite(txn, ThrowingSupplier.sneaky(r));
+//        try {
+//            if (txn.isInTransaction()) {
+//                if (txn.transactionMode() == ReadWrite.WRITE) {
+//                    return r.get();
+//                }
+//                throw new JenaTransactionException("Can't promote to a write transaction");
+//            }
+//
+//            var task = new Task<>(getThreadContext(), txn, r);
+//
+//            queue.offer(task);
+//            return task.get();
+//        } catch (Throwable t) {
+//            return sneakyThrow(t);
+//        }
     }
 
     public static <T, E extends Exception> T calculateWrite(String systemCommitMessage, Transactional txn, ThrowingSupplier<T, E> action) throws E {
@@ -94,6 +95,7 @@ public class Transactions {
             return true;
         }
         var txn = tasks.get(0).txn; // we assume that all tasks share same transactional
+        setThreadContext(tasks.get(0).context);
         return Txn.calculateWrite(txn, () -> {
             for (var it = tasks.iterator(); it.hasNext(); ) {
                 var task = it.next();
