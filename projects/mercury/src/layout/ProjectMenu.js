@@ -2,13 +2,11 @@ import React from 'react';
 import {NavLink, withRouter} from "react-router-dom";
 import {Divider, Icon, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 
-import Config from '../services/Config';
-import {currentProject, projectPrefix} from "../../projects/projects";
-import ListSubheader from '@material-ui/core/ListSubheader';
+import Config from '../common/services/Config';
+import {projectPrefix} from "../projects/projects";
 
 
-const Menu = ({location: {pathname}}) => {
-    const project = currentProject();
+const ProjectMenu = ({location: {pathname}}) => {
     return (
     <>
         <List>
@@ -25,11 +23,7 @@ const Menu = ({location: {pathname}}) => {
             </ListItem>
         </List>
         <Divider />
-        { project ?
-            <List>
-            <ListSubheader>
-                Project: {project}
-            </ListSubheader>
+        <List>
             <ListItem
                 component={NavLink}
                 exact
@@ -87,7 +81,7 @@ const Menu = ({location: {pathname}}) => {
                 </ListItemIcon>
                 <ListItemText primary="Vocabulary" />
             </ListItem>
-        </List> : null }
+        </List>
         <Divider />
         <List>
             {Config.get().urls.dataverse ? (
@@ -110,4 +104,4 @@ const Menu = ({location: {pathname}}) => {
     </>
 )};
 
-export default withRouter(Menu);
+export default withRouter(ProjectMenu);

@@ -12,7 +12,7 @@ export type Project = {
     workspace: string;
 }
 
-class projectsAPI {
+class ProjectsAPI {
     getProjects(): Promise<Project[]> {
         return axios.get(projectsUrl, {headers: {Accept: 'application/json'}})
             .catch(handleHttpError("Failure when retrieving a list of projects"))
@@ -20,13 +20,17 @@ class projectsAPI {
             .then((ids: string[]) => ids.map((id) => ({id, name: id, description: id})));
     }
 
-    createProject(project: Project) {
+    createProject(project: Project): Promise<Project> {
         return axios.put(
             projectsUrl,
             JSON.stringify(project),
             {headers}
-        ).catch(handleHttpError("Failure while saving a collection"));
+        )
+        .catch(handleHttpError("Failure while creating a project"))
+        .then(extractJsonData);
     }
 }
 
-export default new projectsAPI();
+const projectsAPI = new ProjectsAPI();
+
+export default projectsAPI;

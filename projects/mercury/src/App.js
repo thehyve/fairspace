@@ -6,32 +6,19 @@ import DateFnsUtils from "@date-io/date-fns";
 import useIsMounted from "react-is-mounted-hook";
 import {
     ErrorDialog,
-    Footer,
-    Layout,
     LoadingInlay,
     LogoutContextProvider,
     UserProvider,
-    UsersProvider,
     VersionProvider
 } from './common';
 
 import Config from "./common/services/Config";
 import theme from './App.theme';
-import Menu from "./common/components/Menu";
-import Routes from "./routes/Routes";
-import WorkspaceTopBar from "./common/components/WorkspaceTopBar";
 import {UploadsProvider} from "./common/contexts/UploadsContext";
-import {CollectionsProvider} from "./common/contexts/CollectionsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';
-import {VocabularyProvider} from './metadata/VocabularyContext';
-import {ProjectsProvider} from './projects/ProjectsContext';
+import GlobalRoutes from './routes/GlobalRoutes';
 
 const App = () => {
-    const userInfo = '/api/v1/account';
-    const logout = '/logout';
-    const versionUrl = '/config/version.json';
-    const usersUrl = '/api/keycloak/users/';
-
     const isMounted = useIsMounted();
     const [configLoaded, setConfigLoaded] = useState(false);
 
@@ -45,41 +32,19 @@ const App = () => {
     }
 
 
-    const {jupyterhub} = Config.get().urls;
-    const requiredRole = Config.get().roles.user;
-
     return (
-        <VersionProvider url={versionUrl}>
-            <UserProvider url={userInfo}>
-                <LogoutContextProvider
-                    logoutUrl={logout}
-                    jupyterhubUrl={jupyterhub}
-                >
+        <VersionProvider>
+            <UserProvider>
+                <LogoutContextProvider>
                     <MuiPickersUtilsProvider utils={DateFnsUtils}>
                         <MuiThemeProvider theme={theme}>
                             <UploadsProvider>
                                 <ClipboardProvider>
-                                    <ProjectsProvider>
-                                        <CollectionsProvider>
-                                            <ErrorDialog>
-                                                <VocabularyProvider>
-                                                    <Router>
-                                                        <Layout
-                                                            requiredAuthorization={requiredRole}
-                                                            renderMenu={() => <Menu />}
-                                                            renderMain={() => (
-                                                                <UsersProvider url={usersUrl}>
-                                                                    <Routes />
-                                                                </UsersProvider>
-                                                            )}
-                                                            renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                                            renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                                        />
-                                                    </Router>
-                                                </VocabularyProvider>
-                                            </ErrorDialog>
-                                        </CollectionsProvider>
-                                    </ProjectsProvider>
+                                    <ErrorDialog>
+                                        <Router>
+                                            <GlobalRoutes/>
+                                        </Router>
+                                    </ErrorDialog>
                                 </ClipboardProvider>
                             </UploadsProvider>
                         </MuiThemeProvider>

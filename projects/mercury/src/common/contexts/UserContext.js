@@ -5,7 +5,7 @@ import {getUser} from '../services/UsersAndWorkspaceAPI';
 
 const UserContext = React.createContext({});
 
-export const UserProvider = ({children, url}) => {
+export const UserProvider = ({children}) => {
     const [currentUser, setCurrentUser] = useState({});
     const [currentUserLoading, setCurrentUserLoading] = useState(false);
     const [currentUserError, setCurrentUserError] = useState(null);
@@ -13,7 +13,7 @@ export const UserProvider = ({children, url}) => {
     useEffect(() => {
         setCurrentUserLoading(true);
 
-        getUser(url)
+        getUser()
             .then(user => {
                 setCurrentUser(user);
                 setCurrentUserError(null);
@@ -22,7 +22,7 @@ export const UserProvider = ({children, url}) => {
             .finally(() => {
                 setCurrentUserLoading(false);
             });
-    }, [url]);
+    }, []);
 
     return (
         <UserContext.Provider

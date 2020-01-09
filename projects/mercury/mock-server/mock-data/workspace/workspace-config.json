@@ -1,6 +1,5 @@
 {
   "urls": {
-    "jupyterhub": "https://www.google.com/search?q=jupyterhub",
     "cbioportal": "https://cbioportal-server.com"
   },
   "roles": {
