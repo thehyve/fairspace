@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.PermissionEvent;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class PermissionsService {
     private final Supplier<Node> userIriSupplier;
     private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
+    private final UserService userService;
     private final EventService eventService;
 
     public void createResource(Node resource) {
@@ -63,6 +65,10 @@ public class PermissionsService {
         executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), dataset, () -> {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
+
+            // As a side effect it fetches the user from Keycloak when necessary
+            validate(userService.getUser(user) != null, "A user must be known to the system");
+
             if (!isCollection(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
                 var isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
@@ -182,7 +188,6 @@ public class PermissionsService {
      * @return
      */
     public Map<Node, Access> getPermissions(Collection<Node> nodes) {
-
         return calculateRead(dataset, () -> {
             var authorities = getAuthorities(nodes);
             var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());

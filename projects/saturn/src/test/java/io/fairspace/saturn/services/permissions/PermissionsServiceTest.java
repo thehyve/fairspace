@@ -1,6 +1,8 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -25,7 +27,9 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionsServiceTest {
@@ -45,6 +49,9 @@ public class PermissionsServiceTest {
     @Mock
     private PermissionChangeEventHandler permissionChangeEventHandler;
 
+    @Mock
+    private UserService userService;
+
     private Node currentUser = USER1;
 
     private boolean isCoordinator = false;
@@ -53,11 +60,13 @@ public class PermissionsServiceTest {
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsService(ds, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
+        service = new PermissionsService(ds, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, userService, event -> {});
         service.createResource(RESOURCE);
 
         currentUser = USER1;
         isCoordinator = false;
+
+        when(userService.getUser(any())).thenReturn(new User());
     }
 
     @Test

@@ -74,7 +74,7 @@ public class Services {
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsService(dataset, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
+        permissionsService = new PermissionsService(dataset, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, userService, eventService);
 
         collectionsService = new CollectionsService(new DAO(dataset, userIriSupplier), eventBus::post, permissionsService, eventService);
 
