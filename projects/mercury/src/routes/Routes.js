@@ -15,9 +15,20 @@ import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
 import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import useSubject from '../common/hooks/UseSubject';
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
+import ProjectsPage from '../projects/ProjectsPage';
 
 const routes = () => (
     <>
+        <Route
+            path="/projects"
+            exact
+            render={() => (
+                <LinkedDataMetadataProvider>
+                    <ProjectsPage />
+                </LinkedDataMetadataProvider>
+            )}
+        />
+
         <Route path="/projects/:project" exact component={ProjectOverview} />
 
         <Route

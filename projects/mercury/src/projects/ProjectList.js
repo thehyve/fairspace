@@ -1,0 +1,99 @@
+import React from 'react';
+import {useHistory} from 'react-router-dom';
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TableSortLabel,
+} from "@material-ui/core";
+import {MessageDisplay, usePagination, useSorting} from '../common';
+
+import type {Project} from './ProjectsAPI';
+
+const columns = {
+    name: {
+        valueExtractor: 'name',
+        label: 'Name'
+    }
+};
+
+const ProjectList = ({
+    projects = []
+}) => {
+    const history = useHistory();
+
+    const onProjectDoubleClick = (project: Project) => {
+        history.push(`/projects/${project.id}/`);
+    };
+
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(projects, columns, 'name');
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+
+    if (!projects || projects.length === 0) {
+        return (
+            <MessageDisplay
+                message="Please create a project."
+                variant="h6"
+                withIcon={false}
+                isError={false}
+                messageColor="textSecondary"
+            />
+        );
+    }
+
+    return (
+        <Paper>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        {
+                            Object.entries(columns).map(([key, column]) => (
+                                <TableCell key={key}>
+                                    <TableSortLabel
+                                        active={orderBy === key}
+                                        direction={orderAscending ? 'asc' : 'desc'}
+                                        onClick={() => toggleSort(key)}
+                                    >
+                                        {column.label}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))
+                        }
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {pagedItems.map((project: Project) => {
+
+                        return (
+                            <TableRow
+                                key={project.id}
+                                hover
+                                onClick={() => {}}
+                                onDoubleClick={() => onProjectDoubleClick(project)}
+                            >
+                                <TableCell style={{maxWidth: 160}} component="th" scope="row">
+                                    {project.description}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={projects.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={(e, p) => setPage(p)}
+                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+            />
+        </Paper>
+    );
+};
+
+export default ProjectList;

@@ -3,12 +3,33 @@ import {NavLink, withRouter} from "react-router-dom";
 import {Divider, Icon, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 
 import Config from '../services/Config';
-import {projectPrefix} from "../../projects/projects";
+import {currentProject, projectPrefix} from "../../projects/projects";
+import ListSubheader from '@material-ui/core/ListSubheader';
 
 
-const Menu = ({location: {pathname}}) => (
+const Menu = ({location: {pathname}}) => {
+    const project = currentProject();
+    return (
     <>
         <List>
+            <ListItem
+                component={NavLink}
+                to={"/projects"}
+                button
+                selected={pathname === '/projects'}
+            >
+                <ListItemIcon>
+                    <Icon>widgets</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Projects" />
+            </ListItem>
+        </List>
+        <Divider />
+        { project ?
+            <List>
+            <ListSubheader>
+                Project: {project}
+            </ListSubheader>
             <ListItem
                 component={NavLink}
                 exact
@@ -66,7 +87,7 @@ const Menu = ({location: {pathname}}) => (
                 </ListItemIcon>
                 <ListItemText primary="Vocabulary" />
             </ListItem>
-        </List>
+        </List> : null }
         <Divider />
         <List>
             {Config.get().urls.dataverse ? (
@@ -87,6 +108,6 @@ const Menu = ({location: {pathname}}) => (
             ) : null}
         </List>
     </>
-);
+)};
 
 export default withRouter(Menu);

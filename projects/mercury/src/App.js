@@ -24,12 +24,13 @@ import {UploadsProvider} from "./common/contexts/UploadsContext";
 import {CollectionsProvider} from "./common/contexts/CollectionsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';
 import {VocabularyProvider} from './metadata/VocabularyContext';
+import {ProjectsProvider} from './projects/ProjectsContext';
 
 const App = () => {
     const userInfo = '/api/v1/account';
     const logout = '/logout';
     const versionUrl = '/config/version.json';
-    const usersUrl = 'users/';
+    const usersUrl = '/api/keycloak/users/';
 
     const isMounted = useIsMounted();
     const [configLoaded, setConfigLoaded] = useState(false);
@@ -58,25 +59,27 @@ const App = () => {
                         <MuiThemeProvider theme={theme}>
                             <UploadsProvider>
                                 <ClipboardProvider>
-                                    <CollectionsProvider>
-                                        <ErrorDialog>
-                                            <VocabularyProvider>
-                                                <Router>
-                                                    <Layout
-                                                        requiredAuthorization={requiredRole}
-                                                        renderMenu={() => <Menu />}
-                                                        renderMain={() => (
-                                                            <UsersProvider url={usersUrl}>
-                                                                <Routes />
-                                                            </UsersProvider>
-                                                        )}
-                                                        renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
-                                                        renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                                                    />
-                                                </Router>
-                                            </VocabularyProvider>
-                                        </ErrorDialog>
-                                    </CollectionsProvider>
+                                    <ProjectsProvider>
+                                        <CollectionsProvider>
+                                            <ErrorDialog>
+                                                <VocabularyProvider>
+                                                    <Router>
+                                                        <Layout
+                                                            requiredAuthorization={requiredRole}
+                                                            renderMenu={() => <Menu />}
+                                                            renderMain={() => (
+                                                                <UsersProvider url={usersUrl}>
+                                                                    <Routes />
+                                                                </UsersProvider>
+                                                            )}
+                                                            renderTopbar={({name}) => <WorkspaceTopBar name={name} />}
+                                                            renderFooter={({id, version}) => <Footer name={id} version={version} />}
+                                                        />
+                                                    </Router>
+                                                </VocabularyProvider>
+                                            </ErrorDialog>
+                                        </CollectionsProvider>
+                                    </ProjectsProvider>
                                 </ClipboardProvider>
                             </UploadsProvider>
                         </MuiThemeProvider>
