@@ -75,7 +75,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                             if (RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod()) &&
                                     !user.getRoles().contains(Role.DataSteward) &&
                                     !user.getRoles().contains(Role.Coordinator)) {
-                                sendError("Only data stewards can edit the vocabulary", response);
+                                sendError("Only data stewards and project coordinators can edit the vocabulary", response);
                                 return;
                             }
                             break;
