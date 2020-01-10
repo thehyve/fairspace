@@ -20,7 +20,7 @@ export const VocabularyProvider = ({children}) => {
                 setVocabularyError(false);
             })
             .catch(() => {
-                setVocabularyError('An error occurred while loading the vocbulary');
+                setVocabularyError('An error occurred while loading the vocabulary');
             });
     }, []);
 
