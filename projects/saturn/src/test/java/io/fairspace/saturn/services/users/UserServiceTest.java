@@ -2,17 +2,17 @@ package io.fairspace.saturn.services.users;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
 
 import java.io.IOException;
 
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
+
 public class UserServiceTest {
 
+    private Dataset ds = createTxnMem();
 
-    private Dataset ds = DatasetFactory.createTxnMem();
-
-    private UserService userService = new UserService(ds, "coordinator");
+    private UserService userService = new UserService(ds);
 
     private Node userIri;
 

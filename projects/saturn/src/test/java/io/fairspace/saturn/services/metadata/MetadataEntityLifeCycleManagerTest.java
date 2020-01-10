@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -19,6 +20,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
@@ -59,8 +61,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         initVocabularies(ds);
 
-        when(userService.getCurrentUserIri()).thenReturn(userIri);
-        when(userService.getCurrentUser()).thenReturn(user);
+        setThreadContext(new ThreadContext(user, null, null, null));
         when(user.getIri()).thenReturn(userIri);
 
         lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, userService, permissionsService);

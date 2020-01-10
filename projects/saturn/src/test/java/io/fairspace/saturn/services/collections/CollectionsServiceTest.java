@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.collections;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -15,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.function.Consumer;
 
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -39,8 +41,7 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        when(users.getCurrentUser()).thenReturn(user);
-        when(users.getCurrentUserIri()).thenReturn(userIri);
+        setThreadContext(new ThreadContext(user, null, null, null));
         when(user.getIri()).thenReturn(userIri);
         collections = new CollectionsService(createTxnMem(), eventListener, users, permissions, eventService);
     }

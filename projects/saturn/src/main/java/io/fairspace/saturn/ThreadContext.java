@@ -1,6 +1,6 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
+import io.fairspace.saturn.services.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,7 +46,7 @@ public class ThreadContext {
 
     @Getter
     @Setter
-    private OAuthAuthenticationToken userInfo;
+    private User user;
     @Getter
     @Setter
     private String userCommitMessage;

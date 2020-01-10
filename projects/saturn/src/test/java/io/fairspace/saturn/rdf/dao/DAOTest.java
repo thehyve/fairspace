@@ -1,5 +1,7 @@
 package io.fairspace.saturn.rdf.dao;
 
+import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.services.users.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
@@ -15,9 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
-import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -35,10 +37,13 @@ public class DAOTest {
     @Before
     public void before() {
         dataset = createTxnMem();
-        dao = new DAO(dataset, () -> createURI("http://example.com/" + randomUUID()));
+        dao = new DAO(dataset);
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
+        var user = new User();
+        user.setIri(createURI("http://ex.com/user"));
+        setThreadContext(new ThreadContext(user, null, null, null));
     }
 
     @Test
@@ -236,7 +241,7 @@ public class DAOTest {
         assertTrue(entity2.getDateModified().isAfter(t1));
         ensureRecentInstant(entity2.getDateModified());
         assertNotNull(entity2.getModifiedBy());
-        assertNotEquals(entity2.getCreatedBy(), entity2.getModifiedBy());
+        assertEquals(entity2.getCreatedBy(), entity2.getModifiedBy());
         assertNull(entity2.getDeletedBy());
 
         var entity3 = dao.markAsDeleted(entity2);

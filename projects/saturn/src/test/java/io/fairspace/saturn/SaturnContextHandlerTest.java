@@ -1,7 +1,6 @@
 package io.fairspace.saturn;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -21,19 +20,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static io.fairspace.saturn.auth.OAuthAuthenticationToken.AUTHORITIES_CLAIM;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SaturnContextHandlerTest {
     @Mock
-    private Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
+    private Function<HttpServletRequest, User> authenticator;
     @Mock
     private Request baseRequest;
     @Mock
@@ -61,8 +58,9 @@ public class SaturnContextHandlerTest {
         writer = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(writer));
         when(request.getRequestDispatcher(any())).thenReturn(requestDispatcher);
-        when(users.getCurrentUser()).thenReturn(user);
-        when(authenticator.apply(any())).thenReturn(new OAuthAuthenticationToken(null, Map.of()));
+
+        when(authenticator.apply(any())).thenReturn(user);
+        when(users.trySetCurrentUser(any())).thenReturn(user);
     }
 
     @Test
@@ -99,7 +97,6 @@ public class SaturnContextHandlerTest {
 
     @Test
     public void vocabularyCanBeAccessedWithoutAdditionalRoles() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead));
         when(request.getMethod()).thenReturn("GET");
 
@@ -110,7 +107,6 @@ public class SaturnContextHandlerTest {
 
     @Test
     public void vocabularyEditingRequiresDatastewardRole() throws IOException, ServletException {
-        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user"))));
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead));
         when(request.getMethod()).thenReturn("PUT");
 
@@ -118,7 +114,6 @@ public class SaturnContextHandlerTest {
 
         verifyAuthenticated(false);
 
-        when(authenticator.apply(eq(request))).thenReturn(new OAuthAuthenticationToken(null, Map.of(AUTHORITIES_CLAIM, List.of("user", "datasteward"))));
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead, Role.DataSteward));
         when(request.getMethod()).thenReturn("PUT");
 

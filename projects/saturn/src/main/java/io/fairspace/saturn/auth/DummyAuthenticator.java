@@ -1,33 +1,37 @@
 package io.fairspace.saturn.auth;
 
+import io.fairspace.saturn.services.users.Role;
+import io.fairspace.saturn.services.users.User;
 import lombok.AllArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
-import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static java.util.stream.Collectors.toSet;
 
 
 // For local development only
 @AllArgsConstructor
-public class DummyAuthenticator implements Function<HttpServletRequest, OAuthAuthenticationToken> {
-    private final List<String> developerRoles;
+public class DummyAuthenticator implements Function<HttpServletRequest, User> {
+    private final Set<Role> developerRoles;
 
     @Override
-    public OAuthAuthenticationToken apply(HttpServletRequest request) {
+    public User apply(HttpServletRequest request) {
         // Allow the client to provide some authorities
         var authoritiesHeader = request.getHeader("x-fairspace-authorities");
-        var authorities = authoritiesHeader == null
+        var roles = authoritiesHeader == null
                 ? developerRoles
-                : List.of(authoritiesHeader.split(","));
+                : Stream.of(authoritiesHeader.split(",")).map(Role::valueOf).collect(toSet());
 
-        return new OAuthAuthenticationToken("<token>", Map.of(
-                SUBJECT_CLAIM, "6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-                USERNAME_CLAIM, "test-dummy",
-                FULLNAME_CLAIM, "John Snow",
-                EMAIL_CLAIM, "user@example.com",
-                AUTHORITIES_CLAIM, authorities));
+        var user = new User();
+        user.setIri(generateMetadataIri("6e6cde34-45bc-42d8-8cdb-b6e9faf890d3"));
+        user.setName("John Snow");
+        user.setEmail("user@example.com");
+        user.getRoles().addAll(roles);
+
+        return user;
     }
 }

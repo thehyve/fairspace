@@ -60,10 +60,11 @@ auth:
   enabled: false
   # User roles (for local development only)
   developerRoles:
-    - user
-    - datasteward
-    - sparql
-    - coordinator
+    - CanRead
+    - CanWrite
+    - DataSteward
+    - SparqlUser
+    - Coordinator
   # JWKS URL
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"

@@ -17,6 +17,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
@@ -39,7 +40,7 @@ public class PermissionsService {
 
     public void createResource(Node resource) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(userService.getCurrentUserIri()));
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getThreadContext().getUser().getIri()));
 
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
@@ -50,13 +51,13 @@ public class PermissionsService {
 
     public void createResources(Collection<Resource> resources) {
         var resourcePermissions = createDefaultModel();
-        var user = resourcePermissions.asRDFNode(userService.getCurrentUserIri());
+        var user = resourcePermissions.asRDFNode(getThreadContext().getUser().getIri());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions);
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = userService.getCurrentUserIri();
+        var managingUser = getThreadContext().getUser().getIri();
 
         executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), dataset, () -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -95,14 +96,14 @@ public class PermissionsService {
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if (userService.getCurrentUser().getRoles().contains(Role.Coordinator)) {
+        if (getThreadContext().getUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         getPermissions(nodes).forEach((node, access) -> {
             if (access.compareTo(requestedAccess) < 0) {
                 throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                        userService.getCurrentUserIri(), requestedAccess.name().toLowerCase()), node);
+                        getThreadContext().getUser().getIri(), requestedAccess.name().toLowerCase()), node);
             }
         });
     }
@@ -160,12 +161,12 @@ public class PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if (userService.getCurrentUser().getRoles().contains(Role.Coordinator)) {
+        if (getThreadContext().getUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUserIri(), access.name().toLowerCase(), resource), resource);
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getThreadContext().getUser().getIri(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -198,14 +199,14 @@ public class PermissionsService {
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
 
+        var userObject = getThreadContext().getUser();
+
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource
-        if (userService.getCurrentUser().getRoles().contains(Role.Coordinator)) {
+        if (userObject.getRoles().contains(Role.Coordinator)) {
             authorities.forEach(node -> result.put(node, Access.Manage));
             return result;
         }
-
-        var userObject = userService.getCurrentUser();
 
         Access maxAccess;
         if (userObject.getRoles().contains(Role.CanWrite)) {

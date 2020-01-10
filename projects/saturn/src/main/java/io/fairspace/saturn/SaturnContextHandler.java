@@ -1,7 +1,7 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.services.users.Role;
+import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.Request;
@@ -29,14 +29,14 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
     public static final String FORWARDED_ATTRIBUTE = "forwarded";
 
 
-    private final Function<HttpServletRequest, OAuthAuthenticationToken> authenticator;
+    private final Function<HttpServletRequest, User> authenticator;
     private final UserService userService;
 
     /**
      * @param userService
      * @param authenticator Authenticator returning a UserInfo for an incoming request
      */
-    public SaturnContextHandler(UserService userService, Function<HttpServletRequest, OAuthAuthenticationToken> authenticator) {
+    public SaturnContextHandler(UserService userService, Function<HttpServletRequest, User> authenticator) {
         this.userService = userService;
         this.authenticator = authenticator;;
     }
@@ -59,13 +59,14 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                     return;
                 }
 
-                var user = userService.getCurrentUser();
+                var user = userService.trySetCurrentUser(userInfo);
+
                 if (user == null || user.getRoles().isEmpty()) {
                     sendError("You have no access to this project", response);
                     return;
                 }
 
-                setThreadContext(new ThreadContext(userInfo, request.getHeader(COMMIT_MESSAGE_HEADER), null, project));
+                setThreadContext(new ThreadContext(user, request.getHeader(COMMIT_MESSAGE_HEADER), null, project));
 
                 if (parts.length > 1) {
                     var resource = parts[1];

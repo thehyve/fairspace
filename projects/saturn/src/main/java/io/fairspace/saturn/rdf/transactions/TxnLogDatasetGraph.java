@@ -2,8 +2,8 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.saturn.ThreadContext;
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
+import io.fairspace.saturn.services.users.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
@@ -14,6 +14,7 @@ import org.apache.jena.sparql.core.QuadAction;
 import java.io.IOException;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContextListener;
+import static io.fairspace.saturn.rdf.SparqlUtils.extractIdFromIri;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
 
@@ -116,8 +117,8 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     private void onThreadContextChanged(ThreadContext context) {
         if (isInWriteTransaction()) {
-            var userName = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getFullName).orElse(null);
-            var userId = ofNullable(context.getUserInfo()).map(OAuthAuthenticationToken::getSubjectClaim).orElse(null);
+            var userName = ofNullable(context.getUser()).map(User::getName).orElse(null);
+            var userId = ofNullable(context.getUser()).map(user -> extractIdFromIri(user.getIri())).orElse(null);
             try {
                 transactionLog.onMetadata(context.getUserCommitMessage(), context.getSystemCommitMessage(), userId, userName, currentTimeMillis());
             } catch (IOException e) {

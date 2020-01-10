@@ -1,22 +1,30 @@
 package io.fairspace.saturn.auth;
 
+import com.nimbusds.jwt.JWTParser;
+import io.fairspace.saturn.services.users.Role;
+import io.fairspace.saturn.services.users.User;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.util.function.Function;
 
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
-class JWTAuthenticator {
+public class JWTAuthenticator implements Function<HttpServletRequest, User>  {
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final JwtTokenValidator tokenValidator;
+    private final String coordinatorRole;
 
-    JWTAuthenticator(JwtTokenValidator tokenValidator) {
-        this.tokenValidator = tokenValidator;
+    public JWTAuthenticator(String coordinatorRole) {
+        this.coordinatorRole = coordinatorRole;
     }
 
-    OAuthAuthenticationToken getUserInfo(HttpServletRequest request) {
+
+    @Override
+    public User apply(HttpServletRequest request) {
         var authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null) {
@@ -30,8 +38,20 @@ class JWTAuthenticator {
         }
 
         var token = authorizationHeader.substring(BEARER_PREFIX.length());
-        var claims = tokenValidator.parseAndValidate(token);
 
-        return claims != null ? new OAuthAuthenticationToken(token, claims) : null;
+        try {
+            var claims = JWTParser.parse(token).getJWTClaimsSet();
+            var user = new User();
+            user.setIri(generateMetadataIri(claims.getStringClaim("subject")));
+            user.setName(claims.getStringClaim("name"));
+            user.setEmail(claims.getStringClaim("email"));
+            if (claims.getStringListClaim("authorities").contains(coordinatorRole)) {
+                user.getRoles().add(Role.Coordinator);
+            }
+            return user;
+        } catch (ParseException e) {
+            log.error("Error parsing a JWT", e);
+            return null;
+        }
     }
 }

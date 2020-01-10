@@ -2,10 +2,10 @@ package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.SaturnContextHandler;
 import io.fairspace.saturn.auth.DummyAuthenticator;
+import io.fairspace.saturn.auth.JWTAuthenticator;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.security.SecurityHandler;
 
-import static io.fairspace.saturn.auth.SecurityUtil.createAuthenticator;
 
 @Slf4j
 public class ContextHandlerFactory {
@@ -14,7 +14,7 @@ public class ContextHandlerFactory {
             log.warn("Authentication is disabled");
         }
         var authenticator = authConfig.enabled
-                ? createAuthenticator(authConfig.jwksUrl, authConfig.jwtAlgorithm)
+                ? new JWTAuthenticator(authConfig.fullAccessRole)
                 : new DummyAuthenticator(authConfig.developerRoles);
 
         return new SaturnContextHandler(svc.getUserService(), authenticator);

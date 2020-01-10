@@ -60,7 +60,7 @@ public class Services {
         this.dataset = dataset;
 
         projectsService = new ProjectsService(config.jena.datasetPath);
-        userService = new UserService(dataset, config.auth.fullAccessRole);
+        userService = new UserService(dataset);
 
         eventService = setupEventService();
 
@@ -109,14 +109,14 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, userService::getCurrentUserIri, collectionsService, eventBus),
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getThreadContext().getUser().getIri(), collectionsService, eventBus),
                 IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService)));
     }
 
     private EventService setupEventService() throws Exception {
         if(config.rabbitMQ.enabled) {
             try {
-                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name, () -> getThreadContext().getUserInfo());
+                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name);
                 eventService.init();
                 return eventService;
             } catch(Exception e) {

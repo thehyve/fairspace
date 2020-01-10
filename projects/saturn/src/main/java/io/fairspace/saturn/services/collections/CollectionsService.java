@@ -33,7 +33,7 @@ public class CollectionsService {
     private final EventService eventService;
 
     public CollectionsService(Dataset dataset, Consumer<Object> eventListener, UserService userService, PermissionsService permissions, EventService eventService) {
-        this.dao = new DAO(dataset, userService::getCurrentUserIri);
+        this.dao = new DAO(dataset);
         this.eventListener = eventListener;
         this.permissions = permissions;
         this.eventService = eventService;

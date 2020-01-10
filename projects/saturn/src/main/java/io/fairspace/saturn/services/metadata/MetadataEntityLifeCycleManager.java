@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.Resource;
 import java.time.Instant;
 import java.util.Set;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
@@ -80,7 +81,7 @@ class MetadataEntityLifeCycleManager {
             throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
         }
         if (queryAsk(dataset, storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
-            update(dataset, storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userService.getCurrentUserIri(), graph));
+            update(dataset, storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), getThreadContext().getUser().getIri(), graph));
             return true;
         }
         return false;
@@ -94,7 +95,7 @@ class MetadataEntityLifeCycleManager {
      */
     private Model generateCreationInformation(Set<Resource> entities) {
         var model = createDefaultModel();
-        var user = model.asRDFNode(userService.getCurrentUserIri());
+        var user = model.asRDFNode(getThreadContext().getUser().getIri());
         var now = toXSDDateTimeLiteral(Instant.now());
 
         entities.forEach(resource -> model.add(resource, createdBy, user).add(resource, dateCreated, now));

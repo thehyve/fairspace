@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
@@ -21,6 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
@@ -65,9 +67,11 @@ public class PermissionsServiceTest {
         ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.manage, createResource(USER1.getURI()));
         ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.write, createResource(USER2.getURI()));
 
+
         when(userService.getUser(any())).thenReturn(new User());
-        when(userService.getCurrentUserIri()).thenReturn(currentUserIri);
-        when(userService.getCurrentUser()).thenReturn(currentUser);
+
+        setThreadContext(new ThreadContext(currentUser, null, null, null));
+
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getRoles()).thenAnswer(invocation ->
                 isCoordinator

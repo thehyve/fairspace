@@ -1,5 +1,6 @@
 package io.fairspace.saturn.events;
 
+import io.fairspace.saturn.services.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 

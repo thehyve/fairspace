@@ -4,7 +4,6 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.config.Config;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -15,21 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import static io.fairspace.saturn.auth.OAuthAuthenticationToken.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RabbitMQEventServiceTest {
-    private Map<String, Object> claims = Map.of(
-            SUBJECT_CLAIM, "test",
-            FIRSTNAME_CLAIM, "first",
-            LASTNAME_CLAIM, "last"
-    );
 
-    private OAuthAuthenticationToken token = new OAuthAuthenticationToken("accessToken", claims);
     private Config.RabbitMQ config = Config.RabbitMQ.builder()
             .host("server")
             .username("username")
@@ -54,7 +45,7 @@ public class RabbitMQEventServiceTest {
     public void setUp() throws Exception {
         org.apache.log4j.Logger.getRootLogger().addAppender(appender);
 
-        service = new RabbitMQEventService(config, "workspaceId", () -> token);
+        service = new RabbitMQEventService(config, "workspaceId");
         service.setFactory(factory);
 
         when(factory.newConnection()).thenReturn(connection);

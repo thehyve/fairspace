@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.services.BaseApp;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -36,7 +37,7 @@ public class UserApp extends BaseApp {
 
         get("/current/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(service.getCurrentUser());
+            return mapper.writeValueAsString(getThreadContext().getUser());
         });
     }
 }

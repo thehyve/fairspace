@@ -1,6 +1,7 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
+import io.fairspace.saturn.ThreadContext;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -21,8 +22,8 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.lang.String.format;
@@ -71,11 +72,9 @@ public class DAO {
 
     @Getter
     private final Dataset dataset;
-    private final Supplier<Node> userIriSupplier;
 
-    public DAO(Dataset dataset, Supplier<Node> userIriSupplier) {
+    public DAO(Dataset dataset) {
         this.dataset = dataset;
-        this.userIriSupplier = userIriSupplier;
     }
 
     /**
@@ -93,7 +92,7 @@ public class DAO {
 
             if (entity instanceof LifecycleAwarePersistentEntity) {
                 var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                var user = userIriSupplier.get();
+                var user = getUserIRI();
                 basicEntity.setDateModified(now());
                 basicEntity.setModifiedBy(user);
 
@@ -132,6 +131,10 @@ public class DAO {
 
             return entity;
         });
+    }
+
+    private static Node getUserIRI() {
+        return ofNullable(getThreadContext()).map(ThreadContext::getUser).map(PersistentEntity::getIri).orElse(null);
     }
 
     /**
@@ -176,7 +179,7 @@ public class DAO {
         var existing = (T) read(entity.getClass(), entity.getIri());
         if (existing != null) {
             existing.setDateDeleted(now());
-            existing.setDeletedBy(userIriSupplier.get());
+            existing.setDeletedBy(getUserIRI());
             return write(existing);
         }
         return null;
