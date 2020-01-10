@@ -224,7 +224,7 @@ public class PermissionsService {
         return result;
     }
 
-    private Access getRawResourceAccess(Resource r, Resource user) { ;
+    private Access getRawResourceAccess(Resource r, Resource user) {
         if (r.hasProperty(FS.manage, user)) {
             return Access.Manage;
         }
@@ -234,7 +234,7 @@ public class PermissionsService {
         if (r.hasProperty(FS.read, user)) {
             return Access.Read;
         }
-        if (r.equals(FS.theProject) || r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection)) {
+        if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection)) {
             return Access.None;
         }
         if (r.hasLiteral(FS.writeRestricted, true)) {
