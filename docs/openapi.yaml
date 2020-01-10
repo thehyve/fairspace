@@ -953,7 +953,84 @@ paths:
       responses:
         '204':
           description: Succesfully deleted the collection
-
+  /users/:
+    get:
+      summary: Retrieve a set of users
+      operationId: getUsers
+      tags:
+        - users
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/Users'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Add a user
+      operationId: getUsers
+      tags:
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Update a user
+      operationId: getUsers
+      tags:
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /users/current/:
+    get:
+      summary: Returns information about current user
+      operationId: getCurrentUser
+      tags:
+        - users
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json:
+              schema:
+                - $ref: '#/components/schemas/User'
   /permissions/:
     get:
       summary: Retrieve a set of permissions
@@ -1288,6 +1365,31 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Permission"
+    User:
+      properties:
+        iri:
+          type: string
+          format: iri
+        name:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+    Users:
+      type: array
+      items:
+        $ref: "#/components/schemas/User"
+    Role:
+      type: string
+      enum:
+        - CanRead
+        - CanWrite
+        - DataSteward
+        - Sparql
+        - Coordinator
     Restricted:
       properties:
         restricted:
