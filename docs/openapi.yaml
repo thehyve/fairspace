@@ -949,10 +949,9 @@ paths:
                 $ref: '#/components/schemas/Account'
         default:
           $ref: '#components/responses/Unexpected'
-
   /projects/{project}/users/:
     get:
-      summary: Retrieve a list of users known to the project
+      summary: Retrieve a set of users
       operationId: getUsers
       tags:
         - users
@@ -967,32 +966,13 @@ paths:
                 $ref: '#/components/schemas/Users'
         default:
           $ref: '#components/responses/Unexpected'
-
-  /projects/{project}/permissions/:
-  /users/:
-    get:
-      summary: Retrieve a set of users
-      operationId: getUsers
-      tags:
-        - users
-      responses:
-        '200':
-          description: Succesful response
-          content:
-            application/json:
-              schema:
-                - $ref: '#/components/schemas/Users'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
     put:
       summary: Add a user
       operationId: getUsers
       tags:
         - users
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/json:
@@ -1004,18 +984,16 @@ paths:
           content:
             application/json:
               schema:
-                - $ref: '#/components/schemas/'
+                $ref: '#/components/schemas/User'
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     patch:
       summary: Update a user
       operationId: getUsers
       tags:
         - users
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/json:
@@ -1027,27 +1005,25 @@ paths:
           content:
             application/json:
               schema:
-                - $ref: '#/components/schemas/'
+                $ref: '#/components/schemas/User'
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /users/current/:
+          $ref: '#components/responses/Unexpected'
+  /projects/{project}/users/current/:
     get:
       summary: Returns information about current user
       operationId: getCurrentUser
       tags:
         - users
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       responses:
         '200':
           description: Succesful response
           content:
             application/json:
               schema:
-                - $ref: '#/components/schemas/User'
-  /permissions/:
+                $ref: '#/components/schemas/User'
+  /projects/{project}/permissions/:
     get:
       summary: Retrieve a set of permissions
       operationId: getPermissions
@@ -1396,6 +1372,22 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Permission"
+    Account:
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        fullName:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        authorizations:
+          type: array
+          items:
+            type: string
     User:
       properties:
         iri:
