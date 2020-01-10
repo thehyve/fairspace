@@ -968,7 +968,7 @@ paths:
           $ref: '#components/responses/Unexpected'
     put:
       summary: Add a user
-      operationId: getUsers
+      operationId: addUser
       tags:
         - users
       parameters:
