@@ -73,8 +73,8 @@ public class ShaclValidatorTest {
                 resource1, RDF.type, FS.User,
                 resource1, RDFS.label, createTypedLiteral(123),
                 resource1, RDFS.comment, createTypedLiteral(123));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
-                vocabulary, violationHandler);
+
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
         expect(resource1, RDFS.comment, createTypedLiteral(123));
 

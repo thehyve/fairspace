@@ -17,6 +17,6 @@ public class ContextHandlerFactory {
                 ? createAuthenticator(authConfig.jwksUrl, authConfig.jwtAlgorithm)
                 : new DummyAuthenticator(authConfig.developerRoles);
 
-        return new SaturnContextHandler(authConfig, authenticator);
+        return new SaturnContextHandler(svc.getUserService(), authenticator);
     }
 }

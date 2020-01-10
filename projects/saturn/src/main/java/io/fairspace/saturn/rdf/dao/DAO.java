@@ -278,7 +278,7 @@ public class DAO {
         if (value instanceof Node) {
             return (Node) value;
         }
-        if (value instanceof String) {
+        if (value instanceof String || value instanceof Enum) {
             return createStringLiteral(value.toString()).asNode();
         }
         if (value instanceof Instant) {
@@ -341,6 +341,9 @@ public class DAO {
             }
             if (type == Instant.class) {
                 return ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
+            }
+            if (Enum.class.isAssignableFrom(type)) {
+                return Enum.valueOf((Class<Enum>) type, literal.getString());
             }
         }
 

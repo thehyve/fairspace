@@ -191,7 +191,15 @@ fs:UserShape a fs:ClassShape ;
     sh:property
         fs:labelShape,
         fs:commentShape,
-        fs:userEmailShape .
+        fs:userEmailShape,
+          [
+            sh:path fs:hasRole ;
+            fs:machineOnly true ;
+            a fs:DatatypePropertyShape ;
+            sh:name "Has a role" ;
+            sh:description "A markdown formatted description for the project homepage." ;
+            sh:datatype xsd:string ;
+          ].
 
 fs:Project a fs:ClassShape ;
   sh:description "Resource description for the current project." ;

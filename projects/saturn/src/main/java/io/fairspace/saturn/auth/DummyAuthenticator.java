@@ -18,8 +18,8 @@ public class DummyAuthenticator implements Function<HttpServletRequest, OAuthAut
     @Override
     public OAuthAuthenticationToken apply(HttpServletRequest request) {
         // Allow the client to provide some authorities
-        String authoritiesHeader = request.getHeader("x-fairspace-authorities");
-        List<String> authorities = authoritiesHeader == null
+        var authoritiesHeader = request.getHeader("x-fairspace-authorities");
+        var authorities = authoritiesHeader == null
                 ? developerRoles
                 : List.of(authoritiesHeader.split(","));
 

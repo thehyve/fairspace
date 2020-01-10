@@ -66,7 +66,7 @@ public class Services {
         this.userInfoSupplier = userInfoSupplier;
 
         projectsService = new ProjectsService(config.jena.datasetPath);
-        userService = new UserService(config.auth.userUrlTemplate, dataset);
+        userService = new UserService(dataset, userInfoSupplier, config.auth.fullAccessRole);
         Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
         BooleanSupplier hasFullAccessSupplier = () -> userInfoSupplier.get().getAuthorities().contains(config.auth.fullAccessRole);
 
@@ -119,6 +119,10 @@ public class Services {
         fileSystem = new CompoundFileSystem(collectionsService, Map.of(
                 ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim()), collectionsService, eventBus),
                 IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService)));
+    }
+
+    public Node getCurrentUser() {
+        return userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
     }
 
     private EventService setupEventService() throws Exception {

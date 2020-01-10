@@ -29,7 +29,7 @@ public class RabbitMQEventServiceTest {
             LASTNAME_CLAIM, "last"
     );
 
-    private OAuthAuthenticationToken token = new OAuthAuthenticationToken("accessToken", "refreshToken", claims);
+    private OAuthAuthenticationToken token = new OAuthAuthenticationToken("accessToken", claims);
     private Config.RabbitMQ config = Config.RabbitMQ.builder()
             .host("server")
             .username("username")

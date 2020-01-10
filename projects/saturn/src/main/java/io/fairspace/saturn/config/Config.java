@@ -84,15 +84,7 @@ public class Config {
 
         public String jwtAlgorithm = "RS256";
 
-        public String workspaceUserRole = "user";
-
-        public String dataStewardRole = "datasteward";
-
-        public String sparqlRole = "sparql";
-
         public String fullAccessRole = "coordinator";
-
-        public String userUrlTemplate = "http://localhost:5100/auth/admin/realms/ci/users/%s";
     }
 
     public static class WebDAV {

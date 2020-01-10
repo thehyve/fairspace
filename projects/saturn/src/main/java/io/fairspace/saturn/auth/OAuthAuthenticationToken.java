@@ -12,7 +12,6 @@ import static java.util.stream.Collectors.toSet;
 
 @Getter
 @EqualsAndHashCode
-@AllArgsConstructor
 @Builder(toBuilder = true)
 @ToString(exclude = "claimsSet")
 @Slf4j
@@ -28,16 +27,13 @@ public class OAuthAuthenticationToken implements Serializable {
     public static final String EMAIL_CLAIM = "email";
 
     private String accessToken;
-    private String refreshToken;
     private Map<String,Object> claimsSet;
 
     public OAuthAuthenticationToken(String accessToken, Map<String,Object> claimsSet) {
-        this(accessToken, null, claimsSet);
+        this.accessToken = accessToken;
+        this.claimsSet = claimsSet;
     }
 
-    public OAuthAuthenticationToken(String accessToken, String refreshToken) {
-        this(accessToken, refreshToken, null);
-    }
 
     public String getStringClaim(String claim) {
         if(claimsSet == null) {
