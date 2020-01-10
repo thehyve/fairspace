@@ -197,7 +197,7 @@ fs:UserShape a fs:ClassShape ;
             fs:machineOnly true ;
             a fs:DatatypePropertyShape ;
             sh:name "Has a role" ;
-            sh:description "A markdown formatted description for the project homepage." ;
+            sh:description "Roles assigned to the user" ;
             sh:datatype xsd:string ;
           ].
 
