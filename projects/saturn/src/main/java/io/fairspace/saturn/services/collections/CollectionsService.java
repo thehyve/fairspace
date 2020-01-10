@@ -6,8 +6,9 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import lombok.RequiredArgsConstructor;
+import io.fairspace.saturn.services.users.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.query.Dataset;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,13 +25,19 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
-@RequiredArgsConstructor
 @Slf4j
 public class CollectionsService {
     private final DAO dao;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
     private final EventService eventService;
+
+    public CollectionsService(Dataset dataset, Consumer<Object> eventListener, UserService userService, PermissionsService permissions, EventService eventService) {
+        this.dao = new DAO(dataset, userService::getCurrentUserIri);
+        this.eventListener = eventListener;
+        this.permissions = permissions;
+        this.eventService = eventService;
+    }
 
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");

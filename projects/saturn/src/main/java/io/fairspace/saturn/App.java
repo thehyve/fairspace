@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.DatasetFactory;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ContextHandlerFactory.getContextHandler;
@@ -20,7 +19,7 @@ public class App {
 
         var ds =  DatasetFactory.wrap(new DatasetGraphMulti(CONFIG.jena));
 
-        var svc = new Services(CONFIG, ds, () -> getThreadContext().getUserInfo());
+        var svc = new Services(CONFIG, ds);
 
         FusekiServer.create()
                 // The easiest way to add a top-level handler to Fuseki

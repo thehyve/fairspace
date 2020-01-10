@@ -1,14 +1,13 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.rdf.dao.DAO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 
 import java.util.List;
-import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.extractIdFromIri;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
@@ -16,14 +15,12 @@ import static io.fairspace.saturn.util.ValidationUtils.validate;
 
 @Slf4j
 public class UserService {
-    private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
     private final DAO dao;
     private final String coordinatorsRole;
 
-    public UserService(Dataset dataset, Supplier<OAuthAuthenticationToken> userInfoSupplier, String coordinatorsRole) {
-        this.userInfoSupplier = userInfoSupplier;
+    public UserService(Dataset dataset, String coordinatorsRole) {
         this.coordinatorsRole = coordinatorsRole;
-        this.dao = new DAO(dataset, () -> getUserIri(userInfoSupplier.get().getSubjectClaim()));
+        this.dao = new DAO(dataset, () -> getUserIri(getThreadContext().getUserInfo().getSubjectClaim()));
     }
 
     public List<User> getUsers() {
@@ -31,10 +28,14 @@ public class UserService {
         return dao.list(User.class);
     }
 
+    public Node getCurrentUserIri() {
+        return getUserIri(getThreadContext().getUserInfo().getSubjectClaim());
+    }
+
     public User getCurrentUser() {
-        var user = getUser(getUserIri(userInfoSupplier.get().getSubjectClaim()));
+        var userInfo = getThreadContext().getUserInfo();
+        var user = getUser(getUserIri(userInfo.getSubjectClaim()));
         if (user == null) {
-            var userInfo = userInfoSupplier.get();
             // Must be a coordinator
             if (userInfo.getAuthorities().contains(coordinatorsRole)) {
                 var u = new User();

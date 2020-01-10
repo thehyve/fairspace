@@ -1,7 +1,10 @@
 package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.search.*;
+import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
+import io.fairspace.saturn.rdf.search.ElasticSearchIndexConfigurer;
+import io.fairspace.saturn.rdf.search.SingleTripleTextDocProducer;
+import io.fairspace.saturn.rdf.search.TextIndexESBulk;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;

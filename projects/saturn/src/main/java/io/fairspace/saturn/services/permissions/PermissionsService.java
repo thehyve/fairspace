@@ -11,15 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
@@ -37,15 +33,13 @@ public class PermissionsService {
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final Dataset dataset;
-    private final Supplier<Node> userIriSupplier;
-    private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final UserService userService;
     private final EventService eventService;
 
     public void createResource(Node resource) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(userIriSupplier.get()));
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(userService.getCurrentUserIri()));
 
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
@@ -55,15 +49,14 @@ public class PermissionsService {
     }
 
     public void createResources(Collection<Resource> resources) {
-        Model resourcePermissions = createDefaultModel();
-        Resource user = ResourceFactory.createResource(userIriSupplier.get().getURI());
+        var resourcePermissions = createDefaultModel();
+        var user = resourcePermissions.asRDFNode(userService.getCurrentUserIri());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions);
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = userIriSupplier.get();
-
+        var managingUser = userService.getCurrentUserIri();
 
         executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), dataset, () -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -97,19 +90,19 @@ public class PermissionsService {
         );
 
         if (permissionChangeEventHandler != null)
-            permissionChangeEventHandler.onPermissionChange(userIriSupplier.get(), resource, user, access);
+            permissionChangeEventHandler.onPermissionChange(managingUser, resource, user, access);
     }
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if (hasFullAccessSupplier.getAsBoolean()) {
+        if (userService.getCurrentUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         getPermissions(nodes).forEach((node, access) -> {
             if (access.compareTo(requestedAccess) < 0) {
                 throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                        userIriSupplier.get(), requestedAccess.name().toLowerCase()), node);
+                        userService.getCurrentUserIri(), requestedAccess.name().toLowerCase()), node);
             }
         });
     }
@@ -167,12 +160,12 @@ public class PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if (hasFullAccessSupplier.getAsBoolean()) {
+        if (userService.getCurrentUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource), resource);
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userService.getCurrentUserIri(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -207,7 +200,7 @@ public class PermissionsService {
 
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource
-        if (hasFullAccessSupplier.getAsBoolean()) {
+        if (userService.getCurrentUser().getRoles().contains(Role.Coordinator)) {
             authorities.forEach(node -> result.put(node, Access.Manage));
             return result;
         }

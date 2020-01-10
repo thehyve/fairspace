@@ -25,10 +25,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.currentThread;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)

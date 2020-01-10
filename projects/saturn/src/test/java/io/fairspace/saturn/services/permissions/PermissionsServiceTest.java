@@ -65,20 +65,18 @@ public class PermissionsServiceTest {
         ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.manage, createResource(USER1.getURI()));
         ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.write, createResource(USER2.getURI()));
 
-        currentUserIri = USER1;
-
-        service = new PermissionsService(ds, () -> currentUserIri, () -> isCoordinator, permissionChangeEventHandler, userService, event -> {});
-        service.createResource(RESOURCE);
-
-        isCoordinator = false;
-
         when(userService.getUser(any())).thenReturn(new User());
+        when(userService.getCurrentUserIri()).thenReturn(currentUserIri);
         when(userService.getCurrentUser()).thenReturn(currentUser);
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getRoles()).thenAnswer(invocation ->
                 isCoordinator
-                ? EnumSet.of(Role.CanRead, Role.CanWrite)
-                : EnumSet.of(Role.CanRead, Role.CanWrite, Role.Coordinator));
+                ? EnumSet.of(Role.CanRead, Role.CanWrite, Role.Coordinator)
+                : EnumSet.of(Role.CanRead, Role.CanWrite));
+
+
+        service = new PermissionsService(ds, permissionChangeEventHandler, userService, event -> {});
+        service.createResource(RESOURCE);
     }
 
     @Test

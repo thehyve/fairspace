@@ -3,8 +3,6 @@ package io.fairspace.saturn.rdf.transactions;
 import com.pivovarit.function.ThrowingRunnable;
 import com.pivovarit.function.ThrowingSupplier;
 import io.fairspace.saturn.ThreadContext;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.sparql.core.Transactional;
 import org.apache.jena.system.Txn;
 
