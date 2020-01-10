@@ -9,7 +9,51 @@ info:
 servers:
   - url: https://workspace.ci.fairway.app/api/v1
 paths:
-  /metadata/:
+  /workspaces/:
+    description: The workspaces resource
+    get:
+      summary: Retrieve workspaces
+      responses:
+        '200':
+          description: A list of workspaces (Just identifiers, currently URLs)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspaces'
+        default:
+          $ref: '#components/responses/Unexpected'
+  /projects/:
+    description: The projects resource
+    get:
+      summary: Retrieve projects
+      operationId: getProjects
+      responses:
+        '200':
+          description: A list of projects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+        default:
+          $ref: '#components/responses/Unexpected'
+    put:
+      summary: Create a project
+      operationId: createProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: Project metadata
+          content:
+            application/ld+json:
+              schema:
+                $ref: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
+        default:
+          $ref: '#components/responses/Unexpected'
+  /projects/{project}/metadata/:
     description: The metadata is stored as triples. Its structure should match the vocabulary definition in /vocabulary. Any updates that do not match the vocabulary definition will return a 400 status with a message indicating what went wrong.
     get:
       summary: Retrieve metadata
@@ -17,6 +61,7 @@ paths:
       tags:
         - metadata
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: subject
           in: query
           description: The subject to filter on
@@ -107,18 +152,15 @@ paths:
                     "ws" : "http://workspace.ci.fairway.app/iri/"
                   }
                 }
-
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     put:
       summary: Adds metadata. Existing metadata is left untouched
       operationId: putMetadata
       tags:
         - metadata
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/ld+json:
@@ -143,29 +185,19 @@ paths:
         '204':
           description: Data was stored properly
         '400':
-          description: Bad request. Either the syntax or the data was invalid.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/400BadRequest'
         '415':
-          description: Unsupported media type
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/415UnsupportedMediaType'
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     patch:
       summary: Adds metadata. Existing metadata is overwritten.
       description: Any existing metadata for a given subject/predicate combination will be overwritten with the provided values
       operationId: patchMetadata
       tags:
         - metadata
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/ld+json:
@@ -190,23 +222,11 @@ paths:
         '204':
           description: Data was stored properly
         '400':
-          description: Bad request. Either the syntax or the data was invalid.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/400BadRequest'
         '415':
-          description: Unsupported media type
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/415UnsupportedMediaType'
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     delete:
       summary: Delete metadata
       description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, the subject specified in the subject parameter will be marked as deleted. Please note that the subject will still exist in the database.
@@ -214,6 +234,7 @@ paths:
       tags:
         - metadata
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: subject
           in: query
           description: The subject to filter on
@@ -244,24 +265,17 @@ paths:
         '204':
           description: Data was deleted
         '400':
-          description: Bad request. Either the syntax was invalid, or the data would be invalidated by this deletion.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/400BadRequest'
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /metadata/entities/:
+          $ref: '#components/responses/Unexpected'
+  /projects/{project}/metadata/entities/:
     get:
       summary: Retrieve metadata entities
       operationId: getEntities
       tags:
         - metadata
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: type
           in: query
           description: The type to filter on. If given, only entities of the specified type will be returned.
@@ -307,13 +321,9 @@ paths:
                   }
                 }
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
 
-  /vocabulary/:
+  /projects/{project}/vocabulary/:
     description: The vocabulary contains a description of the structure of the metadata. It contains the types of entities that can be created, along with the datatypes for the fields. It is stored in the [SHACL](https://www.w3.org/TR/shacl/) format.
 
       The vocabulary structure should match the meta-vocabulary definition in /meta-vocabulary. Any updates that do not match that definition will return a 400 status with a message indicating what went wrong.
@@ -323,6 +333,7 @@ paths:
       tags:
         - vocabulary
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: subject
           in: query
           description: The subject to filter on
@@ -436,16 +447,14 @@ paths:
                 }
 
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     put:
       summary: Adds a shacl definition to the vocabulary. Existing vocabulary is left untouched
       operationId: putVocabulary
       tags:
         - vocabulary
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/ld+json:
@@ -469,29 +478,19 @@ paths:
         '204':
           description: Data was stored properly
         '400':
-          description: Bad request. Either the syntax or the data was invalid.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/400BadRequest'
         '415':
-          description: Unsupported media type
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/415UnsupportedMediaType'
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     patch:
       summary: Adds a shacl definition to the vocabulary. Existing vocabulary entries are overwritten.
       description: Any existing vocabulary definitions for a given subject/predicate combination will be overwritten with the provided values
       operationId: patchVocabulary
       tags:
         - vocabulary
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/ld+json:
@@ -515,23 +514,11 @@ paths:
         '204':
           description: Data was stored properly
         '400':
-          description: Bad request. Either the syntax or the data was invalid.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/400BadRequest'
         '415':
-          description: Unsupported media type
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/415UnsupportedMediaType'
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
     delete:
       summary: Delete vocabulary entries
       description: If a request body is given in JSON-LD format, the triples specified in the body will be deleted. Otherwise, the subject specified in the subject parameter will be marked as deleted. Please note that the subject will still exist in the database.
@@ -539,6 +526,7 @@ paths:
       tags:
         - vocabulary
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: subject
           in: query
           description: The subject to filter on
@@ -568,24 +556,17 @@ paths:
         '204':
           description: Data was deleted
         '400':
-          description: Bad request. Either the syntax was invalid, or the data would be invalidated by this deletion.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/400BadRequest'
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /vocabulary/entities/:
+          $ref: '#components/responses/Unexpected'
+  /projects/{project}/vocabulary/entities/:
     get:
       summary: Retrieve vocabulary entities
       operationId: getVocabularyEntities
       tags:
         - vocabulary
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: type
           in: query
           description: The type to filter on. If given, only entities of the specified type will be returned.
@@ -627,13 +608,9 @@ paths:
                   }
                 }
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
 
-  /meta-vocabulary/:
+  /projects/{project}/meta-vocabulary/:
     description: The meta-vocabulary contains a description of the structure of the vocabulary. It contains the types of entities that can be created, along with the datatypes for the fields. It is stored in the [SHACL](https://www.w3.org/TR/shacl/) format.
 
       Please note that the meta-vocabulary is fixed and can only be changed in the code. This means that a client can
@@ -645,6 +622,7 @@ paths:
       tags:
         - vocabulary
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: subject
           in: query
           description: The subject to filter on
@@ -771,20 +749,17 @@ paths:
                 }
 
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: '#components/responses/Unexpected'
 
 
-  /collections/:
+  /projects/{project}/collections/:
     get:
       summary: Retrieve a list of collections
       operationId: getCollections
       tags:
         - collections
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: iri
           in: query
           description: If given, a single collection with the given IRI will be returned
@@ -866,6 +841,8 @@ paths:
       operationId: createCollection
       tags:
         - collections
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/json:
@@ -903,6 +880,8 @@ paths:
       operationId: updateCollection
       tags:
         - collections
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
       requestBody:
         content:
           application/json:
@@ -943,6 +922,7 @@ paths:
       tags:
         - collections
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: iri
           in: query
           description: The iri of the collection to delete
@@ -953,6 +933,42 @@ paths:
       responses:
         '204':
           description: Succesfully deleted the collection
+
+  /account:
+    get:
+      summary: Current user's account information
+      operationId: getUsers
+      tags:
+        - users
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        default:
+          $ref: '#components/responses/Unexpected'
+
+  /projects/{project}/users/:
+    get:
+      summary: Retrieve a list of users known to the project
+      operationId: getUsers
+      tags:
+        - users
+      parameters:
+        - $ref: '#/components/parameters/projectParam'
+      responses:
+        '200':
+          description: Succesful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+        default:
+          $ref: '#components/responses/Unexpected'
+
+  /projects/{project}/permissions/:
   /users/:
     get:
       summary: Retrieve a set of users
@@ -1038,6 +1054,7 @@ paths:
       tags:
         - permissions
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: iri
           in: query
           description: The iri of the entity to return the permissions for
@@ -1137,7 +1154,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /permissions/restricted/:
+  /projects/{project}/permissions/restricted/:
     get:
       summary: Retrieve the restricted status of an entity
       description: Metadata entities are writable by default for anyone. However, someone with manage access can restrict the access to an entity, to prevent changes to its metadata.
@@ -1147,6 +1164,7 @@ paths:
       tags:
         - permissions
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: iri
           in: query
           description: The iri of the entity to check restricted status for
@@ -1167,6 +1185,7 @@ paths:
       tags:
         - permissions
       parameters:
+        - $ref: '#/components/parameters/projectParam'
         - name: iri
           in: query
           description: The iri of the entity to set the restricted status for
@@ -1248,6 +1267,18 @@ components:
           format: iri
         object:
           type: string
+    Workspaces:
+      type: array
+      items:
+        type: string
+    Project:
+      properties:
+        id:
+          type: string
+    Projects:
+      type: array
+      items:
+        $ref: "#/components/schemas/Project"
     BasicCollection:
       properties:
         name:
@@ -1394,6 +1425,35 @@ components:
       properties:
         restricted:
           type: boolean
+  parameters:
+    projectParam:
+      name: project
+      in: path
+      description: The project
+      required: true
+      schema:
+        type: string
+
+  responses:
+    400BadRequest:
+      description: Bad request. Either the syntax or the data was invalid.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    415UnsupportedMediaType:
+      description: Unsupported media type
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unexpected:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
 security:
   - OpenID:
       - openid
