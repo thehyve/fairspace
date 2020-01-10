@@ -32,8 +32,6 @@ data:
           indexName: "{{ .Values.external.elasticsearch.indexName }}"
     auth:
       enabled: true
-      jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.external.keycloak.realm }}/protocol/openid-connect/certs
-      jwtAlgorithm: "RS256"
       fullAccessRole: "{{ template "workspace.roles.coordinator" . }}"
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"

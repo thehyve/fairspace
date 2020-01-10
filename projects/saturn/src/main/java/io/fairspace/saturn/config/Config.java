@@ -78,10 +78,6 @@ public class Config {
 
         public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser);
 
-        public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
-
-        public String jwtAlgorithm = "RS256";
-
         public String fullAccessRole = "coordinator";
     }
 
