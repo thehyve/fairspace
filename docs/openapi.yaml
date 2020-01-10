@@ -989,7 +989,7 @@ paths:
           $ref: '#components/responses/Unexpected'
     patch:
       summary: Update a user
-      operationId: getUsers
+      operationId: updateUser
       tags:
         - users
       parameters:
