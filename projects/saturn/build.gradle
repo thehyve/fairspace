@@ -2,7 +2,7 @@ buildscript {
     ext {
 //        jena_version = '3.13.1'
         milton_version = '2.7.4.9'
-        mockitoVersion = '2.23.0'
+        mockitoVersion = '3.2.4'
         jacksonVersion = '2.10.1' // check what version is used by Jena
     }
 }
@@ -12,7 +12,7 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
     id 'jacoco'
-    id  'com.github.spotbugs' version '1.6.10'
+//    id  'com.github.spotbugs' version '1.6.10'
     id "org.owasp.dependencycheck" version "5.2.2"
 }
 
@@ -34,7 +34,7 @@ repositories {
     maven {
         url "http://dl.bintray.com/milton/Milton"
     }
-    
+
     maven {
         url "https://raw.githubusercontent.com/DICE-UNC/DICE-Maven/master/releases"
     }
@@ -74,7 +74,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
 
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
-    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
+//    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 
     constraints {
 //        implementation('org.elasticsearch.client:transport:6.8.2') {
@@ -97,18 +97,19 @@ dependencyCheck {
     failBuildOnCVSS=9
 }
 
-apply plugin: 'com.github.spotbugs'
+// Plugin disabled for Java 13 - not compatible
+//apply plugin: 'com.github.spotbugs'
+//
+//spotbugs {
+//  toolVersion = '3.1.12'
+//  effort = "max"
+//  reportLevel = "low"
+//  ignoreFailures = true
+//}
 
-spotbugs {
-  toolVersion = '3.1.12'
-  effort = "max"
-  reportLevel = "low"
-  ignoreFailures = true
-}
-
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-}
+//tasks.withType(com.github.spotbugs.SpotBugsTask) {
+//    reports {
+//        xml.enabled = false
+//        html.enabled = true
+//    }
+//}
