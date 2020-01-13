@@ -23,5 +23,10 @@ module.exports = (app) => {
         target: BACKEND_URL
     }));
 
+    app.use(proxy('/api/v1/workspaces', {
+        target: MOCKED_SERVER_URL
+    }));
+
+
     app.use(proxy('/api/v1', {target: BACKEND_URL}));
 };

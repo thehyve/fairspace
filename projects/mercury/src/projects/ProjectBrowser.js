@@ -19,8 +19,8 @@ export const ProjectBrowser = ({
 
     const handleCreateProjectClick = () => setCreatingProject(true);
 
-    const handleSaveProject = (project: Project) => {
-        createProject(project)
+    const handleSaveProject = async (project: Project) => {
+        return createProject(project)
             .then(() => setCreatingProject(false))
             .catch(err => {
                 const message = err && err.message ? err.message : "An error occurred while creating a collection";
@@ -43,8 +43,9 @@ export const ProjectBrowser = ({
                 {creatingProject ? (
                     <ProjectEditor
                         title="Create project"
-                        onSave={handleSaveProject}
+                        onSubmit={handleSaveProject}
                         onClose={handleCancelCreateProject}
+                        projects={projects}
                     />
                 ) : null}
             </>
