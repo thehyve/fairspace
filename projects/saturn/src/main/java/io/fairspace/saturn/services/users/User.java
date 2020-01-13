@@ -24,4 +24,6 @@ public class User extends PersistentEntity {
 
     @RDFProperty(value = HAS_ROLE_URI, required = true)
     private final Set<Role> roles = EnumSet.noneOf(Role.class);
+
+    private boolean isAdmin;
 }

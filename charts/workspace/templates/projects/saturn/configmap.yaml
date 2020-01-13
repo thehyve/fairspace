@@ -32,7 +32,7 @@ data:
           indexName: "{{ .Values.external.elasticsearch.indexName }}"
     auth:
       enabled: true
-      fullAccessRole: "{{ template "workspace.roles.coordinator" . }}"
+      fullAccessRole: organisation-admin
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     workspace:

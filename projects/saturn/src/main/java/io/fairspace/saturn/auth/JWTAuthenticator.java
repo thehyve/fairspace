@@ -1,7 +1,6 @@
 package io.fairspace.saturn.auth;
 
 import com.nimbusds.jwt.JWTParser;
-import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,10 +15,10 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 public class JWTAuthenticator implements Function<HttpServletRequest, User>  {
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final String coordinatorRole;
+    private final String adminRole;
 
-    public JWTAuthenticator(String coordinatorRole) {
-        this.coordinatorRole = coordinatorRole;
+    public JWTAuthenticator(String adminRole) {
+        this.adminRole = adminRole;
     }
 
 
@@ -45,9 +44,8 @@ public class JWTAuthenticator implements Function<HttpServletRequest, User>  {
             user.setIri(generateMetadataIri(claims.getStringClaim("subject")));
             user.setName(claims.getStringClaim("name"));
             user.setEmail(claims.getStringClaim("email"));
-            if (claims.getStringListClaim("authorities").contains(coordinatorRole)) {
-                user.getRoles().add(Role.Coordinator);
-            }
+            user.setAdmin(claims.getStringListClaim("authorities").contains(adminRole));
+
             return user;
         } catch (ParseException e) {
             log.error("Error parsing a JWT", e);

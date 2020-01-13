@@ -10,6 +10,7 @@ import java.util.List;
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
+import static java.util.EnumSet.allOf;
 
 @Slf4j
 public class UserService {
@@ -21,17 +22,14 @@ public class UserService {
 
     public User trySetCurrentUser(User user) {
         var stored = dao.read(User.class, user.getIri());
-        if (stored != null) {
-            if (user.getRoles().contains(Role.Coordinator) && !stored.getRoles().contains(Role.Coordinator)) {
-                stored.getRoles().add(Role.Coordinator);
-                stored = dao.write(stored);
-            } else if (!user.getRoles().contains(Role.Coordinator) && stored.getRoles().contains(Role.Coordinator)) {
-                stored.getRoles().remove(Role.Coordinator);
-                stored = dao.write(stored);
+
+        if (user.isAdmin()) {
+            if (stored == null) {
+                stored = dao.write(user);
             }
-        }  else if (user.getRoles().contains(Role.Coordinator)) {
-            stored = dao.write(user);
+            stored.getRoles().addAll(allOf(Role.class));
         }
+
         return stored;
     }
 

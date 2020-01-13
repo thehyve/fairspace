@@ -78,7 +78,7 @@ public class Config {
 
         public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser, Role.Coordinator);
 
-        public String fullAccessRole = "coordinator";
+        public String fullAccessRole = "organisation-admin";
     }
 
     public static class WebDAV {
