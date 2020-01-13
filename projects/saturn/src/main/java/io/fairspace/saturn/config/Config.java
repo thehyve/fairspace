@@ -76,7 +76,7 @@ public class Config {
     public static class Auth {
         public boolean enabled = false;
 
-        public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser);
+        public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser, Role.Coordinator);
 
         public String fullAccessRole = "coordinator";
     }

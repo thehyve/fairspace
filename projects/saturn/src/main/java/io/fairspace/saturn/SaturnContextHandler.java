@@ -59,6 +59,11 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                     return;
                 }
 
+                var context = new ThreadContext();
+                context.setUserCommitMessage(request.getHeader(COMMIT_MESSAGE_HEADER));
+                context.setProject(project);
+                setThreadContext(context);
+
                 var user = userService.trySetCurrentUser(userInfo);
 
                 if (user == null || user.getRoles().isEmpty()) {
@@ -66,7 +71,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                     return;
                 }
 
-                setThreadContext(new ThreadContext(user, request.getHeader(COMMIT_MESSAGE_HEADER), null, project));
+                context.setUser(user);
 
                 if (parts.length > 1) {
                     var resource = parts[1];
