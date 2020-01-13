@@ -1,14 +1,11 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import org.apache.jena.query.Dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,18 +14,13 @@ import static org.junit.Assert.assertNotNull;
 public class ServicesTest {
     @Mock
     private Dataset dataset;
-
-    @Mock
-    private Supplier<OAuthAuthenticationToken> userInfoSupplier;
-
     private Config config = new Config();
-
     private Services svc;
 
 
     @Before
     public void before() throws Exception {
-        svc = new Services(config, dataset, userInfoSupplier);
+        svc = new Services(config, dataset);
     }
 
     @Test
@@ -39,11 +31,6 @@ public class ServicesTest {
     @Test
     public void getRdf() {
         assertEquals(dataset, svc.getDataset());
-    }
-
-    @Test
-    public void getUserInfoSupplier() {
-        assertEquals(userInfoSupplier, svc.getUserInfoSupplier());
     }
 
     @Test

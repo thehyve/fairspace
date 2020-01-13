@@ -1,9 +1,11 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
@@ -18,20 +20,25 @@ import java.time.Instant;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataEntityLifeCycleManagerTest {
+    @Mock
+    private UserService userService;
+    @Mock
+    private User user;
     @Mock
     private PermissionsService permissionsService;
 
@@ -39,8 +46,8 @@ public class MetadataEntityLifeCycleManagerTest {
     private Dataset ds;
     private Model model;
 
-    private Node graph = NodeFactory.createURI("http://graph");
-    private Node user = NodeFactory.createURI("http://user");
+    private Node graph = createURI("http://graph");
+    private final Node userIri = createURI("http://user");
     private Resource userResource = createResource("http://user");
 
     private Resource resource = createResource("http://resource");
@@ -53,7 +60,11 @@ public class MetadataEntityLifeCycleManagerTest {
         model = ds.getNamedModel(graph.getURI());
 
         initVocabularies(ds);
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, () -> user, permissionsService);
+
+        setThreadContext(new ThreadContext(user, null, null, null));
+        when(user.getIri()).thenReturn(userIri);
+
+        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, userService, permissionsService);
     }
 
     @Test
@@ -128,7 +139,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
     @Test
     public void testMissingPermissionsService() {
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, () -> user);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, userService);
 
         Model delta = ModelFactory.createDefaultModel();
         delta.add(resource, property, otherResource);
@@ -150,7 +161,7 @@ public class MetadataEntityLifeCycleManagerTest {
         assertTrue(lifeCycleManager.softDelete(resource));
 
         assertTrue(model.contains(resource, FS.dateDeleted));
-        assertTrue(model.contains(resource, FS.deletedBy, createResource(user.getURI())));
+        assertTrue(model.contains(resource, FS.deletedBy, createResource(userIri.getURI())));
     }
 
     @Test(expected = IllegalArgumentException.class)

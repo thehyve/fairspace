@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.stream.Collectors.joining;
 

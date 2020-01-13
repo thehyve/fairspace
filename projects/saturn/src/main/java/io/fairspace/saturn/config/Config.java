@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.fairspace.saturn.services.users.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -21,10 +22,7 @@ import org.apache.jena.tdb2.params.StoreParamsCodec;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
@@ -78,21 +76,9 @@ public class Config {
     public static class Auth {
         public boolean enabled = false;
 
-        public List<String> developerRoles = List.of("user", "datasteward", "sparql");
-
-        public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
-
-        public String jwtAlgorithm = "RS256";
-
-        public String workspaceUserRole = "user";
-
-        public String dataStewardRole = "datasteward";
-
-        public String sparqlRole = "sparql";
+        public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser);
 
         public String fullAccessRole = "coordinator";
-
-        public String userUrlTemplate = "http://localhost:5100/auth/admin/realms/ci/users/%s";
     }
 
     public static class WebDAV {

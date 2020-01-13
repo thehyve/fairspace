@@ -1,10 +1,12 @@
 package io.fairspace.saturn.services.collections;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.events.EventService;
-import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -23,18 +25,25 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionsServiceTest {
-    private CollectionsService collections;
+    private static final Node userIri = createURI("http://ex.com/user");
+
     @Mock
     private Consumer<Object> eventListener;
+    @Mock
+    private UserService users;
+    @Mock
+    private User user;
     @Mock
     private PermissionsService permissions;
     @Mock
     private EventService eventService;
+    private CollectionsService collections;
 
     @Before
     public void before() {
-        Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
-        collections = new CollectionsService(new DAO(createTxnMem(), userIriSupplier), eventListener, permissions, eventService);
+        setThreadContext(new ThreadContext(user, null, null, null));
+        when(user.getIri()).thenReturn(userIri);
+        collections = new CollectionsService(createTxnMem(), eventListener, users, permissions, eventService);
     }
 
     @Test

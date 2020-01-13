@@ -1,6 +1,10 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.users.Role;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -15,17 +19,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionsServiceTest {
@@ -45,7 +50,13 @@ public class PermissionsServiceTest {
     @Mock
     private PermissionChangeEventHandler permissionChangeEventHandler;
 
-    private Node currentUser = USER1;
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private User currentUser;
+
+    private Node currentUserIri = USER1;
 
     private boolean isCoordinator = false;
 
@@ -53,11 +64,23 @@ public class PermissionsServiceTest {
     public void setUp() {
         ds = DatasetFactory.create();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        service = new PermissionsService(ds, () -> currentUser, () -> isCoordinator, permissionChangeEventHandler, event -> {});
-        service.createResource(RESOURCE);
+        ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.manage, createResource(USER1.getURI()));
+        ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.write, createResource(USER2.getURI()));
 
-        currentUser = USER1;
-        isCoordinator = false;
+
+        when(userService.getUser(any())).thenReturn(new User());
+
+        setThreadContext(new ThreadContext(currentUser, null, null, null));
+
+        when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
+        when(currentUser.getRoles()).thenAnswer(invocation ->
+                isCoordinator
+                ? EnumSet.of(Role.CanRead, Role.CanWrite, Role.Coordinator)
+                : EnumSet.of(Role.CanRead, Role.CanWrite));
+
+
+        service = new PermissionsService(ds, permissionChangeEventHandler, userService, event -> {});
+        service.createResource(RESOURCE);
     }
 
     @Test
@@ -84,7 +107,7 @@ public class PermissionsServiceTest {
         service.setWriteRestricted(RESOURCE, true);
         service.setPermission(RESOURCE, USER2, Access.Write);
 
-        verify(permissionChangeEventHandler).onPermissionChange(currentUser, RESOURCE, USER2, Access.Write);
+        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
 
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
@@ -99,7 +122,7 @@ public class PermissionsServiceTest {
         assertNull(service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.Write);
 
-        verify(permissionChangeEventHandler).onPermissionChange(currentUser, RESOURCE, USER2, Access.Write);
+        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
 
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
@@ -236,7 +259,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToVisibleCollections() {
         setupAccessCheckForMultipleNodes();
 
-        currentUser = USER2;
+        currentUserIri = USER2;
 
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
@@ -246,7 +269,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToCollections() {
         setupAccessCheckForMultipleNodes();
 
-        currentUser = USER2;
+        currentUserIri = USER2;
 
         service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
     }
@@ -255,7 +278,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToFiles() {
         setupAccessCheckForMultipleNodes();
 
-        currentUser = USER2;
+        currentUserIri = USER2;
 
         service.ensureAccess(Set.of(FILE_1), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2), Access.Read);
@@ -267,7 +290,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToNonRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
-        currentUser = USER2;
+        currentUserIri = USER2;
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
         service.ensureAccess(Set.of(RESOURCE2), Access.Write);
@@ -277,7 +300,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
-        currentUser = USER2;
+        currentUserIri = USER2;
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Write);
     }
@@ -307,7 +330,7 @@ public class PermissionsServiceTest {
     public void testReturnedSubjectInEnsureAccessException() {
         setupAccessCheckForMultipleNodes();
 
-        currentUser = USER2;
+        currentUserIri = USER2;
 
         // The exception thrown by ensureAccess should return the failing entity
         try {
@@ -320,7 +343,7 @@ public class PermissionsServiceTest {
         // The exception thrown by ensureAccess should return the failing entity
         // also when it has been verified by authority
         try {
-            service.ensureAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
+            service.ensureAccess(Set.of(FILE_1), Access.Read);
             fail();
         } catch(MetadataAccessDeniedException e) {
             assertEquals(FILE_1, e.getSubject());

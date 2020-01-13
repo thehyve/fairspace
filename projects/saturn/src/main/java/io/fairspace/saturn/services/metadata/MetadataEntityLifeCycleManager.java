@@ -2,19 +2,23 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.users.UserService;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
 public
@@ -22,17 +26,17 @@ class MetadataEntityLifeCycleManager {
     private final Dataset dataset;
     private final Node graph;
     private final Node vocabulary;
-    private final Supplier<Node> userIriSupplier;
+    private final UserService userService;
     private final PermissionsService permissionsService;
 
     /**
      * Instantiates a lifecycle manager without a reference for the permissions
      * @param dataset
      * @param graph
-     * @param userIriSupplier
+     * @param userService
      */
-    public MetadataEntityLifeCycleManager(Dataset dataset, Node graph, Node vocabulary, Supplier<Node> userIriSupplier) {
-        this(dataset, graph, vocabulary, userIriSupplier, null);
+    public MetadataEntityLifeCycleManager(Dataset dataset, Node graph, Node vocabulary, UserService userService) {
+        this(dataset, graph, vocabulary, userService, null);
     }
 
     /**
@@ -77,7 +81,7 @@ class MetadataEntityLifeCycleManager {
             throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
         }
         if (queryAsk(dataset, storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
-            update(dataset, storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), userIriSupplier.get(), graph));
+            update(dataset, storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), getThreadContext().getUser().getIri(), graph));
             return true;
         }
         return false;
@@ -90,9 +94,9 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private Model generateCreationInformation(Set<Resource> entities) {
-        Model model = ModelFactory.createDefaultModel();
-        Resource user = model.createResource(userIriSupplier.get().getURI());
-        Literal now = toXSDDateTimeLiteral(Instant.now());
+        var model = createDefaultModel();
+        var user = model.asRDFNode(getThreadContext().getUser().getIri());
+        var now = toXSDDateTimeLiteral(Instant.now());
 
         entities.forEach(resource -> model.add(resource, createdBy, user).add(resource, dateCreated, now));
 

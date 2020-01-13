@@ -1,12 +1,10 @@
 package io.fairspace.saturn.config;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.saturn.auth.OAuthAuthenticationToken;
 import io.fairspace.saturn.events.EventCategory;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.MetadataEvent;
 import io.fairspace.saturn.events.RabbitMQEventService;
-import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
@@ -26,15 +24,13 @@ import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 
 import java.io.File;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -44,7 +40,6 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 public class Services {
     private final Config config;
     private final Dataset dataset;
-    private final Supplier<OAuthAuthenticationToken> userInfoSupplier;
 
     private final EventBus eventBus = new EventBus();
     private final ProjectsService projectsService;
@@ -60,25 +55,22 @@ public class Services {
     private final VirtualFileSystem fileSystem;
 
 
-    public Services(@NonNull Config config, @NonNull Dataset dataset, @NonNull Supplier<OAuthAuthenticationToken> userInfoSupplier) throws Exception {
+    public Services(@NonNull Config config, @NonNull Dataset dataset) throws Exception {
         this.config = config;
         this.dataset = dataset;
-        this.userInfoSupplier = userInfoSupplier;
 
         projectsService = new ProjectsService(config.jena.datasetPath);
-        userService = new UserService(config.auth.userUrlTemplate, dataset);
-        Supplier<Node> userIriSupplier = () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim());
-        BooleanSupplier hasFullAccessSupplier = () -> userInfoSupplier.get().getAuthorities().contains(config.auth.fullAccessRole);
+        userService = new UserService(dataset);
 
         eventService = setupEventService();
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsService(dataset, userIriSupplier, hasFullAccessSupplier, permissionNotificationHandler, eventService);
+        permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService, eventService);
 
-        collectionsService = new CollectionsService(new DAO(dataset, userIriSupplier), eventBus::post, permissionsService, eventService);
+        collectionsService = new CollectionsService(dataset, eventBus::post, userService, permissionsService, eventService);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, userIriSupplier, permissionsService);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, userService, permissionsService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
@@ -103,7 +95,7 @@ public class Services {
                 new InverseForUsedPropertiesValidator(dataset)
         );
 
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userIriSupplier);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userService);
 
         Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
                 eventService.emitEvent(MetadataEvent.builder()
@@ -117,14 +109,14 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> userService.getUserIri(userInfoSupplier.get().getSubjectClaim()), collectionsService, eventBus),
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getThreadContext().getUser().getIri(), collectionsService, eventBus),
                 IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService)));
     }
 
     private EventService setupEventService() throws Exception {
         if(config.rabbitMQ.enabled) {
             try {
-                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name, userInfoSupplier);
+                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name);
                 eventService.init();
                 return eventService;
             } catch(Exception e) {

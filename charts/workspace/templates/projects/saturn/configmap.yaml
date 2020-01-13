@@ -32,13 +32,7 @@ data:
           indexName: "{{ .Values.external.elasticsearch.indexName }}"
     auth:
       enabled: true
-      jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.external.keycloak.realm }}/protocol/openid-connect/certs
-      jwtAlgorithm: "RS256"
-      workspaceUserRole: "{{ template "workspace.roles.user" . }}"
-      dataStewardRole: "{{ template "workspace.roles.datasteward" . }}"
-      sparqlRole: "{{ template "workspace.roles.sparql" . }}"
       fullAccessRole: "{{ template "workspace.roles.coordinator" . }}"
-      userUrlTemplate: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}/users/%s"
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     workspace:

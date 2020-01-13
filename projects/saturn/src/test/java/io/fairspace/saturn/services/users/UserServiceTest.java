@@ -1,67 +1,81 @@
 package io.fairspace.saturn.services.users;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.HttpServer;
-import org.apache.jena.graph.Node;
+import io.fairspace.saturn.ThreadContext;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Set;
 
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.junit.Assert.*;
 
 public class UserServiceTest {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private Dataset ds = createTxnMem();
 
-    private HttpServer mockServer;
+    private UserService userService = new UserService(ds);
 
-    private UserService userService;
-
-    private Dataset ds = DatasetFactory.createTxnMem();
-
-    private final KeycloakUser keycloakUser = new KeycloakUser() {{
-        setId("123");
-        setFirstName("John");
-        setLastName("Smith");
-        setEmail("john@example.com");
-        setEnabled(true);
-    }};
-
-    private Node userIri;
+    private User coordinator = new User();
+    private User regular1 = new User();
+    private User regular2 = new User();
 
     @Before
-    public void before() throws IOException {
-        mockServer = HttpServer.create(new InetSocketAddress(0), 0);
-        mockServer.createContext("/users/123", exchange -> {
-            var response = mapper.writeValueAsBytes(keycloakUser);
-            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
-            exchange.getResponseBody().write(response);
-            exchange.close();
-        });
-        mockServer.start();
+    public void before() {
+        coordinator.setIri(generateMetadataIri("1"));
+        coordinator.setName("Coordinator");
+        coordinator.getRoles().add(Role.Coordinator);
 
-        userService = new UserService("http://localhost:" + mockServer.getAddress().getPort() + "/users/%s", ds);
-        userIri = userService.getUserIri(keycloakUser.getId());
+        regular1.setIri(generateMetadataIri("2"));
+        regular1.setName("Regular1");
+        regular1.getRoles().add(Role.CanRead);
+
+        regular2.setIri(generateMetadataIri("3"));
+        regular2.setName("Regular2");
+        regular2.getRoles().add(Role.CanRead);
     }
 
     @Test
-    public void usersAreRetrieved() {
-        var user =  userService.getUser(userIri);
-
-        assertEquals(keycloakUser.getFullName(), user.getName());
-        assertEquals(keycloakUser.getEmail(), user.getEmail());
+    public void coordinatorCanSaveItself() {
+        assertNotNull(userService.trySetCurrentUser(coordinator));
+        assertEquals(List.of(coordinator), userService.getUsers());
     }
 
     @Test
-    public void usersGetPersisted() {
-        userService.getUser(userIri);
-        assertTrue(ds.getDefaultModel().contains(createResource(userIri.getURI()), null));
+    public void regularUserCanNotSaveItself() {
+        assertNull(userService.trySetCurrentUser(regular1));
+        assertEquals(List.of(), userService.getUsers());
+    }
+
+    @Test
+    public void coordinatorCanAddUsers() {
+        setThreadContext(new ThreadContext(coordinator, null, null, null));
+        assertNotNull(userService.addUser(regular1));
+    }
+
+    @Test
+    public void coordinatorCanGrantRoles() {
+        setThreadContext(new ThreadContext(coordinator, null, null, null));
+        assertNotNull(userService.addUser(regular1));
+        regular1.getRoles().add(Role.CanWrite);
+        assertNotNull(userService.updateUser(regular1));
+        assertEquals(Set.of(Role.CanRead, Role.CanWrite), regular1.getRoles());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void sameUserCanNotBeAddedTwice() {
+        setThreadContext(new ThreadContext(coordinator, null, null, null));
+        assertNotNull(userService.addUser(regular1));
+        assertNotNull(userService.addUser(regular1));
+        assertEquals(Set.of(Role.CanRead, Role.CanWrite), regular1.getRoles());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void regularUserCanNotAddUsers() {
+        setThreadContext(new ThreadContext(regular1, null, null, null));
+        userService.addUser(regular2);
     }
 }

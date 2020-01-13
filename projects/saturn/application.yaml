@@ -60,19 +60,13 @@ auth:
   enabled: false
   # User roles (for local development only)
   developerRoles:
-    - user
-    - datasteward
-    - sparql
-  # JWKS URL
-  jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
-  # JWK encryption algorithm. Defaults to "RS256"
-  jwtAlgorithm: "RS256"
-  # Role name for workspace users
-  workspaceUserRole: "user"
-  # Role name for data stewards, who are allowed to modify the vocabulary
-  dataStewardRole: "datasteward"
-  # Role name for users who are allowed to perform SPARQL queries
-  sparqlRole: "sparql"
+    - CanRead
+    - CanWrite
+    - DataSteward
+    - SparqlUser
+    - Coordinator
+  # Role name for users who are allowed to do EVERYTHING
+  fullAccessRole: coordinator
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"

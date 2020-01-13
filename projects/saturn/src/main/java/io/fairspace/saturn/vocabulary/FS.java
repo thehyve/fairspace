@@ -54,6 +54,9 @@ public class FS {
     public static final String EMAIL_URI = NS + "email";
     public static final Property email = createProperty(EMAIL_URI);
 
+    public static final String HAS_ROLE_URI = NS + "hasRole";
+    public static final Property hasRole = createProperty(HAS_ROLE_URI);
+
     public static final String FILE_PATH_URI = NS + "filePath";
     public static final Property filePath = createProperty(FILE_PATH_URI);
 

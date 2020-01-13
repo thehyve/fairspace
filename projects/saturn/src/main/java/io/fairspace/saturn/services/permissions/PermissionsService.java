@@ -4,21 +4,20 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.PermissionEvent;
+import io.fairspace.saturn.services.users.Role;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
@@ -26,6 +25,7 @@ import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
@@ -34,14 +34,13 @@ public class PermissionsService {
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
     private final Dataset dataset;
-    private final Supplier<Node> userIriSupplier;
-    private final BooleanSupplier hasFullAccessSupplier;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
+    private final UserService userService;
     private final EventService eventService;
 
     public void createResource(Node resource) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(userIriSupplier.get()));
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getThreadContext().getUser().getIri()));
 
         eventService.emitEvent(PermissionEvent.builder()
                 .eventType(PermissionEvent.Type.RESOURCE_CREATED)
@@ -51,18 +50,22 @@ public class PermissionsService {
     }
 
     public void createResources(Collection<Resource> resources) {
-        Model resourcePermissions = createDefaultModel();
-        Resource user = ResourceFactory.createResource(userIriSupplier.get().getURI());
+        var resourcePermissions = createDefaultModel();
+        var user = resourcePermissions.asRDFNode(getThreadContext().getUser().getIri());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions);
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = userIriSupplier.get();
+        var managingUser = getThreadContext().getUser().getIri();
 
         executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), dataset, () -> {
+            var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
+
+            validate(userService.getUser(user) != null, "A user must be known to the system");
+
             if (!isCollection(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
                 var isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
@@ -70,41 +73,37 @@ public class PermissionsService {
                         "Regular metadata entities must be marked as write-restricted before granting permissions");
             }
 
-            PermissionEvent.Type eventType;
-            var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             g.removeAll(g.asRDFNode(resource).asResource(), null, g.asRDFNode(user));
 
-            if (access == Access.None) {
-                eventType = PermissionEvent.Type.DELETED;
-            } else {
+            if (access != Access.None) {
                 g.add(g.asRDFNode(resource).asResource(), g.createProperty(FS.NS, access.name().toLowerCase()), g.asRDFNode(user));
-                eventType = PermissionEvent.Type.UPDATED;
             }
-
-            eventService.emitEvent(PermissionEvent.builder()
-                    .eventType(eventType)
-                    .resource(resource.getURI())
-                    .otherUser(user.getURI())
-                    .access(access.toString())
-                    .build()
-            );
         });
 
+        var eventType = (access == Access.None) ? PermissionEvent.Type.DELETED : PermissionEvent.Type.UPDATED;
+
+        eventService.emitEvent(PermissionEvent.builder()
+                .eventType(eventType)
+                .resource(resource.getURI())
+                .otherUser(user.getURI())
+                .access(access.toString())
+                .build()
+        );
+
         if (permissionChangeEventHandler != null)
-            permissionChangeEventHandler.onPermissionChange(userIriSupplier.get(), resource, user, access);
+            permissionChangeEventHandler.onPermissionChange(managingUser, resource, user, access);
     }
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if (hasFullAccessSupplier.getAsBoolean()) {
+        if (getThreadContext().getUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
-        var authorities = getAuthorities(nodes);
-        getPermissionsForAuthorities(authorities.keySet()).forEach((authority, access) -> {
+        getPermissions(nodes).forEach((node, access) -> {
             if (access.compareTo(requestedAccess) < 0) {
                 throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                        userIriSupplier.get(), requestedAccess.name().toLowerCase()), authorities.get(authority).iterator().next());
+                        getThreadContext().getUser().getIri(), requestedAccess.name().toLowerCase()), node);
             }
         });
     }
@@ -162,12 +161,12 @@ public class PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if (hasFullAccessSupplier.getAsBoolean()) {
+        if (getThreadContext().getUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", userIriSupplier.get(), access.name().toLowerCase(), resource), resource);
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getThreadContext().getUser().getIri(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -182,7 +181,6 @@ public class PermissionsService {
      * @return
      */
     public Map<Node, Access> getPermissions(Collection<Node> nodes) {
-
         return calculateRead(dataset, () -> {
             var authorities = getAuthorities(nodes);
             var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());
@@ -201,34 +199,49 @@ public class PermissionsService {
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
 
+        var userObject = getThreadContext().getUser();
+
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource
-        if (hasFullAccessSupplier.getAsBoolean()) {
+        if (userObject.getRoles().contains(Role.Coordinator)) {
             authorities.forEach(node -> result.put(node, Access.Manage));
             return result;
         }
 
-        var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
+        Access maxAccess;
+        if (userObject.getRoles().contains(Role.CanWrite)) {
+            maxAccess = Access.Manage; // sic!
+        } else  if (userObject.getRoles().contains(Role.CanRead)) {
+            maxAccess = Access.Read;
+        } else {
+            maxAccess = Access.None;
+        }
 
-        var user = g.asRDFNode(userIriSupplier.get()).asResource();
-        authorities.forEach(a -> {
-            var r = g.asRDFNode(a).asResource();
-            Access access;
-            if (r.hasProperty(FS.manage, user)) {
-                access = Access.Manage;
-            } else if (r.hasProperty(FS.write, user)) {
-                access = Access.Write;
-            } else if (r.hasProperty(FS.read, user) || r.hasLiteral(FS.writeRestricted, true)) {
-                access = Access.Read;
-            } else if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection)) {
-                access = Access.None;
-            } else {
-                access = Access.Write;
-            }
-            result.put(a, access);
-        });
+        var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
+        var userResource = g.wrapAsResource(userObject.getIri());
+        authorities.forEach(a -> result.put(a, min(maxAccess, getRawResourceAccess(g.wrapAsResource(a), userResource))));
 
         return result;
+    }
+
+    private Access getRawResourceAccess(Resource r, Resource user) {
+        if (r.hasProperty(FS.manage, user)) {
+            return Access.Manage;
+        }
+        if (r.hasProperty(FS.write, user)) {
+            return  Access.Write;
+        }
+        if (r.hasProperty(FS.read, user)) {
+            return Access.Read;
+        }
+        if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection)) {
+            return Access.None;
+        }
+        if (r.hasLiteral(FS.writeRestricted, true)) {
+            return Access.Read;
+        }
+
+        return Access.Write;
     }
 
     private boolean isCollection(Node resource) {
@@ -306,4 +319,6 @@ public class PermissionsService {
 
         return result;
     }
+
+
 }
