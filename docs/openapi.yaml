@@ -937,7 +937,7 @@ paths:
   /account:
     get:
       summary: Current user's account information
-      operationId: getUsers
+      operationId: getCurrentUser
       tags:
         - users
       responses:
