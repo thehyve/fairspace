@@ -17,7 +17,7 @@ public class UserServiceTest {
 
     private Dataset ds = createTxnMem();
 
-    private UserService userService = new UserService(ds);
+    private UserService userService = new UserService(ds, null);
 
     private User coordinator = new User();
     private User regular1 = new User();
@@ -41,13 +41,13 @@ public class UserServiceTest {
     @Test
     public void coordinatorCanSaveItself() {
         assertNotNull(userService.trySetCurrentUser(coordinator));
-        assertEquals(List.of(coordinator), userService.getUsers());
+        assertEquals(Set.of(coordinator), userService.getUsers());
     }
 
     @Test
     public void regularUserCanNotSaveItself() {
         assertNull(userService.trySetCurrentUser(regular1));
-        assertEquals(List.of(), userService.getUsers());
+        assertEquals(Set.of(), userService.getUsers());
     }
 
     @Test
