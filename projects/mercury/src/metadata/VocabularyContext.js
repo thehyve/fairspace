@@ -20,12 +20,13 @@ export const VocabularyProvider = ({children}) => {
                 setVocabularyError(false);
             })
             .catch(() => {
-                setVocabularyError('An error occurred while loading the vocbulary');
+                setVocabularyError('An error occurred while loading the vocabulary');
             });
     }, []);
 
     useEffect(() => {
         fetchVocabulary();
+        return function cleanup() {}
     }, [fetchVocabulary]);
 
     const submitVocabularyChanges = (subject, values, metaVocabulary) => VocabularyAPI.updateEntity(subject, values, metaVocabulary);

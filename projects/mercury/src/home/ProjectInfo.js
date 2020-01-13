@@ -23,7 +23,7 @@ const ProjectInfo = () => {
         <Paper style={{maxWidth: 800, padding: 20}}>
             {isCoordinator ? (
                 <Grid container direction="row">
-                    <Grid item xs="11">
+                    <Grid item xs={11}>
                         <LinkedDataEntityFormContainer
                             subject={PROJECT_INFO_URI}
                             editable={editingEnabled}
@@ -37,7 +37,7 @@ const ProjectInfo = () => {
                             }}
                         />
                     </Grid>
-                    <Grid item xs="1">
+                    <Grid item xs={1}>
                         <Button onClick={() => setEditingEnabled(prev => !prev)}>
                             {editingEnabled ? 'Cancel' : 'Edit'}
                         </Button>

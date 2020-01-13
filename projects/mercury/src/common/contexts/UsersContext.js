@@ -4,14 +4,14 @@ import {getUsers} from "../services/UsersAndWorkspaceAPI";
 
 const UsersContext = React.createContext({});
 
-export const UsersProvider = ({children, url}) => {
+export const UsersProvider = ({children}) => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const refresh = () => {
         setLoading(true);
-        getUsers(url)
+        getUsers()
             .then(setUsers)
             .catch(setError)
             .finally(() => {
@@ -20,7 +20,7 @@ export const UsersProvider = ({children, url}) => {
     };
 
     // Refresh the permissions whenever the component is rerendered
-    useEffect(refresh, [url]);
+    useEffect(refresh, []);
 
     return (
         <UsersContext.Provider

@@ -10,14 +10,14 @@ const initialState = {
 
 const VersionContext = React.createContext(initialState);
 
-export const VersionProvider = ({children, url}) => {
+export const VersionProvider = ({children}) => {
     const [info, setInfo] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [redirecting, setRedirecting] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-        getVersion(url)
+        getVersion()
             .then(i => {
                 setInfo(i);
                 setLoading(false);
@@ -25,7 +25,7 @@ export const VersionProvider = ({children, url}) => {
             .catch((error) => {
                 setRedirecting(!!error.redirecting);
             });
-    }, [url]);
+    }, []);
 
     return (
         <VersionContext.Provider

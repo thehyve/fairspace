@@ -1,4 +1,5 @@
-import axios from 'axios';
+//@flow
+import axios, {AxiosRequestConfig} from 'axios';
 
 
 export const currentProject = () => {
@@ -8,7 +9,7 @@ export const currentProject = () => {
 
 export const projectPrefix = () => (currentProject() && `/projects/${currentProject()}`) || '';
 
-axios.interceptors.request.use((config) => {
+axios.interceptors.request.use((config: AxiosRequestConfig) => {
     if (!config.url.startsWith('/')) {
         const project = currentProject();
         if (project) {

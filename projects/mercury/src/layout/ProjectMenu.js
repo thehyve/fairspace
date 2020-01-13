@@ -2,12 +2,27 @@ import React from 'react';
 import {NavLink, withRouter} from "react-router-dom";
 import {Divider, Icon, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
 
-import Config from '../services/Config';
-import {projectPrefix} from "../../projects/projects";
+import Config from '../common/services/Config';
+import {projectPrefix} from "../projects/projects";
 
 
-const Menu = ({location: {pathname}}) => (
+const ProjectMenu = ({location: {pathname}}) => {
+    return (
     <>
+        <List>
+            <ListItem
+                component={NavLink}
+                to={"/projects"}
+                button
+                selected={pathname === '/projects'}
+            >
+                <ListItemIcon>
+                    <Icon>widgets</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Projects" />
+            </ListItem>
+        </List>
+        <Divider />
         <List>
             <ListItem
                 component={NavLink}
@@ -87,6 +102,6 @@ const Menu = ({location: {pathname}}) => (
             ) : null}
         </List>
     </>
-);
+)};
 
-export default withRouter(Menu);
+export default withRouter(ProjectMenu);
