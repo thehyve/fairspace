@@ -4,6 +4,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
@@ -16,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -53,6 +55,8 @@ public class RabbitMQEventServiceTest {
 
         when(event.toString()).thenReturn("-- serialized event --");
         when(event.getCategory()).thenReturn(EventCategory.COLLECTION);
+
+        setThreadContext(new ThreadContext());
     }
 
     @Test
