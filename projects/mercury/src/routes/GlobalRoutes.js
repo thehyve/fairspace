@@ -1,16 +1,14 @@
 import React from 'react';
-import {Redirect, Route} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import {logout} from '../common';
 
 import ProjectListLayout from '../layout/ProjectListLayout';
 import ProjectLayout from '../layout/ProjectLayout';
 
 const GlobalRoutes = () => (
-    <>
-        <Redirect exact from="/" to="/projects" />
+    <Switch>
         <Route
-            path="/projects"
-            exact
+            path="/projects" exact
             component={ProjectListLayout}
         />
 
@@ -25,7 +23,9 @@ const GlobalRoutes = () => (
             path="/logout"
             render={() => logout()}
         />
-    </>
+
+        <Redirect to="/projects" />
+    </Switch>
 );
 
 export default GlobalRoutes;
