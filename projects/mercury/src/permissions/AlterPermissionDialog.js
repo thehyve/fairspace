@@ -130,7 +130,7 @@ export class AlterPermissionDialog extends React.Component {
         return (
             <UserSelect
                 onChange={this.handleSelectedUserChange}
-                filter={u => u.roles.includes('CanRead') && user.iri !== currentUser.iri && collaborators.find(c => c.user === user.iri) === undefined}
+                filter={u => u.roles.includes('CanRead') && u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
