@@ -1,9 +1,8 @@
 // @flow
-import mockAxios, {AxiosResponse} from 'axios';
+import mockAxios from 'axios';
 import WorkspacesAPI, {Workspace} from '../WorkspacesAPI';
 
 describe('WorkspacesAPI', () => {
-
     it('Fetches workspaces', async () => {
         const dummyWorkspaces = ['workspace1', 'workspace2'];
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
@@ -13,5 +12,4 @@ describe('WorkspacesAPI', () => {
         const projects: Workspace[] = await WorkspacesAPI.getWorkspaces();
         expect(projects.map((workspace: Workspace) => workspace.id)).toEqual(dummyWorkspaces);
     });
-
 });

@@ -14,7 +14,7 @@ const ControlledTextFieldWrapper = ({
         margin="dense"
         autoFocus={autoFocus}
         control={control}
-        selectOptions = {selectOptions}
+        selectOptions={selectOptions}
         type={type}
         disabled={disabled}
         id={id}
@@ -32,35 +32,38 @@ const ControlledTextFieldWrapper = ({
     />
 );
 
-export default ({onSubmit, onClose, submitDisabled, fields}) => {
-    return (
-        <Dialog
-            open
-            onClose={onClose}
-            aria-labelledby="form-dialog-title"
-            fullWidth
-            maxWidth="sm"
-        >
-            <DialogTitle id="form-dialog-title">
-                <div>
-                    <Typography variant="h5" component="h2">New project</Typography>
-                </div>
-            </DialogTitle>
-            <DialogContent style={{overflowX: 'hidden'}}>
-                <form data-testid="form" id="formId" noValidate onSubmit={onSubmit}>
-                    {fields.map(ControlledTextFieldWrapper)}
-                </form>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} aria-label="Cancel" color="secondary">
+export default ({onSubmit, onClose, submitDisabled, fields}) => (
+    <Dialog
+        open
+        onClose={onClose}
+        aria-labelledby="form-dialog-title"
+        fullWidth
+        maxWidth="sm"
+    >
+        <DialogTitle id="form-dialog-title">
+            <div>
+                <Typography variant="h5" component="h2">New project</Typography>
+            </div>
+        </DialogTitle>
+        <DialogContent style={{overflowX: 'hidden'}}>
+            <form data-testid="form" id="formId" noValidate onSubmit={onSubmit}>
+                {fields.map(ControlledTextFieldWrapper)}
+            </form>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={onClose} aria-label="Cancel" color="secondary">
                     Cancel
-                </Button>
-                <Button type="submit" form="formId" data-testid="submit-button"
-                        disabled={submitDisabled} color="primary" variant="contained">
+            </Button>
+            <Button
+                type="submit"
+                form="formId"
+                data-testid="submit-button"
+                disabled={submitDisabled}
+                color="primary"
+                variant="contained"
+            >
                     Save
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
-
-}
+            </Button>
+        </DialogActions>
+    </Dialog>
+);

@@ -12,7 +12,8 @@ const ControlledTextField = ({control: {value, touched, setValue, valid, declare
         value={value}
         onChange={e => setValue(e.target.value)}
         onBlur={declareTouched}
-        error={touched && !valid}>
+        error={touched && !valid}
+    >
         {selectOptions.map(option => <MenuItem key={option} value={option}>{option}</MenuItem>)}
     </TextField>
 );

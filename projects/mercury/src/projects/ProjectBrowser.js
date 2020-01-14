@@ -12,8 +12,7 @@ export const ProjectBrowser = ({
     loading = false,
     error = false,
     projects = [],
-    createProject = () => {},
-    users = []
+    createProject = () => {}
 }) => {
     const [creatingProject, setCreatingProject] = useState(false);
     const [loadingCreatedProject, setLoadingCreatedProject] = useState(false);

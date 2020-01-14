@@ -8,15 +8,12 @@ import {LoadingOverlay} from "../common/components";
 const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
 export default ({onSubmit, onClose, creating, projects, getWorkspaces = WorkspacesAPI.getWorkspaces,
-                 project: {id = '', workspace = ''} = {}}) => {
-
+    project: {id = '', workspace = ''} = {}}) => {
     const {data: workspaces = [], loading} = useAsync(getWorkspaces);
 
     const workspaceControl = useFormField(workspace, value => !!value);
 
-    const isProjectIdUnique = (id) => {
-        return !projects.some(project => {return project.id === id});
-    };
+    const isProjectIdUnique = (projectId) => !projects.some(project => project.id === projectId);
     const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isProjectIdUnique(value));
 
     const allControls = [idControl, workspaceControl];
@@ -45,8 +42,8 @@ export default ({onSubmit, onClose, creating, projects, getWorkspaces = Workspac
             id: "id",
             label: "Id",
             name: "id",
-            helperText: "Value has to be unique per workspace. " +
-                "Only lower case letters, numbers, hyphens and should start with a letter."
+            helperText: "Value has to be unique per workspace. "
+                + "Only lower case letters, numbers, hyphens and should start with a letter."
         }
     ];
 
@@ -78,5 +75,4 @@ export default ({onSubmit, onClose, creating, projects, getWorkspaces = Workspac
             <LoadingOverlay loading={creating} />
         </>
     );
-
 };
