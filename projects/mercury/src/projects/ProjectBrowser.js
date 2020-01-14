@@ -31,6 +31,7 @@ export const ProjectBrowser = ({
                 history.push(`/projects/${project.id}/`);
             })
             .catch(err => {
+                setLoadingCreatedProject(false);
                 const message = err && err.message ? err.message : "An error occurred while creating a project";
                 ErrorDialog.showError(err, message);
             });

@@ -10,7 +10,7 @@ const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)
 export default ({onSubmit, onClose, creating, projects, getWorkspaces = WorkspacesAPI.getWorkspaces,
                  project: {id = '', workspace = ''} = {}}) => {
 
-    const {data: workspaces = [], error, loading, refresh} = useAsync(getWorkspaces);
+    const {data: workspaces = [], loading} = useAsync(getWorkspaces);
 
     const workspaceControl = useFormField(workspace, value => !!value);
 
@@ -22,10 +22,6 @@ export default ({onSubmit, onClose, creating, projects, getWorkspaces = Workspac
     const allControls = [idControl, workspaceControl];
 
     const formValid = allControls.every(({valid}) => valid);
-
-    const state = {
-        editing: true
-    };
 
     const defaultWorkspace = (workspaces.length === 1) && workspaces[0];
     if (defaultWorkspace && (defaultWorkspace.id !== workspaceControl.value)) {

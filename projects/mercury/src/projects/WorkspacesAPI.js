@@ -4,7 +4,6 @@ import {extractJsonData, handleHttpError} from '../common';
 
 
 const workspacesUrl = "/api/v1/workspaces/";
-const headers = {'Content-Type': 'application/json'};
 
 export type Workspace = {
     id: string;

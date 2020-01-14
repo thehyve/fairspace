@@ -42,7 +42,9 @@ export default ({onSubmit, onClose, submitDisabled, fields}) => {
             maxWidth="sm"
         >
             <DialogTitle id="form-dialog-title">
-                <Typography variant="h5">New project</Typography>
+                <div>
+                    <Typography variant="h5" component="h2">New project</Typography>
+                </div>
             </DialogTitle>
             <DialogContent style={{overflowX: 'hidden'}}>
                 <form data-testid="form" id="formId" noValidate onSubmit={onSubmit}>

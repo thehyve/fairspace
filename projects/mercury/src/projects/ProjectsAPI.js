@@ -4,7 +4,6 @@ import {extractJsonData, handleHttpError} from '../common';
 
 
 const projectsUrl = "/api/v1/projects/";
-const headers = {'Content-Type': 'application/json'};
 
 export type Project = {
     id: string;
