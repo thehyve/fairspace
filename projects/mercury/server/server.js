@@ -151,7 +151,7 @@ app.put('/api/v1/projects', (req, res) => {
             if (res.ok) {
                 allProjects.push(project);
             }
-            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text());
+            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text()).end();
         })
         .finally(() => projectsBeingCreated.delete(project.id));
 });
