@@ -85,7 +85,7 @@ const ContextualAuthorizationCheck = props => {
     const {currentUser = {}, currentUserLoading = false, currentUserError = false} = useContext(UserContext);
     return (
         <AuthorizationCheck
-            authorizations={currentUser.authorizations}
+            authorizations={currentUser.roles}
             pending={currentUserLoading}
             error={currentUserError}
             {...props}

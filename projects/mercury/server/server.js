@@ -164,15 +164,6 @@ app.use(proxy('/api/v1/search', {
     pathRewrite: (url) => `/${getProjectId(url)}/_search`
 }));
 
-app.get('/api/v1/account', (req, res) => res.json({
-    id: accessToken.content.sub,
-    username: accessToken.content.preferred_username,
-    fullName: accessToken.content.name,
-    firstName: accessToken.content.given_name,
-    lastName: accessToken.content.family_name,
-    authorizations: accessToken.content.realm_access.roles
-}));
-
 app.use(proxy('/api/v1/projects/*/**', {
     target: 'http://never.ever',
     router: req => getWorkspaceUrl(req.originalUrl),

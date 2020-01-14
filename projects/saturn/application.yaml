@@ -67,7 +67,7 @@ auth:
     - Coordinator
   # Role name for users who are allowed to do EVERYTHING
   fullAccessRole: organisation-admin
-  userUrl: http://localhost:5100/auth/admin/realms/ci/users/
+  userUrl: http://localhost:5000/api/keycloak/users/
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"

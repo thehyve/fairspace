@@ -13,7 +13,6 @@ import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
-import Config from "../common/services/Config";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
 import useMetaVocabulary from './UseMetaVocabulary';
@@ -46,7 +45,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
             properties,
             isFixed: isFixedShape(shape),
             systemProperties: getSystemProperties(shape),
-            isEditable: isEntityEditable && isDataSteward(authorizations, Config.get())
+            isEditable: isEntityEditable && isDataSteward(authorizations)
         });
     };
 
@@ -69,8 +68,8 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 // Fixed properties
                 namespaces,
                 requireIdentifier: false,
-                hasEditRight: isDataSteward(currentUser.authorizations, Config.get()),
-                isCoordinator: isCoordinator(currentUser.authorizations, Config.get()),
+                hasEditRight: isDataSteward(currentUser.roles),
+                isCoordinator: isCoordinator(currentUser.roles),
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import onLogout from "../services/logout";
-import {getUser} from '../services/UsersAndWorkspaceAPI';
+import {getUser} from '../../users/UsersAndWorkspaceAPI';
 
 const UserContext = React.createContext({});
 

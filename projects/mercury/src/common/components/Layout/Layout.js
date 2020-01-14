@@ -15,7 +15,7 @@ import UserContext from "../../contexts/UserContext";
 const Layout = ({
     classes,
     requiredAuthorization,
-    renderMenu = () => {},
+    renderMenu,
     renderMain = () => {},
     renderTopbar = ({name}) => <TopBar name={name} />,
     renderFooter = ({name, version}) => <Footer name={name} version={version} />
@@ -72,7 +72,7 @@ const Layout = ({
         <>
             {renderTopbar({name})}
             <AuthorizationCheck requiredAuthorization={requiredAuthorization} transformError={transformError}>
-                <MenuDrawer open={menuOpen} renderMenu={renderMenu} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />
+                {renderMenu && (<MenuDrawer open={menuOpen} renderMenu={renderMenu} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />)}
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     {renderMain()}
                 </main>

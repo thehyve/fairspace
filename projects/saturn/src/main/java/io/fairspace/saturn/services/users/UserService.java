@@ -48,11 +48,13 @@ public class UserService {
             stored.getRoles().addAll(allOf(Role.class));
         }
 
+        stored.setAdmin(user.isAdmin());
+
         return stored;
     }
 
     public Set<User> getUsers() {
-        var result = new HashSet<User>();
+        var result = new HashSet<>(dao.list(User.class));
 
         try {
             result.addAll(fetchKeycloakUsers());
@@ -60,8 +62,6 @@ public class UserService {
             log.error("Error retrieving users from {}", usersUrl, e);
         }
 
-        var projectUsers = dao.list(User.class);
-        result.addAll(projectUsers);
         return result;
     }
 

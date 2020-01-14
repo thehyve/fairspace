@@ -26,7 +26,7 @@ export const VocabularyProvider = ({children}) => {
 
     useEffect(() => {
         fetchVocabulary();
-        return function cleanup() {}
+        return function cleanup() {};
     }, [fetchVocabulary]);
 
     const submitVocabularyChanges = (subject, values, metaVocabulary) => VocabularyAPI.updateEntity(subject, values, metaVocabulary);
