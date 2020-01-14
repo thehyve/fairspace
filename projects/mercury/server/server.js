@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const coexist = require('coexist-parser-proxy');
 const proxy = require('http-proxy-middleware');
 const fetch = require("node-fetch");
 const YAML = require('yaml');
@@ -10,6 +11,7 @@ const cryptoRandomString = require('crypto-random-string');
 
 const app = express();
 
+app.use(coexist);
 app.use(express.json());
 
 const port = process.env.PORT || 8081;
