@@ -313,7 +313,7 @@ docs:
   terminationGracePeriodSeconds: 10
 
 rabbitmq:
-  enabled: true
+  enabled: false
   required: true
   username:
   password:
