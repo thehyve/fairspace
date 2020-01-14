@@ -35,7 +35,9 @@ const workspaceProjects = (url) => fetch(url + '/api/v1/projects/')
 let allProjects;
 
 Promise.all(workspaces.map(workspaceProjects))
-    .then(responses => { allProjects = responses.reduce((x, y) => [...x, ...y], []); })
+    .then(responses => {
+        allProjects = responses.reduce((x, y) => [...x, ...y], []);
+    })
     .catch(e => {
         console.error('Error retrieving projects', e);
         process.exit(1);
@@ -141,7 +143,12 @@ app.put('/api/v1/projects', (req, res) => {
 
     // A project is created when it is accessed for the first time
     fetch(`${project.workspace}/api/v1/projects/${project.id}/metadata/?subject=http%3A%2F%2Ffairspace.io%2Fontology%23theProject`,
-        {headers: { 'Accept': 'application/json+ld' }})
+        {
+            headers: {
+                Accept: 'application/json+ld',
+                Authorization: `Bearer ${accessToken.token}`
+            }
+        })
         .then(saturnsResponse => {
             if (res.ok) {
                 allProjects.push(project);
