@@ -39,7 +39,6 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
     public SaturnContextHandler(UserService userService, Function<HttpServletRequest, User> authenticator) {
         this.userService = userService;
         this.authenticator = authenticator;
-        ;
     }
 
     @Override
@@ -48,7 +47,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
         if (request.getAttribute(FORWARDED_ATTRIBUTE) != null) {
             baseRequest.setDispatcherType(DispatcherType.REQUEST);
         } else if (pathInContext.startsWith(PROJECTS_PREFIX) && pathInContext.length() > PROJECTS_PREFIX.length()) {
-            // /api/v1/projects/{project}/{resource}/**fortnight
+            // /api/v1/projects/{project}/{resource}/**
             var subPath = pathInContext.substring(PROJECTS_PREFIX.length());
             var parts = subPath.split("/");
             if (parts.length > 0) {
