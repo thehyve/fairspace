@@ -105,7 +105,7 @@ const getWorkspaceUrl = (url) => {
     return (project && project.workspace) || ('/unknown-project/' + projectId);
 };
 
-app.use('/unknown-project/:project', (req, res) => res.status(404).send('Unknown project: ' + req.params.project))
+app.use('/unknown-project/:project', (req, res) => res.status(404).send('Unknown project: ' + req.params.project));
 
 app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
 
