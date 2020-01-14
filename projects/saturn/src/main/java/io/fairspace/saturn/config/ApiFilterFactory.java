@@ -1,6 +1,5 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.services.account.AccountApp;
 import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
@@ -23,7 +22,6 @@ public class ApiFilterFactory {
                 new PermissionsApp("/projects/:project/permissions", svc.getPermissionsService()),
                 new UserApp("/projects/:project/users", svc.getUserService()),
                 new WebDAVApp(svc),
-                new AccountApp("/account"),
                 new HealthApp("/health"));
     }
 }

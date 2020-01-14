@@ -38,7 +38,8 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
      */
     public SaturnContextHandler(UserService userService, Function<HttpServletRequest, User> authenticator) {
         this.userService = userService;
-        this.authenticator = authenticator;;
+        this.authenticator = authenticator;
+        ;
     }
 
     @Override
@@ -46,65 +47,62 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
         // A second pass after forwarding?
         if (request.getAttribute(FORWARDED_ATTRIBUTE) != null) {
             baseRequest.setDispatcherType(DispatcherType.REQUEST);
-        } else {
-            var userInfo = authenticator.apply(request);
-            var context = new ThreadContext();
-            context.setUserCommitMessage(request.getHeader(COMMIT_MESSAGE_HEADER));
-            context.setUser(userInfo);
-            setThreadContext(context);
+        } else if (pathInContext.startsWith(PROJECTS_PREFIX) && pathInContext.length() > PROJECTS_PREFIX.length()) {
+            // /api/v1/projects/{project}/{resource}/**fortnight
+            var subPath = pathInContext.substring(PROJECTS_PREFIX.length());
+            var parts = subPath.split("/");
+            if (parts.length > 0) {
+                var context = new ThreadContext();
+                setThreadContext(context);
 
-            if (pathInContext.startsWith(PROJECTS_PREFIX) && pathInContext.length() > PROJECTS_PREFIX.length()) {
-                // /api/v1/projects/{project}/{resource}/**fortnight
-                var subPath = pathInContext.substring(PROJECTS_PREFIX.length());
-                var parts = subPath.split("/");
-                if (parts.length > 0) {
-                    var project = parts[0];
-                    context.setProject(project);
+                var project = parts[0];
+                context.setProject(project);
 
-                    if (userInfo == null) {
-                        sendError("Unauthenticated", response);
-                        return;
-                    }
+                var userInfo = authenticator.apply(request);
+                if (userInfo == null) {
+                    sendError("Unauthenticated", response);
+                    return;
+                }
 
-                    var user = userService.trySetCurrentUser(userInfo);
+                var user = userService.trySetCurrentUser(userInfo);
 
-                    if (user == null || user.getRoles().isEmpty()) {
-                        sendError("You have no access to this project", response);
-                        return;
-                    }
+                if (user == null || user.getRoles().isEmpty()) {
+                    sendError("You have no access to this project", response);
+                    return;
+                }
 
-                    context.setUser(user);
+                context.setUser(user);
+                context.setUserCommitMessage(request.getHeader(COMMIT_MESSAGE_HEADER));
 
-                    if (parts.length > 1) {
-                        var resource = parts[1];
-                        switch (resource) {
-                            case "vocabulary":
-                                if (RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod()) &&
-                                        !user.getRoles().contains(Role.DataSteward) &&
-                                        !user.getRoles().contains(Role.Coordinator)) {
-                                    sendError("Only data stewards and project coordinators can edit the vocabulary", response);
-                                    return;
-                                }
-                                break;
-                            case "rdf":
-                                if (!user.getRoles().contains(Role.SparqlUser) && !user.getRoles().contains(Role.Coordinator)) {
-                                    sendError("User is not allowed to access the SPARQL endpoint", response);
-                                    return;
-                                }
-
-                                // Fuseki doesn't like path parameters, so we hack the path and forward the request
-                                var newPath = Stream.of(parts).skip(1).collect(joining("/", API_PREFIX + "/", pathInContext.endsWith("/") ? "/" : ""));
-                                request.setAttribute(FORWARDED_ATTRIBUTE, true);
-                                request.getRequestDispatcher(newPath).forward(request, response);
+                if (parts.length > 1) {
+                    var resource = parts[1];
+                    switch (resource) {
+                        case "vocabulary":
+                            if (RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod()) &&
+                                    !user.getRoles().contains(Role.DataSteward) &&
+                                    !user.getRoles().contains(Role.Coordinator)) {
+                                sendError("Only data stewards and project coordinators can edit the vocabulary", response);
                                 return;
-                            case "collections":
-                            case "metadata":
-                            case "meta-vocabulary":
-                            case "users":
-                            case "permissions":
-                            default:
-                                // Permission checks are handled by the corresponding APIs
-                        }
+                            }
+                            break;
+                        case "rdf":
+                            if (!user.getRoles().contains(Role.SparqlUser) && !user.getRoles().contains(Role.Coordinator)) {
+                                sendError("User is not allowed to access the SPARQL endpoint", response);
+                                return;
+                            }
+
+                            // Fuseki doesn't like path parameters, so we hack the path and forward the request
+                            var newPath = Stream.of(parts).skip(1).collect(joining("/", API_PREFIX + "/", pathInContext.endsWith("/") ? "/" : ""));
+                            request.setAttribute(FORWARDED_ATTRIBUTE, true);
+                            request.getRequestDispatcher(newPath).forward(request, response);
+                            return;
+                        case "collections":
+                        case "metadata":
+                        case "meta-vocabulary":
+                        case "users":
+                        case "permissions":
+                        default:
+                            // Permission checks are handled by the corresponding APIs
                     }
                 }
             }

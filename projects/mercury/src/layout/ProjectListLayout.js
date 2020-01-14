@@ -8,7 +8,6 @@ const ProjectListLayout = () => (
     <UserProvider>
         <ProjectsProvider>
             <Layout
-                requiredAuthorization="CanRead"
                 renderMain={() => (
                     <ProjectsPage />
                 )}
