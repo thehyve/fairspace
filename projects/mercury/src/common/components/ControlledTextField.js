@@ -24,7 +24,7 @@ ControlledTextField.propTypes = {
         valid: PropTypes.bool.isRequired,
         touched: PropTypes.bool.isRequired,
         declareTouched: PropTypes.func.isRequired,
-        selectOptions: PropTypes.array.isRequired
+        selectOptions: PropTypes.array
     }),
 };
 

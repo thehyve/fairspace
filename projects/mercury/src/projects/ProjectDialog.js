@@ -25,6 +25,7 @@ const ControlledTextFieldWrapper = ({
         required={required}
         helperText={helperText}
         inputProps={{
+            'data-testid': label,
             'aria-label': label,
             ...inputProps
         }}
@@ -52,7 +53,8 @@ export default ({onSubmit, onClose, submitDisabled, fields}) => {
                 <Button onClick={onClose} aria-label="Cancel" color="secondary">
                     Cancel
                 </Button>
-                <Button type="submit" form="formId" disabled={submitDisabled} color="primary" variant="contained">
+                <Button type="submit" form="formId" data-testid="submit-button"
+                        disabled={submitDisabled} color="primary" variant="contained">
                     Save
                 </Button>
             </DialogActions>

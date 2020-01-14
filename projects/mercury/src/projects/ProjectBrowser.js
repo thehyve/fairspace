@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {withRouter} from "react-router-dom";
+import {withRouter, useHistory} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import ProjectList from './ProjectList';
@@ -16,14 +16,22 @@ export const ProjectBrowser = ({
     users = []
 }) => {
     const [creatingProject, setCreatingProject] = useState(false);
+    const [loadingCreatedProject, setLoadingCreatedProject] = useState(false);
+
+    const history = useHistory();
 
     const handleCreateProjectClick = () => setCreatingProject(true);
 
     const handleSaveProject = async (project: Project) => {
+        setLoadingCreatedProject(true);
         return createProject(project)
-            .then(() => setCreatingProject(false))
+            .then(() => {
+                setCreatingProject(false);
+                setLoadingCreatedProject(false);
+                history.push(`/projects/${project.id}/`);
+            })
             .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                const message = err && err.message ? err.message : "An error occurred while creating a project";
                 ErrorDialog.showError(err, message);
             });
     };
@@ -45,6 +53,7 @@ export const ProjectBrowser = ({
                         title="Create project"
                         onSubmit={handleSaveProject}
                         onClose={handleCancelCreateProject}
+                        creating={loadingCreatedProject}
                         projects={projects}
                     />
                 ) : null}
