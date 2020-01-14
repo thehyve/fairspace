@@ -30,7 +30,7 @@ const workspaceProjects = (url) => fetch(url + '/api/v1/projects/')
         }
         return response.json();
     })
-    .then(projects => projects.map(id => ({id, workspace: url})));
+    .then(projects => projects.map(project => ({...project, workspace: url})));
 
 let allProjects;
 

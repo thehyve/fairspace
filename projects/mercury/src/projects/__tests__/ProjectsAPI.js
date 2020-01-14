@@ -4,13 +4,13 @@ import projectsAPI, {Project} from '../ProjectsAPI';
 
 describe('ProjectsAPI', () => {
     it('Fetches projects', async () => {
-        const dummyProjects = ['project1', 'project2'];
+        const dummyProjects = [{id: 'project1'}, {id: 'project2'}];
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
             data: dummyProjects,
             headers: {'content-type': 'application/json'}
         }));
         const projects: Project[] = await projectsAPI.getProjects();
-        expect(projects.map((project: Project) => project.id)).toEqual(dummyProjects);
+        expect(projects.map((project: Project) => project.id)).toEqual(dummyProjects.map(project => project.id));
     });
 
     it('Creates a new project', async () => {
