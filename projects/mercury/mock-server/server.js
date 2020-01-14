@@ -33,16 +33,14 @@ app.get('/api/keycloak/users', (req, res) => res.sendFile(MOCKED_USERS_LOCATION)
 app.get('/api/v1/users', (req, res) => res.sendFile(`${mockDataDir}/users.json`));
 
 // Create a new project
-app.put('/api/v1/projects', (req, res) => {
+app.put('/api/v1/projects/', (req, res) => {
     const project = req.body;
 
     // A project is created when it is accessed for the first time
-    fetch(`http://localhost:8080/api/v1/projects/${project.id}/metadata/?subject=http%3A%2F%2Ffairspace.io%2Fontology%23theProject`)
+    fetch(`http://localhost:8080/api/v1/projects/${project.id}/collections/`,
+        {headers: { 'Accept': 'application/json' }})
         .then(saturnsResponse => {
-            if (res.ok) {
-                allProjects.push(project);
-            }
-            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text());
+            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.json());
         });
 });
 

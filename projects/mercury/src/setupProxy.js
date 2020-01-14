@@ -27,10 +27,13 @@ module.exports = (app) => {
         target: MOCKED_SERVER_URL
     }));
 
-    app.use(proxy('/api/v1/projects/', {
-        target: MOCKED_SERVER_URL,
-        filter: (req, res) => req.method === 'PUT'
+    app.use(proxy('/api/v1', {
+        target: BACKEND_URL,
+        router: req => {
+            if (req.method === 'PUT' && req.originalUrl === '/api/v1/projects/') {
+                return MOCKED_SERVER_URL;
+            }
+            return BACKEND_URL;
+        },
     }));
-
-    app.use(proxy('/api/v1', {target: BACKEND_URL}));
 };
