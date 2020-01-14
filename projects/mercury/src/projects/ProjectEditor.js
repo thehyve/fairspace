@@ -1,44 +1,78 @@
 import React from 'react';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
-import Button from '@material-ui/core/Button';
+import ProjectDialog from "./ProjectDialog";
+import {useFormField} from "../common/hooks/UseFormField";
+import {useAsync} from "../common/hooks";
+import WorkspacesAPI from "./WorkspacesAPI";
+import {LoadingOverlay} from "../common/components";
 
-class ProjectEditor extends React.Component {
+const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
-    state = {
-        editing: true
-    };
+export default ({onSubmit, onClose, creating, projects, getWorkspaces = WorkspacesAPI.getWorkspaces,
+    project: {id = '', workspace = ''} = {}}) => {
+    const {data: workspaces = [], loading} = useAsync(getWorkspaces);
 
-    handleCancel = () => {
-        this.setState({editing: false});
-        if (this.props.onClose) {
-            this.props.onClose();
+    const workspaceControl = useFormField(workspace, value => !!value);
+
+    const isProjectIdUnique = (projectId) => !projects.some(project => project.id === projectId);
+    const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isProjectIdUnique(value));
+
+    const allControls = [idControl, workspaceControl];
+
+    const formValid = allControls.every(({valid}) => valid);
+
+    const defaultWorkspace = (workspaces.length === 1) && workspaces[0];
+    if (defaultWorkspace && (defaultWorkspace.id !== workspaceControl.value)) {
+        workspaceControl.setValue(defaultWorkspace.id);
+    }
+
+    const fields = [
+        {
+            control: workspaceControl,
+            required: true,
+            autoFocus: true,
+            id: "workspace",
+            label: "Workspace",
+            name: "workspace",
+            select: true,
+            selectOptions: workspaces.map(w => w.id)
+        },
+        {
+            control: idControl,
+            required: true,
+            id: "id",
+            label: "Id",
+            name: "id",
+            helperText: "Value has to be unique per workspace. "
+                + "Only lower case letters, numbers, hyphens and should start with a letter."
         }
-    };
+    ];
 
-    render() {
+    const validateAndSubmit = () => formValid && onSubmit(
+        {
+            workspace: workspaceControl.value,
+            id: idControl.value,
+            title: idControl.value
+        }
+    );
+
+    if (loading) {
         return (
-            <Dialog
-                open={this.state.editing}
-                onClose={this.props.onClose}
-                aria-labelledby="form-dialog-title"
-            >
-                <DialogTitle id="form-dialog-title">
-                    Edit project
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>You can edit the project details here.</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={this.handleCancel} aria-label="Cancel" color="secondary">Cancel</Button>
-                    <Button disabled={true} aria-label="Save" color="primary">Save</Button>
-                </DialogActions>
-            </Dialog>
+            <LoadingOverlay loading />
         );
     }
-}
-
-export default ProjectEditor;
+    return (
+        <>
+            <ProjectDialog
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    validateAndSubmit();
+                }}
+                onClose={onClose}
+                submitDisabled={Boolean(!formValid)}
+                fields={fields}
+            />
+            <LoadingOverlay loading={creating} />
+        </>
+    );
+};

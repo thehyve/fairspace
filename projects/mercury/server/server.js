@@ -140,7 +140,8 @@ app.put('/api/v1/projects', (req, res) => {
     // TODO: Check user's permissions
 
     // A project is created when it is accessed for the first time
-    fetch(`${project.workspace}/api/v1/projects/${project.id}/metadata/?subject=http%3A%2F%2Ffairspace.io%2Fontology%23theProject`)
+    fetch(`${project.workspace}/api/v1/projects/${project.id}/metadata/?subject=http%3A%2F%2Ffairspace.io%2Fontology%23theProject`,
+        {headers: { 'Accept': 'application/json+ld' }})
         .then(saturnsResponse => {
             if (res.ok) {
                 allProjects.push(project);

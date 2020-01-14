@@ -3,7 +3,6 @@ import mockAxios, {AxiosResponse} from 'axios';
 import projectsAPI, {Project} from '../ProjectsAPI';
 
 describe('ProjectsAPI', () => {
-
     it('Fetches projects', async () => {
         const dummyProjects = ['project1', 'project2'];
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
@@ -21,8 +20,8 @@ describe('ProjectsAPI', () => {
         const createProjectResponse = {
             '@id': 'fs:theProject',
             '@type': 'fs:Project',
-            projectDescription: '',
-            label: 'project1',
+            "projectDescription": '',
+            "label": 'project1',
             '@context': {
                 label: {
                     '@id': 'http://www.w3.org/2000/01/rdf-schema#label'
@@ -64,9 +63,8 @@ describe('ProjectsAPI', () => {
         try {
             await projectsAPI.createProject(projectData);
             fail();
-        } catch(error) {
+        } catch (error) {
             expect(error.message).toEqual('Failure while creating a project');
         }
     });
-
 });

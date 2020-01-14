@@ -33,6 +33,7 @@
     "jsonld": "^1.8.1",
     "lodash": "^4.17.15",
     "mdi-material-ui": "latest",
+    "node-fetch": "^2.6.0",
     "prop-types": "^15.7.2",
     "query-string": "^6.9.0",
     "react": "^16.12.0",
