@@ -84,7 +84,7 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find(Button).at(1).prop('disabled')).toBeTruthy();
     });
 
-    it('should not render user selector and render selected user fullname instead when user is provided', () => {
+    it('should not render user selector and render selected user name instead when user is provided', () => {
         wrapper = mount(
             <AlterPermissionDialog
                 open

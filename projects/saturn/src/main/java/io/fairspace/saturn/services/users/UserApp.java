@@ -28,13 +28,6 @@ public class UserApp extends BaseApp {
             return mapper.writeValueAsString(result);
         });
 
-        patch("/", (req, res) -> {
-            var template = mapper.readValue(req.body(), User.class);
-            var result = service.updateUser(template);
-            res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(result);
-        });
-
         get("/current/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(getThreadContext().getUser());

@@ -10,7 +10,6 @@ import VocabularyContext from './VocabularyContext';
 import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
 import {MetadataAPI} from './LinkedDataAPI';
 import {isCoordinator} from '../common/utils/userUtils';
-import Config from '../common/services/Config';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
@@ -60,7 +59,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
 
                 // Fixed properties
                 hasEditRight: true,
-                isCoordinator: isCoordinator(currentUser.authorizations, Config.get()),
+                isCoordinator: isCoordinator(currentUser.roles),
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,

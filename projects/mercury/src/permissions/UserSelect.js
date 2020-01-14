@@ -1,49 +1,25 @@
-import React, {useRef} from "react";
+import React, {useContext} from "react";
 
-import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../constants";
-import KeycloakAPI from "./KeycloakAPI";
 import Dropdown from "../metadata/common/values/Dropdown";
+import {UsersContext} from "../common";
 
-const UserSelect = ({debounce = 300, ...otherProps}) => {
-    const fetchRequest = useRef(null);
+const UserSelect = ({filter = () => true, ...otherProps}) => {
+    const {users} = useContext(UsersContext);
 
-    const search = (query, size = SEARCH_DROPDOWN_DEFAULT_SIZE) => KeycloakAPI.searchUsers({size, query})
-        .then(
-            items => items.map(user => {
-                const {iri, firstName, lastName} = user;
-                const displayLabel = (firstName + ' ' + lastName).trim();
-                return {
-                    label: displayLabel,
-                    iri,
-                    user
-                };
-            })
-        );
-
-    const debouncedSearch = (query) => {
-        if (fetchRequest.current) {
-            clearTimeout(fetchRequest.current);
-        }
-
-        return new Promise((resolve, reject) => {
-            if (fetchRequest.current) {
-                clearTimeout(fetchRequest.current);
+    const options = users
+        .filter(filter)
+        .map(user => (
+            {
+                label: user.name,
+                ...user
             }
-
-            fetchRequest.current = setTimeout(() => {
-                search(query)
-                    .then(resolve)
-                    .catch(reject);
-            }, debounce);
-        });
-    };
+        ));
 
     return (
         <Dropdown
             {...otherProps}
-            async
             clearTextOnSelection={false}
-            loadOptions={debouncedSearch}
+            options={options}
         />
     );
 };

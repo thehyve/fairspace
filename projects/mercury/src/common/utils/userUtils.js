@@ -2,5 +2,5 @@ export default function getDisplayName(user) {
     return (user && user.name) || '';
 }
 
-export const isDataSteward = (authorizations, config) => authorizations && authorizations.includes(config.roles.dataSteward);
-export const isCoordinator = (authorizations, config) => authorizations && authorizations.includes(config.roles.coordinator);
+export const isDataSteward = (authorizations) => authorizations && authorizations.includes('DataSteward');
+export const isCoordinator = (authorizations) => authorizations && authorizations.includes('Coordinator');

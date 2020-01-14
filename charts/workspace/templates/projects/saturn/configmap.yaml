@@ -32,7 +32,8 @@ data:
           indexName: "{{ .Values.external.elasticsearch.indexName }}"
     auth:
       enabled: true
-      fullAccessRole: "{{ template "workspace.roles.coordinator" . }}"
+      fullAccessRole: organisation-admin
+      userUrl: "{{ template "keycloak.baseUrl" . }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}/users/"
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     workspace:

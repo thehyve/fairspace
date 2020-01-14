@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {getVersion} from "../services/UsersAndWorkspaceAPI";
+import {getVersion} from "../../users/UsersAndWorkspaceAPI";
 
 const initialState = {
     name: 'Fairspace',

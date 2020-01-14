@@ -1,6 +1,7 @@
 import React from 'react';
 import {Redirect, Route} from "react-router-dom";
 
+import * as queryString from 'query-string';
 import ProjectOverview from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import Notebooks from "../notebooks/Notebooks";
@@ -12,7 +13,6 @@ import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
 import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
-import * as queryString from 'query-string';
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null

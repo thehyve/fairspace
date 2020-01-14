@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../common';
 
-const permissionsUrl = 'permissions/'
+const permissionsUrl = 'permissions/';
 
 class PermissionAPI {
     /**

@@ -1,26 +1,22 @@
-import {Footer, Layout, UsersProvider} from '../common';
-import WorkspaceTopBar from '../common/components/WorkspaceTopBar';
 import React from 'react';
-import Config from '../common/services/Config';
+import {Footer, Layout, UserProvider} from '../common';
+import WorkspaceTopBar from '../common/components/WorkspaceTopBar';
 import ProjectsPage from '../projects/ProjectsPage';
 import {ProjectsProvider} from '../projects/ProjectsContext';
 
-const ProjectListLayout = () => {
-    const requiredRole = Config.get().roles.user;
-    return (
+const ProjectListLayout = () => (
+    <UserProvider>
         <ProjectsProvider>
             <Layout
-                requiredAuthorization={requiredRole}
+                requiredAuthorization="CanRead"
                 renderMain={() => (
-                    <UsersProvider>
-                        <ProjectsPage />
-                    </UsersProvider>
+                    <ProjectsPage />
                 )}
-                renderTopbar={() => <WorkspaceTopBar name={'Projects'} />}
+                renderTopbar={() => <WorkspaceTopBar name="Projects" />}
                 renderFooter={({id, version}) => <Footer name={id} version={version} />}
             />
         </ProjectsProvider>
-    );
-};
+    </UserProvider>
+);
 
 export default ProjectListLayout;

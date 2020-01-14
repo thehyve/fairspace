@@ -60,7 +60,7 @@ public class Services {
         this.dataset = dataset;
 
         projectsService = new ProjectsService(config.jena.datasetPath);
-        userService = new UserService(dataset);
+        userService = new UserService(dataset, config.auth.userUrl);
 
         eventService = setupEventService();
 
