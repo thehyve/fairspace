@@ -35,9 +35,7 @@ const workspaceProjects = (url) => fetch(url + '/api/v1/projects/')
 let allProjects;
 
 Promise.all(workspaces.map(workspaceProjects))
-    .then(responses => {
-        allProjects = responses.reduce((x, y) => [...x, ...y], []);
-    })
+    .then(responses => { allProjects = responses.reduce((x, y) => [...x, ...y], []); })
     .catch(e => {
         console.error('Error retrieving projects', e);
         process.exit(1);
