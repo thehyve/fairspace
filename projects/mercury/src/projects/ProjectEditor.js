@@ -7,10 +7,10 @@ import {LoadingOverlay} from "../common/components";
 
 const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
-export default ({onSubmit, onClose, creating, projects,
-                    project: {id = '', workspace = '', title = '', description = ''} = {}}) => {
+export default ({onSubmit, onClose, creating, projects, getWorkspaces = WorkspacesAPI.getWorkspaces,
+                 project: {id = '', workspace = ''} = {}}) => {
 
-    const {data: workspaces = [], error, loading, refresh} = useAsync(WorkspacesAPI.getWorkspaces);
+    const {data: workspaces = [], error, loading, refresh} = useAsync(getWorkspaces);
 
     const workspaceControl = useFormField(workspace, value => !!value);
 
@@ -63,7 +63,9 @@ export default ({onSubmit, onClose, creating, projects,
     );
 
     if (loading) {
-        return null;
+        return (
+            <LoadingOverlay loading />
+        );
     }
     return (
         <>
