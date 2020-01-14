@@ -88,7 +88,7 @@ app.use('/**', keycloak.protect((token) => {
     return true;
 }), (res, req, next) => next());
 
-app.use('/api/**', keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
+app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
 // Restore protocol
 app.use((req, res, next) => {

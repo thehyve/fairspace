@@ -42,7 +42,7 @@ const App = () => {
                                 <ClipboardProvider>
                                     <ErrorDialog>
                                         <Router>
-                                            <GlobalRoutes/>
+                                            <GlobalRoutes />
                                         </Router>
                                     </ErrorDialog>
                                 </ClipboardProvider>
