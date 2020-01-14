@@ -3,6 +3,7 @@ import {render, fireEvent, cleanup} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import type {Project} from '../ProjectsAPI';
 import ProjectEditor from '../ProjectEditor';
+import {act} from 'react-dom/test-utils';
 
 describe('ProjectEditor', () => {
 
@@ -16,7 +17,7 @@ describe('ProjectEditor', () => {
 
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
 
-    beforeEach(() => {
+    beforeEach(async () => {
         const workspaceApi = {
             getWorkspaces: jest.fn(() => Promise.resolve([workspace]))
         };
@@ -26,9 +27,11 @@ describe('ProjectEditor', () => {
             id: 'a2', workspace: workspace.id
         }];
         onSubmit = jest.fn();
-        utils = render(<ProjectEditor onSubmit={onSubmit} projects={projects} getWorkspaces={workspaceApi.getWorkspaces}/>);
+        await act(async () => {
+            utils = render(<ProjectEditor onSubmit={onSubmit} projects={projects}
+                                          getWorkspaces={workspaceApi.getWorkspaces}/>);
+        });
     });
-
     afterEach(cleanup);
 
     it('should send all entered parameters to the creation method', () => {
