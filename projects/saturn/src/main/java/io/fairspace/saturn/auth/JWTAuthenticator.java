@@ -27,7 +27,7 @@ public class JWTAuthenticator implements Function<HttpServletRequest, User>  {
         var authorizationHeader = request.getHeader(AUTHORIZATION);
 
         if (authorizationHeader == null) {
-            log.warn("No authorization header was provided for {}", request.getRequestURI());
+            log.debug("No authorization header was provided for {}", request.getRequestURI());
             return null;
         }
 

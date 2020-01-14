@@ -18,7 +18,7 @@ const GlobalRoutes = () => (
             component={ProjectLayout}
         />
 
-        <Route path="/login" render={() => {window.location.href = '/login';}} />
+        <Route path="/login" render={() => {window.location.href = new URLSearchParams(window.location.search).get('redirectUrl');}} />
 
         <Route
             path="/logout"

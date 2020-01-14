@@ -88,7 +88,7 @@ app.use('/**', keycloak.protect((token) => {
     return true;
 }), (res, req, next) => next());
 
-app.use('/api/**', keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
+app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
 // Restore protocol
 app.use((req, res, next) => {
@@ -151,7 +151,7 @@ app.put('/api/v1/projects', (req, res) => {
             if (res.ok) {
                 allProjects.push(project);
             }
-            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text());
+            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text()).end();
         })
         .finally(() => projectsBeingCreated.delete(project.id));
 });
