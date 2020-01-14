@@ -26,8 +26,8 @@ class ProjectsAPI {
             JSON.stringify(project),
             {headers}
         )
-        .catch(handleHttpError("Failure while creating a project"))
-        .then(extractJsonData);
+            .catch(handleHttpError("Failure while creating a project"))
+            .then(extractJsonData);
     }
 }
 

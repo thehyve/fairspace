@@ -6,13 +6,12 @@ import Config from '../common/services/Config';
 import {projectPrefix} from "../projects/projects";
 
 
-const ProjectMenu = ({location: {pathname}}) => {
-    return (
+const ProjectMenu = ({location: {pathname}}) => (
     <>
         <List>
             <ListItem
                 component={NavLink}
-                to={"/projects"}
+                to="/projects"
                 button
                 selected={pathname === '/projects'}
             >
@@ -102,6 +101,6 @@ const ProjectMenu = ({location: {pathname}}) => {
             ) : null}
         </List>
     </>
-)};
+);
 
 export default withRouter(ProjectMenu);

@@ -13,7 +13,6 @@ export const ProjectBrowser = ({
     error = false,
     projects = [],
     createProject = () => {},
-    users = []
 }) => {
     const [creatingProject, setCreatingProject] = useState(false);
 
@@ -31,9 +30,9 @@ export const ProjectBrowser = ({
     const handleCancelCreateProject = () => setCreatingProject(false);
 
     const renderProjectList = () => {
-        projects.forEach((project: Project) => {
-            // project.creatorObj = users.find(u => u.iri === project.createdBy);
-        });
+        // projects.forEach((project: Project) => {
+        //     project.creatorObj = users.find(u => u.iri === project.createdBy);
+        // });
 
         return (
             <>

@@ -22,7 +22,7 @@ const App = () => {
     }, [isMounted]);
 
     if (!configLoaded) {
-        return <LoadingInlay/>;
+        return <LoadingInlay />;
     }
 
 
@@ -35,7 +35,7 @@ const App = () => {
                             <ClipboardProvider>
                                 <ErrorDialog>
                                     <Router>
-                                        <GlobalRoutes/>
+                                        <GlobalRoutes />
                                     </Router>
                                 </ErrorDialog>
                             </ClipboardProvider>

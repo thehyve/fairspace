@@ -1,9 +1,9 @@
+import React from 'react';
 import {VocabularyProvider} from '../metadata/VocabularyContext';
 import {CollectionsProvider} from '../common/contexts/CollectionsContext';
 import {Footer, Layout, usePageTitleUpdater, UserProvider, UsersProvider} from '../common';
 import ProjectMenu from './ProjectMenu';
 import WorkspaceTopBar from '../common/components/WorkspaceTopBar';
-import React from 'react';
 import {currentProject} from '../projects/projects';
 import ProjectRoutes from '../routes/ProjectRoutes';
 
@@ -16,15 +16,15 @@ const ProjectLayout = () => {
             <VocabularyProvider>
                 <CollectionsProvider>
                     <Layout
-                        requiredAuthorization={'CanRead'}
-                        renderMenu={() => <ProjectMenu/>}
+                        requiredAuthorization="CanRead"
+                        renderMenu={() => <ProjectMenu />}
                         renderMain={() => (
                             <UsersProvider>
-                                <ProjectRoutes/>
+                                <ProjectRoutes />
                             </UsersProvider>
                         )}
-                        renderTopbar={() => <WorkspaceTopBar name={project}/>}
-                        renderFooter={({id, version}) => <Footer name={id} version={version}/>}
+                        renderTopbar={() => <WorkspaceTopBar name={project} />}
+                        renderFooter={({id, version}) => <Footer name={id} version={version} />}
                     />
                 </CollectionsProvider>
             </VocabularyProvider>

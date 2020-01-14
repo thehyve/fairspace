@@ -18,7 +18,7 @@ describe('Layout', () => {
 
     // eslint-disable-next-line jest/expect-expect
     it('renders without crashing', () => {
-        const element = wrap(<Layout renderMenu={() => null}/>);
+        const element = wrap(<Layout renderMenu={() => null} />);
 
         const div = document.createElement('div');
 
@@ -27,7 +27,7 @@ describe('Layout', () => {
     });
 
     it('should render content if no required authorization is specified', () => {
-        const element = wrap(<Layout renderMenu={() => null}/>, ['test']);
+        const element = wrap(<Layout renderMenu={() => null} />, ['test']);
 
         const wrapper = mount(element);
 
@@ -35,7 +35,7 @@ describe('Layout', () => {
     });
 
     it('should render no content if user does not have required authorization ', () => {
-        const element = wrap(<Layout requiredAuthorization="other-role" renderMenu={() => null}/>, ['test']);
+        const element = wrap(<Layout requiredAuthorization="other-role" renderMenu={() => null} />, ['test']);
 
         const wrapper = mount(element);
 

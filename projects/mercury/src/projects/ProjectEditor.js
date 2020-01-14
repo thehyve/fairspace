@@ -7,7 +7,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 
 class ProjectEditor extends React.Component {
-
     state = {
         editing: true
     };
@@ -34,7 +33,7 @@ class ProjectEditor extends React.Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleCancel} aria-label="Cancel" color="secondary">Cancel</Button>
-                    <Button disabled={true} aria-label="Save" color="primary">Save</Button>
+                    <Button disabled aria-label="Save" color="primary">Save</Button>
                 </DialogActions>
             </Dialog>
         );

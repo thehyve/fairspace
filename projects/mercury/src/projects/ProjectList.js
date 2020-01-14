@@ -66,21 +66,18 @@ const ProjectList = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map((project: Project) => {
-
-                        return (
-                            <TableRow
-                                key={project.id}
-                                hover
-                                onClick={() => {}}
-                                onDoubleClick={() => onProjectDoubleClick(project)}
-                            >
-                                <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                    {project.description}
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
+                    {pagedItems.map((project: Project) => (
+                        <TableRow
+                            key={project.id}
+                            hover
+                            onClick={() => {}}
+                            onDoubleClick={() => onProjectDoubleClick(project)}
+                        >
+                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
+                                {project.description}
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
             <TablePagination

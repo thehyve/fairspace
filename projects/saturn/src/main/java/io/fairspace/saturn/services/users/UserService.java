@@ -39,18 +39,12 @@ public class UserService {
     }
 
     public User trySetCurrentUser(User user) {
-        var stored = dao.read(User.class, user.getIri());
-
         if (user.isAdmin()) {
-            if (stored == null) {
-                stored = dao.write(user);
-            }
-            stored.getRoles().addAll(allOf(Role.class));
+            user.getRoles().addAll(allOf(Role.class));
+            return user;
         }
 
-        stored.setAdmin(user.isAdmin());
-
-        return stored;
+        return dao.read(User.class, user.getIri());
     }
 
     public Set<User> getUsers() {
@@ -109,17 +103,6 @@ public class UserService {
         return calculateWrite("Add a user " + user.getIri(), dao.getDataset(), () -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
             validate(user.getIri() != null, "Please provide a valid IRI.");
-            validate(dao.read(User.class, user.getIri()) == null, "A user with the provided IRI already exists.");
-
-            return dao.write(user);
-        });
-    }
-
-    public User updateUser(User user) {
-        return calculateWrite("Update a user " + user.getIri(), dao.getDataset(), () -> {
-            validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have a Coordinator's role.");
-            validate(user.getIri() != null, "Please provide a valid IRI.");
-            validate(dao.read(User.class, user.getIri()) != null, "A user with the provided IRI doesn't exist.");
 
             return dao.write(user);
         });

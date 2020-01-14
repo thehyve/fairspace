@@ -8,7 +8,8 @@ import ProjectLayout from '../layout/ProjectLayout';
 const GlobalRoutes = () => (
     <Switch>
         <Route
-            path="/projects" exact
+            path="/projects"
+            exact
             component={ProjectListLayout}
         />
 

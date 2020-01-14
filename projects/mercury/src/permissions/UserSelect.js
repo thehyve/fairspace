@@ -1,19 +1,19 @@
-import React, {useContext, useRef} from "react";
+import React, {useContext} from "react";
 
 import Dropdown from "../metadata/common/values/Dropdown";
 import {UsersContext} from "../common";
 
-const UserSelect = ({debounce = 300, ...otherProps}) => {
+const UserSelect = ({filter = () => true, ...otherProps}) => {
     const {users} = useContext(UsersContext);
 
-    const options = users.map(user => {
-                const {iri, name} = user;
-                return {
-                    label: name,
-                    iri,
-                    user
-                };
-            });
+    const options = users
+        .filter(filter)
+        .map(user => (
+            {
+                label: user.name,
+                ...user
+            }
+        ));
 
     return (
         <Dropdown

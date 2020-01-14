@@ -7,6 +7,7 @@ import useLinkedData from '../metadata/UseLinkedData';
 import {PROJECT_INFO_URI} from '../constants';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import LinkedDataContext from '../metadata/LinkedDataContext';
+import UserList from "../users/UserList";
 
 const ProjectInfoWithProvider = () => (
     <LinkedDataMetadataProvider>
@@ -20,39 +21,42 @@ const ProjectInfo = () => {
     const [editingEnabled, setEditingEnabled] = useState(false);
 
     return (
-        <Paper style={{maxWidth: 800, padding: 20}}>
-            {isCoordinator ? (
-                <Grid container direction="row">
-                    <Grid item xs={11}>
-                        <LinkedDataEntityFormContainer
-                            subject={PROJECT_INFO_URI}
-                            editable={editingEnabled}
-                            properties={properties}
-                            values={values}
-                            linkedDataLoading={linkedDataLoading}
-                            linkedDataError={linkedDataError}
-                            updateLinkedData={() => {
-                                updateLinkedData()
-                                    .then(() => setEditingEnabled(false));
-                            }}
-                        />
+        <>
+            <Paper style={{padding: 20}}>
+                {isCoordinator ? (
+                    <Grid container direction="row">
+                        <Grid item xs={11}>
+                            <LinkedDataEntityFormContainer
+                                subject={PROJECT_INFO_URI}
+                                editable={editingEnabled}
+                                properties={properties}
+                                values={values}
+                                linkedDataLoading={linkedDataLoading}
+                                linkedDataError={linkedDataError}
+                                updateLinkedData={() => {
+                                    updateLinkedData()
+                                        .then(() => setEditingEnabled(false));
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={1}>
+                            <Button onClick={() => setEditingEnabled(prev => !prev)}>
+                                {editingEnabled ? 'Cancel' : 'Edit'}
+                            </Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={1}>
-                        <Button onClick={() => setEditingEnabled(prev => !prev)}>
-                            {editingEnabled ? 'Cancel' : 'Edit'}
-                        </Button>
-                    </Grid>
-                </Grid>
-            ) : (
-                <LinkedDataEntityForm
-                    editable={false}
-                    error={linkedDataError}
-                    loading={linkedDataLoading}
-                    properties={properties}
-                    values={values}
-                />
-            )}
-        </Paper>
+                ) : (
+                    <LinkedDataEntityForm
+                        editable={false}
+                        error={linkedDataError}
+                        loading={linkedDataLoading}
+                        properties={properties}
+                        values={values}
+                    />
+                )}
+            </Paper>
+            <UserList />
+        </>
     );
 };
 
