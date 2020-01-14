@@ -4,7 +4,6 @@ import {extractJsonData, handleHttpError} from '../common';
 
 
 const projectsUrl = "/api/v1/projects/";
-const headers = {'Content-Type': 'application/json'};
 
 export type Project = {
     id: string;
@@ -24,7 +23,7 @@ class ProjectsAPI {
         return axios.put(
             projectsUrl,
             JSON.stringify(project),
-            {headers}
+            {headers: {'Content-Type': 'application/json'}}
         )
             .catch(handleHttpError("Failure while creating a project"))
             .then(extractJsonData);

@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {withRouter} from "react-router-dom";
+import {withRouter, useHistory} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import ProjectList from './ProjectList';
@@ -12,17 +12,26 @@ export const ProjectBrowser = ({
     loading = false,
     error = false,
     projects = [],
-    createProject = () => {},
+    createProject = () => {}
 }) => {
     const [creatingProject, setCreatingProject] = useState(false);
+    const [loadingCreatedProject, setLoadingCreatedProject] = useState(false);
+
+    const history = useHistory();
 
     const handleCreateProjectClick = () => setCreatingProject(true);
 
-    const handleSaveProject = (project: Project) => {
-        createProject(project)
-            .then(() => setCreatingProject(false))
+    const handleSaveProject = async (project: Project) => {
+        setLoadingCreatedProject(true);
+        return createProject(project)
+            .then(() => {
+                setCreatingProject(false);
+                setLoadingCreatedProject(false);
+                history.push(`/projects/${project.id}/`);
+            })
             .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                setLoadingCreatedProject(false);
+                const message = err && err.message ? err.message : "An error occurred while creating a project";
                 ErrorDialog.showError(err, message);
             });
     };
@@ -42,8 +51,10 @@ export const ProjectBrowser = ({
                 {creatingProject ? (
                     <ProjectEditor
                         title="Create project"
-                        onSave={handleSaveProject}
+                        onSubmit={handleSaveProject}
                         onClose={handleCancelCreateProject}
+                        creating={loadingCreatedProject}
+                        projects={projects}
                     />
                 ) : null}
             </>
