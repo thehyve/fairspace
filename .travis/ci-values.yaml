@@ -25,7 +25,7 @@ workspace:
   description: "CI Workspace"
   ingress:
     domain: workspace.ci.fairway.app
-  enableExperimentalFeatures: true
+  enableExperimentalFeatures: false
   configurationScripts:
     keycloak:
       pullPolicy: Always
