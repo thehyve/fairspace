@@ -53,9 +53,9 @@ const UserMenu = ({classes}) => {
                 onClick={handleClick}
                 className={classes.row}
             >
-                <Avatar alt={currentUser.fullName} src="/public/images/avatar.png" className={classes.avatar} />
+                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
                 <span>
-                    {currentUser.fullName}
+                    {currentUser.name}
                 </span>
             </Button>
             <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>

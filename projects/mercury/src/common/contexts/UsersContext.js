@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {getUsers} from "../services/UsersAndWorkspaceAPI";
+import {getUsers} from "../../users/UsersAndWorkspaceAPI";
 
 const UsersContext = React.createContext({});
 

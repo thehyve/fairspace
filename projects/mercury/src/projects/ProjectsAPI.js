@@ -16,7 +16,7 @@ class ProjectsAPI {
         return axios.get(projectsUrl, {headers: {Accept: 'application/json'}})
             .catch(handleHttpError("Failure when retrieving a list of projects"))
             .then(extractJsonData)
-            .then((ids: string[]) => ids.map((id) => ({id, name: id, description: id})));
+            .then((projects) => projects.map(project => ({...project, name: project.id, description: project.id})));
     }
 
     createProject(project: Project): Promise<Project> {

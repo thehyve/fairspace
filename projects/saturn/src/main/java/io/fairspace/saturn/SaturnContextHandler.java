@@ -38,7 +38,8 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
      */
     public SaturnContextHandler(UserService userService, Function<HttpServletRequest, User> authenticator) {
         this.userService = userService;
-        this.authenticator = authenticator;;
+        this.authenticator = authenticator;
+        ;
     }
 
     @Override
@@ -47,22 +48,21 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
         if (request.getAttribute(FORWARDED_ATTRIBUTE) != null) {
             baseRequest.setDispatcherType(DispatcherType.REQUEST);
         } else if (pathInContext.startsWith(PROJECTS_PREFIX) && pathInContext.length() > PROJECTS_PREFIX.length()) {
-            // /api/v1/projects/{project}/{resource}/**
+            // /api/v1/projects/{project}/{resource}/**fortnight
             var subPath = pathInContext.substring(PROJECTS_PREFIX.length());
             var parts = subPath.split("/");
             if (parts.length > 0) {
+                var context = new ThreadContext();
+                setThreadContext(context);
+
                 var project = parts[0];
+                context.setProject(project);
 
                 var userInfo = authenticator.apply(request);
                 if (userInfo == null) {
                     sendError("Unauthenticated", response);
                     return;
                 }
-
-                var context = new ThreadContext();
-                context.setUserCommitMessage(request.getHeader(COMMIT_MESSAGE_HEADER));
-                context.setProject(project);
-                setThreadContext(context);
 
                 var user = userService.trySetCurrentUser(userInfo);
 
@@ -72,6 +72,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                 }
 
                 context.setUser(user);
+                context.setUserCommitMessage(request.getHeader(COMMIT_MESSAGE_HEADER));
 
                 if (parts.length > 1) {
                     var resource = parts[1];

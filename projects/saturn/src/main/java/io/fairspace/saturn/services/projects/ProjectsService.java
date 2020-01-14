@@ -13,9 +13,12 @@ public class ProjectsService {
         this.projectRoot = projectRoot;
     }
 
-    public List<String> listProjects() {
+    public List<Project> listProjects() {
         return projectRoot.exists()
-                ? Stream.of(projectRoot.list((dir, name) -> !name.equals("lost+found") && !name.startsWith("."))).sorted().collect(toList())
+                ? Stream.of(projectRoot.list((dir, name) -> !name.equals("lost+found") && !name.startsWith(".")))
+                .sorted()
+                .map(Project::new)
+                .collect(toList())
                 : List.of();
     }
 }

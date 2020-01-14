@@ -126,20 +126,14 @@ export class AlterPermissionDialog extends React.Component {
             );
         }
 
-        const isOptionDisabled = option => {
-            const isAlreadySelected = collaborators.find(c => c.user === option.iri) !== undefined;
-            const isCurrentUser = option.iri === currentUser.iri;
-            return isAlreadySelected || isCurrentUser;
-        };
-
         // otherwise render select user component
         return (
             <UserSelect
                 onChange={this.handleSelectedUserChange}
+                filter={u => u.roles.includes('CanRead') && u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
-                isOptionDisabled={isOptionDisabled}
             />
         );
     };
@@ -173,6 +167,7 @@ export class AlterPermissionDialog extends React.Component {
                                         key={access}
                                         value={access}
                                         control={<Radio />}
+                                        Sparqlq
                                         label={access}
                                     />
                                 ))}

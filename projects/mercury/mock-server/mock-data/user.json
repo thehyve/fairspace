@@ -5,6 +5,7 @@
   "lastName": "Snow",
   "fullName": "John Snow",
   "authorizations": [
+    "organisation-admin",
     "user-workspace",
     "datasteward",
     "coordinator",

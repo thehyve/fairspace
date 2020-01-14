@@ -39,9 +39,9 @@ export const ProjectBrowser = ({
     const handleCancelCreateProject = () => setCreatingProject(false);
 
     const renderProjectList = () => {
-        projects.forEach((project: Project) => {
-            // project.creatorObj = users.find(u => u.iri === project.createdBy);
-        });
+        // projects.forEach((project: Project) => {
+        //     project.creatorObj = users.find(u => u.iri === project.createdBy);
+        // });
 
         return (
             <>
@@ -85,7 +85,7 @@ export const ProjectBrowser = ({
 const ContextualProjectBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {projects, collectionsLoading, collectionsError, createProject} = useContext(ProjectsContext);
+    const {projects, projectsLoading, projectsError, createProject} = useContext(ProjectsContext);
 
     return (
         <ProjectBrowser
@@ -93,8 +93,8 @@ const ContextualProjectBrowser = (props) => {
             projects={projects}
             createProject={createProject}
             users={users}
-            loading={collectionsLoading || currentUserLoading || usersLoading}
-            error={collectionsError || currentUserError || usersError}
+            loading={projectsLoading || currentUserLoading || usersLoading}
+            error={projectsError || currentUserError || usersError}
         />
     );
 };
