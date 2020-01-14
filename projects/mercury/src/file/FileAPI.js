@@ -72,6 +72,7 @@ class FileAPI {
      * @param file
      * @param destinationFilename
      * @param destinationPath
+     * @param onUploadProgress
      * @returns {Promise<never>|Promise<any[]>}
      */
     upload({file, destinationFilename, destinationPath}, onUploadProgress = () => {}) {

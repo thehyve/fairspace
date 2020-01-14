@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const coexist = require('coexist-parser-proxy');
 const proxy = require('http-proxy-middleware');
 const fetch = require("node-fetch");
 const YAML = require('yaml');
@@ -11,8 +10,6 @@ const cryptoRandomString = require('crypto-random-string');
 
 const app = express();
 
-app.use(coexist);
-app.use(express.json());
 
 const port = process.env.PORT || 8081;
 
@@ -109,10 +106,10 @@ const getWorkspaceUrl = (url) => {
 
 app.use('/unknown-project/:project', (req, res) => res.status(404).send('Unknown project: ' + req.params.project));
 
-app.get('/api/v1/workspaces', (req, res) => res.json(workspaces).end());
+app.get('/api/v1/workspaces', (req, res) => res.send(workspaces).end());
 
 // All projects from all workspaces
-app.get('/api/v1/projects', (req, res) => res.json(allProjects).end());
+app.get('/api/v1/projects', (req, res) => res.send(allProjects).end());
 
 const projectsBeingCreated = new Set();
 
@@ -172,7 +169,7 @@ app.use(proxy('/api/v1/search', {
     pathRewrite: (url) => `/${getProjectId(url)}/_search`
 }));
 
-app.get('/api/v1/account', (req, res) => res.json({
+app.get('/api/v1/account', (req, res) => res.send({
     id: accessToken.content.sub,
     username: accessToken.content.preferred_username,
     fullName: accessToken.content.name,

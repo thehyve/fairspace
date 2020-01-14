@@ -1,7 +1,6 @@
 const express = require('express');
-// eslint-disable-next-line import/no-extraneous-dependencies
-const bodyParser = require('body-parser');
 const path = require('path');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const fetch = require("node-fetch");
 
 const mockDataDir = path.join(__dirname, '/mock-data');
@@ -12,8 +11,6 @@ const app = express();
 // Add a delay to make the loading visible
 // app.use((req, res, next) => setTimeout(next, 1000));
 
-// parse application/json
-app.use(bodyParser.json());
 
 app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
@@ -38,7 +35,7 @@ app.put('/api/v1/projects/', (req, res) => {
 
     // A project is created when it is accessed for the first time
     fetch(`http://localhost:8080/api/v1/projects/${project.id}/collections/`,
-        {headers: { 'Accept': 'application/json' }})
+        {headers: {Accept: 'application/json'}})
         .then(saturnsResponse => {
             res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.json());
         });
