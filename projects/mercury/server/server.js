@@ -113,6 +113,8 @@ app.get('/api/v1/projects', (req, res) => res.send(allProjects).end());
 
 const projectsBeingCreated = new Set();
 
+app.use('/api/v1/projects', express.json());
+
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
     const project = req.body;
