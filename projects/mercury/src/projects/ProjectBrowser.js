@@ -16,6 +16,7 @@ export const ProjectBrowser = ({
 }) => {
     const [creatingProject, setCreatingProject] = useState(false);
     const [loadingCreatedProject, setLoadingCreatedProject] = useState(false);
+    const {currentUser} = useContext(UserContext);
 
     const history = useHistory();
 
@@ -38,28 +39,38 @@ export const ProjectBrowser = ({
 
     const handleCancelCreateProject = () => setCreatingProject(false);
 
-    const renderProjectList = () => {
-        // projects.forEach((project: Project) => {
-        //     project.creatorObj = users.find(u => u.iri === project.createdBy);
-        // });
-
-        return (
-            <>
-                <ProjectList
+    const renderProjectList = () => (
+    // projects.forEach((project: Project) => {
+    //     project.creatorObj = users.find(u => u.iri === project.createdBy);
+    // });
+        <>
+            <ProjectList
+                projects={projects}
+            />
+            {creatingProject ? (
+                <ProjectEditor
+                    title="Create project"
+                    onSubmit={handleSaveProject}
+                    onClose={handleCancelCreateProject}
+                    creating={loadingCreatedProject}
                     projects={projects}
                 />
-                {creatingProject ? (
-                    <ProjectEditor
-                        title="Create project"
-                        onSubmit={handleSaveProject}
-                        onClose={handleCancelCreateProject}
-                        creating={loadingCreatedProject}
-                        projects={projects}
-                    />
-                ) : null}
-            </>
-        );
-    };
+            ) : null}
+        </>
+    );
+
+    const renderAddProjectButton = () => (
+        <Button
+            style={{marginTop: 8}}
+            color="primary"
+            variant="contained"
+            aria-label="Add"
+            title="Create a new project"
+            onClick={handleCreateProjectClick}
+        >
+            New
+        </Button>
+    );
 
     if (error) {
         return <MessageDisplay message="An error occurred while loading projects" />;
@@ -68,16 +79,7 @@ export const ProjectBrowser = ({
     return (
         <>
             {loading ? <LoadingInlay /> : renderProjectList()}
-            <Button
-                style={{marginTop: 8}}
-                color="primary"
-                variant="contained"
-                aria-label="Add"
-                title="Create a new project"
-                onClick={handleCreateProjectClick}
-            >
-                New
-            </Button>
+            {currentUser.admin ? renderAddProjectButton() : null }
         </>
     );
 };
