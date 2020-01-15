@@ -113,10 +113,12 @@ app.get('/api/v1/projects', (req, res) => res.send(allProjects).end());
 
 const projectsBeingCreated = new Set();
 
-app.use('/api/v1/projects', express.json());
+const json = express.json();
 
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
+    json(req, res, () => {});
+
     const project = req.body;
 
     if (!workspaces.includes(project.workspace)) {
