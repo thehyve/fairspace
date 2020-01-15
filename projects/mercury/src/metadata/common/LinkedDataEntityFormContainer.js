@@ -39,7 +39,6 @@ const LinkedDataEntityFormContainer = ({
         confirmationShown, hideConfirmation, executeNavigation
     } = useNavigationBlocker(hasFormUpdates && canEdit);
 
-
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
 
@@ -79,7 +78,7 @@ const LinkedDataEntityFormContainer = ({
                             id={formId}
                             editable={canEdit}
                             onSubmit={validateAndSubmit}
-                            error={linkedDataError}
+                            errorMessage={linkedDataError}
                             loading={linkedDataLoading}
                             properties={extendedProperties}
                             values={valuesWithUpdates}
