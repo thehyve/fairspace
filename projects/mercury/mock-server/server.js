@@ -33,16 +33,17 @@ const json = express.json();
 
 // Create a new project
 app.put('/api/v1/projects/', (req, res) => {
-    json(req, res, () => {});
-    const project = req.body;
+    json(req, res, () => {
+        const project = req.body;
 
-    // A project is created when it is accessed for the first time
-    fetch(`http://localhost:8080/api/v1/projects/${project.id}/collections/`,
-        {headers: {Accept: 'application/json'}})
-        .then(saturnsResponse => saturnsResponse.json())
-        .then(body => {
-            res.status(200).type('application/json').send(body);
-        });
+        // A project is created when it is accessed for the first time
+        fetch(`http://localhost:8080/api/v1/projects/${project.id}/collections/`,
+            {headers: {Accept: 'application/json'}})
+            .then(saturnsResponse => saturnsResponse.json())
+            .then(body => {
+                res.status(200).type('application/json').send(body);
+            });
+    });
 });
 
 app.listen(port);

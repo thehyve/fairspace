@@ -117,46 +117,46 @@ const json = express.json();
 
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
-    json(req, res, () => {});
-    const project = req.body;
-    console.log(`Creating project ${JSON.stringify(project)}`);
+    json(req, res, () => {
+        const project = req.body;
 
-    if (!workspaces.includes(project.workspace)) {
-        res.status(400).send('Unknown workspace URL');
-        return;
-    }
-    if (!project.id || !(/^[a-z][a-z_0-9]*$/i).test(project.id)) {
-        res.status(400).send('Invalid project id: ' + project.id);
-        return;
-    }
-    if (allProjects.find(p => p.id === project.id)) {
-        res.status(400).send('This project id is already taken: ' + project.id);
-        return;
-    }
-    if (projectsBeingCreated.has(project.id)) {
-        res.status(400).send('A project with this id is already being created: ' + project.id);
-        return;
-    }
+        if (!workspaces.includes(project.workspace)) {
+            res.status(400).send('Unknown workspace URL');
+            return;
+        }
+        if (!project.id || !(/^[a-z][a-z_0-9]*$/i).test(project.id)) {
+            res.status(400).send('Invalid project id: ' + project.id);
+            return;
+        }
+        if (allProjects.find(p => p.id === project.id)) {
+            res.status(400).send('This project id is already taken: ' + project.id);
+            return;
+        }
+        if (projectsBeingCreated.has(project.id)) {
+            res.status(400).send('A project with this id is already being created: ' + project.id);
+            return;
+        }
 
-    projectsBeingCreated.add(project.id);
+        projectsBeingCreated.add(project.id);
 
-    // TODO: Check user's permissions
+        // TODO: Check user's permissions
 
-    // A project is created when it is accessed for the first time
-    fetch(`${project.workspace}/api/v1/projects/${project.id}/collections/`,
-        {
-            headers: {
-                Accept: 'application/json',
-                Authorization: `Bearer ${accessToken.token}`
-            }
-        })
-        .then(workspaceResponse => {
-            if (workspaceResponse.ok) {
-                allProjects.push(project);
-            }
-            res.status(workspaceResponse.status).end();
-        })
-        .finally(() => projectsBeingCreated.delete(project.id));
+        // A project is created when it is accessed for the first time
+        fetch(`${project.workspace}/api/v1/projects/${project.id}/collections/`,
+            {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${accessToken.token}`
+                }
+            })
+            .then(workspaceResponse => {
+                if (workspaceResponse.ok) {
+                    allProjects.push(project);
+                }
+                res.status(workspaceResponse.status).end();
+            })
+            .finally(() => projectsBeingCreated.delete(project.id));
+    });
 });
 
 const addToken = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
