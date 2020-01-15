@@ -17,32 +17,11 @@ describe('ProjectsAPI', () => {
         const projectData: Project = {
             id: 'project1'
         };
-        const createProjectResponse = {
-            '@id': 'fs:theProject',
-            '@type': 'fs:Project',
-            "projectDescription": '',
-            "label": 'project1',
-            '@context': {
-                label: {
-                    '@id': 'http://www.w3.org/2000/01/rdf-schema#label'
-                },
-                projectDescription: {
-                    '@id': 'http://fairspace.io/ontology#projectDescription',
-                    '@type': 'http://fairspace.io/ontology#markdown'
-                },
-                vocabulary: 'http://localhost/vocabulary/',
-                sh: 'http://www.w3.org/ns/shacl#',
-                ws: 'http://localhost/iri/',
-                fs: 'http://fairspace.io/ontology#'
-            }
-        };
         const putResponse: AxiosResponse = {
-            data: createProjectResponse,
             headers: {'content-type': 'application/json'}
         };
         mockAxios.put.mockImplementationOnce(() => Promise.resolve(putResponse));
-        const response: any = await projectsAPI.createProject(projectData);
-        expect(response).toEqual(createProjectResponse);
+        await projectsAPI.createProject(projectData);
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
             '/api/v1/projects/',
