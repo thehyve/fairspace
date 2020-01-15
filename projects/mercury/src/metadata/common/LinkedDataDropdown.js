@@ -47,6 +47,7 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, 
         <Dropdown
             {...otherProps}
             async
+            loadOptionsOnMount={false}
             loadOptions={debouncedSearch}
             isOptionDisabled={option => valuesContainsValueOrId(currentValues, undefined, option.id)}
         />
