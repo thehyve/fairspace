@@ -115,7 +115,7 @@ const UserList = () => {
                                 </TableCell>
                                 {
                                     rolesToShow.map(role => (
-                                        <TableCell style={{width: 100}}>
+                                        <TableCell key={user.iri.concat(".", role)} style={{width: 100}}>
                                             <Checkbox
                                                 checked={checkRole(role)(user)}
                                                 disabled={!isCoordinator}
