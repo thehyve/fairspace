@@ -7,16 +7,17 @@ import {compareBy} from '../../../common';
 
 const Dropdown = ({
     options, clearTextOnSelection = true, placeholder, async,
-    loadOptions, isOptionDisabled, onChange, value, ...otherProps
+    loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value, ...otherProps
 }) => {
     const [optionsToShow, setOptionsToShow] = useState(async && options ? options : []);
     const [searchText, setSearchText] = useState('');
+    const [touched, setTouched] = useState(loadOptionsOnMount);
 
     const isMounted = useIsMounted();
 
     useEffect(() => {
         if (isMounted()) {
-            if (async && loadOptions) {
+            if (async && loadOptions && touched) {
                 loadOptions(searchText)
                     .then(setOptionsToShow);
             } else {
@@ -24,12 +25,13 @@ const Dropdown = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [async, searchText, options]);
+    }, [async, searchText, options, touched]);
 
     const inputProps = (params) => ({
         ...params.inputProps,
         value: searchText,
-        onChange: (e) => isMounted() && setSearchText(e.target.value)
+        onChange: (e) => isMounted() && setSearchText(e.target.value),
+        onClick: () => setTouched(true)
     });
 
     return (
