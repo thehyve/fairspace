@@ -148,11 +148,11 @@ app.put('/api/v1/projects', (req, res) => {
                 Authorization: `Bearer ${accessToken.token}`
             }
         })
-        .then(saturnsResponse => {
-            if (res.ok) {
+        .then(workspaceResponse => {
+            if (workspaceResponse.ok) {
                 allProjects.push(project);
             }
-            res.status(saturnsResponse.status).type(saturnsResponse.headers.get('content-type')).send(saturnsResponse.text()).end();
+            res.status(workspaceResponse.status).type('application/json').send(workspaceResponse.json()).end();
         })
         .finally(() => projectsBeingCreated.delete(project.id));
 });
