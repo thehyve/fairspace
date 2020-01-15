@@ -118,8 +118,8 @@ const json = express.json();
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
     json(req, res, () => {});
-
     const project = req.body;
+    console.log(`Creating project ${project}`);
 
     if (!workspaces.includes(project.workspace)) {
         res.status(400).send('Unknown workspace URL');
@@ -154,7 +154,7 @@ app.put('/api/v1/projects', (req, res) => {
             if (workspaceResponse.ok) {
                 allProjects.push(project);
             }
-            res.status(workspaceResponse.status).type('application/json').send(workspaceResponse.json()).end();
+            res.status(workspaceResponse.status).end();
         })
         .finally(() => projectsBeingCreated.delete(project.id));
 });

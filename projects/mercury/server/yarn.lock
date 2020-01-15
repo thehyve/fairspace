@@ -183,11 +183,6 @@ chromedriver@*:
     request "^2.88.0"
     tcp-port-used "^1.0.1"
 
-coexist-parser-proxy@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/coexist-parser-proxy/-/coexist-parser-proxy-1.0.4.tgz#80e2aacf35ee215a9ed6528ab0f5d1d7dcc0a7c3"
-  integrity sha512-naBAZ/KrnoYBCCAObRmRJmIbWleLBdxNwWZd2nyQY93sumpSowksOhwp7qE1ixQ0/Gj0YCnhvIATAAx+dEeqrw==
-
 combined-stream@^1.0.6, combined-stream@~1.0.6:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
