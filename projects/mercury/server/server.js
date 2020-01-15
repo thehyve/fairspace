@@ -119,7 +119,7 @@ const json = express.json();
 app.put('/api/v1/projects', (req, res) => {
     json(req, res, () => {});
     const project = req.body;
-    console.log(`Creating project ${project}`);
+    console.log(`Creating project ${JSON.stringify(project)}`);
 
     if (!workspaces.includes(project.workspace)) {
         res.status(400).send('Unknown workspace URL');
