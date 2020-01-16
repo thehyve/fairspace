@@ -13,6 +13,7 @@ import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
 import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
+import UsersPage from '../users/UsersPage';
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
@@ -21,6 +22,12 @@ const getSubject = () => (
 const ProjectRoutes = () => (
     <>
         <Route path="/projects/:project" exact component={ProjectOverview} />
+
+        <Route
+            path="/projects/:project/users"
+            exact
+            component={UsersPage}
+        />
 
         <Route
             path="/projects/:project/collections"

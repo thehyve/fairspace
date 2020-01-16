@@ -13,10 +13,4 @@ export default createMuiTheme({
             elevation: 1
         }
     },
-    overrides: {
-        // needed to avoid: https://github.com/mui-org/material-ui/issues/18082
-        MuiAutocomplete: {
-            popup: {zIndex: 1300},
-        },
-    },
 });

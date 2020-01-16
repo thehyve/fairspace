@@ -7,7 +7,6 @@ import useLinkedData from '../metadata/UseLinkedData';
 import {PROJECT_INFO_URI} from '../constants';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import LinkedDataContext from '../metadata/LinkedDataContext';
-import UserList from "../users/UserList";
 
 const ProjectInfoWithProvider = () => (
     <LinkedDataMetadataProvider>
@@ -55,7 +54,6 @@ const ProjectInfo = () => {
                     />
                 )}
             </Paper>
-            <UserList />
         </>
     );
 };
