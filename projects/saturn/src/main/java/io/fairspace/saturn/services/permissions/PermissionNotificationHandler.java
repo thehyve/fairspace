@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -16,7 +17,6 @@ import javax.mail.internet.InternetAddress;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.queryConstruct;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
@@ -26,7 +26,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 @AllArgsConstructor
 @Slf4j
 public class PermissionNotificationHandler implements PermissionChangeEventHandler {
-    private final Dataset dataset;
+    private final DatasetJobSupport dataset;
     private final UserService userService;
     private final MailService mailService;
     private final String publicUrl;
@@ -39,7 +39,7 @@ public class PermissionNotificationHandler implements PermissionChangeEventHandl
                         var msg = mailService.newMessage();
                         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
                         msg.setSubject("Your access permissions changed");
-                        msg.setText(calculateRead(dataset, () ->
+                        msg.setText(dataset.calculateRead(() ->
                             "Your access level for " +
                                     (isCollection(resource)
                                             ? "collection " + getLabel(resource) + " (" + getCollectionUrl(resource) + ")"

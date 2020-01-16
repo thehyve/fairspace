@@ -1,11 +1,12 @@
 package io.fairspace.saturn.rdf.dao;
 
 import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.users.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,14 +22,14 @@ import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
+import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.junit.Assert.*;
 
 public class DAOTest {
 
-    private Dataset dataset;
+    private DatasetJobSupport dataset;
     private DAO dao;
     private Entity entity;
     private EntityWithInheritedProperties entityWithInheritedProperties;
@@ -36,7 +37,7 @@ public class DAOTest {
 
     @Before
     public void before() {
-        dataset = createTxnMem();
+        dataset = new DatasetJobSupportInMemory();
         dao = new DAO(dataset);
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();

@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import org.apache.jena.query.Dataset;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(MockitoJUnitRunner.class)
 public class ServicesTest {
     @Mock
-    private Dataset dataset;
+    private DatasetJobSupport dataset;
     private Config config = new Config();
     private Services svc;
 

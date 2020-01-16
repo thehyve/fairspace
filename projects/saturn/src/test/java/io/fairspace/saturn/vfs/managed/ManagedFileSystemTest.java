@@ -1,6 +1,8 @@
 package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
@@ -43,13 +45,13 @@ public class ManagedFileSystemTest {
     @Mock
     private CollectionsService collections;
 
-    private Dataset ds;
+    private DatasetJobSupport ds;
     private ManagedFileSystem fs;
 
     @Before
     public void before()  {
         var store = new MemoryBlobStore();
-        ds = createTxnMem();
+        ds = new DatasetJobSupportInMemory();
 
         ds.getDefaultModel().add(
                 createResource("http://example.com/user"),

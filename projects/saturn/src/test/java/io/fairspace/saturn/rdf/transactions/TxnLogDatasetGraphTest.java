@@ -2,8 +2,6 @@ package io.fairspace.saturn.rdf.transactions;
 
 import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.users.User;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -18,7 +16,6 @@ import java.io.IOException;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.rdf.transactions.Transactions.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -31,7 +28,7 @@ public class TxnLogDatasetGraphTest {
 
     @Mock
     private TransactionLog log;
-    private Dataset ds;
+    private DatasetJobSupport ds;
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
@@ -42,13 +39,13 @@ public class TxnLogDatasetGraphTest {
         user.setName("fullName");
         user.setIri(generateMetadataIri("userId"));
         setThreadContext(new ThreadContext(user, "message"    , "system", "project"));
-        ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
+        ds = new DatasetJobSupportImpl(new DatasetGraphBatch(new TxnLogDatasetGraph(createTxnMem(), log)));
     }
 
 
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        calculateWrite("system", ds, () -> ds.getNamedModel("http://example.com/g1")
+        ds.calculateWrite("system", () -> ds.getNamedModel("http://example.com/g1")
                 .add(statement)
                 .remove(statement));
 
@@ -62,7 +59,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
-        executeWrite("system", ds, () -> {
+        ds.executeWrite("system", () -> {
             ds.getNamedModel("http://example.com/g1")
                     .add(statement)
                     .remove(statement);
@@ -79,7 +76,7 @@ public class TxnLogDatasetGraphTest {
 
     @Test
     public void shouldNotLogReadTransactions() throws IOException {
-        executeRead(ds, () -> ds.getNamedModel("http://example.com/g1").listStatements().toList());
+        ds.executeRead(() -> ds.getNamedModel("http://example.com/g1").listStatements().toList());
 
         verifyNoMoreInteractions(log);
     }
@@ -87,7 +84,7 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
-            calculateWrite("system", ds, () -> {
+            ds.executeWrite("system",  () -> {
                 ds.getNamedModel("http://example.com/g1")
                         .add(statement)
                         .remove(statement);
@@ -109,7 +106,6 @@ public class TxnLogDatasetGraphTest {
 
         doThrow(IOException.class).when(log).onCommit();
 
-        executeWrite(ds, () -> {
-        });
+        ds.executeWrite(() -> {});
     }
 }

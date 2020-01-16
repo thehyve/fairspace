@@ -1,7 +1,8 @@
 package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.ThreadContext;
-import org.apache.jena.query.Dataset;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,12 +11,12 @@ import java.util.Set;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
 
-    private Dataset ds = createTxnMem();
+    private DatasetJobSupport ds = new DatasetJobSupportInMemory();
 
     private UserService userService = new UserService(ds, null);
 

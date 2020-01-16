@@ -11,7 +11,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
@@ -19,24 +18,24 @@ import static org.junit.Assert.*;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchingTest {
     private static final Resource RESOURCE = createResource("http://example.com/1");
-    private Dataset ds = createTxnMem();
+    private DatasetJobSupport ds = new DatasetJobSupportInMemory();
 
 
     @Test
     public void tasksReturnResults() {
-        assertEquals("blah", Transactions.calculateWrite(ds, () -> "blah"));
+        assertEquals("blah", ds.calculateWrite(() -> "blah"));
     }
 
     @Test(expected = IOException.class)
     public void tasksThrowExceptions() throws IOException {
-        Transactions.calculateWrite(ds, () -> {
+        ds.calculateWrite(() -> {
             throw new IOException();
         });
     }
 
     @Test
     public void nestedCallsAreAllowed() throws Exception {
-        assertEquals("blah",  Transactions.calculateWrite(ds, () ->  Transactions.calculateWrite(ds, () ->  Transactions.calculateWrite(ds, () -> "blah"))));
+        assertEquals("blah",  ds.calculateWrite(() ->  ds.calculateWrite(() ->  ds.calculateRead(() -> "blah"))));
     }
 
     @Test
@@ -45,7 +44,7 @@ public class BatchingTest {
         batch(
                 () -> {
                     model.add(RESOURCE, RDFS.label, "success");
-                    Transactions.calculateWrite(ds, () -> model.add(RESOURCE, RDFS.label, "nested"));
+                    ds.calculateWrite(() -> model.add(RESOURCE, RDFS.label, "nested"));
                     return null;
                 },
                 () -> {
@@ -60,7 +59,7 @@ public class BatchingTest {
                 () -> model.add(RESOURCE, RDFS.label, "another success")
         );
 
-        executeRead(ds, () -> {
+        ds.executeRead(() -> {
             assertTrue(model.contains(RESOURCE, RDFS.label, "success"));
             assertTrue(model.contains(RESOURCE, RDFS.label, "nested"));
             assertFalse(model.contains(RESOURCE, RDFS.label, "failed"));
@@ -71,11 +70,11 @@ public class BatchingTest {
     }
 
     // executes actions in one batch
-    private void batch(ThrowingSupplier<?, ?>... actions) {
+    private void batch(ThrowingSupplier<?, ?>... jobs) {
         try {
             // First submit a long-running task to get other tasks batched
             var latch1 = new CountDownLatch(1);
-            Transactions.calculateWrite(ds, () -> {
+            ds.calculateWrite(() -> {
                 latch1.countDown();
                 Thread.sleep(500);
                 return null;
@@ -83,11 +82,11 @@ public class BatchingTest {
 
             latch1.await();
 
-            var latch2 = new CountDownLatch(actions.length);
-            for (var action : actions) {
+            var latch2 = new CountDownLatch(jobs.length);
+            for (var job : jobs) {
                 new Thread(() -> {
                     try {
-                        Transactions.calculateWrite(ds, action);
+                        ds.calculateWrite(job);
                     } catch (Exception ignore) {
                     } finally {
                         latch2.countDown();

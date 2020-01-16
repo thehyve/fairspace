@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
 import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -25,7 +26,6 @@ import java.util.concurrent.Callable;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -71,9 +71,9 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final Dataset dataset;
+    private final DatasetJobSupport dataset;
 
-    public DAO(Dataset dataset) {
+    public DAO(DatasetJobSupport dataset) {
         this.dataset = dataset;
     }
 
@@ -106,7 +106,7 @@ public class DAO {
                 entity.setIri(generateMetadataIri());
             }
 
-            executeWrite(dataset, () -> {
+            dataset.executeWrite(() -> {
                 var graph = dataset.getDefaultModel().getGraph();
 
                 graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
@@ -165,7 +165,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        executeWrite(dataset, () ->
+        dataset.executeWrite(() ->
                 dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
     }
 
@@ -207,7 +207,7 @@ public class DAO {
      * @return
      */
     public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
-        return safely(() -> {
+        return dataset.calculateRead(() -> safely(() -> {
             var model = queryConstruct(dataset, query);
             var entities = new ArrayList<T>();
             Iterable<Resource> subjects = model::listSubjects;
@@ -221,7 +221,7 @@ public class DAO {
             }
 
             return entities;
-        });
+        }));
     }
 
     private static <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {

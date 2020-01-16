@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
 import io.fairspace.saturn.rdf.search.ElasticSearchIndexConfigurer;
 import io.fairspace.saturn.rdf.search.SingleTripleTextDocProducer;
 import io.fairspace.saturn.rdf.search.TextIndexESBulk;
+import io.fairspace.saturn.rdf.transactions.DatasetGraphBatch;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
@@ -24,12 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
-import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
@@ -66,35 +63,29 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog);
 
-        // Create a dataset
-        var ds = DatasetFactory.wrap(dsg);
+        var dsgb = new DatasetGraphBatch(dsg);
 
-        TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
+        dsgb.calculateWrite(() -> {
+            // Create a dataset
+            var ds = DatasetFactory.wrap(dsgb);
 
-        // Preserve the contest through multiple transactions
-        var ctx = getThreadContext();
+            TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
-        if (!calculateRead(ds, () -> ds.getDefaultModel().contains(FS.theProject, null))) {
-            executeWrite("Workspace initialization", ds, () -> {
-                ds.getDefaultModel()
-                        .add(FS.theProject, RDF.type, FS.Project)
-                        .add(FS.theProject, RDFS.label, projectName)
-                        .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
-                ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
-            });
-        }
 
-        setThreadContext(ctx);
+            if (! ds.getDefaultModel().contains(FS.theProject, null)) {
+                    ds.getDefaultModel()
+                            .add(FS.theProject, RDF.type, FS.Project)
+                            .add(FS.theProject, RDFS.label, projectName)
+                            .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
+                    ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
+            }
 
-        initVocabularies(ds);
+            initVocabularies(ds);
 
-        setThreadContext(ctx);
+            return null;
+        });
 
-        if (ctx != null) {
-            ctx.setSystemCommitMessage(null);
-        }
-
-        return dsg;
+        return dsgb;
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {

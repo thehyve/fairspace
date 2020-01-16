@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
@@ -21,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -58,12 +59,12 @@ public class ChangeableMetadataServiceValidationTest {
 
     private static final Statement LBL_STMT1 = createStatement(resource1, RDFS.label, createStringLiteral("subject1"));
 
-    private Dataset ds;
+    private DatasetJobSupport ds;
     private ChangeableMetadataService api;
 
     @Before
     public void setUp() {
-        ds = createTxnMem();
+        ds = new DatasetJobSupportInMemory();
         api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator, event -> {});
     }
 
@@ -107,7 +108,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testSoftDeleteShouldSucceedOnValidationSuccess() {
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
+        ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1));
 
         api.softDelete(resource1);
 
@@ -123,7 +124,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1));
+        ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1));
 
         api.delete(modelOf(LBL_STMT1));
 
@@ -143,7 +144,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, createTypedLiteral(1));
 
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             api.put(toAdd);
             ds.abort();
         });
@@ -165,7 +166,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, resource2);
 
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             api.put(toAdd);
             ds.abort();
         });
@@ -203,7 +204,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, resource2);
 
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             api.put(toAdd);
             ds.abort();
         });
@@ -245,7 +246,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property2, resource2);
 
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             api.put(toAdd);
             ds.abort();
         });

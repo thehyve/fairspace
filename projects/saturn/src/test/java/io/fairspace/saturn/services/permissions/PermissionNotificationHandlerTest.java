@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -32,7 +34,7 @@ public class PermissionNotificationHandlerTest {
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node COLLECTION_1 = createURI("http://example.com/collection1");
 
-    private Dataset ds;
+    private DatasetJobSupport ds;
     private PermissionNotificationHandler permissionNotificationHandler;
 
     @Mock
@@ -55,7 +57,7 @@ public class PermissionNotificationHandlerTest {
         }});
         when(mailService.newMessage()).thenReturn(message);
 
-        ds = DatasetFactory.create();
+        ds = new DatasetJobSupportInMemory();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDF.type, FS.Collection);
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDFS.label, "COLLECTION");

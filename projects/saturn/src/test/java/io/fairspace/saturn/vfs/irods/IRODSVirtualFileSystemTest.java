@@ -1,5 +1,7 @@
 package io.fairspace.saturn.vfs.irods;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.rdf.transactions.TransactionLog;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
@@ -69,7 +71,7 @@ public class IRODSVirtualFileSystemTest {
 
     private IRODSVirtualFileSystem vfs;
 
-    private final Dataset ds = DatasetFactory.createTxnMem();
+    private final DatasetJobSupport ds = new DatasetJobSupportInMemory();
 
 
     @Before
