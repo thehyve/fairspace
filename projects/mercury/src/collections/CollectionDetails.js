@@ -29,18 +29,18 @@ class CollectionDetails extends React.Component {
             this.setState({editing: true});
             this.handleMenuClose();
         }
-    }
+    };
 
     handleDelete = () => {
         if (this.props.collection.canManage) {
             this.setState({deleting: true});
             this.handleMenuClose();
         }
-    }
+    };
 
     handleCloseDelete = () => {
         this.setState({deleting: false});
-    }
+    };
 
     handleMenuClick = event => {
         this.setState({anchorEl: event.currentTarget});
@@ -53,7 +53,7 @@ class CollectionDetails extends React.Component {
     handleSave = (name, description, location, connectionString) => {
         this.props.onUpdateCollection(name, description, location, connectionString);
         this.setState({editing: false});
-    }
+    };
 
     render() {
         const {loading, collection} = this.props;
@@ -136,7 +136,9 @@ class CollectionDetails extends React.Component {
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={`Delete ${collection.name}`}
+                        content={`Delete collection ${collection.name}`}
+                        dangerous={true}
+                        agreeButtonText={'Delete'}
                         onAgree={() => this.props.onCollectionDelete(this.props.collection)}
                         onDisagree={this.handleCloseDelete}
                         onClose={this.handleCloseDelete}

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import ConfirmationDialog from './ConfirmationDialog';
 
-const ConfirmationButton = ({children, message, disabled, onClick}) => {
+const ConfirmationButton = ({children, message, disabled, onClick, ...otherProps}) => {
     const [isDialogOpen, showDialog] = useState(false);
 
     const agree = () => {
@@ -18,7 +18,7 @@ const ConfirmationButton = ({children, message, disabled, onClick}) => {
             content={message}
             onAgree={agree}
             onDisagree={() => showDialog(false)}
-            onClose={() => showDialog(false)}
+            {...otherProps}
         />
     ) : null;
 

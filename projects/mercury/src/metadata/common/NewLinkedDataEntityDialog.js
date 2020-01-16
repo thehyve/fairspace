@@ -144,13 +144,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={handleCloseDialog}
-                        color="secondary"
-                        disabled={isUpdating}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
                         data-testid="submit-button"
                         type="submit"
                         onClick={createEntity}
@@ -161,6 +154,13 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     >
                         {`Create ${typeLabel}`}
                         {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
+                    </Button>
+                    <Button
+                        onClick={handleCloseDialog}
+                        color="default"
+                        disabled={isUpdating}
+                    >
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

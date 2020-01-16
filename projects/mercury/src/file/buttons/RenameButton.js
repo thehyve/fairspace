@@ -59,18 +59,18 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={closeDialog}
-                    color="secondary"
-                >
-                    Close
-                </Button>
-                <Button
                     data-testid="rename-button"
                     onClick={handleRename}
                     color="primary"
                     disabled={!name || name === currentName}
                 >
                     Rename
+                </Button>
+                <Button
+                    onClick={closeDialog}
+                    color="default"
+                >
+                    Cancel
                 </Button>
             </DialogActions>
         </Dialog>
