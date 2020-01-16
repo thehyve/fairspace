@@ -3,6 +3,7 @@ package io.fairspace.saturn;
 import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.Request;
 
@@ -22,6 +23,7 @@ import static java.util.stream.Collectors.joining;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
+@Slf4j
 public class SaturnContextHandler extends ConstraintSecurityHandler {
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
     public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
@@ -63,10 +65,17 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                     return;
                 }
 
+                log.debug("Authenticated as {} {}", userInfo.getName(), userInfo.getIri());
+
                 var user = userService.trySetCurrentUser(userInfo);
 
-                if (user == null || user.getRoles().isEmpty()) {
+                if (user == null) {
                     sendError("You have no access to this project", response);
+                    return;
+                }
+
+                if (user.getRoles().isEmpty()) {
+                    sendError("Your access to this project has been revoked", response);
                     return;
                 }
 

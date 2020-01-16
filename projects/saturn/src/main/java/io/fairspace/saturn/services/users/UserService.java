@@ -100,6 +100,8 @@ public class UserService {
     }
 
     public User addUser(User user) {
+        log.debug("Adding user {} {} with roles {}", user.getName(), user.getIri(), user.getRoles());
+
         return calculateWrite("Add a user " + user.getIri(), dao.getDataset(), () -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
             validate(user.getIri() != null, "Please provide a valid IRI.");
