@@ -1,11 +1,20 @@
 import {extractJsonData, handleHttpError} from "../httpUtils";
+import ErrorDialog from "../../components/ErrorDialog";
 
 describe('Http Utils', () => {
     describe('handleHttpError', () => {
-        it('Should redirect to the login page on 401 and throw exception', () => {
+        it('Should show an error on 401', () => {
             window.location.assign = jest.fn();
-            expect(() => handleHttpError("Default error")({response: {status: 401}})).toThrow();
-            expect(window.location.assign).toHaveBeenCalledWith('/login?redirectUrl=http://localhost/');
+            ErrorDialog.showError = jest.fn();
+            handleHttpError("Default error")({response: {status: 401}});
+            expect(ErrorDialog.showError).toHaveBeenCalledWith(null, "Your session has expired. Please log in again.", null, expect.anything());
+        });
+
+        it('Should show an error on 403', () => {
+            window.location.assign = jest.fn();
+            ErrorDialog.showError = jest.fn();
+            handleHttpError("Default error")({response: {status: 403}});
+            expect(ErrorDialog.showError).toHaveBeenCalledWith(null, "You have no access to this project. Ask the project coordinator to grant you access.", null, expect.anything());
         });
 
         it('Should throw an exception with the backend error on responses other than 401', () => {
