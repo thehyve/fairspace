@@ -18,7 +18,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
-import static java.util.EnumSet.allOf;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
@@ -39,7 +38,7 @@ public class UserService {
 
     public User trySetCurrentUser(User user) {
         if (user.isAdmin()) {
-            user.getRoles().addAll(allOf(Role.class));
+            user.getRoles().add(Role.Coordinator);
             return user;
         }
 
