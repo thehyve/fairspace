@@ -6,7 +6,6 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
@@ -100,6 +99,8 @@ public class UserService {
     }
 
     public User addUser(User user) {
+        log.debug("Adding user {} {} with roles {}", user.getName(), user.getIri(), user.getRoles());
+
         return dao.getDataset().calculateWrite("Add a user " + user.getIri(), () -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
             validate(user.getIri() != null, "Please provide a valid IRI.");
