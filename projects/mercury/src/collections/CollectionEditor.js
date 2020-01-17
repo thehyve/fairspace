@@ -137,8 +137,8 @@ class CollectionEditor extends React.Component {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleCancel} aria-label="Cancel" color="secondary">Cancel</Button>
                     <Button onClick={this.handleSave} disabled={!this.isInputValid()} aria-label="Save" color="primary">Save</Button>
+                    <Button onClick={this.handleCancel} aria-label="Cancel" color="inherit">Cancel</Button>
                 </DialogActions>
             </Dialog>
         );

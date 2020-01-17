@@ -51,8 +51,8 @@ const CreateDirectoryButton = ({children, disabled, onCreate}) => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={closeDialog} color="secondary">Close</Button>
                     <Button onClick={createDirectory} color="primary" disabled={!name}>Create</Button>
+                    <Button onClick={closeDialog} color="default">Cancel</Button>
                 </DialogActions>
             </Dialog>
         </>

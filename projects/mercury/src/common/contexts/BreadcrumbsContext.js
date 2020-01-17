@@ -4,7 +4,7 @@ import {projectPrefix} from "../../projects/projects";
 
 const BreadcrumbsContext = React.createContext({
     segments: [{
-        label: 'Project Overview',
+        label: 'Project overview',
         href: projectPrefix(),
         icon: 'home'
     }]

@@ -134,6 +134,7 @@ export class AlterPermissionDialog extends React.Component {
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
+                autoFocus={true}
             />
         );
     };
@@ -177,18 +178,18 @@ export class AlterPermissionDialog extends React.Component {
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={this.handleClose}
-                        color="secondary"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
                         onClick={this.handleSubmit}
                         color="primary"
                         disabled={Boolean(!selectedUser || loading || error)}
                         data-testid="submit"
                     >
-                        Submit
+                        Save
+                    </Button>
+                    <Button
+                        onClick={this.handleClose}
+                        color="default"
+                    >
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>
