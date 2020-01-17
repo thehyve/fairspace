@@ -38,11 +38,12 @@ public class UserService {
 
     public User trySetCurrentUser(User user) {
         var userWithRoles = dao.read(User.class, user.getIri());
-        if (userWithRoles == null) {
-            userWithRoles = user;
-        }
 
         if (user.isAdmin()) {
+            if (userWithRoles == null) {
+                userWithRoles = user;
+            }
+
             userWithRoles.setAdmin(true);
             userWithRoles.getRoles().add(Role.Coordinator);
         }
