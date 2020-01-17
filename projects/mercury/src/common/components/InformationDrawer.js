@@ -72,7 +72,7 @@ export class InformationDrawer extends React.Component {
                 })
                 .catch(err => {
                     const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                    ErrorDialog.showError(err, message, () => {}, false);
+                    ErrorDialog.showError(err, message);
                 })
                 .finally(() => setBusy(false));
         }
