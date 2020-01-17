@@ -7,14 +7,14 @@ const confirmationDialog = ({
     content = '',
     agreeButtonText = 'Submit',
     disagreeButtonText = 'Cancel',
+    dangerous = false,
     open = false,
-    onClose = () => {},
     onAgree = () => {},
-    onDisagree = () => {}
+    onDisagree = () => {},
 }) => (
     <Dialog
         open={open}
-        onClose={onClose}
+        onClose={onDisagree}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
@@ -28,17 +28,17 @@ const confirmationDialog = ({
         </DialogContent>
         <DialogActions>
             <Button
-                onClick={onDisagree}
-                color="primary"
-            >
-                {disagreeButtonText}
-            </Button>
-            <Button
                 onClick={onAgree}
-                color="primary"
-                autoFocus
+                color={dangerous ? 'secondary' : 'primary'}
+                autoFocus={!dangerous}
             >
                 {agreeButtonText}
+            </Button>
+            <Button
+                onClick={onDisagree}
+                color="default"
+            >
+                {disagreeButtonText}
             </Button>
         </DialogActions>
     </Dialog>

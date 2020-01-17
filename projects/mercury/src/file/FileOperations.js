@@ -165,6 +165,8 @@ export const FileOperations = ({
                 <ProgressButton active={activeOperation === Operations.DELETE}>
                     <ConfirmationButton
                         message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
+                        agreeButtonText={'Remove'}
+                        dangerous={true}
                         onClick={handleDelete}
                         disabled={noPathSelected || isWritingDisabled || busy}
                     >

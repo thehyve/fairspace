@@ -7,7 +7,8 @@ import useLinkedData from '../metadata/UseLinkedData';
 import {PROJECT_INFO_URI} from '../constants';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import LinkedDataContext from '../metadata/LinkedDataContext';
-import UserList from "../users/UserList";
+import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
 
 const ProjectInfoWithProvider = () => (
     <LinkedDataMetadataProvider>
@@ -40,9 +41,10 @@ const ProjectInfo = () => {
                             />
                         </Grid>
                         <Grid item xs={1}>
-                            <Button onClick={() => setEditingEnabled(prev => !prev)}>
-                                {editingEnabled ? 'Cancel' : 'Edit'}
-                            </Button>
+                            {editingEnabled ?
+                                <Button onClick={() => setEditingEnabled(false)}>Cancel</Button> :
+                                <IconButton aria-label="Edit" onClick={() => setEditingEnabled(true)}><Icon>edit</Icon></IconButton>
+                            }
                         </Grid>
                     </Grid>
                 ) : (
@@ -55,7 +57,6 @@ const ProjectInfo = () => {
                     />
                 )}
             </Paper>
-            <UserList />
         </>
     );
 };

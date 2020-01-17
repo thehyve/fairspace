@@ -7,7 +7,8 @@ import {compareBy} from '../../../common';
 
 const Dropdown = ({
     options, clearTextOnSelection = true, placeholder, async,
-    loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value, ...otherProps
+    loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value,
+    autoFocus = false, ...otherProps
 }) => {
     const [optionsToShow, setOptionsToShow] = useState(async && options ? options : []);
     const [searchText, setSearchText] = useState('');
@@ -49,6 +50,7 @@ const Dropdown = ({
             getOptionLabel={option => option.label}
             renderInput={(params) => (
                 <TextField
+                    autoFocus={autoFocus}
                     fullWidth
                     {...params}
                     inputProps={clearTextOnSelection ? inputProps(params) : params.inputProps}

@@ -5,6 +5,23 @@ import {compareBy, comparing, LoadingInlay, MessageDisplay} from '../../common';
 
 import LinkedDataProperty from "./LinkedDataProperty";
 import {hasValue, shouldPropertyBeHidden} from "../../common/utils/linkeddata/metadataUtils";
+import {LABEL_URI} from '../../constants';
+
+type PropertyType = {
+    key: string;
+}
+function labelFirst(x: PropertyType, y: PropertyType): number {
+    if (x.key === y.key) {
+        return 0;
+    }
+    if (x.key === LABEL_URI) {
+        return -1;
+    }
+    if (y.key === LABEL_URI) {
+        return 1;
+    }
+    return 0;
+}
 
 export const LinkedDataEntityForm = ({
     id,
@@ -50,6 +67,7 @@ export const LinkedDataEntityForm = ({
 
                         // Properties are sorted based on the sh:order property, or by its label otherwise
                         .sort(comparing(
+                            labelFirst,
                             compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
                             compareBy('label')
                         ))

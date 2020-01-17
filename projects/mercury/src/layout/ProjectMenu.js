@@ -80,6 +80,17 @@ const ProjectMenu = ({location: {pathname}}) => (
                 </ListItemIcon>
                 <ListItemText primary="Vocabulary" />
             </ListItem>
+            <ListItem
+                component={NavLink}
+                to={projectPrefix() + "/users"}
+                button
+                selected={pathname.startsWith(projectPrefix() + '/users')}
+            >
+                <ListItemIcon>
+                    <Icon>group</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Users" />
+            </ListItem>
         </List>
         <Divider />
         <List>
