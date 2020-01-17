@@ -20,7 +20,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState();
     // Properties have to be undefined here not to display "No metadata found" error
-    const [properties, setProperties] = useState();
+    const [properties, setProperties] = useState(null);
     const [values, setValues] = useState({});
     const [typeInfo, setTypeInfo] = useState({});
 
@@ -43,6 +43,8 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
                             setProperties(getProperties(shapes, propertyShapes));
                             setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
                         }
+                    } else {
+                        setProperties([]);
                     }
                 })
                 .catch(setError)
@@ -61,7 +63,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
 
     let err = shapesError || (error && `Unable to load metadata for ${subject}`) || '';
 
-    if (!err && !linkedDataLoading && properties !== undefined && properties.length === 0) {
+    if (!err && !linkedDataLoading && properties !== null && properties.length === 0) {
         err = 'No metadata found for this subject';
     }
 

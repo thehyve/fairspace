@@ -29,7 +29,7 @@ describe('useLinkedData', () => {
     it('should handle missing linkedData', async () => {
         const {result} = renderHook(() => useLinkedDataNoContext('my-subject', defaultContext));
 
-        expect(result.current.properties).toEqual([]);
+        expect(result.current.properties).toEqual(null);
         expect(result.current.values).toEqual({});
         expect(result.current.typeInfo).toEqual({});
     });
@@ -50,8 +50,12 @@ describe('useLinkedData', () => {
 
     describe('error state', () => {
         it('should show some message for no metadata', async () => {
-            const {result} = renderHook(() => useLinkedDataNoContext('my-subject', defaultContext));
-
+            const context = {
+                fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([])),
+                shapes: [{aShapeKey: 'aValue'}]
+            };
+            const {result, waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('my-subject', context));
+            await waitForNextUpdate();
             expect(result.current.linkedDataError).toMatch(/no metadata found/i);
         });
 
