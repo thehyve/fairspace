@@ -45,9 +45,9 @@ public class UserServiceTest {
     }
 
     @Test
-    public void adminHasAllRoles() {
+    public void adminHasCoordinatorsRole() {
         assertNotNull(userService.trySetCurrentUser(admin));
-        assertEquals(EnumSet.allOf(Role.class), admin.getRoles());
+        assertEquals(EnumSet.of(Role.Coordinator), admin.getRoles());
     }
 
     @Test
