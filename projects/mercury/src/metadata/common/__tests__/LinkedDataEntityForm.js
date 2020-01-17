@@ -86,7 +86,7 @@ describe('LinkedDataEntityForm', () => {
             properties={defaultMetadata}
             values={defaultValues}
             subject={collection.iri}
-            error="Testing error"
+            errorMessage="Testing error"
         />);
 
         const errorMessage = wrapper.find(MessageDisplay);

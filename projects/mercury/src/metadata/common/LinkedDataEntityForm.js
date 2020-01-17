@@ -12,19 +12,19 @@ export const LinkedDataEntityForm = ({
     properties = [],
     values = {},
     validationErrors = {},
-    error = false,
+    errorMessage = '',
     loading = false,
     onChange = () => {},
     onAdd = () => {},
     onDelete = () => {},
     editable = true,
 }) => {
-    if (error) {
-        return <MessageDisplay message={error} />;
-    }
-
     if (loading) {
         return <LoadingInlay />;
+    }
+
+    if (errorMessage !== '') {
+        return <MessageDisplay message={errorMessage} />;
     }
 
     const primaryType = values['@type'] && values['@type'][0] && values['@type'][0].id;
@@ -81,7 +81,7 @@ LinkedDataEntityForm.propTypes = {
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
 
-    error: PropTypes.string,
+    errorMessage: PropTypes.string,
 
     loading: PropTypes.bool,
     properties: PropTypes.array,

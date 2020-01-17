@@ -48,7 +48,7 @@ const ProjectInfo = () => {
                 ) : (
                     <LinkedDataEntityForm
                         editable={false}
-                        error={linkedDataError}
+                        errorMessage={linkedDataError}
                         loading={linkedDataLoading}
                         properties={properties}
                         values={values}
