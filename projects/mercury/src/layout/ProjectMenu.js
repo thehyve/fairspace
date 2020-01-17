@@ -83,6 +83,17 @@ const ProjectMenu = ({location: {pathname}}) => (
                     <ListItemText primary="Vocabulary" />
                 </ListItem>
             </AuthorizationCheck>
+            <ListItem
+                component={NavLink}
+                to={projectPrefix() + "/users"}
+                button
+                selected={pathname.startsWith(projectPrefix() + '/users')}
+            >
+                <ListItemIcon>
+                    <Icon>group</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Users" />
+            </ListItem>
         </List>
         <AuthorizationCheck requiredAuthorization="CanRead" transformError={() => null}>
             <Divider />

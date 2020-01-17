@@ -129,6 +129,8 @@ const UserList = () => {
                                         onClick={() => removeUser(user).then(refresh)}
                                         disabled={!isCoordinator}
                                         message="Are you sure you want to remove this user from the project?"
+                                        agreeButtonText={'Remove user'}
+                                        dangerous={true}
                                     >
                                         <IconButton>
                                             <Delete />
@@ -168,22 +170,20 @@ const UserList = () => {
                     )
                     : ''
             }
-            <Dialog open={showAddUserDialog}>
+            <Dialog
+                open={showAddUserDialog}
+                onClose={() => {setShowAddUserDialog(false)}}
+            >
                 <DialogTitle id="scroll-dialog-title">Add user to the project</DialogTitle>
                 <DialogContent>
                     <UserSelect
+                        autoFocus
                         filter={user => user.roles.length === 0}
                         onChange={setUserToAdd}
                         placeholder="Please select a user"
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={() => setShowAddUserDialog(false)}
-                        color="secondary"
-                    >
-                        Cancel
-                    </Button>
                     <Button
                         onClick={() => {
                             setShowAddUserDialog(false);
@@ -192,7 +192,13 @@ const UserList = () => {
                         color="primary"
                         disabled={!userToAdd}
                     >
-                        Submit
+                        Add
+                    </Button>
+                    <Button
+                        onClick={() => setShowAddUserDialog(false)}
+                        color="default"
+                    >
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

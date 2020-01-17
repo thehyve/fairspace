@@ -51,9 +51,6 @@ export default ({onSubmit, onClose, submitDisabled, fields}) => (
             </form>
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose} aria-label="Cancel" color="secondary">
-                    Cancel
-            </Button>
             <Button
                 type="submit"
                 form="formId"
@@ -63,6 +60,9 @@ export default ({onSubmit, onClose, submitDisabled, fields}) => (
                 variant="contained"
             >
                     Save
+            </Button>
+            <Button onClick={onClose} aria-label="Cancel" color="default">
+                Cancel
             </Button>
         </DialogActions>
     </Dialog>

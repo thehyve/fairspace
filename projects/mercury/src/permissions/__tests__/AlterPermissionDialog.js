@@ -79,9 +79,9 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Manage');
 
         // render cancel and submit buttons
-        expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Cancel');
-        expect(wrapper.find(Button).at(1).childAt(0).text()).toEqual('Submit');
-        expect(wrapper.find(Button).at(1).prop('disabled')).toBeTruthy();
+        expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');
+        expect(wrapper.find(Button).at(1).childAt(0).text()).toEqual('Cancel');
+        expect(wrapper.find(Button).at(0).prop('disabled')).toBeTruthy();
     });
 
     it('should not render user selector and render selected user name instead when user is provided', () => {
