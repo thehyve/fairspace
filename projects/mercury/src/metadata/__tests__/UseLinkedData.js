@@ -29,7 +29,7 @@ describe('useLinkedData', () => {
     it('should handle missing linkedData', async () => {
         const {result} = renderHook(() => useLinkedDataNoContext('my-subject', defaultContext));
 
-        expect(result.current.properties).toEqual(null);
+        expect(result.current.properties).toEqual([]);
         expect(result.current.values).toEqual({});
         expect(result.current.typeInfo).toEqual({});
     });
