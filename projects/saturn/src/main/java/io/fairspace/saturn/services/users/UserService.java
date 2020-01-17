@@ -37,12 +37,17 @@ public class UserService {
     }
 
     public User trySetCurrentUser(User user) {
-        if (user.isAdmin()) {
-            user.getRoles().add(Role.Coordinator);
-            return user;
+        var userWithRoles = dao.read(User.class, user.getIri());
+        if (userWithRoles == null) {
+            userWithRoles = user;
         }
 
-        return dao.read(User.class, user.getIri());
+        if (user.isAdmin()) {
+            userWithRoles.setAdmin(true);
+            userWithRoles.getRoles().add(Role.Coordinator);
+        }
+
+        return userWithRoles;
     }
 
     public Set<User> getUsers() {
@@ -75,7 +80,8 @@ public class UserService {
 
         var response = request.send();
         if (response.getStatus() == SC_OK) {
-            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {});
+            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {
+            });
             log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
             return keycloakUsers
                     .stream()
