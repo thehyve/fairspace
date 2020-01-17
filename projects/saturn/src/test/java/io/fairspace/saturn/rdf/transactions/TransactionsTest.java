@@ -1,40 +1,45 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.DatasetGraphMulti;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.JenaTransactionException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
 
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeRead;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.util.UUID.randomUUID;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
-import static org.apache.jena.tdb2.TDB2Factory.connectDataset;
 
 public class TransactionsTest {
-    private static File dsDir;
-    private static Dataset ds;
+    private DatasetJobSupport ds;
+    private Config.Jena config = new Config.Jena();
 
+    @Before
+    public void before() {
+        config.elasticSearch.enabled = false;
+        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
-    @BeforeClass
-    public static void before() {
-        dsDir = new File(getTempDirectory(), randomUUID().toString());
-        ds = connectDataset(dsDir.getAbsolutePath());
+        setThreadContext(new ThreadContext());
+        getThreadContext().setProject("ds");
+
+        ds = new DatasetJobSupportImpl(new DatasetGraphMulti(config));
     }
 
-    @AfterClass
-    public static void after() throws IOException {
+    @After
+    public void after() throws IOException {
         ds.close();
-        deleteDirectory(dsDir);
+        deleteDirectory(config.datasetPath);
         ds = null;
     }
 
@@ -47,6 +52,8 @@ public class TransactionsTest {
     public void onlyOneWriteTransactionAtATime() throws InterruptedException {
         ds.begin(WRITE);
         var anotherThread = new Thread(() -> {
+            setThreadContext(new ThreadContext());
+            getThreadContext().setProject("ds");
             ds.begin(WRITE);
             ds.commit();
         });
@@ -77,12 +84,12 @@ public class TransactionsTest {
 
     @Test(expected = JenaTransactionException.class)
     public void readToWritePromotionIsNotPossible() {
-        executeRead(ds, () -> executeWrite(ds, () -> {}));
+        ds.executeRead(() -> ds.executeWrite(() -> {}));
     }
 
     @Test
     public void writeToReadDemotionIsPossible() {
-        executeWrite(ds, () -> executeRead(ds, () -> {}));
+        ds.executeWrite(() -> ds.executeRead(() -> {}));
     }
 
 }

@@ -3,9 +3,9 @@ package io.fairspace.saturn.services.users;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
@@ -17,7 +17,6 @@ import java.util.Set;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.EnumSet.allOf;
 import static java.util.stream.Collectors.toList;
@@ -33,7 +32,7 @@ public class UserService {
     private final DAO dao;
     private final String usersUrl;
 
-    public UserService(Dataset dataset, String usersUrl) {
+    public UserService(DatasetJobSupport dataset, String usersUrl) {
         this.dao = new DAO(dataset);
         this.usersUrl = usersUrl;
     }
@@ -102,7 +101,7 @@ public class UserService {
     public User addUser(User user) {
         log.debug("Adding user {} {} with roles {}", user.getName(), user.getIri(), user.getRoles());
 
-        return calculateWrite("Add a user " + user.getIri(), dao.getDataset(), () -> {
+        return dao.getDataset().calculateWrite("Add a user " + user.getIri(), () -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
             validate(user.getIri() != null, "Please provide a valid IRI.");
 

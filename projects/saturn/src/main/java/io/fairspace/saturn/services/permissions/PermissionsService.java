@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.PermissionEvent;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -20,8 +21,6 @@ import java.util.*;
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.rdf.transactions.Transactions.calculateRead;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
@@ -33,7 +32,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 public class PermissionsService {
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
-    private final Dataset dataset;
+    private final DatasetJobSupport dataset;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final UserService userService;
     private final EventService eventService;
@@ -59,7 +58,7 @@ public class PermissionsService {
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = getThreadContext().getUser().getIri();
 
-        executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), dataset, () -> {
+        dataset.executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), () -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
@@ -109,7 +108,7 @@ public class PermissionsService {
     }
 
     Map<Node, Access> getPermissions(Node resource) {
-        return calculateRead(dataset, () -> {
+        return dataset.calculateRead(() -> {
             var authority = getAuthority(resource);
             ensureAccess(authority, Access.Read);
 
@@ -131,12 +130,12 @@ public class PermissionsService {
     }
 
     boolean isWriteRestricted(Node resource) {
-        return calculateRead(dataset, () ->
+        return dataset.calculateRead(() ->
                 dataset.getNamedModel(PERMISSIONS_GRAPH).createResource(resource.getURI()).hasLiteral(FS.writeRestricted, true));
     }
 
     void setWriteRestricted(Node resource, boolean restricted) {
-        executeWrite(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), dataset, () -> {
+        dataset.executeWrite(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), () -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {
@@ -181,7 +180,7 @@ public class PermissionsService {
      * @return
      */
     public Map<Node, Access> getPermissions(Collection<Node> nodes) {
-        return calculateRead(dataset, () -> {
+        return dataset.calculateRead(() -> {
             var authorities = getAuthorities(nodes);
             var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());
             var result = new HashMap<Node, Access>();

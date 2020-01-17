@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vfs.irods;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
@@ -44,13 +44,13 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
     public static final String TYPE = "irods";
     public static final String FAIRSPACE_IRI_ATTRIBUTE = "FairspaceIRI";
     private final IRODSFileSystem fs;
-    private final Dataset dataset;
+    private final DatasetJobSupport dataset;
 
-    public IRODSVirtualFileSystem(Dataset dataset, CollectionsService collections) throws JargonException {
+    public IRODSVirtualFileSystem(DatasetJobSupport dataset, CollectionsService collections) throws JargonException {
         this(dataset, collections, IRODSFileSystem.instance());
     }
 
-    IRODSVirtualFileSystem(Dataset dataset, CollectionsService collections, IRODSFileSystem fs) {
+    IRODSVirtualFileSystem(DatasetJobSupport dataset, CollectionsService collections, IRODSFileSystem fs) {
         super(collections);
 
         this.fs = fs;
@@ -142,7 +142,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        executeWrite("Generate an IRI for an external resource", dataset, () ->
+        dataset.executeWrite("Generate an IRI for an external resource", () ->
                 update(dataset, storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }

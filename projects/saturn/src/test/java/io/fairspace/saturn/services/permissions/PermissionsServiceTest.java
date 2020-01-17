@@ -1,6 +1,8 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
@@ -44,7 +46,7 @@ public class PermissionsServiceTest {
     private static final Node FILE_1 = createURI("http://example.com/file1");
     private static final Node FILE_2 = createURI("http://example.com/file2");
 
-    private Dataset ds;
+    private DatasetJobSupport ds;
     private PermissionsService service;
 
     @Mock
@@ -62,7 +64,7 @@ public class PermissionsServiceTest {
 
     @Before
     public void setUp() {
-        ds = DatasetFactory.create();
+        ds = new DatasetJobSupportInMemory();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
         ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.manage, createResource(USER1.getURI()));
         ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.write, createResource(USER2.getURI()));

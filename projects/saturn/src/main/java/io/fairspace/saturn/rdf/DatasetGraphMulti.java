@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.ElasticSearchClientFactory;
+import io.fairspace.saturn.rdf.transactions.DatasetGraphWrapperJobSupport;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphWrapper;
 import org.apache.jena.sparql.util.Context;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 
-public class DatasetGraphMulti extends DatasetGraphWrapper {
+public class DatasetGraphMulti extends DatasetGraphWrapperJobSupport {
     private final LoadingCache<String, DatasetGraph> cache;
     private final Client client;
 

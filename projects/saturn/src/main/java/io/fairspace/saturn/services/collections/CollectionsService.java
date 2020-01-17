@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.events.CollectionEvent;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -15,8 +16,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
-import static io.fairspace.saturn.rdf.transactions.Transactions.calculateWrite;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Comparator.comparing;
@@ -32,7 +31,7 @@ public class CollectionsService {
     private final PermissionsService permissions;
     private final EventService eventService;
 
-    public CollectionsService(Dataset dataset, Consumer<Object> eventListener, UserService userService, PermissionsService permissions, EventService eventService) {
+    public CollectionsService(DatasetJobSupport dataset, Consumer<Object> eventListener, UserService userService, PermissionsService permissions, EventService eventService) {
         this.dao = new DAO(dataset);
         this.eventListener = eventListener;
         this.permissions = permissions;
@@ -50,7 +49,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        Collection storedCollection = calculateWrite("Create collection " + collection.getName(), dao.getDataset(), () -> {
+        var storedCollection = dao.getDataset().calculateWrite("Create collection " + collection.getName(), () -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -114,7 +113,7 @@ public class CollectionsService {
 
     public void delete(String iri) {
         validateIRI(iri);
-        executeWrite("Delete collection " + iri, dao.getDataset(), () -> {
+        dao.getDataset().executeWrite("Delete collection " + iri, () -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -144,7 +143,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return calculateWrite("Update collection " + patch.getName(), dao.getDataset(), () -> {
+        return dao.getDataset().calculateWrite("Update collection " + patch.getName(), () -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());

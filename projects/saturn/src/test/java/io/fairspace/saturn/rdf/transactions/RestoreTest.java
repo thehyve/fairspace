@@ -1,6 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.DatasetGraphMulti;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -12,7 +14,9 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static io.fairspace.saturn.rdf.transactions.Transactions.*;
+import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
@@ -35,6 +39,9 @@ public class RestoreTest {
         config.elasticSearch.enabled = false;
         config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
         config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+
+        setThreadContext(new ThreadContext());
+        getThreadContext().setProject("ds");
     }
 
     @After
@@ -47,8 +54,8 @@ public class RestoreTest {
     public void restoreWorksAsExpected() throws IOException {
         var ds1 = newDataset();
 
-        executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt1));
-        executeWrite(ds1, () -> ds1.getDefaultModel().add(stmt2));
+        ds1.executeWrite(() -> ds1.getDefaultModel().add(stmt1));
+        ds1.executeWrite(() -> ds1.getDefaultModel().add(stmt2));
 
         ds1.close();
 
@@ -58,7 +65,7 @@ public class RestoreTest {
         var ds2 = newDataset();
 
         try {
-            executeRead(ds2, () -> {
+            ds2.executeRead(() -> {
                 assertTrue(ds2.getDefaultModel().contains(stmt1));
                 assertTrue(ds2.getDefaultModel().contains(stmt2));
             });
@@ -70,11 +77,11 @@ public class RestoreTest {
     @Test
     public void restoreListsWorksAsExpected() throws IOException {
         var ds1 = newDataset();
-        executeWrite(ds1, () -> ds1.getDefaultModel()
+        ds1.executeWrite(() -> ds1.getDefaultModel()
                 .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), ds1.getDefaultModel().createList(createTypedLiteral(1), createTypedLiteral(2)))
                 .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), ds1.getDefaultModel().createList(createTypedLiteral("a"), createTypedLiteral("b"))));
 
-        var before  = calculateRead(ds1, () -> ds1.getDefaultModel().listStatements().toSet());
+        var before  = ds1.calculateRead(() -> ds1.getDefaultModel().listStatements().toSet());
 
         ds1.close();
 
@@ -83,13 +90,13 @@ public class RestoreTest {
         var ds2 = newDataset();
 
         try {
-            executeRead(ds2, () -> assertEquals(before, ds2.getDefaultModel().listStatements().toSet()));
+            ds2.executeRead(() -> assertEquals(before, ds2.getDefaultModel().listStatements().toSet()));
         } finally {
             ds2.close();
         }
     }
 
-    private Dataset newDataset() throws IOException {
-        return DatasetFactory.wrap(SaturnDatasetFactory.connect(config, "ds", null));
+    private DatasetJobSupport newDataset() {
+        return new DatasetJobSupportImpl(new DatasetGraphMulti(config));
     }
 }

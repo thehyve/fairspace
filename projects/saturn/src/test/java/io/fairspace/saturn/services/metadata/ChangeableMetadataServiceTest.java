@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -18,7 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
@@ -41,7 +42,7 @@ public class ChangeableMetadataServiceTest {
     private static final Statement STMT2 = createStatement(S2, P1, S3);
 
 
-    private Dataset ds = createTxnMem();
+    private DatasetJobSupport ds = new DatasetJobSupportInMemory();
     private ChangeableMetadataService api;
 
     @Mock
@@ -75,7 +76,7 @@ public class ChangeableMetadataServiceTest {
         // Prepopulate the model
         final Statement EXISTING1 = createStatement(S1, P1, S3);
         final Statement EXISTING2 = createStatement(S2, P2, createPlainLiteral("test"));
-        executeWrite(ds, () -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
+        ds.executeWrite(() -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
 
         // Put new statements
         var delta = modelOf(STMT1, STMT2);
@@ -92,7 +93,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void deleteModel() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        ds.executeWrite(() -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
         api.delete(modelOf(STMT1));
 
@@ -102,7 +103,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void patch() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        ds.executeWrite(() -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
         Statement newStmt1 = createStatement(S1, P1, S3);
         Statement newStmt2 = createStatement(S2, P1, S1);
@@ -118,7 +119,7 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void patchWithNil() {
-        executeWrite(ds, () -> ds.getDefaultModel().add(S1, P1, S2).add(S1, P1, S3));
+        ds.executeWrite(() -> ds.getDefaultModel().add(S1, P1, S2).add(S1, P1, S3));
 
 
         api.patch(createDefaultModel().add(S1, P1, NIL));

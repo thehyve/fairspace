@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.system.Txn;
 
 import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.system.Txn.calculateRead;
 
 @AllArgsConstructor
 public

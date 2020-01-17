@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -15,14 +17,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ReadableMetadataServiceTest {
     private static final String userVocabularyURI = "http://localhost/iri/user-vocabulary";
     private static final String GRAPH = "http://localhost/iri/graph";
@@ -38,12 +38,11 @@ public class ReadableMetadataServiceTest {
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
     private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
-    private Dataset ds;
+    private DatasetJobSupport ds = new DatasetJobSupportInMemory();
     private ReadableMetadataService api;
 
     @Before
     public void setUp() {
-        ds = createTxnMem();
         api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI));
     }
 
@@ -51,7 +50,7 @@ public class ReadableMetadataServiceTest {
     public void get() {
         assertEquals(0, api.get(null, null, null, false).size());
 
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
+        ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         Model m1 = api.get(null, null, null, false);
         assertEquals(2, m1.size());
@@ -79,7 +78,7 @@ public class ReadableMetadataServiceTest {
     public void getWithImportantPropertiesReturnsFullModel() {
         assertEquals(0, api.get(null, null, null, true).size());
 
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             ds.getNamedModel(GRAPH)
                     .add(STMT1).add(STMT2)
                     .add(LBL_STMT1).add(LBL_STMT2);
@@ -97,7 +96,7 @@ public class ReadableMetadataServiceTest {
 
     @Test
     public void getWithImportantPropertiesWorksWithoutImportantProperties() {
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             ds.getNamedModel(GRAPH)
                     .add(STMT1).add(STMT2)
                     .add(LBL_STMT1).add(LBL_STMT2);
@@ -118,7 +117,7 @@ public class ReadableMetadataServiceTest {
         Statement dateCreated = createStatement(S3, FS.dateCreated, createStringLiteral("yesterday"));
         Statement md5 = createStatement(S3, FS.md5, createStringLiteral("some-hash"));
 
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             setupImportantProperties();
             ds.getNamedModel(GRAPH)
                     .add(STMT1).add(STMT2)
@@ -217,7 +216,7 @@ public class ReadableMetadataServiceTest {
     @Test(expected = TooManyTriplesException.class)
     public void testTripleLimit() {
         api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI), 1);
-        executeWrite(ds, () -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
+        ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
         api.get(null, null, null, false);
     }
@@ -242,7 +241,7 @@ public class ReadableMetadataServiceTest {
         Resource userShape = createProperty("http://fairspace.io/ontology#UserShape");
 
         // Setup the model
-        executeWrite(ds, () -> {
+        ds.executeWrite(() -> {
             ds.getNamedModel(GRAPH)
                     .add(S1, RDF.type, personConsentEx)
                     .add(LBL_STMT1)

@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.events.EventService;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -43,7 +44,7 @@ public class CollectionsServiceTest {
     public void before() {
         setThreadContext(new ThreadContext(user, null, null, null));
         when(user.getIri()).thenReturn(userIri);
-        collections = new CollectionsService(createTxnMem(), eventListener, users, permissions, eventService);
+        collections = new CollectionsService(new DatasetJobSupportInMemory(), eventListener, users, permissions, eventService);
     }
 
     @Test

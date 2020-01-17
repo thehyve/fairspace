@@ -1,5 +1,6 @@
 package io.fairspace.saturn.vocabulary;
 
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -7,7 +8,6 @@ import org.apache.jena.util.FileManager;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
-import static io.fairspace.saturn.rdf.transactions.Transactions.executeWrite;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
@@ -20,7 +20,6 @@ public class Vocabularies {
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
     public static void initVocabularies(Dataset ds) {
-        executeWrite("Initializing the vocabularies", ds, () -> {
             ds.replaceNamedModel(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
 
             var oldSystemVocabulary = ds.getNamedModel(SYSTEM_VOCABULARY_GRAPH_BACKUP);
@@ -37,6 +36,5 @@ public class Vocabularies {
                 ds.replaceNamedModel(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
                 ds.replaceNamedModel(SYSTEM_VOCABULARY_GRAPH_BACKUP, SYSTEM_VOCABULARY);
             }
-        });
     }
 }

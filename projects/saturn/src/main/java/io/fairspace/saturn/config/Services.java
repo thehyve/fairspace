@@ -5,6 +5,7 @@ import io.fairspace.saturn.events.EventCategory;
 import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.events.MetadataEvent;
 import io.fairspace.saturn.events.RabbitMQEventService;
+import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
@@ -39,7 +40,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 @Getter
 public class Services {
     private final Config config;
-    private final Dataset dataset;
+    private final DatasetJobSupport dataset;
 
     private final EventBus eventBus = new EventBus();
     private final ProjectsService projectsService;
@@ -55,7 +56,7 @@ public class Services {
     private final VirtualFileSystem fileSystem;
 
 
-    public Services(@NonNull Config config, @NonNull Dataset dataset) throws Exception {
+    public Services(@NonNull Config config, @NonNull DatasetJobSupport dataset) throws Exception {
         this.config = config;
         this.dataset = dataset;
 
