@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {currentProject} from "../projects/projects";
+import {createMetadataIri} from "../common/utils/linkeddata/metadataUtils";
 
 export type User = {
     iri: string;
@@ -26,6 +27,7 @@ export const getUser = () => {
         .catch(handleHttpError("Failure when retrieving user's information"))
         .then(extractJsonData)
         .then(keycloakUser => ({
+            iri: createMetadataIri(keycloakUser.id),
             name: keycloakUser.fullName,
             email: keycloakUser.email,
             admin: keycloakUser.authorizations.includes('organisation-admin'),
