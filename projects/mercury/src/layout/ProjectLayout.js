@@ -16,7 +16,6 @@ const ProjectLayout = () => {
             <VocabularyProvider>
                 <CollectionsProvider>
                     <Layout
-                        requiredAuthorization="CanRead"
                         renderMenu={() => <ProjectMenu />}
                         renderMain={() => (
                             <UsersProvider>

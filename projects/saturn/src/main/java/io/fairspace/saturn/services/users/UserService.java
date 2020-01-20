@@ -18,7 +18,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
-import static java.util.EnumSet.allOf;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
@@ -38,12 +37,18 @@ public class UserService {
     }
 
     public User trySetCurrentUser(User user) {
+        var userWithRoles = dao.read(User.class, user.getIri());
+
         if (user.isAdmin()) {
-            user.getRoles().addAll(allOf(Role.class));
-            return user;
+            if (userWithRoles == null) {
+                userWithRoles = user;
+            }
+
+            userWithRoles.setAdmin(true);
+            userWithRoles.getRoles().add(Role.Coordinator);
         }
 
-        return dao.read(User.class, user.getIri());
+        return userWithRoles;
     }
 
     public Set<User> getUsers() {
@@ -76,7 +81,8 @@ public class UserService {
 
         var response = request.send();
         if (response.getStatus() == SC_OK) {
-            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {});
+            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {
+            });
             log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
             return keycloakUsers
                     .stream()
