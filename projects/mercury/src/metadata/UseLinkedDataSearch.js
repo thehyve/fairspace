@@ -1,4 +1,5 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useState} from 'react';
+import useDeepCompareEffect from "../common/hooks/UseDeepCompareEffect";
 
 import LinkedDataContext from './LinkedDataContext';
 
@@ -10,7 +11,7 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         // Only execute search if there are any availableTypes to query on,
         // i.e. when the shapes have been loaded
         if (availableTypes.length === 0 || shapesLoading) {
@@ -38,7 +39,7 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
             })
             .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-    }, [query, shapesLoading, size, page, availableTypes, searchLinkedData, selectedTypes]);
+    }, [query, shapesLoading, size, page, searchLinkedData, selectedTypes, availableTypes]);
 
     return {
         searchPending: loading,
