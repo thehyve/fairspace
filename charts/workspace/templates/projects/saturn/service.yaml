@@ -1,19 +1,23 @@
+{{- $global := . }}
+{{- range .Values.saturn.names }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "saturn.fullname" . }}
+  name: {{ $global.Release.Name }}-saturn-{{.}}
   labels:
     app: saturn
-    chart: {{ template "workspace.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+    release: {{ $global.Release.Name }}
+    heritage: {{ $global.Release.Service }}
 spec:
-  type: {{ .Values.saturn.service.type }}
+  type: {{ $global.Values.saturn.service.type }}
   ports:
-    - port: {{ .Values.saturn.service.externalPort }}
-      targetPort: {{ .Values.saturn.service.internalPort }}
+    - port: {{ $global.Values.saturn.service.externalPort }}
+      targetPort: {{ $global.Values.saturn.service.internalPort }}
       protocol: TCP
       name: http
   selector:
     app: saturn
-    release: {{ .Release.Name }}
+    release: {{ $global.Release.Name }}
+{{- end}}

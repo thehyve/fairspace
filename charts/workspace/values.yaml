@@ -122,6 +122,10 @@ services:
 # Specific settings for Saturn subchart
 #####################################################################
 saturn:
+  names:
+    - one
+    - two
+    - three
   replicaCount: 1
   rollingUpdate:
     maxSurge: 0%
@@ -170,8 +174,6 @@ saturn:
   ## Persist data to a persistent volume
   persistence:
     database:
-      enabled: true
-
       ## A manually managed Persistent Volume and Claim
       ## Requires persistence.enabled: true
       ## If defined, PVC must be created manually before volume will be bound
@@ -189,8 +191,6 @@ saturn:
       size: 50Gi
       mountPath: /data
     files:
-      enabled: true
-
       ## A manually managed Persistent Volume and Claim
       ## Requires persistence.enabled: true
       ## If defined, PVC must be created manually before volume will be bound

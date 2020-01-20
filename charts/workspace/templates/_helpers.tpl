@@ -109,9 +109,6 @@ Scheme to access workspace components (http or https)
 {{ template "workspace.scheme" . }}://{{ template "docs.hostname" . }}
 {{- end -}}
 
-{{- define "saturn.fullname" -}}
-{{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
-{{- end -}}
 {{- define "mercury.fullname" -}}
 {{- .Values.mercury.nameOverride | default (printf "%s-mercury" .Release.Name) -}}
 {{- end -}}
