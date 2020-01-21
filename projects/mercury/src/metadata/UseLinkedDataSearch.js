@@ -37,7 +37,7 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
             })
             .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-    }, [query, shapesLoading, size, page, targetClassesInCatalog, searchLinkedData, selectedTypes, availableTypes.length]);
+    }, [query, shapesLoading, size, page, targetClassesInCatalog, searchLinkedData, selectedTypes]);
 
     return {
         searchPending: loading,
