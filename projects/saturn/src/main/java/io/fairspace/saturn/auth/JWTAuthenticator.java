@@ -41,7 +41,7 @@ public class JWTAuthenticator implements Function<HttpServletRequest, User>  {
         try {
             var claims = JWTParser.parse(token).getJWTClaimsSet();
             var user = new User();
-            user.setIri(generateMetadataIri(claims.getStringClaim("subject")));
+            user.setIri(generateMetadataIri(claims.getStringClaim("sub")));
             user.setName(claims.getStringClaim("name"));
             user.setEmail(claims.getStringClaim("email"));
             user.setAdmin(claims.getStringListClaim("authorities").contains(adminRole));

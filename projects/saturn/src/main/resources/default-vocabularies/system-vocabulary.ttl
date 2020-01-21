@@ -255,7 +255,8 @@ fs:labelShape a fs:DatatypePropertyShape ;
     dash:singleLine true ;
     fs:fixedShape true ;
     fs:importantProperty true ;
-    sh:path rdfs:label . 
+    sh:path rdfs:label;
+    sh:order 0.
  
 fs:commentShape a fs:DatatypePropertyShape ;
     sh:name "Description" ;

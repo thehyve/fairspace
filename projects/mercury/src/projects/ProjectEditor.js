@@ -5,7 +5,7 @@ import {useAsync} from "../common/hooks";
 import WorkspacesAPI from "./WorkspacesAPI";
 import {LoadingOverlay} from "../common/components";
 
-const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 
 export default ({onSubmit, onClose, creating, projects, getWorkspaces = WorkspacesAPI.getWorkspaces,
     project: {id = '', workspace = ''} = {}}) => {
