@@ -115,6 +115,8 @@ const projectsBeingCreated = new Set();
 
 const json = express.json();
 
+const PROJECT_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
+
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
     json(req, res, () => {
@@ -124,7 +126,7 @@ app.put('/api/v1/projects', (req, res) => {
             res.status(400).send('Unknown workspace URL');
             return;
         }
-        if (!project.id || !(/^[a-z][a-z_0-9]*$/i).test(project.id)) {
+        if (!project.id || !(PROJECT_ID_PATTERN).test(project.id)) {
             res.status(400).send('Invalid project id: ' + project.id);
             return;
         }
