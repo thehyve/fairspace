@@ -1,9 +1,8 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import {Link as RouterLink} from 'react-router-dom';
-import {Breadcrumbs, Icon, Link, withStyles} from '@material-ui/core';
+import {Breadcrumbs, Icon, Link, Typography, withStyles} from '@material-ui/core';
 import BreadcrumbsContext from "../contexts/BreadcrumbsContext";
-import Typography from '@material-ui/core/Typography';
 
 /**
  * Renders a list of breadcrumbs
@@ -21,24 +20,25 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
     return (
         <Breadcrumbs aria-label="Breadcrumbs" className={classes.root}>
             {allSegments.map(({label, icon, href}, idx) => (
-                    <Typography
-                        key={href}
-                        className={classes.link}
-                        color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}
-                    >
-                        {icon ? <Icon className={classes.icon}>{icon}</Icon> : undefined}
-                        {idx === allSegments.length - 1 ?
-                            label :
+                <Typography
+                    key={href}
+                    className={classes.link}
+                    color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}
+                >
+                    { icon ? <Icon className={classes.icon}>{icon}</Icon> : undefined }
+                    { idx === allSegments.length - 1
+                        ? label
+                        : (
                             <Link
                                 component={RouterLink}
                                 className={classes.link}
-                                color={'inherit'}
+                                color="inherit"
                                 to={href}
                             >
                                 {label}
                             </Link>
-                        }
-                    </Typography>
+                        ) }
+                </Typography>
             ))}
         </Breadcrumbs>
     );

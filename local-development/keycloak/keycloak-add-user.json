@@ -1,0 +1,89 @@
+[ {
+  "realm" : "fairspace",
+  "users" : [ {
+    "username" : "organisation-admin",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "t8bblTme2yyu5bFA5Qqp88+7usvDYrPDh0tEsnZCz91KKvGDJEIJncKMOgX/Mivfbh58+8S1z7ElpeEc7HMacQ==",
+      "salt" : "KU8BscCubkHEYPOn22JmKA==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ],
+    "realmRoles" : [ "organisation-admin" ]
+  }, {
+    "username" : "datasteward",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "t8bblTme2yyu5bFA5Qqp88+7usvDYrPDh0tEsnZCz91KKvGDJEIJncKMOgX/Mivfbh58+8S1z7ElpeEc7HMacQ==",
+      "salt" : "KU8BscCubkHEYPOn22JmKA==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ]
+  }, {
+    "username" : "coordinator",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "EwhN/09yZ4LDkXtQQN/o3CAKgYuMg2/1V6+eM3UN34Z4mirqYuFcG3gv7J0NBRXNQppWsRbiuel/7roRFrYn1A==",
+      "salt" : "knVkWfbSl1S0eX4g6EpW1A==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ]
+  }, {
+    "username" : "coordinator2",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "ZS+QXwW6IGUz4yRozBbzgRpQTkAxBRKP9qpdIMnPi3DezjFSTX1P/IXCPTLtc0GYzWU6hbl8JA8x2MYyW9PzhQ==",
+      "salt" : "k+vzGc9X5zfVN5uvsAFgHw==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ]
+  }, {
+    "username" : "user",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "SEsidzlXSJ2kNzyfePmOBikIWp8l+isHgkPpQi0V/50DxaffSZw/MoVXBUoLH+Cl2wypdTMbzmSv1pHp42Kuig==",
+      "salt" : "62iHKU0CRl5iD1xv5xzPJw==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ]
+  }, {
+    "username" : "user2",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "77ZMmTVT5GnxDuanovvqCHfiGSu+wfjZRz6J19oSHSWWD3G7l0BKUKHyUn1tlVSGdqNNq/euqpzsqpcDOyRoZQ==",
+      "salt" : "idhZxv/6LbvEaGoHxmrbPQ==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ]
+  }, {
+    "username" : "user3",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "YBVppEVRoXqux/CspAXOs+2WzsoktO7zs7nOZKGw53ERriFvJooRz7tt0MI4avL//TDCzwfJ+Mgh4m1JVo/EsA==",
+      "salt" : "vuoNifbptaxRB7OgqNFEPA==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ]
+  } ]
+}, {
+  "realm" : "master",
+  "users" : [ {
+    "username" : "keycloak",
+    "enabled" : true,
+    "credentials" : [ {
+      "type" : "password",
+      "hashedSaltedValue" : "4cNHFLkJ8xpgpafMz/sG69Mnp3kxKh1Gdj1E3odHMIKsIdTyhBf5b4ZYStGgFmzC1lvus43Z/szg1mSOimSBdQ==",
+      "salt" : "5RLac6G8YsS8adkasKCtoA==",
+      "hashIterations" : 100000,
+      "algorithm" : "pbkdf2-sha256"
+    } ],
+    "realmRoles" : [ "admin" ]
+  } ]
+} ]

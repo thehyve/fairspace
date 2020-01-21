@@ -134,7 +134,7 @@ export class AlterPermissionDialog extends React.Component {
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
-                autoFocus={true}
+                autoFocus
             />
         );
     };
