@@ -1,5 +1,4 @@
 import React, {useCallback, useContext} from 'react';
-import {UserContext} from '../common';
 // Utils
 import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
 // Other
@@ -10,10 +9,11 @@ import VocabularyContext from './VocabularyContext';
 import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
 import {MetadataAPI} from './LinkedDataAPI';
 import {isCoordinator} from '../common/utils/userUtils';
+import ProjectUserContext from '../common/contexts/ProjectUserContext';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
-    const {currentUser} = useContext(UserContext);
+    const {projectUser} = useContext(ProjectUserContext);
 
     const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, includeObjectProperties: true})
         .catch(() => {
@@ -59,7 +59,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
 
                 // Fixed properties
                 hasEditRight: true,
-                isCoordinator: isCoordinator(currentUser.roles),
+                isCoordinator: isCoordinator(projectUser.roles),
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,

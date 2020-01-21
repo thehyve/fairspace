@@ -27,8 +27,8 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
         <ProgressButton active={isDeleting}>
             <ConfirmationButton
                 message="Are you sure you want to delete this resource?"
-                agreeButtonText={'Delete'}
-                dangerous={true}
+                agreeButtonText="Delete"
+                dangerous
                 onClick={handleDelete}
                 disabled={!canDelete}
             >

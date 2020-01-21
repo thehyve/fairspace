@@ -84,6 +84,8 @@
     "import/prefer-default-export": 0,
     "prefer-template": 0,
     "react/state-in-constructor": 0,
-    "react/jsx-props-no-spreading": 0
+    "react/jsx-props-no-spreading": 0,
+    "jest/no-test-callback": 0,
+    "jest/no-try-expect": 0
   }
 }

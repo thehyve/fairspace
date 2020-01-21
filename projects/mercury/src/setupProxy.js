@@ -1,17 +1,13 @@
 const proxy = require('http-proxy-middleware');
 
-const MOCKED_SERVER_URL = 'http://localhost:5000/';
 const SEARCH_URL = 'http://localhost:9200/';
-const BACKEND_URL = 'http://localhost:8080/';
+const BACKEND_URL = 'http://localhost:8081/';
 
 // '/api/v1/projects/project/collections/' -> ['', 'api', 'v1', 'projects', 'project', 'collections', '']
 const getProjectId = (url) => url.split('/')[4];
 
 module.exports = (app) => {
-    app.use(proxy('/config', {target: MOCKED_SERVER_URL}));
-    // app.use(proxy('/api/v1/account', {target: MOCKED_SERVER_URL}));
-    // app.use(proxy('/api/v1/*/users', {target: MOCKED_SERVER_URL}));
-    // app.use(proxy('/api/keycloak/users', {target: MOCKED_SERVER_URL}));
+    app.get('/config/config.json', (req, res) => res.send({}));
 
     // to talk to a real ES instance on localhost
     app.use(proxy('/api/v1/search', {
@@ -23,17 +19,7 @@ module.exports = (app) => {
         target: BACKEND_URL
     }));
 
-    app.use(proxy(['/api/v1/workspaces', '/api/v1/account'], {
-        target: MOCKED_SERVER_URL
-    }));
-
     app.use(proxy('/api/v1', {
-        target: BACKEND_URL,
-        router: req => {
-            if (req.method === 'PUT' && req.originalUrl === '/api/v1/projects/') {
-                return MOCKED_SERVER_URL;
-            }
-            return BACKEND_URL;
-        },
+        target: BACKEND_URL
     }));
 };
