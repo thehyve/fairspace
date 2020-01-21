@@ -80,7 +80,7 @@ const UserList = () => {
     const {isCoordinator} = useContext(LinkedDataContext);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
-    const refresh = (user) => {
+    const refresh = (user) => () => {
         if (user.iri === currentUser.iri) {
             refreshUser();
         }
