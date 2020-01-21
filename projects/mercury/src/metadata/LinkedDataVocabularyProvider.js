@@ -1,5 +1,4 @@
 import React, {useCallback, useContext, useEffect} from 'react';
-import {UserContext} from '../common';
 // Utils
 import {isCoordinator, isDataSteward} from "../common/utils/userUtils";
 import {
@@ -16,6 +15,7 @@ import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
 import useMetaVocabulary from './UseMetaVocabulary';
+import ProjectUserContext from '../common/contexts/ProjectUserContext';
 
 const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps}) => {
     const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = useMetaVocabulary();
@@ -28,7 +28,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
         vocabulary, fetchVocabulary, submitVocabularyChanges, createVocabularyEntity, deleteVocabularyEntity
     } = useContext(VocabularyContext);
 
-    const {currentUser} = useContext(UserContext);
+    const {projectUser} = useContext(ProjectUserContext);
 
     const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type);
 
@@ -68,8 +68,8 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 // Fixed properties
                 namespaces,
                 requireIdentifier: false,
-                hasEditRight: isDataSteward(currentUser.roles),
-                isCoordinator: isCoordinator(currentUser.roles),
+                hasEditRight: isDataSteward(projectUser.roles),
+                isCoordinator: isCoordinator(projectUser.roles),
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,

@@ -3,9 +3,10 @@
   "version": "0.0.0-RELEASEVERSION",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"yarn server:mock\" \"yarn start\" \"yarn test\" \"yarn server\" \"yarn elasticsearch\"",
-    "server:mock": "node mock-server/server.js",
-    "server": "wait-on http://localhost:9200/ && cd ../saturn/ && ./gradlew run",
+    "dev": "yarn build && concurrently \"yarn keycloak\" \"yarn server\" \"yarn saturn\" \"yarn elasticsearch\"",
+    "keycloak": "cd ../../local-development && docker-compose up",
+    "server": "wait-on http://localhost:8080/api/v1/health/ && cd server/ && node server.js",
+    "saturn": "wait-on http://localhost:9200/ && cd ../saturn/ && ./gradlew run",
     "elasticsearch": "./start-elasticsearch",
     "start": "react-scripts start",
     "build": "react-scripts build && cd server && npm install",

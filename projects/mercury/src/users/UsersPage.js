@@ -11,8 +11,8 @@ const UsersPage = () => {
     return (
         <LinkedDataMetadataProvider>
             <UsersBreadcrumbsContextProvider>
-                <BreadCrumbs/>
-                <UserList/>
+                <BreadCrumbs />
+                <UserList />
             </UsersBreadcrumbsContextProvider>
         </LinkedDataMetadataProvider>
     );

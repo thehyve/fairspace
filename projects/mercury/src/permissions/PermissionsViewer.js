@@ -146,8 +146,8 @@ const PermissionsViewer = ({
                 open
                 title="Confirmation"
                 content={content}
-                dangerous={true}
-                agreeButtonText={'Remove'}
+                dangerous
+                agreeButtonText="Remove"
                 onAgree={handleDeleteCollaborator}
                 onDisagree={handleCloseConfirmDeleteDialog}
                 onClose={handleCloseConfirmDeleteDialog}

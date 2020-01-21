@@ -1,5 +1,5 @@
 // @flow
-import mockAxios, {AxiosResponse} from 'axios';
+import mockAxios, {AxiosError, AxiosResponse} from 'axios';
 import projectsAPI, {Project} from '../ProjectsAPI';
 
 describe('ProjectsAPI', () => {
@@ -26,11 +26,11 @@ describe('ProjectsAPI', () => {
         expect(mockAxios.put).toHaveBeenCalledWith(
             '/api/v1/projects/',
             JSON.stringify(projectData),
-            {headers: {'Content-Type': 'application/json'}}
+            {headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}}
         );
     });
 
-    it('Failure to create a project is handled correctly', async () => {
+    it('Failure to create a project is handled correctly', async (done) => {
         const projectData: Project = {
             id: 'project1'
         };
@@ -38,12 +38,14 @@ describe('ProjectsAPI', () => {
             status: 409,
             headers: {'content-type': 'application/json'}
         };
-        mockAxios.put.mockImplementationOnce(() => Promise.reject({response: conflictResponse}));
+        const errorResponse: AxiosError = {response: conflictResponse};
+        mockAxios.put.mockImplementationOnce(() => Promise.reject(errorResponse));
         try {
             await projectsAPI.createProject(projectData);
-            fail();
+            done.fail('API call expected to fail');
         } catch (error) {
             expect(error.message).toEqual('Failure while creating a project');
+            done();
         }
     });
 });

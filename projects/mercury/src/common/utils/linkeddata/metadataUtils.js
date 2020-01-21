@@ -1,9 +1,9 @@
 import _, {mapValues} from 'lodash';
-import {isNonEmptyValue} from "../..";
 
 import * as consts from "../../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import {determineShapeForTypes} from './vocabularyUtils';
+import {isNonEmptyValue} from '../genericUtils';
 
 /**
  * Returns the local part of the given uri

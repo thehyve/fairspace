@@ -11,7 +11,7 @@ const ProjectTopBar = ({project, location, history}) => {
     };
 
     return (
-        <TopBar name={project}>
+        <TopBar title={project}>
             <SearchBar query={searchQuery} onSearchChange={handleSearch} />
         </TopBar>
     );

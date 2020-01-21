@@ -50,7 +50,6 @@ confirmationDialog.propTypes = {
     content: PropTypes.string,
     agreeButtonText: PropTypes.string,
     disagreeButtonText: PropTypes.string,
-    onClose: PropTypes.func,
     onAgree: PropTypes.func,
     onDisagree: PropTypes.func,
 };

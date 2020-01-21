@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import LoadingInlay from "./LoadingInlay";
-import UserContext from "../contexts/UserContext";
+import ProjectUserContext from '../contexts/ProjectUserContext';
 
 /**
  * This component performs an authorization check for the current user
@@ -18,6 +18,10 @@ export const AuthorizationCheck = props => {
      */
     function hasAuthorization() {
         const {authorizations, requiredAuthorization} = props;
+
+        if (!requiredAuthorization) {
+            return true;
+        }
 
         if (Array.isArray(authorizations)) {
             // If no authorization is given as property, the only check is for a status 200 response
@@ -82,12 +86,12 @@ AuthorizationCheck.propTypes = {
 };
 
 const ContextualAuthorizationCheck = props => {
-    const {currentUser = {}, currentUserLoading = false, currentUserError = false} = useContext(UserContext);
+    const {projectUser = {}, projectUserLoading = false, projectUserError = false} = useContext(ProjectUserContext);
     return (
         <AuthorizationCheck
-            authorizations={currentUser.roles}
-            pending={currentUserLoading}
-            error={currentUserError}
+            authorizations={projectUser.roles}
+            pending={projectUserLoading}
+            error={projectUserError}
             {...props}
         />
     );

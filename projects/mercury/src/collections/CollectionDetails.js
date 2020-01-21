@@ -137,8 +137,8 @@ class CollectionDetails extends React.Component {
                         open
                         title="Confirmation"
                         content={`Delete collection ${collection.name}`}
-                        dangerous={true}
-                        agreeButtonText={'Delete'}
+                        dangerous
+                        agreeButtonText="Delete"
                         onAgree={() => this.props.onCollectionDelete(this.props.collection)}
                         onDisagree={this.handleCloseDelete}
                         onClose={this.handleCloseDelete}
