@@ -126,10 +126,6 @@ saturn:
     - one
     - two
     - three
-  replicaCount: 1
-  rollingUpdate:
-    maxSurge: 0%
-    maxUnavailable: 100%
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION
@@ -137,11 +133,6 @@ saturn:
   initContainer:
     image: alpine:3.9
     pullPolicy: IfNotPresent
-  service:
-    name: saturn
-    type: ClusterIP
-    externalPort: 80
-    internalPort: 8080
 
   resources:
     limits:
@@ -150,8 +141,6 @@ saturn:
     requests:
       cpu: 200m
       memory: 512Mi
-
-  probePath: /api/v1/health/
   livenessProbe:
     initialDelaySeconds: 20
     periodSeconds: 10
@@ -187,9 +176,7 @@ saturn:
       ##   GKE, AWS & OpenStack)
       ##
       # storageClass: "-"
-      accessMode: ReadWriteOnce
       size: 50Gi
-      mountPath: /data
     files:
       ## A manually managed Persistent Volume and Claim
       ## Requires persistence.enabled: true
@@ -204,11 +191,10 @@ saturn:
       ##   GKE, AWS & OpenStack)
       ##
       # storageClass: "-"
-      accessMode: ReadWriteOnce
       size: 50Gi
-      mountPath: /data
 
   maxTriplesToReturn: 50000
+  # See Apache Jena TDB2 documentation
   storeParams:
     tdb.file_mode: "mapped"
     tdb.block_size: 8192
@@ -255,10 +241,6 @@ mercury:
     image: eu.gcr.io/fairspace-207108/mercury
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
-    externalPort: 80
-    internalPort: 80
   resources:
     limits:
       cpu: 200m
@@ -266,7 +248,6 @@ mercury:
     requests:
       cpu: 100m
       memory: 64Mi
-  probePath: /
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 10
@@ -277,9 +258,6 @@ mercury:
     successThreshold: 1
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 10
-  workspaces:
-  urls:
-    storage:
 
 # Settings for the documentation container
 docs:
@@ -310,7 +288,7 @@ docs:
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 1
-  terminationGracePeriodSeconds: 10
+  terminationGracePeriodSeconds: 60
 
 rabbitmq:
   enabled: false

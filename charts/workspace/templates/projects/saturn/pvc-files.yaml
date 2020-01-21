@@ -16,7 +16,7 @@ metadata:
 {{- end }}
 spec:
   accessModes:
-    - {{ $global.Values.saturn.persistence.files.accessMode | quote }}
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ $global.Values.saturn.persistence.files.size | quote }}
