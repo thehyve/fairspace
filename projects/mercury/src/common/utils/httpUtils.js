@@ -6,19 +6,33 @@
  * @param providedMessage   If the backend does not provide an error message, this message will be given in the Error
  * @returns {Function}
  */
+import ErrorDialog from "../components/ErrorDialog";
+
+const handleAuthError = (status) => {
+    switch (status) {
+        case 401:
+            ErrorDialog.showError(null, 'Your session has expired. Please log in again.',
+                null,
+                () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
+            break;
+        case 403:
+            ErrorDialog.showError(null, 'You have no access to this project. Ask the project coordinator to grant you access.',
+                null,
+                () => window.location.assign('/projects'));
+            break;
+        default:
+    }
+};
+
 export function handleHttpError(providedMessage) {
     return ({response}) => {
         const {status, data} = response;
 
         switch (status) {
             case 401:
-                window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
-
-                // eslint-disable-next-line no-throw-literal
-                throw {
-                    message: 'Your session has expired. Please log in again',
-                    redirecting: true
-                };
+            case 403:
+                handleAuthError(status);
+                break;
             default: {
                 if (status === 400 && data && data.details) {
                     // eslint-disable-next-line no-throw-literal
@@ -41,8 +55,9 @@ export const handleSearchError = (e) => {
     switch (e.status) {
         case 400: throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
         case 401:
-            window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
-            throw new Error('Your session has expired. Please log in again');
+        case 403:
+            handleAuthError(e.status);
+            break;
         default: throw new Error("Error retrieving search results");
     }
 };

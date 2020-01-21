@@ -29,20 +29,21 @@ class ErrorDialog extends React.Component {
             errorAsComponent: DialogContentText,
             errorAsComponentProps: null,
             title: DEFAULT_ERROR_TITLE,
-            onRetry: null
+            onRetry: null,
+            onDismiss: null
         };
         ErrorDialog.instance = this;
     }
 
-    static showError(error, message, onRetry, printToConsole = true) {
+    static showError(error, message, onRetry, onDismiss, printToConsole = true) {
         if (printToConsole) {
             console.error(message, error);
         }
 
-        ErrorDialog.renderError(DialogContentText, {children: message}, DEFAULT_ERROR_TITLE, DEFAULT_MAX_WIDTH, onRetry);
+        ErrorDialog.renderError(DialogContentText, {children: message}, DEFAULT_ERROR_TITLE, DEFAULT_MAX_WIDTH, onRetry, onDismiss);
     }
 
-    static renderError(component, props, title = DEFAULT_ERROR_TITLE, maxWidth, onRetry) {
+    static renderError(component, props, title = DEFAULT_ERROR_TITLE, maxWidth, onRetry, onDismiss) {
         if (ErrorDialog.instance) {
             ErrorDialog.instance.setState({
                 showDialog: true,
@@ -51,6 +52,7 @@ class ErrorDialog extends React.Component {
                 title,
                 maxWidth: maxWidth || 'md',
                 onRetry,
+                onDismiss,
             });
         }
     }
@@ -63,11 +65,16 @@ class ErrorDialog extends React.Component {
         this.setState({
             showDialog: false,
             onRetry: null,
+            onDismiss: null
         });
     }
 
     handleClose = () => {
+        const dismiss = this.state.onDismiss;
         this.resetState();
+        if (dismiss) {
+            dismiss();
+        }
     };
 
     handleRetry = () => {

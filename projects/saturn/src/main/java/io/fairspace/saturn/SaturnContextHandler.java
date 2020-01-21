@@ -20,6 +20,7 @@ import static io.fairspace.saturn.App.API_PREFIX;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static java.util.stream.Collectors.joining;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
@@ -61,7 +62,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
 
                 var userInfo = authenticator.apply(request);
                 if (userInfo == null) {
-                    sendError("Unauthenticated", response);
+                    sendError(SC_UNAUTHORIZED, "Unauthenticated", response);
                     return;
                 }
 
@@ -70,12 +71,12 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                 var user = userService.trySetCurrentUser(userInfo);
 
                 if (user == null) {
-                    sendError("You have no access to this project", response);
+                    sendError(SC_FORBIDDEN, "You have no access to this project", response);
                     return;
                 }
 
                 if (user.getRoles().isEmpty()) {
-                    sendError("Your access to this project has been revoked", response);
+                    sendError(SC_FORBIDDEN, "Your access to this project has been revoked", response);
                     return;
                 }
 
@@ -89,13 +90,13 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                             if (RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod()) &&
                                     !user.getRoles().contains(Role.DataSteward) &&
                                     !user.getRoles().contains(Role.Coordinator)) {
-                                sendError("Only data stewards and project coordinators can edit the vocabulary", response);
+                                sendError(SC_FORBIDDEN,"Only data stewards and project coordinators can edit the vocabulary", response);
                                 return;
                             }
                             break;
                         case "rdf":
                             if (!user.getRoles().contains(Role.SparqlUser) && !user.getRoles().contains(Role.Coordinator)) {
-                                sendError("User is not allowed to access the SPARQL endpoint", response);
+                                sendError(SC_FORBIDDEN,"User is not allowed to access the SPARQL endpoint", response);
                                 return;
                             }
 
@@ -119,10 +120,10 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
         getHandler().handle(pathInContext, baseRequest, request, response);
     }
 
-    private void sendError(String error, HttpServletResponse response) throws IOException {
+    private void sendError(int status, String error, HttpServletResponse response) throws IOException {
         response.setContentType(APPLICATION_JSON.asString());
-        response.setStatus(SC_UNAUTHORIZED);
-        response.getWriter().write(errorBody(SC_UNAUTHORIZED, error));
+        response.setStatus(status);
+        response.getWriter().write(errorBody(status, error));
         response.getWriter().flush();
         response.getWriter().close();
     }
