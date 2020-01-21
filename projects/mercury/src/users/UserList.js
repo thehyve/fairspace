@@ -23,6 +23,7 @@ import {addUser} from "./UsersAndWorkspaceAPI";
 import type {User} from './UsersAndWorkspaceAPI';
 import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
+import UserContext from "../common/contexts/UserContext";
 
 const checkRole = (role: string) => (user: User) => user.roles.includes(role);
 
@@ -71,13 +72,20 @@ const addNewUser = (user: User) => addUser({...user, roles: ['CanRead']});
 const rolesToShow = ['CanWrite', 'DataSteward', 'SparqlUser', 'Coordinator'];
 
 const UserList = () => {
-    const {users, refresh} = useContext(UsersContext);
+    const {currentUser, refreshUser} = useContext(UserContext);
+    const {users, refresh: refreshUsers} = useContext(UsersContext);
     const projectUsers = users.filter(u => u.roles.includes('CanRead'));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(projectUsers, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const {isCoordinator} = useContext(LinkedDataContext);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
+    const refresh = (user) => () => {
+        if (user.iri === currentUser.iri) {
+            refreshUser();
+        }
+        refreshUsers();
+    };
 
     return (
         <>
@@ -119,18 +127,18 @@ const UserList = () => {
                                             <Checkbox
                                                 checked={checkRole(role)(user)}
                                                 disabled={!isCoordinator}
-                                                onChange={() => toggleRole(user, role).then(refresh)}
+                                                onChange={() => toggleRole(user, role).then(refresh(user))}
                                             />
                                         </TableCell>
                                     ))
                                 }
                                 <TableCell>
                                     <ConfirmationButton
-                                        onClick={() => removeUser(user).then(refresh)}
+                                        onClick={() => removeUser(user).then(refresh(user))}
                                         disabled={!isCoordinator}
                                         message="Are you sure you want to remove this user from the project?"
-                                        agreeButtonText={'Remove user'}
-                                        dangerous={true}
+                                        agreeButtonText="Remove user"
+                                        dangerous
                                     >
                                         <IconButton>
                                             <Delete />
@@ -172,7 +180,7 @@ const UserList = () => {
             }
             <Dialog
                 open={showAddUserDialog}
-                onClose={() => {setShowAddUserDialog(false)}}
+                onClose={() => setShowAddUserDialog(false)}
             >
                 <DialogTitle id="scroll-dialog-title">Add user to the project</DialogTitle>
                 <DialogContent>
@@ -187,7 +195,7 @@ const UserList = () => {
                     <Button
                         onClick={() => {
                             setShowAddUserDialog(false);
-                            addNewUser(userToAdd).then(refresh);
+                            addNewUser(userToAdd).then(refresh(userToAdd));
                         }}
                         color="primary"
                         disabled={!userToAdd}

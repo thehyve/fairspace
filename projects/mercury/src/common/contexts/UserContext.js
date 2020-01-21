@@ -10,7 +10,7 @@ export const UserProvider = ({children}) => {
     const [currentUserLoading, setCurrentUserLoading] = useState(false);
     const [currentUserError, setCurrentUserError] = useState(null);
 
-    useEffect(() => {
+    const refreshUser = () => {
         setCurrentUserLoading(true);
 
         getUser()
@@ -22,7 +22,9 @@ export const UserProvider = ({children}) => {
             .finally(() => {
                 setCurrentUserLoading(false);
             });
-    }, []);
+    };
+
+    useEffect(refreshUser, []);
 
     return (
         <UserContext.Provider
@@ -30,6 +32,7 @@ export const UserProvider = ({children}) => {
                 currentUser,
                 currentUserLoading,
                 currentUserError,
+                refreshUser,
                 onLogout: () => onLogout({})
             }}
         >
