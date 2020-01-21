@@ -1,10 +1,10 @@
 {{- $global := . }}
-{{- range .Values.saturn.names }}
+{{- range .Values.saturn.nodes }}
 ---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ $global.Release.Name }}-saturn-{{.}}
+  name: {{ $global.Release.Name }}-saturn-{{.name}}
   labels:
     app: saturn
     chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
@@ -59,7 +59,11 @@ spec:
             successThreshold: {{ $global.Values.saturn.readinessProbe.successThreshold }}
             timeoutSeconds: {{ $global.Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
+{{- if .resources }}
+  {{ toYaml .resources | indent 12 }}
+{{- else }}
 {{ toYaml $global.Values.saturn.resources | indent 12 }}
+{{- end }}
     {{- with $global.Values.saturn.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -75,14 +79,14 @@ spec:
       - name: database
         {{- if $global.Values.saturn.persistence.database.enabled }}
         persistentVolumeClaim:
-          claimName: {{ $global.Release.Name }}-saturn-{{.}}-database
+          claimName: {{ $global.Release.Name }}-saturn-{{.name}}-database
         {{- else }}
         emptyDir: {}
         {{- end }}
       - name: files
         {{- if $global.Values.saturn.persistence.files.enabled }}
         persistentVolumeClaim:
-          claimName: {{ $global.Release.Name }}-saturn-{{.}}-files
+          claimName: {{ $global.Release.Name }}-saturn-{{.name}}-files
         {{- else }}
         emptyDir: {}
         {{- end }}

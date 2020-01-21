@@ -1,10 +1,10 @@
 {{- $global := . }}
-{{- range .Values.saturn.names }}
+{{- range .Values.saturn.nodes }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $global.Release.Name }}-saturn-{{.}}
+  name: {{ $global.Release.Name }}-saturn-{{.name}}
   labels:
     app: saturn
     chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}

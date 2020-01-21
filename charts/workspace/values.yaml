@@ -122,10 +122,13 @@ services:
 # Specific settings for Saturn subchart
 #####################################################################
 saturn:
-  names:
-    - one
-    - two
-    - three
+  nodes:
+    - name: node1
+      persistence:
+        files:
+          size: 50Gi
+        database:
+          size: 50Gi
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION

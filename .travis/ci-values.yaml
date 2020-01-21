@@ -40,6 +40,23 @@ pluto:
     
 # Specific settings for Saturn subchart
 saturn:
+  nodes:
+    - name: node1
+    - name: node2
+      persistence:
+        files:
+          size: 60Gi
+          storageClass: expandable
+        database:
+          size: 60Gi
+          storageClass: expandable
+      resources:
+        limits:
+          cpu: 1
+          memory: 16Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
   image:
     pullPolicy: Always
   customStorageClass:

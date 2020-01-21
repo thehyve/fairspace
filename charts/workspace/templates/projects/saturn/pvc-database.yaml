@@ -1,10 +1,10 @@
 {{- $global := . }}
-{{- range .Values.saturn.names }}
+{{- range .Values.saturn.nodes }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ $global.Release.Name }}-saturn-{{.}}-database
+  name: {{ $global.Release.Name }}-saturn-{{.name}}-database
   labels:
     app: saturn
     chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
@@ -19,12 +19,22 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
+      {{- if .persistence.database.size }}
+      storage: {{ .persistence.database.size | quote }}
+      {{- else }}
       storage: {{ $global.Values.saturn.persistence.database.size | quote }}
-{{- if $global.Values.saturn.persistence.database.storageClass }}
-{{- if (eq "-" $global.Values.saturn.persistence.database.storageClass) }}
+      {{- end }}
+  {{- if .persistence.database.storageClass }}
+  {{- if (eq "-" .persistence.database.storageClass) }}
   storageClassName: ""
-{{- else }}
+  {{- else }}
+  storageClassName: {{ .persistence.database.storageClass | quote }}
+  {{- end }}
+  {{- else if $global.Values.saturn.persistence.database.storageClass }}
+  {{- if (eq "-" $global.Values.saturn.persistence.database.storageClass) }}
+  storageClassName: ""
+  {{- else }}
   storageClassName: "{{ $global.Values.saturn.persistence.database.storageClass }}"
-{{- end }}
-{{- end }}
+  {{- end }}
+  {{- end }}
 {{- end}}

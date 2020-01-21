@@ -14,8 +14,8 @@ data:
         keycloak: {{ .Values.external.keycloak.baseUrl }}
         elasticsearch: {{ template "elasticsearch.baseurl" . }}
         workspaces:
-          {{- range .Values.saturn.names }}
-          - http://{{ $global.Release.Name }}-saturn-{{.}}.{{ $global.Release.Namespace }}.svc.cluster.local
+          {{- range .Values.saturn.nodes }}
+          - http://{{ $global.Release.Name }}-saturn-{{.name}}.{{ $global.Release.Namespace }}.svc.cluster.local
           {{- end}}
       keycloak:
         realm: {{ .Values.external.keycloak.realm }}
