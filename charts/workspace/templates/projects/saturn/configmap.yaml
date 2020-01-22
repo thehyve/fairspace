@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "saturn.fullname" . }}
+  name: {{ .Release.Name }}-saturn
   labels:
     app: saturn
     chart: {{ template "workspace.chart" . }}

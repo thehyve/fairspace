@@ -83,11 +83,6 @@ Scheme to access workspace components (http or https)
 {{- .Values.workspace.ingress.domain -}}
 {{- end -}}
 
-{{/* Storage external hostname */}}
-{{- define "storage.hostname" -}}
-{{- printf "storage.%s" .Values.workspace.ingress.domain -}}
-{{- end -}}
-
 {{/* Docs external hostname */}}
 {{- define "docs.hostname" -}}
 {{- printf "docs.%s" .Values.workspace.ingress.domain -}}
@@ -101,17 +96,10 @@ Scheme to access workspace components (http or https)
 {{ template "workspace.scheme" . }}://jupyter.{{ template "mercury.hostname" . }}
 {{- end -}}
 
-{{- define "storage.url" -}}
-{{ template "workspace.scheme" . }}://{{ template "storage.hostname" . }}
-{{- end -}}
-
 {{- define "docs.url" -}}
 {{ template "workspace.scheme" . }}://{{ template "docs.hostname" . }}
 {{- end -}}
 
-{{- define "saturn.fullname" -}}
-{{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
-{{- end -}}
 {{- define "mercury.fullname" -}}
 {{- .Values.mercury.nameOverride | default (printf "%s-mercury" .Release.Name) -}}
 {{- end -}}
@@ -123,24 +111,8 @@ Scheme to access workspace components (http or https)
 {{- printf "%s://%s:%s" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) -}}
 {{- end -}}
 
-
 {{- define "elasticsearch.resturl" -}}
 {{- printf "%s://%s:%s/%s/_search" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) .Values.external.elasticsearch.indexName -}}
 {{- end -}}
 
-{{- define "workspace.roles.sparql" -}}
-{{ .Values.workspace.keycloak.roles.sparql | default (printf "sparqluser-%s" (include "workspace.name" .)) }}
-{{- end -}}
-
-{{- define "workspace.roles.datasteward" -}}
-{{ .Values.workspace.keycloak.roles.datasteward | default (printf "datasteward-%s" (include "workspace.name" .)) }}
-{{- end -}}
-
-{{- define "workspace.roles.coordinator" -}}
-{{ .Values.workspace.keycloak.roles.coordinator | default (printf "coordinator-%s" (include "workspace.name" .)) }}
-{{- end -}}
-
-{{- define "workspace.roles.user" -}}
-{{ .Values.workspace.keycloak.roles.user | default (printf "user-%s" (include "workspace.name" .)) }}
-{{- end -}}
 

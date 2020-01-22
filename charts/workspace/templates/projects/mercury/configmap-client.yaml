@@ -15,11 +15,6 @@ data:
         {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
         {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
       },
-      "roles": {
-        "user": "{{ template "workspace.roles.user" . }}",
-        "dataSteward": "{{ template "workspace.roles.datasteward" . }}",
-        "coordinator": "{{ template "workspace.roles.coordinator" . }}"
-      },
       "enableExperimentalFeatures": {{ .Values.workspace.enableExperimentalFeatures }}
     }
   version.json: |-

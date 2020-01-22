@@ -29,7 +29,7 @@ spec:
         image: "{{ .Values.mercury.image.image }}:{{ .Values.mercury.image.tag }}"
         imagePullPolicy: {{ .Values.mercury.image.pullPolicy }}
         ports:
-        - containerPort: {{ .Values.mercury.service.internalPort }}
+        - containerPort: 80
         volumeMounts:
           - name: client-config-storage
             mountPath: /usr/src/client/config/
@@ -37,16 +37,16 @@ spec:
             mountPath: /usr/src/server/config/
         livenessProbe:
           httpGet:
-            path: {{ .Values.mercury.probePath }}liveness
-            port: {{ .Values.mercury.service.internalPort }}
+            path: /liveness
+            port: 80
           initialDelaySeconds: {{ .Values.mercury.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.mercury.livenessProbe.periodSeconds }}
           successThreshold: {{ .Values.mercury.livenessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.mercury.livenessProbe.timeoutSeconds }}
         readinessProbe:
           httpGet:
-            path: {{ .Values.mercury.probePath }}readiness
-            port: {{ .Values.mercury.service.internalPort }}
+            path: /readiness
+            port: 80
           periodSeconds: {{ .Values.mercury.readinessProbe.periodSeconds }}
           successThreshold: {{ .Values.mercury.readinessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.mercury.readinessProbe.timeoutSeconds }}

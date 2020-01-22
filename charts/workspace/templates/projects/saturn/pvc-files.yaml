@@ -1,28 +1,40 @@
-{{- if and .Values.saturn.persistence.files.enabled (not .Values.saturn.persistence.files.existingClaim) -}}
+{{- $global := . }}
+{{- range $global.Values.saturn.nodes }}
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "saturn.fullname" . }}-files
+  name: {{ $global.Release.Name }}-saturn-{{.name}}-files
   labels:
     app: saturn
-    chart: {{ template "workspace.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-{{- if .Values.saturn.persistence.files.annotations }}
+    chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+    release: {{ $global.Release.Name }}
+    heritage: {{ $global.Release.Service }}
+{{- if $global.Values.saturn.persistence.files.annotations }}
   annotations:
-{{ toYaml .Values.saturn.persistence.files.annotations | indent 4 }}
+{{ toYaml $global.Values.saturn.persistence.files.annotations | indent 4 }}
 {{- end }}
 spec:
   accessModes:
-    - {{ .Values.saturn.persistence.files.accessMode | quote }}
+    - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.saturn.persistence.files.size | quote }}
-{{- if .Values.saturn.persistence.files.storageClass }}
-{{- if (eq "-" .Values.saturn.persistence.files.storageClass) }}
+      {{- if .persistence.files.size }}
+      storage: {{ .persistence.files.size | quote }}
+      {{- else }}
+      storage: {{ $global.Values.saturn.persistence.files.size | quote }}
+      {{- end }}
+{{- if .persistence.files.storageClass }}
+  {{- if (eq "-" .persistence.files.storageClass) }}
   storageClassName: ""
-{{- else }}
-  storageClassName: "{{ .Values.saturn.persistence.files.storageClass }}"
+  {{- else }}
+  storageClassName: {{ .persistence.files.storageClass | quote }}
+  {{- end }}
+{{- else if $global.Values.saturn.persistence.files.storageClass }}
+  {{- if (eq "-" $global.Values.saturn.persistence.files.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: "{{ $global.Values.saturn.persistence.files.storageClass }}"
+  {{- end }}
 {{- end }}
 {{- end }}
-{{- end -}}
