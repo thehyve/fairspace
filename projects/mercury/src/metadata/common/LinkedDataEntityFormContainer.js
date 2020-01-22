@@ -1,6 +1,8 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid} from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "@material-ui/core/Icon";
 import {ConfirmationDialog} from '../../common';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
@@ -12,15 +14,14 @@ import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "../UseLinkedData";
 
 const LinkedDataEntityFormContainer = ({
-    subject, editable = true, fullpage = false,
+    subject, editable = true, showEditButtons = false, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
 }) => {
+    const [editingEnabled, setEditingEnabled] = useState(!showEditButtons);
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
 
     const {
-        addValue, updateValue, deleteValue, clearForm,
-        getUpdates, hasFormUpdates, valuesWithUpdates,
-
+        addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid
     } = useFormData(values);
 
@@ -33,7 +34,7 @@ const LinkedDataEntityFormContainer = ({
         subject
     );
 
-    const canEdit = editable && hasEditRight;
+    const canEdit = editingEnabled && hasEditRight;
 
     const {
         confirmationShown, hideConfirmation, executeNavigation
@@ -69,41 +70,66 @@ const LinkedDataEntityFormContainer = ({
     }
 
     return (
-        <>
-            <FormContext.Provider value={{submit: validateAndSubmit}}>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <LinkedDataEntityForm
-                            {...otherProps}
-                            id={formId}
-                            editable={canEdit}
-                            onSubmit={validateAndSubmit}
-                            errorMessage={linkedDataError}
-                            loading={linkedDataLoading}
-                            properties={extendedProperties}
-                            values={valuesWithUpdates}
-                            validationErrors={validationErrors}
-                            onAdd={addValue}
-                            onChange={updateValue}
-                            onDelete={deleteValue}
-                        />
+        <Grid container direction="row">
+            <Grid item xs={11}>
+                <FormContext.Provider value={{submit: validateAndSubmit}}>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <LinkedDataEntityForm
+                                {...otherProps}
+                                id={formId}
+                                editable={canEdit}
+                                onSubmit={validateAndSubmit}
+                                errorMessage={linkedDataError}
+                                loading={linkedDataLoading}
+                                properties={extendedProperties}
+                                values={valuesWithUpdates}
+                                validationErrors={validationErrors}
+                                onAdd={addValue}
+                                onChange={updateValue}
+                                onDelete={deleteValue}
+                            />
+                        </Grid>
+                        {footer && <Grid item>{footer}</Grid>}
                     </Grid>
-                    {footer && <Grid item>{footer}</Grid>}
-                </Grid>
-            </FormContext.Provider>
-            {confirmationShown && (
-                <ConfirmationDialog
-                    open
-                    title="Unsaved changes"
-                    content={'You have unsaved changes, are you sure you want to navigate away?'
+                </FormContext.Provider>
+                {confirmationShown && (
+                    <ConfirmationDialog
+                        open
+                        title="Unsaved changes"
+                        content={'You have unsaved changes, are you sure you want to navigate away?'
                         + ' Your pending changes will be lost.'}
-                    agreeButtonText="Navigate"
-                    disagreeButtonText="back to form"
-                    onAgree={() => executeNavigation()}
-                    onDisagree={hideConfirmation}
-                />
-            )}
-        </>
+                        agreeButtonText="Navigate"
+                        disagreeButtonText="back to form"
+                        onAgree={() => executeNavigation()}
+                        onDisagree={hideConfirmation}
+                    />
+                )}
+            </Grid>
+            {editable && showEditButtons ? (
+                <Grid item xs={1}>
+                    {canEdit ? (
+                        <Button
+                            type="submit"
+                            color="primary"
+                            onClick={() => {
+                                clearForm();
+                                setEditingEnabled(false);
+                            }}
+                        >Cancel
+                        </Button>
+                    ) : (
+                        <IconButton
+                            aria-label="Edit"
+                            onClick={() => {
+                                setEditingEnabled(true);
+                            }}
+                        ><Icon>edit</Icon>
+                        </IconButton>
+                    )}
+                </Grid>
+            ) : null}
+        </Grid>
     );
 };
 

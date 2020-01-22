@@ -19,7 +19,6 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState();
-    // Properties have to be undefined here not to display "No metadata found" error
     const [properties, setProperties] = useState([]);
     const [propertiesLoaded, setPropertiesLoaded] = useState(false);
     const [values, setValues] = useState({});
