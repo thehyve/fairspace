@@ -19,12 +19,12 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      {{- if .persistence.database.size }}
+      {{- if (and .persistence .persistence.database .persistence.database.size) }}
       storage: {{ .persistence.database.size | quote }}
       {{- else }}
       storage: {{ $global.Values.saturn.persistence.database.size | quote }}
       {{- end }}
-  {{- if .persistence.database.storageClass }}
+  {{- if (and .persistence .persistence.database .persistence.database.storageClass) }}
   {{- if (eq "-" .persistence.database.storageClass) }}
   storageClassName: ""
   {{- else }}
