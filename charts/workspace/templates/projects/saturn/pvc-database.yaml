@@ -1,28 +1,40 @@
-{{- if and .Values.saturn.persistence.database.enabled (not .Values.saturn.persistence.database.existingClaim) -}}
+{{- $global := . }}
+{{- range .Values.saturn.nodes }}
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "saturn.fullname" . }}-database
+  name: {{ $global.Release.Name }}-saturn-{{.name}}-database
   labels:
     app: saturn
-    chart: {{ template "workspace.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-{{- if .Values.saturn.persistence.database.annotations }}
+    chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+    release: {{ $global.Release.Name }}
+    heritage: {{ $global.Release.Service }}
+{{- if $global.Values.saturn.persistence.database.annotations }}
   annotations:
-{{ toYaml .Values.saturn.persistence.database.annotations | indent 4 }}
+{{ toYaml $global.Values.saturn.persistence.database.annotations | indent 4 }}
 {{- end }}
 spec:
   accessModes:
-    - {{ .Values.saturn.persistence.database.accessMode | quote }}
+    - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.saturn.persistence.database.size | quote }}
-{{- if .Values.saturn.persistence.database.storageClass }}
-{{- if (eq "-" .Values.saturn.persistence.database.storageClass) }}
+      {{- if .persistence.database.size }}
+      storage: {{ .persistence.database.size | quote }}
+      {{- else }}
+      storage: {{ $global.Values.saturn.persistence.database.size | quote }}
+      {{- end }}
+  {{- if .persistence.database.storageClass }}
+  {{- if (eq "-" .persistence.database.storageClass) }}
   storageClassName: ""
-{{- else }}
-  storageClassName: "{{ .Values.saturn.persistence.database.storageClass }}"
-{{- end }}
-{{- end }}
-{{- end -}}
+  {{- else }}
+  storageClassName: {{ .persistence.database.storageClass | quote }}
+  {{- end }}
+  {{- else if $global.Values.saturn.persistence.database.storageClass }}
+  {{- if (eq "-" $global.Values.saturn.persistence.database.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: "{{ $global.Values.saturn.persistence.database.storageClass }}"
+  {{- end }}
+  {{- end }}
+{{- end}}

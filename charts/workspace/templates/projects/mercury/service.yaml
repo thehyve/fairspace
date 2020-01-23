@@ -8,10 +8,10 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  type: {{ .Values.mercury.service.type }}
+  type: ClusterIP
   ports:
-  - port: {{ .Values.mercury.service.externalPort }}
-    targetPort: {{ .Values.mercury.service.internalPort }}
+  - port: 80
+    targetPort: 80
     protocol: TCP
     name: http
   selector:

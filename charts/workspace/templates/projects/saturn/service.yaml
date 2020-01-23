@@ -1,19 +1,23 @@
+{{- $global := . }}
+{{- range .Values.saturn.nodes }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "saturn.fullname" . }}
+  name: {{ $global.Release.Name }}-saturn-{{.name}}
   labels:
     app: saturn
-    chart: {{ template "workspace.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    chart: {{- printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+    release: {{ $global.Release.Name }}
+    heritage: {{ $global.Release.Service }}
 spec:
-  type: {{ .Values.saturn.service.type }}
+  type: ClusterIP
   ports:
-    - port: {{ .Values.saturn.service.externalPort }}
-      targetPort: {{ .Values.saturn.service.internalPort }}
+    - port: 80
+      targetPort: 8080
       protocol: TCP
       name: http
   selector:
     app: saturn
-    release: {{ .Release.Name }}
+    release: {{ $global.Release.Name }}
+{{- end}}

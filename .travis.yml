@@ -79,7 +79,7 @@ jobs:
       - "ci/versioning/set_next_version.sh"
     - stage: deploy
       cache: false
-      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
+      # if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
       install:
         - source charts/.travis/install.sh
       script:

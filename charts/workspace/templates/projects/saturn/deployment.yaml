@@ -1,38 +1,41 @@
+{{- $global := . }}
+{{- range .Values.saturn.nodes }}
+---
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "saturn.fullname" . }}
+  name: {{ $global.Release.Name }}-saturn-{{.name}}
   labels:
     app: saturn
-    chart: {{ template "workspace.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    chart: {{- printf " %s-%s\n    " $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+    release: {{ $global.Release.Name }}
+    heritage: {{ $global.Release.Service }}
 spec:
-  replicas: {{ .Values.saturn.replicaCount }}
+  replicas: 1
   strategy:
     rollingUpdate:
-      maxSurge: {{ .Values.saturn.rollingUpdate.maxSurge | default "0%" }}
-      maxUnavailable: {{ .Values.saturn.rollingUpdate.maxUnavailable | default "100%" }}
+      maxSurge: 0%
+      maxUnavailable: 100%
   selector:
     matchLabels:
       app: saturn
-      release: {{ .Release.Name }}
+      release: {{ $global.Release.Name }}
   template:
     metadata:
       labels:
         app: saturn
-        release: {{ .Release.Name }}
-{{- if .Values.podAnnotations.saturn }}
+        release: {{ $global.Release.Name }}
+{{- if $global.Values.podAnnotations.saturn }}
       annotations:
-{{ toYaml .Values.podAnnotations.saturn | indent 8 }}
+{{ toYaml $global.Values.podAnnotations.saturn | indent 8 }}
 {{- end }}
     spec:
       containers:
-        - name: {{ template "saturn.fullname" . }}
-          image: "{{ .Values.saturn.image.image }}:{{ .Values.saturn.image.tag }}"
-          imagePullPolicy: {{ .Values.saturn.image.pullPolicy }}
+        - name: {{ $global.Release.Name }}-saturn
+          image: "{{ $global.Values.saturn.image.image }}:{{ $global.Values.saturn.image.tag }}"
+          imagePullPolicy: {{ $global.Values.saturn.image.pullPolicy }}
           ports:
-          - containerPort: {{ .Values.saturn.service.internalPort }}
+          - containerPort: 8080
           volumeMounts:
           - name: config-volume
             mountPath: /opt/config
@@ -42,44 +45,41 @@ spec:
             mountPath: /data/saturn/files
           livenessProbe:
             httpGet:
-              path: {{ .Values.saturn.probePath }}
-              port: {{ .Values.saturn.service.internalPort }}
-            initialDelaySeconds: {{ .Values.saturn.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.saturn.livenessProbe.periodSeconds }}
-            successThreshold: {{ .Values.saturn.livenessProbe.successThreshold }}
-            timeoutSeconds: {{ .Values.saturn.livenessProbe.timeoutSeconds }}
+              path:  /api/v1/health/
+              port: 8080
+            initialDelaySeconds: {{ $global.Values.saturn.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ $global.Values.saturn.livenessProbe.periodSeconds }}
+            successThreshold: {{ $global.Values.saturn.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ $global.Values.saturn.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.saturn.probePath }}
-              port: {{ .Values.saturn.service.internalPort }}
-            periodSeconds: {{ .Values.saturn.readinessProbe.periodSeconds }}
-            successThreshold: {{ .Values.saturn.readinessProbe.successThreshold }}
-            timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
+              path:  /api/v1/health/
+              port: 8080
+            periodSeconds: {{ $global.Values.saturn.readinessProbe.periodSeconds }}
+            successThreshold: {{ $global.Values.saturn.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ $global.Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
-{{ toYaml .Values.saturn.resources | indent 12 }}
-    {{- with .Values.saturn.nodeSelector }}
+{{- if .resources }}
+  {{ toYaml .resources | indent 12 }}
+{{- else }}
+{{ toYaml $global.Values.saturn.resources | indent 12 }}
+{{- end }}
+    {{- with $global.Values.saturn.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.imagePullSecrets }}
+    {{- with $global.Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 8 }}
     {{- end }}
       volumes:
       - name: config-volume
         configMap:
-          name: {{ template "saturn.fullname" . }}
+          name: {{ $global.Release.Name }}-saturn
       - name: database
-        {{- if .Values.saturn.persistence.database.enabled }}
         persistentVolumeClaim:
-          claimName: {{ .Values.saturn.persistence.database.existingDatabaseClaim | default (printf "%s-database" (include "saturn.fullname" .)) }}
-        {{- else }}
-        emptyDir: {}
-        {{- end }}
+          claimName: {{ $global.Release.Name }}-saturn-{{.name}}-database
       - name: files
-        {{- if .Values.saturn.persistence.files.enabled }}
         persistentVolumeClaim:
-          claimName: {{ .Values.saturn.persistence.files.existingClaim | default (printf "%s-files" (include "saturn.fullname" .)) }}
-        {{- else }}
-        emptyDir: {}
-        {{- end }}
+          claimName: {{ $global.Release.Name }}-saturn-{{.name}}-files
+{{- end}}
