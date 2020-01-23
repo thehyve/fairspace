@@ -60,7 +60,7 @@ spec:
             timeoutSeconds: {{ $global.Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
 {{- if .resources }}
-  {{ toYaml .resources | indent 12 }}
+{{ toYaml .resources | indent 12 }}
 {{- else }}
 {{ toYaml $global.Values.saturn.resources | indent 12 }}
 {{- end }}
