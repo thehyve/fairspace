@@ -1,44 +1,60 @@
 version: '3'
+
 services:
-  keycloak:
-    image: jboss/keycloak:4.5.0.Final
+  fairspace-keycloak-postgres:
+    image: postgres:11-alpine
+    container_name: fairspace-keycloak-database
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
     volumes:
-      - ".:/pr"
+      - fairspace-keycloak-postgres-data:/var/lib/postgresql/data
     networks:
-      - local-development
-    environment:
-      KEYCLOAK_USER: "keycloak"
-      KEYCLOAK_PASSWORD: "keycloak"
-    ports:
-      - "5100:8080"
+      - fairspace-keycloak-db-network
+    restart: unless-stopped
+    logging:
+      driver: ${DOCKER_LOGGING_DRIVER:-journald}
+      options:
+        labels: application
+        tag: fairspace-keycloak-postgres
 
-  keycloak-config:
-    image: eu.gcr.io/fairspace-207108/keycloak-configuration:0.1.2
-    networks:
-      - local-development
+  fairspace-keycloak:
+    image: jboss/keycloak:6.0.1
+    container_name: fairspace-keycloak
     environment:
-      KEYCLOAK_PASSWORD: "keycloak"
-      TESTUSER_USERNAME: "test"
-      TESTUSER_PASSWORD: "test"
-      COORDINATOR_USERNAME: "coordinator"
-      COORDINATOR_PASSWORD: "coordinator"
-      CLIENT_SECRET: 00000000-0000-0000-0000-000000000000
+      DB_VENDOR: POSTGRES
+      DB_ADDR: fairspace-keycloak-postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+      KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME:?Please configure KEYCLOAK_HOSTNAME.}
+      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_PORT:-5100}
+      KEYCLOAK_IMPORT: /tmp/realm-export.json
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:?Please configure KEYCLOAK_REALM}
+      WORKSPACE_CLIENT_ID: ${WORKSPACE_CLIENT_ID:?Please configure WORKSPACE_CLIENT_ID}
+      PROXY_ADDRESS_FORWARDING: 'true'
+      WORKSPACE_URL: ${WORKSPACE_URL:?Please configure WORKSPACE_URL.}
+    ports:
+      - ${KEYCLOAK_PORT:-5100}:8080
+    depends_on:
+      - fairspace-keycloak-postgres
+    networks:
+      - fairspace-keycloak-db-network
     volumes:
-    - ".:/config"
-    command:
-      - "/config/keycloak/run-config.sh"
+      - ./keycloak/setup-realm.sh:/opt/jboss/startup-scripts/setup-realm.sh
+      - ./keycloak/realm-template.json:/tmp/realm-template.json
+      - ./keycloak/keycloak-add-user.json:/opt/jboss/keycloak/standalone/configuration/keycloak-add-user.json
+    restart: unless-stopped
+    logging:
+      driver: ${DOCKER_LOGGING_DRIVER:-journald}
+      options:
+        labels: application
+        tag: fairspace-keycloak
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.6.1
-    networks:
-      - local-development
-    container_name: elasticsearch
-    environment:
-      - cluster.name=elasticsearch
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.net.preferIPv4Stack=true"
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+volumes:
+  fairspace-keycloak-postgres-data:
 
 networks:
-  local-development:
+  fairspace-keycloak-db-network:
+    driver: bridge

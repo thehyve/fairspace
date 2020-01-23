@@ -10,14 +10,16 @@ import static java.util.stream.Collectors.joining;
 @Data
 class KeycloakUser {
     private String id;
+    private String username;
     private String firstName;
     private String lastName;
     private String email;
     private boolean enabled;
 
     String getFullName() {
-        return Stream.of(firstName, lastName)
+        String fullName = Stream.of(firstName, lastName)
                 .filter(Objects::nonNull)
                 .collect(joining(" "));
+        return fullName.isEmpty() ? username : fullName;
     }
 }

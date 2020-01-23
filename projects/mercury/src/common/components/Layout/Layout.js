@@ -9,7 +9,7 @@ import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer";
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../constants";
 import LoadingInlay from "../LoadingInlay";
-import VersionContext from "../../contexts/VersionContext";
+import versionInfo from '../../VersionInfo';
 import UserContext from "../../contexts/UserContext";
 
 const Layout = ({
@@ -17,16 +17,14 @@ const Layout = ({
     requiredAuthorization,
     renderMenu,
     renderMain = () => {},
-    renderTopbar = ({name}) => <TopBar name={name} />,
-    renderFooter = ({name, version}) => <Footer name={name} version={version} />
+    renderTopbar = () => <TopBar title={versionInfo.name} />
 }) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const {currentUserLoading} = useContext(UserContext);
-    const {id, name, version, loading: versionLoading, redirecting} = useContext(VersionContext);
 
-    if (redirecting || versionLoading || currentUserLoading) {
+    if (currentUserLoading) {
         return <LoadingInlay />;
     }
 
@@ -70,14 +68,14 @@ const Layout = ({
     // The topbar is shown even if the user has no proper authorization
     return (
         <>
-            {renderTopbar({name})}
+            {renderTopbar()}
             <AuthorizationCheck requiredAuthorization={requiredAuthorization} transformError={transformError}>
                 {renderMenu && (<MenuDrawer open={menuOpen} renderMenu={renderMenu} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />)}
                 <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                     {renderMain()}
                 </main>
             </AuthorizationCheck>
-            {renderFooter({id, name, version})}
+            <Footer content={`${versionInfo.id} ${versionInfo.version}`} />
         </>
     );
 };
@@ -86,8 +84,7 @@ Layout.propTypes = {
     requiredAuthorization: PropTypes.string,
     renderMenu: PropTypes.func,
     renderMain: PropTypes.func,
-    renderTopbar: PropTypes.func,
-    renderFooter: PropTypes.func
+    renderTopbar: PropTypes.func
 };
 
 export default withStyles(styles)(Layout);

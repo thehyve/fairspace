@@ -1,33 +1,33 @@
 import React from 'react';
 import {VocabularyProvider} from '../metadata/VocabularyContext';
 import {CollectionsProvider} from '../common/contexts/CollectionsContext';
-import {Footer, Layout, usePageTitleUpdater, UserProvider, UsersProvider} from '../common';
+import {Layout, usePageTitleUpdater, UsersProvider} from '../common';
 import ProjectMenu from './ProjectMenu';
 import ProjectTopBar from './ProjectTopBar';
 import {currentProject} from '../projects/projects';
 import ProjectRoutes from '../routes/ProjectRoutes';
+import {ProjectUserProvider} from '../common/contexts/ProjectUserContext';
 
 const ProjectLayout = () => {
     const project = currentProject();
     usePageTitleUpdater(project);
 
     return (
-        <UserProvider>
-            <VocabularyProvider>
-                <CollectionsProvider>
-                    <Layout
-                        renderMenu={() => <ProjectMenu />}
-                        renderMain={() => (
-                            <UsersProvider>
+        <ProjectUserProvider>
+            <UsersProvider>
+                <VocabularyProvider>
+                    <CollectionsProvider>
+                        <Layout
+                            renderMenu={() => <ProjectMenu />}
+                            renderMain={() => (
                                 <ProjectRoutes />
-                            </UsersProvider>
-                        )}
-                        renderTopbar={() => <ProjectTopBar project={project} />}
-                        renderFooter={({id, version}) => <Footer name={id} version={version} />}
-                    />
-                </CollectionsProvider>
-            </VocabularyProvider>
-        </UserProvider>
+                            )}
+                            renderTopbar={() => <ProjectTopBar project={project} />}
+                        />
+                    </CollectionsProvider>
+                </VocabularyProvider>
+            </UsersProvider>
+        </ProjectUserProvider>
     );
 };
 

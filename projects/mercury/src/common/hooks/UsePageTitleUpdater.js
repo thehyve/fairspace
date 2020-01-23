@@ -1,14 +1,12 @@
-import {useContext, useEffect} from 'react';
-import VersionContext from '../contexts/VersionContext';
+import {useEffect} from 'react';
+import versionInfo from '../VersionInfo';
 
 const separator = '-';
 
 const UsePageTitleUpdater = title => {
-    const {name} = useContext(VersionContext);
-
     useEffect(() => {
-        document.title = title ? `${title} ${separator} ${name}` : name;
-    }, [name, title]);
+        document.title = title ? `${title} ${separator} ${versionInfo.name}` : versionInfo.name;
+    }, [title]);
 };
 
 export default UsePageTitleUpdater;

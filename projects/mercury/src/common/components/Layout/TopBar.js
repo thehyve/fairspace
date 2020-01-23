@@ -13,11 +13,11 @@ const styles = theme => ({
     }
 });
 
-const TopBar = ({classes, name, children}) => (
+const TopBar = ({classes, title, children}) => (
     <AppBar className={classes.root} position="sticky">
         <Toolbar>
             <Typography variant="h6" color="inherit" noWrap className={classes.title}>
-                {name}
+                {title}
             </Typography>
             {children}
             <UserMenu />

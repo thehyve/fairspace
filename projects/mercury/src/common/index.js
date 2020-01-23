@@ -19,7 +19,6 @@ export {default as SearchResultHighlights} from './components/search/SearchResul
 export {default as BreadcrumbsContext} from './contexts/BreadcrumbsContext';
 export {default as UserContext, UserProvider} from './contexts/UserContext';
 export {default as UsersContext, UsersProvider} from './contexts/UsersContext';
-export {default as VersionContext, VersionProvider} from './contexts/VersionContext';
 export {default as LogoutContext, LogoutContextProvider} from './contexts/LogoutContext';
 
 /** ************************ HOOKS ************************* */
@@ -45,3 +44,5 @@ export {default as Config} from './services/Config';
 export {default as logout} from './services/logout';
 export {SORT_DATE_CREATED, SORT_ALPHABETICALLY} from './services/SearchAPI';
 export {default as SearchAPI} from './services/SearchAPI';
+
+export {default as VersionInfo} from './VersionInfo';

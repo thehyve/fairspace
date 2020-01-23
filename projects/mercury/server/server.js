@@ -68,14 +68,10 @@ app.use(session({
     secret: cryptoRandomString({length: 32}),
     resave: false,
     saveUninitialized: true,
+    // Uncomment to limit the session lifetime to 1 minute
+    // cookie: {maxAge: 60 * 1000 },
     store
 }));
-
-// A hack to make proxying work
-app.use((req, res, next) => {
-    Object.defineProperty(req, "protocol", {value: 'https', writable: true});
-    next();
-});
 
 app.use(keycloak.middleware({logout: '/logout'}));
 
@@ -85,15 +81,11 @@ let accessToken;
 app.use('/**', keycloak.protect((token) => {
     accessToken = token;
     return true;
-}), (res, req, next) => next());
+}), (res, req, next) => {
+    next()
+});
 
 app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
-
-// Restore protocol
-app.use((req, res, next) => {
-    req.protocol = 'http';
-    next();
-});
 
 // '/api/v1/projects/project/collections/' -> ['', 'api', 'v1', 'projects', 'project', 'collections', '']
 const getProjectId = (url) => url.split('/')[4];
@@ -155,7 +147,7 @@ app.put('/api/v1/projects', (req, res) => {
                 if (workspaceResponse.ok) {
                     allProjects.push(project);
                 }
-                res.status(workspaceResponse.status).end();
+                res.status(workspaceResponse.status).body(project).end();
             })
             .finally(() => projectsBeingCreated.delete(project.id));
     });
@@ -190,6 +182,7 @@ app.use(proxy('/api/v1/projects/*/**', {
     onProxyReq: addToken
 }));
 
+
 const clientDir = path.join(path.dirname(__dirname), 'client');
 
 // Serve any static files
@@ -197,6 +190,7 @@ app.use(express.static(clientDir));
 
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) => res.sendFile(path.join(clientDir, 'index.html')));
+
 
 // eslint-disable-next-line no-console
 app.listen(port, () => console.log(`Listening on port ${port}`));
