@@ -35,14 +35,14 @@ spec:
           image: "{{ $global.Values.saturn.image.image }}:{{ $global.Values.saturn.image.tag }}"
           imagePullPolicy: {{ $global.Values.saturn.image.pullPolicy }}
           ports:
-          - containerPort: 8080
+            - containerPort: 8080
           volumeMounts:
-          - name: config-volume
-            mountPath: /opt/config
-          - name: database
-            mountPath: /data/saturn/db
-          - name: files
-            mountPath: /data/saturn/files
+            - name: config-volume
+              mountPath: /opt/config
+            - name: database
+              mountPath: /data/saturn/db
+            - name: files
+              mountPath: /data/saturn/files
           livenessProbe:
             httpGet:
               path:  /api/v1/health/
