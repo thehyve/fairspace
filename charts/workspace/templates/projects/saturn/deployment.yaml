@@ -7,7 +7,7 @@ metadata:
   name: {{ $global.Release.Name }}-saturn-{{.name}}
   labels:
     app: saturn
-    chart: {{- printf " %s-%s\n    " $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+    chart: {{ printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
     release: {{ $global.Release.Name }}
     heritage: {{ $global.Release.Service }}
 spec:
