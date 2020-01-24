@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "yarn build && concurrently \"yarn keycloak\" \"yarn server\" \"yarn saturn\" \"yarn elasticsearch\"",
+    "dev-no-server": "yarn build && concurrently \"yarn keycloak\" \"yarn saturn\" \"yarn elasticsearch\"",
+    "dev-no-saturn": "yarn build && concurrently \"yarn keycloak\" \"yarn server\" \"yarn elasticsearch\"",
     "keycloak": "cd ../../local-development && docker-compose up",
     "server": "wait-on http://localhost:8080/api/v1/health/ && cd server/ && node server.js",
     "saturn": "wait-on http://localhost:9200/ && cd ../saturn/ && ./gradlew run",
