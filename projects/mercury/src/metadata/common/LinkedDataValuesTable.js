@@ -9,6 +9,9 @@ const styles = {
     buttonColumn: {
         width: 80
     },
+    valueColumn: {
+        cursor: 'default'
+    },
     noRowDividers: {
         '& td': {
             borderBottomWidth: 0
@@ -43,7 +46,7 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                         // eslint-disable-next-line react/no-array-index-key
                         key={idx}
                     >
-                        {columnDefinitions.map(columnDef => <TableCell key={columnDef.id}>{columnDef.getValue(entry, idx)}</TableCell>)}
+                        {columnDefinitions.map(columnDef => <TableCell className={classes.valueColumn} key={columnDef.id}>{columnDef.getValue(entry, idx)}</TableCell>)}
                         {
                             property.isEditable
                             && (
