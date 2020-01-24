@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       labels:
-        app: saturn
+        app: saturn-{{.name}}
         release: {{ $global.Release.Name }}
 {{- if $global.Values.podAnnotations.saturn }}
       annotations:

@@ -18,6 +18,6 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: saturn
+    app: saturn-{{.name}}
     release: {{ $global.Release.Name }}
 {{- end}}
