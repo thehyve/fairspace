@@ -28,8 +28,7 @@ spec:
             backend:
               serviceName: {{ .Release.Name }}-mercury
               servicePort: 80
-{{- end -}}
-
-
-
-
+      annotations:
+        nginx.org/location-snippets: |
+          proxy_set_header      X-Forwarded-Proto https;
+  {{- end -}}
