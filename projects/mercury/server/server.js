@@ -81,9 +81,7 @@ let accessToken;
 app.use('/**', keycloak.protect((token) => {
     accessToken = token;
     return true;
-}), (res, req, next) => {
-    next()
-});
+}), (res, req, next) => next());
 
 app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
@@ -147,7 +145,7 @@ app.put('/api/v1/projects', (req, res) => {
                 if (workspaceResponse.ok) {
                     allProjects.push(project);
                 }
-                res.status(workspaceResponse.status).body(project).end();
+                res.status(workspaceResponse.status).send(project);
             })
             .finally(() => projectsBeingCreated.delete(project.id));
     });
