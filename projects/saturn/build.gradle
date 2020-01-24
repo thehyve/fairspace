@@ -1,6 +1,6 @@
 buildscript {
     ext {
-//        jena_version = '3.13.1'
+        jena_version = '3.14.0'
         milton_version = '2.7.4.9'
         mockitoVersion = '3.2.4'
         jacksonVersion = '2.10.1' // check what version is used by Jena
@@ -44,10 +44,10 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: '*.jar')
-//    implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
-//    implementation "org.apache.jena:jena-text:${jena_version}"
-//    implementation "org.apache.jena:jena-text-es:${jena_version}"
+//    implementation fileTree(dir: 'libs', include: '*.jar') // jena-fuseki-server-*.jar jena-text-es-*.jar
+    implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
+    implementation "org.apache.jena:jena-text:${jena_version}"
+    implementation "org.apache.jena:jena-text-es:${jena_version}"
     implementation('org.elasticsearch.client:transport:6.4.2')
     implementation "io.milton:milton-server-ce:${milton_version}"
     implementation 'com.nimbusds:nimbus-jose-jwt:7.1'
