@@ -70,7 +70,7 @@ jobs:
       - source charts/.travis/install.sh
       script:
       - charts/.travis/build.sh
-    - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    - if: branch = master AND type != pull_request
       cache: false
       stage: Versioning
       name: Set tag and update version
@@ -79,7 +79,7 @@ jobs:
       - "ci/versioning/set_next_version.sh"
     - stage: deploy
       cache: false
-      # if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
+      if: branch in (dev, master) and type != pull_request
       install:
         - source charts/.travis/install.sh
       script:
