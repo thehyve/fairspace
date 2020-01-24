@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import * as PropTypes from "prop-types";
+import {projectPrefix} from '../../projects/projects';
 
 /**
  * Renders a link to a the editor for the given entity.
@@ -11,7 +12,7 @@ import * as PropTypes from "prop-types";
  * @param props
  * @constructor
  */
-const LinkedDataLink = ({uri, editorPath, children}) => <Link to={{pathname: editorPath, search: "?iri=" + encodeURIComponent(uri)}}>{children}</Link>;
+const LinkedDataLink = ({uri, editorPath, children}) => <Link to={{pathname: `${projectPrefix()}${editorPath}`, search: "?iri=" + encodeURIComponent(uri)}}>{children}</Link>;
 
 LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,
