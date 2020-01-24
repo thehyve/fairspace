@@ -18,7 +18,7 @@ spec:
       maxUnavailable: 100%
   selector:
     matchLabels:
-      app: saturn-{{name}}
+      app: saturn-{{.name}}
       release: {{ $global.Release.Name }}
   template:
     metadata:
