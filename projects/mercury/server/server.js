@@ -73,6 +73,8 @@ app.use(session({
     store
 }));
 
+app.set('trust proxy', true);
+
 app.use(keycloak.middleware({logout: '/logout'}));
 
 let accessToken;
