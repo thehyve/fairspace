@@ -4,10 +4,11 @@ import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.DatasetGraphMulti;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.JenaTransactionException;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;

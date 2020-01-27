@@ -11,7 +11,6 @@ import java.util.Set;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.junit.Assert.*;
 
 public class UserServiceTest {
@@ -58,13 +57,13 @@ public class UserServiceTest {
 
     @Test
     public void coordinatorCanAddUsers() {
-        setThreadContext(new ThreadContext(coordinator, null, null, null));
+        setThreadContext(new ThreadContext(coordinator, "project"));
         assertNotNull(userService.addUser(regular1));
     }
 
     @Test
     public void coordinatorCanGrantRoles() {
-        setThreadContext(new ThreadContext(coordinator, null, null, null));
+        setThreadContext(new ThreadContext(coordinator, "project"));
         assertNotNull(userService.addUser(regular1));
         regular1.getRoles().add(Role.CanWrite);
         assertNotNull(userService.addUser(regular1));
@@ -73,7 +72,7 @@ public class UserServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void regularUserCanNotAddUsers() {
-        setThreadContext(new ThreadContext(regular1, null, null, null));
+        setThreadContext(new ThreadContext(regular1, "project"));
         userService.addUser(regular2);
     }
 }

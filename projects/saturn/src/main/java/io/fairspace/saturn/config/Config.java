@@ -12,9 +12,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.fairspace.saturn.services.users.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.query.text.es.ESSettings;
 import org.apache.jena.tdb2.params.StoreParams;
@@ -41,10 +38,6 @@ public class Config {
     public final WebDAV webDAV = new WebDAV();
 
     public final Properties mail = new Properties();
-
-    public final Workspace workspace = new Workspace();
-
-    public final RabbitMQ rabbitMQ = new RabbitMQ();
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
@@ -85,33 +78,6 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
-    }
-
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RabbitMQ {
-        @Builder.Default
-        public boolean enabled = false;
-        @Builder.Default
-        public boolean required = true;
-
-        @Builder.Default
-        public String host = "localhost";
-        @Builder.Default
-        public int port = 5672;
-        public String username;
-        public String password;
-        @Builder.Default
-        public String virtualHost = "/";
-        @Builder.Default
-        public String exchangeName = "fairspace";
-    }
-
-    public static class Workspace {
-        public String id = "workspace";
-        public String name = "Workspace";
-        public String version = "1.0.0";
     }
 
     @Override

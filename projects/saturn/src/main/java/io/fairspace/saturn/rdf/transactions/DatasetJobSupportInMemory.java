@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingSupplier;
-import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.system.Txn;
 

@@ -7,7 +7,6 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.ElasticSearchClientFactory;
 import io.fairspace.saturn.rdf.transactions.DatasetGraphWrapperJobSupport;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetGraphWrapper;
 import org.apache.jena.sparql.util.Context;
 import org.elasticsearch.client.Client;
 

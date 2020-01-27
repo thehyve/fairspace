@@ -24,7 +24,6 @@ import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
-import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.junit.Assert.*;
 
 public class DAOTest {
@@ -44,7 +43,7 @@ public class DAOTest {
         basicEntity = new LifecycleAwareEntity();
         var user = new User();
         user.setIri(createURI("http://ex.com/user"));
-        setThreadContext(new ThreadContext(user, null, null, null));
+        setThreadContext(new ThreadContext(user, null));
     }
 
     @Test

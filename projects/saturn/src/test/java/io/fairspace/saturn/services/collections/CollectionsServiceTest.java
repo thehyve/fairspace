@@ -1,13 +1,11 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.ThreadContext;
-import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
 import org.apache.jena.graph.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +18,6 @@ import java.util.function.Consumer;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -31,20 +28,17 @@ public class CollectionsServiceTest {
     @Mock
     private Consumer<Object> eventListener;
     @Mock
-    private UserService users;
-    @Mock
     private User user;
     @Mock
     private PermissionsService permissions;
-    @Mock
-    private EventService eventService;
     private CollectionsService collections;
 
     @Before
     public void before() {
-        setThreadContext(new ThreadContext(user, null, null, null));
+        setThreadContext(new ThreadContext(user, "project"));
         when(user.getIri()).thenReturn(userIri);
-        collections = new CollectionsService(new DatasetJobSupportInMemory(), eventListener, users, permissions, eventService);
+        when(user.getName()).thenReturn("name");
+        collections = new CollectionsService(new DatasetJobSupportInMemory(), eventListener, permissions);
     }
 
     @Test

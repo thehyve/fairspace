@@ -1,10 +1,6 @@
 package io.fairspace.saturn.config;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.saturn.events.EventCategory;
-import io.fairspace.saturn.events.EventService;
-import io.fairspace.saturn.events.MetadataEvent;
-import io.fairspace.saturn.events.RabbitMQEventService;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
@@ -16,6 +12,7 @@ import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.projects.ProjectsService;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vfs.AuditedFileSystem;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
@@ -25,11 +22,9 @@ import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.query.Dataset;
 
 import java.io.File;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
@@ -45,7 +40,6 @@ public class Services {
     private final EventBus eventBus = new EventBus();
     private final ProjectsService projectsService;
     private final UserService userService;
-    private final EventService eventService;
     private final MailService mailService;
     private final PermissionsService permissionsService;
     private final CollectionsService collectionsService;
@@ -63,13 +57,11 @@ public class Services {
         projectsService = new ProjectsService(config.jena.datasetPath);
         userService = new UserService(dataset, config.auth.userUrl);
 
-        eventService = setupEventService();
-
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService, eventService);
+        permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService);
 
-        collectionsService = new CollectionsService(dataset, eventBus::post, userService, permissionsService, eventService);
+        collectionsService = new CollectionsService(dataset, eventBus::post, permissionsService);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, userService, permissionsService);
 
@@ -79,14 +71,7 @@ public class Services {
                 new PermissionCheckingValidator(permissionsService),
                 new ShaclValidator());
 
-        Consumer<MetadataEvent.Type> metadataEventConsumer = type ->
-                eventService.emitEvent(MetadataEvent.builder()
-                        .category(EventCategory.METADATA)
-                        .eventType(type)
-                        .build()
-                );
-
-        metadataService = new ChangeableMetadataService(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator, metadataEventConsumer);
+        metadataService = new ChangeableMetadataService(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -98,41 +83,12 @@ public class Services {
 
         var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userService);
 
-        Consumer<MetadataEvent.Type> vocabularyEventConsumer = type ->
-                eventService.emitEvent(MetadataEvent.builder()
-                        .category(EventCategory.VOCABULARY)
-                        .eventType(type)
-                        .build()
-                );
-
-        userVocabularyService = new ChangeableMetadataService(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, 0, vocabularyLifeCycleManager, vocabularyValidator, vocabularyEventConsumer);
+        userVocabularyService = new ChangeableMetadataService(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, 0, vocabularyLifeCycleManager, vocabularyValidator);
         metaVocabularyService = new ReadableMetadataService(dataset, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        fileSystem = new CompoundFileSystem(collectionsService, Map.of(
+        fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
                 ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getThreadContext().getUser().getIri(), collectionsService, eventBus),
-                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService)));
-    }
-
-    private EventService setupEventService() throws Exception {
-        if(config.rabbitMQ.enabled) {
-            try {
-                var eventService = new RabbitMQEventService(config.rabbitMQ, config.workspace.name);
-                eventService.init();
-                return eventService;
-            } catch(Exception e) {
-                log.error("Error connecting to RabbitMQ", e);
-
-                if(config.rabbitMQ.required) {
-                    throw e;
-                }
-
-                log.warn("Continuing without event functionality");
-            }
-        } else {
-            log.warn("Logging to rabbitMQ is disabled due to configuration settings. Set rabbitMQ.enabled to true to enable logging");
-        }
-
-        return event -> log.trace("Logging events is disabled in configuration. Set rabbitMQ.enabled to true");
+                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService))));
     }
 }

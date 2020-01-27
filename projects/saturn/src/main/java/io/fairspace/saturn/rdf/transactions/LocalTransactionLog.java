@@ -63,8 +63,8 @@ public class LocalTransactionLog implements TransactionLog {
     }
 
     @Override
-    public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) throws IOException {
-        writingListener.onMetadata(userCommitMessage, systemCommitMessage, userId, userName, timestamp);
+    public void onMetadata(String userId, String userName, long timestamp) throws IOException {
+        writingListener.onMetadata(userId, userName, timestamp);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.vocabulary;
 
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;

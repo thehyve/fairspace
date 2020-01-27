@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingSupplier;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
@@ -11,7 +10,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
 
