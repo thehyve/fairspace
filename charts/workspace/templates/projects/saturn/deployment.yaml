@@ -59,11 +59,7 @@ spec:
             successThreshold: {{ $global.Values.saturn.readinessProbe.successThreshold }}
             timeoutSeconds: {{ $global.Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
-{{- if .resources }}
 {{ toYaml .resources | indent 12 }}
-{{- else }}
-{{ toYaml $global.Values.saturn.resources | indent 12 }}
-{{- end }}
     {{- with $global.Values.saturn.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
