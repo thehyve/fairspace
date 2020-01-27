@@ -83,7 +83,7 @@ let accessToken;
 app.use('/**', keycloak.protect((token) => {
     accessToken = token;
     return true;
-}), (res, req, next) => next());
+}));
 
 app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
 
