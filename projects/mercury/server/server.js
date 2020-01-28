@@ -44,9 +44,9 @@ app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and runni
 
 app.get('/readiness', (req, res) => {
     if (allProjects) {
-        res.status(200).send('Ready.').end();
+        res.status(200).end('Ready');
     } else {
-        res.status(503).send('Initializing.').end();
+        res.status(503).end('Initializing');
     }
 });
 
@@ -75,6 +75,26 @@ app.use(session({
 
 app.set('trust proxy', true);
 
+app.use('/api/v1/projects/*/webdav', (req, res, next) => {
+    if (!req.session['keycloak-token']) {
+        const auth = req.headers.authorization;
+        if (auth && auth.startsWith('Basic ')) {
+            const [username, password] = Buffer.from(auth.substr('Basic '.length), 'base64').toString('utf8').split(':');
+            keycloak.grantManager.obtainDirectly(username, password)
+                .then(grant => keycloak.storeGrant(grant, req, res))
+                .catch(() => {
+                    res.status(401).end('Unauthorized');
+                    return Promise.reject();
+                })
+                .then(() => next());
+        } else {
+            res.status(401).header('WWW-Authenticate', 'Basic').end();
+        }
+    } else {
+        next();
+    }
+});
+
 app.use(keycloak.middleware({logout: '/logout'}));
 
 let accessToken;
@@ -85,7 +105,7 @@ app.use('/**', keycloak.protect((token) => {
     return true;
 }));
 
-app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}), (req, res, next) => next());
+app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}));
 
 // '/api/v1/projects/project/collections/' -> ['', 'api', 'v1', 'projects', 'project', 'collections', '']
 const getProjectId = (url) => url.split('/')[4];
