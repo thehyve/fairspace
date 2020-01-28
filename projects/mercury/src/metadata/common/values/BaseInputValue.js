@@ -38,16 +38,10 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
                     otherProps.onBlur(e);
                 }
             }}
-            onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                    // If multiline and with ctrl key or if both are false
-                    if (e.ctrlKey === property.multiLine) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        updateOuterState(e.target.value);
-                        submit();
-                    }
-                }
+            onKeyUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                updateOuterState(e.target.value);
             }}
             style={{...style, marginTop: 0, width: '100%'}}
         />
