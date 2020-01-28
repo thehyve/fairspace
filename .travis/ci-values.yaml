@@ -7,10 +7,6 @@ external:
     realm: ci
     clientId: workspace-ci-pluto
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-  rabbitmq:
-    host: hyperspace-ci-rabbitmq.hyperspace-ci.svc.cluster.local
-    username: rabbitmq
-    password: X6SXtXV3Jzg4gyVR
   elasticsearch:
     enabled: true
     indexName: workspace-ci
@@ -100,8 +96,3 @@ mercury:
 docs:
   image:
     pullPolicy: Always
-
-rabbitmq:
-  required: false
-  username: workspace-ci
-  password: "8VCnaMSHTdcFN9dX"
