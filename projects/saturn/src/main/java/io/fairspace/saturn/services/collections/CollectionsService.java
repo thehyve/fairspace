@@ -1,20 +1,17 @@
 package io.fairspace.saturn.services.collections;
 
-import io.fairspace.saturn.events.CollectionEvent;
-import io.fairspace.saturn.events.EventService;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.users.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.query.Dataset;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
@@ -29,13 +26,11 @@ public class CollectionsService {
     private final DAO dao;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
-    private final EventService eventService;
 
-    public CollectionsService(DatasetJobSupport dataset, Consumer<Object> eventListener, UserService userService, PermissionsService permissions, EventService eventService) {
+    public CollectionsService(DatasetJobSupport dataset, Consumer<Object> eventListener, PermissionsService permissions) {
         this.dao = new DAO(dataset);
         this.eventListener = eventListener;
         this.permissions = permissions;
-        this.eventService = eventService;
     }
 
     public Collection create(Collection collection) {
@@ -49,7 +44,7 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        var storedCollection = dao.getDataset().calculateWrite("Create collection " + collection.getName(), () -> {
+        var storedCollection = dao.getDataset().calculateWrite(() -> {
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
             permissions.createResource(collection.getIri());
@@ -58,11 +53,10 @@ public class CollectionsService {
             return collection;
         });
 
-        eventService.emitEvent(CollectionEvent.builder()
-                .eventType(CollectionEvent.Type.CREATED)
-                .collection(getEventCollection(storedCollection))
-                .build()
-        );
+        audit("COLLECTION_CREATED",
+                "name", storedCollection.getName(),
+                "location", storedCollection.getLocation(),
+                "iri", storedCollection.getIri().getURI());
 
         return storedCollection;
     }
@@ -95,25 +89,18 @@ public class CollectionsService {
         var iris = collections.stream().map(Collection::getIri).collect(toList());
         var userPermissions = permissions.getPermissions(iris);
 
-        List<Collection> collectionList = collections.stream()
+        return collections.stream()
                 .filter(c -> {
                     c.setAccess(userPermissions.get(c.getIri()));
                     return c.canRead();
                 })
                 .sorted(comparing(Collection::getName))
                 .collect(toList());
-
-        eventService.emitEvent(CollectionEvent.builder()
-                .eventType(CollectionEvent.Type.LISTED)
-                .build()
-        );
-
-        return collectionList;
     }
 
     public void delete(String iri) {
         validateIRI(iri);
-        dao.getDataset().executeWrite("Delete collection " + iri, () -> {
+        var c = dao.getDataset().calculateWrite(() -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -129,13 +116,13 @@ public class CollectionsService {
             // Emit event on internal eventbus so the filesystem can act accordingly
             eventListener.accept(new CollectionDeletedEvent(collection));
 
-            // Emit event on external eventbus for logging purposes
-            eventService.emitEvent(CollectionEvent.builder()
-                    .eventType(CollectionEvent.Type.DELETED)
-                    .collection(getEventCollection(collection))
-                    .build()
-            );
+            return collection;
         });
+
+        audit("COLLECTION_DELETED",
+                "iri", iri,
+                "name", c.getName(),
+                "location", c.getLocation());
     }
 
     public Collection update(Collection patch) {
@@ -143,7 +130,7 @@ public class CollectionsService {
 
         validateIRI(patch.getIri().getURI());
 
-        return dao.getDataset().calculateWrite("Update collection " + patch.getName(), () -> {
+        var c = dao.getDataset().calculateWrite(() -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());
@@ -175,23 +162,18 @@ public class CollectionsService {
             validateFields(collection);
             collection = dao.write(collection);
 
-            CollectionEvent.Type eventType;
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
-                eventType = CollectionEvent.Type.MOVED;
-            } else {
-                eventType = CollectionEvent.Type.UPDATED;
             }
-
-            // Emit event on external eventbus for logging purposes
-            eventService.emitEvent(CollectionEvent.builder()
-                    .eventType(eventType)
-                    .collection(getEventCollection(collection))
-                    .build()
-            );
-
             return collection;
         });
+
+        audit("COLLECTION_UPDATED",
+                "iri", c.getIri().getURI(),
+                "name", c.getName(),
+                "location", c.getLocation());
+
+        return c;
     }
 
     private void validateFields(Collection collection) {
@@ -215,10 +197,6 @@ public class CollectionsService {
         return name.matches("[A-Za-z0-9_-]+")
                 && !name.isEmpty()
                 && name.length() < 128;
-    }
-
-    private CollectionEvent.Collection getEventCollection(Collection collection) {
-        return new CollectionEvent.Collection(collection.getIri().toString(), collection.getName());
     }
 
 }

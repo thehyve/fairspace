@@ -1,7 +1,6 @@
 package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import org.apache.jena.query.Dataset;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,11 +41,6 @@ public class ServicesTest {
     @Test
     public void getUserService() {
         assertNotNull(svc.getUserService());
-    }
-
-    @Test
-    public void getEventService() {
-        assertNotNull(svc.getEventService());
     }
 
     @Test

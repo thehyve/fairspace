@@ -6,8 +6,6 @@ import io.fairspace.saturn.rdf.transactions.TransactionLog;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.*;
 import org.irods.jargon.core.pub.domain.ObjStat;

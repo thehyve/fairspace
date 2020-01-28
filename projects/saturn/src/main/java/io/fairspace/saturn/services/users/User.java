@@ -3,8 +3,6 @@ package io.fairspace.saturn.services.users;
 import io.fairspace.saturn.rdf.dao.PersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.vocabulary.RDFS;

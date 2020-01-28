@@ -1,12 +1,13 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
+import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -21,17 +22,17 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceValidationTest {
@@ -40,6 +41,9 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
+
+    @Mock
+    private User user;
 
     private static final String GRAPH = "http://localhost/iri/graph";
     private static final String VOCABULARY = "http://localhost/iri/vocabulary";
@@ -65,7 +69,11 @@ public class ChangeableMetadataServiceValidationTest {
     @Before
     public void setUp() {
         ds = new DatasetJobSupportInMemory();
-        api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator, event -> {});
+        api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
+
+        setThreadContext(new ThreadContext(user, "project"));
+        when(user.getIri()).thenReturn(createURI("http://ex.com/user"));
+        when(user.getName()).thenReturn("name");
     }
 
     @Test

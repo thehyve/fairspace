@@ -2,7 +2,6 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.config.Services;
 import io.milton.config.HttpManagerBuilder;
-import io.milton.event.RequestEvent;
 import io.milton.http.*;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -57,9 +56,6 @@ public class WebDAVApp implements SparkApplication {
                     responseHandler.respondContent(resource, response, request, params);
                 }
             });
-
-            var requestEventListener = new WebdavEventEmitter(svc.getEventService());
-            eventManager.registerEventListener(e -> requestEventListener.accept(((RequestEvent) e).getRequest()), RequestEvent.class);
         }}.buildHttpManager();
     }
 

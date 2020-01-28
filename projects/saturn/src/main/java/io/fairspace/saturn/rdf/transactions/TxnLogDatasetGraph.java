@@ -120,7 +120,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             var userName = ofNullable(context.getUser()).map(User::getName).orElse(null);
             var userId = ofNullable(context.getUser()).map(user -> extractIdFromIri(user.getIri())).orElse(null);
             try {
-                transactionLog.onMetadata(context.getUserCommitMessage(), context.getSystemCommitMessage(), userId, userName, currentTimeMillis());
+                transactionLog.onMetadata(userId, userName, currentTimeMillis());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -1,21 +1,19 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.events.MetadataEvent;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.function.Consumer;
 
+import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -27,14 +25,12 @@ public class ChangeableMetadataService extends ReadableMetadataService {
     private final DatasetJobSupport dataset;
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
-    private final Consumer<MetadataEvent.Type> eventConsumer;
 
-    public ChangeableMetadataService(DatasetJobSupport dataset, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator, Consumer<MetadataEvent.Type> eventConsumer) {
+    public ChangeableMetadataService(DatasetJobSupport dataset, Node graph, Node vocabulary, long tripleLimit, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
         super(dataset, graph, vocabulary, tripleLimit);
         this.dataset = dataset;
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
-        this.eventConsumer = eventConsumer;
     }
 
     /**
@@ -46,8 +42,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        dataset.executeWrite("Store metadata", () -> update(EMPTY_MODEL, model));
-        eventConsumer.accept(MetadataEvent.Type.CREATED);
+        dataset.executeWrite(() -> update(EMPTY_MODEL, model));
+        audit("METADATA_ADDED");
     }
 
     /**
@@ -56,8 +52,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param subject   Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if(dataset.calculateWrite("Mark <" + subject + "> as deleted", () -> lifeCycleManager.softDelete(subject))) {
-            eventConsumer.accept(MetadataEvent.Type.SOFT_DELETED);
+        if(dataset.calculateWrite(() -> lifeCycleManager.softDelete(subject))) {
+            audit("METADATA_MARKED_AS_DELETED", "iri", subject.getURI());
             return true;
         } else {
             return false;
@@ -72,8 +68,8 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        dataset.executeWrite("Delete metadata", () -> update(model, EMPTY_MODEL));
-        eventConsumer.accept(MetadataEvent.Type.DELETED);
+        dataset.executeWrite(() -> update(model, EMPTY_MODEL));
+        audit("METADATA_DELETED");
     }
 
     /**
@@ -91,7 +87,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        dataset.executeWrite("Update metadata", () -> {
+        dataset.executeWrite(() -> {
             var before = dataset.getNamedModel(graph.getURI());
             var existing = createDefaultModel();
             model.listStatements()
@@ -102,7 +98,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
             update(existing.difference(model), model.remove(existing).removeAll(null, null, NIL));
         });
-        eventConsumer.accept(MetadataEvent.Type.UPDATED);
+        audit("METADATA_UPDATED");;
     }
 
     private void update(Model modelToRemove, Model modelToAdd) {

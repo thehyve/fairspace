@@ -1,9 +1,10 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import org.apache.jena.query.Dataset;
+import io.fairspace.saturn.services.users.User;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -18,12 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
+import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
-import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
@@ -50,7 +52,14 @@ public class ChangeableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator(), event -> {});
+        var ctx = new ThreadContext();
+        var user = new User();
+        user.setIri(createURI("http://example.com#user"));
+        user.setName("user");
+        ctx.setProject("project");
+        ctx.setUser(user);
+        setThreadContext(ctx);
+        api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());
     }
 
     @Test
