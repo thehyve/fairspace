@@ -29,11 +29,6 @@ external:
     realm:
     clientSecret:
 
-  rabbitmq:
-    host:
-    username: rabbitmq
-    password:
-
   elasticsearch:
     enabled: true
     indexName:
@@ -93,18 +88,6 @@ workspace:
             limits:
                 cpu: "500m"
                 memory: "2048Mi"
-      rabbitmq:
-        dockerRepository: eu.gcr.io
-        image: fairspace-207108/rabbitmq-configuration
-        configurationScriptsTag: 0.1.2
-        pullPolicy: IfNotPresent
-        resources:
-          requests:
-            cpu: "50m"
-            memory: "512Mi"
-          limits:
-            cpu: "1"
-            memory: "2048Mi"
 
     enableExperimentalFeatures: false
 

@@ -40,12 +40,6 @@ data:
       id: "{{ .Release.Name }}"
       name: "{{ .Values.workspace.name }}"
       version: "{{ .Chart.Version }}"
-    rabbitMQ:
-      enabled: {{ .Values.rabbitmq.enabled }}
-      required: {{ .Values.rabbitmq.required }}
-      host: {{ .Values.external.rabbitmq.host }}
-      username: {{ .Values.rabbitmq.username }}
-      password: {{ .Values.rabbitmq.password }}
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
 
