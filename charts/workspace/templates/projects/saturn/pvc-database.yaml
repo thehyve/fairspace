@@ -10,9 +10,9 @@ metadata:
     chart: {{ printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
     release: {{ $global.Release.Name }}
     heritage: {{ $global.Release.Service }}
-{{- if $global.Values.saturn.persistence.database.annotations }}
+{{- if .persistence.database.annotations }}
   annotations:
-{{ toYaml $global.Values.saturn.persistence.database.annotations | indent 4 }}
+{{ toYaml .persistence.database.annotations | indent 4 }}
 {{- end }}
 spec:
   accessModes:
