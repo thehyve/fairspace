@@ -5,7 +5,6 @@ import io.fairspace.saturn.rdf.DatasetGraphMulti;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.query.DatasetFactory;
 
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;

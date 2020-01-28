@@ -4,7 +4,8 @@ import io.fairspace.saturn.services.BaseApp;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.*;
+import static spark.Spark.get;
+import static spark.Spark.put;
 
 public class UserApp extends BaseApp {
     private final UserService service;

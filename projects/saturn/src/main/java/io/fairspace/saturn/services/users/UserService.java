@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.stream.Collectors.toList;
@@ -81,8 +82,7 @@ public class UserService {
 
         var response = request.send();
         if (response.getStatus() == SC_OK) {
-            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<List<KeycloakUser>>() {
-            });
+            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<>() {});
             log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
             return keycloakUsers
                     .stream()
@@ -107,11 +107,20 @@ public class UserService {
     public User addUser(User user) {
         log.debug("Adding user {} {} with roles {}", user.getName(), user.getIri(), user.getRoles());
 
-        return dao.getDataset().calculateWrite("Add a user " + user.getIri(), () -> {
+        var result = dao.getDataset().calculateWrite(() -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
             validate(user.getIri() != null, "Please provide a valid IRI.");
 
             return dao.write(user);
         });
+
+
+        audit("USER_ADD",
+                "iri", user.getIri().getURI(),
+                "name", user.getName(),
+                "email", user.getEmail(),
+                "roles", user.getRoles().toString());
+
+        return result;
     }
 }

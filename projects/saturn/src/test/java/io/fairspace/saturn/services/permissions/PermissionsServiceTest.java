@@ -9,8 +9,6 @@ import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
@@ -72,16 +70,17 @@ public class PermissionsServiceTest {
 
         when(userService.getUser(any())).thenReturn(new User());
 
-        setThreadContext(new ThreadContext(currentUser, null, null, null));
+        setThreadContext(new ThreadContext(currentUser, "project"));
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
+        when(currentUser.getName()).thenReturn("name");
         when(currentUser.getRoles()).thenAnswer(invocation ->
                 isCoordinator
                 ? EnumSet.of(Role.CanRead, Role.CanWrite, Role.Coordinator)
                 : EnumSet.of(Role.CanRead, Role.CanWrite));
 
 
-        service = new PermissionsService(ds, permissionChangeEventHandler, userService, event -> {});
+        service = new PermissionsService(ds, permissionChangeEventHandler, userService);
         service.createResource(RESOURCE);
     }
 

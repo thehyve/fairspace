@@ -22,8 +22,6 @@ public class SparqlTransactionCodec implements TransactionCodec {
     private static final String TIMESTAMP_PREFIX = "# Timestamp: ";
     private static final String USER_NAME_PREFIX = "# User Name: ";
     private static final String USER_ID_PREFIX = "# User ID: ";
-    private static final String USER_COMMIT_MESSAGE_PREFIX = "# User Commit Message: ";
-    private static final String SYSTEM_COMMIT_MESSAGE_PREFIX = "# System Commit Message: ";
     private static final String COMMITTED = "# Committed";
     private static final String ABORTED = "# Aborted";
     private static final Prologue PROLOGUE = new Prologue();
@@ -34,19 +32,13 @@ public class SparqlTransactionCodec implements TransactionCodec {
             private final OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
 
             @Override
-            public void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) throws IOException {
+            public void onMetadata(String userId, String userName, long timestamp) throws IOException {
                 writer.write(TIMESTAMP_PREFIX + timestamp + "\n");
                 if (userName != null) {
                     writer.write(USER_NAME_PREFIX + userName + "\n");
                 }
                 if (userId != null) {
                     writer.write(USER_ID_PREFIX + userId + "\n");
-                }
-                if (userCommitMessage != null) {
-                    writer.write(USER_COMMIT_MESSAGE_PREFIX + userCommitMessage.replace('\n', ' ') + "\n");
-                }
-                if (systemCommitMessage != null) {
-                    writer.write(SYSTEM_COMMIT_MESSAGE_PREFIX + systemCommitMessage.replace('\n', ' ') + "\n");
                 }
                 writer.write('\n');
             }
@@ -95,8 +87,6 @@ public class SparqlTransactionCodec implements TransactionCodec {
         long timestamp = 0L;
         String userName = null;
         String userId = null;
-        String userCommitMessage = null;
-        String systemCommitMessage = null;
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -106,18 +96,12 @@ public class SparqlTransactionCodec implements TransactionCodec {
                 userName = line.substring(USER_NAME_PREFIX.length());
             } else if (line.startsWith(USER_ID_PREFIX)) {
                 userId = line.substring(USER_ID_PREFIX.length());
-            } else if (line.startsWith(USER_COMMIT_MESSAGE_PREFIX)) {
-                userCommitMessage = line.substring(USER_COMMIT_MESSAGE_PREFIX.length());
-            } else if (line.startsWith(SYSTEM_COMMIT_MESSAGE_PREFIX)) {
-                systemCommitMessage = line.substring(SYSTEM_COMMIT_MESSAGE_PREFIX.length());
             } else if (line.isBlank()) {
-                listener.onMetadata(userCommitMessage, systemCommitMessage, userId, userName, timestamp);
+                listener.onMetadata(userId, userName, timestamp);
 
                 timestamp = 0L;
                 userName = null;
                 userId = null;
-                userCommitMessage = null;
-                systemCommitMessage = null;
             } else if (line.equals(COMMITTED)) {
                 listener.onCommit();
             } else if (line.equals(ABORTED)) {

@@ -2,8 +2,6 @@ package io.fairspace.saturn.services.permissions;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import io.fairspace.saturn.events.EventService;
-import io.fairspace.saturn.events.PermissionEvent;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.UserService;
@@ -11,7 +9,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -19,6 +16,7 @@ import org.apache.jena.vocabulary.RDF;
 import java.util.*;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
@@ -35,17 +33,14 @@ public class PermissionsService {
     private final DatasetJobSupport dataset;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final UserService userService;
-    private final EventService eventService;
+
 
     public void createResource(Node resource) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
         model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getThreadContext().getUser().getIri()));
 
-        eventService.emitEvent(PermissionEvent.builder()
-                .eventType(PermissionEvent.Type.RESOURCE_CREATED)
-                .resource(resource.getURI())
-                .build()
-        );
+        audit("RESOURCE_CREATED",
+                "resource", resource.getURI());
     }
 
     public void createResources(Collection<Resource> resources) {
@@ -58,7 +53,7 @@ public class PermissionsService {
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = getThreadContext().getUser().getIri();
 
-        dataset.executeWrite(format("Setting permission for resource %s, user %s to %s", resource, user, access), () -> {
+        var success = dataset.calculateWrite(() -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
@@ -76,18 +71,18 @@ public class PermissionsService {
 
             if (access != Access.None) {
                 g.add(g.asRDFNode(resource).asResource(), g.createProperty(FS.NS, access.name().toLowerCase()), g.asRDFNode(user));
+                return true;
             }
+            return false;
         });
 
-        var eventType = (access == Access.None) ? PermissionEvent.Type.DELETED : PermissionEvent.Type.UPDATED;
-
-        eventService.emitEvent(PermissionEvent.builder()
-                .eventType(eventType)
-                .resource(resource.getURI())
-                .otherUser(user.getURI())
-                .access(access.toString())
-                .build()
-        );
+        if (success) {
+            audit("PERMISSION_UPDATED",
+                    "manager", getThreadContext().getUser().getName(),
+                    "target-user", user.getURI(),
+                    "resource", resource.getURI(),
+                    "access", access.toString());
+        }
 
         if (permissionChangeEventHandler != null)
             permissionChangeEventHandler.onPermissionChange(managingUser, resource, user, access);
@@ -135,7 +130,7 @@ public class PermissionsService {
     }
 
     void setWriteRestricted(Node resource, boolean restricted) {
-        dataset.executeWrite(format("Setting fs:writeRestricted attribute of resource %s to %s", resource, restricted), () -> {
+        var success = dataset.calculateWrite(() -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {
@@ -147,15 +142,15 @@ public class PermissionsService {
                 } else {
                     g.removeAll(s, FS.write, null);
                 }
-
-                eventService.emitEvent(PermissionEvent.builder()
-                        .eventType(PermissionEvent.Type.UPDATED)
-                        .resource(resource.getURI())
-                        .access(restricted ? "writeRestricted" : "writeNotRestricted")
-                        .build()
-                );
+                return true;
             }
+            return false;
         });
+
+        if (success) {
+                audit("SET_WRITE_RESTRICTED",
+                        "resource", resource.getURI());
+        }
     }
 
     private void ensureAccess(Node resource, Access access) {

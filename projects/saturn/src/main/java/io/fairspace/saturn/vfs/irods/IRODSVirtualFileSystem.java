@@ -7,7 +7,6 @@ import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang.StringUtils;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -142,7 +141,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        dataset.executeWrite("Generate an IRI for an external resource", () ->
+        dataset.executeWrite(() ->
                 update(dataset, storedQuery("register_external_resource", iri, type)));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }

@@ -15,7 +15,6 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QuerySolution;
 
 import java.io.FileNotFoundException;
@@ -78,7 +77,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo doMkdir(String path) throws IOException {
-        return dataset.calculateWrite("Create directory " + path, () -> {
+        return dataset.calculateWrite(() -> {
             ensureCanCreate(path);
             update(dataset, storedQuery("fs_mkdir", path, userIriSupplier.get(), name(path)));
             return stat(path);
@@ -89,7 +88,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected FileInfo doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        return dataset.calculateWrite("Create file " + path, () -> {
+        return dataset.calculateWrite(() -> {
             ensureCanCreate(path);
             update(dataset, storedQuery("fs_create", path, blobInfo.getSize(), blobInfo.getId(), userIriSupplier.get(), name(path), blobInfo.getMd5()));
             return stat(path);
@@ -100,7 +99,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        dataset.executeWrite("Modify file " + path, () -> {
+        dataset.executeWrite(() -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -135,7 +134,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void doDelete(String path) throws IOException {
-        dataset.executeWrite("Delete " + path, () -> {
+        dataset.executeWrite(() -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -199,7 +198,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (from.equals(to) || to.startsWith(from + '/')) {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
-        dataset.executeWrite(verb + " data from " + from + " to " + to, () -> {
+        dataset.executeWrite(() -> {
             ensureCanCreate(to);
             var typeSuffix = stat(from).isDirectory() ? "_dir" : "_file";
             update(dataset, storedQuery("fs_" + verb + typeSuffix, from, to, name(to)));

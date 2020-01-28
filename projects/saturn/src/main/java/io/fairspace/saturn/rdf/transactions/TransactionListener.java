@@ -11,7 +11,7 @@ public interface TransactionListener {
     default void onBegin() throws IOException {
     }
 
-    default void onMetadata(String userCommitMessage, String systemCommitMessage, String userId, String userName, long timestamp) throws IOException {
+    default void onMetadata(String userId, String userName, long timestamp) throws IOException {
     }
 
     default void onAdd(Node graph, Node subject, Node predicate, Node object) throws IOException {

@@ -3,9 +3,6 @@ package io.fairspace.saturn.rdf.transactions;
 import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.DatasetGraphMulti;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +13,6 @@ import java.io.IOException;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;

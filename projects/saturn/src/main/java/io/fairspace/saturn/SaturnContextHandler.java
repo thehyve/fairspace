@@ -27,7 +27,6 @@ import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 @Slf4j
 public class SaturnContextHandler extends ConstraintSecurityHandler {
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
-    public static final String COMMIT_MESSAGE_HEADER = "Saturn-Commit-Message";
     public static final String PROJECTS_PREFIX = API_PREFIX + "/projects/";
     public static final String FORWARDED_ATTRIBUTE = "forwarded";
 
@@ -81,7 +80,6 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                 }
 
                 context.setUser(user);
-                context.setUserCommitMessage(request.getHeader(COMMIT_MESSAGE_HEADER));
 
                 if (parts.length > 1) {
                     var resource = parts[1];
