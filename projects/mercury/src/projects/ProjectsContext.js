@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import {useAsync} from '../common/hooks';
 import ProjectsAPI from './ProjectsAPI';

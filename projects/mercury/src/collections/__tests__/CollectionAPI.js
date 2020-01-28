@@ -17,7 +17,12 @@ describe('CollectionAPI', () => {
     });
 
     it('makes a proper call to add a collection', async () => {
-        await CollectionAPI.addCollection('name', 'description', 'connectionString', 'location');
+        await CollectionAPI.addCollection({
+            name: 'name',
+            description: 'description',
+            connectionString: 'connectionString',
+            location: 'location'
+        });
 
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
@@ -33,7 +38,13 @@ describe('CollectionAPI', () => {
     });
 
     it('makes a proper call to update a collection', async () => {
-        await CollectionAPI.updateCollection('iri', 'name', 'description', 'connectionString', 'location');
+        await CollectionAPI.updateCollection({
+            iri: 'iri',
+            name: 'name',
+            description: 'description',
+            connectionString: 'connectionString',
+            location: 'location'
+        });
 
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
         expect(mockAxios.patch).toHaveBeenCalledWith(
@@ -42,15 +53,17 @@ describe('CollectionAPI', () => {
                 iri: 'iri',
                 name: 'name',
                 description: 'description',
-                location: 'location',
-                connectionString: 'connectionString'
+                connectionString: 'connectionString',
+                location: 'location'
             }),
             {headers: {'Content-Type': 'application/json'}}
         );
     });
 
     it('makes a proper call to delete a collection', async () => {
-        await CollectionAPI.deleteCollection('id');
+        await CollectionAPI.deleteCollection({
+            iri: 'id'
+        });
 
         expect(mockAxios.delete).toHaveBeenCalledTimes(1);
         expect(mockAxios.delete).toHaveBeenCalledWith(

@@ -6,9 +6,8 @@ import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
-import {getDirectoryFromFullpath, getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
+import {getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
 import * as consts from '../constants';
-import {getCollectionAbsolutePath} from "../common/utils/collectionUtils";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 import CollectionsContext from "../common/contexts/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
@@ -18,7 +17,6 @@ import {projectPrefix} from "../projects/projects";
 export const FilesPage = ({
     match,
     location,
-    history,
     fileApi,
     collections = [],
     loading = false,
@@ -55,11 +53,6 @@ export const FilesPage = ({
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
-    const handleCollectionLocationChange = (newLocation) => {
-        // If the collection location changes, the URI for the current page should change as well
-        history.push(`${getCollectionAbsolutePath(newLocation)}${getDirectoryFromFullpath(openedPath)}`);
-    };
-
     // Path for which metadata should be rendered
     const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
 
@@ -82,7 +75,6 @@ export const FilesPage = ({
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
                     <InformationDrawer
-                        onCollectionLocationChange={handleCollectionLocationChange}
                         setBusy={setBusy}
                         path={path}
                         selectedCollectionIri={collection.iri}

@@ -1,12 +1,30 @@
-import React from 'react';
-import {Card, CardContent, CardHeader, Icon, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
+// @flow
+import React, {useContext} from 'react';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    Icon,
+    IconButton,
+    Menu,
+    MenuItem,
+    Typography
+} from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import {ConfirmationDialog, LoadingInlay} from '../common';
+import {withRouter, useHistory} from 'react-router-dom';
+import {ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
 import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
 import PermissionsCard from "../permissions/PermissionsCard";
 import TechnicalMetadata from "../file/TechnicalMetadata";
+import type {Collection, Resource} from './CollectionAPI';
+import CollectionsContext from '../common/contexts/CollectionsContext';
+import {projectPrefix} from '../projects/projects';
+import type {History} from '../types';
+import type {AuditInfo} from '../file/TechnicalMetadata';
+import UsersContext from '../common/contexts/UsersContext';
+import getDisplayName from '../common/utils/userUtils';
 
 export const ICONS = {
     LOCAL_STORAGE: 'folder_open',
@@ -17,7 +35,28 @@ export const ICONS = {
 
 const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
-class CollectionDetails extends React.Component {
+type CollectionDetailsProps = {
+    loading: boolean;
+    collection: Collection;
+    users: any[];
+    inCollectionsBrowser: boolean;
+    deleteCollection: (Resource) => Promise<void>;
+    setBusy: (boolean) => void;
+    history: History;
+};
+
+type CollectionDetailsState = {
+    editing: boolean;
+    deleting: boolean;
+    anchorEl: any;
+}
+
+export class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
+    static defaultProps = {
+        inCollectionsBrowser: false,
+        setBusy: () => {}
+    };
+
     state = {
         editing: false,
         anchorEl: null,
@@ -42,7 +81,7 @@ class CollectionDetails extends React.Component {
         this.setState({deleting: false});
     };
 
-    handleMenuClick = event => {
+    handleMenuClick = (event: Event) => {
         this.setState({anchorEl: event.currentTarget});
     };
 
@@ -50,13 +89,37 @@ class CollectionDetails extends React.Component {
         this.setState({anchorEl: null});
     };
 
-    handleSave = (name, description, location, connectionString) => {
-        this.props.onUpdateCollection(name, description, location, connectionString);
-        this.setState({editing: false});
+    handleCollectionDelete = (collection: Collection) => {
+        const {setBusy, deleteCollection, history} = this.props;
+        setBusy(true);
+        deleteCollection(collection)
+            .then(() => history.push(`${projectPrefix()}/collections`))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while deleting a collection",
+                this.handleCollectionDelete
+            ))
+            .finally(() => setBusy(false));
     };
 
+    getUsernameByIri = (iri: string) => {
+        const {users} = this.props;
+        const user = users.find(u => u.iri === iri);
+        return user ? getDisplayName(user) : iri;
+    };
+
+    collectionMetadata(): AuditInfo {
+        const {collection} = this.props;
+        return {
+            dateCreated: collection.dateCreated,
+            createdBy: collection.createdBy ? this.getUsernameByIri(collection.createdBy) : collection.createdBy,
+            dateModified: collection.dateModified,
+            modifiedBy: collection.modifiedBy ? this.getUsernameByIri(collection.modifiedBy) : collection.modifiedBy
+        };
+    }
+
     render() {
-        const {loading, collection} = this.props;
+        const {loading, collection, inCollectionsBrowser = false} = this.props;
         const {anchorEl, editing, deleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
@@ -106,7 +169,7 @@ class CollectionDetails extends React.Component {
                             {collection.description}
                         </Typography>
 
-                        {this.props.collectionProps && <TechnicalMetadata fileProps={this.props.collectionProps} />}
+                        <TechnicalMetadata fileProps={this.collectionMetadata()} />
                     </CardContent>
                 </Card>
 
@@ -124,11 +187,10 @@ class CollectionDetails extends React.Component {
 
                 {editing ? (
                     <CollectionEditor
-                        name={collection.name}
-                        description={collection.description}
-                        location={collection.location}
-                        connectionString={collection.connectionString}
-                        onSave={this.handleSave}
+                        collection={collection}
+                        updateExisting
+                        inCollectionsBrowser={inCollectionsBrowser}
+                        setBusy={this.props.setBusy}
                         onClose={() => this.setState({editing: false})}
                     />
                 ) : null}
@@ -139,7 +201,7 @@ class CollectionDetails extends React.Component {
                         content={`Delete collection ${collection.name}`}
                         dangerous
                         agreeButtonText="Delete"
-                        onAgree={() => this.props.onCollectionDelete(this.props.collection)}
+                        onAgree={() => this.handleCollectionDelete(this.props.collection)}
                         onDisagree={this.handleCloseDelete}
                         onClose={this.handleCloseDelete}
                     />
@@ -149,4 +211,19 @@ class CollectionDetails extends React.Component {
     }
 }
 
-export default CollectionDetails;
+const ContextualCollectionDetails = (props) => {
+    const history = useHistory();
+    const {users} = useContext(UsersContext);
+    const {deleteCollection} = useContext(CollectionsContext);
+
+    return (
+        <CollectionDetails
+            {...props}
+            users={users}
+            history={history}
+            deleteCollection={deleteCollection}
+        />
+    );
+};
+
+export default withRouter(ContextualCollectionDetails);

@@ -8,12 +8,16 @@ import ProjectsContext from './ProjectsContext';
 import type {Project} from './ProjectsAPI';
 import ProjectEditor from './ProjectEditor';
 
-export const ProjectBrowser = ({
-    loading = false,
-    error = false,
-    projects = [],
-    createProject = () => {}
-}) => {
+
+type ProjectBrowserProps = {
+    loading: boolean,
+    error: boolean,
+    projects: Project[],
+    createProject: (Project) => Promise<Project>
+}
+
+export const ProjectBrowser = (props: ProjectBrowserProps) => {
+    const {loading, error, projects, createProject} = props;
     const [creatingProject, setCreatingProject] = useState(false);
     const [loadingCreatedProject, setLoadingCreatedProject] = useState(false);
     const {currentUser} = useContext(UserContext);
@@ -82,6 +86,11 @@ export const ProjectBrowser = ({
             {currentUser.admin ? renderAddProjectButton() : null }
         </>
     );
+};
+
+ProjectBrowser.defaultProps = {
+    loading: false,
+    error: false
 };
 
 const ContextualProjectBrowser = (props) => {

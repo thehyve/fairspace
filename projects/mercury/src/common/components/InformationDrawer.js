@@ -1,5 +1,5 @@
+// @flow
 import React, {useContext} from 'react';
-import PropTypes from 'prop-types';
 import {
     ExpansionPanel,
     ExpansionPanelDetails,
@@ -10,17 +10,15 @@ import {
 } from '@material-ui/core';
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {withRouter} from "react-router-dom";
-import {ErrorDialog, MessageDisplay, UsersContext} from '..';
+import {withRouter} from 'react-router-dom';
 
 import styles from './InformationDrawer.styles';
 import CollectionDetails from "../../collections/CollectionDetails";
 import PathMetadata from "../../metadata/metadata/PathMetadata";
-import getDisplayName from "../utils/userUtils";
 import CollectionsContext from "../contexts/CollectionsContext";
 import {LinkedDataEntityFormWithLinkedData} from '../../metadata/common/LinkedDataEntityFormContainer';
-
-const getUserObject = (users, iri) => users.find(user => user.iri === iri);
+import type {Collection} from '../../collections/CollectionAPI';
+import MessageDisplay from './MessageDisplay';
 
 const pathHierarchy = (fullPath) => {
     if (!fullPath) return [];
@@ -34,59 +32,27 @@ const pathHierarchy = (fullPath) => {
     return paths.reverse();
 };
 
-export class InformationDrawer extends React.Component {
-    handleDetailsChange = (location, locationChanged) => {
-        // If the location of a collection has changed, the URI where it
-        // can be found may also change. For that reason we need to redirect
-        // the user there.
-        if (locationChanged && this.props.onCollectionLocationChange) {
-            this.props.onCollectionLocationChange(location);
-        }
-    };
+type InformationDrawerProps = {
+    classes: any;
+    path: string;
+    inCollectionsBrowser: boolean;
+    atLeastSingleCollectionExists: boolean;
+    setBusy: (boolean) => void;
 
-    handleCollectionDelete = (collection) => {
-        const {deleteCollection, setBusy = () => {}} = this.props;
-        setBusy(true);
-        deleteCollection(collection.iri, collection.location)
-            .catch(err => ErrorDialog.showError(
-                err,
-                "An error occurred while deleting a collection",
-                this.handleCollectionDelete
-            ))
-            .finally(() => setBusy(false));
-    };
+    collection: Collection;
+    loading: boolean;
+};
 
-    handleUpdateCollection = (name, description, location, connectionString) => {
-        const {collection: oldCollection, setBusy = () => {}} = this.props;
-        setBusy(true);
-
-        if ((name !== oldCollection.name
-            || description !== oldCollection.description
-            || location !== oldCollection.location
-            || connectionString !== oldCollection.connectionString)
-            && (name !== '') && (location !== '')) {
-            return this.props.updateCollection(oldCollection.iri, name, description, connectionString, location, oldCollection.location)
-                .then(() => {
-                    const locationChanged = oldCollection.location !== location;
-                    this.handleDetailsChange(location, locationChanged);
-                })
-                .catch(err => {
-                    const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                    ErrorDialog.showError(err, message);
-                })
-                .finally(() => setBusy(false));
-        }
-
-        return Promise.resolve();
+export class InformationDrawer extends React.Component<InformationDrawerProps> {
+    static defaultProps = {
+        inCollectionsBrowser: false,
+        setBusy: () => {}
     };
 
     render() {
-        const {classes, collection, loading, atLeastSingleCollectionExists, inCollectionsBrowser = false, path} = this.props;
-        const {users} = this.context;
+        const {classes, collection, loading, atLeastSingleCollectionExists, inCollectionsBrowser, path} = this.props;
 
         const paths = pathHierarchy(path);
-
-        const getUsernameByIri = iri => getDisplayName(getUserObject(users, iri));
 
         if (!collection) {
             return atLeastSingleCollectionExists && inCollectionsBrowser
@@ -115,15 +81,9 @@ export class InformationDrawer extends React.Component {
             <>
                 <CollectionDetails
                     collection={collection}
-                    onUpdateCollection={this.handleUpdateCollection}
-                    onCollectionDelete={this.handleCollectionDelete}
+                    inCollectionsBrowser={this.props.inCollectionsBrowser}
                     loading={loading}
-                    collectionProps={{
-                        dateCreated: collection.dateCreated,
-                        createdBy: collection.createdBy ? getUsernameByIri(collection.createdBy) : '',
-                        dateModified: collection.dateModified,
-                        modifiedBy: collection.modifiedBy ? getUsernameByIri(collection.modifiedBy) : '',
-                    }}
+                    setBusy={this.props.setBusy}
                 />
                 <ExpansionPanel defaultExpanded>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -166,19 +126,8 @@ export class InformationDrawer extends React.Component {
     }
 }
 
-InformationDrawer.contextType = UsersContext;
-
-InformationDrawer.propTypes = {
-    updateCollection: PropTypes.func,
-    deleteCollection: PropTypes.func,
-    onCollectionLocationChange: PropTypes.func,
-
-    collection: PropTypes.object,
-    loading: PropTypes.bool
-};
-
 const ContextualInformationDrawer = ({selectedCollectionIri, ...props}) => {
-    const {loading, collections, updateCollection, deleteCollection} = useContext(CollectionsContext);
+    const {loading, collections} = useContext(CollectionsContext);
     const collection = collections.find(c => c.iri === selectedCollectionIri);
     const atLeastSingleCollectionExists = collections.length > 0;
 
@@ -187,8 +136,6 @@ const ContextualInformationDrawer = ({selectedCollectionIri, ...props}) => {
             {...props}
             loading={loading}
             collection={collection}
-            updateCollection={updateCollection}
-            deleteCollection={deleteCollection}
             atLeastSingleCollectionExists={atLeastSingleCollectionExists}
         />
     );

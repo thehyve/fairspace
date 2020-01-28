@@ -1,5 +1,5 @@
+// @flow
 import React from "react";
-import PropTypes from "prop-types";
 import {List, ListItem, ListItemText} from "@material-ui/core";
 import filesize from "filesize";
 import {formatDateTime, isNonEmptyValue} from '../common';
@@ -10,45 +10,52 @@ const ItemData = ({primary, secondary}) => (primary && secondary ? (
     </ListItem>
 ) : null);
 
-const TechnicalMetadata = ({fileProps: {dateCreated, createdBy, dateModified, modifiedBy, fileSize, checksum, ownedBy}}) => (
-    <List dense>
-        <ItemData
-            primary="Created"
-            secondary={(dateCreated || createdBy) && `${formatDateTime(dateCreated)} ${createdBy ? ' by ' + createdBy : ''}`}
-        />
+export type AuditInfo = {
+    dateCreated?: string;
+    createdBy?: string; // username
+    dateModified?: string;
+    modifiedBy?: string; // username
+    ownedBy?: string;
+    fileSize?: number;
+    checksum?: string;
+}
+export type TechnicalMetadataProps = {
+    fileProps: AuditInfo;
+};
 
-        <ItemData
-            primary="Last modified"
-            secondary={(dateModified || modifiedBy) && `${formatDateTime(dateModified)} ${modifiedBy ? ' by ' + modifiedBy : ''}`}
-        />
+const TechnicalMetadata = (props: TechnicalMetadataProps) => {
+    const {fileProps: {dateCreated, createdBy, dateModified, modifiedBy, ownedBy, fileSize, checksum}} = props;
 
-        {isNonEmptyValue(fileSize) && (
+    return (
+        <List dense>
             <ItemData
-                primary="Filesize"
-                secondary={filesize(fileSize)}
+                primary="Created"
+                secondary={(dateCreated || createdBy) && `${formatDateTime(dateCreated)} ${createdBy ? ' by ' + createdBy : ''}`}
             />
-        )}
 
-        <ItemData
-            primary="Checksum"
-            secondary={checksum}
-        />
+            <ItemData
+                primary="Last modified"
+                secondary={(dateModified || modifiedBy) && `${formatDateTime(dateModified)} ${modifiedBy ? ' by ' + modifiedBy : ''}`}
+            />
 
-        <ItemData
-            primary="Owner"
-            secondary={ownedBy}
-        />
-    </List>
-);
+            {isNonEmptyValue(fileSize) && (
+                <ItemData
+                    primary="Filesize"
+                    secondary={filesize(fileSize)}
+                />
+            )}
 
-TechnicalMetadata.propTypes = {
-    dateCreated: PropTypes.string,
-    createdBy: PropTypes.string,
-    dateModified: PropTypes.string,
-    modifiedBy: PropTypes.string,
-    ownedBy: PropTypes.string,
-    fileSize: PropTypes.number,
-    checksum: PropTypes.string
+            <ItemData
+                primary="Checksum"
+                secondary={checksum}
+            />
+
+            <ItemData
+                primary="Owner"
+                secondary={ownedBy}
+            />
+        </List>
+    );
 };
 
 export default TechnicalMetadata;

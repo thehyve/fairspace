@@ -3,6 +3,7 @@ import React from 'react';
 import {shallow} from "enzyme";
 
 import {InformationDrawer} from "../InformationDrawer";
+import CollectionDetails from '../../../collections/CollectionDetails';
 
 describe('InformationDrawer', () => {
     const collection = {
@@ -15,59 +16,18 @@ describe('InformationDrawer', () => {
     const defaultProps = {
         collection,
         updateCollection: () => Promise.resolve(),
-        paths: []
+        classes: {},
+        path: '/videos',
+        atLeastSingleCollectionExists: true,
+        loading: false
     };
 
-    it('invokes callback method after collection location has changed', () => {
-        const handleCollectionLocationChange = jest.fn();
-        const wrapper = shallow(<InformationDrawer
-            {...defaultProps}
-            onCollectionLocationChange={handleCollectionLocationChange}
-        />);
-
-        return wrapper.instance()
-            .handleUpdateCollection('My collection', 'description', 'newlocation')
-            .then(() => {
-                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(1);
-                expect(handleCollectionLocationChange).toHaveBeenCalledWith('newlocation');
-            });
-    });
-
-    it('does not invoke callback method if collection location has not changed', () => {
-        const handleCollectionLocationChange = jest.fn();
-        const wrapper = shallow(<InformationDrawer
-            {...defaultProps}
-            onCollectionLocationChange={handleCollectionLocationChange}
-        />);
-
-        return wrapper.instance()
-            .handleUpdateCollection('Other name', 'Other description', 'location1')
-            .then(() => {
-                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(0);
-            });
-    });
-
-
-    it('does not invoke callback method if collection update fails', () => {
-        const handleCollectionLocationChange = jest.fn();
-        const wrapper = shallow(<InformationDrawer
-            {...defaultProps}
-            updateCollection={() => Promise.reject()}
-            onCollectionLocationChange={handleCollectionLocationChange}
-        />);
-
-        return wrapper.instance()
-            .handleUpdateCollection('Other name', 'Other description', 'newlocation')
-            .then(() => {
-                expect(handleCollectionLocationChange).toHaveBeenCalledTimes(0);
-            });
-    });
-
-    it('ignores a missing callback function when a collection location has changed', () => {
+    it('renders collection details for the selected collection', () => {
         const wrapper = shallow(<InformationDrawer
             {...defaultProps}
         />);
 
-        expect(() => wrapper.instance().handleDetailsChange(collection, true)).not.toThrow();
+        const collectionDetailsProps = wrapper.find(CollectionDetails).first().props();
+        expect(collectionDetailsProps.collection.location).toBe('location1');
     });
 });
