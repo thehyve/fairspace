@@ -44,9 +44,9 @@ app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and runni
 
 app.get('/readiness', (req, res) => {
     if (allProjects) {
-        res.status(200).send('Ready.').end();
+        res.status(200).end('Ready');
     } else {
-        res.status(503).send('Initializing.').end();
+        res.status(503).end('Initializing');
     }
 });
 
@@ -83,12 +83,12 @@ app.use('/api/v1/projects/*/webdav', (req, res, next) => {
             keycloak.grantManager.obtainDirectly(username, password)
                 .then(grant => keycloak.storeGrant(grant, req, res))
                 .catch(() => {
-                    keycloak.accessDenied(req, res);
+                    res.status(401).end('Unauthorized');
                     return Promise.reject();
                 })
                 .then(() => next());
         } else {
-            res.status(401).header('WWW-Authenticate', 'Basic').send();
+            res.status(401).header('WWW-Authenticate', 'Basic').end();
         }
     } else {
         next();
