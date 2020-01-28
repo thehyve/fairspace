@@ -19,22 +19,11 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      {{- if .persistence.files.size }}
       storage: {{ .persistence.files.size | quote }}
-      {{- else }}
-      storage: {{ $global.Values.saturn.persistence.files.size | quote }}
-      {{- end }}
 {{- if .persistence.files.storageClass }}
   {{- if (eq "-" .persistence.files.storageClass) }}
   storageClassName: ""
   {{- else }}
   storageClassName: {{ .persistence.files.storageClass | quote }}
   {{- end }}
-{{- else if $global.Values.saturn.persistence.files.storageClass }}
-  {{- if (eq "-" $global.Values.saturn.persistence.files.storageClass) }}
-  storageClassName: ""
-  {{- else }}
-  storageClassName: "{{ $global.Values.saturn.persistence.files.storageClass }}"
-  {{- end }}
-{{- end }}
 {{- end }}
