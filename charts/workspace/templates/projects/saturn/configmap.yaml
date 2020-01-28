@@ -29,7 +29,6 @@ data:
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1
-          indexName: "{{ .Values.external.elasticsearch.indexName }}"
     auth:
       enabled: true
       fullAccessRole: organisation-admin
