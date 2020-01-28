@@ -61,7 +61,7 @@ public class WebDAVApp implements SparkApplication {
 
     @Override
     public void init() {
-        before("/projects/*/webdav/*", (req, res) -> {
+        before("/projects/*/webdav", (req, res) -> {
             var servletRequest = (HttpServletRequest) req.raw();
             var servletResponse = (HttpServletResponse) res.raw();
 
