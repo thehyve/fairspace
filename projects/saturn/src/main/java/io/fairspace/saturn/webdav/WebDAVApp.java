@@ -61,18 +61,21 @@ public class WebDAVApp implements SparkApplication {
 
     @Override
     public void init() {
-        before("/projects/*/webdav", (req, res) -> {
-            var servletRequest = (HttpServletRequest) req.raw();
-            var servletResponse = (HttpServletResponse) res.raw();
+        before("/projects/*/webdav/*", this::handle);
+        before("/projects/*/webdav", this::handle);
+    }
 
-            try {
-                setThreadlocals(servletRequest, servletResponse);
-                httpManager.process(new ServletRequest(servletRequest, servletRequest.getServletContext()), new ServletResponse(servletResponse));
-            } finally {
-                clearThreadlocals();
-                servletResponse.getOutputStream().flush();
-                servletResponse.flushBuffer();
-            }
-        });
+    private void handle(spark.Request req, spark.Response res) throws Exception {
+        var servletRequest = (HttpServletRequest) req.raw();
+        var servletResponse = (HttpServletResponse) res.raw();
+
+        try {
+            setThreadlocals(servletRequest, servletResponse);
+            httpManager.process(new ServletRequest(servletRequest, servletRequest.getServletContext()), new ServletResponse(servletResponse));
+        } finally {
+            clearThreadlocals();
+            servletResponse.getOutputStream().flush();
+            servletResponse.flushBuffer();
+        }
     }
 }
