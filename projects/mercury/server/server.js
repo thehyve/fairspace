@@ -111,6 +111,10 @@ const PROJECT_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
 
 // Create a new project
 app.put('/api/v1/projects', (req, res) => {
+    if (!accessToken.content.authorities.includes('organisation-admin')) {
+        res.status(403).send('Forbidden');
+        return;
+    }
     json(req, res, () => {
         const project = req.body;
 
@@ -132,8 +136,6 @@ app.put('/api/v1/projects', (req, res) => {
         }
 
         projectsBeingCreated.add(project.id);
-
-        // TODO: Check user's permissions
 
         // A project is created when it is accessed for the first time
         fetch(`${project.workspace}/api/v1/projects/${project.id}/collections/`,
