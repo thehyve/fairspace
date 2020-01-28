@@ -56,16 +56,29 @@ const LinkedDataEntityFormContainer = ({
         footer = <CircularProgress />;
     } else if (canEdit) {
         footer = (
-            <Button
-                type="submit"
-                form={formId}
-                variant={fullpage ? 'contained' : 'text'}
-                color="primary"
-                onClick={validateAndSubmit}
-                disabled={!hasFormUpdates || !isValid}
-            >
-                Update
-            </Button>
+            <div>
+                {editable && showEditButtons && (
+                    <Button
+                        type="submit"
+                        color="secondary"
+                        onClick={() => {
+                            clearForm();
+                            setEditingEnabled(false);
+                        }}
+                    >Cancel
+                    </Button>
+                )}
+                <Button
+                    type="submit"
+                    form={formId}
+                    variant={fullpage ? 'contained' : 'text'}
+                    color="primary"
+                    onClick={validateAndSubmit}
+                    disabled={!hasFormUpdates || !isValid}
+                >
+                    Update
+                </Button>
+            </div>
         );
     }
 
@@ -108,17 +121,7 @@ const LinkedDataEntityFormContainer = ({
             </Grid>
             {showEditButtons ? (
                 <Grid item xs={1}>
-                    {canEdit ? (
-                        <Button
-                            type="submit"
-                            color="primary"
-                            onClick={() => {
-                                clearForm();
-                                setEditingEnabled(false);
-                            }}
-                        >Cancel
-                        </Button>
-                    ) : (
+                    {!canEdit && (
                         <IconButton
                             aria-label="Edit"
                             onClick={() => {
