@@ -44,8 +44,10 @@ const useFormData = (values) => {
     };
 
     const updateValue = (property, value, index) => {
-        const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
-        save(property, newValue);
+        if (!values[property.key] || values[property.key][0].value !== value.value) {
+            const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
+            save(property, newValue);
+        }
     };
 
     const deleteValue = (property, index) => {
