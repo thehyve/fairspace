@@ -1,4 +1,3 @@
-// @flow
 import mockAxios from 'axios';
 import WorkspacesAPI, {Workspace} from '../WorkspacesAPI';
 

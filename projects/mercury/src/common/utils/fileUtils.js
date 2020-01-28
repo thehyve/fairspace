@@ -49,28 +49,6 @@ export function getFileName(path) {
     return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;
 }
 
-/**
- * Extracts the directory within a collection from the full path
- *
- * For example. A full path of /my-collection/all-data would return /all-data
- * @param path Full path including the collection-location. May or may not start with a leading /
- * @returns {string} Directory name within the collection. Starts with a leading '/'
- */
-export function getDirectoryFromFullpath(path) {
-    // Remove the first directory name from the opened path, in order
-    // to remove the previous collection location
-    // If there is a leading slash, remove it
-    const cleanedPath = path.charAt(0) === '/' ? path.substring(1) : path;
-    const firstSlashPosition = cleanedPath.indexOf('/');
-
-    // Without a slash, we are in the root directory
-    if (firstSlashPosition === -1) {
-        return '/';
-    }
-
-    return cleanedPath.substring(firstSlashPosition);
-}
-
 export const getPathInfoFromParams = ({collection, path}) => (
     {
         collectionLocation: collection,

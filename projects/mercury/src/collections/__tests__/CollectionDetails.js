@@ -3,7 +3,7 @@ import {render} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 import '@testing-library/jest-dom/extend-expect';
 
-import CollectionDetails, {ICONS} from "../CollectionDetails";
+import {CollectionDetails, ICONS} from "../CollectionDetails";
 
 describe('<CollectionDetails />', () => {
     it('renders proper icon for local storage collection', async () => {

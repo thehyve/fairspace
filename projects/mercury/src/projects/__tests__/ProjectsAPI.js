@@ -1,4 +1,3 @@
-// @flow
 import mockAxios, {AxiosError, AxiosResponse} from 'axios';
 import projectsAPI, {Project} from '../ProjectsAPI';
 

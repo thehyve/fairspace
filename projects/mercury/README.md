@@ -58,6 +58,12 @@ You can also run eslint manually by doing:
 yarn lint
 ```
 
+Some types have been added using [flow]. To run the flow type checker:
+```
+yarn flow
+```
+
+
 ### Testing
 
 To run the test scripts:  
@@ -72,3 +78,6 @@ Jest is the main testing framework and runner. Some (older) tests use [Enzyme](h
 
 In order for the search functionality to work, Docker has to be installed and running on your machine.
 If you are having an issue running the search, try to stop the container running the Elasticsearch image (`docker ps` to see running containers and docker stop `<CONTAINER_ID>`) and rerun the app again.
+
+
+[flow]: https://flow.org/en/docs/lang/

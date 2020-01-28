@@ -1,11 +1,10 @@
 import React, {useContext, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
+import {LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
-import Config from "../common/services/Config";
 import CollectionsContext from "../common/contexts/CollectionsContext";
 
 export const CollectionBrowser = ({
@@ -14,7 +13,6 @@ export const CollectionBrowser = ({
     collections = [],
     isSelected = () => false,
     selectCollection = () => {},
-    addCollection = () => {},
     users = [],
     history
 }) => {
@@ -30,15 +28,6 @@ export const CollectionBrowser = ({
 
     const handleCollectionDoubleClick = (collection) => {
         history.push(getCollectionAbsolutePath(collection.location));
-    };
-
-    const handleAddCollection = (name, description, location, connectionString) => {
-        addCollection(name, description, connectionString, location)
-            .then(() => setAddingNewCollection(false))
-            .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                ErrorDialog.showError(err, message);
-            });
     };
 
     const handleCancelAddCollection = () => setAddingNewCollection(false);
@@ -59,9 +48,7 @@ export const CollectionBrowser = ({
                 {addingNewCollection ? (
                     <CollectionEditor
                         title="Add collection"
-                        onSave={handleAddCollection}
                         onClose={handleCancelAddCollection}
-                        editType={Config.get().enableExperimentalFeatures}
                     />
                 ) : null}
             </>
@@ -92,13 +79,12 @@ export const CollectionBrowser = ({
 const ContextualCollectionBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {collections, collectionsLoading, collectionsError, addCollection} = useContext(CollectionsContext);
+    const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
 
     return (
         <CollectionBrowser
             {...props}
             collections={collections}
-            addCollection={addCollection}
             users={users}
             loading={collectionsLoading || currentUserLoading || usersLoading}
             error={collectionsError || currentUserError || usersError}

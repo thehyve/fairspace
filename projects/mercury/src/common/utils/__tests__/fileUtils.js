@@ -1,7 +1,6 @@
 import {
     generateUniqueFileName,
     getBaseNameAndExtension,
-    getDirectoryFromFullpath,
     getFileName,
     getParentPath,
     getPathInfoFromParams
@@ -76,20 +75,6 @@ describe('getFileName', () => {
         expect(getFileName('ccc.ext')).toEqual('ccc.ext');
         expect(getFileName('aaa/bbb.ext/')).toEqual('bbb.ext');
         expect(getFileName('aaa/bbb')).toEqual('bbb');
-    });
-});
-
-describe('getDirectoryFromFullpath', () => {
-    it('gets the directory from the full path', () => {
-        expect(getDirectoryFromFullpath('/my-collection/sub-directory')).toEqual('/sub-directory');
-        expect(getDirectoryFromFullpath('/my-collection/sub-directory/nested/others.txt')).toEqual('/sub-directory/nested/others.txt');
-        expect(getDirectoryFromFullpath('/my-collection')).toEqual('/');
-    });
-
-    it('allows the path not to have a leading slash', () => {
-        expect(getDirectoryFromFullpath('my-collection/sub-directory')).toEqual('/sub-directory');
-        expect(getDirectoryFromFullpath('my-collection/sub-directory/nested/others.txt')).toEqual('/sub-directory/nested/others.txt');
-        expect(getDirectoryFromFullpath('my-collection')).toEqual('/');
     });
 });
 

@@ -4,6 +4,7 @@ import {act} from 'react-dom/test-utils';
 
 import {FilesPage} from "../FilesPage";
 import InformationDrawer from "../../common/components/InformationDrawer";
+import FileBrowser from '../FileBrowser';
 
 const collections = [
     {
@@ -36,31 +37,31 @@ function shallowRender(history, openedPath, locationSearch = '') {
 describe('FilesPage', () => {
     let wrapper;
 
-    it('updates url after collection location has changed', () => {
-        const history = [];
-
-        act(() => {
-            wrapper = shallowRender(history, 'subdirectory/something-else');
-        });
-
-        const collectionChangeHandler = wrapper.find(InformationDrawer).prop("onCollectionLocationChange");
-        collectionChangeHandler('new-location');
-
-        expect(history.length).toEqual(1);
-        expect(history[0]).toEqual('/collections/new-location/subdirectory/something-else');
-    });
-
-    it('can handle an empty openedPath', () => {
+    it('renders a file browser and information drawer', () => {
         const history = [];
 
         act(() => {
             wrapper = shallowRender(history, '');
         });
 
-        const collectionChangeHandler = wrapper.find(InformationDrawer).prop("onCollectionLocationChange");
-        collectionChangeHandler('new-location');
+        const fileBrowserProps = wrapper.find(FileBrowser).first().props();
+        expect(fileBrowserProps.openedPath).toBe('/location1');
+        expect(fileBrowserProps.openedCollection.location).toBe('location1');
+        const informationDrawerProps = wrapper.find(InformationDrawer).first().props();
+        expect(informationDrawerProps.selectedCollectionIri).toBe('http://test');
+    });
 
-        expect(history.length).toEqual(1);
-        expect(history[0]).toEqual('/collections/new-location/');
+    it('renders a file browser and information drawer for a specified path', () => {
+        const history = [];
+
+        act(() => {
+            wrapper = shallowRender(history, 'music/jazz');
+        });
+
+        const fileBrowserProps = wrapper.find(FileBrowser).first().props();
+        expect(fileBrowserProps.openedPath).toBe('/location1/music/jazz');
+        expect(fileBrowserProps.openedCollection.location).toBe('location1');
+        const informationDrawerProps = wrapper.find(InformationDrawer).first().props();
+        expect(informationDrawerProps.selectedCollectionIri).toBe('http://test');
     });
 });
