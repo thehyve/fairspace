@@ -11,6 +11,12 @@ Some general architecture on the overall code can be found [here](./architecture
 
 ## Running the app in development mode
 
+Prerequisites:
+
+- [nodejs and npm](https://www.npmjs.com/get-npm)
+- [yarn](https://yarnpkg.com/lang/en/)
+- nodemon (can be installed with `npm install -g nodemon`)
+
 The app needs a backend to communicate with. For convenience, there are a few scripts to use for local development:
 
 - `./start-elasticsearch` starts an ElasticSearch instance at port 9200 and 9300.
@@ -32,7 +38,11 @@ This will start:
 
 The application will be available at http://localhost:8081/
 
-All commands require you to have [yarn](https://yarnpkg.com/lang/en/) installed. 
+It's also possible to start the application without either the proxy server or Saturn and then start the missing component manually in debug mode:
+
+`yarn dev-no-server`
+
+`yarn dev-no-saturn`
 
 
 ## Development
