@@ -1,5 +1,4 @@
 {{- $ingress := .Values.workspace.ingress -}}
-{{- if $ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -31,4 +30,3 @@ spec:
       annotations:
         nginx.org/location-snippets: |
           proxy_set_header      X-Forwarded-Proto https;
-  {{- end -}}

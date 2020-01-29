@@ -7,7 +7,6 @@
 imagePullSecrets: {}
 
 # Set specific workspace name. Defaults to release name
-# Please note that if this is set, also set it for pluto in `pluto.workspace.name`
 nameOverride:
 
 # External dependencies for running the workspace
@@ -18,7 +17,7 @@ external:
   # to the sensitive nature of these parameters
   #
   # We could either:
-  # - have the hyperspace setup keycloak itself, when creating a new workspace
+  # - have the workspace setup keycloak itself, when creating a new workspace
   # - use temporary credentials for setting up these users
   # - ...
   keycloak:
@@ -100,7 +99,6 @@ workspace:
     name: "workspace"
     description: "Workspace"
     ingress:
-        enabled: true
         domain:
         annotations:
           mercury:

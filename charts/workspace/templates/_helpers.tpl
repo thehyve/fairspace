@@ -66,12 +66,8 @@ Define the keycloak realm, by using a set value. This allows us to pass the valu
 Scheme to access workspace components (http or https)
 */}}
 {{- define "workspace.scheme" -}}
-{{- if .Values.workspace.ingress.enabled -}}
 {{- if .Values.workspace.ingress.tls.enabled -}}
 {{- "https" -}}
-{{- else -}}
-{{- "http" -}}
-{{- end -}}
 {{- else -}}
 {{- "http" -}}
 {{- end -}}

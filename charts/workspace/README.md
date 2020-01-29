@@ -5,9 +5,9 @@ Contains:
 - Mercury
 - Saturn
 
-A workspace within Fairspace is always associated with a hyperspace. The
-hyperspace contains shared components, such as Keycloak for authentication.
-The connection to the hyperspace should be configured when installing this chart.
+A workspace within Fairspace is always associated with a workspace. The
+workspace contains shared components, such as Keycloak for authentication.
+The connection to the workspace should be configured when installing this chart.
 
 ## Prerequisites
 
@@ -23,12 +23,12 @@ registries using `gcloud auth configure-docker`.
 First create a configuration file with settings for the workspace to install. For example:
 
 ```yaml
-hyperspace:
-    domain: hyperspace.ci.test.fairdev.app
+workspace:
+    domain: workspace.ci.test.fairdev.app
     keycloak:
         username: keycloak
         password: abcdefghi
-        realm: hyperspace
+        realm: workspace
      
 
 ```
@@ -42,13 +42,13 @@ By default, on minikube one would want to run the system without TLS and ingress
 configuration file would be something like:
 
 ```yaml
-# Provide your own hyperspace settings here
+# Provide your own workspace settings here
 external:
     keycloak:
         baseUrl: http://192.168.99.100:30867
         username: keycloak
         password: abcdefghi
-        realm: hyperspace
+        realm: workspace
 
 workspace:
     description: "Demo workspace"
@@ -63,10 +63,9 @@ installation.
 #### Workspace parameters
 | Parameter  | Description  | Default |
 |---|---|---|
-| `nameOverride`  | Unique name for the workspace to install. Please note that if you override the name, also set `pluto.workspace.name` | <release name> |
+| `nameOverride`  | Unique name for the workspace to install | <release name> |
 | `workspace.name`  | Human-friendly name of the workspace | workspace |
 | `workspace.description`  | Description of the purpose of the workspace | Workspace |
-| `workspace.ingress.enabled`  | Whether or not an ingress is setup for the workspace components. Should be set to false when running locally.  | true |
 | `workspace.ingress.domain`   | Domain that is used for setting up the workspace. Is used as postfix for the hostname for the specific components.  | workspace.ci.test.fairdev.app  |
 | `workspace.ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for workspace  | true  |
 | `workspace.ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
@@ -81,7 +80,7 @@ installation.
 | `external.keycloak.baseUrl` | Base url for keycloak installation  | https://keycloak.ci.fairway.app  |
 | `external.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
 | `external.keycloak.password`  | Password used for setting up keycloak users. | |
-| `external.keycloak.realm`  | Keycloak realm that is used for this hyperspace.| |
+| `external.keycloak.realm`  | Keycloak realm that is used for this workspace.| |
 | `external.keycloak.clientSecret`  | UUID that is used as client secret in communication between Mercury and keycloak.| <random uuid> |
 
 #### Tool configuration
@@ -115,5 +114,5 @@ of the chart, as the random values may be computed again.
 Other properties may contain default values, which is not advised to use. For those reasons it is strongly advised to define
 values for at least the following properties:
 
-* `hyperspace.keycloak.password`
-* `hyperspace.keycloak.clientSecret`
+* `workspace.keycloak.password`
+* `workspace.keycloak.clientSecret`

@@ -1,5 +1,4 @@
 {{- $ingress := .Values.workspace.ingress -}}
-{{- if $ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -28,8 +27,3 @@ spec:
             backend:
               serviceName: {{ template "docs.fullname" . }}
               servicePort: 80
-{{- end -}}
-
-
-
-
