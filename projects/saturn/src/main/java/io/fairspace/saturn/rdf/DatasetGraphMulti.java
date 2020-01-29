@@ -19,15 +19,15 @@ public class DatasetGraphMulti extends DatasetGraphWrapperJobSupport {
     private final LoadingCache<String, DatasetGraph> cache;
     private final Client client;
 
-    public DatasetGraphMulti(Config.Jena config) {
+    public DatasetGraphMulti(Config config) {
         super(null);
 
-        client = config.elasticSearch.enabled
-                ? ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings)
+        client = config.jena.elasticSearch.enabled
+                ? ElasticSearchClientFactory.build(config.jena.elasticSearch.settings, config.jena.elasticSearch.advancedSettings)
                 : null;
 
         cache = CacheBuilder.newBuilder()
-                .expireAfterAccess(config.inactiveConnectionShutdownIntervalSec, TimeUnit.SECONDS)
+                .expireAfterAccess(config.jena.inactiveConnectionShutdownIntervalSec, TimeUnit.SECONDS)
                 .removalListener(notification -> ((DatasetGraph) notification.getValue()).close())
                 .build(new CacheLoader<>() {
                     public DatasetGraph load(String projectName) throws Exception {

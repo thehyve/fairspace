@@ -17,7 +17,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        var ds =  new DatasetJobSupportImpl(new DatasetGraphMulti(CONFIG.jena));
+        var ds =  new DatasetJobSupportImpl(new DatasetGraphMulti(CONFIG));
 
         var svc = new Services(CONFIG, ds);
 

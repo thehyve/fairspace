@@ -23,13 +23,13 @@ import static org.apache.jena.query.ReadWrite.WRITE;
 
 public class TransactionsTest {
     private DatasetJobSupport ds;
-    private Config.Jena config = new Config.Jena();
+    private Config config = new Config();
 
     @Before
     public void before() {
-        config.elasticSearch.enabled = false;
-        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config.jena.elasticSearch.enabled = false;
+        config.jena.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
         setThreadContext(new ThreadContext());
         getThreadContext().setProject("ds");
@@ -40,7 +40,7 @@ public class TransactionsTest {
     @After
     public void after() throws IOException {
         ds.close();
-        deleteDirectory(config.datasetPath);
+        deleteDirectory(config.jena.datasetPath);
         ds = null;
     }
 

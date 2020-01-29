@@ -125,6 +125,9 @@ public class FS {
     public static final String PROJECT_DESCRIPTION_URI = NS + "projectDescription";
     public static final Property projectDescription = createProperty(PROJECT_DESCRIPTION_URI);
 
+    public static final String NODE_URL_URI = NS + "nodeUrl";
+    public static final Property nodeUrl = createProperty(NODE_URL_URI);
+
     public static final String PROJECT_EXTERNAL_LINK_URI = NS + "projectExternalLink";
     public static final Property projectExternalLink = createProperty(PROJECT_EXTERNAL_LINK_URI);
 
