@@ -41,19 +41,19 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static DatasetGraph connect(Config.Jena config, String projectName, Client elasticsearchClient) throws IOException {
-        var dsDir = new File(config.datasetPath, projectName);
+    public static DatasetGraph connect(Config config, String projectName, Client elasticsearchClient) throws IOException {
+        var dsDir = new File(config.jena.datasetPath, projectName);
         var restoreNeeded = isRestoreNeeded(dsDir);
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(dsDir.getAbsolutePath()), config.storeParams).getDatasetGraph();
+        var dsg = connectCreate(Location.create(dsDir.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(new File(config.transactionLogPath, projectName), new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(new File(config.jena.transactionLogPath, projectName), new SparqlTransactionCodec());
 
         if (elasticsearchClient != null) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, projectName, config, restoreNeeded, elasticsearchClient);
+            dsg = enableElasticSearch(dsg, projectName, config.jena, restoreNeeded, elasticsearchClient);
         }
 
         if (restoreNeeded) {
@@ -76,6 +76,7 @@ public class SaturnDatasetFactory {
                     ds.getDefaultModel()
                             .add(FS.theProject, RDF.type, FS.Project)
                             .add(FS.theProject, RDFS.label, projectName)
+                            .add(FS.theProject, FS.nodeUrl, config.privateUrl)
                             .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
                     ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
             }

@@ -27,14 +27,14 @@ public class RestoreTest {
             createProperty("http://example.com/property2"),
             createResource("http://example.com/object2"));
 
-    private Config.Jena config;
+    private Config config;
 
     @Before
     public void before() {
-        config = new Config.Jena();
-        config.elasticSearch.enabled = false;
-        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config = new Config();
+        config.jena.elasticSearch.enabled = false;
+        config.jena.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
         setThreadContext(new ThreadContext());
         getThreadContext().setProject("ds");
@@ -42,8 +42,8 @@ public class RestoreTest {
 
     @After
     public void after() {
-        config.transactionLogPath.delete();
-        config.datasetPath.delete();
+        config.jena.transactionLogPath.delete();
+        config.jena.datasetPath.delete();
     }
 
     @Test
@@ -55,8 +55,8 @@ public class RestoreTest {
 
         ds1.close();
 
-        deleteDirectory(config.datasetPath);
-        assertFalse(config.datasetPath.exists());
+        deleteDirectory(config.jena.datasetPath);
+        assertFalse(config.jena.datasetPath.exists());
 
         var ds2 = newDataset();
 
@@ -81,7 +81,7 @@ public class RestoreTest {
 
         ds1.close();
 
-        deleteDirectory(config.datasetPath);
+        deleteDirectory(config.jena.datasetPath);
 
         var ds2 = newDataset();
 

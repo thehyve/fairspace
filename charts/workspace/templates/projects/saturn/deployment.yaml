@@ -71,7 +71,7 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: {{ $global.Release.Name }}-saturn
+          name: {{ $global.Release.Name }}-saturn-{{ .name }}
       - name: database
         persistentVolumeClaim:
           claimName: {{ $global.Release.Name }}-saturn-{{.name}}-database

@@ -31,6 +31,8 @@ public class Config {
 
     public String publicUrl = "http://localhost:3000";
 
+    public String privateUrl = "http://localhost:8080";
+
     public final Jena jena = new Jena();
 
     public final Auth auth = new Auth();
