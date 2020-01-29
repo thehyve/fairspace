@@ -107,4 +107,6 @@ Scheme to access workspace components (http or https)
 {{- printf "%s://%s:%s" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) -}}
 {{- end -}}
 
-
+{{- define "keycloak.prefix" -}}
+{{- printf "%s-%s" .Release.Name "keycloak" | trunc 20 | trimSuffix "-" -}}
+{{- end -}}

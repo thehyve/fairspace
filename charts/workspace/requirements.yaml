@@ -1,4 +1,8 @@
 dependencies:
+- name: keycloak
+  version: "6.0.3"
+  repository: https://codecentric.github.io/helm-charts
+  condition: keycloak.enabled
 - name: elasticsearch
   version: "1.31.0"
   repository: https://kubernetes-charts.storage.googleapis.com

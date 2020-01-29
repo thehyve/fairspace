@@ -39,6 +39,30 @@ external:
       port: 9300
 
 #####################################################################
+# Specific settings for Keycloak
+#####################################################################
+keycloak:
+  enabled: true
+  keycloak:
+    username: keycloak
+    service:
+      type: ClusterIP
+      port: 80
+    ingress:
+      enabled: false
+    extraArgs: "-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled"
+    resources:
+      requests:
+        cpu: "10m"
+        memory: "600Mi"
+      limits:
+        cpu: "500m"
+        memory: "2048Mi"
+    persistence:
+      dbVendor: h2
+      dbPassword:
+
+#####################################################################
 # Specific settings for ElasticSearch
 #####################################################################
 elasticsearch:
@@ -141,7 +165,11 @@ workspace:
             limits:
                 cpu: "500m"
                 memory: "2048Mi"
-
+    organisationadmin:
+      username:
+      password: fairspace123
+    testuser:
+      generate: false
     enableExperimentalFeatures: false
 
 # Generic settings for tracing

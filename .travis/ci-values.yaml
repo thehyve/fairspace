@@ -14,6 +14,13 @@ external:
     rest:
       host: workspace-ci-elasticsearch-client.workspace-ci.svc.cluster.local
 
+# Set passwords to prevent having a new password at every upgrade
+keycloak:
+  keycloak:
+    password: keycloak-ci-123
+    persistence:
+      dbPassword: "9FGwLKpEu$4w/knG"
+
 # Settings for the workspace
 workspace:
   name: "CI Workspace"
@@ -24,14 +31,13 @@ workspace:
   configurationScripts:
     keycloak:
       pullPolicy: Always
+  testuser:
+    generate: true
+    password: fairspace123
 
 services:
   jupyterhub: https://jupyter.workspace.ci.fairway.app
 
-pluto:
-  image:
-    pullPolicy: Always
-    tag: 0.6.11-SNAPSHOT
 
 # Specific settings for Saturn subchart
 saturn:

@@ -1,0 +1,80 @@
+{{ if .Values.keycloak.enabled -}}
+{{- $scripts := .Values.workspace.configurationScripts.keycloak -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}-keycloak-configuration"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}-keycloak-configuration"
+      labels:
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      {{- if .Values.fairspaceImagePullSecret }}
+      imagePullSecrets:
+          - name: {{ .Values.fairspaceImagePullSecret }}
+      {{- end }}
+      containers:
+      - name: configure-keycloak-job
+        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
+        imagePullPolicy: {{ $scripts.pullPolicy }}
+        resources:
+{{ toYaml $scripts.resources | indent 10 }}
+        env:
+          - name: KEYCLOAK_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "keycloak.prefix" . }}-http"
+                key: password
+          - name: ORGANISATION_ADMIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.workspace.keycloak.realm}}-organisationadmin"
+                key: username
+          - name: ORGANISATION_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.workspace.keycloak.realm}}-organisationadmin"
+                key: password
+          - name: TESTUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.workspace.keycloak.realm}}-testuser"
+                key: password
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-oauth-client"
+                key: clientId
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-oauth-client"
+                key: clientSecret
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
+        command:
+        - "/opt/jboss/scripts/setup-keycloak-workspace.sh"
+        - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
+        - "{{.Values.keycloak.keycloak.username}}"
+        - "{{.Values.workspace.keycloak.realm}}"
+        - "/opt/config/redirect.urls"
+        - "{{.Values.workspace.testuser.generate}}"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{.Release.Name}}-keycloak-config-map"
+{{ end -}}
