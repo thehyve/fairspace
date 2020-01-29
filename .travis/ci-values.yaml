@@ -9,11 +9,10 @@ external:
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
   elasticsearch:
     enabled: true
-    indexName: workspace-ci
     transport:
-      host: hyperspace-ci-elasticsearch-discovery.hyperspace-ci.svc.cluster.local
+      host: workspace-ci-elasticsearch-discovery.workspace-ci.svc.cluster.local
     rest:
-      host: hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local
+      host: workspace-ci-elasticsearch-client.workspace-ci.svc.cluster.local
 
 # Settings for the workspace
 workspace:
@@ -90,8 +89,6 @@ saturn:
 mercury:
   image:
     pullPolicy: Always
-  workspaces:
-    - http://workspace-ci-saturn.workspace-ci.svc.cluster.local
 # Specific settings for Mercury subchart
 docs:
   image:
