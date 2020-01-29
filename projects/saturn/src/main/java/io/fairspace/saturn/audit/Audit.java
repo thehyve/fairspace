@@ -19,7 +19,9 @@ public class Audit {
             }
         }
 
-        MDC.put("user_name", ctx.getUser().getName());
+        if (ctx.getUser().getName() != null) {
+            MDC.put("user_name", ctx.getUser().getName());
+        }
         if (ctx.getUser().getEmail() != null) {
             MDC.put("user_email", ctx.getUser().getEmail());
         }
