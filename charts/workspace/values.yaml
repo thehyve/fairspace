@@ -309,11 +309,5 @@ docs:
     timeoutSeconds: 1
   terminationGracePeriodSeconds: 60
 
-rabbitmq:
-  enabled: false
-  required: true
-  username:
-  password:
-
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}
