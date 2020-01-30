@@ -1,11 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import TextField from "@material-ui/core/TextField";
-
-import FormContext from "../FormContext";
 
 const BaseInputValue = ({entry: {value}, property, currentValues, style, onChange, ...otherProps}) => {
     const [localValue, setLocalValue] = useState(value);
-    const {submit} = useContext(FormContext);
 
     useEffect(() => {
         setLocalValue(value);

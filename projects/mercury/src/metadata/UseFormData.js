@@ -1,5 +1,6 @@
 import {useState} from "react";
 import useValidation from "./UseValidation";
+import {first} from "../common/utils";
 
 /**
  * This hook is concerned about storing form state. It is given an initial set of values
@@ -44,7 +45,7 @@ const useFormData = (values) => {
     };
 
     const updateValue = (property, value, index) => {
-        if (!values[property.key] || values[property.key][0].value !== value.value) {
+        if (!first(values[property.key]) || first(values[property.key]).value !== value.value) {
             const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
             save(property, newValue);
         }

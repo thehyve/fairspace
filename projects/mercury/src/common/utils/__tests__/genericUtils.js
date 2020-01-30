@@ -1,7 +1,7 @@
 import {
     compareBy,
     comparePrimitives,
-    comparing,
+    comparing, first,
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
@@ -94,6 +94,18 @@ describe('joinWithSeparator', () => {
     });
     it('should work without a separator', () => {
         expect(joinWithSeparator(['a', 'b', 'c'])).toEqual(['a', 'b', 'c']);
+    });
+});
+
+describe('first', () => {
+    it('should return first element of the array', () => {
+        expect(first(['a', 'b', 'c'])).toEqual('a');
+    });
+    it('should work with empty arrays', () => {
+        expect(first([])).toEqual(undefined);
+    });
+    it('should work with nullable arrays', () => {
+        expect(first(null)).toEqual(undefined);
     });
 });
 
