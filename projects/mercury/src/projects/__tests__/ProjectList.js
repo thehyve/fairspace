@@ -14,16 +14,16 @@ describe('ProjectList', () => {
 
     it('displays the list of projects', () => {
         const projects: Project[] = [{
-            id: 'project1', description: 'Project 1'
+            id: 'project1', label: 'project-1'
         }, {
-            id: 'project2', description: 'Project 2'
+            id: 'project2', label: 'project-2'
         }];
         const {getByText} = render(<MemoryRouter><ProjectList projects={projects} /></MemoryRouter>);
         expect(getByText('Name'))
             .toBeInTheDocument();
-        expect(getByText('Project 1'))
+        expect(getByText('project-1'))
             .toBeInTheDocument();
-        expect(getByText('Project 2'))
+        expect(getByText('project-2'))
             .toBeInTheDocument();
     });
 });
