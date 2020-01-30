@@ -7,4 +7,3 @@ export const SIDE_PANEL_WIDTH = '45%';
 
 // Search
 export const SEARCH_DEFAULT_SIZE = 10;
-export const PROJECTS_MAX_SIZE = 10000;

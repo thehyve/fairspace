@@ -13,6 +13,15 @@ export type Project = {
 }
 
 class ProjectsAPI {
+    getProjects(): Promise<Project[]> {
+        return axios.get(projectsUrl, {
+            headers: {Accept: 'application/json'},
+        })
+            .catch(handleHttpError("Failure when retrieving a list of projects"))
+            .then(extractJsonData)
+            .then((projects) => projects.map(project => ({...project, name: project.id})));
+    }
+
     createProject(project: Project): Promise<Project> {
         return axios.put(projectsUrl, JSON.stringify(project), {
             headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},

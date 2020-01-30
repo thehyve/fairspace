@@ -1,13 +1,12 @@
 // @flow
-import React, {useContext, useEffect, useState} from 'react';
-import {withRouter, useHistory} from "react-router-dom";
+import React, {useContext, useState} from 'react';
+import {useHistory, withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import ProjectList from './ProjectList';
 import ProjectsContext from './ProjectsContext';
 import type {Project} from './ProjectsAPI';
 import ProjectEditor from './ProjectEditor';
-import {first} from "../common/utils";
 
 
 type ProjectBrowserProps = {
@@ -94,32 +93,10 @@ ProjectBrowser.defaultProps = {
     error: false
 };
 
-const mapProjectSearchItems: Project[] = (items) => items.map(item => ({
-    id: item.index,
-    workspace: first(item.nodeUrl),
-    label: first(item.label),
-    description: first(item.projectDescription)
-}));
-
 const ContextualProjectBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {createProject, searchAllProjects} = useContext(ProjectsContext);
-
-    const [projects, setProjects] = useState();
-    const [projectsLoading, setProjectsLoading] = useState(true);
-    const [projectsError, setProjectsError] = useState();
-
-    useEffect(() => {
-        setProjectsLoading(true);
-        searchAllProjects()
-            .then(data => {
-                setProjects(mapProjectSearchItems(data.items));
-                setProjectsError(undefined);
-            })
-            .catch((e) => setProjectsError(e || true))
-            .finally(() => setProjectsLoading(false));
-    }, [searchAllProjects]);
+    const {projects, projectsLoading, projectsError, createProject} = useContext(ProjectsContext);
 
     return (
         <ProjectBrowser

@@ -97,18 +97,6 @@ describe('joinWithSeparator', () => {
     });
 });
 
-describe('first', () => {
-    it('should return first element of the array', () => {
-        expect(first(['a', 'b', 'c'])).toEqual('a');
-    });
-    it('should work with empty arrays', () => {
-        expect(first([])).toEqual(undefined);
-    });
-    it('should work with nullable arrays', () => {
-        expect(first(null)).toEqual(undefined);
-    });
-});
-
 describe('formatDateTime', () => {
     it('should show date when it is not today', () => {
         const dateValue = '2008-09-15T15:53:00';
