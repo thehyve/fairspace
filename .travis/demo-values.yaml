@@ -7,17 +7,12 @@ external:
     realm: demo
     clientId: workspace-demo-pluto
     clientSecret: db67da94-fa31-47cd-8c42-0ed295790841
-  rabbitmq:
-    host: hyperspace-demo-rabbitmq.hyperspace-demo.svc.cluster.local
-    username: rabbitmq
-    password: gtzb28355LFqxbar
   elasticsearch:
     enabled: true
-    indexName: workspace-demo
     transport:
-      host: hyperspace-demo-elasticsearch-discovery.hyperspace-demo.svc.cluster.local
+      host: workspace-demo-elasticsearch-discovery.workspace-demo.svc.cluster.local
     rest:
-      host: hyperspace-demo-elasticsearch-client.hyperspace-demo.svc.cluster.local
+      host: workspace-demo-elasticsearch-client.workspace-demo.svc.cluster.local
 
 # Settings for the workspace
 workspace:
@@ -28,32 +23,53 @@ workspace:
   enableExperimentalFeatures: true
   configurationScripts:
     keycloak:
-      enabled: true
       pullPolicy: IfNotPresent
 
 services:
   jupyterhub: https://jupyter.workspace.demo.fairway.app
 
-# Specific settings for Pluto
-pluto:
-  tracing:
-    enabled: false
 
-# Specific settings for Saturn
+# Specific settings for Saturn subchart
 saturn:
+  nodes:
+    - name: node1
+      persistence:
+        files:
+          size: 60Gi
+          storageClass: expandable
+        database:
+          size: 60Gi
+          storageClass: expandable
+      resources:
+        limits:
+          cpu: 1
+          memory: 16Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    - name: node2
+      persistence:
+        files:
+          size: 60Gi
+          storageClass: expandable
+        database:
+          size: 60Gi
+          storageClass: expandable
+      resources:
+        limits:
+          cpu: 1
+          memory: 16Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+  image:
+    pullPolicy: Always
   customStorageClass:
-      create: true
-      name: expandable
-      type: pd-standard
-      provisioner: kubernetes.io/gce-pd
-      allowVolumeExpansion: true
-  persistence:
-    files:
-      size: 50Gi
-      storageClass: expandable
-    database:
-      size: 50Gi
-      storageClass: expandable
+    create: true
+    name: expandable
+    type: pd-standard
+    provisioner: kubernetes.io/gce-pd
+    allowVolumeExpansion: true
   mail:
     mail.from: janneke@thehyve.nl
     mail.user: AKIAISXHGXUIMMU75YVA
@@ -64,6 +80,12 @@ saturn:
     mail.smtp.port: 587
     mail.smtp.starttls.enable: true
 
-rabbitmq:
-  username: workspace-demo
-  password: "3peju6WHfUYgCvJD"
+
+# Specific settings for Mercury subchart
+mercury:
+  image:
+    pullPolicy: Always
+# Specific settings for Mercury subchart
+docs:
+  image:
+    pullPolicy: Always

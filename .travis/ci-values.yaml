@@ -28,11 +28,6 @@ workspace:
 services:
   jupyterhub: https://jupyter.workspace.ci.fairway.app
 
-pluto:
-  image:
-    pullPolicy: Always
-    tag: 0.6.11-SNAPSHOT
-
 # Specific settings for Saturn subchart
 saturn:
   nodes:
