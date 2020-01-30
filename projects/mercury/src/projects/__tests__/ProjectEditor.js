@@ -44,7 +44,7 @@ describe('ProjectEditor', () => {
             .toHaveBeenCalledWith({
                 workspace: workspace.id,
                 id: 'a',
-                title: 'a'
+                label: 'a'
             });
     });
 

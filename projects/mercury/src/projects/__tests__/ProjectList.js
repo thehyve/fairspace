@@ -19,7 +19,7 @@ describe('ProjectList', () => {
             name: 'project2', label: 'project-2'
         }];
         const {getByText} = render(<MemoryRouter><ProjectList projects={projects} /></MemoryRouter>);
-        expect(getByText('Name'))
+        expect(getByText('Id'))
             .toBeInTheDocument();
         expect(getByText('project-1'))
             .toBeInTheDocument();
