@@ -91,5 +91,6 @@ export const USABLE_IN_METADATA_URI = FAIRSPACE_NS + 'usableInMetadata';
 export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
 export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
 export const PROJECT_INFO_URI = FAIRSPACE_NS + 'theProject';
+export const PROJECT_URI = FAIRSPACE_NS + 'Project';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

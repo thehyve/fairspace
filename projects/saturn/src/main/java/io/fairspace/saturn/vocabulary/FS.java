@@ -133,5 +133,8 @@ public class FS {
 
     public static final String MARKDOWN_URI = NS + "markdown";
     public static final Property markdown = createProperty(MARKDOWN_URI);
+
+    public static final String WORKSPACE_URL = NS + "workspaceUrl";
+    public static final Property workspaceUrl = createProperty(WORKSPACE_URL);
 }
 
