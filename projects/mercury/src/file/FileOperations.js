@@ -1,5 +1,6 @@
 import React, {useContext, useState} from 'react';
-import {Badge, Icon, IconButton} from "@material-ui/core";
+import {Badge, IconButton} from "@material-ui/core";
+import {BorderColor, CreateNewFolder, Delete} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
@@ -131,7 +132,7 @@ export const FileOperations = ({
                             title="Create directory"
                             disabled={isWritingDisabled || busy}
                         >
-                            <Icon>create_new_folder</Icon>
+                            <CreateNewFolder />
                         </IconButton>
                     </CreateDirectoryButton>
                 </ProgressButton>
@@ -158,7 +159,7 @@ export const FileOperations = ({
                             aria-label={`Rename ${selectedItem.basename}`}
                             disabled={isWritingDisabled || isDisabledForMoreThanOneSelection || busy}
                         >
-                            <Icon>border_color</Icon>
+                            <BorderColor />
                         </IconButton>
                     </RenameButton>
                 </ProgressButton>
@@ -175,7 +176,7 @@ export const FileOperations = ({
                             aria-label="Delete"
                             disabled={noPathSelected || isWritingDisabled || busy}
                         >
-                            <Icon>delete</Icon>
+                            <Delete />
                         </IconButton>
 
                     </ConfirmationButton>

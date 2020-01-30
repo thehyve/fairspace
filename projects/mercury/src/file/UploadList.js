@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     Grid,
-    Icon,
     LinearProgress,
     Paper,
     Table,
@@ -11,6 +10,7 @@ import {
     TablePagination,
     TableRow
 } from "@material-ui/core";
+import {CloudUpload} from "@material-ui/icons";
 import Dropzone from "react-dropzone";
 import filesize from "filesize";
 import {usePagination} from '../common';
@@ -103,7 +103,7 @@ const UploadList = ({uploads, enqueue}) => {
                                 style={{padding: 20, minHeight: 200}}
                             >
                                 <Grid item>
-                                    <Icon>cloud_upload</Icon>
+                                    <CloudUpload />
                                 </Grid>
                                 <Grid item>
                                     Drop files or click here to upload
