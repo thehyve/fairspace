@@ -27,14 +27,6 @@ export const joinWithSeparator = (items = [], separator) => items.reduce((prev, 
     return [...prev, curr];
 }, []);
 
-/**
- * Gets the first element of array if exists.
- * @param array
- * @returns The first element of array or undefined.
- */
-export const first = array => ((array && array.length) ? array[0] : undefined);
-
-
 //* *********************************
 //* COMPARISION
 //* *********************************

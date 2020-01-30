@@ -16,7 +16,7 @@ import type {Project} from './ProjectsAPI';
 
 const columns = {
     name: {
-        valueExtractor: 'id',
+        valueExtractor: 'name',
         label: 'Name'
     },
     label: {

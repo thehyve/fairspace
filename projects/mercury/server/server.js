@@ -7,6 +7,7 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
+const elasticsearch = require('elasticsearch');
 
 const app = express();
 
@@ -22,23 +23,84 @@ const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
 const {workspaces} = config.urls;
 
-const workspaceProjects = (url) => fetch(url + '/api/v1/projects/')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Got ${response.status} ${response.statusText} from ${url}`);
+const transformESHit = (hit) => (hit ? {
+    ...hit._source,
+    index: hit._index,
+    id: hit._id,
+    score: hit._score,
+} : {});
+
+const transformESResult = (esJson) => (
+    esJson && esJson.hits && esJson.hits.hits ? esJson.hits.hits.map(transformESHit) : []
+);
+
+const mapProjectSearchItems = (items) => {
+    const result = transformESResult(items);
+    return result.map(item => ({
+        name: item.index,
+        workspace: item.nodeUrl.find(() => true),
+        label: item.label.find(() => true),
+        description: item.projectDescription.find(() => true)
+    }));
+};
+
+const esClient = new elasticsearch.Client({host: config.urls.elasticsearch, log: 'error'});
+
+const getESProjects = () => {
+    const sortDataCreated = [
+        "_score",
+        {
+            dateCreated: {order: "desc"}
         }
-        return response.json();
-    })
-    .then(projects => projects.map(project => ({...project, workspace: url})));
+    ];
+    const esQuery = {
+        bool: {
+            must: [{
+                query_string: {query: '*'}
+            }],
+            must_not: {
+                exists: {
+                    field: "dateDeleted"
+                }
+            },
+            filter: [
+                {
+                    terms: {
+                        "type.keyword": ["http://fairspace.io/ontology#Project"]
+                    }
+                }
+            ]
+        }
+    };
+    return esClient.search({
+        index: "_all",
+        body: {
+            size: 10000,
+            from: 0,
+            sort: sortDataCreated,
+            query: esQuery,
+            highlight: {
+                fields: {
+                    "*": {}
+                }
+            }
+        }
+    }).then(mapProjectSearchItems);
+};
 
 let allProjects;
 
-Promise.all(workspaces.map(workspaceProjects))
-    .then(responses => { allProjects = responses.reduce((x, y) => [...x, ...y], []); })
+const fetchProjects = () => getESProjects()
+    .then((result) => {
+        allProjects = result;
+    })
     .catch(e => {
         console.error('Error retrieving projects', e);
         process.exit(1);
     });
+
+fetchProjects();
+setInterval(() => fetchProjects(), 30000);
 
 app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and running.').end());
 

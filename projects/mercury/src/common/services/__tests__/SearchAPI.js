@@ -149,20 +149,4 @@ describe('Search API', () => {
             .toEqual(types);
     });
 
-    it('searches all indexes', async () => {
-        const types = ["http://localhost/vocabulary/Projects"];
-
-        await searchAPI.searchAll({types});
-
-        expect(mockClient.search.mock.calls.length)
-            .toEqual(1);
-        expect(mockClient.search.mock.calls[0][0].index)
-            .toEqual("_all");
-        expect(mockClient.search.mock.calls[0][0].body.size)
-            .toEqual(SEARCH_DEFAULT_SIZE);
-        expect(mockClient.search.mock.calls[0][0].body.query.bool.must[0].query_string.query)
-            .toEqual('*');
-        expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
-            .toEqual(types);
-    });
 });

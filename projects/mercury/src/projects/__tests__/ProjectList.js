@@ -14,9 +14,9 @@ describe('ProjectList', () => {
 
     it('displays the list of projects', () => {
         const projects: Project[] = [{
-            id: 'project1', label: 'project-1'
+            name: 'project1', label: 'project-1'
         }, {
-            id: 'project2', label: 'project-2'
+            name: 'project2', label: 'project-2'
         }];
         const {getByText} = render(<MemoryRouter><ProjectList projects={projects} /></MemoryRouter>);
         expect(getByText('Name'))
