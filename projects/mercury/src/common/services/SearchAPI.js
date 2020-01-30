@@ -24,11 +24,15 @@ export class SearchAPI {
 
     /**
      * Searches ES with the qiven query string on the specified types
+     * @param searchIndex
      * @param query
+     * @param size
+     * @param from
      * @param types     List of class URIs to search for. If empty, it returns all types
+     * @param sort
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, sort = SORT_SCORE}) => {
+    search = ({searchIndex, query, size = SEARCH_DEFAULT_SIZE, from = 0, types, sort = SORT_SCORE}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -56,7 +60,7 @@ export class SearchAPI {
 
         // Send the query to the backend and transform the results
         return this.client.search({
-            index: currentProject(),
+            index: searchIndex,
             body: {
                 size,
                 from,
@@ -74,13 +78,23 @@ export class SearchAPI {
     /**
      * @returns {Promise}
      */
-    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0, sort}) => this.search({
+    searchLinkedData = ({types, query, size = SEARCH_DEFAULT_SIZE, page = 0, sort}) => this.searchCurrent({
         query,
         size,
         types,
         from: page * size,
         sort
     });
+
+    searchAll = ({types, query, size = SEARCH_DEFAULT_SIZE, from = 0, sort = SORT_SCORE}) => {
+        const searchIndex = "_all";
+        return this.search({searchIndex, query, size, from, types, sort});
+    };
+
+    searchCurrent = ({types, query, size = SEARCH_DEFAULT_SIZE, from = 0, sort = SORT_SCORE}) => {
+        const searchIndex = currentProject();
+        return this.search({searchIndex, query, size, from, types, sort});
+    };
 
     /**
      * Transforms the search result into a format that can be used internally. The format looks like this:
