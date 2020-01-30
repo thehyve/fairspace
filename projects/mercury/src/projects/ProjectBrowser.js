@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {withRouter, useHistory} from "react-router-dom";
+import {useHistory, withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import ProjectList from './ProjectList';

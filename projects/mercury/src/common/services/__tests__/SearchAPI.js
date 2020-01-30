@@ -148,4 +148,5 @@ describe('Search API', () => {
         expect(mockClient.search.mock.calls[0][0].body.query.bool.filter[0].terms['type.keyword'])
             .toEqual(types);
     });
+
 });

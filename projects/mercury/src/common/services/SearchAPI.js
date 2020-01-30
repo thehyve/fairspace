@@ -25,7 +25,10 @@ export class SearchAPI {
     /**
      * Searches ES with the qiven query string on the specified types
      * @param query
+     * @param size
+     * @param from
      * @param types     List of class URIs to search for. If empty, it returns all types
+     * @param sort
      * @return Promise
      */
     search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, sort = SORT_SCORE}) => {

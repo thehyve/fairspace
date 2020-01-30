@@ -1249,7 +1249,13 @@ components:
         type: string
     Project:
       properties:
-        id:
+        name:
+          type: string
+        workspace:
+          type: string
+        label:
+          type: string
+        description:
           type: string
     Projects:
       type: array

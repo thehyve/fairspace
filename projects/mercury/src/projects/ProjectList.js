@@ -18,6 +18,10 @@ const columns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
+    },
+    label: {
+        valueExtractor: 'label',
+        label: 'Label'
     }
 };
 
@@ -73,9 +77,13 @@ const ProjectList = ({
                             onClick={() => {}}
                             onDoubleClick={() => onProjectDoubleClick(project)}
                         >
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                {project.description}
-                            </TableCell>
+                            {
+                                Object.entries(columns).map(([key, column]) => (
+                                    <TableCell style={{maxWidth: 160}} component="th" scope="row" key={key}>
+                                        {project[column.valueExtractor]}
+                                    </TableCell>
+                                ))
+                            }
                         </TableRow>
                     ))}
                 </TableBody>
