@@ -15,9 +15,9 @@ import {MessageDisplay, usePagination, useSorting} from '../common';
 import type {Project} from './ProjectsAPI';
 
 const columns = {
-    name: {
-        valueExtractor: 'name',
-        label: 'Name'
+    id: {
+        valueExtractor: 'id',
+        label: 'Id'
     },
     label: {
         valueExtractor: 'label',
@@ -34,7 +34,7 @@ const ProjectList = ({
         history.push(`/projects/${project.id}/`);
     };
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(projects, columns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(projects, columns, 'id');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!projects || projects.length === 0) {

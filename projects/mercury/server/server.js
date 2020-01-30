@@ -37,7 +37,7 @@ const transformESResult = (esJson) => (
 const mapProjectSearchItems = (items) => {
     const result = transformESResult(items);
     return result.map(item => ({
-        name: item.index,
+        id: item.index,
         workspace: item.nodeUrl.find(() => true),
         label: item.label.find(() => true),
         description: item.projectDescription.find(() => true)
@@ -228,7 +228,7 @@ app.put('/api/v1/projects', (req, res) => {
                 }
             })
             .then(workspaceResponse => {
-                if (workspaceResponse.ok) {
+                if (workspaceResponse.ok && !allProjects.find(p => p.id === project.id)) {
                     allProjects.push(project);
                 }
                 res.status(workspaceResponse.status).send(project);

@@ -51,7 +51,7 @@ export default ({onSubmit, onClose, creating, projects, getWorkspaces = Workspac
         {
             workspace: workspaceControl.value,
             id: idControl.value,
-            title: idControl.value
+            label: idControl.value
         }
     );
 
