@@ -9,7 +9,7 @@ export const ProjectUserProvider = ({children}) => {
     const [projectUserLoading, setProjectUserLoading] = useState(false);
     const [projectUserError, setProjectUserError] = useState(null);
 
-    useEffect(() => {
+    const refreshProjectUser = () => {
         setProjectUserLoading(true);
 
         getProjectUser()
@@ -21,14 +21,17 @@ export const ProjectUserProvider = ({children}) => {
             .finally(() => {
                 setProjectUserLoading(false);
             });
-    }, []);
+    };
+
+    useEffect(refreshProjectUser, []);
 
     return (
         <ProjectUserContext.Provider
             value={{
                 projectUser,
                 projectUserLoading,
-                projectUserError
+                projectUserError,
+                refreshProjectUser
             }}
         >
             {children}
