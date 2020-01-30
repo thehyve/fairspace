@@ -111,6 +111,7 @@ const ContextualProjectBrowser = (props) => {
     const [projectsError, setProjectsError] = useState();
 
     useEffect(() => {
+        setProjectsLoading(true);
         searchAllProjects()
             .then(data => {
                 setProjects(mapProjectSearchItems(data.items));
