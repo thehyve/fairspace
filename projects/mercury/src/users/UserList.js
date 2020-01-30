@@ -23,7 +23,7 @@ import {addUser} from "./UsersAPI";
 import type {User} from './UsersAPI';
 import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
-import UserContext from "../common/contexts/UserContext";
+import ProjectUserContext from "../common/contexts/ProjectUserContext";
 
 const checkRole = (role: string) => (user: User) => user.roles.includes(role);
 
@@ -72,7 +72,7 @@ const addNewUser = (user: User) => addUser({...user, roles: ['CanRead']});
 const rolesToShow = ['CanWrite', 'DataSteward', 'SparqlUser', 'Coordinator'];
 
 const UserList = () => {
-    const {currentUser, refreshUser} = useContext(UserContext);
+    const {projectUser, refreshProjectUser} = useContext(ProjectUserContext);
     const {users, refresh: refreshUsers} = useContext(UsersContext);
     const projectUsers = users.filter(u => u.roles.includes('CanRead'));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(projectUsers, columns, 'name');
@@ -81,8 +81,8 @@ const UserList = () => {
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
     const refresh = (user) => () => {
-        if (user.iri === currentUser.iri) {
-            refreshUser();
+        if (user.iri === projectUser.iri) {
+            refreshProjectUser();
         }
         refreshUsers();
     };
