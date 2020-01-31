@@ -1,9 +1,9 @@
 import React, {useContext, useState} from 'react';
 import {Avatar, Button, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
+import {ErrorOutline} from '@material-ui/icons';
 
 import UserContext from "../../contexts/UserContext";
-import MessageDisplay from "../MessageDisplay";
 import LogoutContext from "../../contexts/LogoutContext";
 
 const styles = {
@@ -41,7 +41,7 @@ const UserMenu = ({classes}) => {
     }
 
     if (currentUserError) {
-        return <MessageDisplay message=" " small noMessage />;
+        return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
     return currentUser && (
