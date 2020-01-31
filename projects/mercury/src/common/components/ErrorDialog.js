@@ -7,10 +7,10 @@ import {
     DialogContentText,
     DialogTitle,
     Grid,
-    Icon,
     Slide,
     Typography,
 } from '@material-ui/core';
+import {Error} from '@material-ui/icons';
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
@@ -67,7 +67,7 @@ class ErrorDialog extends React.Component {
             onRetry: null,
             onDismiss: null
         });
-    }
+    };
 
     handleClose = () => {
         const dismiss = this.state.onDismiss;
@@ -100,7 +100,7 @@ class ErrorDialog extends React.Component {
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={1}>
                         <Grid item>
-                            <Icon color="error" style={{fontSize: 40}}>error</Icon>
+                            <Error color="error" style={{fontSize: 40}} />
                         </Grid>
                         <Grid item>
                             <Typography variant="h6" gutterBottom>
