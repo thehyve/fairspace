@@ -30,8 +30,8 @@ public class DatasetGraphMulti extends DatasetGraphWrapperJobSupport {
                 .expireAfterAccess(config.jena.inactiveConnectionShutdownIntervalSec, TimeUnit.SECONDS)
                 .removalListener(notification -> ((DatasetGraph) notification.getValue()).close())
                 .build(new CacheLoader<>() {
-                    public DatasetGraph load(String projectName) throws Exception {
-                        return SaturnDatasetFactory.connect(config, projectName, client);
+                    public DatasetGraph load(String workspaceName) throws Exception {
+                        return SaturnDatasetFactory.connect(config, workspaceName, client);
                     }
                 });
     }
@@ -39,7 +39,7 @@ public class DatasetGraphMulti extends DatasetGraphWrapperJobSupport {
     @Override
     protected DatasetGraph get() {
         try {
-            return cache.get(getThreadContext().getProject());
+            return cache.get(getThreadContext().getWorkspace());
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -75,6 +75,6 @@ public class DatasetGraphMulti extends DatasetGraphWrapperJobSupport {
 
     @Override
     public String toString() {
-        return "Multi graph, current = " + getThreadContext().getProject();
+        return "Multi graph, current = " + getThreadContext().getWorkspace();
     }
 }

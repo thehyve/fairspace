@@ -1,37 +1,37 @@
 import mockAxios, {AxiosError, AxiosResponse} from 'axios';
-import projectsAPI, {Project} from '../ProjectsAPI';
+import workspacesAPI, {Workspace} from '../WorkspacesAPI';
 
-describe('ProjectsAPI', () => {
-    it('Fetches projects', async () => {
-        const dummyProjects = [{id: 'project1'}, {id: 'project2'}];
+describe('WorkspacesAPI', () => {
+    it('Fetches workspaces', async () => {
+        const dummyWorkspaces = [{id: 'workspace1'}, {id: 'workspace2'}];
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-            data: dummyProjects,
+            data: dummyWorkspaces,
             headers: {'content-type': 'application/json'}
         }));
-        const projects: Project[] = await projectsAPI.getProjects();
-        expect(projects.map((project: Project) => project.id)).toEqual(dummyProjects.map(project => project.id));
+        const workspaces: Workspace[] = await workspacesAPI.getWorkspaces();
+        expect(workspaces.map((workspace: Workspace) => workspace.id)).toEqual(dummyWorkspaces.map(workspace => workspace.id));
     });
 
-    it('Creates a new project', async () => {
-        const projectData: Project = {
-            id: 'project1'
+    it('Creates a new workspace', async () => {
+        const workspaceData: Workspace = {
+            id: 'workspace1'
         };
         const putResponse: AxiosResponse = {
             headers: {'content-type': 'application/json'}
         };
         mockAxios.put.mockImplementationOnce(() => Promise.resolve(putResponse));
-        await projectsAPI.createProject(projectData);
+        await workspacesAPI.createWorkspace(workspaceData);
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
-            '/api/v1/projects/',
-            JSON.stringify(projectData),
+            '/api/v1/workspaces/',
+            JSON.stringify(workspaceData),
             {headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}}
         );
     });
 
-    it('Failure to create a project is handled correctly', async (done) => {
-        const projectData: Project = {
-            id: 'project1'
+    it('Failure to create a workspace is handled correctly', async (done) => {
+        const workspaceData: Workspace = {
+            id: 'workspace1'
         };
         const conflictResponse: AxiosResponse = {
             status: 409,
@@ -40,10 +40,10 @@ describe('ProjectsAPI', () => {
         const errorResponse: AxiosError = {response: conflictResponse};
         mockAxios.put.mockImplementationOnce(() => Promise.reject(errorResponse));
         try {
-            await projectsAPI.createProject(projectData);
+            await workspacesAPI.createWorkspace(workspaceData);
             done.fail('API call expected to fail');
         } catch (error) {
-            expect(error.message).toEqual('Failure while creating a project');
+            expect(error.message).toEqual('Failure while creating a workspace');
             done();
         }
     });

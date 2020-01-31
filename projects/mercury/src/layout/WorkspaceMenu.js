@@ -4,23 +4,23 @@ import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/
 import {Assignment, BarChart, Code, FolderOpen, Group, Home, OpenInNew, Widgets} from "@material-ui/icons";
 
 import Config from '../common/services/Config';
-import {projectPrefix} from "../projects/projects";
+import {workspacePrefix} from "../workspaces/workspaces";
 import AuthorizationCheck from "../common/components/AuthorizationCheck";
 
 
-const ProjectMenu = ({location: {pathname}}) => (
+const WorkspaceMenu = ({location: {pathname}}) => (
     <>
         <List>
             <ListItem
                 component={NavLink}
-                to="/projects"
+                to="/workspaces"
                 button
-                selected={pathname === '/projects'}
+                selected={pathname === '/workspaces'}
             >
                 <ListItemIcon>
                     <Widgets />
                 </ListItemIcon>
-                <ListItemText primary="Projects" />
+                <ListItemText primary="Workspaces" />
             </ListItem>
         </List>
         <Divider />
@@ -28,9 +28,9 @@ const ProjectMenu = ({location: {pathname}}) => (
             <ListItem
                 component={NavLink}
                 exact
-                to={projectPrefix() + "/"}
+                to={workspacePrefix() + "/"}
                 button
-                selected={pathname === projectPrefix() + "/"}
+                selected={pathname === workspacePrefix() + "/"}
             >
                 <ListItemIcon>
                     <Home />
@@ -40,9 +40,9 @@ const ProjectMenu = ({location: {pathname}}) => (
             <AuthorizationCheck requiredAuthorization="CanRead" transformError={() => null}>
                 <ListItem
                     component={NavLink}
-                    to={projectPrefix() + "/collections"}
+                    to={workspacePrefix() + "/collections"}
                     button
-                    selected={pathname.startsWith(projectPrefix() + '/collections')}
+                    selected={pathname.startsWith(workspacePrefix() + '/collections')}
                 >
                     <ListItemIcon>
                         <FolderOpen />
@@ -52,9 +52,9 @@ const ProjectMenu = ({location: {pathname}}) => (
                 {Config.get().urls.jupyterhub ? (
                     <ListItem
                         component={NavLink}
-                        to={projectPrefix() + "/notebooks"}
+                        to={workspacePrefix() + "/notebooks"}
                         button
-                        selected={pathname.startsWith(projectPrefix() + '/notebooks')}
+                        selected={pathname.startsWith(workspacePrefix() + '/notebooks')}
                     >
                         <ListItemIcon>
                             <BarChart />
@@ -64,7 +64,7 @@ const ProjectMenu = ({location: {pathname}}) => (
                 ) : null}
                 <ListItem
                     component={NavLink}
-                    to={projectPrefix() + "/metadata"}
+                    to={workspacePrefix() + "/metadata"}
                     button
                 >
                     <ListItemIcon>
@@ -74,9 +74,9 @@ const ProjectMenu = ({location: {pathname}}) => (
                 </ListItem>
                 <ListItem
                     component={NavLink}
-                    to={projectPrefix() + "/vocabulary"}
+                    to={workspacePrefix() + "/vocabulary"}
                     button
-                    selected={pathname.startsWith(projectPrefix() + '/vocabulary')}
+                    selected={pathname.startsWith(workspacePrefix() + '/vocabulary')}
                 >
                     <ListItemIcon>
                         <Code />
@@ -86,9 +86,9 @@ const ProjectMenu = ({location: {pathname}}) => (
             </AuthorizationCheck>
             <ListItem
                 component={NavLink}
-                to={projectPrefix() + "/users"}
+                to={workspacePrefix() + "/users"}
                 button
-                selected={pathname.startsWith(projectPrefix() + '/users')}
+                selected={pathname.startsWith(workspacePrefix() + '/users')}
             >
                 <ListItemIcon>
                     <Group />
@@ -120,4 +120,4 @@ const ProjectMenu = ({location: {pathname}}) => (
     </>
 );
 
-export default withRouter(ProjectMenu);
+export default withRouter(WorkspaceMenu);

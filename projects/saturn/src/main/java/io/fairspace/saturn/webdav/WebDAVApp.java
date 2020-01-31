@@ -61,8 +61,8 @@ public class WebDAVApp implements SparkApplication {
 
     @Override
     public void init() {
-        before("/projects/*/webdav/*", this::handle);
-        before("/projects/*/webdav", this::handle);
+        before("/workspaces/*/webdav/*", this::handle);
+        before("/workspaces/*/webdav", this::handle);
     }
 
     private void handle(spark.Request req, spark.Response res) throws Exception {

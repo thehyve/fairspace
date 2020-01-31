@@ -14,9 +14,9 @@ import LinkedDataContext from "./LinkedDataContext";
 import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
 import {SHACL_CLASS} from "../constants";
 import {determinePropertyShapesForTypes, determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
-import {projectPrefix} from "../projects/projects";
+import {workspacePrefix} from "../workspaces/workspaces";
 
-const getEntityRelativeUrl = (editorPath, id) => `${projectPrefix()}${editorPath}?iri=` + encodeURIComponent(id);
+const getEntityRelativeUrl = (editorPath, id) => `${workspacePrefix()}${editorPath}?iri=` + encodeURIComponent(id);
 
 const VocabularyGraph = ({history}) => {
     const {vocabulary, editorPath} = useContext(LinkedDataContext);

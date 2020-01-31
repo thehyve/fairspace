@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import {MessageDisplay, usePagination, useSorting} from '../common';
 
-import type {Project} from './ProjectsAPI';
+import type {Workspace} from './WorkspacesAPI';
 
 const columns = {
     id: {
@@ -25,22 +25,22 @@ const columns = {
     }
 };
 
-const ProjectList = ({
-    projects = []
+const WorkspaceList = ({
+    workspaces = []
 }) => {
     const history = useHistory();
 
-    const onProjectDoubleClick = (project: Project) => {
-        history.push(`/projects/${project.id}/`);
+    const onWorkspaceDoubleClick = (workspace: Workspace) => {
+        history.push(`/workspaces/${workspace.id}/`);
     };
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(projects, columns, 'id');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'id');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
-    if (!projects || projects.length === 0) {
+    if (!workspaces || workspaces.length === 0) {
         return (
             <MessageDisplay
-                message="Please create a project."
+                message="Please create a workspace."
                 variant="h6"
                 withIcon={false}
                 isError={false}
@@ -70,17 +70,17 @@ const ProjectList = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map((project: Project) => (
+                    {pagedItems.map((workspace: Workspace) => (
                         <TableRow
-                            key={project.id}
+                            key={workspace.id}
                             hover
                             onClick={() => {}}
-                            onDoubleClick={() => onProjectDoubleClick(project)}
+                            onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                         >
                             {
                                 Object.entries(columns).map(([key, column]) => (
                                     <TableCell style={{maxWidth: 160}} component="th" scope="row" key={key}>
-                                        {project[column.valueExtractor]}
+                                        {workspace[column.valueExtractor]}
                                     </TableCell>
                                 ))
                             }
@@ -91,7 +91,7 @@ const ProjectList = ({
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
-                count={projects.length}
+                count={workspaces.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={(e, p) => setPage(p)}
@@ -101,4 +101,4 @@ const ProjectList = ({
     );
 };
 
-export default ProjectList;
+export default WorkspaceList;

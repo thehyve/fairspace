@@ -27,7 +27,7 @@ import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 @Slf4j
 public class SaturnContextHandler extends ConstraintSecurityHandler {
     private static final Set<String> RESTRICTED_VOCABULARY_METHODS = Set.of("PUT", "PATCH", "DELETE");
-    public static final String PROJECTS_PREFIX = API_PREFIX + "/projects/";
+    public static final String WORKSPACE_PREFIX = API_PREFIX + "/workspaces/";
     public static final String FORWARDED_ATTRIBUTE = "forwarded";
 
 
@@ -48,16 +48,16 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
         // A second pass after forwarding?
         if (request.getAttribute(FORWARDED_ATTRIBUTE) != null) {
             baseRequest.setDispatcherType(DispatcherType.REQUEST);
-        } else if (pathInContext.startsWith(PROJECTS_PREFIX) && pathInContext.length() > PROJECTS_PREFIX.length()) {
-            // /api/v1/projects/{project}/{resource}/**
-            var subPath = pathInContext.substring(PROJECTS_PREFIX.length());
+        } else if (pathInContext.startsWith(WORKSPACE_PREFIX) && pathInContext.length() > WORKSPACE_PREFIX.length()) {
+            // /api/v1/workspaces/{workspace}/{resource}/**
+            var subPath = pathInContext.substring(WORKSPACE_PREFIX.length());
             var parts = subPath.split("/");
             if (parts.length > 0) {
                 var context = new ThreadContext();
                 setThreadContext(context);
 
-                var project = parts[0];
-                context.setProject(project);
+                var workspace = parts[0];
+                context.setWorkspace(workspace);
 
                 var userInfo = authenticator.apply(request);
                 if (userInfo == null) {
@@ -70,12 +70,12 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                 var user = userService.trySetCurrentUser(userInfo);
 
                 if (user == null) {
-                    sendError(SC_FORBIDDEN, "You have no access to this project", response);
+                    sendError(SC_FORBIDDEN, "You have no access to this workspace", response);
                     return;
                 }
 
                 if (user.getRoles().isEmpty()) {
-                    sendError(SC_FORBIDDEN, "Your access to this project has been revoked", response);
+                    sendError(SC_FORBIDDEN, "Your access to this workspace has been revoked", response);
                     return;
                 }
 
@@ -88,7 +88,7 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                             if (RESTRICTED_VOCABULARY_METHODS.contains(request.getMethod()) &&
                                     !user.getRoles().contains(Role.DataSteward) &&
                                     !user.getRoles().contains(Role.Coordinator)) {
-                                sendError(SC_FORBIDDEN,"Only data stewards and project coordinators can edit the vocabulary", response);
+                                sendError(SC_FORBIDDEN,"Only data stewards and workspace coordinators can edit the vocabulary", response);
                                 return;
                             }
                             break;

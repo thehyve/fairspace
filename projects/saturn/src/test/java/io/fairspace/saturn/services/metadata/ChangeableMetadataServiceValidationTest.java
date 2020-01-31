@@ -71,7 +71,7 @@ public class ChangeableMetadataServiceValidationTest {
         ds = new DatasetJobSupportInMemory();
         api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
 
-        setThreadContext(new ThreadContext(user, "project"));
+        setThreadContext(new ThreadContext(user, "workspace"));
         when(user.getIri()).thenReturn(createURI("http://ex.com/user"));
         when(user.getName()).thenReturn("name");
     }

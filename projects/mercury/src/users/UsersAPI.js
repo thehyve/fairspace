@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
-import {currentProject} from "../projects/projects";
+import {currentWorkspace} from "../workspaces/workspaces";
 import {createMetadataIri} from '../common/utils/linkeddata/metadataUtils';
 
 export type User = {
@@ -16,7 +16,7 @@ const requestOptions = {
     headers: {Accept: 'application/json'}
 };
 
-export const getProjectUser = () => axios.get(`/api/v1/projects/${currentProject()}/users/current/`)
+export const getWorkspaceUser = () => axios.get(`/api/v1/workspaces/${currentWorkspace()}/users/current/`)
     .catch(handleHttpError("Failure when retrieving user's information"))
     .then(extractJsonData);
 

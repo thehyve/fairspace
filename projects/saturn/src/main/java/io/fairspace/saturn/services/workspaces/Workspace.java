@@ -1,10 +1,10 @@
-package io.fairspace.saturn.services.projects;
+package io.fairspace.saturn.services.workspaces;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Project {
+public class Workspace {
     private String id;
 }

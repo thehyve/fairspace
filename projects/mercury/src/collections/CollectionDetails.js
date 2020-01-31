@@ -19,7 +19,7 @@ import PermissionsCard from "../permissions/PermissionsCard";
 import TechnicalMetadata from "../file/TechnicalMetadata";
 import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from '../common/contexts/CollectionsContext';
-import {projectPrefix} from '../projects/projects';
+import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
 import type {AuditInfo} from '../file/TechnicalMetadata';
 import UsersContext from '../common/contexts/UsersContext';
@@ -92,7 +92,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
         const {setBusy, deleteCollection, history} = this.props;
         setBusy(true);
         deleteCollection(collection)
-            .then(() => history.push(`${projectPrefix()}/collections`))
+            .then(() => history.push(`${workspacePrefix()}/collections`))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",

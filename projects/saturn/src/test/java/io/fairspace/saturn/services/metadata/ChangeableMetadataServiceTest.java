@@ -56,7 +56,7 @@ public class ChangeableMetadataServiceTest {
         var user = new User();
         user.setIri(createURI("http://example.com#user"));
         user.setName("user");
-        ctx.setProject("project");
+        ctx.setWorkspace("workspace");
         ctx.setUser(user);
         setThreadContext(ctx);
         api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());

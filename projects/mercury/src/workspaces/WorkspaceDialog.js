@@ -42,7 +42,7 @@ export default ({onSubmit, onClose, submitDisabled, fields}) => (
     >
         <DialogTitle id="form-dialog-title">
             <div>
-                <Typography variant="h5" component="h2">New project</Typography>
+                <Typography variant="h5" component="h2">New workspace</Typography>
             </div>
         </DialogTitle>
         <DialogContent style={{overflowX: 'hidden'}}>

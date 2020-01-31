@@ -2,10 +2,10 @@ import React from 'react';
 import {render, fireEvent, cleanup} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {act} from 'react-dom/test-utils';
-import type {Project} from '../ProjectsAPI';
-import ProjectEditor from '../ProjectEditor';
+import type {Workspace} from '../WorkspacesAPI';
+import WorkspaceEditor from '../WorkspaceEditor';
 
-describe('ProjectEditor', () => {
+describe('WorkspaceEditor', () => {
     let onSubmit;
     let utils;
     const node = {id: 'http://localhost:8080'};
@@ -20,16 +20,16 @@ describe('ProjectEditor', () => {
         const nodeApi = {
             getNodes: jest.fn(() => Promise.resolve([node]))
         };
-        const projects: Project[] = [{
+        const workspaces: Workspace[] = [{
             id: 'a1', node: node.id
         }, {
             id: 'a2', node: node.id
         }];
         onSubmit = jest.fn();
         await act(async () => {
-            utils = render(<ProjectEditor
+            utils = render(<WorkspaceEditor
                 onSubmit={onSubmit}
-                projects={projects}
+                workspaces={workspaces}
                 getNodes={nodeApi.getNodes}
             />);
         });
@@ -60,7 +60,7 @@ describe('ProjectEditor', () => {
         expect(onSubmit).toHaveBeenCalledTimes(0);
     });
 
-    it('should require unique project id', () => {
+    it('should require unique workspace id', () => {
         enterId('a1');
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
     });

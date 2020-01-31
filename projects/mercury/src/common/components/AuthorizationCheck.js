@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import LoadingInlay from "./LoadingInlay";
-import ProjectUserContext from '../contexts/ProjectUserContext';
+import WorkspaceUserContext from '../contexts/WorkspaceUserContext';
 
 /**
  * This component performs an authorization check for the current user
@@ -86,12 +86,12 @@ AuthorizationCheck.propTypes = {
 };
 
 const ContextualAuthorizationCheck = props => {
-    const {projectUser = {}, projectUserLoading = false, projectUserError = false} = useContext(ProjectUserContext);
+    const {workspaceUser = {}, workspaceUserLoading = false, workspaceUserError = false} = useContext(WorkspaceUserContext);
     return (
         <AuthorizationCheck
-            authorizations={projectUser.roles}
-            pending={projectUserLoading}
-            error={projectUserError}
+            authorizations={workspaceUser.roles}
+            pending={workspaceUserLoading}
+            error={workspaceUserError}
             {...props}
         />
     );

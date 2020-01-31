@@ -8,7 +8,7 @@ describe('NodesAPI', () => {
             data: dummyNodes,
             headers: {'content-type': 'application/json'}
         }));
-        const projects: Node[] = await NodesAPI.getNodes();
-        expect(projects.map((node: Node) => node.id)).toEqual(dummyNodes);
+        const workspaces: Node[] = await NodesAPI.getNodes();
+        expect(workspaces.map((node: Node) => node.id)).toEqual(dummyNodes);
     });
 });

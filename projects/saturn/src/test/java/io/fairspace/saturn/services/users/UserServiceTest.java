@@ -57,13 +57,13 @@ public class UserServiceTest {
 
     @Test
     public void coordinatorCanAddUsers() {
-        setThreadContext(new ThreadContext(coordinator, "project"));
+        setThreadContext(new ThreadContext(coordinator, "workspace"));
         assertNotNull(userService.addUser(regular1));
     }
 
     @Test
     public void coordinatorCanGrantRoles() {
-        setThreadContext(new ThreadContext(coordinator, "project"));
+        setThreadContext(new ThreadContext(coordinator, "workspace"));
         assertNotNull(userService.addUser(regular1));
         regular1.getRoles().add(Role.CanWrite);
         assertNotNull(userService.addUser(regular1));
@@ -72,7 +72,7 @@ public class UserServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void regularUserCanNotAddUsers() {
-        setThreadContext(new ThreadContext(regular1, "project"));
+        setThreadContext(new ThreadContext(regular1, "workspace"));
         userService.addUser(regular2);
     }
 }

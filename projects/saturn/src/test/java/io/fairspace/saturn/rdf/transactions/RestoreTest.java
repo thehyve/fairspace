@@ -37,7 +37,7 @@ public class RestoreTest {
         config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
         setThreadContext(new ThreadContext());
-        getThreadContext().setProject("ds");
+        getThreadContext().setWorkspace("ds");
     }
 
     @After

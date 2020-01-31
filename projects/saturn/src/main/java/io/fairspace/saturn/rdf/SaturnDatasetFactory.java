@@ -41,19 +41,19 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static DatasetGraph connect(Config config, String projectName, Client elasticsearchClient) throws IOException {
-        var dsDir = new File(config.jena.datasetPath, projectName);
+    public static DatasetGraph connect(Config config, String workspaceName, Client elasticsearchClient) throws IOException {
+        var dsDir = new File(config.jena.datasetPath, workspaceName);
         var restoreNeeded = isRestoreNeeded(dsDir);
 
         // Create a TDB2 dataset graph
         var dsg = connectCreate(Location.create(dsDir.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(new File(config.jena.transactionLogPath, projectName), new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(new File(config.jena.transactionLogPath, workspaceName), new SparqlTransactionCodec());
 
         if (elasticsearchClient != null) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, projectName, config.jena, restoreNeeded, elasticsearchClient);
+            dsg = enableElasticSearch(dsg, workspaceName, config.jena, restoreNeeded, elasticsearchClient);
         }
 
         if (restoreNeeded) {
@@ -72,13 +72,13 @@ public class SaturnDatasetFactory {
             TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
 
-            if (! ds.getDefaultModel().contains(FS.theProject, null)) {
+            if (! ds.getDefaultModel().contains(FS.theWorkspace, null)) {
                     ds.getDefaultModel()
-                            .add(FS.theProject, RDF.type, FS.Project)
-                            .add(FS.theProject, RDFS.label, projectName)
-                            .add(FS.theProject, FS.nodeUrl, config.privateUrl)
-                            .add(FS.theProject, FS.projectDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
-                    ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theProject, FS.writeRestricted, createTypedLiteral(true));
+                            .add(FS.theWorkspace, RDF.type, FS.Workspace)
+                            .add(FS.theWorkspace, RDFS.label, workspaceName)
+                            .add(FS.theWorkspace, FS.nodeUrl, config.privateUrl)
+                            .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
+                    ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true));
             }
 
             initVocabularies(ds);
@@ -93,10 +93,10 @@ public class SaturnDatasetFactory {
         return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
-    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String projectName, Config.Jena config, boolean recreateIndex, Client client) throws UnknownHostException {
+    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String workspaceName, Config.Jena config, boolean recreateIndex, Client client) throws UnknownHostException {
         try {
             // Setup ES client and index
-            config.elasticSearch.settings.setIndexName(projectName);
+            config.elasticSearch.settings.setIndexName(workspaceName);
             ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
 
             // Create a dataset graph that updates ES with every triple update

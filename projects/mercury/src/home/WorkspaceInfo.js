@@ -4,25 +4,25 @@ import {Paper} from '@material-ui/core';
 import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';
 import useLinkedData from '../metadata/UseLinkedData';
-import {PROJECT_INFO_URI} from '../constants';
+import {WORKSPACE_INFO_URI} from '../constants';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import LinkedDataContext from '../metadata/LinkedDataContext';
 
-const ProjectInfoWithProvider = () => (
+const WorkspaceInfoWithProvider = () => (
     <LinkedDataMetadataProvider>
-        <ProjectInfo />
+        <WorkspaceInfo />
     </LinkedDataMetadataProvider>
 );
 
-const ProjectInfo = () => {
+const WorkspaceInfo = () => {
     const {isCoordinator} = useContext(LinkedDataContext);
-    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(PROJECT_INFO_URI);
+    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(WORKSPACE_INFO_URI);
     return (
         <>
             <Paper style={{padding: 20}}>
                 {isCoordinator ? (
                     <LinkedDataEntityFormContainer
-                        subject={PROJECT_INFO_URI}
+                        subject={WORKSPACE_INFO_URI}
                         properties={properties}
                         values={values}
                         showEditButtons
@@ -44,4 +44,4 @@ const ProjectInfo = () => {
     );
 };
 
-export default ProjectInfoWithProvider;
+export default WorkspaceInfoWithProvider;

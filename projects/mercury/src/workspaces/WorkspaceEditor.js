@@ -1,5 +1,5 @@
 import React from 'react';
-import ProjectDialog from "./ProjectDialog";
+import WorkspaceDialog from "./WorkspaceDialog";
 import {useFormField} from "../common/hooks/UseFormField";
 import {useAsync} from "../common/hooks";
 import NodesAPI from "./NodesAPI";
@@ -7,14 +7,14 @@ import {LoadingOverlay} from "../common/components";
 
 const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 
-export default ({onSubmit, onClose, creating, projects, getNodes = NodesAPI.getNodes,
-    project: {id = '', node = ''} = {}}) => {
+export default ({onSubmit, onClose, creating, workspaces, getNodes = NodesAPI.getNodes,
+    workspace: {id = '', node = ''} = {}}) => {
     const {data: nodes = [], loading} = useAsync(getNodes);
 
     const nodeControl = useFormField(node, value => !!value);
 
-    const isProjectIdUnique = (projectId) => !projects.some(project => project.id === projectId);
-    const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isProjectIdUnique(value));
+    const isWorkspaceIdUnique = (workspaceId) => !workspaces.some(workspace => workspace.id === workspaceId);
+    const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isWorkspaceIdUnique(value));
 
     const allControls = [idControl, nodeControl];
 
@@ -62,7 +62,7 @@ export default ({onSubmit, onClose, creating, projects, getNodes = NodesAPI.getN
     }
     return (
         <>
-            <ProjectDialog
+            <WorkspaceDialog
                 onSubmit={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
