@@ -15,7 +15,7 @@ import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
 import useMetaVocabulary from './UseMetaVocabulary';
-import ProjectUserContext from '../common/contexts/ProjectUserContext';
+import WorkspaceUserContext from '../common/contexts/WorkspaceUserContext';
 
 const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps}) => {
     const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = useMetaVocabulary();
@@ -28,7 +28,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
         vocabulary, fetchVocabulary, submitVocabularyChanges, createVocabularyEntity, deleteVocabularyEntity
     } = useContext(VocabularyContext);
 
-    const {projectUser} = useContext(ProjectUserContext);
+    const {workspaceUser} = useContext(WorkspaceUserContext);
 
     const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type);
 
@@ -68,8 +68,8 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 // Fixed properties
                 namespaces,
                 requireIdentifier: false,
-                hasEditRight: isDataSteward(projectUser.roles),
-                isCoordinator: isCoordinator(projectUser.roles),
+                hasEditRight: isDataSteward(workspaceUser.roles),
+                isCoordinator: isCoordinator(workspaceUser.roles),
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,

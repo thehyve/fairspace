@@ -11,7 +11,7 @@ import {BarChart} from "@material-ui/icons";
 import {BreadCrumbs, BreadcrumbsContext} from "../common";
 
 import Config from "../common/services/Config";
-import {projectPrefix} from "../projects/projects";
+import {workspacePrefix} from "../workspaces/workspaces";
 
 const styles = theme => ({
     card: {
@@ -29,7 +29,7 @@ const Notebooks = ({classes}) => (
         segments: [{
             label: 'Notebooks',
             icon: <BarChart />,
-            href: projectPrefix() + '/notebooks'
+            href: workspacePrefix() + '/notebooks'
         }]
     }}
     >

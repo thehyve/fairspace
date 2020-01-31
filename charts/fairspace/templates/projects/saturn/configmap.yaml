@@ -1,0 +1,44 @@
+{{- $global := . }}
+{{- range .Values.saturn.nodes }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $global.Release.Name }}-saturn-{{ .name }}
+  labels:
+    app: saturn
+    chart: {{ printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    release: {{ $global.Release.Name }}
+    heritage: {{ $global.Release.Service }}
+data:
+  application.yaml: |-
+    port: 8080
+    publicUrl: https://{{ $global.Values.fairspace.ingress.domain }}
+    privateUrl: http://{{ $global.Release.Name }}-saturn-{{.name}}.{{ $global.Release.Namespace }}.svc.cluster.local
+    jena:
+      metadataBaseIRI: http://{{ $global.Values.fairspace.ingress.domain }}/iri/
+      vocabularyBaseIRI: http://{{ $global.Values.fairspace.ingress.domain }}/vocabulary/
+      datasetPath: "/data/saturn/db"
+      inactiveConnectionShutdownIntervalSec: 600
+      storeParams:
+{{ toYaml $global.Values.saturn.storeParams | indent 8 }}
+      transactionLogPath: "/data/saturn/files/log"
+      maxTriplesToReturn: {{ $global.Values.saturn.maxTriplesToReturn }}
+      elasticSearch:
+        enabled: {{ $global.Values.external.elasticsearch.enabled }}
+        required: true
+        settings:
+          hostToPortMapping:
+            {{ $global.Values.external.elasticsearch.transport.host }}: {{ $global.Values.external.elasticsearch.transport.port }}
+          clusterName: "elasticsearch"
+          shards: 1
+          replicas: 1
+    auth:
+      enabled: true
+      fullAccessRole: organisation-admin
+      userUrl: {{ $global.Values.external.keycloak.baseUrl }}/auth/admin/realms/{{ $global.Values.external.keycloak.realm }}/users/
+    webDAV:
+      blobStorePath: "/data/saturn/files/blobs"
+    mail:
+{{ toYaml $global.Values.saturn.mail | indent 6 }}
+{{- end}}

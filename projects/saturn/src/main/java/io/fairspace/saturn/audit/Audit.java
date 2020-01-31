@@ -11,7 +11,7 @@ public class Audit {
     public static void audit(String event, String... params) {
         var ctx = getThreadContext();
         MDC.put("event", event);
-        MDC.put("project", ctx.getProject());
+        MDC.put("workspace", ctx.getWorkspace());
 
         for (var i = 0; i < params.length / 2; i++) {
             if (params[2 * i + 1] != null) {

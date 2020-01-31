@@ -14,7 +14,7 @@ describe('Http Utils', () => {
             window.location.assign = jest.fn();
             ErrorDialog.showError = jest.fn();
             handleHttpError("Default error")({response: {status: 403}});
-            expect(ErrorDialog.showError).toHaveBeenCalledWith(null, "You have no access to this project. Ask the project coordinator to grant you access.", null, expect.anything());
+            expect(ErrorDialog.showError).toHaveBeenCalledWith(null, "You have no access to this workspace. Ask the workspace coordinator to grant you access.", null, expect.anything());
         });
 
         it('Should throw an exception with the backend error on responses other than 401', () => {

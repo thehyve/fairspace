@@ -16,9 +16,9 @@ const handleAuthError = (status) => {
                 () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
             break;
         case 403:
-            ErrorDialog.showError(null, 'You have no access to this project. Ask the project coordinator to grant you access.',
+            ErrorDialog.showError(null, 'You have no access to this workspace. Ask the workspace coordinator to grant you access.',
                 null,
-                () => window.location.assign('/projects'));
+                () => window.location.assign('/workspaces'));
             break;
         default:
     }

@@ -31,7 +31,7 @@ public class TxnLogDatasetGraphTest {
         var user = new User();
         user.setIri(createURI("userId"));
         user.setName("fullName");
-        setThreadContext(new ThreadContext(user, "project"));
+        setThreadContext(new ThreadContext(user, "workspace"));
         ds = new DatasetJobSupportImpl(new DatasetGraphBatch(new TxnLogDatasetGraph(createTxnMem(), log)));
     }
 

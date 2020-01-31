@@ -1,32 +1,32 @@
-# External dependencies for running the workspace
+# External dependencies for running the fairspace
 external:
   keycloak:
     baseUrl: https://keycloak.ci.fairway.app
     username: keycloak
     password: keycloak-ci-123
     realm: ci
-    clientId: workspace-ci-pluto
+    clientId: fairspace-ci-pluto
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
   elasticsearch:
     enabled: true
     transport:
-      host: workspace-ci-elasticsearch-discovery.workspace-ci.svc.cluster.local
+      host: fairspace-ci-elasticsearch-discovery.fairspace-ci.svc.cluster.local
     rest:
-      host: workspace-ci-elasticsearch-client.workspace-ci.svc.cluster.local
+      host: fairspace-ci-elasticsearch-client.fairspace-ci.svc.cluster.local
 
-# Settings for the workspace
-workspace:
-  name: "CI Workspace"
-  description: "CI Workspace"
+# Settings for the fairspace
+fairspace:
+  name: "CI Fairspace"
+  description: "CI Fairspace"
   ingress:
-    domain: workspace.ci.fairway.app
+    domain: fairspace.ci.fairway.app
   enableExperimentalFeatures: false
   configurationScripts:
     keycloak:
       pullPolicy: Always
 
 services:
-  jupyterhub: https://jupyter.workspace.ci.fairway.app
+  jupyterhub: https://jupyter.fairspace.ci.fairway.app
 
 # Specific settings for Saturn subchart
 saturn:

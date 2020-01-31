@@ -6,7 +6,7 @@
 export type Match<P> = {
     /**
      * The params type is based on the path parameters in
-     * the matching route, e.g., {project: string;} for the path '/projects/:project'.
+     * the matching route, e.g., {workspace: string;} for the path '/workspaces/:workspace'.
      */
     params: P;
     isExact: boolean;

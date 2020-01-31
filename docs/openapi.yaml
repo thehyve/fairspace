@@ -7,19 +7,19 @@ info:
     name: TBD
 
 servers:
-  - url: https://workspace.ci.fairway.app/api/v1
+  - url: https://fairspace.ci.fairway.app/api/v1
 paths:
-  /workspaces/:
-    description: The workspaces resource
+  /nodes/:
+    description: The nodes resource
     get:
-      summary: Retrieve workspaces
+      summary: Retrieve nodes
       responses:
         '200':
-          description: A list of workspaces (Just identifiers, currently URLs)
+          description: A list of nodes (Just identifiers, currently URLs)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workspaces'
+                $ref: '#/components/schemas/Nodes'
         default:
           $ref: '#components/responses/Unexpected'
   /projects/:
@@ -121,7 +121,7 @@ paths:
                       "@id" : "http://www.w3.org/2000/01/rdf-schema#label"
                     },
                     "gaveConsent" : {
-                      "@id" : "http://workspace.ci.fairway.app/vocabulary/gaveConsent",
+                      "@id" : "http://fairspace.ci.fairway.app/vocabulary/gaveConsent",
                       "@type" : "@id"
                     },
                     "dateCreated" : {
@@ -129,7 +129,7 @@ paths:
                       "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"
                     },
                     "hasData" : {
-                      "@id" : "http://workspace.ci.fairway.app/vocabulary/hasData",
+                      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
                       "@type" : "@id"
                     },
                     "createdBy" : {
@@ -137,19 +137,19 @@ paths:
                       "@type" : "@id"
                     },
                     "hasEvent" : {
-                      "@id" : "http://workspace.ci.fairway.app/vocabulary/hasEvent",
+                      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasEvent",
                       "@type" : "@id"
                     },
                     "patientIdentifier" : {
-                      "@id" : "http://workspace.ci.fairway.app/vocabulary/patientIdentifier"
+                      "@id" : "http://fairspace.ci.fairway.app/vocabulary/patientIdentifier"
                     },
                     "ageOfDeath" : {
-                      "@id" : "http://workspace.ci.fairway.app/vocabulary/ageOfDeath",
+                      "@id" : "http://fairspace.ci.fairway.app/vocabulary/ageOfDeath",
                       "@type" : "http://www.w3.org/2001/XMLSchema#date"
                     },
-                    "vocabulary" : "http://workspace.ci.fairway.app/vocabulary/",
+                    "vocabulary" : "http://fairspace.ci.fairway.app/vocabulary/",
                     "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
-                    "ws" : "http://workspace.ci.fairway.app/iri/"
+                    "ws" : "http://fairspace.ci.fairway.app/iri/"
                   }
                 }
         default:
@@ -174,10 +174,10 @@ paths:
                 } ],
                 "@context" : {
                   "hasData" : {
-                    "@id" : "http://workspace.ci.fairway.app/vocabulary/hasData",
+                    "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
                     "@type" : "@id"
                   },
-                  "ws" : "http://workspace.ci.fairway.app/iri/"
+                  "ws" : "http://fairspace.ci.fairway.app/iri/"
                 }
               }
 
@@ -211,10 +211,10 @@ paths:
                 } ],
                 "@context" : {
                   "hasData" : {
-                    "@id" : "http://workspace.ci.fairway.app/vocabulary/hasData",
+                    "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
                     "@type" : "@id"
                   },
-                  "ws" : "http://workspace.ci.fairway.app/iri/"
+                  "ws" : "http://fairspace.ci.fairway.app/iri/"
                 }
               }
 
@@ -255,10 +255,10 @@ paths:
                 } ],
                 "@context" : {
                   "hasData" : {
-                    "@id" : "http://workspace.ci.fairway.app/vocabulary/hasData",
+                    "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
                     "@type" : "@id"
                   },
-                  "ws" : "http://workspace.ci.fairway.app/iri/"
+                  "ws" : "http://fairspace.ci.fairway.app/iri/"
                 }
               }
       responses:
@@ -313,10 +313,10 @@ paths:
                     "label" : {
                       "@id" : "http://www.w3.org/2000/01/rdf-schema#label"
                     },
-                    "vocabulary" : "http://workspace.ci.fairway.app/vocabulary/",
+                    "vocabulary" : "http://fairspace.ci.fairway.app/vocabulary/",
                     "sh" : "http://www.w3.org/ns/shacl#",
                     "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
-                    "ws" : "http://workspace.ci.fairway.app/iri/",
+                    "ws" : "http://fairspace.ci.fairway.app/iri/",
                     "fs" : "http://fairspace.io/ontology#"
                   }
                 }
@@ -600,10 +600,10 @@ paths:
                     "label" : {
                       "@id" : "http://www.w3.org/2000/01/rdf-schema#label"
                     },
-                    "vocabulary" : "http://workspace.ci.fairway.app/vocabulary/",
+                    "vocabulary" : "http://fairspace.ci.fairway.app/vocabulary/",
                     "sh" : "http://www.w3.org/ns/shacl#",
                     "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
-                    "ws" : "http://workspace.ci.fairway.app/iri/",
+                    "ws" : "http://fairspace.ci.fairway.app/iri/",
                     "fs" : "http://fairspace.io/ontology#"
                   }
                 }
@@ -780,11 +780,11 @@ paths:
                 single:
                   value: |
                     {
-                      "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                      "iri": "http://fairspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                       "dateCreated": "2019-04-24T13:49:05.547Z",
-                      "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                      "createdBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                       "dateModified": "2019-04-24T13:49:05.547Z",
-                      "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                      "modifiedBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                       "dateDeleted": null,
                       "deletedBy": null,
                       "name": "Collection update",
@@ -800,11 +800,11 @@ paths:
                   value: |
                     [
                       {
-                        "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                        "iri": "http://fairspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                         "dateCreated": "2019-04-24T13:49:05.547Z",
-                        "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                        "createdBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                         "dateModified": "2019-04-24T13:49:05.547Z",
-                        "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                        "modifiedBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                         "dateDeleted": null,
                         "deletedBy": null,
                         "name": "Collection update",
@@ -817,11 +817,11 @@ paths:
                         "canRead": true
                       },
                       {
-                          "iri": "http://workspace.ci.fairway.app/iri/f1487ce4-e4c4-4243-af34-18e33d0be7e5",
+                          "iri": "http://fairspace.ci.fairway.app/iri/f1487ce4-e4c4-4243-af34-18e33d0be7e5",
                           "dateCreated": "2019-04-24T14:14:18.093Z",
-                          "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                          "createdBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                           "dateModified": "2019-04-24T14:14:18.093Z",
-                          "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                          "modifiedBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                           "dateDeleted": null,
                           "deletedBy": null,
                           "name": "test",
@@ -857,11 +857,11 @@ paths:
                 $ref: '#/components/schemas/ReturnedCollection'
               example: |
                 {
-                  "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                  "iri": "http://fairspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                   "dateCreated": "2019-04-24T13:49:05.547Z",
-                  "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "createdBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateModified": "2019-04-24T13:49:05.547Z",
-                  "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "modifiedBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateDeleted": null,
                   "deletedBy": null,
                   "name": "Collection update",
@@ -896,11 +896,11 @@ paths:
                 $ref: '#/components/schemas/ReturnedCollection'
               example: |
                 {
-                  "iri": "http://workspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
+                  "iri": "http://fairspace.ci.fairway.app/iri/3a95581c-de86-4977-a853-0237b3ee728e",
                   "dateCreated": "2019-04-24T13:49:05.547Z",
-                  "createdBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "createdBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateModified": "2019-04-24T13:49:05.547Z",
-                  "modifiedBy": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                  "modifiedBy": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                   "dateDeleted": null,
                   "deletedBy": null,
                   "name": "Collection update",
@@ -1057,7 +1057,7 @@ paths:
                 single:
                   value: |
                     {
-                        "user": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                        "user": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                         "access": "Manage",
                         "canWrite": true,
                         "canManage": true,
@@ -1067,14 +1067,14 @@ paths:
                   value: |
                     [
                       {
-                          "user": "http://workspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+                          "user": "http://fairspace.ci.fairway.app/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
                           "access": "Manage",
                           "canWrite": true,
                           "canManage": true,
                           "canRead": true
                       },
                       {
-                          "user": "http://workspace.ci.fairway.app/iri/other-user",
+                          "user": "http://fairspace.ci.fairway.app/iri/other-user",
                           "access": "Write",
                           "canWrite": true,
                           "canManage": false,
@@ -1243,7 +1243,7 @@ components:
           format: iri
         object:
           type: string
-    Workspaces:
+    Nodes:
       type: array
       items:
         type: string
@@ -1251,7 +1251,7 @@ components:
       properties:
         name:
           type: string
-        workspace:
+        node:
           type: string
         label:
           type: string

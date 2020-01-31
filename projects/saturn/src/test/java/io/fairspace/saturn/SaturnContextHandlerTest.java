@@ -72,10 +72,10 @@ public class SaturnContextHandlerTest {
 
 
     @Test
-    public void projectEndpointsCanNotBeAccessedWithoutAuth() throws IOException, ServletException {
+    public void workspaceEndpointsCanNotBeAccessedWithoutAuth() throws IOException, ServletException {
         when(authenticator.apply(eq(request))).thenReturn(null);
 
-        handler.handle("/api/v1/projects/project/metadata/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/metadata/", baseRequest, request, response);
 
         verifyAuthenticated(false);
     }
@@ -84,13 +84,13 @@ public class SaturnContextHandlerTest {
     public void sparqlRequiresSparqlRole() throws IOException, ServletException {
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead));
 
-        handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/rdf/", baseRequest, request, response);
 
         verifyAuthenticated(false);
 
         when(user.getRoles()).thenReturn(Set.of(Role.SparqlUser));
 
-        handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/rdf/", baseRequest, request, response);
 
         verify(requestDispatcher).forward(request, response);
     }
@@ -100,7 +100,7 @@ public class SaturnContextHandlerTest {
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead));
         when(request.getMethod()).thenReturn("GET");
 
-        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(true);
     }
@@ -110,14 +110,14 @@ public class SaturnContextHandlerTest {
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead));
         when(request.getMethod()).thenReturn("PUT");
 
-        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(false);
 
         when(user.getRoles()).thenReturn(Set.of(Role.CanRead, Role.DataSteward));
         when(request.getMethod()).thenReturn("PUT");
 
-        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/vocabulary/", baseRequest, request, response);
 
         verifyAuthenticated(true);
     }
@@ -133,17 +133,17 @@ public class SaturnContextHandlerTest {
     public void anythingCanBeAccessedByCoordinator() throws IOException, ServletException {
         when(user.getRoles()).thenReturn(Set.of(Role.Coordinator));
 
-        handler.handle("/api/v1/projects/project/metadata/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/metadata/", baseRequest, request, response);
         verifyAuthenticated(true);
 
-        handler.handle("/api/v1/projects/project/webdav/path/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/webdav/path/", baseRequest, request, response);
         verifyAuthenticated(true);
 
-        handler.handle("/api/v1/projects/project/rdf/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/rdf/", baseRequest, request, response);
         verify(requestDispatcher).forward(request, response);
 
         when(request.getMethod()).thenReturn("PUT");
-        handler.handle("/api/v1/projects/project/vocabulary/", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/workspace/vocabulary/", baseRequest, request, response);
         verifyAuthenticated(true);
     }
 
@@ -151,7 +151,7 @@ public class SaturnContextHandlerTest {
     public void errorMessageIsSentCorrectly() throws IOException, ServletException {
         when(authenticator.apply(eq(request))).thenReturn(null);
 
-        handler.handle("/api/v1/projects/some/some", baseRequest, request, response);
+        handler.handle("/api/v1/workspaces/some/some", baseRequest, request, response);
 
         verifyAuthenticated(false);
 

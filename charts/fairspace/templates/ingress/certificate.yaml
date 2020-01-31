@@ -1,0 +1,25 @@
+{{- $ingress := .Values.fairspace.ingress -}}
+{{- if $ingress.enabled -}}
+{{- if $ingress.tls.enabled -}}
+{{- if $ingress.tls.certificate.obtain -}}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-fairspace
+  labels:
+    app: {{ template "fairspace.name" . }}
+    chart: {{ template "fairspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  secretName: {{ template "fairspace.tlsSecretName" . }}
+{{- with $ingress.tls.certificate.issuerRef }}
+  issuerRef:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  commonName: '*.{{ $ingress.domain }}'
+  dnsNames:
+  - '{{ $ingress.domain }}'
+{{- end -}}
+{{- end -}}
+{{- end -}}

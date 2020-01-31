@@ -35,7 +35,7 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        setThreadContext(new ThreadContext(user, "project"));
+        setThreadContext(new ThreadContext(user, "workspace"));
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
         collections = new CollectionsService(new DatasetJobSupportInMemory(), eventListener, permissions);

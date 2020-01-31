@@ -4,7 +4,7 @@ import {BreadCrumbs} from "../common";
 import WithRightDrawer from "../common/components/WithRightDrawer";
 import RecentActivity from "./RecentActivity";
 import Config from "../common/services/Config";
-import ProjectInfo from './ProjectInfo';
+import WorkspaceInfo from './WorkspaceInfo';
 
 export default () => (
     <>
@@ -19,6 +19,6 @@ export default () => (
                 )
                 : <BreadCrumbs />
         }
-        <ProjectInfo />
+        <WorkspaceInfo />
     </>
 );

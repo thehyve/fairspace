@@ -8,7 +8,7 @@ jdk:
 env:
   global:
      - NODE_VERSION="10.16.3"
-     - APPNAME="workspace"
+     - APPNAME="fairspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
      - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
@@ -24,7 +24,7 @@ env:
      - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacedemocluster"
      - RELEASE_CLUSTER_NAME="fairspacedemocluster"
      - RELEASE_CLUSTER_ZONE="europe-west1-b"
-     - GIT_TAG_FILES_OVERRIDE="charts/workspace/Chart.yaml charts/workspace/values.yaml projects/"
+     - GIT_TAG_FILES_OVERRIDE="charts/fairspace/Chart.yaml charts/fairspace/values.yaml projects/"
 
      # DOCKER_PASSWORD=
      - secure: "FJTXKY792rdmQZ6DLU5Dlm1W9ZAmFwBFWEJDO4dLJySBO/clUUV0OfRkNX4OaachKUlRCFGxYbXaXCioYtMTVg54aD1d+hjBO5azPzUiT8V2mz2w3MkvxsvnvivziJtcSfol/PNHQdEK8qZhZ9IwdCnQM9LQ3YVwv9tkNpR//qNmUjA4ZdcbQrBLQ63wm/UX2vCo4D3/J24TfCJrmlu9AyoIAqiFsRczsQGixQLRzeRgwH3yFgACZrMt42ySrx4rL+Yi3Ro/ZftY+YrZPRs+wrObh++OmdzjQWXH4KBg8HTFEIJXYMOVnpG0OSdNO7j7oVS8qVRHJmFAG0VHrmSIMMbjU+3js3SVJxtwXRc3xEPJzKzhtyqGaQa5mr3pI1Q8YingcsEBEpWOh9zXBzJm1uh7JhgTgcEbBwQl12/SctMjejyAFFqVHhlSAEzuDBwTkXLiv6z6sF+SUpww8I6eKmQrJUN1HVPm9+n1nsBy1j3PIM0RmTAf+jZCuAMDg0Dg0dlY/in/Jz1k/QuFDbJ4ura4YBBQ315UDoki5rucDi2poxq9YoAaMpMouso9ilAwOms3guVaU/rgOHZsmIPqv2ccH6FEoOh2UeEq3RCGbprLAj88f2rcGNPaHNWRkeek31c+TI9JZPmeL5eh5tJ64cN+feVVk8lbqNWtR9VHRrI="

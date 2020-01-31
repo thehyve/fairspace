@@ -21,7 +21,7 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const {workspaces} = config.urls;
+const {nodes} = config.urls;
 
 const transformESHit = (hit) => (hit ? {
     ...hit._source,
@@ -34,19 +34,19 @@ const transformESResult = (esJson) => (
     esJson && esJson.hits && esJson.hits.hits ? esJson.hits.hits.map(transformESHit) : []
 );
 
-const mapProjectSearchItems = (items) => {
+const mapWorkspaceSearchItems = (items) => {
     const result = transformESResult(items);
     return result.map(item => ({
         id: item.index,
-        workspace: item.nodeUrl.find(() => true),
+        node: item.nodeUrl.find(() => true),
         label: item.label.find(() => true),
-        description: item.projectDescription.find(() => true)
+        description: item.workspaceDescription.find(() => true)
     }));
 };
 
 const esClient = new elasticsearch.Client({host: config.urls.elasticsearch, log: 'error'});
 
-const getESProjects = () => {
+const getESWorkspaces = () => {
     const sortDataCreated = [
         "_score",
         {
@@ -66,7 +66,7 @@ const getESProjects = () => {
             filter: [
                 {
                     terms: {
-                        "type.keyword": ["http://fairspace.io/ontology#Project"]
+                        "type.keyword": ["http://fairspace.io/ontology#Workspace"]
                     }
                 }
             ]
@@ -85,27 +85,27 @@ const getESProjects = () => {
                 }
             }
         }
-    }).then(mapProjectSearchItems);
+    }).then(mapWorkspaceSearchItems);
 };
 
-let allProjects;
+let allWorkspaces;
 
-const fetchProjects = () => getESProjects()
+const fetchWorkspaces = () => getESWorkspaces()
     .then((result) => {
-        allProjects = result;
+        allWorkspaces = result;
     })
     .catch(e => {
-        console.error('Error retrieving projects', e);
+        console.error('Error retrieving workspaces', e);
         process.exit(1);
     });
 
-fetchProjects();
-setInterval(() => fetchProjects(), 30000);
+fetchWorkspaces();
+setInterval(() => fetchWorkspaces(), 30000);
 
 app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and running.').end());
 
 app.get('/readiness', (req, res) => {
-    if (allProjects) {
+    if (allWorkspaces) {
         res.status(200).end('Ready');
     } else {
         res.status(503).end('Initializing');
@@ -137,7 +137,7 @@ app.use(session({
 
 app.set('trust proxy', true);
 
-app.use('/api/v1/projects/*/webdav', (req, res, next) => {
+app.use('/api/v1/workspaces/*/webdav', (req, res, next) => {
     if (!req.session['keycloak-token']) {
         const auth = req.headers.authorization;
         if (auth && auth.startsWith('Basic ')) {
@@ -169,71 +169,71 @@ app.use('/**', keycloak.protect((token) => {
 
 app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}));
 
-// '/api/v1/projects/project/collections/' -> ['', 'api', 'v1', 'projects', 'project', 'collections', '']
-const getProjectId = (url) => url.split('/')[4];
+// '/api/v1/workspaces/workspace/collections/' -> ['', 'api', 'v1', 'workspaces', 'workspace', 'collections', '']
+const getWorkspaceId = (url) => url.split('/')[4];
 
-const getWorkspaceUrl = (url) => {
-    const projectId = getProjectId(url);
-    const project = allProjects.find(p => p.id === projectId);
-    return (project && project.workspace) || ('/unknown-project/' + projectId);
+const getNodeUrl = (url) => {
+    const workspaceId = getWorkspaceId(url);
+    const workspace = allWorkspaces.find(p => p.id === workspaceId);
+    return (workspace && workspace.node) || ('/unknown-workspace/' + workspaceId);
 };
 
-app.use('/unknown-project/:project', (req, res) => res.status(404).send('Unknown project: ' + req.params.project));
+app.use('/unknown-workspace/:workspace', (req, res) => res.status(404).send('Unknown workspace: ' + req.params.workspace));
 
-app.get('/api/v1/workspaces', (req, res) => res.send(workspaces).end());
+app.get('/api/v1/nodes', (req, res) => res.send(nodes).end());
 
-// All projects from all workspaces
-app.get('/api/v1/projects', (req, res) => res.send(allProjects).end());
+// All workspaces from all workspaces
+app.get('/api/v1/workspaces', (req, res) => res.send(allWorkspaces).end());
 
-const projectsBeingCreated = new Set();
+const workspacesBeingCreated = new Set();
 
 const json = express.json();
 
-const PROJECT_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
+const WORKSPACE_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
 
-// Create a new project
-app.put('/api/v1/projects', (req, res) => {
+// Create a new workspace
+app.put('/api/v1/workspaces', (req, res) => {
     if (!accessToken.content.authorities.includes('organisation-admin')) {
         res.status(403).send('Forbidden');
         return;
     }
     json(req, res, () => {
-        const project = req.body;
+        const workspace = req.body;
 
-        if (!workspaces.includes(project.workspace)) {
-            res.status(400).send('Unknown workspace URL');
+        if (!nodes.includes(workspace.node)) {
+            res.status(400).send('Unknown node URL');
             return;
         }
-        if (!project.id || !(PROJECT_ID_PATTERN).test(project.id)) {
-            res.status(400).send('Invalid project id: ' + project.id);
+        if (!workspace.id || !(WORKSPACE_ID_PATTERN).test(workspace.id)) {
+            res.status(400).send('Invalid workspace id: ' + workspace.id);
             return;
         }
-        if (allProjects.find(p => p.id === project.id)) {
-            res.status(400).send('This project id is already taken: ' + project.id);
+        if (allWorkspaces.find(p => p.id === workspace.id)) {
+            res.status(400).send('This workspace id is already taken: ' + workspace.id);
             return;
         }
-        if (projectsBeingCreated.has(project.id)) {
-            res.status(400).send('A project with this id is already being created: ' + project.id);
+        if (workspacesBeingCreated.has(workspace.id)) {
+            res.status(400).send('A workspace with this id is already being created: ' + workspace.id);
             return;
         }
 
-        projectsBeingCreated.add(project.id);
+        workspacesBeingCreated.add(workspace.id);
 
-        // A project is created when it is accessed for the first time
-        fetch(`${project.workspace}/api/v1/projects/${project.id}/collections/`,
+        // A workspace is created when it is accessed for the first time
+        fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`,
             {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${accessToken.token}`
                 }
             })
-            .then(workspaceResponse => {
-                if (workspaceResponse.ok && !allProjects.find(p => p.id === project.id)) {
-                    allProjects.push(project);
+            .then(nodeResponse => {
+                if (nodeResponse.ok && !allWorkspaces.find(p => p.id === workspace.id)) {
+                    allWorkspaces.push(workspace);
                 }
-                res.status(workspaceResponse.status).send(project);
+                res.status(nodeResponse.status).send(workspace);
             })
-            .finally(() => projectsBeingCreated.delete(project.id));
+            .finally(() => workspacesBeingCreated.delete(workspace.id));
     });
 });
 
@@ -248,7 +248,7 @@ app.use(proxy('/api/keycloak', {
 
 app.use(proxy('/api/v1/search', {
     target: config.urls.elasticsearch,
-    pathRewrite: (url) => `/${getProjectId(url)}/_search`
+    pathRewrite: (url) => `/${getWorkspaceId(url)}/_search`
 }));
 
 app.get('/api/v1/account', (req, res) => res.send({
@@ -260,9 +260,9 @@ app.get('/api/v1/account', (req, res) => res.send({
     authorizations: accessToken.content.realm_access.roles
 }));
 
-app.use(proxy('/api/v1/projects/*/**', {
+app.use(proxy('/api/v1/workspaces/*/**', {
     target: 'http://never.ever',
-    router: req => getWorkspaceUrl(req.originalUrl),
+    router: req => getNodeUrl(req.originalUrl),
     onProxyReq: addToken
 }));
 

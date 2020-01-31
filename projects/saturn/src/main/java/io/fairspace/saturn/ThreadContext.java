@@ -49,5 +49,5 @@ public class ThreadContext {
     private User user;
     @Getter
     @Setter
-    private String project;
+    private String workspace;
 }

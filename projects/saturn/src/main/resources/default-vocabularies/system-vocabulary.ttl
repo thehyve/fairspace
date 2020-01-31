@@ -201,10 +201,10 @@ fs:UserShape a fs:ClassShape ;
             sh:datatype xsd:string ;
           ].
 
-fs:Project a fs:ClassShape ;
-  sh:description "Resource description for the current project." ;
-  sh:name "Project" ;
-  sh:targetClass fs:Project ;
+fs:Workspace a fs:ClassShape ;
+  sh:description "Resource description for the current workspace." ;
+  sh:name "Workspace" ;
+  sh:targetClass fs:Workspace ;
   fs:machineOnly true ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
@@ -212,9 +212,9 @@ fs:Project a fs:ClassShape ;
       fs:labelShape,
       [
         a fs:DatatypePropertyShape ;
-        sh:path fs:projectDescription ;
-        sh:name "Project description" ;
-        sh:description "A markdown formatted description for the project homepage." ;
+        sh:path fs:workspaceDescription ;
+        sh:name "Workspace description" ;
+        sh:description "A markdown formatted description for the workspace homepage." ;
         sh:datatype fs:markdown ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -222,7 +222,7 @@ fs:Project a fs:ClassShape ;
       ],
       [
         a fs:ExternalIRIPropertyShape ;
-        sh:path fs:projectExternalLink ;
+        sh:path fs:workspaceExternalLink ;
         sh:name "External links" ;
         sh:description "External links that will be available from the homepage." ;
         fs:externalLink true ;

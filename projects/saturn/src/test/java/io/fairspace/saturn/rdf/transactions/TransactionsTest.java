@@ -32,7 +32,7 @@ public class TransactionsTest {
         config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
         setThreadContext(new ThreadContext());
-        getThreadContext().setProject("ds");
+        getThreadContext().setWorkspace("ds");
 
         ds = new DatasetJobSupportImpl(new DatasetGraphMulti(config));
     }
@@ -54,7 +54,7 @@ public class TransactionsTest {
         ds.begin(WRITE);
         var anotherThread = new Thread(() -> {
             setThreadContext(new ThreadContext());
-            getThreadContext().setProject("ds");
+            getThreadContext().setWorkspace("ds");
             ds.begin(WRITE);
             ds.commit();
         });

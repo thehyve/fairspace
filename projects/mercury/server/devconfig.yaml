@@ -1,5 +1,5 @@
 urls:
-  workspaces:
+  nodes:
     - http://localhost:8080
   elasticsearch: http://localhost:9200
   keycloak: http://localhost:5100

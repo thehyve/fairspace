@@ -2,12 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import {SvgIcon} from '@material-ui/core';
 import {Home} from '@material-ui/icons';
-import {projectPrefix} from "../../projects/projects";
+import {workspacePrefix} from "../../workspaces/workspaces";
 
 const BreadcrumbsContext = React.createContext({
     segments: [{
-        label: 'Project overview',
-        href: projectPrefix(),
+        label: 'Workspace overview',
+        href: workspacePrefix(),
         icon: <Home />
     }]
 });

@@ -15,16 +15,16 @@ PROJECTS=(mercury pluto saturn)
 # pod annotations
 if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
     # Remove empty pod annotations
-    sed -i -e "s/podAnnotations: {}//" charts/workspace/values.yaml
+    sed -i -e "s/podAnnotations: {}//" charts/fairspace/values.yaml
 
     # Add a pod annotation in the values.yaml file
-    echo -e "\npodAnnotations:" >> charts/workspace/values.yaml
-    echo -e "  workspace:\n    commit: \"$COMMIT_ID\"\n" >> charts/workspace/values.yaml
+    echo -e "\npodAnnotations:" >> charts/fairspace/values.yaml
+    echo -e "  fairspace:\n    commit: \"$COMMIT_ID\"\n" >> charts/fairspace/values.yaml
 
     for project in ${PROJECTS[*]}
     do
         if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/$project; then
-            echo -e "  ${project}:\n    commit: \"$COMMIT_ID\"\n" >> charts/workspace/values.yaml
+            echo -e "  ${project}:\n    commit: \"$COMMIT_ID\"\n" >> charts/fairspace/values.yaml
         fi
     done
 fi

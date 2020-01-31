@@ -2,20 +2,20 @@ import React from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 import {logout} from '../common';
 
-import ProjectListLayout from '../layout/ProjectListLayout';
-import ProjectLayout from '../layout/ProjectLayout';
+import WorkspaceListLayout from '../layout/WorkspaceListLayout';
+import WorkspaceLayout from '../layout/WorkspaceLayout';
 
 const GlobalRoutes = () => (
     <Switch>
         <Route
-            path="/projects"
+            path="/workspaces"
             exact
-            component={ProjectListLayout}
+            component={WorkspaceListLayout}
         />
 
         <Route
-            path="/projects/:project"
-            component={ProjectLayout}
+            path="/workspaces/:workspace"
+            component={WorkspaceLayout}
         />
 
         <Route path="/login" render={() => {window.location.href = new URLSearchParams(window.location.search).get('redirectUrl');}} />
@@ -25,7 +25,7 @@ const GlobalRoutes = () => (
             render={() => logout()}
         />
 
-        <Redirect to="/projects" />
+        <Redirect to="/workspaces" />
     </Switch>
 );
 
