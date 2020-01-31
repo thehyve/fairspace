@@ -1,7 +1,7 @@
 import {
     compareBy,
     comparePrimitives,
-    comparing, first,
+    comparing,
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
