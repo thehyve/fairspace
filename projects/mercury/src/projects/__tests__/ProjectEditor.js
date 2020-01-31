@@ -8,29 +8,29 @@ import ProjectEditor from '../ProjectEditor';
 describe('ProjectEditor', () => {
     let onSubmit;
     let utils;
-    const workspace = {id: 'http://localhost:8080'};
+    const node = {id: 'http://localhost:8080'};
 
     const enterValue = (label, value) => fireEvent.change(utils.getByTestId(label), {target: {value}});
-    const enterWorkspace = (value) => enterValue('Workspace', value);
+    const enterNode = (value) => enterValue('Node', value);
     const enterId = (value) => enterValue('Id', value);
 
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
 
     beforeEach(async () => {
-        const workspaceApi = {
-            getWorkspaces: jest.fn(() => Promise.resolve([workspace]))
+        const nodeApi = {
+            getNodes: jest.fn(() => Promise.resolve([node]))
         };
         const projects: Project[] = [{
-            id: 'a1', workspace: workspace.id
+            id: 'a1', node: node.id
         }, {
-            id: 'a2', workspace: workspace.id
+            id: 'a2', node: node.id
         }];
         onSubmit = jest.fn();
         await act(async () => {
             utils = render(<ProjectEditor
                 onSubmit={onSubmit}
                 projects={projects}
-                getWorkspaces={workspaceApi.getWorkspaces}
+                getNodes={nodeApi.getNodes}
             />);
         });
     });
@@ -42,7 +42,7 @@ describe('ProjectEditor', () => {
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(onSubmit)
             .toHaveBeenCalledWith({
-                workspace: workspace.id,
+                node: node.id,
                 id: 'a',
                 label: 'a'
             });
@@ -55,7 +55,7 @@ describe('ProjectEditor', () => {
     });
 
     it('should require an identifier', () => {
-        enterWorkspace(workspace);
+        enterNode(node);
         submit();
         expect(onSubmit).toHaveBeenCalledTimes(0);
     });

@@ -9,7 +9,7 @@ export type Project = {
     id: string;
     label?: string;
     description?: string;
-    workspace: string;
+    node: string;
 }
 
 class ProjectsAPI {

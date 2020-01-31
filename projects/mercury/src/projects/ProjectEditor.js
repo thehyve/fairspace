@@ -2,39 +2,39 @@ import React from 'react';
 import ProjectDialog from "./ProjectDialog";
 import {useFormField} from "../common/hooks/UseFormField";
 import {useAsync} from "../common/hooks";
-import WorkspacesAPI from "./WorkspacesAPI";
+import NodesAPI from "./NodesAPI";
 import {LoadingOverlay} from "../common/components";
 
 const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 
-export default ({onSubmit, onClose, creating, projects, getWorkspaces = WorkspacesAPI.getWorkspaces,
-    project: {id = '', workspace = ''} = {}}) => {
-    const {data: workspaces = [], loading} = useAsync(getWorkspaces);
+export default ({onSubmit, onClose, creating, projects, getNodes = NodesAPI.getNodes,
+    project: {id = '', node = ''} = {}}) => {
+    const {data: nodes = [], loading} = useAsync(getNodes);
 
-    const workspaceControl = useFormField(workspace, value => !!value);
+    const nodeControl = useFormField(node, value => !!value);
 
     const isProjectIdUnique = (projectId) => !projects.some(project => project.id === projectId);
     const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isProjectIdUnique(value));
 
-    const allControls = [idControl, workspaceControl];
+    const allControls = [idControl, nodeControl];
 
     const formValid = allControls.every(({valid}) => valid);
 
-    const defaultWorkspace = (workspaces.length === 1) && workspaces[0];
-    if (defaultWorkspace && (defaultWorkspace.id !== workspaceControl.value)) {
-        workspaceControl.setValue(defaultWorkspace.id);
+    const defaultNode = (nodes.length === 1) && nodes[0];
+    if (defaultNode && (defaultNode.id !== nodeControl.value)) {
+        nodeControl.setValue(defaultNode.id);
     }
 
     const fields = [
         {
-            control: workspaceControl,
+            control: nodeControl,
             required: true,
             autoFocus: true,
-            id: "workspace",
-            label: "Workspace",
-            name: "workspace",
+            id: "node",
+            label: "Node",
+            name: "node",
             select: true,
-            selectOptions: workspaces.map(w => w.id)
+            selectOptions: nodes.map(w => w.id)
         },
         {
             control: idControl,
@@ -42,14 +42,14 @@ export default ({onSubmit, onClose, creating, projects, getWorkspaces = Workspac
             id: "id",
             label: "Id",
             name: "id",
-            helperText: "Value has to be unique per workspace. "
+            helperText: "Value has to be unique per node. "
                 + "Only lower case letters, numbers, hyphens and should start with a letter."
         }
     ];
 
     const validateAndSubmit = () => formValid && onSubmit(
         {
-            workspace: workspaceControl.value,
+            node: nodeControl.value,
             id: idControl.value,
             label: idControl.value
         }

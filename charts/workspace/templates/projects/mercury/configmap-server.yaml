@@ -13,7 +13,7 @@ data:
       urls:
         keycloak: {{ .Values.external.keycloak.baseUrl }}
         elasticsearch: {{ template "elasticsearch.baseurl" . }}
-        workspaces:
+        nodes:
           {{- range .Values.saturn.nodes }}
           - http://{{ $global.Release.Name }}-saturn-{{.name}}.{{ $global.Release.Namespace }}.svc.cluster.local
           {{- end}}

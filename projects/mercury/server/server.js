@@ -21,7 +21,7 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const {workspaces} = config.urls;
+const {nodes} = config.urls;
 
 const transformESHit = (hit) => (hit ? {
     ...hit._source,
@@ -38,7 +38,7 @@ const mapProjectSearchItems = (items) => {
     const result = transformESResult(items);
     return result.map(item => ({
         id: item.index,
-        workspace: item.nodeUrl.find(() => true),
+        node: item.nodeUrl.find(() => true),
         label: item.label.find(() => true),
         description: item.projectDescription.find(() => true)
     }));
@@ -172,15 +172,15 @@ app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}));
 // '/api/v1/projects/project/collections/' -> ['', 'api', 'v1', 'projects', 'project', 'collections', '']
 const getProjectId = (url) => url.split('/')[4];
 
-const getWorkspaceUrl = (url) => {
+const getNodeUrl = (url) => {
     const projectId = getProjectId(url);
     const project = allProjects.find(p => p.id === projectId);
-    return (project && project.workspace) || ('/unknown-project/' + projectId);
+    return (project && project.node) || ('/unknown-project/' + projectId);
 };
 
 app.use('/unknown-project/:project', (req, res) => res.status(404).send('Unknown project: ' + req.params.project));
 
-app.get('/api/v1/workspaces', (req, res) => res.send(workspaces).end());
+app.get('/api/v1/nodes', (req, res) => res.send(nodes).end());
 
 // All projects from all workspaces
 app.get('/api/v1/projects', (req, res) => res.send(allProjects).end());
@@ -200,8 +200,8 @@ app.put('/api/v1/projects', (req, res) => {
     json(req, res, () => {
         const project = req.body;
 
-        if (!workspaces.includes(project.workspace)) {
-            res.status(400).send('Unknown workspace URL');
+        if (!nodes.includes(project.node)) {
+            res.status(400).send('Unknown node URL');
             return;
         }
         if (!project.id || !(PROJECT_ID_PATTERN).test(project.id)) {
@@ -220,18 +220,18 @@ app.put('/api/v1/projects', (req, res) => {
         projectsBeingCreated.add(project.id);
 
         // A project is created when it is accessed for the first time
-        fetch(`${project.workspace}/api/v1/projects/${project.id}/collections/`,
+        fetch(`${project.node}/api/v1/projects/${project.id}/collections/`,
             {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${accessToken.token}`
                 }
             })
-            .then(workspaceResponse => {
-                if (workspaceResponse.ok && !allProjects.find(p => p.id === project.id)) {
+            .then(nodeResponse => {
+                if (nodeResponse.ok && !allProjects.find(p => p.id === project.id)) {
                     allProjects.push(project);
                 }
-                res.status(workspaceResponse.status).send(project);
+                res.status(nodeResponse.status).send(project);
             })
             .finally(() => projectsBeingCreated.delete(project.id));
     });
@@ -262,7 +262,7 @@ app.get('/api/v1/account', (req, res) => res.send({
 
 app.use(proxy('/api/v1/projects/*/**', {
     target: 'http://never.ever',
-    router: req => getWorkspaceUrl(req.originalUrl),
+    router: req => getNodeUrl(req.originalUrl),
     onProxyReq: addToken
 }));
 

@@ -1,8 +1,4 @@
 {
-  "urls": {
-    "workspaces": [
-      "http://localhost:8080"
-    ]
-  },
+  "urls": {},
   "enableExperimentalFeatures": false
 }
