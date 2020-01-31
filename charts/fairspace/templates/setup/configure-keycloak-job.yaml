@@ -49,7 +49,7 @@ spec:
         - name: config-volume
           mountPath: /opt/config
         command:
-        - "/opt/jboss/scripts/setup-keycloak-fairspace.sh"
+        - "/opt/jboss/scripts/setup-keycloak-workspace.sh"
         - "{{ template "keycloak.baseUrl" . }}/auth"
         - "{{.Values.external.keycloak.username}}"
         - "{{.Values.external.keycloak.realm}}"

@@ -46,7 +46,7 @@ spec:
                 name: "{{ .Release.Name }}-oauth-client"
                 key: clientSecret
         command:
-        - "/opt/jboss/scripts/teardown-keycloak-fairspace.sh"
+        - "/opt/jboss/scripts/teardown-keycloak-workspace.sh"
         - "{{ template "keycloak.baseUrl" . }}/auth"
         - "{{.Values.external.keycloak.username}}"
         - "{{.Values.external.keycloak.realm}}"

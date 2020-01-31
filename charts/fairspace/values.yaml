@@ -131,7 +131,7 @@ fairspace:
     # Scripts for setting up keycloak for a fairspace
     configurationScripts:
       keycloak:
-        enabled: false
+        enabled: true
         dockerRepository: eu.gcr.io
         image: fairspace-207108/keycloak-configuration
         configurationScriptsTag: 0.1.8
