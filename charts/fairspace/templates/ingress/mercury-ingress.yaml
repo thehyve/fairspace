@@ -1,0 +1,34 @@
+{{- $ingress := .Values.fairspace.ingress -}}
+{{- if $ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "fairspace.name" . }}-mercury-ingress
+{{- with $ingress.annotations.mercury }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ template "fairspace.name" . }}
+    chart: {{ template "fairspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+{{- if $ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ template "mercury.hostname" $ }}
+      secretName: {{ template "fairspace.tlsSecretName" $ }}
+{{- end }}
+  rules:
+    - host: {{ template "mercury.hostname" $ }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ .Release.Name }}-mercury
+              servicePort: 80
+      annotations:
+        nginx.org/location-snippets: |
+          proxy_set_header      X-Forwarded-Proto https;
+  {{- end -}}

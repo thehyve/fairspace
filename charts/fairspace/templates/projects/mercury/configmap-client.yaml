@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "mercury.fullname" . }}-client
+  labels:
+    app: mercury
+    chart: {{ template "fairspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config.json: |-
+    {
+      "urls": {
+        "thehyve": "https://thehyve.nl/"
+        {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
+        {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
+      },
+      "enableExperimentalFeatures": {{ .Values.fairspace.enableExperimentalFeatures }}
+    }
+  version.json: |-
+    {
+      "id": "{{ .Release.Name }}",
+      "name": "{{ .Values.fairspace.name }}",
+      "version": "{{ .Chart.Version }}",
+      "description": "{{ .Values.fairspace.description }}"
+    }

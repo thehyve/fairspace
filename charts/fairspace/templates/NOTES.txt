@@ -1,0 +1,43 @@
+Fairspace setup for Fairspace
+
+Your release is named {{ .Release.Name }} and installed into the namespace {{ .Release.Namespace }}.
+It might take a few minutes for all pods to be ready. You can check it with the following command:
+
+  kubectl --namespace={{ .Release.Namespace }} get pod
+
+All pods should have status 'Running'
+
+----------------------------
+
+Your fairspace is named {{ template "fairspace.name" . }} and can be accessed via
+
+{{- if .Values.fairspace.ingress.enabled }}
+
+  - {{ template "fairspace.url" . }}
+
+{{- else }}
+
+* Run these commands in the same shell:
+
+  export PLUTO_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{.Release.Name}}-pluto)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo Pluto at http://$NODE_IP:$PLUTO_PORT
+
+{{- end }}
+
+The installation contains instances of Mercury and Saturn.
+
+{{- if not .Values.fairspace.ingress.enabled }}
+----------------------------
+Please note that as ingress is disabled, we do not know the url of pluto while configuring keycloak. This means
+that the client `{{ template "fairspace.name" . }}-pluto` in keycloak should be configured to allow pluto as return url.
+
+You can do so with the following steps:
+
+- Log in to Keycloak at {{ template "keycloak.baseUrl" .}}
+- Go to realm {{ .Values.external.keycloak.realm }}
+- Go to client {{ template "fairspace.name" . }}-pluto
+- Add the pluto url (with /*, so for example http://localhost:32124/*) as valid return url
+- Save the client.
+
+{{- end -}}
