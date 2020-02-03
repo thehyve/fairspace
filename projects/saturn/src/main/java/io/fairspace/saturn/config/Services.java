@@ -69,12 +69,14 @@ public class Services {
                 new MachineOnlyClassesValidator(),
                 new ProtectMachineOnlyPredicatesValidator(),
                 new PermissionCheckingValidator(permissionsService),
+                new DeletionValidator(),
                 new ShaclValidator());
 
         metadataService = new ChangeableMetadataService(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator);
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
+                new DeletionValidator(),
                 new ShaclValidator(),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(dataset),

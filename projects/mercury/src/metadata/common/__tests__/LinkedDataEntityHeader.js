@@ -29,6 +29,7 @@ describe('LinkedDataEntityHeader', () => {
                     <LinkedDataEntityHeader
                         subject={subject}
                         values={values}
+                        isDeleted={values[DATE_DELETED_URI]}
                     />
                 </VocabularyContext.Provider>
             );

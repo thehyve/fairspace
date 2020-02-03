@@ -5,8 +5,7 @@ import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui
 import IriTooltip from "../../common/components/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {
-    COLLECTION_URI,
-    DATE_DELETED_URI,
+    COLLECTION_URI, DATE_DELETED_URI,
     DIRECTORY_URI,
     FILE_PATH_URI,
     FILE_URI,
@@ -43,12 +42,12 @@ const LinkedDataEntityHeader = ({
     linkedDataError = false,
     values = {},
     typeInfo = {},
-    updateLinkedData,
+    updateLinkedData
 }) => {
-    const isDeleted = values[DATE_DELETED_URI];
     const isFixedShape = values[FIXED_SHAPE_URI];
     const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
     const namespacedIri = UseNamespacedIri(subject);
+    const isDeleted = values[DATE_DELETED_URI];
 
     return !linkedDataError && !linkedDataLoading && (
         <>

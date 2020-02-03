@@ -11,6 +11,7 @@ import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "../UseLinkedData";
+import {DATE_DELETED_URI} from "../../constants";
 
 const LinkedDataEntityFormContainer = ({
     subject, editable = true, showEditButtons = false, fullpage = false,
@@ -32,8 +33,8 @@ const LinkedDataEntityFormContainer = ({
             }),
         subject
     );
-
-    const canEdit = editingEnabled && hasEditRight;
+    const isDeleted = values[DATE_DELETED_URI];
+    const canEdit = editingEnabled && hasEditRight && !isDeleted;
 
     const {
         confirmationShown, hideConfirmation, executeNavigation
