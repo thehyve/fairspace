@@ -69,6 +69,7 @@ public class Services {
                 new MachineOnlyClassesValidator(),
                 new ProtectMachineOnlyPredicatesValidator(),
                 new PermissionCheckingValidator(permissionsService),
+                new DeletionValidator(),
                 new ShaclValidator());
 
         metadataService = new ChangeableMetadataService(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, config.jena.maxTriplesToReturn, metadataLifeCycleManager, metadataValidator);

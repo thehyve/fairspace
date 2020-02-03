@@ -6,7 +6,6 @@ import IriTooltip from "../../common/components/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {
     COLLECTION_URI,
-    DATE_DELETED_URI,
     DIRECTORY_URI,
     FILE_PATH_URI,
     FILE_URI,
