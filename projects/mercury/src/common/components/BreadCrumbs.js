@@ -25,7 +25,7 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
                     className={classes.link}
                     color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}
                 >
-                    { <div className={classes.icon}>{icon}</div> || undefined }
+                    { icon ? <div className={classes.icon}>{icon}</div> : undefined }
                     { idx === allSegments.length - 1
                         ? label
                         : (
