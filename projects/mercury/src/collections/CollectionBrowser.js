@@ -12,7 +12,7 @@ export const CollectionBrowser = ({
     error = false,
     collections = [],
     isSelected = () => false,
-    selectCollection = () => {},
+    toggleCollection = () => {},
     users = [],
     history
 }) => {
@@ -21,9 +21,7 @@ export const CollectionBrowser = ({
     const handleAddCollectionClick = () => setAddingNewCollection(true);
 
     const handleCollectionClick = (collection) => {
-        if (!isSelected(collection)) {
-            selectCollection(collection);
-        }
+        toggleCollection(collection);
     };
 
     const handleCollectionDoubleClick = (collection) => {
