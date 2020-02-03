@@ -49,7 +49,7 @@ public class DeletionValidatorTest {
 
         verify(violationHandler).onViolation(
                 "Cannot modify deleted resource",
-                resource1.asNode(), null, null);
+                resource1, null, null);
         verifyNoMoreInteractions(violationHandler);
     }
 }
