@@ -8,7 +8,7 @@ const MarkdownValue = (props) => {
     // or if there is no value yet
     const [showEdit, setShowEdit] = useState(!props.entry.value);
 
-    if (showEdit) {
+    if (showEdit || !props.entry.value || !props.entry.value.trim()) {
         return (
             <BaseInputValue
                 {...props}
