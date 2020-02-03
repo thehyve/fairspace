@@ -23,6 +23,7 @@ fairspace:
   enableExperimentalFeatures: false
   configurationScripts:
     keycloak:
+      configurationScriptsTag: 0.1.9-SNAPSHOT
       pullPolicy: Always
 
 services:
