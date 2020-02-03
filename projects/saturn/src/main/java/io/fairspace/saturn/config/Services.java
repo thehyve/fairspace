@@ -76,6 +76,7 @@ public class Services {
 
         var vocabularyValidator = new ComposedValidator(
                 new ProtectMachineOnlyPredicatesValidator(),
+                new DeletionValidator(),
                 new ShaclValidator(),
                 new SystemVocabularyProtectingValidator(),
                 new MetadataAndVocabularyConsistencyValidator(dataset),
