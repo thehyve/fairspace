@@ -25,6 +25,7 @@ const WorkspaceInfo = () => {
                         subject={WORKSPACE_INFO_URI}
                         properties={properties}
                         values={values}
+                        isMetaDataEditable
                         showEditButtons
                         linkedDataLoading={linkedDataLoading}
                         linkedDataError={linkedDataError}

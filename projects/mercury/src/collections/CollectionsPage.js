@@ -13,7 +13,7 @@ const CollectionsPage = () => {
     usePageTitleUpdater("Collections");
 
     const [busy, setBusy] = useState(false);
-    const {isSelected, select, selected} = useSingleSelection();
+    const {isSelected, toggle, selected} = useSingleSelection();
 
     return (
         <CollectionBreadcrumbsContextProvider>
@@ -22,7 +22,7 @@ const CollectionsPage = () => {
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <CollectionBrowser
                         isSelected={collection => isSelected(collection.iri)}
-                        selectCollection={collection => select(collection.iri)}
+                        toggleCollection={collection => toggle(collection.iri)}
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
