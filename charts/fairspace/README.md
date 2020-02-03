@@ -63,7 +63,7 @@ installation.
 #### Fairspace parameters
 | Parameter  | Description  | Default |
 |---|---|---|
-| `nameOverride`  | Unique name for the fairspace to install. Please note that if you override the name, also set `pluto.fairspace.name` | <release name> |
+| `nameOverride`  | Unique name for the fairspace to install. | <release name> |
 | `fairspace.name`  | Human-friendly name of the fairspace | fairspace |
 | `fairspace.description`  | Description of the purpose of the fairspace | Fairspace |
 | `fairspace.ingress.enabled`  | Whether or not an ingress is setup for the fairspace components. Should be set to false when running locally.  | true |

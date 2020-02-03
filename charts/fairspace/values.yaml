@@ -7,7 +7,6 @@
 imagePullSecrets: {}
 
 # Set specific fairspace name. Defaults to release name
-# Please note that if this is set, also set it for pluto in `pluto.fairspace.name`
 nameOverride:
 
 # External dependencies for running the fairspace
