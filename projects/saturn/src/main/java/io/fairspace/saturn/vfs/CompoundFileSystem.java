@@ -54,7 +54,7 @@ public class CompoundFileSystem extends BaseFileSystem {
 
     @Override
     protected String fileOrDirectoryIri(String path) throws IOException {
-        return fileSystemByPath(path, true).iri(path);
+        return fileSystemByPath(path, false).iri(path);
     }
 
     @Override

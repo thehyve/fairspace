@@ -17,7 +17,7 @@ const LinkedDataEntityFormContainer = ({
     subject, editable = true, showEditButtons = false, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
 }) => {
-    const [editingEnabled, setEditingEnabled] = useState(!showEditButtons);
+    const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons);
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
 
     const {
@@ -106,7 +106,7 @@ const LinkedDataEntityFormContainer = ({
                     />
                 )}
             </Grid>
-            {editable && showEditButtons ? (
+            {showEditButtons ? (
                 <Grid item xs={1}>
                     {canEdit ? (
                         <Button
@@ -135,7 +135,7 @@ const LinkedDataEntityFormContainer = ({
 
 LinkedDataEntityFormContainer.propTypes = {
     subject: PropTypes.string.isRequired,
-    isEditable: PropTypes.bool,
+    editable: PropTypes.bool,
 };
 
 
@@ -145,7 +145,7 @@ export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}
     return (
         <LinkedDataEntityFormContainer
             subject={subject}
-            isEntityEditable={isMetaDataEditable}
+            editable={isMetaDataEditable}
             properties={properties}
             values={values}
             linkedDataLoading={linkedDataLoading}

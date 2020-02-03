@@ -92,7 +92,7 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
                     <ExpansionPanelDetails>
                         <LinkedDataEntityFormWithLinkedData
                             subject={collection.iri}
-                            isEntityEditable={isMetaDataEditable}
+                            isMetaDataEditable={isMetaDataEditable}
                         />
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
@@ -114,7 +114,7 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
                             <ExpansionPanelDetails>
                                 <PathMetadata
                                     path={metadataPath}
-                                    isEntityEditable={collection.canManage && metadataPath === paths[paths.length - 1]}
+                                    isMetaDataEditable={collection.canManage && metadataPath === paths[paths.length - 1]}
                                     style={{width: '100%'}}
                                 />
                             </ExpansionPanelDetails>
