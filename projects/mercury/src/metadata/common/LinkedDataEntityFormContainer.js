@@ -14,7 +14,7 @@ import useLinkedData from "../UseLinkedData";
 
 const LinkedDataEntityFormContainer = ({
     subject, editable = true, showEditButtons = false, fullpage = false,
-    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
+    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, isDeleted, ...otherProps
 }) => {
     const [editingEnabled, setEditingEnabled] = useState(!showEditButtons);
     const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
@@ -33,7 +33,7 @@ const LinkedDataEntityFormContainer = ({
         subject
     );
 
-    const canEdit = editingEnabled && hasEditRight;
+    const canEdit = editingEnabled && hasEditRight && !isDeleted;
 
     const {
         confirmationShown, hideConfirmation, executeNavigation

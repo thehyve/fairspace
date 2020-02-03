@@ -4,12 +4,14 @@ import {BreadCrumbs, usePageTitleUpdater} from "../../common";
 import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from './index';
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 import useLinkedData from '../UseLinkedData';
+import {DATE_DELETED_URI} from "../../constants";
 
 export default ({title, subject}) => {
     const iri = useNamespacedIri(subject);
     usePageTitleUpdater(`${iri} - ${title}`);
 
     const {properties, values, linkedDataLoading, linkedDataError, typeInfo, updateLinkedData} = useLinkedData(subject);
+    const isDeleted = values[DATE_DELETED_URI];
 
     return (
         <>
@@ -22,6 +24,7 @@ export default ({title, subject}) => {
                     linkedDataLoading={linkedDataLoading}
                     linkedDataError={linkedDataError}
                     updateLinkedData={updateLinkedData}
+                    isDeleted={isDeleted}
                 />
                 <LinkedDataEntityFormContainer
                     subject={subject}
@@ -31,6 +34,7 @@ export default ({title, subject}) => {
                     linkedDataLoading={linkedDataLoading}
                     linkedDataError={linkedDataError}
                     updateLinkedData={updateLinkedData}
+                    isDeleted={isDeleted}
                 />
             </Paper>
         </>

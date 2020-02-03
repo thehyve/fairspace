@@ -44,8 +44,8 @@ const LinkedDataEntityHeader = ({
     values = {},
     typeInfo = {},
     updateLinkedData,
+    isDeleted
 }) => {
-    const isDeleted = values[DATE_DELETED_URI];
     const isFixedShape = values[FIXED_SHAPE_URI];
     const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
     const namespacedIri = UseNamespacedIri(subject);
