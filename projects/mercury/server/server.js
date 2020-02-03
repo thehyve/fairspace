@@ -126,6 +126,9 @@ const keycloak = new Keycloak(
     }
 );
 
+// Return 401 Unauthorized for API requests
+keycloak.redirectToLogin = (request) => !request.baseUrl.startsWith('/api/');
+
 app.use(session({
     secret: cryptoRandomString({length: 32}),
     resave: false,
