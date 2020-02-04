@@ -7,7 +7,8 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
-const elasticsearch = require('elasticsearch');
+
+const workspaceRetriever = require('./workspaceRetriever');
 
 const app = express();
 
@@ -21,83 +22,15 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const {nodes} = config.urls;
-
-const transformESHit = (hit) => (hit ? {
-    ...hit._source,
-    index: hit._index,
-    id: hit._id,
-    score: hit._score,
-} : {});
-
-const transformESResult = (esJson) => (
-    esJson && esJson.hits && esJson.hits.hits ? esJson.hits.hits.map(transformESHit) : []
-);
-
-const mapWorkspaceSearchItems = (items) => {
-    const result = transformESResult(items);
-    return result.map(item => ({
-        id: item.index,
-        node: item.nodeUrl.find(() => true),
-        label: item.label.find(() => true),
-        description: item.workspaceDescription.find(() => true)
-    }));
-};
-
-const esClient = new elasticsearch.Client({host: config.urls.elasticsearch, log: 'error'});
-
-const getESWorkspaces = () => {
-    const sortDataCreated = [
-        "_score",
-        {
-            dateCreated: {order: "desc"}
-        }
-    ];
-    const esQuery = {
-        bool: {
-            must: [{
-                query_string: {query: '*'}
-            }],
-            must_not: {
-                exists: {
-                    field: "dateDeleted"
-                }
-            },
-            filter: [
-                {
-                    terms: {
-                        "type.keyword": ["http://fairspace.io/ontology#Workspace"]
-                    }
-                }
-            ]
-        }
-    };
-    return esClient.search({
-        index: "_all",
-        body: {
-            size: 10000,
-            from: 0,
-            sort: sortDataCreated,
-            query: esQuery,
-            highlight: {
-                fields: {
-                    "*": {}
-                }
-            }
-        }
-    }).then(mapWorkspaceSearchItems);
-};
+const {nodes, elasticsearch} = config.urls;
 
 let allWorkspaces;
 
-const fetchWorkspaces = () => getESWorkspaces()
-    .then((result) => {
-        allWorkspaces = result;
-    })
-    .catch(e => {
-        console.error('Error retrieving workspaces', e);
-        process.exit(1);
-    });
+const retrieveWorkspaces = workspaceRetriever(elasticsearch);
+
+const fetchWorkspaces = () => retrieveWorkspaces()
+    .then(result => { allWorkspaces = result; })
+    .catch(e => console.error('Error retrieving workspaces', e));
 
 fetchWorkspaces();
 setInterval(() => fetchWorkspaces(), 30000);
@@ -220,7 +153,7 @@ app.put('/api/v1/workspaces', (req, res) => {
             return;
         }
 
-        workspacesBeingCreated.add(workspace.id);
+        workspacesBeingCreated.add(workspace);
 
         // A workspace is created when it is accessed for the first time
         fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`,
@@ -230,12 +163,7 @@ app.put('/api/v1/workspaces', (req, res) => {
                     Authorization: `Bearer ${accessToken.token}`
                 }
             })
-            .then(nodeResponse => {
-                if (nodeResponse.ok && !allWorkspaces.find(p => p.id === workspace.id)) {
-                    allWorkspaces.push(workspace);
-                }
-                res.status(nodeResponse.status).send(workspace);
-            })
+            .then(nodeResponse => fetchWorkspaces().then(() => res.status(nodeResponse.status).send(workspace)))
             .finally(() => workspacesBeingCreated.delete(workspace.id));
     });
 });
