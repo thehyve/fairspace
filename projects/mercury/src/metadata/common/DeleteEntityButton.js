@@ -21,7 +21,9 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
             .then(() => isMounted() && setDeleting(false));
     };
 
-    const canDelete = hasEditRight && isDeletable;
+    if (!hasEditRight) {
+        return <div />;
+    }
 
     return (
         <ProgressButton active={isDeleting}>
@@ -30,12 +32,12 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
                 agreeButtonText="Delete"
                 dangerous
                 onClick={handleDelete}
-                disabled={!canDelete}
+                disabled={!isDeletable}
             >
                 <IconButton
                     aria-label="Delete this resource"
                     title="Delete"
-                    disabled={!canDelete}
+                    disabled={!isDeletable}
                 >
                     <Delete />
                 </IconButton>
