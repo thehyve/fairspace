@@ -74,7 +74,7 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
                 );
         }
 
-        const isMetaDataEditable = collection && collection.canManage && paths.length === 0;
+        const isMetaDataEditable = collection && collection.canWrite && paths.length === 0;
         const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
 
         return (
