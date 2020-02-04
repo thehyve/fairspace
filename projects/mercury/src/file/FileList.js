@@ -139,7 +139,6 @@ const FileList = ({
                                 <TableCell padding="none" align="left">
                                     {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                 </TableCell>
-                                <TableCell align="left" padding="checkbox" />
                                 <TableCell>
                                     {file.basename}
                                 </TableCell>
