@@ -15,7 +15,7 @@ import {workspacePrefix} from '../../workspaces/workspaces';
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
 export const LinkedDataRelationTable = ({property, values, onDelete, onAdd, canAdd, addComponent, editorPath, history}) => {
-    // Determine the columns to show. If no important property shapes are defined, only
+    // Determine the columns to show. If no important property shapes are defined or a shape is empty, only
     // the URI will be shown
     let columnDefinitions: any[];
 
@@ -32,16 +32,19 @@ export const LinkedDataRelationTable = ({property, values, onDelete, onAdd, canA
                 return {
                     id: shape['@id'],
                     label: getFirstPredicateValue(shape, SHACL_NAME),
-                    getValue: entry => (
-                        entry && entry.otherEntry && Array.isArray(entry.otherEntry[propertyPath])
-                            ? joinWithSeparator(
-                                entry.otherEntry[propertyPath]
-                                    .filter(e => e)
-                                    .map(renderEntry),
-                                ', '
-                            )
-                            : ''
-                    )
+                    getValue: entry => {
+                        if (entry) {
+                            return (entry.otherEntry && Array.isArray(entry.otherEntry[propertyPath])
+                                ? joinWithSeparator(
+                                    entry.otherEntry[propertyPath]
+                                        .filter(e => e)
+                                        .map(renderEntry),
+                                    ', '
+                                )
+                                : entry.id);
+                        }
+                        return "";
+                    }
                 };
             });
     } else {
