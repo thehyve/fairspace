@@ -147,7 +147,7 @@ const createWorkspaceRoles = (workspaceId) => {
 };
 
 const createWorkspaceDatabase = (workspace) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${accessToken.token}`}})
-    .then(nodeResponse => (nodeResponse.ok ? Promise.resolve() : Promise.reject()));
+    .then(nodeResponse => { if (!nodeResponse.ok) { throw Error('Error creating workspace database'); }});
 
 // Create a new workspace
 app.put('/api/v1/workspaces', (req, res) => {
@@ -184,7 +184,7 @@ app.put('/api/v1/workspaces', (req, res) => {
             .then(() => res.status(200).send(workspace))
             .catch(e => {
                 console.error('Error creating a workspace', e);
-                res.status(500).send();
+                res.status(500).send('Internal server error');
             })
             .finally(() => workspacesBeingCreated.delete(workspace.id));
     });
