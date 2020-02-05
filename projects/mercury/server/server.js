@@ -7,6 +7,7 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
+const KeycloakAdminClient = require('keycloak-admin').default;
 
 const workspaceRetriever = require('./workspaceRetriever');
 
@@ -44,6 +45,8 @@ app.get('/readiness', (req, res) => {
         res.status(503).end('Initializing');
     }
 });
+
+const keycloakAdminClient = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: config.keycloak.realm});
 
 const store = new session.MemoryStore();
 
@@ -127,6 +130,27 @@ const json = express.json();
 
 const WORKSPACE_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
 
+const addRoles = (compositeRole, associatedRoles) => Promise.all(associatedRoles.map(name => keycloakAdminClient.roles.findOneByName({name})))
+    .then(roles => keycloakAdminClient.roles.makeUpdateRequest({
+        method: 'POST',
+        path: `/roles/${compositeRole}/composites`,
+    })({}, roles));
+
+const createWorkspaceRoles = (workspaceId) => {
+    keycloakAdminClient.setAccessToken(accessToken.token);
+    return Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
+        .then(({roleName}) => roleName)))
+        .then(([user, coordinator, write, datasteward]) => Promise.all([
+            addRoles(write, [user]),
+            addRoles(datasteward, [user]),
+            addRoles(coordinator, [write, datasteward]),
+            addRoles('organisation-admin', [coordinator])
+        ]));
+};
+
+const createWorkspaceDatabase = (workspace) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${accessToken.token}`}})
+    .then(nodeResponse => (nodeResponse.ok ? Promise.resolve() : Promise.reject()));
+
 // Create a new workspace
 app.put('/api/v1/workspaces', (req, res) => {
     if (!accessToken.content.authorities.includes('organisation-admin')) {
@@ -156,14 +180,14 @@ app.put('/api/v1/workspaces', (req, res) => {
         workspacesBeingCreated.add(workspace);
 
         // A workspace is created when it is accessed for the first time
-        fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`,
-            {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${accessToken.token}`
-                }
+        createWorkspaceRoles(workspace.id)
+            .then(() => createWorkspaceDatabase(workspace))
+            .then(() => fetchWorkspaces())
+            .then(() => res.status(200).send(workspace))
+            .catch(e => {
+                console.error('Error creating a workspace', e);
+                res.status(500).send();
             })
-            .then(nodeResponse => fetchWorkspaces().then(() => res.status(nodeResponse.status).send(workspace)))
             .finally(() => workspacesBeingCreated.delete(workspace.id));
     });
 });
