@@ -23,11 +23,9 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const {nodes, elasticsearch} = config.urls;
-
 let allWorkspaces;
 
-const retrieveWorkspaces = workspaceRetriever(elasticsearch);
+const retrieveWorkspaces = workspaceRetriever(config.urls.elasticsearch);
 
 const fetchWorkspaces = () => retrieveWorkspaces()
     .then(result => { allWorkspaces = result; })
@@ -119,7 +117,7 @@ const getNodeUrl = (url) => {
 
 app.use('/unknown-workspace/:workspace', (req, res) => res.status(404).send('Unknown workspace: ' + req.params.workspace));
 
-app.get('/api/v1/nodes', (req, res) => res.send(nodes).end());
+app.get('/api/v1/nodes', (req, res) => res.send(config.urls.nodes).end());
 
 // All workspaces from all workspaces
 app.get('/api/v1/workspaces', (req, res) => res.send(allWorkspaces).end());
@@ -160,7 +158,7 @@ app.put('/api/v1/workspaces', (req, res) => {
     json(req, res, () => {
         const workspace = req.body;
 
-        if (!nodes.includes(workspace.node)) {
+        if (!config.urls.nodes.includes(workspace.node)) {
             res.status(400).send('Unknown node URL');
             return;
         }
