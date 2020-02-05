@@ -8,7 +8,7 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 import VocabularyContext from './VocabularyContext';
 import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
 import {MetadataAPI} from './LinkedDataAPI';
-import {isCoordinator} from '../common/utils/userUtils';
+import {canWrite, isCoordinator} from '../common/utils/userUtils';
 import WorkspaceUserContext from '../common/contexts/WorkspaceUserContext';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
@@ -58,7 +58,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 submitLinkedDataChanges,
 
                 // Fixed properties
-                hasEditRight: true,
+                hasEditRight: canWrite(workspaceUser.roles),
                 isCoordinator: isCoordinator(workspaceUser.roles),
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
