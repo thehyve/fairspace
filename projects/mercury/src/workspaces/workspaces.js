@@ -7,7 +7,7 @@ export const currentWorkspace = () => {
     return ((segments.length > 2 && segments[0] === '' && segments[1] === 'workspaces') && segments[2]) || '';
 };
 
-export const workspacePrefix = () => (currentWorkspace() ? `/workspaces/${currentWorkspace()}` : '');
+export const workspacePrefix = (workspace = currentWorkspace()) => (workspace ? `/workspaces/${workspace}` : '');
 
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
     if (!config.url.startsWith('/')) {

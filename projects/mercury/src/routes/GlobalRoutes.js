@@ -4,6 +4,7 @@ import {logout} from '../common';
 
 import WorkspaceListLayout from '../layout/WorkspaceListLayout';
 import WorkspaceLayout from '../layout/WorkspaceLayout';
+import WorkspaceListSearchLayout from "../layout/WorkspaceListSearchLayout";
 
 const GlobalRoutes = () => (
     <Switch>
@@ -14,11 +15,22 @@ const GlobalRoutes = () => (
         />
 
         <Route
+            path="/workspaces/_all/search"
+            exact
+            component={WorkspaceListSearchLayout}
+        />
+
+        <Route
             path="/workspaces/:workspace"
             component={WorkspaceLayout}
         />
 
-        <Route path="/login" render={() => {window.location.href = new URLSearchParams(window.location.search).get('redirectUrl');}} />
+        <Route
+            path="/login"
+            render={() => {
+                window.location.href = new URLSearchParams(window.location.search).get('redirectUrl');
+            }}
+        />
 
         <Route
             path="/logout"

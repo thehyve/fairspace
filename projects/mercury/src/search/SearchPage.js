@@ -15,6 +15,7 @@ import {getParentPath} from '../common/utils/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
 import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';
+import {currentWorkspace} from "../workspaces/workspaces";
 
 const styles = {
     tableRoot: {
@@ -52,7 +53,7 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
      * @param result   The clicked search result. For the format, see the ES api
      */
     const handleResultDoubleClick = (result) => {
-        const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
+        const navigationPath = getCollectionAbsolutePath(getPathOfResult(result), result.index);
         const selectionQueryString = "?selection=" + encodeURIComponent('/' + result.filePath);
 
         history.push(navigationPath + selectionQueryString);
@@ -70,11 +71,14 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
         return <MessageDisplay message="No results found!" isError={false} />;
     }
 
+    const showWorkspaceIndex = currentWorkspace() === '_all';
+
     return (
         <Paper className={classes.tableRoot} data-testid="results-table">
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
+                        {showWorkspaceIndex && <TableCell>Workspace</TableCell>}
                         <TableCell>Label</TableCell>
                         <TableCell>Type</TableCell>
                         <TableCell>Description</TableCell>
@@ -89,6 +93,7 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
                                 key={item.id}
                                 onDoubleClick={() => handleResultDoubleClick(item)}
                             >
+                                {showWorkspaceIndex && <TableCell>{item.index}</TableCell>}
                                 <TableCell>
                                     {item.label}
                                 </TableCell>
@@ -113,7 +118,7 @@ export const SearchPage = ({classes, items, total, loading, error, history, voca
 export const SearchPageContainer = ({
     location: {search}, query = getSearchQueryFromString(search),
     vocabulary, vocabularyLoading, vocabularyError,
-    classes, history, searchFunction = SearchAPI.search
+    classes = styles, history, searchFunction = SearchAPI.search
 }) => {
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState();
