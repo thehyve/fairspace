@@ -141,8 +141,6 @@ fs:CollectionShape sh:property
         <booleanWidgetShape>,
         <booleanX2WidgetShape>,
         <fixedDropdownWidgetShape>,
-        <resourceWidgetShape>,
-        <websiteWidgetShape>,
         fs:labelShape,
         fs:commentShape .
 
