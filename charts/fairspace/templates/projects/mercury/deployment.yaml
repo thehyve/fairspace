@@ -30,6 +30,12 @@ spec:
         imagePullPolicy: {{ .Values.mercury.image.pullPolicy }}
         ports:
         - containerPort: 80
+        env:
+          - name: KEYCLOAK_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-oauth-client"
+                key: clientSecret
         volumeMounts:
           - name: client-config-storage
             mountPath: /usr/src/client/config/

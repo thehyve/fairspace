@@ -3,7 +3,7 @@
   "version": "0.0.0-RELEASEVERSION",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "KEYCLOAK_CLIENT_SECRET=********** nodemon server.js"
   },
   "dependencies": {
     "crypto-random-string": "^3.0.1",

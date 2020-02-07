@@ -46,6 +46,12 @@ app.get('/readiness', (req, res) => {
 
 const keycloakAdminClient = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: config.keycloak.realm});
 
+keycloakAdminClient.auth({
+    grantType: 'client_credentials',
+    clientId: config.keycloak.clientId,
+    clientSecret: process.env.KEYCLOAK_CLIENT_SECRET
+}).catch(e => console.error("Error establishing admin client connection", e));
+
 const store = new session.MemoryStore();
 
 const keycloak = new Keycloak(
@@ -56,7 +62,7 @@ const keycloak = new Keycloak(
         authServerUrl: config.urls.keycloak + '/auth',
         realm: config.keycloak.realm,
         clientId: config.keycloak.clientId,
-        secret: config.keycloak.clientSecret
+        secret: process.env.KEYCLOAK_CLIENT_SECRET
     }
 );
 
@@ -134,17 +140,14 @@ const addRoles = (compositeRole, associatedRoles) => Promise.all(associatedRoles
         path: `/roles/${compositeRole}/composites`,
     })({}, roles));
 
-const createWorkspaceRoles = (workspaceId) => {
-    keycloakAdminClient.setAccessToken(accessToken.token);
-    return Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
-        .then(({roleName}) => roleName)))
-        .then(([user, coordinator, write, datasteward]) => Promise.all([
-            addRoles(write, [user]),
-            addRoles(datasteward, [user]),
-            addRoles(coordinator, [write, datasteward]),
-            addRoles('organisation-admin', [coordinator])
-        ]));
-};
+const createWorkspaceRoles = (workspaceId) => Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
+    .then(({roleName}) => roleName)))
+    .then(([user, coordinator, write, datasteward]) => Promise.all([
+        addRoles(write, [user]),
+        addRoles(datasteward, [user]),
+        addRoles(coordinator, [write, datasteward]),
+        addRoles('organisation-admin', [coordinator])
+    ]));
 
 const createWorkspaceDatabase = (workspace) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${accessToken.token}`}})
     .then(nodeResponse => { if (!nodeResponse.ok) { throw Error('Error creating workspace database'); }});
@@ -183,7 +186,9 @@ app.put('/api/v1/workspaces', (req, res) => {
             .then(() => fetchWorkspaces())
             .then(() => res.status(200).send(workspace))
             .catch(e => {
-                console.error('Error creating a workspace', e);
+                console.error('Error creating a workspace. '
+                    + 'Check the permissions granted to Keycloak client\'s service account. '
+                    + 'They must include at least view-realm, manage-realm and manage-authorizations.', e);
                 res.status(500).send('Internal server error');
             })
             .finally(() => workspacesBeingCreated.delete(workspace.id));
