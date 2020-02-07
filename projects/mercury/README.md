@@ -12,7 +12,7 @@ Some general architecture on the overall code can be found [here](./architecture
 ## Access requirements
 
 In order creation of new workspaces and role management to work the Keycloak client used by Mercury should be properly configured.
-It's service account should be granted the following `realm-management` roles: `view-realm`, `manage-realm`, `manage-authorizations`.
+Its service account should be granted the following `realm-management` roles: `view-realm`, `manage-realm`, `manage-authorizations`.
 That holds for both development and production setups.
 In development mode it can be done through the Keycloak admin console running on `localhost:5100`. 
 
