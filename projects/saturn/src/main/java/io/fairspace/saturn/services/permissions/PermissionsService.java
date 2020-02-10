@@ -185,10 +185,10 @@ public class PermissionsService {
     }
 
     /**
-     * Retrieves the permissions of the current user for the given authorities
+     * Retrieves the permissions of the current user for the given authorities.
      *
-     * @param authorities
-     * @return
+     * @param authorities the protected resources to get permissions for.
+     * @return a map from resource to permission level.
      */
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
@@ -202,40 +202,45 @@ public class PermissionsService {
             return result;
         }
 
-        Access maxAccess;
+        Access defaultAccess;
         if (userObject.getRoles().contains(Role.CanWrite)) {
-            maxAccess = Access.Manage; // sic!
-        } else  if (userObject.getRoles().contains(Role.CanRead)) {
-            maxAccess = Access.Read;
+            defaultAccess = Access.Write;
         } else {
-            maxAccess = Access.None;
+            // Any workspace user can read all objects, except for
+            // collection-level objects
+            defaultAccess = Access.Read;
         }
 
         var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
         var userResource = g.wrapAsResource(userObject.getIri());
-        authorities.forEach(a -> result.put(a, min(maxAccess, getRawResourceAccess(g.wrapAsResource(a), userResource))));
+        authorities.forEach(a -> getResourceAccess(g.wrapAsResource(a), userResource)
+                .ifPresentOrElse(
+                        accessLevel -> result.put(a, accessLevel),
+                        () -> result.put(a, defaultAccess)
+                )
+        );
 
         return result;
     }
 
-    private Access getRawResourceAccess(Resource r, Resource user) {
+    private Optional<Access> getResourceAccess(Resource r, Resource user) {
         if (r.hasProperty(FS.manage, user)) {
-            return Access.Manage;
+            return Optional.of(Access.Manage);
         }
         if (r.hasProperty(FS.write, user)) {
-            return  Access.Write;
+            return Optional.of(Access.Write);
         }
         if (r.hasProperty(FS.read, user)) {
-            return Access.Read;
+            return Optional.of(Access.Read);
         }
         if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection)) {
-            return Access.None;
+            return Optional.of(Access.None);
         }
         if (r.hasLiteral(FS.writeRestricted, true)) {
-            return Access.Read;
+            return Optional.of(Access.Read);
         }
 
-        return Access.Write;
+        return Optional.empty();
     }
 
     private boolean isCollection(Node resource) {

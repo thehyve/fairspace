@@ -4,3 +4,4 @@ export default function getDisplayName(user) {
 
 export const isDataSteward = (authorizations) => authorizations && authorizations.includes('DataSteward');
 export const isCoordinator = (authorizations) => authorizations && authorizations.includes('Coordinator');
+export const canWrite = (authorizations) => authorizations && authorizations.includes('CanWrite');

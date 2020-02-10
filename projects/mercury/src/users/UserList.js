@@ -140,7 +140,7 @@ const UserList = () => {
                                         agreeButtonText="Remove user"
                                         dangerous
                                     >
-                                        <IconButton>
+                                        <IconButton disabled={!isCoordinator}>
                                             <Delete />
                                         </IconButton>
                                     </ConfirmationButton>
