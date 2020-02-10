@@ -12,7 +12,11 @@ const WorkspaceListTopBar = ({location, history}) => {
 
     return (
         <TopBar title="Workspaces">
-            <SearchBar query={searchQuery} onSearchChange={handleSearch} />
+            <SearchBar
+                query={searchQuery}
+                onSearchChange={handleSearch}
+                placeholder="Search for metadata in all workspaces"
+            />
         </TopBar>
     );
 };
