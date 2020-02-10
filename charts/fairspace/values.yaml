@@ -27,6 +27,9 @@ external:
     loginRealm: master
     realm:
     clientSecret:
+    serviceAccount:
+      username: fairspace-service-account
+      password:
 
   elasticsearch:
     enabled: true

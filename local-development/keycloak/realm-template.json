@@ -64,7 +64,8 @@
               "manage-realm",
               "view-realm",
               "query-clients",
-              "manage-users"
+              "manage-users",
+              "manage-authorizations"
             ]
           }
         },

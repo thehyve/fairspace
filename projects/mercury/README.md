@@ -11,8 +11,18 @@ Some general architecture on the overall code can be found [here](./architecture
 
 ## Access requirements
 
-In order creation of new workspaces and role management to work the Keycloak client used by Mercury should be properly configured.
-Its service account should be granted the following `realm-management` roles: `view-realm`, `manage-realm`, `manage-authorizations`.
+In order creation of new workspaces and role management to work the Keycloak instance used by Mercury should 
+contain a properly configured service account which should be able to create rew roles and assign them to users in the Fairspace realm.
+The necessary Keycloak credentials should be passed to the back-end using the following environment variables:
+
+|Variable                          |Value used in dev. mode  |
+|----------------------------------|-------------------------|
+|KEYCLOAK_CLIENT_SECRET            |**********               |
+|FAIRSPACE_SERVICE_ACCOUNT_USERNAME|fairspace-service-account|
+|FAIRSPACE_SERVICE_ACCOUNT_PASSWORD|keycloak                 |
+
+
+The service account should be granted the following `realm-management` roles in the Fairspace realm: `view-realm`, `manage-realm`, `manage-authorizations`.
 That holds for both development and production setups.
 In development mode it can be done through the Keycloak admin console running on `localhost:5100`. 
 

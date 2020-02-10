@@ -44,13 +44,16 @@ app.get('/readiness', (req, res) => {
     }
 });
 
-const keycloakAdminClient = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: config.keycloak.realm});
+const keycloakAdminClient = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: 'master'});
 
 keycloakAdminClient.auth({
-    grantType: 'client_credentials',
-    clientId: config.keycloak.clientId,
-    clientSecret: process.env.KEYCLOAK_CLIENT_SECRET
+    grantType: 'password',
+    username: process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME,
+    password: process.env.FAIRSPACE_SERVICE_ACCOUNT_PASSWORD,
+    clientId: 'admin-cli',
 }).catch(e => console.error("Error establishing admin client connection", e));
+
+keycloakAdminClient.realmName = config.keycloak.realm;
 
 const store = new session.MemoryStore();
 
