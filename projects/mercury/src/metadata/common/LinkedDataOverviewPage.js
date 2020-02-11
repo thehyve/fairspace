@@ -94,7 +94,7 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                                     onChange={() => setShowGraph(!showGraph)}
                                 />
                             )}
-                            label="Show Graph"
+                            label="Show graph"
                         />
                     </Grid>
                 </Grid>
