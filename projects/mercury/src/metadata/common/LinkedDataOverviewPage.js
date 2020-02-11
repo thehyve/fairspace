@@ -1,8 +1,8 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
-import {Grid} from "@material-ui/core";
-import ToggleButton from '@material-ui/lab/ToggleButton';
+import {Grid, Switch} from "@material-ui/core";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {BreadCrumbs, usePageTitleUpdater} from '../../common';
 
 import LinkedDataCreator from "./LinkedDataCreator";
@@ -86,14 +86,16 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                         />
                     </Grid>
                     <Grid item xs={2}>
-                        <ToggleButton
-                            color="primary"
-                            selected={showGraph}
-                            value
-                            onChange={() => setShowGraph(!showGraph)}
-                        >
-                            Show Graph
-                        </ToggleButton>
+                        <FormControlLabel
+                            control={(
+                                <Switch
+                                    color="primary"
+                                    checked={showGraph}
+                                    onChange={() => setShowGraph(!showGraph)}
+                                />
+                            )}
+                            label="Show Graph"
+                        />
                     </Grid>
                 </Grid>
             ) : (
