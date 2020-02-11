@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.Resource;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
@@ -42,8 +43,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void put(Model model) {
-        dataset.executeWrite(() -> update(EMPTY_MODEL, model));
-        audit("METADATA_ADDED");
+        logUpdates(dataset.calculateWrite(() -> update(EMPTY_MODEL, model)));
     }
 
     /**
@@ -68,8 +68,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void delete(Model model) {
-        dataset.executeWrite(() -> update(model, EMPTY_MODEL));
-        audit("METADATA_DELETED");
+        logUpdates(dataset.calculateWrite(() -> update(model, EMPTY_MODEL)));
     }
 
     /**
@@ -87,7 +86,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      * @param model
      */
     void patch(Model model) {
-        dataset.executeWrite(() -> {
+        logUpdates(dataset.calculateWrite(() -> {
             var before = dataset.getNamedModel(graph.getURI());
             var existing = createDefaultModel();
             model.listStatements()
@@ -96,12 +95,11 @@ public class ChangeableMetadataService extends ReadableMetadataService {
                     .toSet()
                     .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
-            update(existing.difference(model), model.remove(existing).removeAll(null, null, NIL));
-        });
-        audit("METADATA_UPDATED");;
+            return update(existing.difference(model), model.remove(existing).removeAll(null, null, NIL));
+        }));
     }
 
-    private void update(Model modelToRemove, Model modelToAdd) {
+    private Set<Resource> update(Model modelToRemove, Model modelToAdd) {
         var before = dataset.getNamedModel(graph.getURI());
         var vocabularyModel = dataset.getNamedModel(vocabulary.getURI());
 
@@ -113,6 +111,12 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
 
         persist(modelToRemove, modelToAdd);
+
+        return modelToRemove.listSubjects().andThen(modelToAdd.listSubjects()).toSet();
+    }
+
+    private void logUpdates(Set<Resource> updatedResources) {
+        updatedResources.forEach(resource -> audit("METADATA_UPDATED", "iri", resource.getURI()));
     }
 
     private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
