@@ -36,6 +36,16 @@ spec:
               secretKeyRef:
                 name: "{{ .Release.Name }}-oauth-client"
                 key: clientSecret
+          - name: FAIRSPACE_SERVICE_ACCOUNT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-service-account"
+                key: username
+          - name: FAIRSPACE_SERVICE_ACCOUNT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-service-account"
+                key: password
         volumeMounts:
           - name: client-config-storage
             mountPath: /usr/src/client/config/

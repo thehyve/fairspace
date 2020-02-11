@@ -20,4 +20,3 @@ data:
       keycloak:
         realm: {{ .Values.external.keycloak.realm }}
         clientId: {{ .Values.external.keycloak.clientId }}
-        clientSecret: {{ .Values.external.keycloak.clientSecret }}
