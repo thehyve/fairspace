@@ -7,6 +7,8 @@ external:
     realm: ci
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+    serviceAccount:
+      password: fairspace123
   elasticsearch:
     enabled: true
     transport:
