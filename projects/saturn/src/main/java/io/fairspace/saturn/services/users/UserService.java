@@ -35,6 +35,9 @@ public class UserService {
     public UserService(DatasetJobSupport dataset, String usersUrl) {
         this.dao = new DAO(dataset);
         this.usersUrl = usersUrl;
+
+        httpClient.setRequestBufferSize(128 * 1024);
+        httpClient.setResponseBufferSize(256 * 1024);
     }
 
     public User trySetCurrentUser(User user) {
