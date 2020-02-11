@@ -13,7 +13,6 @@ const workspaceRetriever = require('./workspaceRetriever');
 
 const app = express();
 
-
 const port = process.env.PORT || 8081;
 
 let configPath = path.join(__dirname, 'config', 'config.yaml');
@@ -190,7 +189,7 @@ app.put('/api/v1/workspaces', (req, res) => {
             .then(() => res.status(200).send(workspace))
             .catch(e => {
                 console.error('Error creating a workspace. '
-                    + 'Check the permissions granted to Keycloak client\'s service account. '
+                    + `Check the permissions granted to Fairspace service account ${process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME}.`
                     + 'They must include at least view-realm, manage-realm and manage-authorizations.', e);
                 res.status(500).send('Internal server error');
             })
