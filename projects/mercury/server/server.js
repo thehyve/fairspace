@@ -7,9 +7,8 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
-const KeycloakAdminClient = require('keycloak-admin').default;
-
 const workspaceRetriever = require('./workspaceRetriever');
+const {listUsers, grantRole, revokeRole, createWorkspaceRoles} = require("./roles");
 
 const app = express();
 
@@ -125,40 +124,6 @@ const json = express.json();
 
 const WORKSPACE_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
 
-const createKeycloakAdminClient = () => {
-    const client = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: 'master'});
-    return client.auth({
-        grantType: 'password',
-        username: process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME,
-        password: process.env.FAIRSPACE_SERVICE_ACCOUNT_PASSWORD,
-        clientId: 'admin-cli',
-    })
-        .then(() => {
-            client.realmName = config.keycloak.realm;
-            return client;
-        })
-        .catch(e => {
-            console.error("Error establishing admin client connection", e);
-            return Promise.reject(e);
-        });
-};
-
-const addRoles = (keycloakAdminClient, compositeRole, associatedRoles) => Promise.all(associatedRoles.map(name => keycloakAdminClient.roles.findOneByName({name})))
-    .then(roles => keycloakAdminClient.roles.makeUpdateRequest({
-        method: 'POST',
-        path: `/roles/${compositeRole}/composites`,
-    })({}, roles));
-
-const createWorkspaceRoles = (workspaceId) => createKeycloakAdminClient()
-    .then(keycloakAdminClient => Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
-        .then(({roleName}) => roleName)))
-        .then(([user, coordinator, write, datasteward]) => Promise.all([
-            addRoles(keycloakAdminClient, write, [user]),
-            addRoles(keycloakAdminClient, datasteward, [user]),
-            addRoles(keycloakAdminClient, coordinator, [write, datasteward]),
-            addRoles(keycloakAdminClient, 'organisation-admin', [coordinator])
-        ])));
-
 const createWorkspaceDatabase = (workspace) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${accessToken.token}`}})
     .then(nodeResponse => { if (!nodeResponse.ok) { throw Error('Error creating workspace database'); }});
 
@@ -191,14 +156,14 @@ app.put('/api/v1/workspaces', (req, res) => {
         workspacesBeingCreated.add(workspace);
 
         // A workspace is created when it is accessed for the first time
-        createWorkspaceRoles(workspace.id)
+        createWorkspaceRoles(config, workspace.id)
             .then(() => createWorkspaceDatabase(workspace))
             .then(() => fetchWorkspaces())
             .then(() => res.status(200).send(workspace))
             .catch(e => {
                 console.error('Error creating a workspace. '
                     + `Check the permissions granted to Fairspace service account ${process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME}.`
-                    + 'They must include at least view-realm, manage-realm and manage-authorizations.', e);
+                    + 'They must include at least view-realm, manage-realm, manage-authorizations and manage-users.', e);
                 res.status(500).send('Internal server error');
             })
             .finally(() => workspacesBeingCreated.delete(workspace.id));
@@ -227,6 +192,45 @@ app.get('/api/v1/account', (req, res) => res.send({
     lastName: accessToken.content.family_name,
     authorizations: accessToken.content.realm_access.roles
 }));
+
+app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
+    if (!accessToken.content.authorities.includes(`workspace-${req.params.workspace}-user`)) {
+        res.status(403).send('Forbidden');
+        return;
+    }
+    listUsers(config, req.params.workspace)
+        .then(users => res.send(users).end())
+        .catch(e => {
+            console.error('Error while listing users', e);
+            res.status(500).send('Internal server error');
+        });
+});
+
+app.use('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res) => {
+    let handler;
+    switch (req.method) {
+        case 'PUT':
+            handler = grantRole;
+            break;
+        case 'DELETE':
+            handler = revokeRole;
+            break;
+        default:
+            res.status(405).send('Method not allowed');
+            return;
+    }
+    if (!accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
+        res.status(403).send('Forbidden').end();
+        return;
+    }
+    handler(config, req.params.workspace, req.params.userId, req.params.roleType)
+        .then(() => res.status(200).send())
+        .catch(e => {
+            console.error('Error while altering roles', e);
+            res.status(500).send('Internal server error');
+        });
+});
+
 
 app.use(proxy('/api/v1/workspaces/*/**', {
     target: 'http://never.ever',
