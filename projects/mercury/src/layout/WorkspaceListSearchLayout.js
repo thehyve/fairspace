@@ -1,23 +1,20 @@
 import React from 'react';
-import {useHistory} from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import {Layout} from '../common';
 import {WorkspacesProvider} from '../workspaces/WorkspaceContext';
 import WorkspaceListTopBar from "./WorkspaceListTopBar";
 import WorkspaceListMenuItem from "./WorkspaceListMenuItem";
-import {SearchPageContainer} from "../search/SearchPage";
+import SearchPage from "../search/SearchPage";
 
 
-const WorkspaceListSearchLayout = ({location: {pathname}}) => {
-    const history = useHistory();
-    return (
-        <WorkspacesProvider>
-            <Layout
-                renderMenu={() => <WorkspaceListMenuItem />}
-                renderMain={() => <SearchPageContainer location={pathname} history={history} />}
-                renderTopbar={() => <WorkspaceListTopBar />}
-            />
-        </WorkspacesProvider>
-    );
-};
+const WorkspaceListSearchLayout = ({location, history}) => (
+    <WorkspacesProvider>
+        <Layout
+            renderMenu={() => <WorkspaceListMenuItem />}
+            renderMain={() => <SearchPage location={location} history={history} />}
+            renderTopbar={() => <WorkspaceListTopBar />}
+        />
+    </WorkspacesProvider>
+);
 
-export default WorkspaceListSearchLayout;
+export default withRouter(WorkspaceListSearchLayout);

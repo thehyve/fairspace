@@ -11,6 +11,7 @@ export const MAIN_CONTENT_MAX_HEIGHT = 'calc(100vh - 156px)';
 export const COLLECTIONS_PATH = 'collections';
 export const METADATA_PATH = '/metadata';
 export const VOCABULARY_PATH = '/vocabulary';
+export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';
 export const TOOLTIP_ENTER_DELAY = 350;
 export const DATE_FORMAT = 'dd/MM/yyyy';
 

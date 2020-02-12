@@ -9,7 +9,7 @@ const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
 const KeycloakAdminClient = require('keycloak-admin').default;
 
-const workspaceRetriever = require('./workspaceRetriever');
+const ElasticsearchClient = require('./ElasticsearchClient');
 
 const app = express();
 
@@ -22,12 +22,12 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
+const elasticsearchClient = new ElasticsearchClient(config.urls.elasticsearch);
+
 let allWorkspaces;
 
-const retrieveWorkspaces = workspaceRetriever(config.urls.elasticsearch);
-
-const fetchWorkspaces = () => retrieveWorkspaces()
-    .then(result => { allWorkspaces = result; })
+const fetchWorkspaces = () => elasticsearchClient.retrieveWorkspaces()
+    .then(results => { allWorkspaces = results; })
     .catch(e => console.error('Error retrieving workspaces', e));
 
 fetchWorkspaces();
@@ -213,6 +213,15 @@ app.use(proxy('/api/keycloak', {
     onProxyReq: addToken,
     changeOrigin: true
 }));
+
+// Cross workspaces search
+app.get('/api/v1/search/_all', (req, res) => {
+    const {query} = req.query;
+    elasticsearchClient.retrieveSearchTypes()
+        .then(types => elasticsearchClient.crossWorkspacesSearch(query, types))
+        .then(result => res.send(result).end())
+        .catch(e => console.error('Error retrieving cross-workspace search results.', e));
+});
 
 app.use(proxy('/api/v1/search', {
     target: config.urls.elasticsearch,
