@@ -43,17 +43,6 @@ app.get('/readiness', (req, res) => {
     }
 });
 
-const keycloakAdminClient = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: 'master'});
-
-keycloakAdminClient.auth({
-    grantType: 'password',
-    username: process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME,
-    password: process.env.FAIRSPACE_SERVICE_ACCOUNT_PASSWORD,
-    clientId: 'admin-cli',
-}).catch(e => console.error("Error establishing admin client connection", e));
-
-keycloakAdminClient.realmName = config.keycloak.realm;
-
 const store = new session.MemoryStore();
 
 const keycloak = new Keycloak(
@@ -136,20 +125,39 @@ const json = express.json();
 
 const WORKSPACE_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
 
-const addRoles = (compositeRole, associatedRoles) => Promise.all(associatedRoles.map(name => keycloakAdminClient.roles.findOneByName({name})))
+const createKeycloakAdminClient = () => {
+    const client = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: 'master'});
+    return client.auth({
+        grantType: 'password',
+        username: process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME,
+        password: process.env.FAIRSPACE_SERVICE_ACCOUNT_PASSWORD,
+        clientId: 'admin-cli',
+    })
+        .then(() => {
+            client.realmName = config.keycloak.realm;
+            return client;
+        })
+        .catch(e => {
+            console.error("Error establishing admin client connection", e);
+            return Promise.reject(e);
+        });
+};
+
+const addRoles = (keycloakAdminClient, compositeRole, associatedRoles) => Promise.all(associatedRoles.map(name => keycloakAdminClient.roles.findOneByName({name})))
     .then(roles => keycloakAdminClient.roles.makeUpdateRequest({
         method: 'POST',
         path: `/roles/${compositeRole}/composites`,
     })({}, roles));
 
-const createWorkspaceRoles = (workspaceId) => Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
-    .then(({roleName}) => roleName)))
-    .then(([user, coordinator, write, datasteward]) => Promise.all([
-        addRoles(write, [user]),
-        addRoles(datasteward, [user]),
-        addRoles(coordinator, [write, datasteward]),
-        addRoles('organisation-admin', [coordinator])
-    ]));
+const createWorkspaceRoles = (workspaceId) => createKeycloakAdminClient()
+    .then(keycloakAdminClient => Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
+        .then(({roleName}) => roleName)))
+        .then(([user, coordinator, write, datasteward]) => Promise.all([
+            addRoles(keycloakAdminClient, write, [user]),
+            addRoles(keycloakAdminClient, datasteward, [user]),
+            addRoles(keycloakAdminClient, coordinator, [write, datasteward]),
+            addRoles(keycloakAdminClient, 'organisation-admin', [coordinator])
+        ])));
 
 const createWorkspaceDatabase = (workspace) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${accessToken.token}`}})
     .then(nodeResponse => { if (!nodeResponse.ok) { throw Error('Error creating workspace database'); }});
