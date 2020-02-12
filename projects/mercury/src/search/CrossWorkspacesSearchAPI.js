@@ -10,7 +10,7 @@ class CrossWorkspacesSearchAPI {
             headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
         })
             .then(extractJsonData)
-            .catch(handleHttpError("Failure while searching for metadata ."));
+            .catch(handleHttpError("Failure while searching cross workspaces."));
     }
 }
 

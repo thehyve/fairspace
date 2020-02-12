@@ -9,7 +9,8 @@ import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrows
 let collectionBrowser;
 
 const collectionsContextMock = {
-    addCollection: jest.fn(() => Promise.resolve())
+    addCollection: jest.fn(() => Promise.resolve()),
+    collections: []
 };
 
 beforeEach(() => {
