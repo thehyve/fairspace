@@ -57,17 +57,6 @@ const LinkedDataEntityFormContainer = ({
     } else if (canEdit) {
         footer = (
             <div>
-                {editable && showEditButtons && (
-                    <Button
-                        type="submit"
-                        color="secondary"
-                        onClick={() => {
-                            clearForm();
-                            setEditingEnabled(false);
-                        }}
-                    >Cancel
-                    </Button>
-                )}
                 <Button
                     type="submit"
                     form={formId}
@@ -78,6 +67,17 @@ const LinkedDataEntityFormContainer = ({
                 >
                     Update
                 </Button>
+                {editable && showEditButtons && (
+                    <Button
+                        type="submit"
+                        color="default"
+                        onClick={() => {
+                            clearForm();
+                            setEditingEnabled(false);
+                        }}
+                    >Cancel
+                    </Button>
+                )}
             </div>
         );
     }
