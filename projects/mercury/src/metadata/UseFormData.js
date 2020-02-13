@@ -44,16 +44,24 @@ const useFormData = (values) => {
         save(property, newValue);
     };
 
+    const deleteValue = (property, index) => {
+        const newValue = current(property.key).filter((el, idx) => idx !== index);
+        save(property, newValue);
+    };
+
+    const deleteUpdate = (propertyKey) => {
+        const newUpdates = {...updates};
+        delete newUpdates[propertyKey];
+        setUpdates(newUpdates);
+    };
+
     const updateValue = (property, value, index) => {
         if (!first(values[property.key]) || first(values[property.key]).value !== value.value) {
             const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
             save(property, newValue);
+        } else if (updates[property.key]) {
+            deleteUpdate(property.key);
         }
-    };
-
-    const deleteValue = (property, index) => {
-        const newValue = current(property.key).filter((el, idx) => idx !== index);
-        save(property, newValue);
     };
 
     const clearForm = () => setUpdates({});

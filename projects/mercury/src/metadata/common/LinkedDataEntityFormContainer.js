@@ -42,7 +42,6 @@ const LinkedDataEntityFormContainer = ({
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
-
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
 
@@ -51,7 +50,6 @@ const LinkedDataEntityFormContainer = ({
 
     const formId = `entity-form-${subject}`;
     let footer;
-
     if (isUpdating) {
         footer = <CircularProgress />;
     } else if (canEdit) {
@@ -69,7 +67,6 @@ const LinkedDataEntityFormContainer = ({
                 </Button>
                 {editable && showEditButtons && (
                     <Button
-                        type="submit"
                         color="default"
                         onClick={() => {
                             clearForm();
