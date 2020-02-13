@@ -198,7 +198,7 @@ app.put('/api/v1/workspaces', (req, res) => {
             .catch(e => {
                 console.error('Error creating a workspace. '
                     + `Check the permissions granted to Fairspace service account ${process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME}.`
-                    + 'They must include at least view-realm, manage-realm and manage-authorizations.', e);
+                    + 'They must include at least view-realm, manage-realm and manage-authorization.', e);
                 res.status(500).send('Internal server error');
             })
             .finally(() => workspacesBeingCreated.delete(workspace.id));
