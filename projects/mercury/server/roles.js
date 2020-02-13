@@ -24,8 +24,12 @@ const addRoles = (keycloakAdminClient, compositeRole, associatedRoles) => Promis
         path: `/roles/${compositeRole}/composites`,
     })({}, roles));
 
+const ROLE_TYPES = ['user', 'coordinator', 'write', 'datasteward'];
+
+const workspaceRole = (workspaceId, roleType) => ({name: `workspace-${workspaceId}-${roleType}`});
+
 const createWorkspaceRoles = (config, workspaceId) => createKeycloakAdminClient(config)
-    .then(keycloakAdminClient => Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => keycloakAdminClient.roles.create({name: `workspace-${workspaceId}-${roleType}`})
+    .then(keycloakAdminClient => Promise.all(ROLE_TYPES.map(roleType => keycloakAdminClient.roles.create(workspaceRole(workspaceId, roleType))
         .then(({roleName}) => roleName)))
         .then(([user, coordinator, write, datasteward]) => Promise.all([
             addRoles(keycloakAdminClient, write, [user]),
@@ -43,21 +47,13 @@ const revokeRole = (config, workspaceId, userId, roleType) => createKeycloakAdmi
         .then(role => client.users.delRealmRoleMappings({id: userId, roles: [role]})));
 
 const listUsers = (config, workspaceId) => createKeycloakAdminClient(config)
-    .then(client => Promise.all(['user', 'coordinator', 'write', 'datasteward'].map(roleType => client.roles.findUsersWithRole({name: `workspace-${workspaceId}-${roleType}`})
-        .then(users => ({roleType, users}))))
-        .then(userRoleMappings => {
-            const allUsers = [];
-            userRoleMappings.forEach(({roleType, users}) => users.filter(user => user.enabled)
-                .forEach(user => {
-                    const existing = allUsers.find(u => u.id === user.id);
-                    if (existing) {
-                        existing.roleTypes.push(roleType);
-                    } else {
-                        allUsers.push({id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, roleTypes: [roleType]});
-                    }
-                }));
-            return allUsers;
-        }));
+    .then(client => client.users.find()
+        .then(allUsers => allUsers.filter(user => user.enabled))
+        .then(allUsers => allUsers.map(user => ({id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, roleTypes: []})))
+        .then(allUsers => Promise.all(ROLE_TYPES.map(roleType => client.roles.findUsersWithRole(workspaceRole(workspaceId, roleType))
+            .then(users => users.filter(user => user.enabled)
+                .forEach(user => allUsers.find(u => u.id === user.id).roleTypes.push(roleType)))))
+            .then(() => allUsers)));
 
 
 module.exports = {createWorkspaceRoles, grantRole, revokeRole, listUsers};
