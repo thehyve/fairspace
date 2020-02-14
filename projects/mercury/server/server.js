@@ -8,7 +8,8 @@ const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
 const workspaceRetriever = require('./workspaceRetriever');
-const {listUsers, grantRole, revokeRole, createWorkspaceRoles} = require("./roles");
+const {setRole} = require("./roles");
+const {listUsers, createWorkspaceRoles} = require("./roles");
 
 const app = express();
 
@@ -206,24 +207,12 @@ app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
         });
 });
 
-app.use('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res) => {
-    let handler;
-    switch (req.method) {
-        case 'PUT':
-            handler = grantRole;
-            break;
-        case 'DELETE':
-            handler = revokeRole;
-            break;
-        default:
-            res.status(405).send('Method not allowed');
-            return;
-    }
+app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res) => {
     if (!accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
         res.status(403).send('Forbidden').end();
         return;
     }
-    handler(config, req.params.workspace, req.params.userId, req.params.roleType)
+    setRole(config, req.params.workspace, req.params.userId, req.params.roleType)
         .then(() => res.status(200).send())
         .catch(e => {
             console.error('Error while altering roles', e);

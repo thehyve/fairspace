@@ -6,10 +6,11 @@ import {createMetadataIri} from '../common/utils/linkeddata/metadataUtils';
 
 export type User = {
     iri: string;
+    id: string;
     name: string;
     email?: string;
     admin: boolean,
-    roles: string[]
+    role?: string
 }
 
 const requestOptions = {
@@ -33,8 +34,8 @@ export const getUser = () => axios.get('/api/v1/account')
 
 export const getUsers = () => axios.get('users/', requestOptions)
     .catch(handleHttpError('Error while loading users'))
-    .then(extractJsonData);
+    .then(extractJsonData)
+    .then(users => users.map(user => ({iri: createMetadataIri(user.id), ...user})));
 
-export const addUser = (user) => axios.put('users/', JSON.stringify(user), requestOptions)
-    .catch(handleHttpError('Error while adding a user'))
-    .then(extractJsonData);
+export const grantUserRole = (user, role) => axios.put(`users/${user.id}/roles/${role}`, null, requestOptions)
+    .catch(handleHttpError('Error while altering a role'));

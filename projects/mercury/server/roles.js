@@ -24,36 +24,48 @@ const addRoles = (keycloakAdminClient, compositeRole, associatedRoles) => Promis
         path: `/roles/${compositeRole}/composites`,
     })({}, roles));
 
-const ROLE_TYPES = ['user', 'coordinator', 'write', 'datasteward'];
+const ROLE_TYPES = ['user', 'write', 'datasteward', 'coordinator'];
 
 const workspaceRole = (workspaceId, roleType) => ({name: `workspace-${workspaceId}-${roleType}`});
 
 const createWorkspaceRoles = (config, workspaceId) => createKeycloakAdminClient(config)
     .then(keycloakAdminClient => Promise.all(ROLE_TYPES.map(roleType => keycloakAdminClient.roles.create(workspaceRole(workspaceId, roleType))
         .then(({roleName}) => roleName)))
-        .then(([user, coordinator, write, datasteward]) => Promise.all([
+        .then(([user, write, datasteward, coordinator]) => Promise.all([
             addRoles(keycloakAdminClient, write, [user]),
             addRoles(keycloakAdminClient, datasteward, [user]),
             addRoles(keycloakAdminClient, coordinator, [write, datasteward]),
             addRoles(keycloakAdminClient, 'organisation-admin', [coordinator])
         ])));
 
-const grantRole = (config, workspaceId, userId, roleType) => createKeycloakAdminClient(config)
-    .then(client => client.roles.findOneByName({name: `workspace-${workspaceId}-${roleType}`})
-        .then(role => client.users.addRealmRoleMappings({id: userId, roles: [role]})));
+const setRole = (config, workspaceId, userId, roleType) => createKeycloakAdminClient(config)
+    .then(client => Promise.all(ROLE_TYPES.map(rt => client.roles.findOneByName(workspaceRole(workspaceId, rt))
+        .then(role => client.users.delRealmRoleMappings({id: userId, roles: [role]}))))
+        .then(() => {
+            if (roleType !== 'none') {
+                client.roles.findOneByName(workspaceRole(workspaceId, roleType))
+                    .then(role => client.users.addRealmRoleMappings({id: userId, roles: [role]}));
+            }
+        }));
 
-const revokeRole = (config, workspaceId, userId, roleType) => createKeycloakAdminClient(config)
-    .then(client => client.roles.findOneByName({name: `workspace-${workspaceId}-${roleType}`})
-        .then(role => client.users.delRealmRoleMappings({id: userId, roles: [role]})));
+const username = (user) => (((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username);
 
 const listUsers = (config, workspaceId) => createKeycloakAdminClient(config)
     .then(client => client.users.find()
         .then(allUsers => allUsers.filter(user => user.enabled))
-        .then(allUsers => allUsers.map(user => ({id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, username: user.username, roleTypes: []})))
+        .then(allUsers => allUsers.map(user => ({
+            id: user.id,
+            name: username(user),
+            email: user.email,
+            username: user.username,
+            roleTypes: []
+        })))
         .then(allUsers => Promise.all(ROLE_TYPES.map(roleType => client.roles.findUsersWithRole(workspaceRole(workspaceId, roleType))
-            .then(users => users.filter(user => user.enabled)
-                .forEach(user => allUsers.find(u => u.id === user.id).roleTypes.push(roleType)))))
+            .then(users => ({roleType, users: users.filter(user => user.enabled)}))))
+            .then(roleMappings => roleMappings.forEach(({roleType, users}) => users.forEach(user => {
+                allUsers.find(u => u.id === user.id).role = roleType;
+            })))
             .then(() => allUsers)));
 
 
-module.exports = {createWorkspaceRoles, grantRole, revokeRole, listUsers};
+module.exports = {createWorkspaceRoles, setRole, listUsers};
