@@ -60,7 +60,6 @@ public class SaturnContextHandlerTest {
         when(request.getRequestDispatcher(any())).thenReturn(requestDispatcher);
 
         when(authenticator.apply(any())).thenReturn(user);
-        when(users.trySetCurrentUser(any())).thenReturn(user);
     }
 
     @Test

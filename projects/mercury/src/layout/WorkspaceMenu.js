@@ -37,7 +37,7 @@ const WorkspaceMenu = ({location: {pathname}}) => (
                 </ListItemIcon>
                 <ListItemText primary="Overview" />
             </ListItem>
-            <AuthorizationCheck requiredAuthorization="CanRead" transformError={() => null}>
+            <AuthorizationCheck requiredAuthorization="user" transformError={() => null}>
                 <ListItem
                     component={NavLink}
                     to={workspacePrefix() + "/collections"}
@@ -96,7 +96,7 @@ const WorkspaceMenu = ({location: {pathname}}) => (
                 <ListItemText primary="Users" />
             </ListItem>
         </List>
-        <AuthorizationCheck requiredAuthorization="CanRead" transformError={() => null}>
+        <AuthorizationCheck requiredAuthorization="read" transformError={() => null}>
             <Divider />
             <List>
                 {Config.get().urls.dataverse ? (

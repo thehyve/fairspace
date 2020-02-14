@@ -31,7 +31,6 @@ public class DummyAuthenticator implements Function<HttpServletRequest, User> {
         user.setName("John Snow");
         user.setEmail("user@example.com");
         user.getRoles().addAll(roles);
-        user.setAdmin(true);
 
         return user;
     }

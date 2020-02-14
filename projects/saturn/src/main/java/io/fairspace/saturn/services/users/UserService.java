@@ -40,21 +40,6 @@ public class UserService {
         httpClient.setResponseBufferSize(256 * 1024);
     }
 
-    public User trySetCurrentUser(User user) {
-        var userWithRoles = dao.read(User.class, user.getIri());
-
-        if (user.isAdmin()) {
-            if (userWithRoles == null) {
-                userWithRoles = user;
-            }
-
-            userWithRoles.setAdmin(true);
-            userWithRoles.getRoles().add(Role.Coordinator);
-        }
-
-        return userWithRoles;
-    }
-
     public Set<User> getUsers() {
         var result = new HashSet<>(dao.list(User.class));
 
@@ -108,8 +93,6 @@ public class UserService {
     }
 
     public User addUser(User user) {
-        log.debug("Adding user {} {} with roles {}", user.getName(), user.getIri(), user.getRoles());
-
         var result = dao.getDataset().calculateWrite(() -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
             validate(user.getIri() != null, "Please provide a valid IRI.");

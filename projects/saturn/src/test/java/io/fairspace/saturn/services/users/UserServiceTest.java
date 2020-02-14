@@ -22,7 +22,6 @@ public class UserServiceTest {
     private User coordinator = new User();
     private User regular1 = new User();
     private User regular2 = new User();
-    private User admin = new User();
 
     @Before
     public void before() {
@@ -37,21 +36,10 @@ public class UserServiceTest {
         regular2.setIri(generateMetadataIri("3"));
         regular2.setName("Regular2");
         regular2.getRoles().add(Role.CanRead);
-
-        admin.setIri(generateMetadataIri("4"));
-        admin.setName("Admin");
-        admin.setAdmin(true);
-    }
-
-    @Test
-    public void adminHasCoordinatorsRole() {
-        assertNotNull(userService.trySetCurrentUser(admin));
-        assertEquals(EnumSet.of(Role.Coordinator), admin.getRoles());
     }
 
     @Test
     public void regularUserCanNotSaveItself() {
-        assertNull(userService.trySetCurrentUser(regular1));
         assertEquals(Set.of(), userService.getUsers());
     }
 
