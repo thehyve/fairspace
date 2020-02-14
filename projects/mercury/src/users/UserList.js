@@ -10,9 +10,8 @@ import {
     TableSortLabel,
 } from "@material-ui/core";
 
-import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
-import {Delete, HighlightOffSharp} from "@material-ui/icons";
+import {HighlightOffSharp} from "@material-ui/icons";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -45,8 +44,6 @@ const columns = {
 };
 
 const toggleRole = (user: User, role: string) => (checkRole(role)(user) ? grantUserRole(user, 'none') : grantUserRole(user, role));
-
-const rolesToShow = ['write', 'datasteward', 'coordinator'];
 
 const UserList = () => {
     const {workspaceUser, refreshWorkspaceUser} = useContext(WorkspaceUserContext);
