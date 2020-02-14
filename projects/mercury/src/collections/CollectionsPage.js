@@ -8,40 +8,34 @@ import CollectionBrowser from "./CollectionBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
 import {useSingleSelection} from "../file/UseSelection";
 import {LoadingOverlay} from "../common/components";
-import useLinkedDataSearchParams from "../metadata/UseLinkedDataSearchParams";
+import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
 
-const CollectionsPage = () => {
+const CollectionsPage = ({history}) => {
     usePageTitleUpdater("Collections");
 
-    const {query, setQuery} = useLinkedDataSearchParams();
     const [busy, setBusy] = useState(false);
     const {isSelected, toggle, selected} = useSingleSelection();
+
+    const handleSearch = (value) => {
+        handleCollectionSearchRedirect(history, value);
+    };
 
     return (
         <CollectionBreadcrumbsContextProvider>
             <BreadCrumbs />
+            <div style={{marginBottom: 16, width: consts.MAIN_CONTENT_WIDTH}}>
+                <SearchBar
+                    placeholder="Search"
+                    disableUnderline={false}
+                    onSearchChange={handleSearch}
+                />
+            </div>
             <Grid container spacing={1}>
-                <Grid
-                    container
-                    item
-                    direction="column"
-                    spacing={2}
-                    style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}
-                >
-                    <Grid item justify="center">
-                        <SearchBar
-                            placeholder="Search"
-                            disableUnderline={false}
-                            onSearchChange={setQuery}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <CollectionBrowser
-                            query={query}
-                            isSelected={collection => isSelected(collection.iri)}
-                            toggleCollection={collection => toggle(collection.iri)}
-                        />
-                    </Grid>
+                <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
+                    <CollectionBrowser
+                        isSelected={collection => isSelected(collection.iri)}
+                        toggleCollection={collection => toggle(collection.iri)}
+                    />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
                     <InformationDrawer

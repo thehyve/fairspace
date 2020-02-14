@@ -1,5 +1,5 @@
 import React from 'react';
-import {Redirect, Route} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 
 import * as queryString from 'query-string';
 import WorkspaceOverview from "../home/Home";
@@ -14,13 +14,14 @@ import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
 import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import UsersPage from '../users/UsersPage';
+import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
 );
 
 const WorkspaceRoutes = () => (
-    <>
+    <Switch>
         <Route path="/workspaces/:workspace" exact component={WorkspaceOverview} />
 
         <Route
@@ -32,9 +33,18 @@ const WorkspaceRoutes = () => (
         <Route
             path="/workspaces/:workspace/collections"
             exact
-            render={() => (
+            render={(props) => (
                 <LinkedDataMetadataProvider>
-                    <Collections />
+                    <Collections history={props.history} />
+                </LinkedDataMetadataProvider>
+            )}
+        />
+
+        <Route
+            path="/workspaces/:workspace/collections/search"
+            render={(props) => (
+                <LinkedDataMetadataProvider>
+                    <CollectionSearchResultList {...props} />
                 </LinkedDataMetadataProvider>
             )}
         />
@@ -94,7 +104,7 @@ const WorkspaceRoutes = () => (
             path="/workspaces/:workspace/search"
             render={({location, history}) => <SearchPage location={location} history={history} />}
         />
-    </>
+    </Switch>
 );
 
 export default WorkspaceRoutes;

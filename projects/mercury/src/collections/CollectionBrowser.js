@@ -1,22 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import {
-    handleSearchError,
-    LoadingInlay,
-    MessageDisplay,
-    SearchAPI,
-    SORT_DATE_CREATED,
-    UserContext,
-    UsersContext
-} from '../common';
+import {LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import CollectionsContext from "../common/contexts/CollectionsContext";
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
-
-const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
 export const CollectionBrowser = ({
     loading = false,
@@ -25,14 +14,9 @@ export const CollectionBrowser = ({
     isSelected = () => false,
     toggleCollection = () => {},
     users = [],
-    history,
-    query,
-    searchFunction = SearchAPI.search
+    history
 }) => {
     const [addingNewCollection, setAddingNewCollection] = useState(false);
-    const [searchResults, setSearchResults] = useState([]);
-    const [searching, setSearching] = useState(true);
-    const [searchError, setSearchError] = useState();
 
     const handleAddCollectionClick = () => setAddingNewCollection(true);
 
@@ -46,41 +30,14 @@ export const CollectionBrowser = ({
 
     const handleCancelAddCollection = () => setAddingNewCollection(false);
 
-    useEffect(() => {
-        if (!query) {
-            setSearchResults([...collections]);
-            setSearching(false);
-        } else {
-            setSearching(true);
-            searchFunction(({
-                query,
-                types: COLLECTION_DIRECTORIES_FILES,
-                size: SEARCH_MAX_SIZE,
-                sort: SORT_DATE_CREATED
-            }))
-                .catch(handleSearchError)
-                .then(data => {
-                    if (data.items) {
-                        const filteredCollections = collections.filter(col => (
-                            data.items.some(di => di.iri === col.iri)
-                        ));
-                        setSearchResults(filteredCollections);
-                    }
-                    setSearchError(undefined);
-                })
-                .catch((e) => setSearchError(e || true))
-                .finally(() => setSearching(false));
-        }
-    }, [query, collections, searchFunction]);
-
     const renderCollectionList = () => {
-        searchResults.forEach(col => {
+        collections.forEach(col => {
             col.creatorObj = users.find(u => u.iri === col.createdBy);
         });
         return (
             <>
                 <CollectionList
-                    collections={searchResults}
+                    collections={collections}
                     isSelected={isSelected}
                     onCollectionClick={handleCollectionClick}
                     onCollectionDoubleClick={handleCollectionDoubleClick}
@@ -98,13 +55,10 @@ export const CollectionBrowser = ({
     if (error) {
         return <MessageDisplay message="An error occurred while loading collections" />;
     }
-    if (searchError) {
-        return <MessageDisplay message="An error occurred while searching for collections" />;
-    }
 
     return (
         <>
-            {loading || searching ? <LoadingInlay /> : renderCollectionList()}
+            {loading ? <LoadingInlay /> : renderCollectionList()}
             <Button
                 style={{marginTop: 8}}
                 color="primary"
