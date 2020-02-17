@@ -51,11 +51,22 @@ class ElasticsearchClient {
 
     mapCrossWorkspaceSearchItems(items) {
         const result = this.transformESResult(items);
+
+        const getLabel = (item) => {
+            if (item.label) {
+                return item.label.find(() => true);
+            }
+            if (item.name) {
+                return item.name.find(() => true);
+            }
+            return null;
+        };
+
         return result.map(item => ({
             id: item.id,
             index: item.index,
             type: item.type.find(() => true),
-            label: item.label.find(() => true),
+            label: getLabel(item)
         }));
     }
 
