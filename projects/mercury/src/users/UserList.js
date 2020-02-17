@@ -93,7 +93,7 @@ const UserList = () => {
                                     <Select
                                         value={user.role}
                                         disabled={!canManage}
-                                        onChange={e => toggleRole(user, e.target.value).then(refresh(user))}
+                                        onChange={e => toggleRole(user, e.target.value).then(refresh)}
                                         disableUnderline
                                     >
                                         { ['user', 'write', 'datasteward', 'coordinator'].map(role => (<MenuItem value={role}>{role}</MenuItem>))}
@@ -101,7 +101,7 @@ const UserList = () => {
                                 </TableCell>
                                 <TableCell style={{width: 32}}>
                                     <ConfirmationButton
-                                        onClick={() => grantUserRole(user, 'none').then(refresh(user))}
+                                        onClick={() => grantUserRole(user, 'none').then(refresh)}
                                         disabled={!canManage}
                                         message="Are you sure you want to remove this user from the workspace?"
                                         agreeButtonText="Remove user"
@@ -162,7 +162,7 @@ const UserList = () => {
                     <Button
                         onClick={() => {
                             setShowAddUserDialog(false);
-                            grantUserRole(userToAdd, 'user').then(refresh(userToAdd));
+                            grantUserRole(userToAdd, 'user').then(refresh);
                         }}
                         color="primary"
                         disabled={!userToAdd}
