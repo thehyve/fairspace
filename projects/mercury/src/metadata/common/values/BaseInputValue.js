@@ -36,9 +36,11 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
                 }
             }}
             onKeyUp={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                updateOuterState(e.target.value);
+                if (property.maxValuesCount === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    updateOuterState(e.target.value);
+                }
             }}
             style={{...style, marginTop: 0, width: '100%'}}
         />
