@@ -3,6 +3,7 @@ import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} fro
 import {getSearchQueryFromString, handleSearchError, LoadingInlay, MessageDisplay} from '../common';
 import {workspacePrefix} from "../workspaces/workspaces";
 import crossWorkspacesSearchAPI from "./CrossWorkspacesSearchAPI";
+import {FAIRSPACE_NS, METADATA_PATH, VOCABULARY_PATH} from "../constants";
 
 const styles = {
     tableRoot: {
@@ -16,7 +17,10 @@ const styles = {
 };
 
 export const SearchPage = ({classes, items = [], loading, error, history}) => {
-    const getEntityRelativeUrl = ({index, id}) => `${workspacePrefix(index)}/metadata?iri=` + encodeURIComponent(id);
+    const getEntityRelativeUrl = ({index, id, type}) => {
+        const entityClassType = type.startsWith(FAIRSPACE_NS) ? VOCABULARY_PATH : METADATA_PATH;
+        return `${workspacePrefix(index)}${entityClassType}?iri=` + encodeURIComponent(id);
+    };
 
     /**
      * Handles a click on a search result.
@@ -77,7 +81,6 @@ export const SearchPage = ({classes, items = [], loading, error, history}) => {
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const SearchPageContainer = ({
     location: {search}, query = getSearchQueryFromString(search),
-    vocabulary, vocabularyLoading, vocabularyError,
     classes, history, searchFunction = crossWorkspacesSearchAPI.search
 }) => {
     const [items, setItems] = useState([]);
@@ -99,11 +102,10 @@ export const SearchPageContainer = ({
     return (
         <SearchPage
             items={items}
-            loading={loading || vocabularyLoading}
-            error={vocabularyError || error}
+            loading={loading}
+            error={error}
             classes={classes}
             history={history}
-            vocabulary={vocabulary}
         />
     );
 };
