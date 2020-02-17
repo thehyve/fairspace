@@ -33,12 +33,4 @@ describe('Layout', () => {
 
         expect(wrapper.find(MenuDrawer).length).toEqual(1);
     });
-
-    it('should render no content if user does not have required authorization ', () => {
-        const element = wrap(<Layout requiredAuthorization="other-role" renderMenu={() => null} />, ['test']);
-
-        const wrapper = mount(element);
-
-        expect(wrapper.find(MenuDrawer).length).toEqual(0);
-    });
 });
