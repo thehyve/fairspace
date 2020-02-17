@@ -10,12 +10,14 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.EnumSet;
 import java.util.Set;
 
-import static io.fairspace.saturn.vocabulary.FS.EMAIL_URI;
-import static io.fairspace.saturn.vocabulary.FS.USER_URI;
+import static io.fairspace.saturn.vocabulary.FS.*;
 
 @RDFType(USER_URI)
 @Getter @Setter
 public class User extends PersistentEntity {
+    @RDFProperty(value = ID_URI, required = true)
+    private String id;
+
     @RDFProperty(value = RDFS.uri + "label", required = true)
     private String name;
 

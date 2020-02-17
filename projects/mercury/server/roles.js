@@ -26,19 +26,19 @@ const workspaceRole = (workspaceId, roleType) => ({name: `workspace-${workspaceI
 const createWorkspaceRoles = (config, workspaceId) => createKeycloakAdminClient(config)
     .then(keycloakAdminClient => Promise.all(ROLE_TYPES.map(roleType => keycloakAdminClient.roles.create(workspaceRole(workspaceId, roleType)))));
 
+const fullname = (user) => (((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username);
+
 const setRole = (config, workspaceId, userId, roleType) => createKeycloakAdminClient(config)
     .then(client => Promise.all(ROLE_TYPES.map(rt => client.roles.findOneByName(workspaceRole(workspaceId, rt))
         .then(role => client.users.delRealmRoleMappings({id: userId, roles: [role]}))))
         .then(() => {
             if (roleType !== 'none') {
-                client.roles.findOneByName(workspaceRole(workspaceId, roleType))
+                return client.roles.findOneByName(workspaceRole(workspaceId, roleType))
                     .then(role => client.users.addRealmRoleMappings({id: userId, roles: [role]}));
             }
+            return Promise.resolve();
         })
-        .then(() => client.users.findOne({id: userId}))
-        .then(user => () => fetch(`/api/v1/workspaces/${workspaceId}/users`, {method: 'PUT', body: user})));
-
-const fullname = (user) => (((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username);
+        .then(() => client.users.findOne({id: userId})));
 
 const listUsers = (config, workspaceId) => createKeycloakAdminClient(config)
     .then(client => client.users.find()
@@ -57,4 +57,4 @@ const listUsers = (config, workspaceId) => createKeycloakAdminClient(config)
             .then(() => allUsers)));
 
 
-module.exports = {createWorkspaceRoles, setRole, listUsers};
+module.exports = {createWorkspaceRoles, setRole, listUsers, fullname};

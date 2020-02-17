@@ -7,6 +7,7 @@ import org.apache.jena.graph.Node;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.audit.Audit.audit;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 
 @Slf4j
@@ -24,7 +25,9 @@ public class UserService {
     public User addUser(User user) {
         var result = dao.getDataset().calculateWrite(() -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
-            validate(user.getIri() != null, "Please provide a valid IRI.");
+            validate(user.getId() != null, "Please provide a valid id.");
+
+            user.setIri(generateMetadataIri(user.getId()));
 
             return dao.write(user);
         });

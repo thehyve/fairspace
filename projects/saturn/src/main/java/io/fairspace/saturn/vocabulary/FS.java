@@ -51,6 +51,9 @@ public class FS {
     public static final String DATE_DELETED_URI = NS + "dateDeleted";
     public static final Property dateDeleted = createProperty(DATE_DELETED_URI);
 
+    public static final String ID_URI = NS + "id";
+    public static final Property id = createProperty(ID_URI);
+
     public static final String EMAIL_URI = NS + "email";
     public static final Property email = createProperty(EMAIL_URI);
 
