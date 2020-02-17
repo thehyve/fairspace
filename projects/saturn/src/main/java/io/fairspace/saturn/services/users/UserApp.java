@@ -2,9 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.get;
 import static spark.Spark.put;
 
 public class UserApp extends BaseApp {
@@ -17,21 +15,11 @@ public class UserApp extends BaseApp {
 
     @Override
     protected void initApp() {
-        get("/", (req, res) -> {
-            res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(service.getUsers());
-        });
-
         put("/", (req, res) -> {
             var template = mapper.readValue(req.body(), User.class);
             var result = service.addUser(template);
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
-        });
-
-        get("/current/", (req, res) -> {
-            res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(getThreadContext().getUser());
         });
     }
 }

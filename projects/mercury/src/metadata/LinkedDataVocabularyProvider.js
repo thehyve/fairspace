@@ -45,7 +45,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
             properties,
             isFixed: isFixedShape(shape),
             systemProperties: getSystemProperties(shape),
-            isEditable: isEntityEditable && isDataSteward(authorizations)
+            isEditable: isEntityEditable && isDataSteward(workspaceUser)
         });
     };
 
@@ -68,8 +68,8 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 // Fixed properties
                 namespaces,
                 requireIdentifier: false,
-                hasEditRight: isDataSteward(workspaceUser.roles),
-                isCoordinator: isCoordinator(workspaceUser.roles),
+                hasEditRight: isDataSteward(workspaceUser),
+                isCoordinator: isCoordinator(workspaceUser),
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,

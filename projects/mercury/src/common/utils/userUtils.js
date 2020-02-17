@@ -1,9 +1,7 @@
-import {currentWorkspace} from "../../workspaces/workspaces";
-
 export default function getDisplayName(user) {
     return (user && user.name) || '';
 }
 
-export const isDataSteward = (authorizations) => authorizations && authorizations.includes(`workspace-${currentWorkspace()}-datasteward`);
-export const isCoordinator = (authorizations) => authorizations && authorizations.includes(`workspace-${currentWorkspace()}-coordinator`);
-export const canWrite = (authorizations) => authorizations && authorizations.includes(`workspace-${currentWorkspace()}-write`);
+export const isDataSteward = (user) => ["coordinator", "datasteward"].includes(user.role);
+export const isCoordinator = (user) => ["coordinator"].includes(user.role);
+export const canWrite = (user) => ["coordinator", "datasteward", "write"].includes(user.role);

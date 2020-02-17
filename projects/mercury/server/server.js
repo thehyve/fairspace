@@ -195,7 +195,11 @@ app.get('/api/v1/account', (req, res) => res.send({
 }));
 
 app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
-    if (!accessToken.content.authorities.includes(`workspace-${req.params.workspace}-user`)) {
+    if (!accessToken.content.authorities.includes('organisation-admin')
+        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)
+        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-datasteward`)
+        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-write`)
+        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-user`)) {
         res.status(403).send('Forbidden');
         return;
     }
@@ -208,8 +212,9 @@ app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
 });
 
 app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res) => {
-    if (!accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
-        res.status(403).send('Forbidden').end();
+    if (!accessToken.content.authorities.includes('organisation-admin')
+        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
+        res.status(403).send('Forbidden');
         return;
     }
     setRole(config, req.params.workspace, req.params.userId, req.params.roleType)

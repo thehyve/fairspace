@@ -1,3 +1,4 @@
+const fetch = require("node-fetch");
 const KeycloakAdminClient = require('keycloak-admin').default;
 
 const createKeycloakAdminClient = (config) => {
@@ -18,25 +19,12 @@ const createKeycloakAdminClient = (config) => {
         });
 };
 
-const addRoles = (keycloakAdminClient, compositeRole, associatedRoles) => Promise.all(associatedRoles.map(name => keycloakAdminClient.roles.findOneByName({name})))
-    .then(roles => keycloakAdminClient.roles.makeUpdateRequest({
-        method: 'POST',
-        path: `/roles/${compositeRole}/composites`,
-    })({}, roles));
-
 const ROLE_TYPES = ['user', 'write', 'datasteward', 'coordinator'];
 
 const workspaceRole = (workspaceId, roleType) => ({name: `workspace-${workspaceId}-${roleType}`});
 
 const createWorkspaceRoles = (config, workspaceId) => createKeycloakAdminClient(config)
-    .then(keycloakAdminClient => Promise.all(ROLE_TYPES.map(roleType => keycloakAdminClient.roles.create(workspaceRole(workspaceId, roleType))
-        .then(({roleName}) => roleName)))
-        .then(([user, write, datasteward, coordinator]) => Promise.all([
-            addRoles(keycloakAdminClient, write, [user]),
-            addRoles(keycloakAdminClient, datasteward, [user]),
-            addRoles(keycloakAdminClient, coordinator, [write, datasteward]),
-            addRoles(keycloakAdminClient, 'organisation-admin', [coordinator])
-        ])));
+    .then(keycloakAdminClient => Promise.all(ROLE_TYPES.map(roleType => keycloakAdminClient.roles.create(workspaceRole(workspaceId, roleType)))));
 
 const setRole = (config, workspaceId, userId, roleType) => createKeycloakAdminClient(config)
     .then(client => Promise.all(ROLE_TYPES.map(rt => client.roles.findOneByName(workspaceRole(workspaceId, rt))
@@ -46,19 +34,20 @@ const setRole = (config, workspaceId, userId, roleType) => createKeycloakAdminCl
                 client.roles.findOneByName(workspaceRole(workspaceId, roleType))
                     .then(role => client.users.addRealmRoleMappings({id: userId, roles: [role]}));
             }
-        }));
+        })
+        .then(() => client.users.findOne({id: userId}))
+        .then(user => () => fetch(`/api/v1/workspaces/${workspaceId}/users`, {method: 'PUT', body: user})));
 
-const username = (user) => (((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username);
+const fullname = (user) => (((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username);
 
 const listUsers = (config, workspaceId) => createKeycloakAdminClient(config)
     .then(client => client.users.find()
         .then(allUsers => allUsers.filter(user => user.enabled))
         .then(allUsers => allUsers.map(user => ({
             id: user.id,
-            name: username(user),
+            name: fullname(user),
             email: user.email,
-            username: user.username,
-            roleTypes: []
+            username: user.username
         })))
         .then(allUsers => Promise.all(ROLE_TYPES.map(roleType => client.roles.findUsersWithRole(workspaceRole(workspaceId, roleType))
             .then(users => ({roleType, users: users.filter(user => user.enabled)}))))

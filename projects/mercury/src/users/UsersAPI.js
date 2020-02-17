@@ -17,9 +17,26 @@ const requestOptions = {
     headers: {Accept: 'application/json'}
 };
 
-export const getWorkspaceUser = () => axios.get(`/api/v1/workspaces/${currentWorkspace()}/users/current/`)
+const workspaceRole = (roles) => {
+    if (roles.includes(`workspace-${currentWorkspace()}-coordinator`)) {
+        return 'coordinator';
+    }
+    if (roles.includes(`workspace-${currentWorkspace()}-datasteward`)) {
+        return 'datasteward';
+    }
+    if (roles.includes(`workspace-${currentWorkspace()}-write`)) {
+        return 'write';
+    }
+    if (roles.includes(`workspace-${currentWorkspace()}-user`)) {
+        return 'user';
+    }
+    return undefined;
+};
+
+export const getWorkspaceUser = () => axios.get(`/api/v1/account`)
     .catch(handleHttpError("Failure when retrieving user's information"))
-    .then(extractJsonData);
+    .then(extractJsonData)
+    .then(user => ({...user, role: workspaceRole(user.authorizations), admin: user.authorizations.includes('organisation-admin')}));
 
 export const getUser = () => axios.get('/api/v1/account')
     .catch(handleHttpError("Failure when retrieving user's information"))

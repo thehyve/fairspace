@@ -6,7 +6,6 @@ import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
@@ -17,7 +16,7 @@ public class UserServiceTest {
 
     private DatasetJobSupport ds = new DatasetJobSupportInMemory();
 
-    private UserService userService = new UserService(ds, null);
+    private UserService userService = new UserService(ds);
 
     private User coordinator = new User();
     private User regular1 = new User();
@@ -36,11 +35,6 @@ public class UserServiceTest {
         regular2.setIri(generateMetadataIri("3"));
         regular2.setName("Regular2");
         regular2.getRoles().add(Role.CanRead);
-    }
-
-    @Test
-    public void regularUserCanNotSaveItself() {
-        assertEquals(Set.of(), userService.getUsers());
     }
 
     @Test

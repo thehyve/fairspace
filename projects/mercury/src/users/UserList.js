@@ -19,12 +19,12 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import LinkedDataContext from "../metadata/LinkedDataContext";
 import type {User} from './UsersAPI';
 import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
 import WorkspaceUserContext from "../common/contexts/WorkspaceUserContext";
 import {grantUserRole} from "./UsersAPI";
+import {isCoordinator} from "../common/utils/userUtils";
 
 const checkRole = (role: string) => (user: User) => user.role === role;
 
@@ -46,20 +46,14 @@ const columns = {
 const toggleRole = (user: User, role: string) => (checkRole(role)(user) ? grantUserRole(user, 'none') : grantUserRole(user, role));
 
 const UserList = () => {
-    const {workspaceUser, refreshWorkspaceUser} = useContext(WorkspaceUserContext);
-    const {users, refresh: refreshUsers} = useContext(UsersContext);
+    const {workspaceUser} = useContext(WorkspaceUserContext);
+    const {users, refresh} = useContext(UsersContext);
     const workspaceUsers = users.filter(u => !!u.role);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsers, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const {isCoordinator} = useContext(LinkedDataContext);
+    const canManage = workspaceUser.admin || isCoordinator(workspaceUser);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
-    const refresh = (user) => () => {
-        if (user.iri === workspaceUser.iri) {
-            refreshWorkspaceUser();
-        }
-        refreshUsers();
-    };
 
     return (
         <>
@@ -98,7 +92,7 @@ const UserList = () => {
                                 <TableCell style={{width: 120}}>
                                     <Select
                                         value={user.role}
-                                        disabled={!isCoordinator}
+                                        disabled={!canManage}
                                         onChange={e => toggleRole(user, e.target.value).then(refresh(user))}
                                         disableUnderline
                                     >
@@ -108,12 +102,12 @@ const UserList = () => {
                                 <TableCell style={{width: 32}}>
                                     <ConfirmationButton
                                         onClick={() => grantUserRole(user, 'none').then(refresh(user))}
-                                        disabled={!isCoordinator}
+                                        disabled={!canManage}
                                         message="Are you sure you want to remove this user from the workspace?"
                                         agreeButtonText="Remove user"
                                         dangerous
                                     >
-                                        <IconButton disabled={!isCoordinator}>
+                                        <IconButton disabled={!canManage}>
                                             <HighlightOffSharp />
                                         </IconButton>
                                     </ConfirmationButton>
@@ -133,7 +127,7 @@ const UserList = () => {
                 />
             </Paper>
             {
-                isCoordinator
+                canManage
                     ? (
                         <Button
                             style={{marginTop: 8}}

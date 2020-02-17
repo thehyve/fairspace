@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import LoadingInlay from "./LoadingInlay";
 import WorkspaceUserContext from '../contexts/WorkspaceUserContext';
+import {currentWorkspace} from "../../workspaces/workspaces";
 
 /**
  * This component performs an authorization check for the current user
@@ -89,10 +90,10 @@ const ContextualAuthorizationCheck = props => {
     const {workspaceUser = {}, workspaceUserLoading = false, workspaceUserError = false} = useContext(WorkspaceUserContext);
     return (
         <AuthorizationCheck
-            authorizations={workspaceUser.roles}
+            authorizations={workspaceUser.authorizations}
+            requiredAuthorization={`workspace-${currentWorkspace()}-${props.requiredAuthorization}`}
             pending={workspaceUserLoading}
             error={workspaceUserError}
-            {...props}
         />
     );
 };

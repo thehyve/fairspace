@@ -58,8 +58,8 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 submitLinkedDataChanges,
 
                 // Fixed properties
-                hasEditRight: canWrite(workspaceUser.roles),
-                isCoordinator: isCoordinator(workspaceUser.roles),
+                hasEditRight: canWrite(workspaceUser),
+                isCoordinator: isCoordinator(workspaceUser),
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,
