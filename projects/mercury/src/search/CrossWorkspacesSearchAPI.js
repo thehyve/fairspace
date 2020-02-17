@@ -7,7 +7,7 @@ class CrossWorkspacesSearchAPI {
     search({query}) {
         const queryString = query ? `?query=${query}` : '';
         return axios.get(`${crossWorkspacesSearchUrl}${queryString}`, {
-            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+            headers: {Accept: 'application/json'},
         })
             .then(extractJsonData)
             .catch(handleHttpError("Failure while searching cross workspaces."));
