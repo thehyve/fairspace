@@ -10,7 +10,8 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.EnumSet;
 import java.util.Set;
 
-import static io.fairspace.saturn.vocabulary.FS.*;
+import static io.fairspace.saturn.vocabulary.FS.EMAIL_URI;
+import static io.fairspace.saturn.vocabulary.FS.USER_URI;
 
 @RDFType(USER_URI)
 @Getter @Setter

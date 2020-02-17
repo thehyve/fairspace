@@ -5,8 +5,8 @@ import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
 import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
 import io.fairspace.saturn.services.permissions.PermissionsApp;
-import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 import io.fairspace.saturn.services.users.UserApp;
+import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 import io.fairspace.saturn.webdav.WebDAVApp;
 
 import javax.servlet.Filter;

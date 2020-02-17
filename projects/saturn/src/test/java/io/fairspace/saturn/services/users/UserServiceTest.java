@@ -10,7 +10,8 @@ import java.util.Set;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class UserServiceTest {
 

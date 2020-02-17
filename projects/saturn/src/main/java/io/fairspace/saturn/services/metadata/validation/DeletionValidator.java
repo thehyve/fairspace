@@ -1,12 +1,8 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
-import org.apache.jena.graph.FrontsNode;
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-
-import java.util.Set;
 
 
 public class DeletionValidator implements MetadataRequestValidator {
