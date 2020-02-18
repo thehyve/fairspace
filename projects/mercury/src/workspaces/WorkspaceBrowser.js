@@ -7,6 +7,7 @@ import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
 import type {Workspace} from './WorkspacesAPI';
 import WorkspaceEditor from './WorkspaceEditor';
+import {isAdmin} from "../common/utils/userUtils";
 
 
 type WorkspaceBrowserProps = {
@@ -83,7 +84,7 @@ export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
     return (
         <>
             {loading ? <LoadingInlay /> : renderWorkspaceList()}
-            {currentUser.admin ? renderAddWorkspaceButton() : null }
+            {isAdmin(currentUser) ? renderAddWorkspaceButton() : null }
         </>
     );
 };

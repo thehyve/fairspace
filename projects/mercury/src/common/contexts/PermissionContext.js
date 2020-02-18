@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {UsersContext} from "..";
 
 import PermissionAPI from "../../permissions/PermissionAPI";
-import getDisplayName from "../utils/userUtils";
+import {getDisplayName} from "../utils/userUtils";
 
 const PermissionContext = React.createContext({});
 

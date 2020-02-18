@@ -9,11 +9,11 @@ import VocabularyContext from './VocabularyContext';
 import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
 import {MetadataAPI} from './LinkedDataAPI';
 import {canWrite, isCoordinator} from '../common/utils/userUtils';
-import WorkspaceUserContext from '../common/contexts/WorkspaceUserContext';
+import {UserContext} from "../common/contexts";
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
-    const {workspaceUser} = useContext(WorkspaceUserContext);
+    const {currentUser} = useContext(UserContext);
 
     const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, includeObjectProperties: true})
         .catch(() => {
@@ -58,8 +58,8 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 submitLinkedDataChanges,
 
                 // Fixed properties
-                hasEditRight: canWrite(workspaceUser),
-                isCoordinator: isCoordinator(workspaceUser),
+                hasEditRight: canWrite(currentUser),
+                isCoordinator: isCoordinator(currentUser),
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,

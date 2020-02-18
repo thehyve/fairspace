@@ -26,7 +26,7 @@ const workspaceRole = (workspaceId, roleType) => ({name: `workspace-${workspaceI
 const createWorkspaceRoles = (config, workspaceId) => createKeycloakAdminClient(config)
     .then(keycloakAdminClient => Promise.all(ROLE_TYPES.map(roleType => keycloakAdminClient.roles.create(workspaceRole(workspaceId, roleType)))));
 
-const fullname = (user) => (((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username);
+const fullname = (user) => user.fullName || ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username;
 
 const setRole = (config, workspaceId, userId, roleType) => createKeycloakAdminClient(config)
     .then(client => Promise.all(ROLE_TYPES.map(rt => client.roles.findOneByName(workspaceRole(workspaceId, rt))
@@ -45,7 +45,7 @@ const listUsers = (config, workspaceId) => createKeycloakAdminClient(config)
         .then(allUsers => allUsers.filter(user => user.enabled))
         .then(allUsers => allUsers.map(user => ({
             id: user.id,
-            name: fullname(user),
+            fullName: fullname(user),
             email: user.email,
             username: user.username
         })))

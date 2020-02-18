@@ -31,11 +31,11 @@ const defaultPermissions = [
 const defaultUsers = [
     {
         iri: "http://test/71cfdb89-1cb3-48e6-b0e1-e48ff1bb4245",
-        name: "Gregor Clegane"
+        fullName: "Gregor Clegane"
     },
     {
         iri: "http://test/256b8cc5-ee41-43e3-ac91-6ff7c1f0d3ea",
-        name: "Ygritte"
+        fullName: "Ygritte"
     },
 ];
 
@@ -84,7 +84,7 @@ describe('PermissionProvider', () => {
                 ...defaultUsers,
                 {
                     iri: 'http://test/874e9480-96fc-4ce3-9fcd-d8b07323bf1d',
-                    name: 'Updated user'
+                    fullName: 'Updated user'
                 }
             ]);
         });

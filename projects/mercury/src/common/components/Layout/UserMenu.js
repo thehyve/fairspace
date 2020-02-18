@@ -5,6 +5,7 @@ import {ErrorOutline} from '@material-ui/icons';
 
 import UserContext from "../../contexts/UserContext";
 import LogoutContext from "../../contexts/LogoutContext";
+import {getDisplayName} from "../../utils/userUtils";
 
 const styles = {
     row: {
@@ -55,7 +56,7 @@ const UserMenu = ({classes}) => {
             >
                 <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
                 <span>
-                    {currentUser.name}
+                    {getDisplayName(currentUser)}
                 </span>
             </Button>
             <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>

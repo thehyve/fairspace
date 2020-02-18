@@ -5,11 +5,11 @@ import {Assignment, BarChart, Code, FolderOpen, Group, Home, OpenInNew, Widgets}
 
 import Config from '../common/services/Config';
 import {workspacePrefix} from "../workspaces/workspaces";
-import WorkspaceUserContext from "../common/contexts/WorkspaceUserContext";
+import {UserContext} from "../common/contexts";
+import {hasAccess} from "../common/utils/userUtils";
 
 const WorkspaceMenu = ({location: {pathname}}) => {
-    const {workspaceUser = {}} = useContext(WorkspaceUserContext);
-    const hasAccess = !!workspaceUser.role;
+    const {currentUser = {authorizations: []}} = useContext(UserContext);
 
     return (
         <>
@@ -41,7 +41,7 @@ const WorkspaceMenu = ({location: {pathname}}) => {
                     <ListItemText primary="Overview" />
                 </ListItem>
                 {
-                    hasAccess && (
+                    hasAccess(currentUser) && (
                         <div>
                             <ListItem
                                 component={NavLink}
@@ -104,7 +104,7 @@ const WorkspaceMenu = ({location: {pathname}}) => {
                 </ListItem>
             </List>
             {
-                workspaceUser.role && (
+                hasAccess(currentUser) && (
                     <div>
                         <Divider />
                         <List>
