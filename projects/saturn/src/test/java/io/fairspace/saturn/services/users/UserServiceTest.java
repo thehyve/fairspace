@@ -25,15 +25,16 @@ public class UserServiceTest {
 
     @Before
     public void before() {
+        coordinator.setId("1");
         coordinator.setIri(generateMetadataIri("1"));
         coordinator.setName("Coordinator");
         coordinator.getRoles().add(Role.Coordinator);
 
-        regular1.setIri(generateMetadataIri("2"));
+        regular1.setId("2");
         regular1.setName("Regular1");
         regular1.getRoles().add(Role.CanRead);
 
-        regular2.setIri(generateMetadataIri("3"));
+        regular2.setId("3");
         regular2.setName("Regular2");
         regular2.getRoles().add(Role.CanRead);
     }
