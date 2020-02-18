@@ -1,6 +1,0 @@
-
-PREFIX fs: <http://fairspace.io/ontology#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT ?iri ?externalId ?userName ?fullName ?authorities
-WHERE { ?iri a fs:User; fs:externalId ?externalId; fs:userName ?userName; fs:authorities ?authorities; rdfs:label ?fullName . }
