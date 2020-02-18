@@ -13,7 +13,7 @@ const handleAuthError = (status) => {
         case 401:
             ErrorDialog.showError(null, 'Your session has expired. Please log in again.',
                 null,
-                () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}&ForceAuthn=True`));
+                () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
             break;
         case 403:
             ErrorDialog.showError(null, 'You have no access to this workspace. Ask the workspace coordinator to grant you access.',
