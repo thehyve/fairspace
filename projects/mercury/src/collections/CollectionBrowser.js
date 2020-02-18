@@ -34,7 +34,6 @@ export const CollectionBrowser = ({
         collections.forEach(col => {
             col.creatorObj = users.find(u => u.iri === col.createdBy);
         });
-
         return (
             <>
                 <CollectionList
