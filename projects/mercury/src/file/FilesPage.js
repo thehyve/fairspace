@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import queryString from "query-string";
-import {BreadCrumbs, usePageTitleUpdater} from "../common";
+import {BreadCrumbs, SearchBar, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import InformationDrawer from '../common/components/InformationDrawer';
@@ -13,10 +13,12 @@ import CollectionsContext from "../common/contexts/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
 import {LoadingOverlay} from "../common/components";
 import {workspacePrefix} from "../workspaces/workspaces";
+import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
 
 export const FilesPage = ({
     match,
     location,
+    history,
     fileApi,
     collections = [],
     loading = false,
@@ -34,6 +36,10 @@ export const FilesPage = ({
     // Check whether a filename is specified in the url for selection
     // If so, select it on first render
     const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
+
+    const handleSearch = (value) => {
+        handleCollectionSearchRedirect(history, value);
+    };
 
     useEffect(() => {
         if (preselectedFile) {
@@ -60,6 +66,13 @@ export const FilesPage = ({
         <CollectionBreadcrumbsContextProvider>
             <div style={{position: 'relative', zIndex: 1}}>
                 <BreadCrumbs additionalSegments={breadcrumbSegments} />
+            </div>
+            <div style={{marginBottom: 16, width: consts.MAIN_CONTENT_WIDTH}}>
+                <SearchBar
+                    placeholder="Search"
+                    disableUnderline={false}
+                    onSearchChange={handleSearch}
+                />
             </div>
             <Grid container spacing={1}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>

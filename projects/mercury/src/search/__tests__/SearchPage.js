@@ -1,19 +1,19 @@
 import React from 'react';
+import {TableBody, TableRow} from '@material-ui/core';
 import {mount, shallow} from 'enzyme';
 import {act} from 'react-dom/test-utils';
 import {MessageDisplay} from '../../common';
-
 import {SearchPage, SearchPageContainer} from '../SearchPage';
 
 describe('<SearchPage />', () => {
     let wrapper;
-
+    const historyMock = {push: jest.fn()};
     beforeEach(() => {
         wrapper = shallow(<SearchPage
             classes={{}}
-            total={1}
-            items={[]}
+            items={[{id: "http://id", label: "test", type: "metadata-type-1"}]}
             loading={false}
+            history={historyMock}
         />);
     });
 
@@ -65,5 +65,14 @@ describe('<SearchPage />', () => {
         });
 
         expect(searchFunction).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle redirect to result page', () => {
+        const tableRows = wrapper.find(TableBody).find(TableRow);
+        expect(tableRows.length).toEqual(1);
+        tableRows.first().prop("onDoubleClick")({id: 'http://id'});
+
+        expect(historyMock.push).toHaveBeenCalledTimes(1);
+        expect(historyMock.push).toHaveBeenCalledWith('/metadata?iri=http%3A%2F%2Fid');
     });
 });

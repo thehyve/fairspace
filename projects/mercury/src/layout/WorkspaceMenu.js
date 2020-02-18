@@ -1,31 +1,20 @@
 import React, {useContext} from 'react';
 import {NavLink, withRouter} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, BarChart, Code, FolderOpen, Group, Home, OpenInNew, Widgets} from "@material-ui/icons";
+import {Assignment, BarChart, Code, FolderOpen, Group, Home, OpenInNew} from "@material-ui/icons";
 
 import Config from '../common/services/Config';
 import {workspacePrefix} from "../workspaces/workspaces";
 import {UserContext} from "../common/contexts";
 import {hasAccess} from "../common/utils/userUtils";
+import WorkspaceListMenuItem from "./WorkspaceListMenuItem";
 
 const WorkspaceMenu = ({location: {pathname}}) => {
     const {currentUser = {authorizations: []}} = useContext(UserContext);
 
     return (
         <>
-            <List>
-                <ListItem
-                    component={NavLink}
-                    to="/workspaces"
-                    button
-                    selected={pathname === '/workspaces'}
-                >
-                    <ListItemIcon>
-                        <Widgets />
-                    </ListItemIcon>
-                    <ListItemText primary="Workspaces" />
-                </ListItem>
-            </List>
+            <WorkspaceListMenuItem location={pathname} />
             <Divider />
             <List>
                 <ListItem
