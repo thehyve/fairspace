@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const KeycloakAdminClient = require('keycloak-admin').default;
 
 const createKeycloakAdminClient = (config) => {
