@@ -14,7 +14,6 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import {AccessRights} from "../common/utils/permissionUtils";
 import UserSelect from "./UserSelect";
-import {hasAccess} from "../common/utils/userUtils";
 
 export const styles = {
     root: {
@@ -131,7 +130,7 @@ export class AlterPermissionDialog extends React.Component {
         return (
             <UserSelect
                 onChange={this.handleSelectedUserChange}
-                filter={u => hasAccess(u) && u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
+                filter={u => !!u.role && u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
