@@ -7,7 +7,6 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
-const workspaceRetriever = require('./workspaceRetriever');
 const {fullname} = require("./roles");
 const {setRole} = require("./roles");
 const {listUsers, createWorkspaceRoles} = require("./roles");
@@ -229,8 +228,7 @@ app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res
         return;
     }
     setRole(config, req.params.workspace, req.params.userId, req.params.roleType)
-        .then(user => fetch(`${getNodeUrl(req.originalUrl)}/api/v1/workspaces/${req.params.workspace}/users/`, {
-            method: 'PUT',
+        .then(user => fetch(`${getNodeUrl(req.originalUrl)}/api/v1/workspaces/${req.params.workspace}/users/`, {method: 'PUT',
             headers: {Authorization: `Bearer ${accessToken.token}`},
             body: JSON.stringify({id: user.id, email: user.email, name: fullname(user)})}))
         .then(nodeResponse => res.status(nodeResponse.ok ? 200 : 500).send())
