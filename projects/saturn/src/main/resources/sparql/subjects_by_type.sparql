@@ -1,3 +1,0 @@
-# 0 - type
-
-SELECT ?s WHERE { ?s a %1$s }
