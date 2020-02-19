@@ -23,7 +23,7 @@ const LinkedDataEntityFormContainer = ({
     const {
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid
-    } = useFormData(values);
+    } = useFormData(values, properties);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())

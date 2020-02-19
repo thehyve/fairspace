@@ -54,7 +54,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid,
         hasFormUpdates, clearForm
-    } = useFormData({});
+    } = useFormData({}, extendedProperties);
     const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(!formSubmitted && hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
