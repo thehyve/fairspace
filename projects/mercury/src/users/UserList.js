@@ -23,7 +23,7 @@ import type {WorkspaceUser} from './UsersAPI';
 import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
 import {grantUserRole} from "./UsersAPI";
-import {getDisplayName, hasAccess, isAdmin, isCoordinator} from "../common/utils/userUtils";
+import {getDisplayName, isAdmin, isCoordinator} from "../common/utils/userUtils";
 import {UserContext} from "../common/contexts";
 
 const checkRole = (role: string) => (user: WorkspaceUser) => user.role === role;
