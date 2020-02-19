@@ -1,7 +1,0 @@
-# 0 - graph
-# 1 - type
-
-CONSTRUCT {?s ?p ?o}
-WHERE {
-    GRAPH %1$s { ?s a %2$s; ?p ?o; }
-}

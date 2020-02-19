@@ -5,14 +5,16 @@ import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.vocabulary.RDF;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
+import static io.fairspace.saturn.rdf.dao.DAO.entityFromResource;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.util.Comparator.comparing;
@@ -66,15 +68,17 @@ public class CollectionsService {
     }
 
     public Collection getByLocation(String location) {
-        return getByLocationWithoutAccess(location)
+        return dao.getDataset().calculateRead(() -> getByLocationWithoutAccess(location)
                 .map(this::addPermissionsToObject)
-                .orElse(null);
+                .orElse(null));
     }
 
     private Optional<Collection> getByLocationWithoutAccess(String location) {
-        return dao.construct(Collection.class, storedQuery("coll_get_by_dir", location))
-                .stream()
-                .findFirst();
+        return dao.getDataset().getDefaultModel().listSubjectsWithProperty(FS.filePath, location)
+                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .nextOptional()
+                .map(r -> entityFromResource(Collection.class, r));
     }
 
     private void ensureLocationIsNotUsed(String location) {
@@ -84,18 +88,20 @@ public class CollectionsService {
     }
 
     public List<Collection> list() {
-        var collections = dao.list(Collection.class);
+        return dao.getDataset().calculateRead(() -> {
+            var collections = dao.list(Collection.class);
 
-        var iris = collections.stream().map(Collection::getIri).collect(toList());
-        var userPermissions = permissions.getPermissions(iris);
+            var iris = collections.stream().map(Collection::getIri).collect(toList());
+            var userPermissions = permissions.getPermissions(iris);
 
-        return collections.stream()
-                .filter(c -> {
-                    c.setAccess(userPermissions.get(c.getIri()));
-                    return c.canRead();
-                })
-                .sorted(comparing(Collection::getName))
-                .collect(toList());
+            return collections.stream()
+                    .filter(c -> {
+                        c.setAccess(userPermissions.get(c.getIri()));
+                        return c.canRead();
+                    })
+                    .sorted(comparing(Collection::getName))
+                    .collect(toList());
+        });
     }
 
     public void delete(String iri) {

@@ -1,7 +1,0 @@
-# Register an external resource
-#
-# 0 - iri
-# 1 - type
-
-
-INSERT DATA {%1$s a %2$s}

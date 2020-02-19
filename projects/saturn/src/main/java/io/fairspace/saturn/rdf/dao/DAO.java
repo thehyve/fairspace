@@ -3,6 +3,7 @@ package io.fairspace.saturn.rdf.dao;
 import com.pivovarit.function.ThrowingBiConsumer;
 import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -17,21 +18,19 @@ import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
 /**
@@ -145,8 +144,11 @@ public class DAO {
      * @return The found entity or null if no entity was found or it was marked as deleted
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri) {
-        return construct(type, storedQuery("select_by_mask", defaultGraphIRI, iri, null, null))
-                .stream().findFirst().orElse(null);
+        var m = dataset.getDefaultModel();
+        var resource = m.createResource(iri.getURI());
+        return (m.containsResource(resource) && !resource.hasProperty(FS.dateDeleted))
+                ? entityFromResource(type, resource)
+                : null;
     }
 
     /**
@@ -193,74 +195,54 @@ public class DAO {
      * @return
      */
     public <T extends PersistentEntity> List<T> list(Class<T> type) {
-        return construct(type, storedQuery("select_by_type", defaultGraphIRI, getRdfType(type)));
+        return dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .mapWith(r -> entityFromResource(type, r))
+                .toList();
     }
 
-    /**
-     * Execustes a SPARQL CONSTRUCT query and lists entities of a specific type (except to marked as deleted)
-     * in the resulting model
-     *
-     * @param type
-     * @param query
-     * @param <T>
-     * @return
-     */
-    public <T extends PersistentEntity> List<T> construct(Class<T> type, String query) {
-        return dataset.calculateRead(() -> safely(() -> {
-            var model = queryConstruct(dataset, query);
-            var entities = new ArrayList<T>();
-            Iterable<Resource> subjects = model::listSubjects;
-            for (var resource : subjects) {
-                var entity = createEntity(type, resource);
-                if (entity instanceof LifecycleAwarePersistentEntity && ((LifecycleAwarePersistentEntity) entity).getDateDeleted() != null) {
-                    continue;
-                }
-
-                entities.add(entity);
+    public static <T extends PersistentEntity> T entityFromResource(Class<T> type, Resource resource) {
+        try {
+            var typeResource = createResource(getRdfType(type).getURI());
+            if (!resource.hasProperty(RDF.type, typeResource)) {
+                throw new DAOException(format(WRONG_ENTITY_TYPE_ERROR, resource.getURI(), typeResource.getURI()));
             }
+            var ctor = type.getDeclaredConstructor();
+            ctor.setAccessible(true);
+            var entity = ctor.newInstance();
+            entity.setIri(resource.asNode());
+            processFields(type, (field, annotation) -> {
+                var property = createProperty(annotation.value());
 
-            return entities;
-        }));
-    }
+                var stmts = resource.listProperties(property).toList();
 
-    private static <T extends PersistentEntity> T createEntity(Class<T> type, Resource resource) throws Exception {
-        var typeResource = createResource(getRdfType(type).getURI());
-        if (!resource.hasProperty(RDF.type, typeResource)) {
-            throw new DAOException(format(WRONG_ENTITY_TYPE_ERROR, resource.getURI(), typeResource.getURI()));
+                if (Collection.class.isAssignableFrom(field.getType())) {
+                    var collection = (Collection) field.get(entity);
+                    if (collection == null) {
+                        throw new DAOException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
+                    }
+
+                    var parameterizedType = (ParameterizedType) field.getGenericType();
+                    var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
+
+                    stmts.forEach(stmt -> collection.add(nodeToType(stmt.getObject(), valueType)));
+                } else {
+                    if (stmts.size() > 1) {
+                        throw new DAOException(format(TOO_MANY_VALUES_ERROR, field.getName(), resource.getURI()));
+                    }
+
+                    if (!stmts.isEmpty()) {
+                        var value = nodeToType(stmts.get(0).getObject(), field.getType());
+                        field.set(entity, value);
+                    } else if (annotation.required()) {
+                        throw new DAOException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
+                    }
+                }
+            });
+            return entity;
+        } catch (Exception e) {
+            throw new DAOException(e);
         }
-        var ctor = type.getDeclaredConstructor();
-        ctor.setAccessible(true);
-        var entity = ctor.newInstance();
-        entity.setIri(resource.asNode());
-        processFields(type, (field, annotation) -> {
-            var property = createProperty(annotation.value());
-
-            var stmts = resource.listProperties(property).toList();
-
-            if (Collection.class.isAssignableFrom(field.getType())) {
-                var collection = (Collection) field.get(entity);
-                if (collection == null) {
-                    throw new DAOException(format(UNINITIALIZED_COLLECTION_ERROR, field.getName(), type.getName()));
-                }
-
-                var parameterizedType = (ParameterizedType) field.getGenericType();
-                var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
-
-                stmts.forEach(stmt -> collection.add(nodeToType(stmt.getObject(), valueType)));
-            } else {
-                if (stmts.size() > 1) {
-                    throw new DAOException(format(TOO_MANY_VALUES_ERROR, field.getName(), resource.getURI()));
-                }
-
-                if (!stmts.isEmpty()) {
-                    var value = nodeToType(stmts.get(0).getObject(), field.getType());
-                    field.set(entity, value);
-                } else if (annotation.required()) {
-                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), resource.getURI()));
-                }
-            }
-        });
-        return entity;
     }
 
     @SneakyThrows

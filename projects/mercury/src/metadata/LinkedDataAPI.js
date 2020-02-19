@@ -15,7 +15,6 @@ class LinkedDataAPI {
      */
     constructor(graph) {
         this.statementsUrl = `${graph}/`;
-        this.entitiesUrl = `${graph}/entities/`;
     }
 
     /**
@@ -24,14 +23,6 @@ class LinkedDataAPI {
      */
     getStatementsUrl() {
         return this.statementsUrl;
-    }
-
-    /**
-     * Returns the URL to use for retrieving a list of entities
-     * @returns {string}
-     */
-    getEntitiesUrl() {
-        return this.entitiesUrl;
     }
 
     get(params = {}) {
