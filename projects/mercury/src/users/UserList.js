@@ -153,7 +153,7 @@ const UserList = () => {
                 <DialogContent>
                     <UserSelect
                         autoFocus
-                        filter={user => !hasAccess(user)}
+                        filter={user => !user.role}
                         onChange={setUserToAdd}
                         placeholder="Please select a user"
                     />
