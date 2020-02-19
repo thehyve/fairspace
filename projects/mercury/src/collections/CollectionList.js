@@ -13,7 +13,7 @@ import {
 import {formatDateTime, MessageDisplay, usePagination, useSorting} from '../common';
 
 import styles from './CollectionList.styles';
-import getDisplayName from "../common/utils/userUtils";
+import {getDisplayName} from "../common/utils/userUtils";
 
 const columns = {
     name: {

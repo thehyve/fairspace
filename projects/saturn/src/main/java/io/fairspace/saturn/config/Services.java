@@ -10,8 +10,8 @@ import io.fairspace.saturn.services.metadata.ReadableMetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.vfs.AuditedFileSystem;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
@@ -55,7 +55,7 @@ public class Services {
         this.dataset = dataset;
 
         workspaceService = new WorkspaceService(config.jena.datasetPath);
-        userService = new UserService(dataset, config.auth.userUrl);
+        userService = new UserService(dataset);
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);

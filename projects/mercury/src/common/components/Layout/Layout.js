@@ -5,7 +5,6 @@ import {withStyles} from '@material-ui/core/styles';
 import styles from './Layout.styles';
 import Footer from './Footer';
 import TopBar from "./TopBar";
-import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer";
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../constants";
 import LoadingInlay from "../LoadingInlay";
@@ -14,7 +13,6 @@ import UserContext from "../../contexts/UserContext";
 
 const Layout = ({
     classes,
-    requiredAuthorization,
     renderMenu,
     renderMain = () => {},
     renderTopbar = () => <TopBar title={versionInfo.name} />
@@ -27,15 +25,6 @@ const Layout = ({
     if (currentUserLoading) {
         return <LoadingInlay />;
     }
-
-    // If an error is to be shown, it should be underneath the
-    // AppBar. This method take care of it
-    const transformError = errorContent => (
-        <main className={classes.content}>
-            <div className={classes.toolbar} />
-            {errorContent}
-        </main>
-    );
 
     const menuOpen = menuExpanded || menuOpenDueToHover;
     const toggleMenuExpansion = () => {
@@ -69,19 +58,16 @@ const Layout = ({
     return (
         <>
             {renderTopbar()}
-            <AuthorizationCheck requiredAuthorization={requiredAuthorization} transformError={transformError}>
-                {renderMenu && (<MenuDrawer open={menuOpen} renderMenu={renderMenu} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />)}
-                <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
-                    {renderMain()}
-                </main>
-            </AuthorizationCheck>
+            {renderMenu && (<MenuDrawer open={menuOpen} renderMenu={renderMenu} toggleMenuExpansion={toggleMenuExpansion} onMouseLeave={handleMouseLeave} onMouseEnter={handleMouseEnter} />)}
+            <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
+                {renderMain()}
+            </main>
             <Footer content={`${versionInfo.id} ${versionInfo.version}`} />
         </>
     );
 };
 
 Layout.propTypes = {
-    requiredAuthorization: PropTypes.string,
     renderMenu: PropTypes.func,
     renderMain: PropTypes.func,
     renderTopbar: PropTypes.func

@@ -15,14 +15,14 @@ import static io.fairspace.saturn.vocabulary.FS.*;
 @RDFType(USER_URI)
 @Getter @Setter
 public class User extends PersistentEntity {
+    @RDFProperty(value = ID_URI, required = true)
+    private String id;
+
     @RDFProperty(value = RDFS.uri + "label", required = true)
     private String name;
 
     @RDFProperty(EMAIL_URI)
     private String email;
 
-    @RDFProperty(value = HAS_ROLE_URI, required = true)
     private final Set<Role> roles = EnumSet.noneOf(Role.class);
-
-    private boolean isAdmin;
 }

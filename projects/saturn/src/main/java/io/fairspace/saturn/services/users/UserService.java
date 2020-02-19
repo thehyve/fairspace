@@ -1,106 +1,21 @@
 package io.fairspace.saturn.services.users;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
-import static java.util.stream.Collectors.toList;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 
 @Slf4j
 public class UserService {
-    private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
-    private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
-
-
     private final DAO dao;
-    private final String usersUrl;
 
-    public UserService(DatasetJobSupport dataset, String usersUrl) {
+    public UserService(DatasetJobSupport dataset) {
         this.dao = new DAO(dataset);
-        this.usersUrl = usersUrl;
-
-        httpClient.setRequestBufferSize(128 * 1024);
-        httpClient.setResponseBufferSize(256 * 1024);
-    }
-
-    public User trySetCurrentUser(User user) {
-        var userWithRoles = dao.read(User.class, user.getIri());
-
-        if (user.isAdmin()) {
-            if (userWithRoles == null) {
-                userWithRoles = user;
-            }
-
-            userWithRoles.setAdmin(true);
-            userWithRoles.getRoles().add(Role.Coordinator);
-        }
-
-        return userWithRoles;
-    }
-
-    public Set<User> getUsers() {
-        var result = new HashSet<>(dao.list(User.class));
-
-        try {
-            result.addAll(fetchKeycloakUsers());
-        } catch (Exception e) {
-            log.error("Error retrieving users from {}", usersUrl, e);
-        }
-
-        return result;
-    }
-
-    private List<User> fetchKeycloakUsers() throws Exception {
-        if (usersUrl == null) {
-            return List.of();
-        }
-
-        if (!httpClient.isStarted()) {
-            httpClient.start();
-        }
-
-        var request = httpClient.newRequest(usersUrl);
-
-        var authorization = getCurrentConnection().getHttpChannel().getRequest().getHeader("Authorization");
-        if (authorization != null) {
-            request.header("Authorization", authorization);
-        }
-
-        var response = request.send();
-        if (response.getStatus() == SC_OK) {
-            List<KeycloakUser> keycloakUsers = mapper.readValue(response.getContent(), new TypeReference<>() {});
-            log.trace("Retrieved {} users from keycloak", keycloakUsers.size());
-            return keycloakUsers
-                    .stream()
-                    .filter(KeycloakUser::isEnabled)
-                    .map(keycloakUser -> {
-                        var user = new User();
-                        user.setIri(generateMetadataIri(keycloakUser.getId()));
-                        user.setName(keycloakUser.getFullName());
-                        user.setEmail(keycloakUser.getEmail());
-                        return user;
-                    })
-                    .collect(toList());
-        } else {
-            throw new IOException("Error retrieving users " + response.getStatus() + " " + response.getReason());
-        }
     }
 
     public User getUser(Node iri) {
@@ -108,11 +23,11 @@ public class UserService {
     }
 
     public User addUser(User user) {
-        log.debug("Adding user {} {} with roles {}", user.getName(), user.getIri(), user.getRoles());
-
         var result = dao.getDataset().calculateWrite(() -> {
             validate(getThreadContext().getUser().getRoles().contains(Role.Coordinator), "The managing user must have Coordinator's role.");
-            validate(user.getIri() != null, "Please provide a valid IRI.");
+            validate(user.getId() != null, "Please provide a valid id.");
+
+            user.setIri(generateMetadataIri(user.getId()));
 
             return dao.write(user);
         });

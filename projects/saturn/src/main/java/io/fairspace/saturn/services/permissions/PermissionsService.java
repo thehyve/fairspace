@@ -22,7 +22,6 @@ import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor

@@ -14,7 +14,7 @@ describe('CollectionList', () => {
         const collections = [{
             name: 'My Collection',
             creatorObj: {
-                name: 'Mariah Carey'
+                fullName: 'Mariah Carey'
             },
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0'

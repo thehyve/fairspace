@@ -2,6 +2,7 @@ import React, {useContext} from "react";
 
 import Dropdown from "../metadata/common/values/Dropdown";
 import {compareBy, UsersContext} from "../common";
+import {getDisplayName} from "../common/utils/userUtils";
 
 const UserSelect = ({filter = () => true, ...otherProps}) => {
     const {users} = useContext(UsersContext);
@@ -11,7 +12,7 @@ const UserSelect = ({filter = () => true, ...otherProps}) => {
         .sort(compareBy('name'))
         .map(user => (
             {
-                label: user.name,
+                label: getDisplayName(user),
                 ...user
             }
         ));

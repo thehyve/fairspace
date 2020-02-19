@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {
     Paper,
@@ -10,11 +10,22 @@ import {
     TableRow,
     TableSortLabel,
 } from "@material-ui/core";
+import {Lock} from "@material-ui/icons";
 import {MessageDisplay, usePagination, useSorting} from '../common';
 
 import type {Workspace} from './WorkspacesAPI';
+import {UserContext} from "../common/contexts";
+import {isAdmin} from "../common/utils/userUtils";
+
+type Accessible = {
+    hasAccess: boolean
+}
 
 const columns = {
+    hasAccess: {
+        valueExtractor: 'hasAccess',
+        label: ' '
+    },
     id: {
         valueExtractor: 'id',
         label: 'Id'
@@ -28,13 +39,16 @@ const columns = {
 const WorkspaceList = ({
     workspaces = []
 }) => {
+    const {currentUser = {authorizations: []}} = useContext(UserContext);
     const history = useHistory();
 
-    const onWorkspaceDoubleClick = (workspace: Workspace) => {
-        history.push(`/workspaces/${workspace.id}/`);
+    const onWorkspaceDoubleClick = (workspace: Workspace & Accessible) => {
+        if (workspace.hasAccess) {
+            history.push(`/workspaces/${workspace.id}/`);
+        }
     };
-
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'id');
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, hasAccess: isAdmin(currentUser) || !!currentUser.authorizations.find(role => role.startsWith(`workspace-${ws.id}-`))}));
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'id');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!workspaces || workspaces.length === 0) {
@@ -48,6 +62,7 @@ const WorkspaceList = ({
             />
         );
     }
+
 
     return (
         <Paper>
@@ -70,20 +85,22 @@ const WorkspaceList = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map((workspace: Workspace) => (
+                    {pagedItems.map((workspace: Workspace & Accessible) => (
                         <TableRow
                             key={workspace.id}
                             hover
                             onClick={() => {}}
                             onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                         >
-                            {
-                                Object.entries(columns).map(([key, column]) => (
-                                    <TableCell style={{maxWidth: 160}} component="th" scope="row" key={key}>
-                                        {workspace[column.valueExtractor]}
-                                    </TableCell>
-                                ))
-                            }
+                            <TableCell style={{maxWidth: 32}} component="th" scope="row" key="hasAccess">
+                                {!workspace.hasAccess && (<Lock />)}
+                            </TableCell>
+                            <TableCell style={{maxWidth: 160}} component="th" scope="row" key="id">
+                                {workspace.id}
+                            </TableCell>
+                            <TableCell style={{maxWidth: 160}} component="th" scope="row" key="label">
+                                {workspace.label}
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

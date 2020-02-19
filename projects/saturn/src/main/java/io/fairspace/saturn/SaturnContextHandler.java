@@ -59,23 +59,16 @@ public class SaturnContextHandler extends ConstraintSecurityHandler {
                 var workspace = parts[0];
                 context.setWorkspace(workspace);
 
-                var userInfo = authenticator.apply(request);
-                if (userInfo == null) {
+                var user = authenticator.apply(request);
+                if (user == null) {
                     sendError(SC_UNAUTHORIZED, "Unauthenticated", response);
                     return;
                 }
 
-                log.debug("Authenticated as {} {}", userInfo.getName(), userInfo.getIri());
-
-                var user = userService.trySetCurrentUser(userInfo);
-
-                if (user == null) {
-                    sendError(SC_FORBIDDEN, "You have no access to this workspace", response);
-                    return;
-                }
+                log.debug("Authenticated as {} {}", user.getName(), user.getIri());
 
                 if (user.getRoles().isEmpty()) {
-                    sendError(SC_FORBIDDEN, "Your access to this workspace has been revoked", response);
+                    sendError(SC_FORBIDDEN, "You have no access to this workspace", response);
                     return;
                 }
 

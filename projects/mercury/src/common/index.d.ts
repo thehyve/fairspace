@@ -9,7 +9,6 @@ export declare const DebouncedSelect: ComponentTypeAny;
 export declare const ErrorDialog: ComponentTypeAny;
 export declare const LoadingInlay: ComponentTypeAny;
 export declare const MessageDisplay: ComponentTypeAny;
-export declare const AuthorizationCheck: ComponentTypeAny;
 export declare const Layout: ComponentTypeAny;
 export declare const TopBar: ComponentTypeAny;
 export declare const Footer: ComponentTypeAny;

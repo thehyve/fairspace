@@ -6,7 +6,7 @@ import {getUser} from '../../users/UsersAPI';
 const UserContext = React.createContext({});
 
 export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState({});
+    const [currentUser, setCurrentUser] = useState({authorizations: []});
     const [currentUserLoading, setCurrentUserLoading] = useState(false);
     const [currentUserError, setCurrentUserError] = useState(null);
 

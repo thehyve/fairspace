@@ -23,7 +23,7 @@ import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
 import type {AuditInfo} from '../file/TechnicalMetadata';
 import UsersContext from '../common/contexts/UsersContext';
-import getDisplayName from '../common/utils/userUtils';
+import {getDisplayName} from "../common/utils/userUtils";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,

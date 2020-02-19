@@ -6,53 +6,37 @@ import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class UserServiceTest {
 
     private DatasetJobSupport ds = new DatasetJobSupportInMemory();
 
-    private UserService userService = new UserService(ds, null);
+    private UserService userService = new UserService(ds);
 
     private User coordinator = new User();
     private User regular1 = new User();
     private User regular2 = new User();
-    private User admin = new User();
 
     @Before
     public void before() {
+        coordinator.setId("1");
         coordinator.setIri(generateMetadataIri("1"));
         coordinator.setName("Coordinator");
         coordinator.getRoles().add(Role.Coordinator);
 
-        regular1.setIri(generateMetadataIri("2"));
+        regular1.setId("2");
         regular1.setName("Regular1");
         regular1.getRoles().add(Role.CanRead);
 
-        regular2.setIri(generateMetadataIri("3"));
+        regular2.setId("3");
         regular2.setName("Regular2");
         regular2.getRoles().add(Role.CanRead);
-
-        admin.setIri(generateMetadataIri("4"));
-        admin.setName("Admin");
-        admin.setAdmin(true);
-    }
-
-    @Test
-    public void adminHasCoordinatorsRole() {
-        assertNotNull(userService.trySetCurrentUser(admin));
-        assertEquals(EnumSet.of(Role.Coordinator), admin.getRoles());
-    }
-
-    @Test
-    public void regularUserCanNotSaveItself() {
-        assertNull(userService.trySetCurrentUser(regular1));
-        assertEquals(Set.of(), userService.getUsers());
     }
 
     @Test

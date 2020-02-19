@@ -1,7 +1,17 @@
-export default function getDisplayName(user) {
-    return (user && user.name) || '';
+import {currentWorkspace} from "../../workspaces/workspaces";
+
+export function getDisplayName(user) {
+    return (user && (user.fullName || user.username)) || '';
 }
 
-export const isDataSteward = (authorizations) => authorizations && authorizations.includes('DataSteward');
-export const isCoordinator = (authorizations) => authorizations && authorizations.includes('Coordinator');
-export const canWrite = (authorizations) => authorizations && authorizations.includes('CanWrite');
+export const workspaceRole = (user) => {
+    const workspacePrefix = `workspace-${currentWorkspace()}-`;
+    const role = user && user.authorizations && user.authorizations.find(r => r.startsWith(workspacePrefix));
+    return role && role.substring(workspacePrefix.length);
+};
+
+export const isAdmin = (user) => user.authorizations.includes('organisation-admin');
+export const isDataSteward = (user) => ['datasteward', 'coordinator'].includes(workspaceRole(user));
+export const isCoordinator = (user) => ['coordinator'].includes(workspaceRole(user));
+export const canWrite = (user) => ['write', 'datasteward', 'coordinator'].includes(workspaceRole(user));
+export const hasAccess = (user) => !!workspaceRole(user);

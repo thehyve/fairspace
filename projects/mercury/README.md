@@ -22,7 +22,7 @@ The necessary Keycloak credentials should be passed to the back-end using the fo
 |FAIRSPACE_SERVICE_ACCOUNT_PASSWORD|keycloak                 |
 
 
-The service account should be granted the following `realm-management` roles in the Fairspace realm: `view-realm`, `manage-realm`, `manage-authorization`.
+The service account should be granted the following `realm-management` roles in the Fairspace realm: `view-realm`, `manage-realm`, `manage-authorization`, `manage-users`.
 That holds for both development and production setups.
 In development mode it can be done through the Keycloak admin console running on `localhost:5100`. 
 

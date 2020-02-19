@@ -10,22 +10,23 @@ import {
     TableSortLabel,
 } from "@material-ui/core";
 
-import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
-import {Delete} from "@material-ui/icons";
+import {HighlightOffSharp} from "@material-ui/icons";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
-import LinkedDataContext from "../metadata/LinkedDataContext";
-import {addUser} from "./UsersAPI";
-import type {User} from './UsersAPI';
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import type {WorkspaceUser} from './UsersAPI';
 import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
-import WorkspaceUserContext from "../common/contexts/WorkspaceUserContext";
+import {grantUserRole} from "./UsersAPI";
+import {getDisplayName, hasAccess, isAdmin, isCoordinator} from "../common/utils/userUtils";
+import {UserContext} from "../common/contexts";
 
-const checkRole = (role: string) => (user: User) => user.roles.includes(role);
+const checkRole = (role: string) => (user: WorkspaceUser) => user.role === role;
 
 const columns = {
     name: {
@@ -36,56 +37,23 @@ const columns = {
         valueExtractor: 'email',
         label: 'Email'
     },
-    write: {
-        valueExtractor: checkRole('CanWrite'),
-        label: 'Write'
-    },
-    datasteward: {
-        valueExtractor: checkRole('DataSteward'),
-        label: 'Data steward'
-    },
-    sparql: {
-        valueExtractor: checkRole('SparqlUser'),
-        label: 'Sparql'
-    },
-    coordinator: {
-        valueExtractor: checkRole('Coordinator'),
-        label: 'Coordinator'
-    },
-
-};
-
-const toggleRole = (user: User, role: string) => {
-    const altUser = {...user, roles: [...user.roles]};
-    if (user.roles.includes(role)) {
-        altUser.roles.splice(altUser.roles.indexOf(role), 1);
-    } else {
-        altUser.roles.push(role);
+    role: {
+        valueExtractor: 'role',
+        label: 'Role'
     }
-    return addUser(altUser);
 };
 
-const removeUser = (user: User) => addUser({...user, roles: []});
-
-const addNewUser = (user: User) => addUser({...user, roles: ['CanRead']});
-
-const rolesToShow = ['CanWrite', 'DataSteward', 'SparqlUser', 'Coordinator'];
+const toggleRole = (user: WorkspaceUser, role: string) => (checkRole(role)(user) ? grantUserRole(user, 'none') : grantUserRole(user, role));
 
 const UserList = () => {
-    const {workspaceUser, refreshWorkspaceUser} = useContext(WorkspaceUserContext);
-    const {users, refresh: refreshUsers} = useContext(UsersContext);
-    const workspaceUsers = users.filter(u => u.roles.includes('CanRead'));
+    const {currentUser} = useContext(UserContext);
+    const {users, refresh} = useContext(UsersContext);
+    const workspaceUsers = users.filter(user => !!user.role);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsers, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const {isCoordinator} = useContext(LinkedDataContext);
+    const canManage = isAdmin(currentUser) || isCoordinator(currentUser);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
-    const refresh = (user) => () => {
-        if (user.iri === workspaceUser.iri) {
-            refreshWorkspaceUser();
-        }
-        refreshUsers();
-    };
 
     return (
         <>
@@ -110,38 +78,37 @@ const UserList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {pagedItems.map((user: User) => (
+                        {pagedItems.map((user: WorkspaceUser) => (
                             <TableRow
                                 key={user.iri}
                                 hover
                             >
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                    {user.name}
+                                    {getDisplayName(user)}
                                 </TableCell>
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                     {user.email}
                                 </TableCell>
-                                {
-                                    rolesToShow.map(role => (
-                                        <TableCell key={user.iri.concat(".", role)} style={{width: 100}}>
-                                            <Checkbox
-                                                checked={checkRole(role)(user)}
-                                                disabled={!isCoordinator}
-                                                onChange={() => toggleRole(user, role).then(refresh(user))}
-                                            />
-                                        </TableCell>
-                                    ))
-                                }
-                                <TableCell>
+                                <TableCell style={{width: 120}}>
+                                    <Select
+                                        value={user.role}
+                                        disabled={!canManage}
+                                        onChange={e => toggleRole(user, e.target.value).then(refresh)}
+                                        disableUnderline
+                                    >
+                                        { ['user', 'write', 'datasteward', 'coordinator'].map(role => (<MenuItem value={role}>{role}</MenuItem>))}
+                                    </Select>
+                                </TableCell>
+                                <TableCell style={{width: 32}}>
                                     <ConfirmationButton
-                                        onClick={() => removeUser(user).then(refresh(user))}
-                                        disabled={!isCoordinator}
+                                        onClick={() => grantUserRole(user, 'none').then(refresh)}
+                                        disabled={!canManage}
                                         message="Are you sure you want to remove this user from the workspace?"
                                         agreeButtonText="Remove user"
                                         dangerous
                                     >
-                                        <IconButton disabled={!isCoordinator}>
-                                            <Delete />
+                                        <IconButton disabled={!canManage}>
+                                            <HighlightOffSharp />
                                         </IconButton>
                                     </ConfirmationButton>
                                 </TableCell>
@@ -152,7 +119,7 @@ const UserList = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={users.length}
+                    count={workspaceUsers.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onChangePage={(e, p) => setPage(p)}
@@ -160,7 +127,7 @@ const UserList = () => {
                 />
             </Paper>
             {
-                isCoordinator
+                canManage
                     ? (
                         <Button
                             style={{marginTop: 8}}
@@ -186,7 +153,7 @@ const UserList = () => {
                 <DialogContent>
                     <UserSelect
                         autoFocus
-                        filter={user => user.roles.length === 0}
+                        filter={user => !user.role}
                         onChange={setUserToAdd}
                         placeholder="Please select a user"
                     />
@@ -195,7 +162,7 @@ const UserList = () => {
                     <Button
                         onClick={() => {
                             setShowAddUserDialog(false);
-                            addNewUser(userToAdd).then(refresh(userToAdd));
+                            grantUserRole(userToAdd, 'user').then(refresh);
                         }}
                         color="primary"
                         disabled={!userToAdd}
