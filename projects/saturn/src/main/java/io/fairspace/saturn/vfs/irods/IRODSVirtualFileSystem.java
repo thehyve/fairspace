@@ -8,6 +8,7 @@ import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -37,6 +38,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.riot.system.IRIResolver.checkIRI;
 
 public class IRODSVirtualFileSystem extends BaseFileSystem {
@@ -141,8 +143,7 @@ public class IRODSVirtualFileSystem extends BaseFileSystem {
 
     private AvuData createIri(Resource type) {
         var iri = generateMetadataIri();
-        dataset.executeWrite(() ->
-                update(dataset, storedQuery("register_external_resource", iri, type)));
+        dataset.executeWrite(() -> dataset.getDefaultModel().add(createResource(iri.getURI()), RDF.type, type));
         return new AvuData(FAIRSPACE_IRI_ATTRIBUTE, iri.getURI(), "");
     }
 
