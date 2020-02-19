@@ -3,12 +3,16 @@ package io.fairspace.saturn.services.metadata;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shacl.vocabulary.SHACLM;
+import org.apache.jena.vocabulary.RDF;
 
 import java.time.Instant;
 import java.util.Set;
@@ -19,6 +23,7 @@ import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 @AllArgsConstructor
 public
@@ -66,25 +71,33 @@ class MetadataEntityLifeCycleManager {
         // as well as permissions
         if (!newEntities.isEmpty()) {
             dataset.getNamedModel(graph.getURI()).add(generateCreationInformation(newEntities));
-
-            if(permissionsService != null) {
-                permissionsService.createResources(newEntities);
-            }
+            permissionsService.createResources(newEntities);
         }
     }
 
     boolean softDelete(Resource resource) {
-        if (permissionsService != null) {
-            permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
-        }
-        if (queryAsk(dataset, storedQuery("is_machine_only", resource, graph, vocabulary))) {
+        permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
+        var model = dataset.getNamedModel(graph.getURI());
+        resource = resource.inModel(model);
+        if (isMachineOnly(resource)) {
             throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
         }
-        if (queryAsk(dataset, storedQuery("can_be_marked_as_deleted", resource, graph, vocabulary))) {
-            update(dataset, storedQuery("soft_delete", resource, toXSDDateTimeLiteral(Instant.now()), getThreadContext().getUser().getIri(), graph));
+        if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
+            resource.addLiteral(FS.dateDeleted, toXSDDateTimeLiteral(Instant.now()));
+            resource.addProperty(FS.deletedBy, createResource(getThreadContext().getUser().getIri().getURI()));
             return true;
         }
         return false;
+    }
+
+    private boolean isMachineOnly(Resource resource) {
+        var voc = dataset.getNamedModel(vocabulary.getURI());
+        return resource.listProperties(RDF.type)
+                .mapWith(Statement::getObject)
+                .filterKeep(cl -> voc.listSubjectsWithProperty(SHACLM.targetClass, cl)
+                        .filterKeep(shape -> shape.hasLiteral(FS.machineOnly, true))
+                        .hasNext())
+                .hasNext();
     }
 
     /**

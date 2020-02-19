@@ -138,23 +138,6 @@ public class MetadataEntityLifeCycleManagerTest {
     }
 
     @Test
-    public void testMissingPermissionsService() {
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, userService);
-
-        Model delta = ModelFactory.createDefaultModel();
-        delta.add(resource, property, otherResource);
-
-        lifeCycleManager.updateLifecycleMetadata(delta);
-
-        // Ensure correct storage of creation information
-        assertTrue(model.contains(resource, createdBy, userResource));
-        assertFalse(model.contains(otherResource, createdBy, userResource));
-
-        // Ensure any permissions are ignored
-        verifyZeroInteractions(permissionsService);
-    }
-
-    @Test
     public void testSoftDelete() {
         model.add(resource, RDFS.label, createStringLiteral("label"));
 
