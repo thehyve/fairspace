@@ -93,15 +93,7 @@ app.use('/api/v1/workspaces/*/webdav', (req, res, next) => {
 });
 
 app.use(keycloak.middleware({logout: '/logout'}));
-
-let accessToken;
-
-// Grab a parsed token
-app.use('/**', keycloak.protect((token) => {
-    accessToken = token;
-    return true;
-}));
-
+app.use(keycloak.protect());
 app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}));
 
 // '/api/v1/workspaces/workspace/collections/' -> ['', 'api', 'v1', 'workspaces', 'workspace', 'collections', '']
@@ -126,12 +118,13 @@ const json = express.json();
 
 const WORKSPACE_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
 
-const createWorkspaceDatabase = (workspace) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${accessToken.token}`}})
+const createWorkspaceDatabase = (workspace, token) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${token}`}})
     .then(nodeResponse => { if (!nodeResponse.ok) { throw Error('Error creating workspace database'); }});
 
 // Create a new workspace
 app.put('/api/v1/workspaces', (req, res) => {
-    if (!accessToken.content.authorities.includes('organisation-admin')) {
+    const {token, content: {authorities}} = req.kauth.grant.access_token;
+    if (!authorities.includes('organisation-admin')) {
         res.status(403).send('Forbidden');
         return;
     }
@@ -159,7 +152,7 @@ app.put('/api/v1/workspaces', (req, res) => {
 
         // A workspace is created when it is accessed for the first time
         createWorkspaceRoles(config, workspace.id)
-            .then(() => createWorkspaceDatabase(workspace))
+            .then(() => createWorkspaceDatabase(workspace, token))
             .then(() => fetchWorkspaces())
             .then(() => res.status(200).send(workspace))
             .catch(e => {
@@ -172,7 +165,7 @@ app.put('/api/v1/workspaces', (req, res) => {
     });
 });
 
-const addToken = (proxyReq) => proxyReq.setHeader('Authorization', `Bearer ${accessToken.token}`);
+const addToken = (proxyReq, req) => proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
 app.use(proxy('/api/keycloak', {
     target: config.urls.keycloak,
@@ -195,21 +188,21 @@ app.use(proxy('/api/v1/search', {
     pathRewrite: (url) => `/${getWorkspaceId(url)}/_search`
 }));
 
-app.get('/api/v1/account', (req, res) => res.send({
-    id: accessToken.content.sub,
-    username: accessToken.content.preferred_username,
-    fullName: accessToken.content.name,
-    firstName: accessToken.content.given_name,
-    lastName: accessToken.content.family_name,
-    authorizations: accessToken.content.realm_access.roles
-}));
+app.get('/api/v1/account', (req, res) => {
+    const {content} = req.kauth.grant.access_token;
+    res.send({
+        id: content.sub,
+        username: content.preferred_username,
+        fullName: content.name,
+        firstName: content.given_name,
+        lastName: content.family_name,
+        authorizations: content.realm_access.roles
+    });
+});
 
 app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
-    if (!accessToken.content.authorities.includes('organisation-admin')
-        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)
-        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-datasteward`)
-        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-write`)
-        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-user`)) {
+    const {authorities} = req.kauth.grant.access_token.content;
+    if (!authorities.includes('organisation-admin') && !authorities.find(role => role.startsWith(`workspace-${req.params.workspace}-`))) {
         res.status(403).send('Forbidden');
         return;
     }
@@ -222,14 +215,15 @@ app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
 });
 
 app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res) => {
-    if (!accessToken.content.authorities.includes('organisation-admin')
-        && !accessToken.content.authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
+    const {token, content: {authorities}} = req.kauth.grant.access_token;
+    if (!authorities.includes('organisation-admin')
+        && !authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
         res.status(403).send('Forbidden');
         return;
     }
     setRole(config, req.params.workspace, req.params.userId, req.params.roleType)
         .then(user => fetch(`${getNodeUrl(req.originalUrl)}/api/v1/workspaces/${req.params.workspace}/users/`, {method: 'PUT',
-            headers: {Authorization: `Bearer ${accessToken.token}`},
+            headers: {Authorization: `Bearer ${token}`},
             body: JSON.stringify({id: user.id, email: user.email, name: fullname(user)})}))
         .then(nodeResponse => res.status(nodeResponse.ok ? 200 : 500).send())
         .catch(e => {
