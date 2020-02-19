@@ -300,7 +300,7 @@ export const normalizeMetadataResource = jsonLd => mapValues(
     values => (
         Array.isArray(values)
             ? values.map(v => {
-                if (isNonEmptyValue(v.value) || v.value === '') return v.value;
+                if (Object.prototype.hasOwnProperty.call(v, 'value')) return v.value;
                 return v.id || v;
             })
             : values

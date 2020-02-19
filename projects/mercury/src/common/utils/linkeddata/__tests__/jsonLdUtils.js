@@ -70,7 +70,7 @@ describe('json-ld Utils', () => {
             expect(Object.values(normalizeJsonLdResource({
                 a: [{'@value': 0, '@id': 'a'}, {'@value': false, '@id': 'b'}, {'@value': '', '@id': 'b'}],
             }))).toEqual([
-                [0, false, 'b']
+                [0, false, '']
             ]);
         });
     });

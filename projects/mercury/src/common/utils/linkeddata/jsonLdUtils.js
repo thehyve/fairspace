@@ -1,5 +1,4 @@
-import {mapValues} from 'lodash';
-import {isNonEmptyValue} from '../genericUtils';
+// @flow
 
 /**
  * Returns the value of the given property on the first entry of the predicate for the metadat
@@ -9,15 +8,15 @@ import {isNonEmptyValue} from '../genericUtils';
  * @param defaultValue      A default value to be returned if no value could be found for the metadata entry
  * @returns {*}
  */
-export const getFirstPredicateProperty = (metadataEntry, predicate, property, defaultValue) =>
+export const getFirstPredicateProperty = (metadataEntry: any, predicate: string, property: string, defaultValue: any): any =>
     // eslint-disable-next-line implicit-arrow-linebreak
     (metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue);
 
-export const getFirstPredicateValue = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
+export const getFirstPredicateValue = (metadataEntry: any, predicate: string, defaultValue: any): any => getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
 
-export const getFirstPredicateId = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
+export const getFirstPredicateId = (metadataEntry: any, predicate: string, defaultValue: any): any => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
 
-export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
+export const getFirstPredicateList = (metadataEntry: any, predicate: string, defaultValue: any): any => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
 
 /**
  * Normalize a JSON-LD resource by converting the values or iris into a single object
@@ -28,14 +27,13 @@ export const getFirstPredicateList = (metadataEntry, predicate, defaultValue) =>
  * @param jsonLd
  * @returns {{}}
  */
-export const normalizeJsonLdResource = jsonLd => mapValues(
-    jsonLd,
-    values => (
-        Array.isArray(values)
-            ? values.map(v => {
-                if (isNonEmptyValue(v['@value'])) return v['@value'];
-                return v['@id'] || v;
-            })
-            : values
-    )
-);
+export const normalizeJsonLdResource = (jsonLd: any): any => Object.getOwnPropertyNames(jsonLd).reduce((res: any, key: string) => {
+    const values = jsonLd[key];
+    res[key] = Array.isArray(values)
+        ? values.map((v: any) => {
+            if (Object.prototype.hasOwnProperty.call(v, '@value')) return v['@value'];
+            return v['@id'] || v;
+        })
+        : values;
+    return res;
+}, {});
