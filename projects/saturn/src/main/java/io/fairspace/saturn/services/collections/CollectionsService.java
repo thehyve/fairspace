@@ -68,9 +68,9 @@ public class CollectionsService {
     }
 
     public Collection getByLocation(String location) {
-        return getByLocationWithoutAccess(location)
+        return dao.getDataset().calculateRead(() -> getByLocationWithoutAccess(location)
                 .map(this::addPermissionsToObject)
-                .orElse(null);
+                .orElse(null));
     }
 
     private Optional<Collection> getByLocationWithoutAccess(String location) {
@@ -88,18 +88,20 @@ public class CollectionsService {
     }
 
     public List<Collection> list() {
-        var collections = dao.list(Collection.class);
+        return dao.getDataset().calculateRead(() -> {
+            var collections = dao.list(Collection.class);
 
-        var iris = collections.stream().map(Collection::getIri).collect(toList());
-        var userPermissions = permissions.getPermissions(iris);
+            var iris = collections.stream().map(Collection::getIri).collect(toList());
+            var userPermissions = permissions.getPermissions(iris);
 
-        return collections.stream()
-                .filter(c -> {
-                    c.setAccess(userPermissions.get(c.getIri()));
-                    return c.canRead();
-                })
-                .sorted(comparing(Collection::getName))
-                .collect(toList());
+            return collections.stream()
+                    .filter(c -> {
+                        c.setAccess(userPermissions.get(c.getIri()));
+                        return c.canRead();
+                    })
+                    .sorted(comparing(Collection::getName))
+                    .collect(toList());
+        });
     }
 
     public void delete(String iri) {

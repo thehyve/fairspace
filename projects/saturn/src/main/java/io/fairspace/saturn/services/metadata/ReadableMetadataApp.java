@@ -41,10 +41,6 @@ public class ReadableMetadataApp extends BaseApp {
                 res.type(mimeType);
                 return serializer.serialize(getMetadata(req));
             });
-            get("/entities/", mimeType, (req, res) -> {
-                res.type(mimeType);
-                return serializer.serialize(api.getByType(req.queryParams("type"), req.queryParams().contains("catalog")));
-            });
         });
         exception(TooManyTriplesException.class, exceptionHandler(SC_BAD_REQUEST, "Your query returned too many results"));
     }
