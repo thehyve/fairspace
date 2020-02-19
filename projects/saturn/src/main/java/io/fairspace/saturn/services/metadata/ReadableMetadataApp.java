@@ -48,8 +48,6 @@ public class ReadableMetadataApp extends BaseApp {
     protected Model getMetadata(Request req) {
         return api.get(
                 req.queryParams("subject"),
-                req.queryParams("predicate"),
-                req.queryParams("object"),
                 req.queryParams().contains("includeObjectProperties"));
     }
 }

@@ -8,16 +8,14 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.queryConstruct;
-import static io.fairspace.saturn.rdf.SparqlUtils.storedQuery;
 import static java.util.Optional.ofNullable;
-import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 /**
  * Sends an email to a user that gets access to a certain resource
@@ -67,13 +65,23 @@ public class PermissionNotificationHandler implements PermissionChangeEventHandl
     }
 
     private String getLabel(Node node) {
-        var stmts = queryConstruct(dataset, storedQuery("select_by_mask", defaultGraphIRI, node, RDFS.label, null)).listStatements();
-        return stmts.hasNext() ? stmts.nextStatement().getString() : "";
+        return dataset.getDefaultModel()
+                .asRDFNode(node)
+                .asResource()
+                .listProperties(RDFS.label)
+                .nextOptional()
+                .map(Statement::getString)
+                .orElse("");
     }
 
     private String getLocation(Node collection) {
-        var stmts = queryConstruct(dataset, storedQuery("select_by_mask", defaultGraphIRI, collection, FS.filePath, null)).listStatements();
-        return stmts.hasNext() ? stmts.nextStatement().getString() : "";
+        return dataset.getDefaultModel()
+                .asRDFNode(collection)
+                .asResource()
+                .listProperties(FS.filePath)
+                .nextOptional()
+                .map(Statement::getString)
+                .orElse("");
     }
 }
 
