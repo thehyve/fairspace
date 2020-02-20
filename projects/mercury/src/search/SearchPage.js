@@ -3,7 +3,7 @@ import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} fro
 import {getSearchQueryFromString, handleSearchError, LoadingInlay, MessageDisplay} from '../common';
 import {workspacePrefix} from "../workspaces/workspaces";
 import crossWorkspacesSearchAPI from "./CrossWorkspacesSearchAPI";
-import {FAIRSPACE_NS, METADATA_PATH, VOCABULARY_PATH} from "../constants";
+import {FAIRSPACE_NS, METADATA_PATH, VOCABULARY_PATH, WORKSPACE_URI} from "../constants";
 
 const styles = {
     tableRoot: {
@@ -18,8 +18,13 @@ const styles = {
 
 export const SearchPage = ({classes, items = [], loading, error, history}) => {
     const getEntityRelativeUrl = ({index, id, type}) => {
-        const entityClassType = type.startsWith(FAIRSPACE_NS) ? VOCABULARY_PATH : METADATA_PATH;
-        return `${workspacePrefix(index)}${entityClassType}?iri=` + encodeURIComponent(id);
+        if (type.startsWith(WORKSPACE_URI)) {
+            return workspacePrefix(index);
+        }
+        if (type.startsWith(FAIRSPACE_NS)) {
+            return `${workspacePrefix(index)}${VOCABULARY_PATH}?iri=` + encodeURIComponent(id);
+        }
+        return `${workspacePrefix(index)}${METADATA_PATH}?iri=` + encodeURIComponent(id);
     };
 
     /**
