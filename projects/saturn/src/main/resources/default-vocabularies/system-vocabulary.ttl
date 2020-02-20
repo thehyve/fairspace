@@ -33,20 +33,20 @@ fs:RDFS-Namespace a sh:PrefixDeclaration ;
    sh:namespace <http://www.w3.org/2000/01/rdf-schema#> .
 
 fs:XSD-Namespace a sh:PrefixDeclaration ;
-   sh:name "xsd: (XML Schema Definition)" ; 
+   sh:name "xsd: (XML Schema Definition)" ;
    sh:prefix "xsd" ;
    fs:fixedShape true ;
    sh:namespace <http://www.w3.org/2001/XMLSchema#> .
 
 fs:Schema-Namespace a sh:PrefixDeclaration ;
-   sh:name "schema: (schema.org)" ; 
+   sh:name "schema: (schema.org)" ;
    sh:prefix "schema" ;
    fs:fixedShape true ;
    fs:usableInVocabulary true ;
    sh:namespace <http://schema.org/> .
 
 fs:Fairspace-Namespace a sh:PrefixDeclaration ;
-   sh:name "fs: (Fairspace global)" ; 
+   sh:name "fs: (Fairspace global)" ;
    sh:prefix "fs" ;
    fs:fixedShape true ;
    sh:namespace <http://fairspace.io/ontology#> .
@@ -70,7 +70,7 @@ fs:FileShape a fs:ClassShape ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
     fs:fixedShape true ;
-    fs:systemProperties 
+    fs:systemProperties
         fs:fileSizeShape,
         fs:md5Shape,
         fs:filePathShape,
@@ -102,7 +102,7 @@ fs:DirectoryShape a fs:ClassShape ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
-    fs:systemProperties 
+    fs:systemProperties
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -219,16 +219,16 @@ fs:Workspace a fs:ClassShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:order 1 ;
-      ],
-      [
-        a fs:ExternalIRIPropertyShape ;
-        sh:path fs:workspaceExternalLink ;
-        sh:name "External links" ;
-        sh:description "External links that will be available from the homepage." ;
-        fs:externalLink true ;
-        sh:nodeKind sh:IRI ;
-        sh:order 2 ;
       ]
+#     ,[
+#        a fs:ExternalIRIPropertyShape ;
+#        sh:path fs:workspaceExternalLink ;
+#        sh:name "External links" ;
+#        sh:description "External links that will be available from the homepage." ;
+#        fs:externalLink true ;
+#        sh:nodeKind sh:IRI ;
+#        sh:order 2 ;
+#      ]
 .
 
 ## Property Shapes
@@ -257,15 +257,15 @@ fs:labelShape a fs:DatatypePropertyShape ;
     fs:importantProperty true ;
     sh:path rdfs:label;
     sh:order 0.
- 
+
 fs:commentShape a fs:DatatypePropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:fixedShape true ;
-    sh:path rdfs:comment . 
-     
+    sh:path rdfs:comment .
+
 fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:name "Date created" ;
     sh:description "Time at point of creation" ;
@@ -302,7 +302,7 @@ fs:connectionString a fs:DatatypePropertyShape ;
     fs:fixedShape true ;
     sh:path fs:connectionString .
 
-fs:filePathShape a fs:DatatypePropertyShape ; 
+fs:filePathShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:name "File path" ;
@@ -313,8 +313,8 @@ fs:filePathShape a fs:DatatypePropertyShape ;
     sh:path fs:filePath .
 
 fs:fileSizeShape a fs:DatatypePropertyShape ;
-    sh:name "File size" ; 
-    sh:description "File size in bytes" ; 
+    sh:name "File size" ;
+    sh:description "File size in bytes" ;
     sh:datatype xsd:long ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
@@ -322,8 +322,8 @@ fs:fileSizeShape a fs:DatatypePropertyShape ;
     sh:path fs:fileSize .
 
 fs:md5Shape a fs:DatatypePropertyShape ;
-    sh:name "MD5 checksum" ; 
-    sh:description "Hash uniquely identifying the content of this file" ; 
+    sh:name "MD5 checksum" ;
+    sh:description "Hash uniquely identifying the content of this file" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
@@ -345,7 +345,7 @@ fs:userEmailShape a fs:DatatypePropertyShape ;
 fs:createdByShape a sh:PropertyShape ;
     sh:name "Created By" ;
     sh:description "User that created this resource." ;
-    sh:class fs:User ; 
+    sh:class fs:User ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     fs:fixedShape true ;
@@ -354,7 +354,7 @@ fs:createdByShape a sh:PropertyShape ;
 fs:modifiedByShape a sh:PropertyShape ;
     sh:name "Last Modified By" ;
     sh:description "User that last modified this resource." ;
-    sh:class fs:User ; 
+    sh:class fs:User ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     fs:fixedShape true ;
@@ -363,7 +363,7 @@ fs:modifiedByShape a sh:PropertyShape ;
 fs:deletedByShape a sh:PropertyShape ;
     sh:name "Deleted By" ;
     sh:description "User that deleted this resource." ;
-    sh:class fs:User ; 
+    sh:class fs:User ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
     fs:fixedShape true ;
@@ -378,10 +378,10 @@ fs:ClassShape a sh:NodeShape .
 fs:DatatypePropertyShape a rdf:Class ;
     rdfs:subClassOf sh:PropertyShape .
 
-fs:ExternalIRIPropertyShape a rdf:Class ;
-    rdfs:subClassOf sh:PropertyShape .
+#fs:ExternalIRIPropertyShape a rdf:Class ;
+#    rdfs:subClassOf sh:PropertyShape .
 
-fs:ControlledVocabularyPropertyShape a rdf:Class ; 
+fs:ControlledVocabularyPropertyShape a rdf:Class ;
     rdfs:subClassOf sh:PropertyShape .
 
 fs:RelationShape a rdf:Class ;

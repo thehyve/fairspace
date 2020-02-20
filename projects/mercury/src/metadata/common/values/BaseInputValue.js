@@ -1,11 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import TextField from "@material-ui/core/TextField";
-
-import FormContext from "../FormContext";
 
 const BaseInputValue = ({entry: {value}, property, currentValues, style, onChange, ...otherProps}) => {
     const [localValue, setLocalValue] = useState(value);
-    const {submit} = useContext(FormContext);
 
     useEffect(() => {
         setLocalValue(value);
@@ -38,15 +35,11 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
                     otherProps.onBlur(e);
                 }
             }}
-            onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                    // If multiline and with ctrl key or if both are false
-                    if (e.ctrlKey === property.multiLine) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        updateOuterState(e.target.value);
-                        submit();
-                    }
+            onKeyUp={(e) => {
+                if (property.maxValuesCount === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    updateOuterState(e.target.value);
                 }
             }}
             style={{...style, marginTop: 0, width: '100%'}}

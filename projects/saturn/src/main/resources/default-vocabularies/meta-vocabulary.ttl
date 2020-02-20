@@ -33,7 +33,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:class sh:PropertyShape ;
         sh:minCount 1 ;
         sh:path sh:property ;
-        sh:name "Properties" ; 
+        sh:name "Properties" ;
         sh:description "List of all properties and relations for this class." ;
         fs:inverseRelation fs:domainIncludes ;
         sh:order 3
@@ -44,7 +44,7 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
         sh:nodeKind sh:IRI ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:path sh:targetClass ; 
+        sh:path sh:targetClass ;
         sh:name "Target class" ;
         fs:importantProperty true ;
         sh:description "IRI of the class this shape constrains." ;
@@ -62,42 +62,42 @@ fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:targetClass fs:ClassShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
-fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "Shape of FS defined properties." ;
-    sh:name "External IRI Property" ;
-    sh:property
-        fs:PropertyNameShape, 
-        fs:MinCountShape,
-        fs:MaxCountShape, 
-        fs:DescriptionShape,
-        fs:ImportantPropertyShape,
-        fs:PathShape,
-        fs:domainIncludes,
-    [
-        sh:maxCount 1 ;
-        sh:minCount 1 ;
-        sh:path sh:nodeKind ;
-        sh:name "Property node kind" ;
-        sh:in ( sh:IRI )
-    ], [
-        sh:datatype xsd:boolean ;
-        sh:maxCount 1 ;
-        sh:path fs:externalLink ;
-        sh:name "Show as external link" ;
-        sh:description "If this flag is set to true, a link to a IRI for this property will not be loaded in the metadata editor"
-    ] ;
-    sh:targetClass fs:ExternalIRIPropertyShape ;
-    sh:ignoredProperties <ignoredPropertiesCollection> .
+#fs:ExternalIRIPropertyShapeMetaShape a sh:NodeShape ;
+#    sh:closed true ;
+#    sh:description "Shape of FS defined properties." ;
+#    sh:name "External IRI Property" ;
+#    sh:property
+#        fs:PropertyNameShape,
+#        fs:MinCountShape,
+#        fs:MaxCountShape,
+#        fs:DescriptionShape,
+#        fs:ImportantPropertyShape,
+#        fs:PathShape,
+#        fs:domainIncludes,
+#    [
+#        sh:maxCount 1 ;
+#        sh:minCount 1 ;
+#        sh:path sh:nodeKind ;
+#        sh:name "Property node kind" ;
+#        sh:in ( sh:IRI )
+#    ], [
+#        sh:datatype xsd:boolean ;
+#        sh:maxCount 1 ;
+#        sh:path fs:externalLink ;
+#        sh:name "Show as external link" ;
+#        sh:description "If this flag is set to true, a link to a IRI for this property will not be loaded in the metadata editor"
+#    ] ;
+#    sh:targetClass fs:ExternalIRIPropertyShape ;
+#    sh:ignoredProperties <ignoredPropertiesCollection> .
 
 fs:DatatypePropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Shape of FS defined properties." ;
     sh:name "Datatype Property" ;
-    sh:property 
-        fs:PropertyNameShape, 
+    sh:property
+        fs:PropertyNameShape,
         fs:MinCountShape,
-        fs:MaxCountShape, 
+        fs:MaxCountShape,
         fs:DescriptionShape,
         fs:ImportantPropertyShape,
         fs:PathShape,
@@ -117,7 +117,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Shape of FS defined properties." ;
     sh:name "Controlled Vocabulary Property" ;
-    sh:property 
+    sh:property
         fs:PropertyNameShape,
         fs:MinCountShape,
         fs:MaxCountShape,
@@ -135,7 +135,7 @@ fs:ControlledVocabularyPropertyShapeMetaShape a sh:NodeShape ;
             sh:path ( [ sh:zeroOrMorePath rdf:rest ] rdf:first ) ;
             sh:minLength 1 ;
         ] ;
-        sh:order 3 
+        sh:order 3
     ] ;
     sh:targetClass fs:ControlledVocabularyPropertyShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
@@ -144,11 +144,11 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
     sh:description "Shape of FS defined relations." ;
     sh:name "Relation" ;
-    sh:property 
-        fs:inverseRelationShape, 
-        fs:PropertyNameShape, 
+    sh:property
+        fs:inverseRelationShape,
+        fs:PropertyNameShape,
         fs:MinCountShape,
-        fs:MaxCountShape, 
+        fs:MaxCountShape,
         fs:DescriptionShape,
         fs:PathShape,
         fs:relationDomainIncludes,
@@ -168,7 +168,7 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
     sh:ignoredProperties <ignoredPropertiesCollection> .
 
 sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
-    sh:targetClass sh:PrefixDeclaration ; 
+    sh:targetClass sh:PrefixDeclaration ;
     sh:closed true ;
     sh:description "Add a namespace with a preferred prefix that can be used within the workspace to shorten IRIs" ;
     sh:name "Namespace" ;
@@ -212,7 +212,7 @@ sh:PrefixDeclaration a sh:NodeShape, rdfs:Class ;
         ] ,
         [
           sh:name "Default namespace" ;
-          sh:description "When a user creates a new resource, a default namespace will be selected automatically" ; 
+          sh:description "When a user creates a new resource, a default namespace will be selected automatically" ;
           sh:maxCount 1 ;
           sh:datatype xsd:boolean ;
           sh:path fs:defaultNamespace
@@ -225,12 +225,12 @@ fs:inverseRelationShape a fs:RelationShape ;
     sh:maxCount 1 ;
     sh:name "Inverse relation" ;
     sh:description "An inverse relation has at most a single relation shape instance as value. A shape with sh:path P1 and fs:inverseRelationShape S2 with sh:path P2 has equivalent meaning as P1 owl:inverseOf P2." ;
-    sh:path fs:inverseRelation . 
+    sh:path fs:inverseRelation .
 
 fs:domainIncludes a fs:RelationShape ;
     fs:inverseRelation [
         a sh:PropertyShape ;
-        sh:path sh:property 
+        sh:path sh:property
         ] ;
     sh:path fs:domainIncludes ;
     sh:class fs:ClassShape ;
@@ -257,7 +257,7 @@ fs:relationDomainIncludes a fs:RelationShape ;
 fs:fixedShapeShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path fs:fixedShape ;
-    fs:machineOnly true ; 
+    fs:machineOnly true ;
     sh:maxCount 1 ;
     sh:name "Fixed shape" ;
     sh:description "If this is true, a user can not make changes to this shape definition." .
@@ -265,11 +265,11 @@ fs:fixedShapeShape a fs:DatatypePropertyShape ;
 fs:singleLineShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path dash:singleLine ;
-    sh:maxCount 1 ; 
+    sh:maxCount 1 ;
     sh:name "Single line input (for string only)" ;
     sh:description "Restricts the input field for this string field to a single line." .
 
-fs:machineOnlyShape a fs:DatatypePropertyShape ; 
+fs:machineOnlyShape a fs:DatatypePropertyShape ;
     sh:datatype xsd:boolean ;
     sh:path fs:machineOnly ;
     fs:machineOnly true ;
@@ -287,7 +287,7 @@ fs:ShapeIsAClosedShape a sh:PropertyShape ;
   sh:description "A fs:ClassShape shape cannot be defined as sh:closed true." ;
   sh:path sh:closed .
 
-fs:PathShape a sh:PropertyShape ; 
+fs:PathShape a sh:PropertyShape ;
   sh:maxCount 1 ;
   sh:minCount 1 ;
   sh:path sh:path ;
@@ -306,7 +306,7 @@ fs:PropertyNameShape a sh:PropertyShape ;
   fs:importantProperty true ;
   sh:order 1 .
 
-fs:DescriptionShape a sh:PropertyShape ; 
+fs:DescriptionShape a sh:PropertyShape ;
   sh:datatype xsd:string ;
   sh:maxCount 1 ;
   sh:minCount 1 ;
@@ -315,7 +315,7 @@ fs:DescriptionShape a sh:PropertyShape ;
   fs:importantProperty true ;
   sh:order 2 .
 
-fs:MinCountShape a sh:PropertyShape ; 
+fs:MinCountShape a sh:PropertyShape ;
   sh:datatype xsd:integer ;
   sh:path sh:minCount ;
   sh:maxInclusive 1 ;
@@ -324,14 +324,14 @@ fs:MinCountShape a sh:PropertyShape ;
   sh:name "Minimum number of values" ;
   sh:order 9 .
 
-fs:MaxCountShape a sh:PropertyShape ; 
+fs:MaxCountShape a sh:PropertyShape ;
   sh:datatype xsd:integer ;
   sh:path sh:maxCount ;
   sh:maxCount 1 ;
   sh:greaterThanOrEquals sh:minCount ;
   sh:minInclusive 1 ;
-  sh:name "Maximum number of values" ; 
-  sh:order 10 . 
+  sh:name "Maximum number of values" ;
+  sh:order 10 .
 
 fs:ImportantPropertyShape a sh:PropertyShape ;
   sh:datatype xsd:boolean ;
@@ -354,7 +354,7 @@ fs:DatatypeShape a sh:PropertyShape ;
 fs:ClassShape a sh:NodeShape .
 fs:DatatypePropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:ControlledVocabularyPropertyShape rdfs:subClassOf sh:PropertyShape .
-fs:ExternalIRIPropertyShape rdfs:subClassOf sh:PropertyShape .
+#fs:ExternalIRIPropertyShape rdfs:subClassOf sh:PropertyShape .
 fs:RelationShape rdfs:subClassOf sh:PropertyShape .
 
 # Definition for property shape, used to render a table with properties

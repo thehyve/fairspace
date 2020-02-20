@@ -23,7 +23,7 @@ const LinkedDataEntityFormContainer = ({
     const {
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid
-    } = useFormData(values);
+    } = useFormData(values, properties);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
@@ -42,7 +42,6 @@ const LinkedDataEntityFormContainer = ({
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
-
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
 
@@ -51,21 +50,32 @@ const LinkedDataEntityFormContainer = ({
 
     const formId = `entity-form-${subject}`;
     let footer;
-
     if (isUpdating) {
         footer = <CircularProgress />;
     } else if (canEdit) {
         footer = (
-            <Button
-                type="submit"
-                form={formId}
-                variant={fullpage ? 'contained' : 'text'}
-                color="primary"
-                onClick={validateAndSubmit}
-                disabled={!hasFormUpdates || !isValid}
-            >
-                Update
-            </Button>
+            <div>
+                <Button
+                    type="submit"
+                    form={formId}
+                    variant={fullpage ? 'contained' : 'text'}
+                    color="primary"
+                    onClick={validateAndSubmit}
+                    disabled={!hasFormUpdates || !isValid}
+                >
+                    Update
+                </Button>
+                {editable && showEditButtons && (
+                    <Button
+                        color="default"
+                        onClick={() => {
+                            clearForm();
+                            setEditingEnabled(false);
+                        }}
+                    >Cancel
+                    </Button>
+                )}
+            </div>
         );
     }
 
@@ -108,17 +118,7 @@ const LinkedDataEntityFormContainer = ({
             </Grid>
             {showEditButtons ? (
                 <Grid item xs={1}>
-                    {canEdit ? (
-                        <Button
-                            type="submit"
-                            color="primary"
-                            onClick={() => {
-                                clearForm();
-                                setEditingEnabled(false);
-                            }}
-                        >Cancel
-                        </Button>
-                    ) : (
+                    {!canEdit && (
                         <IconButton
                             aria-label="Edit"
                             onClick={() => {
