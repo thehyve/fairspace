@@ -6,11 +6,11 @@ import useIsMounted from 'react-is-mounted-hook';
 import {compareBy} from '../../../common';
 
 const Dropdown = ({
-    options, clearTextOnSelection = true, placeholder, async,
+    options = null, clearTextOnSelection = true, placeholder,
     loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value,
     autoFocus = false, ...otherProps
 }) => {
-    const [optionsToShow, setOptionsToShow] = useState(async && options ? options : []);
+    const [optionsToShow, setOptionsToShow] = useState(options);
     const [searchText, setSearchText] = useState('');
     const [touched, setTouched] = useState(loadOptionsOnMount);
 
@@ -18,22 +18,23 @@ const Dropdown = ({
 
     useEffect(() => {
         if (isMounted()) {
-            if (async && loadOptions && touched) {
-                loadOptions(searchText)
+            if (loadOptions && touched) {
+                loadOptions(searchText.length < 3 ? '' : searchText)
                     .then(setOptionsToShow);
-            } else {
-                setOptionsToShow(options);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [async, searchText, options, touched]);
+    }, [searchText, touched]);
 
     const inputProps = (params) => ({
         ...params.inputProps,
         value: searchText,
         onChange: (e) => isMounted() && setSearchText(e.target.value),
+        onFocus: () => setTouched(true),
         onClick: () => setTouched(true)
     });
+
+    const inputRef = React.createRef();
 
     return (
         <Autocomplete
@@ -41,11 +42,15 @@ const Dropdown = ({
             value={value}
             onChange={(e, v) => {
                 onChange(v);
-                if (clearTextOnSelection && isMounted()) {
+                if (isMounted() && clearTextOnSelection) {
                     setSearchText('');
                 }
+                inputRef.current.blur();
             }}
-            options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : optionsToShow}
+            blurOnSelect
+            loading={optionsToShow == null}
+            onOpen={() => setTouched(true)}
+            options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : []}
             getOptionDisabled={option => (isOptionDisabled && isOptionDisabled(option))}
             getOptionLabel={option => option.label}
             renderInput={(params) => (
@@ -54,6 +59,7 @@ const Dropdown = ({
                     fullWidth
                     {...params}
                     inputProps={clearTextOnSelection ? inputProps(params) : params.inputProps}
+                    inputRef={inputRef}
                 />
             )}
         />
