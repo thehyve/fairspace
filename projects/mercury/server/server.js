@@ -177,10 +177,22 @@ app.use(proxy('/api/keycloak', {
 // Cross workspaces search
 app.get('/api/v1/search/_all', (req, res) => {
     const {query} = req.query;
-    elasticsearchClient.retrieveSearchTypes()
-        .then(types => elasticsearchClient.crossWorkspacesSearch(query, types))
+    const indices = req.kauth.grant.access_token.content.authorities
+        .filter(auth => auth.startsWith('workspace-'))
+        .map(auth => auth.split('-')[1]);
+
+    elasticsearchClient.retrieveSearchTypes(indices)
+        .then(types => elasticsearchClient.crossWorkspacesSearch(query, types, indices))
         .then(result => res.send(result).end())
         .catch(e => console.error('Error retrieving cross-workspace search results.', e));
+});
+
+app.use(['/api/v1/workspaces/:workspace/**', '/api/v1/search/:workspace/**'], (req, res, next) => {
+    if (req.kauth.grant.access_token.content.authorities.find(auth => auth.startsWith(`workspace-${req.params.workspace}-`))) {
+        next();
+    } else {
+        res.status(403).send('Forbidden');
+    }
 });
 
 app.use(proxy('/api/v1/search', {
@@ -231,7 +243,6 @@ app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res
             res.status(500).send('Internal server error');
         });
 });
-
 
 app.use(proxy('/api/v1/workspaces/*/**', {
     target: 'http://never.ever',

@@ -105,9 +105,9 @@ class ElasticsearchClient {
         }).then(items => this.mapWorkspaceSearchItems(items));
     }
 
-    retrieveSearchTypes() {
+    retrieveSearchTypes(indices) {
         return this.client.search({
-            index: "_all",
+            index: indices.join(','),
             body: {
                 query: {
                     bool: {
@@ -128,7 +128,7 @@ class ElasticsearchClient {
         }).then(items => this.transformESAggregates(items));
     }
 
-    crossWorkspacesSearch(query, types) {
+    crossWorkspacesSearch(query, types, indices) {
         const esQuery = {
             bool: {
                 must: [{
@@ -149,7 +149,7 @@ class ElasticsearchClient {
             }
         };
         return this.client.search({
-            index: "_all",
+            index: indices.join(','),
             body: {
                 size: 10000,
                 from: 0,
