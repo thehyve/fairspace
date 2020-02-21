@@ -4,6 +4,7 @@ import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRo
 import ClearIcon from '@material-ui/icons/Clear';
 
 import {canDelete} from "../../common/utils/linkeddata/metadataUtils";
+import {STRING_URI} from '../../constants';
 
 const styles = {
     buttonColumn: {
@@ -22,7 +23,13 @@ const styles = {
 export const LinkedDataValuesTable = ({classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
-    const showRowDividers = property.maxValuesCount !== 1;
+    const showRowDividers = property.maxValuesCount !== 1 && !(property.isEditable && property.datatype === STRING_URI);
+
+    // The serial number is used to initialise a fresh 'add component' after adding or
+    // deleting an item, in order to update the list of options correctly.
+    const [serialNumber, setSerialNumber] = useState(0);
+
+    const incrementSerialNumber = () => setSerialNumber(serialNumber + 1);
 
     return (
         <Table padding="none" className={showRowDividers ? '' : classes.noRowDividers}>
@@ -56,7 +63,7 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                                         <IconButton
                                             data-testid="delete-btn"
                                             title="Delete"
-                                            onClick={() => onDelete(idx)}
+                                            onClick={() => {onDelete(idx); incrementSerialNumber();}}
                                             style={{opacity: hoveredIndex === idx ? 1 : 0}}
                                             aria-label="Delete"
                                         >
@@ -76,12 +83,14 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                     <TableRow>
                         <TableCell colSpan={columnDefinitions.length} style={{borderBottom: 'none'}}>
                             <AddComponent
+                                key={serialNumber}
                                 property={property}
                                 currentValues={values}
                                 placeholder=""
                                 onChange={val => {
                                     if (val) {
                                         onAdd(val);
+                                        incrementSerialNumber();
                                     }
                                 }}
                                 aria-labelledby={labelId}
