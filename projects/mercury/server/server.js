@@ -183,6 +183,14 @@ app.get('/api/v1/search/_all', (req, res) => {
         .catch(e => console.error('Error retrieving cross-workspace search results.', e));
 });
 
+app.use('/api/v1/*/:workspace/**', (req, res, next) => {
+    if (req.kauth.grant.access_token.content.authorities.find(auth => auth.startsWith(`workspace-${req.params.workspace}-`))) {
+        next();
+    } else {
+        res.status(403).send('Forbidden');
+    }
+});
+
 app.use(proxy('/api/v1/search', {
     target: config.urls.elasticsearch,
     pathRewrite: (url) => `/${getWorkspaceId(url)}/_search`
@@ -231,7 +239,6 @@ app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res
             res.status(500).send('Internal server error');
         });
 });
-
 
 app.use(proxy('/api/v1/workspaces/*/**', {
     target: 'http://never.ever',
