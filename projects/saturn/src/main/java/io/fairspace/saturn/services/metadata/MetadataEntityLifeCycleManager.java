@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import static io.fairspace.saturn.ThreadContext.getThreadContext;
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;

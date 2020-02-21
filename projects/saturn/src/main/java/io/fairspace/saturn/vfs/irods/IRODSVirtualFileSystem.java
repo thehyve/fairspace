@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static io.fairspace.saturn.rdf.SparqlUtils.*;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static org.apache.commons.io.IOUtils.copyLarge;

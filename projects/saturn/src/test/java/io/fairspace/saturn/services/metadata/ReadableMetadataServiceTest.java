@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
-import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -16,8 +15,7 @@ import org.junit.Test;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ReadableMetadataServiceTest {
     private static final String userVocabularyURI = "http://localhost/iri/user-vocabulary";
@@ -44,35 +42,31 @@ public class ReadableMetadataServiceTest {
 
     @Test
     public void get() {
-        assertEquals(0, api.get(null, null, null, false).size());
+        assertEquals(0, api.get(null, false).size());
 
         ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
-        Model m1 = api.get(null, null, null, false);
+        Model m1 = api.get(null, false);
         assertEquals(2, m1.size());
         assertTrue(m1.contains(STMT1));
         assertTrue(m1.contains(STMT2));
 
-        Model m2 = api.get(S1.getURI(), null, null, false);
+        Model m2 = api.get(S1.getURI(), false);
         assertEquals(1, m2.size());
         assertTrue(m2.contains(STMT1));
 
-        Model m3 = api.get(null, P1.getURI(), null, false);
+        Model m3 = api.get(null, false);
         assertEquals(2, m3.size());
         assertTrue(m3.contains(STMT1));
         assertTrue(m3.contains(STMT2));
 
-        Model m4 = api.get(null, null, S2.getURI(), false);
-        assertEquals(1, m4.size());
-        assertTrue(m4.contains(STMT1));
-
-        Model m5 = api.get(S3.getURI(), null, null, false);
+        Model m5 = api.get(S3.getURI(), false);
         assertTrue(m5.isEmpty());
     }
 
     @Test
     public void getWithImportantPropertiesReturnsFullModel() {
-        assertEquals(0, api.get(null, null, null, true).size());
+        assertEquals(0, api.get(null, true).size());
 
         ds.executeWrite(() -> {
             ds.getNamedModel(GRAPH)
@@ -82,7 +76,7 @@ public class ReadableMetadataServiceTest {
         });
 
         // Fetching the whole model should work with object properties as well
-        Model m1 = api.get(null, null, null, true);
+        Model m1 = api.get(null, true);
         assertEquals(4, m1.size());
         assertTrue(m1.contains(STMT1));
         assertTrue(m1.contains(STMT2));
@@ -99,7 +93,7 @@ public class ReadableMetadataServiceTest {
         });
 
         // Fetching the whole model should work with object properties as well
-        Model m1 = api.get(null, null, null, true);
+        Model m1 = api.get(null, true);
         assertEquals(4, m1.size());
         assertTrue(m1.contains(STMT1));
         assertTrue(m1.contains(STMT2));
@@ -109,42 +103,41 @@ public class ReadableMetadataServiceTest {
 
     @Test
     public void getWithImportantPropertiesIncludesImportantProperties() {
-        Statement createdBy = createStatement(S3, FS.createdBy, createStringLiteral("unit test"));
-        Statement dateCreated = createStatement(S3, FS.dateCreated, createStringLiteral("yesterday"));
-        Statement md5 = createStatement(S3, FS.md5, createStringLiteral("some-hash"));
+        var someProperty = createProperty("http://ex.com/some");
+        var importantProperty = createProperty("http://ex.com/important");
+        var unimportantProperty = createProperty("http://ex.com/unimportant");
+
+
+        var clazz = createResource("http://ex.com/Class");
+        var clazzShape = createResource("http://ex.com/ClassShape");
+        var importantPropertyShape = createResource("http://ex.com/importantShape");
+        var unimportantPropertyShape = createResource("http://ex.com/unimportantShape");;
 
         ds.executeWrite(() -> {
             setupImportantProperties();
+
+            ds.getNamedModel(userVocabularyURI)
+                    .add(clazzShape, SHACLM.targetClass, clazz)
+                    .add(clazzShape, SHACLM.property, importantPropertyShape)
+                    .add(importantPropertyShape, SHACLM.path, importantProperty)
+                    .addLiteral(importantPropertyShape, FS.importantProperty, true)
+                    .add(clazzShape, SHACLM.property, unimportantPropertyShape)
+                    .add(unimportantPropertyShape, SHACLM.path, unimportantProperty);
+
             ds.getNamedModel(GRAPH)
-                    .add(STMT1).add(STMT2)
-                    .add(LBL_STMT1).add(LBL_STMT2)
-                    .add(createdBy).add(dateCreated).add(md5);
+                    .add(S1, someProperty, S2)
+                    .add(S2, RDF.type, clazz)
+                    .add(S2, unimportantProperty, S3)
+                    .add(S2, importantProperty, S3);
         });
 
-        // The important properties of any related object should be returned as well
-        // In this case we expect the important properties of S2 to be returned
-        Model m2 = api.get(S1.getURI(), null, null, true);
-        assertEquals(3, m2.size());
-        assertTrue(m2.contains(STMT1));
-        assertTrue(m2.contains(LBL_STMT1));
-        assertTrue(m2.contains(LBL_STMT2));
 
-        // The important properties of any related object should be returned as well
-        // In this case we expect the important properties of S2 and S3 to be returned
-        // Only createdBy is marked as fs:importantProperty = true in the vocabulary
-        Model m3 = api.get(null, P1.getURI(), null, true);
-        assertEquals(4, m3.size());
-        assertTrue(m3.contains(STMT1));
-        assertTrue(m3.contains(STMT2));
-        assertTrue(m3.contains(LBL_STMT2));
-        assertTrue(m3.contains(createdBy));
+        var result = api.get(S1.getURI(), true);
 
-        // The important property of any related object should be returned as well
-        // In this case we expect the important properties of S2 to be returned
-        Model m4 = api.get(null, null, S2.getURI(), true);
-        assertEquals(2, m4.size());
-        assertTrue(m4.contains(STMT1));
-        assertTrue(m4.contains(LBL_STMT2));
+        assertEquals(2, result.size());
+        assertTrue(result.contains(S1, someProperty, S2));
+        assertTrue(result.contains(S2, importantProperty, S3));
+        assertFalse(result.contains(S2, unimportantProperty, S3));
     }
 
     @Test(expected = TooManyTriplesException.class)
@@ -152,39 +145,7 @@ public class ReadableMetadataServiceTest {
         api = new ReadableMetadataService(ds, createURI(GRAPH), createURI(userVocabularyURI), 1);
         ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
 
-        api.get(null, null, null, false);
-    }
-
-    private void setupModelForTypes() {
-        Resource personConsent = createResource("http://fairspace.io/ontology#PersonConsent");
-        Resource personConsentEx = createResource("http://fairspace.io/ontology#PersonConsentEx");
-        Resource researchProject = createResource("http://fairspace.io/ontology#ResearchProject");
-        Property targetClass = createProperty("http://www.w3.org/ns/shacl#targetClass");
-        Resource personConsentShape = createProperty("http://fairspace.io/ontology#PersonConsentShape");
-        Resource personConsentExShape = createProperty("http://fairspace.io/ontology#PersonConsentExShape");
-        Resource researchShape = createProperty("http://fairspace.io/ontology#ResearchProjectShape");
-        Resource user = createProperty("http://fairspace.io/ontology#User");
-        Resource userShape = createProperty("http://fairspace.io/ontology#UserShape");
-
-        // Setup the model
-        ds.executeWrite(() -> {
-            ds.getNamedModel(GRAPH)
-                    .add(S1, RDF.type, personConsentEx)
-                    .add(LBL_STMT1)
-                    .add(S2, RDF.type, researchProject)
-                    .add(createResource("http://example.com/unknown"), RDF.type, createResource("http://fairspace.io/ontology#Unknown"))
-                    .add(createResource("http://example.com/person"), RDF.type, FOAF.Person)
-                    .add(createResource("http://example.com/user"), RDF.type, user);
-
-            // Mark personConsent and researchProject as fairspace entities
-            ds.getNamedModel(userVocabularyURI)
-                    .add(personConsentShape, targetClass, personConsent)
-                    .add(personConsentExShape, targetClass, personConsentEx)
-                    .add(researchShape, targetClass, researchProject)
-                    .add(userShape, targetClass, user)
-                    .addLiteral(userShape, FS.machineOnly, true)
-                    .add(personConsentEx, RDFS.subClassOf, personConsent);
-        });
+        api.get(null, false);
     }
 
     private void setupImportantProperties() {

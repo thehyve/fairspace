@@ -68,7 +68,7 @@ public class ChangeableMetadataServiceTest {
 
         api.put(delta);
 
-        Model result = api.get(null, null, null, false);
+        Model result = api.get(null, false);
         assertTrue(result.contains(STMT1) && result.contains(STMT2));
     }
 
