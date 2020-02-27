@@ -50,7 +50,8 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
     };
 
     render() {
-        const {classes, collection, loading, atLeastSingleCollectionExists, inCollectionsBrowser, path} = this.props;
+        const {classes, collection, loading, atLeastSingleCollectionExists, setHasCollectionMetadataUpdates,
+            inCollectionsBrowser, path} = this.props;
 
         const paths = pathHierarchy(path);
 
@@ -93,6 +94,7 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
                         <LinkedDataEntityFormWithLinkedData
                             subject={collection.iri}
                             isMetaDataEditable={isMetaDataEditable}
+                            setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
                         />
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
