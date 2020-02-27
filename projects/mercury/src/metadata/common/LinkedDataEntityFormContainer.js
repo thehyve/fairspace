@@ -15,7 +15,7 @@ import {DATE_DELETED_URI, WORKSPACE_INFO_URI} from "../../constants";
 
 const LinkedDataEntityFormContainer = ({
     subject, editable = true, showEditButtons = false, fullpage = false,
-    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, ...otherProps
+    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons);
     const {submitLinkedDataChanges, extendProperties, hasEditRight, isCoordinator} = useContext(LinkedDataContext);
@@ -24,6 +24,8 @@ const LinkedDataEntityFormContainer = ({
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid
     } = useFormData(values, properties);
+
+    setHasUpdates(hasFormUpdates);
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
@@ -139,7 +141,7 @@ LinkedDataEntityFormContainer.propTypes = {
 };
 
 
-export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}) => {
+export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable, setHasCollectionMetadataUpdates}) => {
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
     return (
@@ -151,6 +153,7 @@ export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable}
             linkedDataLoading={linkedDataLoading}
             linkedDataError={linkedDataError}
             updateLinkedData={updateLinkedData}
+            setHasUpdates={setHasCollectionMetadataUpdates}
         />
     );
 };

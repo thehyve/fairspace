@@ -35,10 +35,13 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
 const useFormData = (values, initialProperties = []) => {
     const [updates, setUpdates] = useState({});
     const {validateProperty, validationErrors, isValid} = useValidation();
-    const [formValues, setFormValues] = useState({...values});
+    const [formValues, setFormValues] = useState(values);
+
+    const resetUpdates = () => setUpdates({});
 
     useDeepCompareEffect(() => {
         populateDefaultFormValues(initialProperties, values, setFormValues);
+        resetUpdates();
     }, [initialProperties, values]);
 
     const hasFormUpdates = Object.keys(updates).length > 0;
