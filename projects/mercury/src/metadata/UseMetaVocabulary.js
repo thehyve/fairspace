@@ -16,7 +16,7 @@ const UseMetaVocabulary = () => {
                 setShapesError(false);
             })
             .catch(() => {
-                setShapesError('An error occurred while loading the meta vocbulary');
+                setShapesError('An error occurred while loading the meta vocabulary');
             });
     }, []);
 

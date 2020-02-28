@@ -3,7 +3,8 @@ import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} fro
 import {getSearchQueryFromString, handleSearchError, LoadingInlay, MessageDisplay} from '../common';
 import {workspacePrefix} from "../workspaces/workspaces";
 import crossWorkspacesSearchAPI from "./CrossWorkspacesSearchAPI";
-import {FAIRSPACE_NS, METADATA_PATH, VOCABULARY_PATH, WORKSPACE_URI} from "../constants";
+import {METADATA_PATH, WORKSPACE_URI} from "../constants";
+import {Link} from "react-router-dom";
 
 const styles = {
     tableRoot: {
@@ -18,11 +19,8 @@ const styles = {
 
 export const SearchPage = ({classes, items = [], loading, error, history}) => {
     const getEntityRelativeUrl = ({index, id, type}) => {
-        if (type.startsWith(WORKSPACE_URI)) {
+        if (type === WORKSPACE_URI) {
             return workspacePrefix(index);
-        }
-        if (type.startsWith(FAIRSPACE_NS)) {
-            return `${workspacePrefix(index)}${VOCABULARY_PATH}?iri=` + encodeURIComponent(id);
         }
         return `${workspacePrefix(index)}${METADATA_PATH}?iri=` + encodeURIComponent(id);
     };
@@ -73,7 +71,14 @@ export const SearchPage = ({classes, items = [], loading, error, history}) => {
                                     {item.label}
                                 </TableCell>
                                 <TableCell>
-                                    {item.type}
+                                    <Link
+                                        to={{
+                                            pathname: `${workspacePrefix(item.index)}/vocabulary`,
+                                            search: "?iri=" + encodeURIComponent(item.type)
+                                        }}
+                                    >
+                                        {item.type}
+                                    </Link>;
                                 </TableCell>
                             </TableRow>
                         ))}
