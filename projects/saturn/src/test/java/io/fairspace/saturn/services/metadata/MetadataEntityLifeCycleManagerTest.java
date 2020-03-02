@@ -65,7 +65,7 @@ public class MetadataEntityLifeCycleManagerTest {
         setThreadContext(new ThreadContext(user, null));
         when(user.getIri()).thenReturn(userIri);
 
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, userService, permissionsService);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, permissionsService);
     }
 
     @Test

@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
@@ -31,18 +30,7 @@ class MetadataEntityLifeCycleManager {
     private final Dataset dataset;
     private final Node graph;
     private final Node vocabulary;
-    private final UserService userService;
     private final PermissionsService permissionsService;
-
-    /**
-     * Instantiates a lifecycle manager without a reference for the permissions
-     * @param dataset
-     * @param graph
-     * @param userService
-     */
-    public MetadataEntityLifeCycleManager(Dataset dataset, Node graph, Node vocabulary, UserService userService) {
-        this(dataset, graph, vocabulary, userService, null);
-    }
 
     /**
      * Stores statements regarding the lifecycle of the entities in this model

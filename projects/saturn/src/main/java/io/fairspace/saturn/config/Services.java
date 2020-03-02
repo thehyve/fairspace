@@ -63,7 +63,7 @@ public class Services {
 
         collectionsService = new CollectionsService(dataset, eventBus::post, permissionsService);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, userService, permissionsService);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
@@ -83,7 +83,7 @@ public class Services {
                 new InverseForUsedPropertiesValidator(dataset)
         );
 
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, userService);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, permissionsService);
 
         userVocabularyService = new ChangeableMetadataService(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, 0, vocabularyLifeCycleManager, vocabularyValidator);
         metaVocabularyService = new ReadableMetadataService(dataset, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
