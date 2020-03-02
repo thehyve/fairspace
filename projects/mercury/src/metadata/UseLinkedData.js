@@ -45,7 +45,12 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
                         }
                     }
                 })
-                .catch(setError)
+                .catch(e => {
+                    if (e) {
+                        console.error('Error fetching linked data', e);
+                    }
+                    setError(e || true);
+                })
                 .finally(() => {
                     setPropertiesLoaded(true);
                     setLoading(false);
