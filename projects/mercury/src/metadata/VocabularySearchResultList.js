@@ -4,8 +4,9 @@ import LinkedDataContext from "./LinkedDataContext";
 import {getLabel} from "../common/utils/linkeddata/metadataUtils";
 import LinkedDataList from "./common/LinkedDataList";
 import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
-import {SHACL_TARGET_CLASS} from "../constants";
+import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../constants";
 import {determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
+import LinkedDataLink from "./common/LinkedDataLink";
 
 export default ({items, ...otherProps}) => {
     const {shapes} = useContext(LinkedDataContext);
@@ -25,7 +26,7 @@ export default ({items, ...otherProps}) => {
         };
     });
 
-    const typeRender = (entry) => <a href={entry.typeUrl}> {entry.typeLabel} </a>;
+    const typeRender = (entry) => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.typeUrl}>{entry.typeLabel}</LinkedDataLink>;
 
     return <LinkedDataList entities={entities} typeRender={typeRender} {...otherProps} />;
 };
