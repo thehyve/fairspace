@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.util.Map;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -90,7 +90,7 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getThreadContext().getUser().getIri(), collectionsService, eventBus),
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus),
                 IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService))));
     }
 }

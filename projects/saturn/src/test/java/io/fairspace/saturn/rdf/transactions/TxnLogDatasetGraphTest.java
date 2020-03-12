@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.users.User;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
@@ -11,7 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -29,9 +28,9 @@ public class TxnLogDatasetGraphTest {
     @Before
     public void before() {
         var user = new User();
-        user.setIri(createURI("userId"));
+        user.setId("userId");
         user.setName("fullName");
-        setThreadContext(new ThreadContext(user, "workspace"));
+        setCurrentUser(user);
         ds = new DatasetJobSupportImpl(new DatasetGraphBatch(new TxnLogDatasetGraph(createTxnMem(), log)));
     }
 

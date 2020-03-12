@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import org.junit.Before;
@@ -8,8 +7,8 @@ import org.junit.Test;
 
 import java.util.Set;
 
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -41,13 +40,13 @@ public class UserServiceTest {
 
     @Test
     public void coordinatorCanAddUsers() {
-        setThreadContext(new ThreadContext(coordinator, "workspace"));
+        setCurrentUser(coordinator);
         assertNotNull(userService.addUser(regular1));
     }
 
     @Test
     public void coordinatorCanGrantRoles() {
-        setThreadContext(new ThreadContext(coordinator, "workspace"));
+        setCurrentUser(coordinator);
         assertNotNull(userService.addUser(regular1));
         regular1.getRoles().add(Role.CanWrite);
         assertNotNull(userService.addUser(regular1));
@@ -56,7 +55,7 @@ public class UserServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void regularUserCanNotAddUsers() {
-        setThreadContext(new ThreadContext(regular1, "workspace"));
+        setCurrentUser(regular1);
         userService.addUser(regular2);
     }
 }

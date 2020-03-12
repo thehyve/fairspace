@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.dao;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.users.User;
@@ -18,8 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -43,7 +42,7 @@ public class DAOTest {
         basicEntity = new LifecycleAwareEntity();
         var user = new User();
         user.setIri(createURI("http://ex.com/user"));
-        setThreadContext(new ThreadContext(user, null));
+        setCurrentUser(user);
     }
 
     @Test

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.collections;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -15,7 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.function.Consumer;
 
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.*;
@@ -35,7 +34,7 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() {
-        setThreadContext(new ThreadContext(user, "workspace"));
+        setCurrentUser(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
         collections = new CollectionsService(new DatasetJobSupportInMemory(), eventListener, permissions);

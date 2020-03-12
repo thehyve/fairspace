@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.permissions;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
@@ -22,8 +21,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -70,7 +69,7 @@ public class PermissionsServiceTest {
 
         when(userService.getUser(any())).thenReturn(new User());
 
-        setThreadContext(new ThreadContext(currentUser, "workspace"));
+        setCurrentUser(currentUser);
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");

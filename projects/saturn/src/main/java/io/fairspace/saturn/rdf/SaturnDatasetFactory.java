@@ -1,15 +1,8 @@
 package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.search.AutoEntityDefinition;
-import io.fairspace.saturn.rdf.search.ElasticSearchIndexConfigurer;
-import io.fairspace.saturn.rdf.search.SingleTripleTextDocProducer;
-import io.fairspace.saturn.rdf.search.TextIndexESBulk;
-import io.fairspace.saturn.rdf.transactions.DatasetGraphBatch;
-import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
-import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
-import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.rdf.search.*;
+import io.fairspace.saturn.rdf.transactions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
@@ -17,8 +10,6 @@ import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.elasticsearch.client.Client;
 
 import java.io.File;
@@ -27,9 +18,7 @@ import java.net.UnknownHostException;
 
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
-import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
-import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
 @Slf4j
@@ -41,19 +30,22 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static DatasetGraph connect(Config config, String workspaceName, Client elasticsearchClient) throws IOException {
-        var dsDir = new File(config.jena.datasetPath, workspaceName);
-        var restoreNeeded = isRestoreNeeded(dsDir);
+    public static DatasetJobSupport connect(Config.Jena config) throws IOException {
+        var elasticsearchClient = config.elasticSearch.enabled
+                ? ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings)
+                : null;
+
+        var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(dsDir.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
+        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams).getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(new File(config.jena.transactionLogPath, workspaceName), new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
         if (elasticsearchClient != null) {
             // When a restore is needed, we instruct ES to delete the index first
             // This way, the index will be in sync with our current database
-            dsg = enableElasticSearch(dsg, workspaceName, config.jena, restoreNeeded, elasticsearchClient);
+            dsg = enableElasticSearch(dsg, config, restoreNeeded, elasticsearchClient);
         }
 
         if (restoreNeeded) {
@@ -71,32 +63,22 @@ public class SaturnDatasetFactory {
 
             TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
-
-            if (! ds.getDefaultModel().contains(FS.theWorkspace, null)) {
-                    ds.getDefaultModel()
-                            .add(FS.theWorkspace, RDF.type, FS.Workspace)
-                            .add(FS.theWorkspace, RDFS.label, workspaceName)
-                            .add(FS.theWorkspace, FS.nodeUrl, config.privateUrl)
-                            .add(FS.theWorkspace, FS.workspaceDescription, createTypedLiteral("", MARKDOWN_DATA_TYPE));
-                    ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.writeRestricted, createTypedLiteral(true));
-            }
-
             initVocabularies(ds);
 
             return null;
         });
 
-        return dsgb;
+        return new DatasetJobSupportImpl(dsgb);
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {
         return !datasetPath.exists() || datasetPath.list((dir, name) -> name.startsWith("Data-")).length == 0;
     }
 
-    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, String workspaceName, Config.Jena config, boolean recreateIndex, Client client) throws UnknownHostException {
+    private static DatasetGraph enableElasticSearch(DatasetGraph dsg, Config.Jena config, boolean recreateIndex, Client client) throws UnknownHostException {
         try {
             // Setup ES client and index
-            config.elasticSearch.settings.setIndexName(workspaceName);
+            config.elasticSearch.settings.setIndexName("fairspace");
             ElasticSearchIndexConfigurer.configure(client, config.elasticSearch.settings, recreateIndex);
 
             // Create a dataset graph that updates ES with every triple update

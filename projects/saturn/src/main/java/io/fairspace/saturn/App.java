@@ -1,8 +1,7 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.config.Services;
-import io.fairspace.saturn.rdf.DatasetGraphMulti;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportImpl;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 
@@ -17,7 +16,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        var ds =  new DatasetJobSupportImpl(new DatasetGraphMulti(CONFIG));
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
         var svc = new Services(CONFIG, ds);
 

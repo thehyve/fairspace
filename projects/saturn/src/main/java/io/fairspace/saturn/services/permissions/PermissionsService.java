@@ -15,10 +15,10 @@ import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
@@ -36,7 +36,7 @@ public class PermissionsService {
 
     public void createResource(Node resource) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getThreadContext().getUser().getIri()));
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getCurrentUser().getIri()));
 
         audit("RESOURCE_CREATED",
                 "resource", resource.getURI());
@@ -44,13 +44,13 @@ public class PermissionsService {
 
     public void createResources(Collection<Resource> resources) {
         var resourcePermissions = createDefaultModel();
-        var user = resourcePermissions.asRDFNode(getThreadContext().getUser().getIri());
+        var user = resourcePermissions.asRDFNode(getCurrentUser().getIri());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions);
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = getThreadContext().getUser().getIri();
+        var managingUser = getCurrentUser().getIri();
 
         var success = dataset.calculateWrite(() -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -77,7 +77,7 @@ public class PermissionsService {
 
         if (success) {
             audit("PERMISSION_UPDATED",
-                    "manager", getThreadContext().getUser().getName(),
+                    "manager", getCurrentUser().getName(),
                     "target-user", user.getURI(),
                     "resource", resource.getURI(),
                     "access", access.toString());
@@ -89,14 +89,14 @@ public class PermissionsService {
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if (getThreadContext().getUser().getRoles().contains(Role.Coordinator)) {
+        if (getCurrentUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         getPermissions(nodes).forEach((node, access) -> {
             if (access.compareTo(requestedAccess) < 0) {
                 throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                        getThreadContext().getUser().getIri(), requestedAccess.name().toLowerCase()), node);
+                        getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
             }
         });
     }
@@ -154,12 +154,12 @@ public class PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if (getThreadContext().getUser().getRoles().contains(Role.Coordinator)) {
+        if (getCurrentUser().getRoles().contains(Role.Coordinator)) {
             return;
         }
 
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getThreadContext().getUser().getIri(), access.name().toLowerCase(), resource), resource);
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -192,7 +192,7 @@ public class PermissionsService {
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
 
-        var userObject = getThreadContext().getUser();
+        var userObject = getCurrentUser();
 
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource

@@ -1,20 +1,21 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.services.users.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.function.Consumer;
 
 
-@NoArgsConstructor
-@AllArgsConstructor
 public class ThreadContext {
     private static final ThreadLocal<ThreadContext> threadContext = new ThreadLocal<>();
 
     private static final ThreadLocal<Consumer<? super ThreadContext>> threadContextListener = new ThreadLocal<>();
+
+    public ThreadContext(User user) {
+        this.user = user;
+    }
+
+    public ThreadContext() {
+    }
 
     public static ThreadContext getThreadContext() {
         return threadContext.get();
@@ -44,10 +45,14 @@ public class ThreadContext {
         }
     }
 
-    @Getter
-    @Setter
     private User user;
-    @Getter
-    @Setter
-    private String workspace;
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
 }
