@@ -61,7 +61,9 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void begin(ReadWrite readWrite) {
         super.begin(readWrite);
+
         if (readWrite == ReadWrite.WRITE) { // a write transaction => be ready to collect changes
+            user = null;
             critical(transactionLog::onBegin);
         }
     }
