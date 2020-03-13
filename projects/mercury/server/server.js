@@ -1,16 +1,11 @@
 const express = require('express');
 const path = require('path');
 const proxy = require('http-proxy-middleware');
-const fetch = require("node-fetch");
 const YAML = require('yaml');
 const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
-const {fullname} = require("./roles");
-const {setRole} = require("./roles");
-const {listUsers, createWorkspaceRoles} = require("./roles");
-const ElasticsearchClient = require('./ElasticsearchClient');
 
 const app = express();
 
@@ -23,26 +18,9 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-const elasticsearchClient = new ElasticsearchClient(config.urls.elasticsearch);
+app.get('/liveness' , (req, res) => res.status(200).send('Mercury is up and running.').end());
 
-let allWorkspaces;
-
-const fetchWorkspaces = () => elasticsearchClient.retrieveWorkspaces()
-    .then(results => { allWorkspaces = results; })
-    .catch(e => console.error('Error retrieving workspaces', e));
-
-fetchWorkspaces();
-setInterval(() => fetchWorkspaces(), 30000);
-
-app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and running.').end());
-
-app.get('/readiness', (req, res) => {
-    if (allWorkspaces) {
-        res.status(200).end('Ready');
-    } else {
-        res.status(503).end('Initializing');
-    }
-});
+app.get('/readiness', (req, res) => res.status(200).end('Ready'));
 
 const store = new session.MemoryStore();
 
@@ -96,75 +74,6 @@ app.use(keycloak.middleware({logout: '/logout'}));
 app.use(keycloak.protect());
 app.use(['/api/**', '/login'], keycloak.enforcer([], {response_mode: 'token'}));
 
-// '/api/v1/workspaces/workspace/collections/' -> ['', 'api', 'v1', 'workspaces', 'workspace', 'collections', '']
-const getWorkspaceId = (url) => url.split('/')[4];
-
-const getNodeUrl = (url) => {
-    const workspaceId = getWorkspaceId(url);
-    const workspace = allWorkspaces.find(p => p.id === workspaceId);
-    return (workspace && workspace.node) || ('/unknown-workspace/' + workspaceId);
-};
-
-app.use('/unknown-workspace/:workspace', (req, res) => res.status(404).send('Unknown workspace: ' + req.params.workspace));
-
-app.get('/api/v1/nodes', (req, res) => res.send(config.urls.nodes).end());
-
-// All workspaces from all workspaces
-app.get('/api/v1/workspaces', (req, res) => res.send(allWorkspaces).end());
-
-const workspacesBeingCreated = new Set();
-
-const json = express.json();
-
-const WORKSPACE_ID_PATTERN = /^[a-z][-a-z0-9]*$/;
-
-const createWorkspaceDatabase = (workspace, token) => fetch(`${workspace.node}/api/v1/workspaces/${workspace.id}/collections/`, {headers: {Authorization: `Bearer ${token}`}})
-    .then(nodeResponse => { if (!nodeResponse.ok) { throw Error('Error creating workspace database'); }});
-
-// Create a new workspace
-app.put('/api/v1/workspaces', (req, res) => {
-    const {token, content: {authorities}} = req.kauth.grant.access_token;
-    if (!authorities.includes('organisation-admin')) {
-        res.status(403).send('Forbidden');
-        return;
-    }
-    json(req, res, () => {
-        const workspace = req.body;
-
-        if (!config.urls.nodes.includes(workspace.node)) {
-            res.status(400).send('Unknown node URL');
-            return;
-        }
-        if (!workspace.id || !(WORKSPACE_ID_PATTERN).test(workspace.id)) {
-            res.status(400).send('Invalid workspace id: ' + workspace.id);
-            return;
-        }
-        if (allWorkspaces.find(p => p.id === workspace.id)) {
-            res.status(400).send('This workspace id is already taken: ' + workspace.id);
-            return;
-        }
-        if (workspacesBeingCreated.has(workspace.id)) {
-            res.status(400).send('A workspace with this id is already being created: ' + workspace.id);
-            return;
-        }
-
-        workspacesBeingCreated.add(workspace);
-
-        // A workspace is created when it is accessed for the first time
-        createWorkspaceRoles(config, workspace.id)
-            .then(() => createWorkspaceDatabase(workspace, token))
-            .then(() => fetchWorkspaces())
-            .then(() => res.status(200).send(workspace))
-            .catch(e => {
-                console.error('Error creating a workspace. '
-                    + `Check the permissions granted to Fairspace service account ${process.env.FAIRSPACE_SERVICE_ACCOUNT_USERNAME}.`
-                    + 'They must include at least view-realm, manage-realm, manage-authorization and manage-users.', e);
-                res.status(500).send('Internal server error');
-            })
-            .finally(() => workspacesBeingCreated.delete(workspace.id));
-    });
-});
-
 const addToken = (proxyReq, req) => proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
 app.use(proxy('/api/keycloak', {
@@ -173,22 +82,6 @@ app.use(proxy('/api/keycloak', {
     onProxyReq: addToken,
     changeOrigin: true
 }));
-
-// Cross workspaces search
-app.get('/api/v1/search/_all', (req, res) => {
-    const {query} = req.query;
-    const {authorities} = req.kauth.grant.access_token.content;
-    const indices = authorities.includes('organisation-admin')
-        ? ['_all']
-        : authorities
-            .filter(auth => auth.startsWith('workspace-'))
-            .map(auth => auth.split('-')[1]);
-
-    elasticsearchClient.retrieveSearchTypes(indices)
-        .then(types => elasticsearchClient.crossWorkspacesSearch(query, types, indices))
-        .then(result => res.send(result).end())
-        .catch(e => console.error('Error retrieving cross-workspace search results.', e));
-});
 
 app.use(['/api/v1/workspaces/:workspace/**', '/api/v1/search/:workspace/**'], (req, res, next) => {
     const {authorities} = req.kauth.grant.access_token.content;
@@ -200,8 +93,7 @@ app.use(['/api/v1/workspaces/:workspace/**', '/api/v1/search/:workspace/**'], (r
 });
 
 app.use(proxy('/api/v1/search', {
-    target: config.urls.elasticsearch,
-    pathRewrite: (url) => `/${getWorkspaceId(url)}/_search`
+    target: config.urls.elasticsearch
 }));
 
 app.get('/api/v1/account', (req, res) => {
@@ -216,41 +108,8 @@ app.get('/api/v1/account', (req, res) => {
     });
 });
 
-app.get('/api/v1/workspaces/:workspace/users', (req, res) => {
-    const {authorities} = req.kauth.grant.access_token.content;
-    if (!authorities.includes('organisation-admin') && !authorities.find(role => role.startsWith(`workspace-${req.params.workspace}-`))) {
-        res.status(403).send('Forbidden');
-        return;
-    }
-    listUsers(config, req.params.workspace)
-        .then(users => res.send(users).end())
-        .catch(e => {
-            console.error('Error while listing users', e);
-            res.status(500).send('Internal server error');
-        });
-});
-
-app.put('/api/v1/workspaces/:workspace/users/:userId/roles/:roleType', (req, res) => {
-    const {token, content: {authorities}} = req.kauth.grant.access_token;
-    if (!authorities.includes('organisation-admin')
-        && !authorities.includes(`workspace-${req.params.workspace}-coordinator`)) {
-        res.status(403).send('Forbidden');
-        return;
-    }
-    setRole(config, req.params.workspace, req.params.userId, req.params.roleType)
-        .then(user => fetch(`${getNodeUrl(req.originalUrl)}/api/v1/workspaces/${req.params.workspace}/users/`, {method: 'PUT',
-            headers: {Authorization: `Bearer ${token}`},
-            body: JSON.stringify({id: user.id, email: user.email, name: fullname(user)})}))
-        .then(nodeResponse => res.status(nodeResponse.ok ? 200 : 500).send())
-        .catch(e => {
-            console.error('Error while altering roles', e);
-            res.status(500).send('Internal server error');
-        });
-});
-
-app.use(proxy('/api/v1/workspaces/*/**', {
-    target: 'http://never.ever',
-    router: req => getNodeUrl(req.originalUrl),
+app.use(proxy('/api/**', {
+    target: config.urls.saturn,
     onProxyReq: addToken
 }));
 
