@@ -93,7 +93,8 @@ app.use(['/api/v1/workspaces/:workspace/**', '/api/v1/search/:workspace/**'], (r
 });
 
 app.use(proxy('/api/v1/search', {
-    target: config.urls.elasticsearch
+    target: config.urls.elasticsearch,
+    pathRewrite: () => `/fairspace/_search`
 }));
 
 app.get('/api/v1/account', (req, res) => {

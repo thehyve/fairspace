@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 // TODO re-enable me
 @Ignore
 @RunWith(MockitoJUnitRunner.class)
-public class SaturnContextHandlerTest {
+public class SaturnSecurityHandlerTest {
     @Mock
     private Function<HttpServletRequest, User> authenticator;
     @Mock
@@ -51,11 +51,11 @@ public class SaturnContextHandlerTest {
 
     private StringWriter writer;
 
-    private SaturnContextHandler handler;
+    private SaturnSecurityHandler handler;
 
     @Before
     public void before() throws IOException {
-        handler = new SaturnContextHandler(users, authenticator);
+        handler = new SaturnSecurityHandler(users, authenticator);
         handler.setHandler(nextHandler);
 
         writer = new StringWriter();

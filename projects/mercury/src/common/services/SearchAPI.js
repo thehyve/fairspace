@@ -2,7 +2,6 @@
 import elasticsearch from "elasticsearch";
 
 import {SEARCH_DEFAULT_SIZE} from '../constants';
-import {currentWorkspace} from "../../workspaces/workspaces";
 
 const SORT_SCORE = ["_score"];
 
@@ -59,7 +58,7 @@ export class SearchAPI {
 
         // Send the query to the backend and transform the results
         return this.client.search({
-            index: currentWorkspace(),
+            index: 'fairspace',
             body: {
                 size,
                 from,
