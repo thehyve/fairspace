@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.collections;
 
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -37,7 +38,7 @@ public class CollectionsServiceTest {
         setCurrentUser(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
-        collections = new CollectionsService(new DatasetJobSupportInMemory(), eventListener, permissions);
+        collections = new CollectionsService(new DAO(new DatasetJobSupportInMemory()), eventListener, permissions);
     }
 
     @Test

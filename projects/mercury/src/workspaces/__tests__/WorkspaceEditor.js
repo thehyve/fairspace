@@ -41,7 +41,6 @@ describe('WorkspaceEditor', () => {
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(onSubmit)
             .toHaveBeenCalledWith({
-                node: node.id,
                 id: 'a',
                 label: 'a'
             });

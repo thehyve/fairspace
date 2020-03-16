@@ -18,7 +18,7 @@ public class WorkspaceService {
     }
 
     public Workspace createWorkspace(String id) {
-        var ws = dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id)));
+        var ws = dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id, id, null)));
         audit("WS_CREATE", "workspace", id);
         return ws;
     }
