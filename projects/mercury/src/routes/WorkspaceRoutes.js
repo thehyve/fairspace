@@ -2,7 +2,6 @@ import React from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 
 import * as queryString from 'query-string';
-import Grid from "@material-ui/core/Grid";
 import WorkspaceOverview from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import Notebooks from "../notebooks/Notebooks";
