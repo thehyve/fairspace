@@ -4,6 +4,8 @@ import io.fairspace.saturn.rdf.dao.DAO;
 
 import java.util.List;
 
+import static io.fairspace.saturn.audit.Audit.audit;
+
 public class WorkspaceService {
     private final DAO dao;
 
@@ -16,6 +18,8 @@ public class WorkspaceService {
     }
 
     public Workspace createWorkspace(String id) {
-        return dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id)));
+        var ws = dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id)));
+        audit("WS_CREATE", "workspace", id);
+        return ws;
     }
 }
