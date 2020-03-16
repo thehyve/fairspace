@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -29,8 +28,8 @@ public class CollectionsService {
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
 
-    public CollectionsService(DatasetJobSupport dataset, Consumer<Object> eventListener, PermissionsService permissions) {
-        this.dao = new DAO(dataset);
+    public CollectionsService(DAO dao, Consumer<Object> eventListener, PermissionsService permissions) {
+        this.dao = dao;
         this.eventListener = eventListener;
         this.permissions = permissions;
     }

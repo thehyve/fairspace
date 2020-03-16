@@ -2,22 +2,17 @@ package io.fairspace.saturn.services.users;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.services.BaseApp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -31,12 +26,10 @@ import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 public class UserService {
     private static final ObjectMapper mapper = new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
-    private final DAO dao;
     private final String usersUrl;
     private final LoadingCache<Boolean, List<User>> users;
 
-    public UserService(DatasetJobSupport dataset, String usersUrl) {
-        this.dao = new DAO(dataset);
+    public UserService(DAO dao, String usersUrl) {
         this.usersUrl = usersUrl;
         users = CacheBuilder.newBuilder()
                 .expireAfterAccess(30, TimeUnit.SECONDS)

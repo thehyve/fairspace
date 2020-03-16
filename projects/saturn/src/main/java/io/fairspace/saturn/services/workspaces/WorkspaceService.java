@@ -1,20 +1,21 @@
 package io.fairspace.saturn.services.workspaces;
 
-import java.io.File;
-import java.util.List;
-import java.util.stream.Stream;
+import io.fairspace.saturn.rdf.dao.DAO;
 
-import static java.util.stream.Collectors.toList;
+import java.util.List;
 
 public class WorkspaceService {
-    private final File workspaceRoot;
+    private final DAO dao;
 
-    public WorkspaceService(File workspaceRoot) {
-        this.workspaceRoot = workspaceRoot;
+    public WorkspaceService(DAO dao) {
+        this.dao = dao;
     }
 
     public List<Workspace> listWorkspaces() {
-        // TODO: reimplement
-        return null;
+        return dao.getDataset().calculateRead(() -> dao.list(Workspace.class));
+    }
+
+    public Workspace createWorkspace(String id) {
+        return dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id)));
     }
 }

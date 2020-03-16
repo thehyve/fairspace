@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.BaseApp;
 
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
+import static spark.Spark.put;
 
 public class WorkspaceApp extends BaseApp {
     private final WorkspaceService workspaceService;
@@ -18,6 +19,12 @@ public class WorkspaceApp extends BaseApp {
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(workspaceService.listWorkspaces());
+        });
+
+        put("/:id", (req, res) -> {
+            var ws = workspaceService.createWorkspace(req.params("id"));
+            res.type(APPLICATION_JSON.asString());
+            return mapper.writeValueAsString(ws);
         });
     }
 }
