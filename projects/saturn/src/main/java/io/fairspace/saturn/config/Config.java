@@ -53,8 +53,6 @@ public class Config {
 
         public long maxTriplesToReturn = 50000;
 
-        public long inactiveConnectionShutdownIntervalSec  = 600;
-
         public ElasticSearch elasticSearch = new ElasticSearch();
 
         public static class ElasticSearch {
@@ -74,6 +72,8 @@ public class Config {
         public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser, Role.Coordinator);
 
         public String fullAccessRole = "organisation-admin";
+
+        public String userUrl = "http://localhost:5100/auth/admin/realms/fairspace/users/";
     }
 
     public static class WebDAV {

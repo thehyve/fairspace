@@ -23,9 +23,9 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
-        // /api/v1/workspaces/*/webdav/relPath -> relPath
+        // /api/v1/webdav/relPath -> relPath
         var relPath = Stream.of(splitPath(path))
-                .skip(5)
+                .skip(3)
                 .collect(joining("/"));
         return getResource(fs, relPath);
     }

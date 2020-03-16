@@ -14,11 +14,7 @@ public class WorkspaceService {
     }
 
     public List<Workspace> listWorkspaces() {
-        return workspaceRoot.exists()
-                ? Stream.of(workspaceRoot.list((dir, name) -> !name.equals("lost+found") && !name.startsWith(".")))
-                .sorted()
-                .map(Workspace::new)
-                .collect(toList())
-                : List.of();
+        // TODO: reimplement
+        return null;
     }
 }

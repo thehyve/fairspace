@@ -55,7 +55,7 @@ public class Services {
         this.dataset = dataset;
 
         workspaceService = new WorkspaceService(config.jena.datasetPath);
-        userService = new UserService(dataset);
+        userService = new UserService(dataset, config.auth.userUrl);
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
