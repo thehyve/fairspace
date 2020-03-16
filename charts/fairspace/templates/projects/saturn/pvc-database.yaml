@@ -1,30 +1,27 @@
-{{- $global := . }}
-{{- range .Values.saturn.nodes }}
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ $global.Release.Name }}-saturn-{{.name}}-database
+  name: {{ .Release.Name }}-saturn-database
   labels:
     app: saturn
-    chart: {{ printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    release: {{ $global.Release.Name }}
-    heritage: {{ $global.Release.Service }}
-{{- if .persistence.database.annotations }}
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.saturn.persistence.database.annotations }}
   annotations:
-{{ toYaml .persistence.database.annotations | indent 4 }}
+{{ toYaml .Values.saturn.persistence.database.annotations | indent 4 }}
 {{- end }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .persistence.database.size | quote }}
-  {{- if .persistence.database.storageClass }}
-  {{- if (eq "-" .persistence.database.storageClass) }}
+      storage: {{ .Values.saturn.persistence.database.size | quote }}
+  {{- if .Values.saturn.persistence.database.storageClass }}
+  {{- if (eq "-" .Values.saturn.persistence.database.storageClass) }}
   storageClassName: ""
   {{- else }}
-  storageClassName: {{ .persistence.database.storageClass | quote }}
+  storageClassName: {{ .Values.saturn.persistence.database.storageClass | quote }}
   {{- end }}
   {{- end }}
-{{- end}}
+

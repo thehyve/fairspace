@@ -162,25 +162,23 @@ services:
 # Specific settings for Saturn subchart
 #####################################################################
 saturn:
-  nodes:
-    - name: node1
-      persistence:
-        files:
-          ## A manually managed Persistent Volume and Claim
-          ## If defined, PVC must be created manually before volume will be bound
-          # existingClaim:
+  persistence:
+    files:
+      ## A manually managed Persistent Volume and Claim
+      ## If defined, PVC must be created manually before volume will be bound
+      # existingClaim:
 
-          ## database data Persistent Volume Storage Class
-          ## If defined, storageClassName: <storageClass>
-          ## If set to "-", storageClassName: "", which disables dynamic provisioning
-          ## If undefined (the default) or set to null, no storageClassName spec is
-          ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-          ##   GKE, AWS & OpenStack)
-          ##
-          # storageClass: "-"
-          size: 50Gi
-        database:
-          size: 50Gi
+      ## database data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      # storageClass: "-"
+      size: 50Gi
+    database:
+      size: 50Gi
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION
