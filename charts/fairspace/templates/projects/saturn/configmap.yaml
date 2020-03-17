@@ -16,7 +16,6 @@ data:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
       vocabularyBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/vocabulary/
       datasetPath: "/data/saturn/db"
-      userUrl: 600
       storeParams:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}
       transactionLogPath: "/data/saturn/files/log"
