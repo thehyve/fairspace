@@ -68,11 +68,11 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: {{ .Release.Name }}-saturn-{{ .name }}
+          name: {{ .Release.Name }}-saturn
       - name: database
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-saturn-{{.name}}-database
+          claimName: {{ .Release.Name }}-saturn-database
       - name: files
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-saturn-{{.name}}-files
+          claimName: {{ .Release.Name }}-saturn-files
 
