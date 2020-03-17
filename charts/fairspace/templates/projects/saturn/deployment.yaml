@@ -1,15 +1,12 @@
-{{- $global := . }}
-{{- range .Values.saturn.nodes }}
----
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ $global.Release.Name }}-saturn-{{.name}}
+  name: {{.Release.Name }}-saturn
   labels:
     app: saturn
-    chart: {{ printf "%s-%s" $global.Chart.Name $global.Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    release: {{ $global.Release.Name }}
-    heritage: {{ $global.Release.Service }}
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    release: {{.Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   strategy:
@@ -18,22 +15,22 @@ spec:
       maxUnavailable: 100%
   selector:
     matchLabels:
-      app: saturn-{{.name}}
-      release: {{ $global.Release.Name }}
+      app: saturn
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: saturn-{{.name}}
-        release: {{ $global.Release.Name }}
-{{- if $global.Values.podAnnotations.saturn }}
+        app: saturn
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.saturn }}
       annotations:
-{{ toYaml $global.Values.podAnnotations.saturn | indent 8 }}
+{{ toYaml .Values.podAnnotations.saturn | indent 8 }}
 {{- end }}
     spec:
       containers:
-        - name: {{ $global.Release.Name }}-saturn
-          image: "{{ $global.Values.saturn.image.image }}:{{ $global.Values.saturn.image.tag }}"
-          imagePullPolicy: {{ $global.Values.saturn.image.pullPolicy }}
+        - name: {{ .Release.Name }}-saturn
+          image: "{{ .Values.saturn.image.image }}:{{ .Values.saturn.image.tag }}"
+          imagePullPolicy: {{ .Values.saturn.image.pullPolicy }}
           ports:
             - containerPort: 8080
           volumeMounts:
@@ -47,35 +44,35 @@ spec:
             httpGet:
               path:  /api/v1/health/
               port: 8080
-            initialDelaySeconds: {{ $global.Values.saturn.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ $global.Values.saturn.livenessProbe.periodSeconds }}
-            successThreshold: {{ $global.Values.saturn.livenessProbe.successThreshold }}
-            timeoutSeconds: {{ $global.Values.saturn.livenessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.saturn.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.saturn.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.saturn.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.saturn.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
               path:  /api/v1/health/
               port: 8080
-            periodSeconds: {{ $global.Values.saturn.readinessProbe.periodSeconds }}
-            successThreshold: {{ $global.Values.saturn.readinessProbe.successThreshold }}
-            timeoutSeconds: {{ $global.Values.saturn.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.saturn.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.saturn.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
 {{ toYaml .resources | indent 12 }}
-    {{- with $global.Values.saturn.nodeSelector }}
+    {{- with .Values.saturn.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with $global.Values.imagePullSecrets }}
+    {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 8 }}
     {{- end }}
       volumes:
       - name: config-volume
         configMap:
-          name: {{ $global.Release.Name }}-saturn-{{ .name }}
+          name: {{ .Release.Name }}-saturn
       - name: database
         persistentVolumeClaim:
-          claimName: {{ $global.Release.Name }}-saturn-{{.name}}-database
+          claimName: {{ .Release.Name }}-saturn-database
       - name: files
         persistentVolumeClaim:
-          claimName: {{ $global.Release.Name }}-saturn-{{.name}}-files
-{{- end}}
+          claimName: {{ .Release.Name }}-saturn-files
+

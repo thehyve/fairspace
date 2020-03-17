@@ -11,7 +11,6 @@ describe('WorkspaceEditor', () => {
     const node = {id: 'http://localhost:8080'};
 
     const enterValue = (label, value) => fireEvent.change(utils.getByTestId(label), {target: {value}});
-    const enterNode = (value) => enterValue('Node', value);
     const enterId = (value) => enterValue('Id', value);
 
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
@@ -42,7 +41,6 @@ describe('WorkspaceEditor', () => {
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(onSubmit)
             .toHaveBeenCalledWith({
-                node: node.id,
                 id: 'a',
                 label: 'a'
             });
@@ -55,7 +53,6 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should require an identifier', () => {
-        enterNode(node);
         submit();
         expect(onSubmit).toHaveBeenCalledTimes(0);
     });

@@ -9,7 +9,6 @@ jena:
   vocabularyBaseIRI: "http://localhost/vocabulary/"
   # Jena's TDB2 database path
   datasetPath: "data/db"
-  inactiveConnectionShutdownIntervalSec: 600
   storeParams:
     tdb.file_mode: "mapped"
     tdb.block_size: 8192
@@ -66,6 +65,7 @@ auth:
     - Coordinator
   # Role name for users who are allowed to do EVERYTHING
   fullAccessRole: organisation-admin
+  userUrl: http://localhost:5100/auth/admin/realms/fairspace/users/
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"

@@ -2,26 +2,12 @@ import React from 'react';
 import {Redirect, Route, Switch} from "react-router-dom";
 import {logout} from '../common';
 
-import WorkspaceListLayout from '../layout/WorkspaceListLayout';
 import WorkspaceLayout from '../layout/WorkspaceLayout';
-import WorkspaceListSearchLayout from "../layout/WorkspaceListSearchLayout";
 
 const GlobalRoutes = () => (
     <Switch>
         <Route
-            path="/workspaces"
-            exact
-            component={WorkspaceListLayout}
-        />
-
-        <Route
-            path="/workspaces/_all/search"
-            exact
-            component={WorkspaceListSearchLayout}
-        />
-
-        <Route
-            path="/workspaces/:workspace"
+            path="/"
             component={WorkspaceLayout}
         />
 

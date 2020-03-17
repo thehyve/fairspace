@@ -1,41 +1,20 @@
 import React from 'react';
 import WorkspaceDialog from "./WorkspaceDialog";
 import {useFormField} from "../common/hooks/UseFormField";
-import {useAsync} from "../common/hooks";
-import NodesAPI from "./NodesAPI";
 import {LoadingOverlay} from "../common/components";
 
 const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 
-export default ({onSubmit, onClose, creating, workspaces, getNodes = NodesAPI.getNodes,
-    workspace: {id = '', node = ''} = {}}) => {
-    const {data: nodes = [], loading} = useAsync(getNodes);
-
-    const nodeControl = useFormField(node, value => !!value);
-
+export default ({onSubmit, onClose, creating, workspaces,
+    workspace: {id = ''} = {}}) => {
     const isWorkspaceIdUnique = (workspaceId) => !workspaces.some(workspace => workspace.id === workspaceId);
     const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isWorkspaceIdUnique(value));
 
-    const allControls = [idControl, nodeControl];
+    const allControls = [idControl];
 
     const formValid = allControls.every(({valid}) => valid);
 
-    const defaultNode = (nodes.length === 1) && nodes[0];
-    if (defaultNode && (defaultNode.id !== nodeControl.value)) {
-        nodeControl.setValue(defaultNode.id);
-    }
-
     const fields = [
-        {
-            control: nodeControl,
-            required: true,
-            autoFocus: true,
-            id: "node",
-            label: "Node",
-            name: "node",
-            select: true,
-            selectOptions: nodes.map(w => w.id)
-        },
         {
             control: idControl,
             required: true,
@@ -49,17 +28,10 @@ export default ({onSubmit, onClose, creating, workspaces, getNodes = NodesAPI.ge
 
     const validateAndSubmit = () => formValid && onSubmit(
         {
-            node: nodeControl.value,
             id: idControl.value,
             label: idControl.value
         }
     );
-
-    if (loading) {
-        return (
-            <LoadingOverlay loading />
-        );
-    }
     return (
         <>
             <WorkspaceDialog

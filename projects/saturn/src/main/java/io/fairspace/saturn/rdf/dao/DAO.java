@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
@@ -23,8 +22,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -132,7 +131,7 @@ public class DAO {
     }
 
     private static Node getUserIRI() {
-        return ofNullable(getThreadContext()).map(ThreadContext::getUser).map(PersistentEntity::getIri).orElse(null);
+        return ofNullable(getCurrentUser()).map(PersistentEntity::getIri).orElse(null);
     }
 
     /**

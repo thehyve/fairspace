@@ -5,6 +5,7 @@ import {Layout, TopBar, usePageTitleUpdater, UsersProvider} from '../common';
 import WorkspaceMenu from './WorkspaceMenu';
 import {currentWorkspace} from '../workspaces/workspaces';
 import WorkspaceRoutes from '../routes/WorkspaceRoutes';
+import {WorkspacesProvider} from "../workspaces/WorkspaceContext";
 
 const WorkspaceLayout = () => {
     const workspace = currentWorkspace();
@@ -13,15 +14,17 @@ const WorkspaceLayout = () => {
     return (
         <UsersProvider>
             <VocabularyProvider>
-                <CollectionsProvider>
-                    <Layout
-                        renderMenu={() => <WorkspaceMenu />}
-                        renderMain={() => (
-                            <WorkspaceRoutes />
-                        )}
-                        renderTopbar={() => <TopBar title={workspace} />}
-                    />
-                </CollectionsProvider>
+                <WorkspacesProvider>
+                    <CollectionsProvider>
+                        <Layout
+                            renderMenu={() => <WorkspaceMenu />}
+                            renderMain={() => (
+                                <WorkspaceRoutes />
+                            )}
+                            renderTopbar={() => <TopBar title={workspace} />}
+                        />
+                    </CollectionsProvider>
+                </WorkspacesProvider>
             </VocabularyProvider>
         </UsersProvider>
     );

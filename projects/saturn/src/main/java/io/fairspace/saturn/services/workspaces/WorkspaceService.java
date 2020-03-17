@@ -1,24 +1,25 @@
 package io.fairspace.saturn.services.workspaces;
 
-import java.io.File;
-import java.util.List;
-import java.util.stream.Stream;
+import io.fairspace.saturn.rdf.dao.DAO;
 
-import static java.util.stream.Collectors.toList;
+import java.util.List;
+
+import static io.fairspace.saturn.audit.Audit.audit;
 
 public class WorkspaceService {
-    private final File workspaceRoot;
+    private final DAO dao;
 
-    public WorkspaceService(File workspaceRoot) {
-        this.workspaceRoot = workspaceRoot;
+    public WorkspaceService(DAO dao) {
+        this.dao = dao;
     }
 
     public List<Workspace> listWorkspaces() {
-        return workspaceRoot.exists()
-                ? Stream.of(workspaceRoot.list((dir, name) -> !name.equals("lost+found") && !name.startsWith(".")))
-                .sorted()
-                .map(Workspace::new)
-                .collect(toList())
-                : List.of();
+        return dao.getDataset().calculateRead(() -> dao.list(Workspace.class));
+    }
+
+    public Workspace createWorkspace(String id) {
+        var ws = dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id, id, null)));
+        audit("WS_CREATE", "workspace", id);
+        return ws;
     }
 }

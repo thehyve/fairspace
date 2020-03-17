@@ -1,8 +1,8 @@
 urls:
-  nodes:
-    - http://localhost:8080
+  saturn: http://localhost:8080
   elasticsearch: http://localhost:9200
   keycloak: http://localhost:5100
+  jupyterhub: https://jupyter.org/hub
 keycloak:
   realm: fairspace
   clientId: workspace-client

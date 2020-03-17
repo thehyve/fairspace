@@ -29,7 +29,7 @@ describe('LinkedDataApi', () => {
         MetadataAPI.get({});
 
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('metadata/?', {headers: {Accept: 'application/ld+json'}});
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/metadata/?', {headers: {Accept: 'application/ld+json'}});
     });
 
     it('stores metadata as jsonld', () => {
@@ -65,6 +65,6 @@ describe('LinkedDataApi', () => {
         ];
 
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith('metadata/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
+        expect(mockAxios.patch).toHaveBeenCalledWith('/api/v1/metadata/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
     });
 });

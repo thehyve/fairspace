@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingSupplier;
-import io.fairspace.saturn.ThreadContext;
+import io.fairspace.saturn.services.users.User;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -14,7 +14,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.fairspace.saturn.ThreadContext.*;
+import static io.fairspace.saturn.services.users.User.getCurrentUser;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static java.lang.Thread.currentThread;
 
 public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport {
@@ -52,7 +53,7 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
                 throw new JenaTransactionException("Can't promote to a write transaction");
             }
 
-            var task = new Task<>(getThreadContext(), job);
+            var task = new Task<>(getCurrentUser(), job);
 
             queue.offer(task);
             return task.get();
@@ -98,19 +99,19 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
 
     private static class Task<R, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
-        private final ThreadContext context;
+        private final User user;
         private final ThrowingSupplier<R, E> job;
         private R result;
         private Throwable error;
 
-        Task(ThreadContext context, ThrowingSupplier<R, E> job) {
-            this.context = context;
+        Task(User user, ThrowingSupplier<R, E> job) {
+            this.user = user;
             this.job = job;
         }
 
         boolean perform() {
             try {
-                setThreadContext(context);
+                setCurrentUser(user);
 
                 result = job.get();
                 error = null;
@@ -120,7 +121,7 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
                 error = e;
                 return false;
             } finally {
-                cleanThreadContext();
+                setCurrentUser(null);
             }
         }
 

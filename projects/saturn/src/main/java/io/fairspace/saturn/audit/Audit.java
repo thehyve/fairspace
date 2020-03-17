@@ -3,15 +3,14 @@ package io.fairspace.saturn.audit;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.services.users.User.getCurrentUser;
+
 
 public class Audit {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger("AUDIT");
 
     public static void audit(String event, String... params) {
-        var ctx = getThreadContext();
         MDC.put("event", event);
-        MDC.put("workspace", ctx.getWorkspace());
 
         for (var i = 0; i < params.length / 2; i++) {
             if (params[2 * i + 1] != null) {
@@ -19,13 +18,15 @@ public class Audit {
             }
         }
 
-        if (ctx.getUser().getName() != null) {
-            MDC.put("user_name", ctx.getUser().getName());
+        var user = getCurrentUser();
+
+        if (user.getName() != null) {
+            MDC.put("user_name", user.getName());
         }
-        if (ctx.getUser().getEmail() != null) {
-            MDC.put("user_email", ctx.getUser().getEmail());
+        if (user.getEmail() != null) {
+            MDC.put("user_email", user.getEmail());
         }
-        MDC.put("user_iri", ctx.getUser().getIri().getURI());
+        MDC.put("user_iri", user.getIri().getURI());
 
         log.info(event);
 

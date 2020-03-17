@@ -15,6 +15,7 @@ import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import UsersPage from '../users/UsersPage';
 import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
+import WorkspaceBrowser from "../workspaces/WorkspaceBrowser";
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
@@ -22,6 +23,8 @@ const getSubject = () => (
 
 const WorkspaceRoutes = () => (
     <Switch>
+        <Route path="/workspaces" exact component={WorkspaceBrowser} />
+
         <Route path="/workspaces/:workspace" exact component={WorkspaceOverview} />
 
         <Route
@@ -31,7 +34,7 @@ const WorkspaceRoutes = () => (
         />
 
         <Route
-            path="/workspaces/:workspace/collections"
+            path="/collections"
             exact
             render={(props) => (
                 <LinkedDataMetadataProvider>
@@ -41,7 +44,7 @@ const WorkspaceRoutes = () => (
         />
 
         <Route
-            path="/workspaces/:workspace/collections/search"
+            path="/collections/search"
             render={(props) => (
                 <LinkedDataMetadataProvider>
                     <CollectionSearchResultList {...props} />
@@ -50,7 +53,7 @@ const WorkspaceRoutes = () => (
         />
 
         <Route
-            path="/workspaces/:workspace/collections/:collection/:path(.*)?"
+            path="/collections/:collection/:path(.*)?"
             render={(props) => (
                 <LinkedDataMetadataProvider>
                     <FilesPage {...props} />
@@ -58,10 +61,10 @@ const WorkspaceRoutes = () => (
             )}
         />
 
-        <Route path="/workspaces/:workspace/notebooks" exact component={Notebooks} />
+        <Route path="/notebooks" exact component={Notebooks} />
 
         <Route
-            path="/workspaces/:workspace/metadata"
+            path="/metadata"
             exact
             render={() => {
                 const subject = getSubject();
@@ -76,12 +79,12 @@ const WorkspaceRoutes = () => (
 
         <Route
             /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/workspaces/:workspace/iri/**"
+            path="/iri/**"
             render={({match}) => (<Redirect to={"/metadata?iri=" + encodeURIComponent(createMetadataIri(match.params[0]))} />)}
         />
 
         <Route
-            path="/workspaces/:workspace/vocabulary"
+            path="/vocabulary"
             exact
             render={() => {
                 const subject = getSubject();
@@ -96,12 +99,12 @@ const WorkspaceRoutes = () => (
 
         <Route
             /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/workspaces/:workspace/vocabulary/**"
+            path="/vocabulary/**"
             render={({match}) => (<Redirect to={"/vocabulary?iri=" + encodeURIComponent(createVocabularyIri(match.params[0]))} />)}
         />
 
         <Route
-            path="/workspaces/:workspace/search"
+            path="/search"
             render={({location, history}) => <SearchPage location={location} history={history} />}
         />
     </Switch>

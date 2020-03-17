@@ -1,4 +1,3 @@
-{{- $global := . }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,10 +12,7 @@ data:
       urls:
         keycloak: {{ .Values.external.keycloak.baseUrl }}
         elasticsearch: {{ template "elasticsearch.baseurl" . }}
-        nodes:
-          {{- range .Values.saturn.nodes }}
-          - http://{{ $global.Release.Name }}-saturn-{{.name}}.{{ $global.Release.Namespace }}.svc.cluster.local
-          {{- end}}
+        saturn: http://{{ .Release.Name }}-saturn.{{ .Release.Namespace }}.svc.cluster.local
       keycloak:
         realm: {{ .Values.external.keycloak.realm }}
         clientId: {{ .Values.external.keycloak.clientId }}

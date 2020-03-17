@@ -1,9 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -20,7 +18,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
@@ -36,8 +34,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataEntityLifeCycleManagerTest {
-    @Mock
-    private UserService userService;
     @Mock
     private User user;
     @Mock
@@ -62,7 +58,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         initVocabularies(ds);
 
-        setThreadContext(new ThreadContext(user, null));
+        setCurrentUser(user);
         when(user.getIri()).thenReturn(userIri);
 
         lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, permissionsService);

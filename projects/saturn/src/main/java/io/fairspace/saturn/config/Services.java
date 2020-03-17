@@ -1,6 +1,7 @@
 package io.fairspace.saturn.config;
 
 import com.google.common.eventbus.EventBus;
+import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.util.Map;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
+import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -36,6 +37,7 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 public class Services {
     private final Config config;
     private final DatasetJobSupport dataset;
+    private final DAO dao;
 
     private final EventBus eventBus = new EventBus();
     private final WorkspaceService workspaceService;
@@ -53,15 +55,16 @@ public class Services {
     public Services(@NonNull Config config, @NonNull DatasetJobSupport dataset) throws Exception {
         this.config = config;
         this.dataset = dataset;
+        this.dao = new DAO(dataset);
 
-        workspaceService = new WorkspaceService(config.jena.datasetPath);
-        userService = new UserService(dataset);
+        workspaceService = new WorkspaceService(dao);
+        userService = new UserService(dao, config.auth.userUrl);
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService);
 
-        collectionsService = new CollectionsService(dataset, eventBus::post, permissionsService);
+        collectionsService = new CollectionsService(dao, eventBus::post, permissionsService);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
 
@@ -90,7 +93,7 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getThreadContext().getUser().getIri(), collectionsService, eventBus),
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus),
                 IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService))));
     }
 }

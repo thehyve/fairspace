@@ -1,8 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.ThreadContext;
+
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.DatasetGraphMulti;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.JenaTransactionException;
@@ -13,8 +13,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.util.UUID.randomUUID;
 import static junit.framework.TestCase.assertTrue;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -23,24 +21,21 @@ import static org.apache.jena.query.ReadWrite.WRITE;
 
 public class TransactionsTest {
     private DatasetJobSupport ds;
-    private Config config = new Config();
+    private Config.Jena config = new Config.Jena();
 
     @Before
-    public void before() {
-        config.jena.elasticSearch.enabled = false;
-        config.jena.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+    public void before() throws IOException {
+        config.elasticSearch.enabled = false;
+        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
-        setThreadContext(new ThreadContext());
-        getThreadContext().setWorkspace("ds");
-
-        ds = new DatasetJobSupportImpl(new DatasetGraphMulti(config));
+        ds = SaturnDatasetFactory.connect(config);
     }
 
     @After
     public void after() throws IOException {
         ds.close();
-        deleteDirectory(config.jena.datasetPath);
+        deleteDirectory(config.datasetPath);
         ds = null;
     }
 
@@ -53,8 +48,6 @@ public class TransactionsTest {
     public void onlyOneWriteTransactionAtATime() throws InterruptedException {
         ds.begin(WRITE);
         var anotherThread = new Thread(() -> {
-            setThreadContext(new ThreadContext());
-            getThreadContext().setWorkspace("ds");
             ds.begin(WRITE);
             ds.commit();
         });

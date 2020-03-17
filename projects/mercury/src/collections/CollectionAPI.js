@@ -3,7 +3,7 @@ import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../common';
 
 
-const collectionsUrl = "collections/";
+const collectionsUrl = "/api/v1/collections/";
 const headers = {'Content-Type': 'application/json'};
 
 export type CollectionProperties = {|

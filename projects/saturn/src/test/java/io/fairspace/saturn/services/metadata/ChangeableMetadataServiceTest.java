@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
@@ -19,10 +18,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
+import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -52,13 +51,10 @@ public class ChangeableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        var ctx = new ThreadContext();
         var user = new User();
         user.setIri(createURI("http://example.com#user"));
         user.setName("user");
-        ctx.setWorkspace("workspace");
-        ctx.setUser(user);
-        setThreadContext(ctx);
+        setCurrentUser(user);
         api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());
     }
 

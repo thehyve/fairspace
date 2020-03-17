@@ -27,7 +27,7 @@ export const getUser = () => axios.get('/api/v1/account')
     .then(extractJsonData)
     .then(user => ({...user, iri: createMetadataIri(user.id)}));
 
-export const getUsers = () => axios.get('users/', requestOptions)
+export const getUsers = () => axios.get('/api/v1/users/', requestOptions)
     .catch(handleHttpError('Error while loading users'))
     .then(extractJsonData)
     .then(users => users.map(user => ({iri: createMetadataIri(user.id), role: workspaceRole(user), ...user})));

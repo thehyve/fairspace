@@ -15,12 +15,12 @@ public class ApiFilterFactory {
     public static Filter createApiFilter(String apiPathPrefix, Services svc, Config config) {
         return new SaturnSparkFilter(apiPathPrefix,
                 new WorkspaceApp("/workspaces", svc.getWorkspaceService()),
-                new ChangeableMetadataApp("/workspaces/:workspace/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
-                new ChangeableMetadataApp("/workspaces/:workspace/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
-                new ReadableMetadataApp("/workspaces/:workspace/meta-vocabulary", svc.getMetaVocabularyService()),
-                new CollectionsApp("/workspaces/:workspace/collections", svc.getCollectionsService()),
-                new PermissionsApp("/workspaces/:workspace/permissions", svc.getPermissionsService()),
-                new UserApp("/workspaces/:workspace/users", svc.getUserService()),
+                new ChangeableMetadataApp("/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
+                new ChangeableMetadataApp("/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
+                new ReadableMetadataApp("/meta-vocabulary", svc.getMetaVocabularyService()),
+                new CollectionsApp("/collections", svc.getCollectionsService()),
+                new PermissionsApp("/permissions", svc.getPermissionsService()),
+                new UserApp("/users", svc.getUserService()),
                 new WebDAVApp(svc),
                 new HealthApp("/health"));
     }

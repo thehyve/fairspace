@@ -14,7 +14,7 @@ class LinkedDataAPI {
      * @param graph Either 'metadata' or 'vocabulary' or 'meta-vocabulary'
      */
     constructor(graph) {
-        this.statementsUrl = `${graph}/`;
+        this.statementsUrl = `/api/v1/${graph}/`;
     }
 
     /**

@@ -1,8 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.ThreadContext;
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.DatasetGraphMulti;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
@@ -11,8 +10,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static io.fairspace.saturn.ThreadContext.getThreadContext;
-import static io.fairspace.saturn.ThreadContext.setThreadContext;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
@@ -27,23 +24,20 @@ public class RestoreTest {
             createProperty("http://example.com/property2"),
             createResource("http://example.com/object2"));
 
-    private Config config;
+    private Config.Jena config;
 
     @Before
     public void before() {
-        config = new Config();
-        config.jena.elasticSearch.enabled = false;
-        config.jena.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.jena.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
-
-        setThreadContext(new ThreadContext());
-        getThreadContext().setWorkspace("ds");
+        config = new Config.Jena();
+        config.elasticSearch.enabled = false;
+        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
+        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
     }
 
     @After
     public void after() {
-        config.jena.transactionLogPath.delete();
-        config.jena.datasetPath.delete();
+        config.transactionLogPath.delete();
+        config.datasetPath.delete();
     }
 
     @Test
@@ -55,8 +49,8 @@ public class RestoreTest {
 
         ds1.close();
 
-        deleteDirectory(config.jena.datasetPath);
-        assertFalse(config.jena.datasetPath.exists());
+        deleteDirectory(config.datasetPath);
+        assertFalse(config.datasetPath.exists());
 
         var ds2 = newDataset();
 
@@ -81,7 +75,7 @@ public class RestoreTest {
 
         ds1.close();
 
-        deleteDirectory(config.jena.datasetPath);
+        deleteDirectory(config.datasetPath);
 
         var ds2 = newDataset();
 
@@ -92,7 +86,7 @@ public class RestoreTest {
         }
     }
 
-    private DatasetJobSupport newDataset() {
-        return new DatasetJobSupportImpl(new DatasetGraphMulti(config));
+    private DatasetJobSupport newDataset() throws IOException {
+        return SaturnDatasetFactory.connect(config);
     }
 }
