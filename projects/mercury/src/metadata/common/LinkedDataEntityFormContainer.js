@@ -18,7 +18,7 @@ const LinkedDataEntityFormContainer = ({
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons);
-    const {submitLinkedDataChanges, extendProperties, hasEditRight, isCoordinator} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
 
     const {
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
