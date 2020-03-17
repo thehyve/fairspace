@@ -6,7 +6,7 @@ import {useAsync} from '../common/hooks';
 const WorkspaceContext = React.createContext({});
 
 export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) => {
-    const {data: workspaces = [], error: workspacesError, loading: workspacesLoading, refresh} = useAsync(workspacesAPI.getWorkspaces);
+    const {data: workspaces = [], error: workspacesError, loading: workspacesLoading, refresh: refreshWorkspaces} = useAsync(workspacesAPI.getWorkspaces);
     const createWorkspace = (workspace: Workspace) => workspacesAPI.createWorkspace(workspace);
 
     return (
@@ -15,7 +15,7 @@ export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) =>
                 workspaces,
                 workspacesError,
                 workspacesLoading,
-                refresh,
+                refreshWorkspaces,
                 createWorkspace
             }}
         >
