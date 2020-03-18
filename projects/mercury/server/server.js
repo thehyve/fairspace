@@ -6,6 +6,7 @@ const fs = require('fs');
 const Keycloak = require('keycloak-connect');
 const session = require('express-session');
 const cryptoRandomString = require('crypto-random-string');
+const KeycloakAdminClient = require('keycloak-admin').default;
 
 const app = express();
 
@@ -18,7 +19,7 @@ if (!fs.existsSync(configPath)) {
 
 const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
 
-app.get('/liveness' , (req, res) => res.status(200).send('Mercury is up and running.').end());
+app.get('/liveness', (req, res) => res.status(200).send('Mercury is up and running.').end());
 
 app.get('/readiness', (req, res) => res.status(200).end('Ready'));
 
@@ -96,6 +97,39 @@ app.use(proxy('/api/v1/search', {
     target: config.urls.elasticsearch,
     pathRewrite: () => `/fairspace/_search`
 }));
+
+const createKeycloakAdminClient = () => {
+    const client = new KeycloakAdminClient({baseUrl: `${config.urls.keycloak}/auth`, realmName: config.keycloak.realm});
+    return client.auth({
+        grantType: 'client_credentials',
+        clientId: config.keycloak.clientId,
+        clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+    }).then(() => client)
+        .catch(e => {
+            console.error("Error establishing admin client connection", e);
+            console.error(`Check whether the service account for client ${config.keycloak.clientId} in realm ${config.keycloak.realm} is enabled and granted view-users role`);
+            return Promise.reject(e);
+        });
+};
+
+
+app.get('/api/v1/users', (req, res) => {
+    createKeycloakAdminClient(config)
+        .then(client => client.users.find())
+        .then(users => users
+            .filter(user => user.enabled)
+            .map(user => ({
+                id: user.id,
+                fullName: user.fullName || ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username,
+                email: user.email,
+                username: user.username
+            })))
+        .then(users => res.send(users))
+        .catch(e => {
+            console.error('Error retrieving users', e);
+            res.status(500).end('Internal server error');
+        });
+});
 
 app.get('/api/v1/account', (req, res) => {
     const {content} = req.kauth.grant.access_token;
