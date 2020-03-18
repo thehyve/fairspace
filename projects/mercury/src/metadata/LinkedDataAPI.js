@@ -26,6 +26,10 @@ class LinkedDataAPI {
     }
 
     get(params = {}) {
+        if (Object.prototype.hasOwnProperty.call(params, 'subject') && !params.subject) {
+            return Promise.reject(new Error('Please provide a valid subject.'));
+        }
+
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
 
         return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
