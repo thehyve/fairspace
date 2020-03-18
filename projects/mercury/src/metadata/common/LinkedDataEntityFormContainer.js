@@ -11,14 +11,14 @@ import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "../UseLinkedData";
-import {DATE_DELETED_URI, WORKSPACE_INFO_URI} from "../../constants";
+import {DATE_DELETED_URI} from "../../constants";
 
 const LinkedDataEntityFormContainer = ({
     subject, editable = true, showEditButtons = false, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons);
-    const {submitLinkedDataChanges, extendProperties, hasEditRight, isCoordinator} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
 
     const {
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
@@ -36,7 +36,8 @@ const LinkedDataEntityFormContainer = ({
         subject
     );
     const isDeleted = values[DATE_DELETED_URI];
-    const canEdit = editingEnabled && (hasEditRight || (subject === WORKSPACE_INFO_URI && isCoordinator)) && !isDeleted;
+    // TODO: handle workspaces
+    const canEdit = editingEnabled && hasEditRight && !isDeleted;
 
     const {
         confirmationShown, hideConfirmation, executeNavigation

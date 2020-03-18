@@ -119,9 +119,6 @@ public class FS {
     public static final String ERROR_MESSAGE_URI = NS + "errorMessage";
     public static final String ERROR_DETAILS_URI = NS + "errorDetails";
 
-    public static final String THE_WORKSPACE_URI = NS + "theWorkspace";
-    public static final Resource theWorkspace = createResource(THE_WORKSPACE_URI);
-
     public static final String WORKSPACE_URI = NS + "Workspace";
     public static final Resource Workspace = createResource(WORKSPACE_URI);
 

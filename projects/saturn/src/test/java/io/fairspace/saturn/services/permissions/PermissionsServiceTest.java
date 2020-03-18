@@ -63,8 +63,6 @@ public class PermissionsServiceTest {
     public void setUp() {
         ds = new DatasetJobSupportInMemory();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
-        ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.manage, createResource(USER1.getURI()));
-        ds.getNamedModel(PERMISSIONS_GRAPH).add(FS.theWorkspace, FS.write, createResource(USER2.getURI()));
 
 
         when(userService.getUser(any())).thenReturn(new User());

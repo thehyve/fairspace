@@ -18,7 +18,7 @@ type WorkspaceBrowserProps = {
 }
 
 export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
-    const {loading, error, workspaces, createWorkspace} = props;
+    const {loading, error, workspaces, createWorkspace, refreshWorkspaces} = props;
     const [creatingWorkspace, setCreatingWorkspace] = useState(false);
     const [loadingCreatedWorkspace, setLoadingCreatedWorkspace] = useState(false);
     const {currentUser} = useContext(UserContext);
@@ -30,6 +30,7 @@ export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
     const handleSaveWorkspace = async (workspace: Workspace) => {
         setLoadingCreatedWorkspace(true);
         return createWorkspace(workspace)
+            .then(() => refreshWorkspaces())
             .then(() => {
                 setCreatingWorkspace(false);
                 setLoadingCreatedWorkspace(false);
@@ -97,13 +98,14 @@ WorkspaceBrowser.defaultProps = {
 const ContextualWorkspaceBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {workspaces, workspacesLoading, workspacesError, createWorkspace} = useContext(WorkspaceContext);
+    const {workspaces, workspacesLoading, workspacesError, createWorkspace, refreshWorkspaces} = useContext(WorkspaceContext);
 
     return (
         <WorkspaceBrowser
             {...props}
             workspaces={workspaces}
             createWorkspace={createWorkspace}
+            refreshWorkspaces={refreshWorkspaces}
             users={users}
             loading={workspacesLoading || currentUserLoading || usersLoading}
             error={workspacesError || currentUserError || usersError}

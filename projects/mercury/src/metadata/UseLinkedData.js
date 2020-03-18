@@ -13,10 +13,6 @@ import {getTypeInfo} from '../common/utils/linkeddata/metadataUtils';
  * @param {string} subject
  */
 export const useLinkedDataNoContext = (subject, context = {}) => {
-    if (!subject) {
-        throw new Error('Please provide a valid subject.');
-    }
-
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState();
     const [properties, setProperties] = useState([]);
