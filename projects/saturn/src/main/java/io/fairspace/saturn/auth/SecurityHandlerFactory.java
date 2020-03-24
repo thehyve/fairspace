@@ -27,7 +27,7 @@ public class SecurityHandlerFactory {
         adapterConfig.setCredentials(Map.of("secret",  getenv("KEYCLOAK_CLIENT_SECRET")));
         authenticator.setAdapterConfig(adapterConfig);
         securityHandler.setAuthenticator(authenticator);
-        var localhost = CONFIG.auth.authServerUrl.contains("localhost");
+        var localhost = CONFIG.auth.authServerUrl.startsWith("http://localhost:");
         adapterConfig.setSslRequired((localhost ? SslRequired.NONE : SslRequired.ALL).name());
         if(!localhost) {
             adapterConfig.setConfidentialPort(443);
