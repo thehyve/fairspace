@@ -54,8 +54,6 @@ jena:
       replicas: 1
     advancedSettings:
 auth:
-  # Enables JWT/JWKS authentication. Defaults to false.
-  enabled: true
   authServerUrl: http://localhost:5100/auth/
   realm: fairspace
   clientId: workspace-client

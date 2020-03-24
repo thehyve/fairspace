@@ -30,9 +30,9 @@ data:
           shards: 1
           replicas: 1
     auth:
-      enabled: true
-      fullAccessRole: organisation-admin
-      userUrl: {{ .Values.external.keycloak.baseUrl }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}/users/
+      authServerUrl: {{ .Values.external.keycloak.baseUrl }}/auth/
+      realm: {{ .Values.external.keycloak.realm }}
+      clientId: {{ .Values.external.keycloak.clientId }}
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     services:
