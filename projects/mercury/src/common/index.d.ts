@@ -55,7 +55,6 @@ export declare const buildSearchUrl: any;
 export declare const getSearchQueryFromString: any;
 
 /** ************************ OTHER ************************* */
-export declare const Config: any;
 export declare const logout: any;
 export declare const getUser: any;
 export declare const getUsers: any;

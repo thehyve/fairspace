@@ -6,6 +6,7 @@ import WorkspaceMenu from './WorkspaceMenu';
 import {currentWorkspace} from '../workspaces/workspaces';
 import WorkspaceRoutes from '../routes/WorkspaceRoutes';
 import {WorkspacesProvider} from "../workspaces/WorkspaceContext";
+import {ServicesProvider} from '../common/contexts/ServicesContext';
 
 const WorkspaceLayout = () => {
     const workspace = currentWorkspace();
@@ -16,13 +17,13 @@ const WorkspaceLayout = () => {
             <VocabularyProvider>
                 <WorkspacesProvider>
                     <CollectionsProvider>
-                        <Layout
-                            renderMenu={() => <WorkspaceMenu />}
-                            renderMain={() => (
-                                <WorkspaceRoutes />
-                            )}
-                            renderTopbar={() => <TopBar title={workspace} />}
-                        />
+                        <ServicesProvider>
+                            <Layout
+                                renderMenu={() => <WorkspaceMenu />}
+                                renderMain={() => <WorkspaceRoutes />}
+                                renderTopbar={() => <TopBar title={workspace} />}
+                            />
+                        </ServicesProvider>
                     </CollectionsProvider>
                 </WorkspacesProvider>
             </VocabularyProvider>

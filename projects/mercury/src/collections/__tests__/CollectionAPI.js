@@ -12,7 +12,7 @@ describe('CollectionAPI', () => {
         const collections = await CollectionAPI.getCollections();
 
         expect(collections).toEqual([{name: 'collection1'}]);
-        expect(mockAxios.get).toHaveBeenCalledTimes(2);
+        expect(mockAxios.get).toHaveBeenCalledTimes(1);
         expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/collections/', {headers: {Accept: 'application/json'}});
     });
 

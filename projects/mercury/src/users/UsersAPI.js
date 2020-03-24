@@ -22,7 +22,7 @@ const requestOptions = {
     headers: {Accept: 'application/json'}
 };
 
-export const getUser = () => axios.get('/api/v1/account')
+export const getUser = () => axios.get('/api/v1/users/current')
     .catch(handleHttpError("Failure when retrieving user's information"))
     .then(extractJsonData)
     .then(user => ({...user, iri: createMetadataIri(user.id)}));

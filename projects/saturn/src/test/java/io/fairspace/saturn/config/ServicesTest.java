@@ -2,7 +2,10 @@ package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.contrib.java.lang.system.ProvideSystemProperty;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -17,9 +20,12 @@ public class ServicesTest {
     private Config config = new Config();
     private Services svc;
 
-
+    @Rule
+    public final EnvironmentVariables environmentVariables
+            = new EnvironmentVariables();
     @Before
     public void before() throws Exception {
+        environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
         svc = new Services(config, dataset);
     }
 
