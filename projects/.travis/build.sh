@@ -1,13 +1,15 @@
 #!/bin/bash
 set -e
 
+root="$PWD"
+
 echo 'Building the front-end'
-cd mercury
+cd "$root/mercury"
 $BUILD_SCRIPTS_DIR/yarn/tag.sh || exit 1
 $BUILD_SCRIPTS_DIR/yarn/build.sh || exit 1
 
 echo 'Building the back-end'
-cd ../saturn
+cd "$root/saturn"
 $BUILD_SCRIPTS_DIR/gradle/tag.sh
 ./gradlew clean build test jacocoTestReport $GRADLE_OPTIONS
 
@@ -30,5 +32,5 @@ if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then
 fi
 
 echo 'Building the Docker image'
-cd ..
+cd "$root"
 $BUILD_SCRIPTS_DIR/docker/build.sh
