@@ -33,6 +33,12 @@ spec:
           imagePullPolicy: {{ .Values.saturn.image.pullPolicy }}
           ports:
             - containerPort: 8080
+          env:
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-oauth-client"
+                  key: clientSecret
           volumeMounts:
             - name: config-volume
               mountPath: /opt/config

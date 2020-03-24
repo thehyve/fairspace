@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.users;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -9,13 +8,10 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.dao.DAO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UsersResource;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+import static java.lang.System.getenv;
 
 @Slf4j
 public class UserService {
@@ -37,9 +34,9 @@ public class UserService {
                 .realm(config.realm)
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .clientId(config.clientId)
-                .clientSecret("**********")
+                .clientSecret(getenv("KEYCLOAK_CLIENT_SECRET"))
                 .username(config.clientId)
-                .password("**********")
+                .password(getenv("KEYCLOAK_CLIENT_SECRET"))
                 .build()
                 .realm(config.realm)
                 .users();
