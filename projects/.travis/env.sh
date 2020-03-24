@@ -1,2 +1,2 @@
 #!/bin/bash
-export ARTIFACT_BUILD_FILE=mercury/package.json
+export ARTIFACT_BUILD_FILE=saturn/build.gradle
