@@ -6,6 +6,7 @@ import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
+import org.keycloak.common.enums.SslRequired;
 import org.keycloak.enums.TokenStore;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
@@ -26,6 +27,7 @@ public class SecurityHandlerFactory {
         adapterConfig.setCredentials(Map.of("secret",  getenv("KEYCLOAK_CLIENT_SECRET")));
         authenticator.setAdapterConfig(adapterConfig);
         securityHandler.setAuthenticator(authenticator);
+        adapterConfig.setSslRequired((CONFIG.auth.authServerUrl.startsWith("https://") ? SslRequired.ALL : SslRequired.NONE).name());
 
         var constraint = new Constraint("any", Constraint.ANY_AUTH);
         constraint.setAuthenticate(true);
@@ -34,7 +36,6 @@ public class SecurityHandlerFactory {
         mapping.setConstraint(constraint);
         mapping.setPathSpec("/*");
         securityHandler.addConstraintMapping(mapping);
-
 
         constraint = new Constraint("health", Constraint.ANY_AUTH);
         constraint.setAuthenticate(false);
