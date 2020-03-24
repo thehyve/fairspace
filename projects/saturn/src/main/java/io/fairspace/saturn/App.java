@@ -1,7 +1,9 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.config.SaturnSparkFilter;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.web.StaticFilesApp;
 import io.fairspace.saturn.webdav.WebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
@@ -14,7 +16,7 @@ import java.io.IOException;
 
 import static io.fairspace.saturn.auth.SecurityHandlerFactory.createSecurityHandler;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
+import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.services.users.User.setCurrentUser;
 
@@ -45,7 +47,6 @@ public class App {
                     @Override
                     public void destroy() {}
                 })
-                .addFilter(API_PREFIX + "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .addServlet(API_PREFIX + "/webdav/*", new WebDAVServlet(svc))
                 .addServlet(API_PREFIX + "/search/*", new ProxyServlet() {
                     @Override
@@ -60,6 +61,8 @@ public class App {
                         return client;
                     }
                 })
+                .addFilter(API_PREFIX + "/*", createApiFilter(API_PREFIX, svc, CONFIG))
+                .addFilter("/*", new SaturnSparkFilter(new StaticFilesApp()))
                 .port(CONFIG.port)
                 .build()
                 .start();

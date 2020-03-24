@@ -24,6 +24,9 @@ public class StaticFilesApp implements SparkApplication {
 
         StaticFilesConfiguration.servletInstance.configureExternal(STATIC_FILES);
         notFound((req, res) -> {
+            if (req.pathInfo().startsWith("/api/")) {
+                return null;
+            }
             res.status(200);
             res.type("text/html");
             return index;
