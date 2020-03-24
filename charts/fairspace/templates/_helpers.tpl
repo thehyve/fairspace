@@ -90,7 +90,7 @@ Scheme to access fairspace components (http or https)
 {{- end -}}
 
 {{- define "fairspace.url" -}}
-{{ template "fairspace.scheme" . }}://{{ template "sa.hostname" . }}
+{{ template "fairspace.scheme" . }}://{{ template "saturn.hostname" . }}
 {{- end -}}
 
 {{- define "jupyter.url" -}}
