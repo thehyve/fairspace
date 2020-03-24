@@ -3,8 +3,8 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "fairspace.name" . }}-mercury-ingress
-{{- with $ingress.annotations.mercury }}
+  name: {{ template "fairspace.name" . }}-saturn-ingress
+{{- with $ingress.annotations.saturn }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -17,16 +17,16 @@ spec:
 {{- if $ingress.tls.enabled }}
   tls:
     - hosts:
-      - {{ template "mercury.hostname" $ }}
+      - {{ template "saturn.hostname" $ }}
       secretName: {{ template "fairspace.tlsSecretName" $ }}
 {{- end }}
   rules:
-    - host: {{ template "mercury.hostname" $ }}
+    - host: {{ template "saturn.hostname" $ }}
       http:
         paths:
           - path: /
             backend:
-              serviceName: {{ .Release.Name }}-mercury
+              serviceName: {{ .Release.Name }}-saturn
               servicePort: 80
       annotations:
         nginx.org/location-snippets: |
