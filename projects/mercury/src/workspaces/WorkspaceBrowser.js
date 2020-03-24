@@ -1,6 +1,7 @@
 // @flow
 import React, {useContext, useState} from 'react';
 import Button from "@material-ui/core/Button";
+import {useHistory, withRouter} from "react-router-dom";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
@@ -96,6 +97,7 @@ WorkspaceBrowser.defaultProps = {
 };
 
 const ContextualWorkspaceBrowser = (props) => {
+    const history = useHistory();
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
     const {workspaces, workspacesLoading, workspacesError, createWorkspace, refreshWorkspaces} = useContext(WorkspaceContext);
@@ -103,6 +105,7 @@ const ContextualWorkspaceBrowser = (props) => {
     return (
         <WorkspaceBrowser
             {...props}
+            history={history}
             workspaces={workspaces}
             createWorkspace={createWorkspace}
             refreshWorkspaces={refreshWorkspaces}
@@ -113,4 +116,4 @@ const ContextualWorkspaceBrowser = (props) => {
     );
 };
 
-export default ContextualWorkspaceBrowser;
+export default withRouter(ContextualWorkspaceBrowser);

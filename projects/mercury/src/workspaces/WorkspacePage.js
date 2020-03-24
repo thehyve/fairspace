@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import Grid from '@material-ui/core/Grid';
-import {useHistory, withRouter} from "react-router-dom";
 import {usePageTitleUpdater} from "../common";
 
 import * as consts from '../constants';
@@ -13,7 +12,6 @@ const WorkspacePage = () => {
     usePageTitleUpdater('Workspaces');
 
     const [busy, setBusy] = useState(false);
-    const history = useHistory();
     const {isSelected, toggle, selected} = useSingleSelection();
 
     return (
@@ -21,7 +19,6 @@ const WorkspacePage = () => {
             <Grid container spacing={1}>
                 <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
                     <WorkspaceBrowser
-                        history={history}
                         isSelected={workspace => isSelected(workspace.iri)}
                         toggleWorkspace={workspace => toggle(workspace.iri)}
                     />
@@ -38,4 +35,4 @@ const WorkspacePage = () => {
     );
 };
 
-export default withRouter(WorkspacePage);
+export default WorkspacePage;
