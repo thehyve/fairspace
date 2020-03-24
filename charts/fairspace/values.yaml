@@ -180,7 +180,7 @@ saturn:
     database:
       size: 50Gi
   image:
-    image: eu.gcr.io/fairspace-207108/saturn
+    image: eu.gcr.io/fairspace-207108/projects
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   initContainer:
