@@ -66,11 +66,11 @@ saturn:
     mail.smtp.starttls.enable: true
 
 
-# Specific settings for Mercury subchart
-mercury:
+# Specific settings for Saturn subchart
+saturn:
   image:
     pullPolicy: Always
-# Specific settings for Mercury subchart
+# Specific settings for Docs subchart
 docs:
   image:
     pullPolicy: Always

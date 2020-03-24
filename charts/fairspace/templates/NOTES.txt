@@ -19,13 +19,13 @@ Your fairspace is named {{ template "fairspace.name" . }} and can be accessed vi
 
 * Run these commands in the same shell:
 
-  export PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{.Release.Name}}-mercury)
+  export PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{.Release.Name}}-saturn)
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo Fairspace at http://$NODE_IP:$PORT
 
 {{- end }}
 
-The installation contains instances of Mercury and Saturn.
+The installation contain an instance Saturn.
 
 {{- if not .Values.fairspace.ingress.enabled }}
 ----------------------------

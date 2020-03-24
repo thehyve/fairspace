@@ -2,7 +2,7 @@
 This helm chart will install and setup a single VRE fairspace.
 
 Contains:
-- Mercury
+
 - Saturn
 
 A fairspace within Fairspace is always associated with a hyperspace. The
@@ -82,14 +82,10 @@ installation.
 | `external.keycloak.username`  | Username used for setting up keycloak users. Must have access to the master realm | |
 | `external.keycloak.password`  | Password used for setting up keycloak users. | |
 | `external.keycloak.realm`  | Keycloak realm that is used for this hyperspace.| |
-| `external.keycloak.clientSecret`  | UUID that is used as client secret in communication between Mercury and keycloak.| <random uuid> |
+| `external.keycloak.clientSecret`  | UUID that is used as client secret in communication between Saturn and keycloak.| <random uuid> |
 
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
-
-* Mercury
-Settings for Mercury should be in the section `mercury`.
-See [the Mercury README](https://github.com/fairspace/fairspace/blob/dev/projects/mercury/README.md) for more information on the specific settings
 
 ## Image pull secrets
 When pulling docker images from a private repository, k8s needs credentials to do so. This can be configured using [image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry).
@@ -101,9 +97,9 @@ To use the secret for installing a fairspace, follow these steps:
       imagePullSecrets:
       - name: <secret-name>
     ```
-    This configuration should be added for each fairspace service (mercury, saturn), so for example:
+    This configuration should be added for each fairspace service (saturn, docs), so for example:
     ```yaml
-      mercury:
+      saturn:
         imagePullSecrets:
         - name: <secret-name>
     ```

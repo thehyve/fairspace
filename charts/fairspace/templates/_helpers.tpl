@@ -78,10 +78,11 @@ Scheme to access fairspace components (http or https)
 {{- end -}}
 
 
-{{/* Mercury external hostname */}}
-{{- define "mercury.hostname" -}}
+{{/* Saturn external hostname */}}
+{{- define "saturn.hostname" -}}
 {{- .Values.fairspace.ingress.domain -}}
 {{- end -}}
+
 
 {{/* Docs external hostname */}}
 {{- define "docs.hostname" -}}
@@ -89,19 +90,19 @@ Scheme to access fairspace components (http or https)
 {{- end -}}
 
 {{- define "fairspace.url" -}}
-{{ template "fairspace.scheme" . }}://{{ template "mercury.hostname" . }}
+{{ template "fairspace.scheme" . }}://{{ template "sa.hostname" . }}
 {{- end -}}
 
 {{- define "jupyter.url" -}}
-{{ template "fairspace.scheme" . }}://jupyter.{{ template "mercury.hostname" . }}
+{{ template "fairspace.scheme" . }}://jupyter.{{ template "saturn.hostname" . }}
 {{- end -}}
 
 {{- define "docs.url" -}}
 {{ template "fairspace.scheme" . }}://{{ template "docs.hostname" . }}
 {{- end -}}
 
-{{- define "mercury.fullname" -}}
-{{- .Values.mercury.nameOverride | default (printf "%s-mercury" .Release.Name) -}}
+{{- define "saturn.fullname" -}}
+{{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
 {{- end -}}
 {{- define "docs.fullname" -}}
 {{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
