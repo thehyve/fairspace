@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.fairspace.saturn.services.users.Role;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.query.text.es.ESSettings;
 import org.apache.jena.tdb2.params.StoreParams;
@@ -29,17 +28,19 @@ public class Config {
 
     public int port = 8080;
 
-    public String publicUrl = "http://localhost:3000";
+    public String publicUrl = "http://localhost:8080";
 
-    public String privateUrl = "http://localhost:8080";
+    public String elasticsearchUrl = "http://localhost:9200";
 
-    public final Jena jena = new Jena();
+    public Jena jena = new Jena();
 
-    public final Auth auth = new Auth();
+    public Auth auth = new Auth();
 
-    public final WebDAV webDAV = new WebDAV();
+    public WebDAV webDAV = new WebDAV();
 
-    public final Properties mail = new Properties();
+    public Properties mail = new Properties();
+
+    public Map<String, String> services = new HashMap<>();
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
@@ -68,12 +69,9 @@ public class Config {
 
     public static class Auth {
         public boolean enabled = false;
-
-        public Set<Role> developerRoles = EnumSet.of(Role.CanRead, Role.CanWrite, Role.DataSteward, Role.SparqlUser, Role.Coordinator);
-
-        public String fullAccessRole = "organisation-admin";
-
-        public String userUrl = "http://localhost:5100/auth/admin/realms/fairspace/users/";
+        public String authServerUrl = "http://localhost:5100/auth/";
+        public String realm = "fairspace";
+        public String clientId = "workspace-client";
     }
 
     public static class WebDAV {

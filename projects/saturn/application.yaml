@@ -1,7 +1,7 @@
 # Application's port
 port: 8080
-publicUrl: "http://localhost:3000"
-privateUrl: "http://localhost:8080"
+publicUrl: http://localhost:8080
+elasticsearchUrl: http://localhost:9200
 jena:
   # Base IRI for all metadata entities
   metadataBaseIRI: "http://localhost/iri/"
@@ -56,16 +56,9 @@ jena:
 auth:
   # Enables JWT/JWKS authentication. Defaults to false.
   enabled: true
-  # User roles (for local development only)
-  developerRoles:
-    - CanRead
-    - CanWrite
-    - DataSteward
-    - SparqlUser
-    - Coordinator
-  # Role name for users who are allowed to do EVERYTHING
-  fullAccessRole: organisation-admin
-  userUrl: http://localhost:5100/auth/admin/realms/fairspace/users/
+  authServerUrl: http://localhost:5100/auth/
+  realm: fairspace
+  clientId: workspace-client
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
@@ -78,3 +71,7 @@ mail:
   mail.smtp.host: host
   mail.smtp.port: 587
   mail.smtp.starttls.enable: true
+services:
+  jupyterhub: https://jupyter.org/hub
+  cbioportal: https://www.cbioportal.org
+

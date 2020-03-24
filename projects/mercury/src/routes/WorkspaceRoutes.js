@@ -4,7 +4,6 @@ import {Redirect, Route, Switch} from "react-router-dom";
 import * as queryString from 'query-string';
 import WorkspaceOverview from "../home/Home";
 import Collections from "../collections/CollectionsPage";
-import Notebooks from "../notebooks/Notebooks";
 import FilesPage from "../file/FilesPage";
 import SearchPage from '../search/SearchPage';
 import {createMetadataIri, createVocabularyIri} from "../common/utils/linkeddata/metadataUtils";
@@ -60,8 +59,6 @@ const WorkspaceRoutes = () => (
                 </LinkedDataMetadataProvider>
             )}
         />
-
-        <Route path="/notebooks" exact component={Notebooks} />
 
         <Route
             path="/metadata"

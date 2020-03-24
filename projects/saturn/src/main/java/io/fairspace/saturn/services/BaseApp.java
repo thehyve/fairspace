@@ -35,7 +35,7 @@ public abstract class BaseApp implements SparkApplication {
     @Override
     public final void init() {
         path(basePath, () -> {
-            notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
+      //      notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
             exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
             exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
             exception(DAOException.class, exceptionHandler(SC_BAD_REQUEST, "Bad request"));

@@ -58,7 +58,7 @@ public class Services {
         this.dao = new DAO(dataset);
 
         workspaceService = new WorkspaceService(dao);
-        userService = new UserService(dao, config.auth.userUrl);
+        userService = new UserService(config.auth, dao);
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);

@@ -11,7 +11,7 @@ data:
   application.yaml: |-
     port: 8080
     publicUrl: https://{{ .Values.fairspace.ingress.domain }}
-    privateUrl: http://{{ .Release.Name }}-saturn].{{ .Release.Namespace }}.svc.cluster.local
+    elasticsearchUrl: {{ template "elasticsearch.baseurl" . }}
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
       vocabularyBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/vocabulary/
@@ -35,6 +35,9 @@ data:
       userUrl: {{ .Values.external.keycloak.baseUrl }}/auth/admin/realms/{{ .Values.external.keycloak.realm }}/users/
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
+    services:
+      {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
+      {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
 
