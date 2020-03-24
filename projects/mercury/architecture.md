@@ -10,7 +10,7 @@ Most feature folders contain:
 ## The rest of the code
 - /common (Shared code)
   - /components
-    - [InformationDrawer](./src/common/components/InformationDrawer.js) (Side panel contains collection info, collaborators/permissions and metadata for selected collection, directories or files)
+    - [CollectionInformationDrawer](src/collections/CollectionInformationDrawer.js) (Side panel contains collection info, collaborators/permissions and metadata for selected collection, directories or files)
   - /context (shared/injected state/logic) [Read on React Context](https://reactjs.org/docs/context.html)
   - /hooks (pure logic/state no UI) [Read on React Hooks](https://reactjs.org/docs/hooks-intro.html)
   - [/services/Config.js](./src/common/services/Config.js) (configuration from backend)

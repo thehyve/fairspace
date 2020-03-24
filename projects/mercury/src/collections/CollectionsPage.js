@@ -5,7 +5,7 @@ import {BreadCrumbs, ConfirmationDialog, SearchBar, usePageTitleUpdater} from ".
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
 import CollectionBrowser from "./CollectionBrowser";
-import InformationDrawer from '../common/components/InformationDrawer';
+import CollectionInformationDrawer from './CollectionInformationDrawer';
 import {useSingleSelection} from "../file/UseSelection";
 import {LoadingOverlay} from "../common/components";
 import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
@@ -57,7 +57,7 @@ const CollectionsPage = ({history}) => {
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                    <InformationDrawer
+                    <CollectionInformationDrawer
                         inCollectionsBrowser
                         setBusy={setBusy}
                         selectedCollectionIri={selected}

@@ -5,7 +5,7 @@ import queryString from "query-string";
 import {BreadCrumbs, SearchBar, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
-import InformationDrawer from '../common/components/InformationDrawer';
+import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
 import {getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
@@ -87,7 +87,7 @@ export const FilesPage = ({
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
-                    <InformationDrawer
+                    <CollectionInformationDrawer
                         setBusy={setBusy}
                         path={path}
                         selectedCollectionIri={collection.iri}

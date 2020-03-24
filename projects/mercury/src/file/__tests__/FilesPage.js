@@ -3,7 +3,7 @@ import {shallow} from "enzyme";
 import {act} from 'react-dom/test-utils';
 
 import {FilesPage} from "../FilesPage";
-import InformationDrawer from "../../common/components/InformationDrawer";
+import CollectionInformationDrawer from "../../collections/CollectionInformationDrawer";
 import FileBrowser from '../FileBrowser';
 
 const collections = [
@@ -47,7 +47,7 @@ describe('FilesPage', () => {
         const fileBrowserProps = wrapper.find(FileBrowser).first().props();
         expect(fileBrowserProps.openedPath).toBe('/location1');
         expect(fileBrowserProps.openedCollection.location).toBe('location1');
-        const informationDrawerProps = wrapper.find(InformationDrawer).first().props();
+        const informationDrawerProps = wrapper.find(CollectionInformationDrawer).first().props();
         expect(informationDrawerProps.selectedCollectionIri).toBe('http://test');
     });
 
@@ -61,7 +61,7 @@ describe('FilesPage', () => {
         const fileBrowserProps = wrapper.find(FileBrowser).first().props();
         expect(fileBrowserProps.openedPath).toBe('/location1/music/jazz');
         expect(fileBrowserProps.openedCollection.location).toBe('location1');
-        const informationDrawerProps = wrapper.find(InformationDrawer).first().props();
+        const informationDrawerProps = wrapper.find(CollectionInformationDrawer).first().props();
         expect(informationDrawerProps.selectedCollectionIri).toBe('http://test');
     });
 });

@@ -1,24 +1,16 @@
 // @flow
 import React, {useContext} from 'react';
-import {
-    ExpansionPanel,
-    ExpansionPanelDetails,
-    ExpansionPanelSummary,
-    Grid,
-    Typography,
-    withStyles
-} from '@material-ui/core';
-import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
+import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography, withStyles} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from 'react-router-dom';
 
-import styles from './InformationDrawer.styles';
-import CollectionDetails from "../../collections/CollectionDetails";
-import PathMetadata from "../../metadata/metadata/PathMetadata";
-import CollectionsContext from "../contexts/CollectionsContext";
-import {LinkedDataEntityFormWithLinkedData} from '../../metadata/common/LinkedDataEntityFormContainer';
-import type {Collection} from '../../collections/CollectionAPI';
-import MessageDisplay from './MessageDisplay';
+import styles from '../common/components/InformationDrawer.styles';
+import CollectionDetails from "./CollectionDetails";
+import PathMetadata from "../metadata/metadata/PathMetadata";
+import CollectionsContext from "../common/contexts/CollectionsContext";
+import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
+import type {Collection} from './CollectionAPI';
+import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
 
 const pathHierarchy = (fullPath) => {
     if (!fullPath) return [];
@@ -32,7 +24,7 @@ const pathHierarchy = (fullPath) => {
     return paths.reverse();
 };
 
-type InformationDrawerProps = {
+type CollectionInformationDrawerProps = {
     classes: any;
     path: string;
     inCollectionsBrowser: boolean;
@@ -43,7 +35,7 @@ type InformationDrawerProps = {
     loading: boolean;
 };
 
-export class InformationDrawer extends React.Component<InformationDrawerProps> {
+export class CollectionInformationDrawer extends React.Component<CollectionInformationDrawerProps> {
     static defaultProps = {
         inCollectionsBrowser: false,
         setBusy: () => {}
@@ -57,22 +49,7 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
 
         if (!collection) {
             return atLeastSingleCollectionExists && inCollectionsBrowser
-                && (
-                    <Grid container direction="column" justify="center" alignItems="center">
-                        <Grid item>
-                            <AssignmentOutlined color="disabled" style={{fontSize: '4em'}} />
-                        </Grid>
-                        <Grid item>
-                            <MessageDisplay
-                                message="Select a collection to display its metadata"
-                                variant="h6"
-                                withIcon={false}
-                                isError={false}
-                                messageColor="textSecondary"
-                            />
-                        </Grid>
-                    </Grid>
-                );
+                && <EmptyInformationDrawer message="Select a collection to display its metadata" />;
         }
 
         const isMetaDataEditable = collection && collection.canWrite && paths.length === 0;
@@ -128,13 +105,13 @@ export class InformationDrawer extends React.Component<InformationDrawerProps> {
     }
 }
 
-const ContextualInformationDrawer = ({selectedCollectionIri, ...props}) => {
+const ContextualCollectionInformationDrawer = ({selectedCollectionIri, ...props}) => {
     const {loading, collections} = useContext(CollectionsContext);
     const collection = collections.find(c => c.iri === selectedCollectionIri);
     const atLeastSingleCollectionExists = collections.length > 0;
 
     return (
-        <InformationDrawer
+        <CollectionInformationDrawer
             {...props}
             loading={loading}
             collection={collection}
@@ -143,4 +120,4 @@ const ContextualInformationDrawer = ({selectedCollectionIri, ...props}) => {
     );
 };
 
-export default withRouter(withStyles(styles)(ContextualInformationDrawer));
+export default withRouter(withStyles(styles)(ContextualCollectionInformationDrawer));

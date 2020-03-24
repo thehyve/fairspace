@@ -14,7 +14,7 @@ import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import UsersPage from '../users/UsersPage';
 import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
-import WorkspaceBrowser from "../workspaces/WorkspaceBrowser";
+import WorkspacePage from "../workspaces/WorkspacePage";
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
@@ -22,7 +22,7 @@ const getSubject = () => (
 
 const WorkspaceRoutes = () => (
     <Switch>
-        <Route path="/workspaces" exact component={WorkspaceBrowser} />
+        <Route path="/workspaces" exact component={WorkspacePage} />
 
         <Route path="/workspaces/:workspace" exact component={WorkspaceOverview} />
 

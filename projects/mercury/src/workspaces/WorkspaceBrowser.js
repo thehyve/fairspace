@@ -1,6 +1,5 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {useHistory, withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import WorkspaceList from './WorkspaceList';
@@ -14,16 +13,15 @@ type WorkspaceBrowserProps = {
     loading: boolean,
     error: boolean,
     workspaces: Workspace[],
-    createWorkspace: (Workspace) => Promise<Workspace>
+    createWorkspace: (Workspace) => Promise<Workspace>,
+    toggleWorkspace: () => {}
 }
 
 export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
-    const {loading, error, workspaces, createWorkspace, refreshWorkspaces} = props;
+    const {loading, error, workspaces, history, createWorkspace, refreshWorkspaces, toggleWorkspace, isSelected} = props;
     const [creatingWorkspace, setCreatingWorkspace] = useState(false);
     const [loadingCreatedWorkspace, setLoadingCreatedWorkspace] = useState(false);
     const {currentUser} = useContext(UserContext);
-
-    const history = useHistory();
 
     const handleCreateWorkspaceClick = () => setCreatingWorkspace(true);
 
@@ -52,6 +50,8 @@ export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
         <>
             <WorkspaceList
                 workspaces={workspaces}
+                toggleWorkspace={toggleWorkspace}
+                isSelected={isSelected}
             />
             {creatingWorkspace ? (
                 <WorkspaceEditor
@@ -113,4 +113,4 @@ const ContextualWorkspaceBrowser = (props) => {
     );
 };
 
-export default withRouter(ContextualWorkspaceBrowser);
+export default ContextualWorkspaceBrowser;

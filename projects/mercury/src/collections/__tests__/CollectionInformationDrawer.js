@@ -2,10 +2,10 @@
 import React from 'react';
 import {shallow} from "enzyme";
 
-import {InformationDrawer} from "../InformationDrawer";
-import CollectionDetails from '../../../collections/CollectionDetails';
+import {CollectionInformationDrawer} from "../CollectionInformationDrawer";
+import CollectionDetails from '../CollectionDetails';
 
-describe('InformationDrawer', () => {
+describe('CollectionInformationDrawer', () => {
     const collection = {
         name: 'My collection',
         description: 'description',
@@ -23,7 +23,7 @@ describe('InformationDrawer', () => {
     };
 
     it('renders collection details for the selected collection', () => {
-        const wrapper = shallow(<InformationDrawer
+        const wrapper = shallow(<CollectionInformationDrawer
             {...defaultProps}
         />);
 
