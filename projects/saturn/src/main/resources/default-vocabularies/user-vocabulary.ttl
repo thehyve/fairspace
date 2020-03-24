@@ -123,117 +123,6 @@ fs:CollectionShape sh:property
         fs:labelShape,
         fs:commentShape .
 
-<WidgetMaster> a fs:Class .
-<WidgetMasterShape> a fs:ClassShape ;
-    sh:closed false ;
-    sh:description "A widget is an element of a graphical user interface (GUI) that displays information or provides a specific way for a user to interact with the operating system or an application." ;
-    sh:name "Master of widgets" ;
-    sh:targetClass <WidgetMaster> ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-        <relatesToWidgetShape>,
-        <dateWidgetShape>,
-        <dateTimeWidgetShape>,
-        <multiLineStringWidgetShape>,
-        <markdownWidgetShape>,
-        <integerLongWidgetShape>,
-        <integerWidgetShape>,
-        <booleanWidgetShape>,
-        <booleanX2WidgetShape>,
-        <fixedDropdownWidgetShape>,
-        fs:labelShape,
-        fs:commentShape .
-
-## User property shapes
-
-<dateWidget> a rdf:Property .
-<dateWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "A single date" ;
-    sh:description "A single date." ;
-    sh:datatype xsd:date ;
-    sh:maxCount 1 ;
-    sh:path <dateWidget> .
-
-<dateTimeWidget> a rdf:Property .
-<dateTimeWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Date and times" ;
-    sh:description "A bunch of date and times." ;
-    sh:datatype xsd:dateTime ;
-    sh:path <dateTimeWidget> .
-
-<multiLineStringWidget> a rdf:Property .
-<multiLineStringWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Multi line string" ;
-    sh:description "Can do newlines, but max length of 500." ;
-    sh:datatype xsd:string ;
-    sh:maxLength 500 ;
-    sh:path <multiLineStringWidget> .
-
-<markdownWidget> a rdf:Property .
-<markdownWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Markdown string" ;
-    sh:description "Provides markdown capabilities to a textfield" ;
-    sh:datatype fs:markdown ;
-    sh:maxCount 1 ;
-    sh:path <markdownWidget> .
-
-<integerLongWidget> a rdf:Property .
-<integerLongWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Integer (long)" ;
-    sh:description "A single integer (long)." ;
-    sh:datatype xsd:long ;
-    sh:maxCount 1 ;
-    sh:path <integerLongWidget> .
-
-<integerWidget> a rdf:Property .
-<integerWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Integer" ;
-    sh:description "A single integer." ;
-    sh:datatype xsd:integer ;
-    sh:maxCount 1 ;
-    sh:path <integerWidget> .
-
-<booleanWidget> a rdf:Property .
-<booleanWidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Boolean" ;
-    sh:description "On or off single." ;
-    sh:datatype xsd:boolean ;
-    sh:maxCount 1 ;
-    sh:path <booleanWidget> .
-
-<booleanX2Widget> a rdf:Property .
-<booleanX2WidgetShape> a fs:DatatypePropertyShape ;
-    sh:name "Boolean X4" ;
-    sh:description "On or off (max 2) times. Can only store unique values though." ;
-    sh:datatype xsd:boolean ;
-    sh:maxCount 2 ;
-    sh:path <booleanX2Widget> .
-
-<fixedDropdownWidget> a rdf:Property .
-<fixedDropdownWidgetShape> a fs:ControlledVocabularyPropertyShape ;
-    sh:name "Fixed set of values (pick 2)" ;
-    sh:description "A set of 2 values from a fixed list." ;
-    sh:in ( "E" "A" "D" "G" "B" "E" ) ;
-    sh:maxCount 2 ;
-    sh:path <fixedDropdownWidget> .
-
-#<resourceWidget> a rdf:Property .
-#<resourceWidgetShape> a fs:ExternalIRIPropertyShape ;
-#    sh:name "Resource" ;
-#    sh:description "Some URL" ;
-#    sh:nodeKind sh:IRI ;
-#    sh:maxCount 5 ;
-#    sh:path <resourceWidget> .
-#
-#<websiteWidget> a rdf:Property .
-#<websiteWidgetShape> a fs:ExternalIRIPropertyShape ;
-#    sh:name "Website" ;
-#    sh:description "A URL for another website" ;
-#    sh:nodeKind sh:IRI ;
-#    fs:externalLink true ;
-#    sh:maxCount 5 ;
-#    sh:path <websiteWidget> .
-
 <projectCodeShape> a fs:DatatypePropertyShape ;
     sh:name "Project Code" ;
     sh:description "Specific project code." ;
@@ -357,14 +246,6 @@ fs:CollectionShape sh:property
     sh:path <numberOfBreakPoints> .
 
 ## User relation shapes
-
-<relatesToWidget> a rdf:Property .
-<relatesToWidgetShape> a fs:RelationShape ;
-    sh:name "Relates to widget master" ;
-    sh:description "Relates to other widget masters" ;
-    sh:class <WidgetMaster> ;
-    fs:inverseRelation <relatesToWidgetShape> ;
-    sh:path <relatesToWidget> .
 
 <derivesFromShape> a fs:RelationShape ;
     sh:name "Derives from" ;
