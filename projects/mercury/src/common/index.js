@@ -39,7 +39,6 @@ export {testHook} from './utils/testUtils';
 export {buildSearchUrl, getSearchQueryFromString} from './utils/searchUtils';
 
 /** ************************ OTHER ************************* */
-export {default as Config} from './services/Config';
 export {default as logout} from './services/logout';
 export {SORT_DATE_CREATED, SORT_ALPHABETICALLY} from './services/SearchAPI';
 export {default as SearchAPI} from './services/SearchAPI';

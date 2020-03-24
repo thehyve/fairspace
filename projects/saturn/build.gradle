@@ -70,6 +70,11 @@ dependencies {
 
     implementation 'net.logstash.log4j:jsonevent-layout:1.7'
 
+    compile group: 'org.eclipse.jetty', name: 'jetty-proxy', version: '9.4.15.v20190215'
+
+    implementation 'org.keycloak:keycloak-jetty94-adapter:9.0.0'
+    implementation 'org.keycloak:keycloak-admin-client:9.0.0'
+
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
 

@@ -12,9 +12,9 @@ import io.milton.http.http11.PartialGetHelper;
 import io.milton.resource.GetableResource;
 import io.milton.resource.Resource;
 import io.milton.servlet.ServletRequest;
-import io.milton.servlet.ServletResponse;
-import spark.servlet.SparkApplication;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,12 +25,11 @@ import java.util.Map;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
-import static spark.Spark.before;
 
-public class WebDAVApp implements SparkApplication {
+public class WebDAVServlet extends HttpServlet {
     private final HttpManager httpManager;
 
-    public WebDAVApp(Services svc) {
+    public WebDAVServlet(Services svc) {
         httpManager =  new HttpManagerBuilder() {{
             setResourceFactory(new VfsBackedMiltonResourceFactory(svc.getFileSystem()));
             setMultiNamespaceCustomPropertySourceEnabled(true);
@@ -60,18 +59,13 @@ public class WebDAVApp implements SparkApplication {
     }
 
     @Override
-    public void init() {
-        before("/webdav/*", this::handle);
-        before("/webdav", this::handle);
-    }
-
-    private void handle(spark.Request req, spark.Response res) throws Exception {
-        var servletRequest = (HttpServletRequest) req.raw();
-        var servletResponse = (HttpServletResponse) res.raw();
+    public void service(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) throws ServletException, IOException {
+        var req = (HttpServletRequest) servletRequest;
+        var res = (HttpServletResponse) servletResponse;
 
         try {
-            setThreadlocals(servletRequest, servletResponse);
-            httpManager.process(new ServletRequest(servletRequest, servletRequest.getServletContext()), new ServletResponse(servletResponse));
+            setThreadlocals(req, res);
+            httpManager.process(new ServletRequest(req, servletRequest.getServletContext()), new io.milton.servlet.ServletResponse(res));
         } finally {
             clearThreadlocals();
             servletResponse.getOutputStream().flush();

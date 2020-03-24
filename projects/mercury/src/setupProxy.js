@@ -7,8 +7,6 @@ const BACKEND_URL = 'http://localhost:8081/';
 const getWorkspaceId = (url) => url.split('/')[4];
 
 module.exports = (app) => {
-    app.get('/config/config.json', (req, res) => res.send({}));
-
     // to talk to a real ES instance on localhost
     app.use(proxy('/api/v1/search', {
         target: SEARCH_URL,
