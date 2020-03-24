@@ -36,8 +36,8 @@ data:
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     services:
-      {{ if ( and .Values.services .Values.services.jupyterhub  ) }}, "jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
-      {{ if ( and .Values.services .Values.services.cbioportal  ) }}, "cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
+      {{ if ( and .Values.services .Values.services.jupyterhub  ) }}"jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
+      {{ if ( and .Values.services .Values.services.cbioportal  ) }}"cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
 
