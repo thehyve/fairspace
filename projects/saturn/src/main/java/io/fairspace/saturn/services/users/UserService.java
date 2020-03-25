@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.System.getenv;
 
@@ -67,9 +68,12 @@ public class UserService {
                 .stream()
                 .map(keycloakUser -> {
                     var user = new User();
+                    var name = (isNotEmpty(keycloakUser.getFirstName()) || isNotEmpty(keycloakUser.getLastName()))
+                            ? (keycloakUser.getFirstName() + " " + keycloakUser.getLastName()).trim()
+                            : keycloakUser.getUsername();
                     user.setId(keycloakUser.getId());
                     user.setIri(generateMetadataIri(keycloakUser.getId()));
-                    user.setName((keycloakUser.getFirstName() + " " + keycloakUser.getLastName()).trim());
+                    user.setName(name);
                     user.setEmail(keycloakUser.getEmail());
                     return user;
                 })
