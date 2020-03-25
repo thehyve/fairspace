@@ -37,7 +37,9 @@ const columns = {
 };
 
 const WorkspaceList = ({
-    workspaces = []
+    workspaces = [],
+    isSelected = () => false,
+    toggleWorkspace = () => {}
 }) => {
     const {currentUser = {authorizations: []}} = useContext(UserContext);
     const history = useHistory();
@@ -47,6 +49,10 @@ const WorkspaceList = ({
             history.push(`/workspaces/${workspace.id}/`);
         }
     };
+    const onWorkspaceClick = (workspace: Workspace) => {
+        toggleWorkspace(workspace);
+    };
+
     const workspacesWithAccess = workspaces.map(ws => ({...ws, hasAccess: isAdmin(currentUser) || !!currentUser.authorizations.find(role => role.startsWith(`workspace-${ws.id}-`))}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'id');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
@@ -85,24 +91,29 @@ const WorkspaceList = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map((workspace: Workspace & Accessible) => (
-                        <TableRow
-                            key={workspace.id}
-                            hover
-                            onClick={() => {}}
-                            onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
-                        >
-                            <TableCell style={{maxWidth: 32}} component="th" scope="row" key="hasAccess">
-                                {!workspace.hasAccess && (<Lock />)}
-                            </TableCell>
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row" key="id">
-                                {workspace.id}
-                            </TableCell>
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row" key="label">
-                                {workspace.label}
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {pagedItems.map((workspace: Workspace & Accessible) => {
+                        const selected = isSelected(workspace);
+
+                        return (
+                            <TableRow
+                                key={workspace.id}
+                                hover
+                                onClick={() => onWorkspaceClick(workspace)}
+                                onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
+                                selected={selected}
+                            >
+                                <TableCell style={{maxWidth: 32}} component="th" scope="row" key="hasAccess">
+                                    {!workspace.hasAccess && (<Lock />)}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 160}} component="th" scope="row" key="id">
+                                    {workspace.id}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 160}} component="th" scope="row" key="label">
+                                    {workspace.label}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
             <TablePagination

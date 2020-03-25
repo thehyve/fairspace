@@ -10,7 +10,7 @@ export const workspaceRole = (user) => {
     return role && role.substring(workspacePrefix.length);
 };
 
-export const isAdmin = (user) => user.authorizations.includes('organisation-admin');
+export const isAdmin = (user) => user && user.authorizations && user.authorizations.includes('organisation-admin');
 export const isDataSteward = (user) => ['datasteward', 'coordinator'].includes(workspaceRole(user));
 export const isCoordinator = (user) => ['coordinator'].includes(workspaceRole(user));
 export const canWrite = (user) => ['write', 'datasteward', 'coordinator'].includes(workspaceRole(user));

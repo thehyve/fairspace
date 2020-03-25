@@ -1,7 +1,7 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {useHistory, withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
+import {useHistory, withRouter} from "react-router-dom";
 import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
@@ -14,16 +14,15 @@ type WorkspaceBrowserProps = {
     loading: boolean,
     error: boolean,
     workspaces: Workspace[],
-    createWorkspace: (Workspace) => Promise<Workspace>
+    createWorkspace: (Workspace) => Promise<Workspace>,
+    toggleWorkspace: () => {}
 }
 
 export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
-    const {loading, error, workspaces, createWorkspace, refreshWorkspaces} = props;
+    const {loading, error, workspaces, history, createWorkspace, refreshWorkspaces, toggleWorkspace, isSelected} = props;
     const [creatingWorkspace, setCreatingWorkspace] = useState(false);
     const [loadingCreatedWorkspace, setLoadingCreatedWorkspace] = useState(false);
     const {currentUser} = useContext(UserContext);
-
-    const history = useHistory();
 
     const handleCreateWorkspaceClick = () => setCreatingWorkspace(true);
 
@@ -52,6 +51,8 @@ export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
         <>
             <WorkspaceList
                 workspaces={workspaces}
+                toggleWorkspace={toggleWorkspace}
+                isSelected={isSelected}
             />
             {creatingWorkspace ? (
                 <WorkspaceEditor
@@ -96,6 +97,7 @@ WorkspaceBrowser.defaultProps = {
 };
 
 const ContextualWorkspaceBrowser = (props) => {
+    const history = useHistory();
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
     const {workspaces, workspacesLoading, workspacesError, createWorkspace, refreshWorkspaces} = useContext(WorkspaceContext);
@@ -103,6 +105,7 @@ const ContextualWorkspaceBrowser = (props) => {
     return (
         <WorkspaceBrowser
             {...props}
+            history={history}
             workspaces={workspaces}
             createWorkspace={createWorkspace}
             refreshWorkspaces={refreshWorkspaces}
