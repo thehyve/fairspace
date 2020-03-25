@@ -29,8 +29,6 @@ public class UserService {
 
 
     public UserService(Config.Auth config, DAO dao) {
-        log.warn("KEYCLOAK_CLIENT_SECRET: " + getenv("KEYCLOAK_CLIENT_SECRET"));
-
         usersResource = KeycloakBuilder.builder()
                 .serverUrl(config.authServerUrl)
                 .realm(config.realm)
