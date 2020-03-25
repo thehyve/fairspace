@@ -23,7 +23,7 @@ public class SecurityHandlerFactory {
         adapterConfig.setResource(config.clientId);
         adapterConfig.setRealm(config.realm);
         adapterConfig.setAuthServerUrl(CONFIG.auth.authServerUrl);
-        adapterConfig.setTokenStore(TokenStore.COOKIE.name());
+        adapterConfig.setTokenStore(TokenStore.SESSION.name());
         adapterConfig.setCredentials(Map.of("secret",  getenv("KEYCLOAK_CLIENT_SECRET")));
         authenticator.setAdapterConfig(adapterConfig);
         securityHandler.setAuthenticator(authenticator);

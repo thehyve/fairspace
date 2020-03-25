@@ -7,16 +7,16 @@ import io.fairspace.saturn.services.web.StaticFilesApp;
 import io.fairspace.saturn.webdav.WebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.server.session.SessionHandler;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static io.fairspace.saturn.auth.SecurityHandlerFactory.createSecurityHandler;
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.services.users.User.setCurrentUser;
 
@@ -31,13 +31,13 @@ public class App {
 
         var svc = new Services(CONFIG, ds);
 
-        FusekiServer.create()
+        var server = FusekiServer.create()
                 .securityHandler(createSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", ds, false)
                 .addFilter("/*", new Filter() {
                     @Override
                     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-                        setCurrentUser(svc.getUserService().getUser(generateMetadataIri(((HttpServletRequest)request).getRemoteUser())));
+                        setCurrentUser(svc.getUserService().getUser(generateMetadataIri(((HttpServletRequest) request).getRemoteUser())));
                         chain.doFilter(request, response);
                     }
 
@@ -53,19 +53,15 @@ public class App {
                     protected String rewriteTarget(HttpServletRequest clientRequest) {
                         return clientRequest.getRequestURI().replace(API_PREFIX + "/search", CONFIG.elasticsearchUrl);
                     }
-
-                    @Override
-                    protected HttpClient createHttpClient() throws ServletException {
-                        var client = super.createHttpClient();
-                        client.setRequestBufferSize(64 * 1024);
-                        return client;
-                    }
                 })
                 .addFilter(API_PREFIX + "/*", createApiFilter(API_PREFIX, svc, CONFIG))
                 .addFilter("/*", new SaturnSparkFilter(new StaticFilesApp()))
                 .port(CONFIG.port)
-                .build()
-                .start();
+                .build();
+
+        server.getJettyServer().insertHandler(new SessionHandler());
+
+        server.start();
 
         log.info("Saturn has started");
     }
