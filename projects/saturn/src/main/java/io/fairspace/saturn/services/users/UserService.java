@@ -29,6 +29,8 @@ public class UserService {
 
 
     public UserService(Config.Auth config, DAO dao) {
+        log.warn("KEYCLOAK_CLIENT_SECRET: " + getenv("KEYCLOAK_CLIENT_SECRET"));
+
         usersResource = KeycloakBuilder.builder()
                 .serverUrl(config.authServerUrl)
                 .realm(config.realm)
@@ -45,7 +47,7 @@ public class UserService {
                 .expireAfterAccess(30, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
-                    public List<User> load(Boolean key) throws Exception {
+                    public List<User> load(Boolean key) {
                         var users = fetchKeycloakUsers();
                         dao.getDataset().executeWrite(() -> users.forEach(dao::write));
                         return users;
@@ -65,7 +67,7 @@ public class UserService {
         }
     }
 
-    private List<User> fetchKeycloakUsers() throws Exception {
+    private List<User> fetchKeycloakUsers() {
         return usersResource.list()
                 .stream()
                 .map(keycloakUser -> {
