@@ -10,8 +10,9 @@ import WorkspaceDetails from "./WorkspaceDetails";
 
 
 export const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWorkspaceExists}) => {
-    if (!workspace && !loading && atLeastSingleWorkspaceExists) {
-        return <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
+    if (!workspace) {
+        return atLeastSingleWorkspaceExists
+            && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
     }
 
     return (
