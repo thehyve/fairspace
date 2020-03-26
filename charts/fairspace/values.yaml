@@ -21,7 +21,6 @@ external:
   # - use temporary credentials for setting up these users
   # - ...
   keycloak:
-    enabled: true
     baseUrl:
     username:
     password:
@@ -41,10 +40,6 @@ external:
     transport:
       host:
       port: 9300
-
-keycloak:
-  enabled: true
-
 
 #####################################################################
 # Specific settings for ElasticSearch
