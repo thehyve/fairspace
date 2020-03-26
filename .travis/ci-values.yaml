@@ -28,6 +28,10 @@ fairspace:
       configurationScriptsTag: 0.1.9-SNAPSHOT
       pullPolicy: Always
 
+keycloak:
+  keycloak:
+    password: keycloak-ci-123
+
 services:
   jupyterhub: https://jupyter.fairspace.ci.fairway.app
 
@@ -65,11 +69,6 @@ saturn:
     mail.smtp.port: 587
     mail.smtp.starttls.enable: true
 
-
-# Specific settings for Saturn subchart
-saturn:
-  image:
-    pullPolicy: Always
 # Specific settings for Docs subchart
 docs:
   image:

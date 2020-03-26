@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import static io.fairspace.saturn.auth.SecurityHandlerFactory.createSecurityHandler;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 
 @Slf4j
 public class App {
