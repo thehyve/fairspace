@@ -21,6 +21,7 @@ external:
   # - use temporary credentials for setting up these users
   # - ...
   keycloak:
+    enabled: true
     baseUrl:
     username:
     password:
