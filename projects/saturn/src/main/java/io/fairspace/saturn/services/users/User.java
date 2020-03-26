@@ -26,6 +26,8 @@ public class User extends PersistentEntity {
     @RDFProperty(EMAIL_URI)
     private String email;
 
+    private boolean admin;
+
     private final Set<Role> roles = EnumSet.noneOf(Role.class);
 
     public static User getCurrentUser() {

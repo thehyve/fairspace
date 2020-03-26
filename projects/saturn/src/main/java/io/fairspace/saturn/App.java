@@ -1,5 +1,6 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.auth.UserIdentityFilter;
 import io.fairspace.saturn.config.SaturnSparkFilter;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
@@ -10,15 +11,12 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.server.session.SessionHandler;
 
-import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 import static io.fairspace.saturn.auth.SecurityHandlerFactory.createSecurityHandler;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
 
 @Slf4j
 public class App {
@@ -34,19 +32,7 @@ public class App {
         var server = FusekiServer.create()
                 .securityHandler(createSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", ds, false)
-                .addFilter("/*", new Filter() {
-                    @Override
-                    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-                        setCurrentUser(svc.getUserService().getUser(generateMetadataIri(((HttpServletRequest) request).getRemoteUser())));
-                        chain.doFilter(request, response);
-                    }
-
-                    @Override
-                    public void init(FilterConfig filterConfig) {}
-
-                    @Override
-                    public void destroy() {}
-                })
+                .addFilter("/*", new UserIdentityFilter(svc))
                 .addServlet(API_PREFIX + "/webdav/*", new WebDAVServlet(svc))
                 .addServlet(API_PREFIX + "/search/*", new ProxyServlet() {
                     @Override
@@ -65,4 +51,5 @@ public class App {
 
         log.info("Saturn has started");
     }
+
 }
