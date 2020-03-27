@@ -5,7 +5,6 @@ import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';
 import useLinkedData from '../metadata/UseLinkedData';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
-import LinkedDataContext from '../metadata/LinkedDataContext';
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import {currentWorkspace} from "../workspaces/workspaces";
 import {LoadingInlay} from "../common";
@@ -17,7 +16,6 @@ const WorkspaceInfoWithProvider = () => (
 );
 
 const WorkspaceInfo = () => {
-    const {isCoordinator} = useContext(LinkedDataContext);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
     const id = currentWorkspace();
     const ws = workspaces.find(w => w.id === id);
@@ -32,7 +30,7 @@ const WorkspaceInfo = () => {
     return (
         <>
             <Paper style={{padding: 20}}>
-                {isCoordinator ? (
+                {ws.canManage ? (
                     <LinkedDataEntityFormContainer
                         subject={iri}
                         properties={properties}

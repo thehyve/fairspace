@@ -28,8 +28,6 @@ public class User extends PersistentEntity {
 
     private boolean admin;
 
-    private final Set<Role> roles = EnumSet.noneOf(Role.class);
-
     public static User getCurrentUser() {
         return current.get();
     }

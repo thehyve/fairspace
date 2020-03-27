@@ -35,75 +35,76 @@ type CollectionInformationDrawerProps = {
     loading: boolean;
 };
 
-export class CollectionInformationDrawer extends React.Component<CollectionInformationDrawerProps> {
-    static defaultProps = {
-        inCollectionsBrowser: false,
-        setBusy: () => {}
-    };
+export const CollectionInformationDrawer = (props: CollectionInformationDrawerProps) => {
+    const {
+        classes, collection, loading, atLeastSingleCollectionExists, setHasCollectionMetadataUpdates,
+        inCollectionsBrowser, path
+    } = props;
 
-    render() {
-        const {classes, collection, loading, atLeastSingleCollectionExists, setHasCollectionMetadataUpdates,
-            inCollectionsBrowser, path} = this.props;
+    const paths = pathHierarchy(path);
 
-        const paths = pathHierarchy(path);
-
-        if (!collection) {
-            return atLeastSingleCollectionExists && inCollectionsBrowser
-                && <EmptyInformationDrawer message="Select a collection to display its metadata" />;
-        }
-
-        const isMetaDataEditable = collection && collection.canWrite && paths.length === 0;
-        const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
-
-        return (
-            <>
-                <CollectionDetails
-                    collection={collection}
-                    inCollectionsBrowser={this.props.inCollectionsBrowser}
-                    loading={loading}
-                    setBusy={this.props.setBusy}
-                />
-                <ExpansionPanel defaultExpanded>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography>Metadata for {collection.name}</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <LinkedDataEntityFormWithLinkedData
-                            subject={collection.iri}
-                            isMetaDataEditable={isMetaDataEditable}
-                            setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                {
-                    paths.map(metadataPath => (
-                        <ExpansionPanel
-                            key={metadataPath}
-                            defaultExpanded
-                        >
-                            <ExpansionPanelSummary
-                                expandIcon={<ExpandMoreIcon />}
-                            >
-                                <Typography
-                                    className={classes.heading}
-                                >
-                                    Metadata for {relativePath(metadataPath)}
-                                </Typography>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails>
-                                <PathMetadata
-                                    path={metadataPath}
-                                    isMetaDataEditable={collection.canManage && metadataPath === paths[paths.length - 1]}
-                                    style={{width: '100%'}}
-                                />
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
-                    ))
-                }
-            </>
-        );
+    if (!collection) {
+        return atLeastSingleCollectionExists && inCollectionsBrowser
+            && <EmptyInformationDrawer message="Select a collection to display its metadata" />;
     }
-}
+
+    const isMetaDataEditable = collection && collection.canWrite && paths.length === 0;
+    const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
+
+    return (
+        <>
+            <CollectionDetails
+                collection={collection}
+                inCollectionsBrowser={props.inCollectionsBrowser}
+                loading={loading}
+                setBusy={props.setBusy}
+            />
+            <ExpansionPanel defaultExpanded>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Metadata for {collection.name}</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                    <LinkedDataEntityFormWithLinkedData
+                        subject={collection.iri}
+                        isMetaDataEditable={isMetaDataEditable}
+                        setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
+                    />
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+            {
+                paths.map(metadataPath => (
+                    <ExpansionPanel
+                        key={metadataPath}
+                        defaultExpanded
+                    >
+                        <ExpansionPanelSummary
+                            expandIcon={<ExpandMoreIcon />}
+                        >
+                            <Typography
+                                className={classes.heading}
+                            >
+                                Metadata for {relativePath(metadataPath)}
+                            </Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <PathMetadata
+                                path={metadataPath}
+                                isMetaDataEditable={collection.canManage && metadataPath === paths[paths.length - 1]}
+                                style={{width: '100%'}}
+                            />
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                ))
+            }
+        </>
+    );
+};
+
+CollectionInformationDrawer.defaultProps = {
+    inCollectionsBrowser: false,
+    setBusy: () => {
+    }
+};
 
 const ContextualCollectionInformationDrawer = ({selectedCollectionIri, ...props}) => {
     const {loading, collections} = useContext(CollectionsContext);

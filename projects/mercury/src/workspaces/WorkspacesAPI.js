@@ -5,12 +5,24 @@ import {extractJsonData, handleHttpError} from '../common';
 
 const workspacesUrl = "/api/v1/workspaces/";
 
-export type Workspace = {
+export type WorkspacePermissions = {|
+    canRead: boolean;
+    canWrite: boolean;
+    canManage: boolean;
+|};
+
+export type WorkspaceProperties = {|
     id: string;
     label?: string;
     description?: string;
     node: string;
-}
+|}
+
+export type Resource = {|
+    iri: string;
+|};
+
+export type Workspace = WorkspacePermissions & WorkspaceProperties & Resource;
 
 class WorkspacesAPI {
     getWorkspaces(): Promise<Workspace[]> {
@@ -21,7 +33,7 @@ class WorkspacesAPI {
             .then(extractJsonData);
     }
 
-    createWorkspace(workspace: Workspace): Promise<Workspace> {
+    createWorkspace(workspace: WorkspaceProperties): Promise<WorkspaceProperties> {
         return axios.put(`${workspacesUrl}${workspace.id}`, '', {
             headers: {Accept: 'application/json'},
         })
