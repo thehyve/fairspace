@@ -3,7 +3,7 @@ import {getDisplayName} from "../userUtils";
 describe('usersUtils', () => {
     const mockUser = {
         iri: "http://example.com#b4804cdb-b690-41ef-a167-6af7ed983d8d",
-        fullName: 'Daenarys Targaryen',
+        name: 'Daenarys Targaryen',
         email: 'user@example.com'
     };
 
