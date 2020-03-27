@@ -224,7 +224,8 @@ public class PermissionsService {
         if (r.hasProperty(FS.read, user)) {
             return Optional.of(Access.Read);
         }
-        if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection)) {
+        if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection) ||
+            r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Workspace)) {
             return Optional.of(Access.None);
         }
         if (r.hasLiteral(FS.writeRestricted, true)) {
