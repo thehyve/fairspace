@@ -45,17 +45,6 @@ const WorkspaceMenu = ({location: {pathname}}) => {
                     </ListItemIcon>
                     <ListItemText primary="Vocabulary" />
                 </ListItem>
-                <ListItem
-                    component={NavLink}
-                    to={workspacePrefix() + "/users"}
-                    button
-                    selected={pathname.startsWith(workspacePrefix() + '/users')}
-                >
-                    <ListItemIcon>
-                        <Group />
-                    </ListItemIcon>
-                    <ListItemText primary="Users" />
-                </ListItem>
             </List>
 
             <div>
