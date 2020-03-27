@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.permissions;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -18,10 +17,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
@@ -71,10 +72,6 @@ public class PermissionsServiceTest {
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
-        when(currentUser.getRoles()).thenAnswer(invocation ->
-                isCoordinator
-                ? EnumSet.of(Role.CanRead, Role.CanWrite, Role.Coordinator)
-                : EnumSet.of(Role.CanRead, Role.CanWrite));
 
 
         service = new PermissionsService(ds, permissionChangeEventHandler, userService);

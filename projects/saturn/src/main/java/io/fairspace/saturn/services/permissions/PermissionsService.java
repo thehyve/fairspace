@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.permissions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
@@ -59,7 +58,7 @@ public class PermissionsService {
 
             validate(userService.getUser(user) != null, "A user must be known to the system");
 
-            if (!isCollection(resource)) {
+            if (!isCollection(resource) && !isWorkspace(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
                 var isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
                 validate(!isSpecifyingWriteAccessOnNonRestrictedResource,
@@ -89,7 +88,7 @@ public class PermissionsService {
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
-        if (getCurrentUser().getRoles().contains(Role.Coordinator)) {
+        if (getCurrentUser().isAdmin()) {
             return;
         }
 
@@ -132,6 +131,7 @@ public class PermissionsService {
         var success = dataset.calculateWrite(() -> {
             ensureAccess(resource, Access.Manage);
             validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
+            validate(!isWorkspace(resource), "A workspace cannot be marked as write-restricted");
             if (restricted != isWriteRestricted(resource)) {
                 var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
                 var s = g.asRDFNode(resource).asResource();
@@ -154,7 +154,7 @@ public class PermissionsService {
 
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
-        if (getCurrentUser().getRoles().contains(Role.Coordinator)) {
+        if (getCurrentUser().isAdmin()) {
             return;
         }
 
@@ -196,20 +196,12 @@ public class PermissionsService {
 
         // Organisation admins are allowed to do anything, so they have manage right
         // to any resource
-        if (userObject.getRoles().contains(Role.Coordinator)) {
+        if (userObject.isAdmin()) {
             authorities.forEach(node -> result.put(node, Access.Manage));
             return result;
         }
 
-        Access defaultAccess;
-        if (userObject.getRoles().contains(Role.CanWrite)) {
-            defaultAccess = Access.Write;
-        } else {
-            // Any workspace user can read all objects, except for
-            // collection-level objects
-            defaultAccess = Access.Read;
-        }
-
+        Access defaultAccess = Access.Read;
         var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
         var userResource = g.wrapAsResource(userObject.getIri());
         authorities.forEach(a -> getResourceAccess(g.wrapAsResource(a), userResource)
@@ -244,6 +236,10 @@ public class PermissionsService {
 
     private boolean isCollection(Node resource) {
         return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Collection);
+    }
+
+    private boolean isWorkspace(Node resource) {
+        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Workspace);
     }
 
     /**

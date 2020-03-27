@@ -53,7 +53,7 @@ const WorkspaceList = ({
         toggleWorkspace(workspace);
     };
 
-    const workspacesWithAccess = workspaces.map(ws => ({...ws, hasAccess: isAdmin(currentUser) || !!currentUser.authorizations.find(role => role.startsWith(`workspace-${ws.id}-`))}));
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, hasAccess: isAdmin(currentUser) || ws.canRead}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'id');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 

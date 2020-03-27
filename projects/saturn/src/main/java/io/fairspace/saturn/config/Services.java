@@ -56,13 +56,13 @@ public class Services {
         this.dataset = dataset;
         this.dao = new DAO(dataset);
 
-        workspaceService = new WorkspaceService(dao);
         userService = new UserService(config.auth, dao);
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService);
 
+        workspaceService = new WorkspaceService(dao, permissionsService);
         collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", dao, eventBus::post, permissionsService);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);

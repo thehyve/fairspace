@@ -2,7 +2,6 @@ import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {createMetadataIri} from '../common/utils/linkeddata/metadataUtils';
-import {workspaceRole} from "../common/utils/userUtils";
 
 export type User = {
     iri: string;
@@ -12,11 +11,8 @@ export type User = {
     firstName?: string;
     lastName?: string;
     email?: string;
-    authorizations: string
+    admin: boolean;
 }
-
-export type WorkspaceUser = User & { role?: string };
-
 
 const requestOptions = {
     headers: {Accept: 'application/json'}
@@ -30,7 +26,4 @@ export const getUser = () => axios.get('/api/v1/users/current')
 export const getUsers = () => axios.get('/api/v1/users/', requestOptions)
     .catch(handleHttpError('Error while loading users'))
     .then(extractJsonData)
-    .then(users => users.map(user => ({iri: createMetadataIri(user.id), role: workspaceRole(user), ...user})));
-
-export const grantUserRole = (user, role) => axios.put(`users/${user.id}/roles/${role}`, null, requestOptions)
-    .catch(handleHttpError('Error while altering a role'));
+    .then(users => users.map(user => ({iri: createMetadataIri(user.id), ...user})));

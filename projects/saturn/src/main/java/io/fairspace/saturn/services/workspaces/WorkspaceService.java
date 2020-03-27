@@ -1,26 +1,48 @@
 package io.fairspace.saturn.services.workspaces;
 
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.List;
 
 import static io.fairspace.saturn.audit.Audit.audit;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 
 public class WorkspaceService {
     private final DAO dao;
+    private final PermissionsService permissions;
 
-    public WorkspaceService(DAO dao) {
+    public WorkspaceService(DAO dao, PermissionsService permissions) {
         this.dao = dao;
+        this.permissions = permissions;
     }
 
     public List<Workspace> listWorkspaces() {
-        return dao.getDataset().calculateRead(() -> dao.list(Workspace.class));
+        return dao.getDataset().calculateRead(() -> {
+            var workspaces = dao.list(Workspace.class);
+            var iris = workspaces.stream().map(Workspace::getIri).collect(toList());
+            var userPermissions = permissions.getPermissions(iris);
+            return workspaces.stream()
+                    .filter(c -> {
+                        c.setAccess(userPermissions.get(c.getIri()));
+                        return c.canRead();
+                    })
+                    .sorted(comparing(Workspace::getName))
+                    .collect(toList());
+        });
     }
 
     public Workspace createWorkspace(String id) {
-        var ws = dao.getDataset().calculateWrite(() -> dao.write(new Workspace(id, id, null)));
+        var ws = dao.getDataset().calculateWrite(() -> {
+            Workspace workspace = new Workspace(id, id, null, Access.Manage);
+            dao.write(workspace);
+            permissions.createResource(workspace.getIri());
+            return workspace;
+        });
         audit("WS_CREATE", "workspace", id);
         return ws;
     }

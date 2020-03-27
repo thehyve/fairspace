@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect} from 'react';
 // Utils
-import {isCoordinator, isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward} from "../common/utils/userUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo,
     getNamespaces,
@@ -69,7 +69,6 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 namespaces,
                 requireIdentifier: false,
                 hasEditRight: isDataSteward(currentUser),
-                isCoordinator: isCoordinator(currentUser),
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,
