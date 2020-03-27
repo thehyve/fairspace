@@ -27,10 +27,7 @@ public class WorkspaceService {
             var iris = workspaces.stream().map(Workspace::getIri).collect(toList());
             var userPermissions = permissions.getPermissions(iris);
             return workspaces.stream()
-                    .filter(c -> {
-                        c.setAccess(userPermissions.get(c.getIri()));
-                        return c.canRead();
-                    })
+                    .peek(c -> c.setAccess(userPermissions.get(c.getIri())))
                     .sorted(comparing(Workspace::getName))
                     .collect(toList());
         });
