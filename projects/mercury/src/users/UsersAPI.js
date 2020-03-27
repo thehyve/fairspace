@@ -6,10 +6,7 @@ import {createMetadataIri} from '../common/utils/linkeddata/metadataUtils';
 export type User = {
     iri: string;
     id: string;
-    fullName: string;
-    username: string;
-    firstName?: string;
-    lastName?: string;
+    name: string;
     email?: string;
     admin: boolean;
 }

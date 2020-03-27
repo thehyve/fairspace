@@ -1,9 +1,7 @@
 import React, {useContext} from 'react';
 import {NavLink, withRouter} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Code, FolderOpen, Group, OpenInNew} from "@material-ui/icons";
-
-import {workspacePrefix} from "../workspaces/workspaces";
+import {Assignment, Code, FolderOpen, OpenInNew} from "@material-ui/icons";
 import WorkspaceListMenuItem from "./WorkspaceListMenuItem";
 import ServicesContext from "../common/contexts/ServicesContext";
 
