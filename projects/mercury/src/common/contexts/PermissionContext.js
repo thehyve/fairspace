@@ -12,7 +12,10 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const extendWithUsernames = rawPermissions => rawPermissions.map(permission => ({...permission, userName: getDisplayName(users.find(user => permission.user === user.iri))}));
+    const extendWithUsernamesAndEmails = rawPermissions => rawPermissions.map(permission => {
+        const user = users.find(u => permission.user === u.iri);
+        return {...permission, name: getDisplayName(user), email: user.email};
+    });
 
     const refresh = () => {
         let didCancel = false;
@@ -45,7 +48,7 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
     return (
         <PermissionContext.Provider
             value={{
-                permissions: extendWithUsernames(permissions),
+                permissions: extendWithUsernamesAndEmails(permissions),
                 error,
                 loading,
                 refresh
