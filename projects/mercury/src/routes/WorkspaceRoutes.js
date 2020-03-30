@@ -12,7 +12,6 @@ import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
 import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
-import UsersPage from '../users/UsersPage';
 import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
 import WorkspacePage from "../workspaces/WorkspacePage";
 
@@ -25,12 +24,6 @@ const WorkspaceRoutes = () => (
         <Route path="/workspaces" exact component={WorkspacePage} />
 
         <Route path="/workspaces/:workspace" exact component={WorkspaceOverview} />
-
-        <Route
-            path="/workspaces/:workspace/users"
-            exact
-            component={UsersPage}
-        />
 
         <Route
             path="/collections"
