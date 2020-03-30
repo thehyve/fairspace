@@ -51,7 +51,7 @@ public class Services {
     private final VirtualFileSystem fileSystem;
 
 
-    public Services(@NonNull Config config, @NonNull DatasetJobSupport dataset) throws Exception {
+    public Services(@NonNull Config config, @NonNull DatasetJobSupport dataset) {
         this.config = config;
         this.dataset = dataset;
         this.dao = new DAO(dataset);
@@ -63,7 +63,7 @@ public class Services {
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService);
 
-        collectionsService = new CollectionsService(dao, eventBus::post, permissionsService);
+        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", dao, eventBus::post, permissionsService);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
 

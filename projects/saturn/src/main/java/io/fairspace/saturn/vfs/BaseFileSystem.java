@@ -59,20 +59,8 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     @Override
     public String iri(String path) throws IOException {
-        if (path.isEmpty()) {
-            return null;
-        }
-        if (isCollection(path)) {
-            var collection = collections.getByLocation(path);
-            if (collection == null) {
-                return null;
-            }
-            return collection.getIri().getURI();
-        }
-        return fileOrDirectoryIri(path);
+        return collections.getBaseIri() + path;
     }
-
-    protected abstract String fileOrDirectoryIri(String path) throws IOException;
 
     @Override
     public List<FileInfo> list(String parentPath) throws IOException {

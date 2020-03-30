@@ -87,24 +87,24 @@ public class DAO {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
 
-            if (entity instanceof LifecycleAwarePersistentEntity) {
-                var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                var user = getUserIRI();
-                basicEntity.setDateModified(now());
-                basicEntity.setModifiedBy(user);
-
-                if (entity.getIri() == null) {
-                    basicEntity.setDateCreated(basicEntity.getDateModified());
-                    basicEntity.setCreatedBy(user);
-                }
-            }
-
-            if (entity.getIri() == null) {
-                entity.setIri(generateMetadataIri());
-            }
-
             dataset.executeWrite(() -> {
                 var graph = dataset.getDefaultModel().getGraph();
+
+                if (entity instanceof LifecycleAwarePersistentEntity) {
+                    var basicEntity = (LifecycleAwarePersistentEntity) entity;
+                    var user = getUserIRI();
+                    basicEntity.setDateModified(now());
+                    basicEntity.setModifiedBy(user);
+
+                    if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY)) {
+                        basicEntity.setDateCreated(basicEntity.getDateModified());
+                        basicEntity.setCreatedBy(user);
+                    }
+                }
+
+                if (entity.getIri() == null) {
+                    entity.setIri(generateMetadataIri());
+                }
 
                 graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
 

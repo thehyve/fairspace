@@ -147,12 +147,6 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected String fileOrDirectoryIri(String path) throws IOException {
-        return selectSingle(dataset, storedQuery("fs_stat", path), row -> row.getResource("iri").getURI())
-                .orElse(null);    
-    }
-
-    @Override
     public void close() throws IOException {
     }
 

@@ -24,18 +24,27 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 
 @Slf4j
 public class CollectionsService {
+    private final String baseIri;
     private final DAO dao;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
 
-    public CollectionsService(DAO dao, Consumer<Object> eventListener, PermissionsService permissions) {
+    public CollectionsService(String baseIri, DAO dao, Consumer<Object> eventListener, PermissionsService permissions) {
+        this.baseIri = baseIri;
         this.dao = dao;
         this.eventListener = eventListener;
         this.permissions = permissions;
     }
 
+    public String getBaseIri() {
+        return baseIri;
+    }
+
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
+
+        collection.setIri(createURI(baseIri + collection.getLocation()));
+
         if (isBlank(collection.getConnectionString())) {
             collection.setConnectionString("");
         }
