@@ -1,27 +1,14 @@
-import React, {useContext, useState} from "react";
+import React, {useContext} from "react";
 import {UserContext, UsersContext} from '../common';
 
 import PermissionContext from "../common/contexts/PermissionContext";
-import PermissionAPI from "./PermissionAPI";
 import PermissionsViewer from "./PermissionsViewer";
 
 export default ({iri, canManage}) => {
-    const {permissions, loading: permissionsLoading, error: permissionsError, refresh: refreshPermissions} = useContext(PermissionContext);
+    const {permissions, loading: permissionsLoading, error: permissionsError, alterPermission, altering} = useContext(PermissionContext);
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
-    const {usersLoading, usersError, refresh: refreshUsers} = useContext(UsersContext);
-    const [altering, setAltering] = useState(false);
+    const {usersLoading, usersError} = useContext(UsersContext);
 
-    const alterPermission = (userIri, resourceIri, access) => {
-        setAltering(true);
-        return PermissionAPI
-            .alterPermission(userIri, resourceIri, access)
-            .then(() => {
-                refreshUsers();
-                refreshPermissions();
-            })
-            .catch(e => {console.error("Error altering permission", e);})
-            .finally(() => setAltering(false));
-    };
 
     return (
         <PermissionsViewer

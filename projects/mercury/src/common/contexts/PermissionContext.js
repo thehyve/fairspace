@@ -7,17 +7,18 @@ import {getDisplayName} from "../utils/userUtils";
 const PermissionContext = React.createContext({});
 
 export const PermissionProvider = ({iri, children, getPermissions = PermissionAPI.getPermissions}) => {
-    const {users} = useContext(UsersContext);
+    const {users, refresh: refreshUsers} = useContext(UsersContext);
     const [permissions, setPermissions] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [altering, setAltering] = useState(false);
 
     const extendWithUsernamesAndEmails = rawPermissions => rawPermissions.map(permission => {
         const user = users.find(u => permission.user === u.iri);
         return {...permission, name: getDisplayName(user), email: user.email};
     });
 
-    const refresh = () => {
+    const refreshPermissions = () => {
         let didCancel = false;
 
         const fetchData = async () => {
@@ -43,7 +44,19 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
     };
 
     // Refresh the permissions whenever the iri changes
-    useEffect(refresh, [iri]);
+    useEffect(refreshPermissions, [iri]);
+
+    const alterPermission = (userIri, resourceIri, access) => {
+        setAltering(true);
+        return PermissionAPI
+            .alterPermission(userIri, resourceIri, access)
+            .then(() => {
+                refreshUsers();
+                refreshPermissions();
+            })
+            .catch(e => {console.error("Error altering permission", e);})
+            .finally(() => setAltering(false));
+    };
 
     return (
         <PermissionContext.Provider
@@ -51,7 +64,8 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
                 permissions: extendWithUsernamesAndEmails(permissions),
                 error,
                 loading,
-                refresh
+                alterPermission,
+                altering
             }}
         >
             {children}

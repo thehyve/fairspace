@@ -7,7 +7,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import {BreadCrumbs} from "../common";
+import {BreadCrumbs, LoadingInlay} from "../common";
 import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
@@ -52,8 +52,15 @@ export default () => {
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
-    const id = currentWorkspace();
-    const ws = workspaces.find(w => w.id === id);
+
+    const workspace = workspaces.find(w => w.id === currentWorkspace());
+
+    if (workspacesLoading) {
+        return (<LoadingInlay />);
+    }
+    if (workspacesError || !workspace.iri) {
+        return 'Error loading workspaces';
+    }
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -75,10 +82,10 @@ export default () => {
             </AppBar>
             <TabPanel value={value} index={0}>
                 <BreadCrumbs />
-                <WorkspaceInfo workspace={ws} workspacesError={workspacesError} workspacesLoading={workspacesLoading} />
+                <WorkspaceInfo workspace={workspace} />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <UserList workspace={ws} workspacesError={workspacesError} workspacesLoading={workspacesLoading} />
+                <UserList workspace={workspace} />
             </TabPanel>
         </div>
     );

@@ -19,11 +19,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
+import {ConfirmationButton, LoadingInlay, MessageDisplay, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
 import {UserContext} from "../common/contexts";
 import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
-import PermissionAPI from "../permissions/PermissionAPI";
+import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const columns = {
     name: {
@@ -41,27 +41,28 @@ const columns = {
 };
 
 const UserList = (props) => {
-    const {collaborators, users, currentUser, workspace, refresh: refreshUsers} = props;
+    const {currentUser, workspace} = props;
+    const {canManage} = workspace;
+    const {
+        permissions: collaborators, alterPermission, altering,
+        loading: loadingPermissions, error: errorPermissions
+    } = useContext(PermissionContext);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collaborators, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const canManage = currentUser.admin || workspace.canManage;
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
-    const [altering, setAltering] = useState(false);
 
-    const grantUserAccess = (userIri, access) => {
-        setAltering(true);
-        return PermissionAPI
-            .alterPermission(userIri, workspace.iri, access)
-            .then(() => {
-                refreshUsers();
-                // refreshPermissions();
-            })
-            .catch(e => {
-                console.error("Error altering permission", e);
-            })
-            .finally(() => setAltering(false));
-    };
+    if (errorPermissions) {
+        return (<MessageDisplay message="An error occurred loading permissions" />);
+    } if (loadingPermissions) {
+        return (<LoadingInlay />);
+    } if (altering) {
+        return (<LoadingOverlay loading />);
+    }
+
+    const grantUserAccess = (userIri, access) => (
+        alterPermission(userIri, workspace.iri, access)
+    );
 
     const renderAddUserDialog = () => (
         <Dialog
@@ -150,7 +151,7 @@ const UserList = (props) => {
                             <TableCell style={{width: 120}}>
                                 <Select
                                     value={u.access}
-                                    disabled={!canManage}
+                                    disabled={!canManage || u.user !== currentUser.iri}
                                     onChange={e => grantUserAccess(u.user, e.target.value)}
                                     disableUnderline
                                 >
@@ -162,7 +163,7 @@ const UserList = (props) => {
                             <TableCell style={{width: 32}}>
                                 <ConfirmationButton
                                     onClick={() => grantUserAccess(u.user, 'None')}
-                                    disabled={!canManage}
+                                    disabled={!canManage || u.iri !== currentUser.iri}
                                     message="Are you sure you want to remove this user from the workspace?"
                                     agreeButtonText="Remove user"
                                     dangerous
@@ -198,23 +199,22 @@ const UserList = (props) => {
 };
 
 const ContextualUserList = (props) => {
-    const {workspace, workspacesError, workspacesLoading} = props;
-    const {currentUser} = useContext(UserContext);
-    const {users, refresh, loadingUsers, errorUsers} = useContext(UsersContext);
+    const {workspace} = props;
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
+    const {usersLoading, usersError} = useContext(UsersContext);
+
+    if (currentUserError || usersError) {
+        return (<MessageDisplay message="An error occurred loading users" />);
+    } if (currentUserLoading || usersLoading) {
+        return (<LoadingInlay />);
+    }
 
     return (
         <PermissionProvider iri={workspace.iri}>
-            <PermissionContext.Consumer>
-                {({permissions}) => (
-                    <UserList
-                        collaborators={permissions}
-                        users={users}
-                        currentUser={currentUser}
-                        workspace={workspace}
-                        refresh={refresh}
-                    />
-                )}
-            </PermissionContext.Consumer>
+            <UserList
+                currentUser={currentUser}
+                workspace={workspace}
+            />
         </PermissionProvider>
     );
 };
