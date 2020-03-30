@@ -16,7 +16,6 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.vfs.AuditedFileSystem;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.BlobStore;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -93,7 +92,6 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus),
-                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService))));
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus))));
     }
 }
