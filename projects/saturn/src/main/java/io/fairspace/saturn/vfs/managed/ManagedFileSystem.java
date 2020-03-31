@@ -59,7 +59,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         return dataset.calculateRead(() -> {
             var model = dataset.getDefaultModel();
             var resource = model.createResource(iri(path));
-            if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
+            if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted) && !resource.hasProperty(FS.movedTo)) {
                 var fileInfo = fileInfo(resource);
                 var collection = collections.getByLocation(splitPath(path)[0]);
                 if (collection == null) {
@@ -322,6 +322,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
             dataset.getDefaultModel()
                     .listStatements(null, null, src)
+                    .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
                     .forEachRemaining(stmt -> dataset.getDefaultModel().add(stmt.getSubject(), stmt.getPredicate(), dst));
 
             dataset.getDefaultModel()
