@@ -16,14 +16,13 @@ import {ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 import CollectionEditor from "./CollectionEditor";
 import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
 import PermissionsCard from "../permissions/PermissionsCard";
-import TechnicalMetadata from "../file/TechnicalMetadata";
 import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from '../common/contexts/CollectionsContext';
 import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
-import type {AuditInfo} from '../file/TechnicalMetadata';
 import UsersContext from '../common/contexts/UsersContext';
 import {getDisplayName} from "../common/utils/userUtils";
+import PathMetadata from "../metadata/metadata/PathMetadata";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -107,16 +106,6 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
         return user ? getDisplayName(user) : iri;
     };
 
-    collectionMetadata(): AuditInfo {
-        const {collection} = this.props;
-        return {
-            dateCreated: collection.dateCreated,
-            createdBy: collection.createdBy ? this.getUsernameByIri(collection.createdBy) : collection.createdBy,
-            dateModified: collection.dateModified,
-            modifiedBy: collection.modifiedBy ? this.getUsernameByIri(collection.modifiedBy) : collection.modifiedBy
-        };
-    }
-
     render() {
         const {loading, collection, inCollectionsBrowser = false} = this.props;
         const {anchorEl, editing, deleting} = this.state;
@@ -163,8 +152,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                         <Typography component="p">
                             {collection.description}
                         </Typography>
-
-                        <TechnicalMetadata fileProps={this.collectionMetadata()} />
+                        <PathMetadata path={collection.location} />
                     </CardContent>
                 </Card>
 

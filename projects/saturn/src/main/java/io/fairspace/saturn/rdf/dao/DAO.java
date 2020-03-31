@@ -96,7 +96,7 @@ public class DAO {
                     basicEntity.setDateModified(now());
                     basicEntity.setModifiedBy(user);
 
-                    if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY)) {
+                    if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY) || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
                         basicEntity.setDateCreated(basicEntity.getDateModified());
                         basicEntity.setCreatedBy(user);
                     }

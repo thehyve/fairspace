@@ -10,6 +10,7 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
@@ -51,11 +51,9 @@ public class ManagedFileSystemTest {
         var store = new MemoryBlobStore();
         ds = new DatasetJobSupportInMemory();
 
-        ds.getDefaultModel().add(
-                createResource("http://example.com/user"),
-                RDFS.label,
-                "user"
-        );
+        ds.getDefaultModel()
+                .add(createResource("http://example.com/user"), RDFS.label, "user")
+                .add(createResource("http://example.com/coll"), RDF.type, FS.Collection);
 
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
@@ -72,7 +70,7 @@ public class ManagedFileSystemTest {
         collection2.setIri(createURI("http://example.com/234"));
         collection2.setAccess(Access.Read);
 
-
+        when(collections.getBaseIri()).thenReturn("http://example.com/");
         when(collections.list()).thenReturn(asList(collection1, collection2));
         when(collections.getByLocation(eq("coll"))).thenReturn(collection1);
         when(collections.getByLocation(eq("read-only"))).thenReturn(collection2);
@@ -97,13 +95,6 @@ public class ManagedFileSystemTest {
     @Test
     public void statNonExisting() throws IOException {
         assertNull(fs.stat("coll/aaa"));
-    }
-
-    @Test
-    public void statContainsCreatorAndModifier() throws IOException {
-        fs.mkdir("coll/aaa");
-        var stat = fs.stat("coll/aaa");
-        assertEquals(Map.of("createdBy", "user", "modifiedBy", "user"), stat.getCustomProperties());
     }
 
     @Test
@@ -236,7 +227,7 @@ public class ManagedFileSystemTest {
         assertTrue(ds.getDefaultModel().contains(file, FS.modifiedBy, user));
 
         fs.delete("coll/file");
-        assertTrue(ds.getDefaultModel().contains(file, FS.deletedBy, user));
+        assertEquals(user, file.inModel(ds.getDefaultModel()).getPropertyResourceValue(FS.deletedBy));
     }
 
     @Test
@@ -294,8 +285,7 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/subdir/file", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertEquals(oldIri, fs.iri("coll/dir2"));
-        assertTrue(ds.getDefaultModel().contains(createResource(oldIri), RDFS.label, createStringLiteral("dir2")));
+        assertTrue(ds.getDefaultModel().contains(createResource(fs.iri("coll/dir2")), RDFS.label, createStringLiteral("dir2")));
     }
 
     @Test
@@ -310,7 +300,6 @@ public class ManagedFileSystemTest {
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/file2", os);
         assertArrayEquals(content1, os.toByteArray());
-        assertEquals(oldIri, fs.iri("coll/dir2/file2"));
     }
 
     @Test(expected = IOException.class)
