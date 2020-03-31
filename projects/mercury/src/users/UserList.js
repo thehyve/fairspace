@@ -25,6 +25,8 @@ import {UserContext} from "../common/contexts";
 import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
 import LoadingOverlay from "../common/components/LoadingOverlay";
 import {canAlterPermission} from "../common/utils/permissionUtils";
+import type {Workspace} from "../workspaces/WorkspacesAPI";
+import type {User} from "./UsersAPI";
 
 const columns = {
     name: {
@@ -41,7 +43,12 @@ const columns = {
     }
 };
 
-const UserList = (props) => {
+type UserListProps = {
+    currentUser: User,
+    workspace: Workspace
+}
+
+const UserList = (props: UserListProps) => {
     const {currentUser, workspace} = props;
     const {canManage} = workspace;
     const {
