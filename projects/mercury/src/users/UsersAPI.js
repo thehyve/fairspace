@@ -2,7 +2,6 @@ import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {createMetadataIri} from '../common/utils/linkeddata/metadataUtils';
-import {AccessRights} from "../common/utils/permissionUtils";
 
 export type User = {
     iri: string;
@@ -10,7 +9,7 @@ export type User = {
     name: string;
     email?: string;
     admin: boolean;
-    access: AccessRights
+    access: string;
 }
 
 const requestOptions = {

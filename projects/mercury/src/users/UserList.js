@@ -24,6 +24,7 @@ import UserSelect from "../permissions/UserSelect";
 import {UserContext} from "../common/contexts";
 import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
 import LoadingOverlay from "../common/components/LoadingOverlay";
+import {canAlterPermission} from "../common/utils/permissionUtils";
 
 const columns = {
     name: {
@@ -151,7 +152,7 @@ const UserList = (props) => {
                             <TableCell style={{width: 120}}>
                                 <Select
                                     value={u.access}
-                                    disabled={!canManage || u.user !== currentUser.iri}
+                                    disabled={!canAlterPermission(canManage, u, currentUser)}
                                     onChange={e => grantUserAccess(u.user, e.target.value)}
                                     disableUnderline
                                 >
@@ -163,7 +164,7 @@ const UserList = (props) => {
                             <TableCell style={{width: 32}}>
                                 <ConfirmationButton
                                     onClick={() => grantUserAccess(u.user, 'None')}
-                                    disabled={!canManage || u.iri !== currentUser.iri}
+                                    disabled={!canAlterPermission(canManage, u, currentUser)}
                                     message="Are you sure you want to remove this user from the workspace?"
                                     agreeButtonText="Remove user"
                                     dangerous
@@ -198,7 +199,7 @@ const UserList = (props) => {
     );
 };
 
-const ContextualUserList = (props) => {
+const UserListWithPermissionProvider = (props) => {
     const {workspace} = props;
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {usersLoading, usersError} = useContext(UsersContext);
@@ -219,4 +220,4 @@ const ContextualUserList = (props) => {
     );
 };
 
-export default ContextualUserList;
+export default UserListWithPermissionProvider;

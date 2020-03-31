@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {UsersContext} from "..";
 
 import PermissionAPI from "../../permissions/PermissionAPI";
-import {getDisplayName} from "../utils/userUtils";
+import {getDisplayName, getEmail} from "../utils/userUtils";
 
 const PermissionContext = React.createContext({});
 
@@ -15,7 +15,7 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
 
     const extendWithUsernamesAndEmails = rawPermissions => rawPermissions.map(permission => {
         const user = users.find(u => permission.user === u.iri);
-        return {...permission, name: getDisplayName(user), email: user.email};
+        return {...permission, name: getDisplayName(user), email: getEmail(user)};
     });
 
     const refreshPermissions = () => {

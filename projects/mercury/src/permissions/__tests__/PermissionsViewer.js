@@ -30,30 +30,22 @@ describe('PermissionsViewer', () => {
         {
             user: 'http://localhost/iri/user2-id',
             access: 'Write',
-            firstName: 'Michael',
-            lastName: 'Jackson',
-            userName: 'Michael Jackson'
+            name: 'Michael Jackson'
         },
         {
             user: 'http://localhost/iri/user3-id',
             access: 'Read',
-            firstName: 'Bruno',
-            lastName: 'Mars',
-            userName: 'Bruno Mars'
+            name: 'Bruno Mars'
         },
         {
             user: 'http://localhost/iri/user1-id',
             access: 'Manage',
-            firstName: 'Mariah',
-            lastName: 'Carey',
-            userName: 'Mariah Carey'
+            name: 'Mariah Carey'
         },
         {
             user: 'http://localhost/iri/user4-id',
             access: 'Manage',
-            firstName: 'Kurt',
-            lastName: 'Cobain',
-            userName: 'Kurt Cobain'
+            name: 'Kurt Cobain'
         }
     ];
     const mockcurrentUserCreatorCanManage = {id: 'user4-id'};
