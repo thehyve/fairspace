@@ -9,12 +9,12 @@ export const sortPermissions = (permissions) => {
         return [];
     }
 
-    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('userName')));
+    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('name')));
 };
 
 /**
  * Check if collaborator can alter permission. User can alter permission if:
- * - has manage access to a collection
+ * - has manage access to a resource
  * - permission is not his/hers
  */
 export const canAlterPermission = (userCanManage, permission, currentLoggedUser) => {
