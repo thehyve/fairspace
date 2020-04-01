@@ -142,32 +142,29 @@ public class ManagedFileSystem extends BaseFileSystem {
 
         return dataset.calculateWrite(() -> {
             ensureCanCreate(path);
-            return dataset.calculateWrite(() -> {
-                ensureCanCreate(path);
 
-                var resource = dataset.getDefaultModel().createResource(iri(path));
+            var resource = dataset.getDefaultModel().createResource(iri(path));
 
-                dataset.getDefaultModel().removeAll(resource, null, null);
-                dataset.getDefaultModel().removeAll(null, null, resource);
-                var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
-                var now = toXSDDateTimeLiteral(Instant.now());
+            dataset.getDefaultModel().removeAll(resource, null, null);
+            dataset.getDefaultModel().removeAll(null, null, resource);
+            var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
+            var now = toXSDDateTimeLiteral(Instant.now());
 
-                resource.addLiteral(FS.filePath, path)
-                        .addProperty(RDF.type, FS.File)
-                        .addProperty(RDFS.label, name(path))
-                        .addProperty(FS.createdBy, user)
-                        .addProperty(FS.modifiedBy, user)
-                        .addLiteral(FS.dateCreated, now)
-                        .addLiteral(FS.dateModified, now)
-                        .addLiteral(FS.fileSize, blobInfo.size)
-                        .addLiteral(FS.blobId, blobInfo.id)
-                        .addLiteral(FS.md5, blobInfo.md5);
+            resource.addLiteral(FS.filePath, path)
+                    .addProperty(RDF.type, FS.File)
+                    .addProperty(RDFS.label, name(path))
+                    .addProperty(FS.createdBy, user)
+                    .addProperty(FS.modifiedBy, user)
+                    .addLiteral(FS.dateCreated, now)
+                    .addLiteral(FS.dateModified, now)
+                    .addLiteral(FS.fileSize, blobInfo.size)
+                    .addLiteral(FS.blobId, blobInfo.id)
+                    .addLiteral(FS.md5, blobInfo.md5);
 
-                var parent = dataset.getDefaultModel().createResource(iri(parentPath(path)));
-                dataset.getDefaultModel().add(parent, FS.contains, resource);
+            var parent = dataset.getDefaultModel().createResource(iri(parentPath(path)));
+            dataset.getDefaultModel().add(parent, FS.contains, resource);
 
-                return stat(path);
-            });
+            return stat(path);
         });
     }
 
@@ -297,7 +294,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     private void copyOrMoveNoCheck(boolean move, String from, String to) throws IOException {
         var src = dataset.getDefaultModel().createResource(iri(from));
         var dst = dataset.getDefaultModel().createResource(iri(to));
-        var parent =  dataset.getDefaultModel().createResource(iri(parentPath(to)));
+        var parent = dataset.getDefaultModel().createResource(iri(parentPath(to)));
         dst.removeProperties();
         dst.addProperty(FS.filePath, to);
         parent.addProperty(FS.contains, dst);
