@@ -21,6 +21,9 @@ export const getUser = () => axios.get('/api/v1/users/current')
     .then(extractJsonData)
     .then(user => ({...user, iri: createMetadataIri(user.id)}));
 
+export const logoutUser = () => axios.post('/api/v1/users/current/logout', {}, {headers: {'Content-Type': 'application/json'}})
+    .catch(handleHttpError("Failure when logging out user"));
+
 export const getUsers = () => axios.get('/api/v1/users/', requestOptions)
     .catch(handleHttpError('Error while loading users'))
     .then(extractJsonData)

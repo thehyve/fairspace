@@ -1,3 +1,5 @@
+import {logoutUser} from "../../users/UsersAPI";
+
 export default function logout() {
     const performLocalLogout = () => {window.location.href = '/logout';};
 
@@ -8,5 +10,5 @@ export default function logout() {
     //         .then(performLocalLogout);
     // }
 
-    return Promise.resolve().then(performLocalLogout);
+    return logoutUser().then(performLocalLogout);
 }
