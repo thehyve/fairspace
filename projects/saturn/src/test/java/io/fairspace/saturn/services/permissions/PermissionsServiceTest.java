@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.permissions;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.users.Role;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -18,10 +17,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_GRAPH;
 import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
@@ -57,8 +58,6 @@ public class PermissionsServiceTest {
 
     private Node currentUserIri = USER1;
 
-    private boolean isCoordinator = false;
-
     @Before
     public void setUp() {
         ds = new DatasetJobSupportInMemory();
@@ -71,10 +70,6 @@ public class PermissionsServiceTest {
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
-        when(currentUser.getRoles()).thenAnswer(invocation ->
-                isCoordinator
-                ? EnumSet.of(Role.CanRead, Role.CanWrite, Role.Coordinator)
-                : EnumSet.of(Role.CanRead, Role.CanWrite));
 
 
         service = new PermissionsService(ds, permissionChangeEventHandler, userService);
@@ -189,7 +184,7 @@ public class PermissionsServiceTest {
     public void testDefaultPermissionForRegularEntities() {
         var entity = createResource("http://example.com/entity");
         ds.getDefaultModel().add(entity, RDF.type, createResource("http://fairspace.io/ontology#Entity"));
-        assertEquals(Access.Write, service.getPermission(entity.asNode()));
+        assertEquals(Access.Read, service.getPermission(entity.asNode()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -291,7 +286,6 @@ public class PermissionsServiceTest {
         currentUserIri = USER2;
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
-        service.ensureAccess(Set.of(RESOURCE2), Access.Write);
     }
 
     @Test(expected = MetadataAccessDeniedException.class)
@@ -304,16 +298,23 @@ public class PermissionsServiceTest {
     }
 
     @Test
-    public void testEnsureAccessForCoordinator() {
-        isCoordinator = true;
+    public void testSetPermissionForAWorkspace() {
+        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, createResource("http://fairspace.io/ontology#Workspace"));
+        assertNull(service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER2, Access.Write);
 
-        service.ensureAccess(Set.of(RESOURCE), Access.Manage);
-        service.ensureAccess(Set.of(RESOURCE2), Access.Manage);
+        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
+
+        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER2, Access.None);
+        assertNull(service.getPermissions(RESOURCE).get(USER2));
+        service.setPermission(RESOURCE, USER3, Access.Manage);
+        assertEquals(Access.Manage, service.getPermissions(RESOURCE).get(USER3));
     }
 
     @Test
     public void getPermissionsForOrganisationAdmins() {
-        isCoordinator = true;
+        when(currentUser.isAdmin()).thenReturn(true);
 
         assertEquals(
                 Map.of(

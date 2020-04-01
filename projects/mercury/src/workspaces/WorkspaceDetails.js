@@ -36,10 +36,4 @@ export const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
     );
 };
 
-const ContextualWorkspaceDetails = (props) => (// TODO required context
-    <WorkspaceDetails
-        {...props}
-    />
-);
-
-export default withRouter(ContextualWorkspaceDetails);
+export default withRouter(WorkspaceDetails);

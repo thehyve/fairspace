@@ -19,14 +19,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import type {WorkspaceUser} from './UsersAPI';
+import type {User} from './UsersAPI';
 import {ConfirmationButton, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
-import {grantUserRole} from "./UsersAPI";
-import {getDisplayName, isAdmin, isCoordinator} from "../common/utils/userUtils";
+import {getDisplayName} from "../common/utils/userUtils";
 import {UserContext} from "../common/contexts";
-
-const checkRole = (role: string) => (user: WorkspaceUser) => user.role === role;
 
 const columns = {
     name: {
@@ -37,23 +34,24 @@ const columns = {
         valueExtractor: 'email',
         label: 'Email'
     },
-    role: {
-        valueExtractor: 'role',
-        label: 'Role'
+    permission: {
+        valueExtractor: 'permission',
+        label: 'Permission'
     }
 };
-
-const toggleRole = (user: WorkspaceUser, role: string) => (checkRole(role)(user) ? grantUserRole(user, 'none') : grantUserRole(user, role));
 
 const UserList = () => {
     const {currentUser} = useContext(UserContext);
     const {users, refresh} = useContext(UsersContext);
-    const workspaceUsers = users.filter(user => !!user.role);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsers, columns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const canManage = isAdmin(currentUser) || isCoordinator(currentUser);
+    const canManage = currentUser.admin; // TODO or workspace coordinator
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
+
+    const grantUserPermission = () => {
+        // TODO
+    };
 
     return (
         <>
@@ -78,7 +76,7 @@ const UserList = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {pagedItems.map((user: WorkspaceUser) => (
+                        {pagedItems.map((user: User) => (
                             <TableRow
                                 key={user.iri}
                                 hover
@@ -93,7 +91,7 @@ const UserList = () => {
                                     <Select
                                         value={user.role}
                                         disabled={!canManage}
-                                        onChange={e => toggleRole(user, e.target.value).then(refresh)}
+                                        // onChange={e => toggleRole(user, e.target.value).then(refresh)}
                                         disableUnderline
                                     >
                                         { ['user', 'write', 'datasteward', 'coordinator'].map(role => (<MenuItem value={role}>{role}</MenuItem>))}
@@ -101,7 +99,7 @@ const UserList = () => {
                                 </TableCell>
                                 <TableCell style={{width: 32}}>
                                     <ConfirmationButton
-                                        onClick={() => grantUserRole(user, 'none').then(refresh)}
+                                        onClick={() => grantUserPermission(user, null).then(refresh)}
                                         disabled={!canManage}
                                         message="Are you sure you want to remove this user from the workspace?"
                                         agreeButtonText="Remove user"
@@ -119,7 +117,7 @@ const UserList = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={workspaceUsers.length}
+                    count={users.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onChangePage={(e, p) => setPage(p)}
@@ -162,7 +160,7 @@ const UserList = () => {
                     <Button
                         onClick={() => {
                             setShowAddUserDialog(false);
-                            grantUserRole(userToAdd, 'user').then(refresh);
+                            grantUserPermission(userToAdd, 'read').then(refresh);
                         }}
                         color="primary"
                         disabled={!userToAdd}
