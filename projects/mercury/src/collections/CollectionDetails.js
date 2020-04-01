@@ -1,16 +1,8 @@
 // @flow
 import React, {useContext} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    IconButton,
-    Menu,
-    MenuItem,
-    Typography
-} from '@material-ui/core';
+import {Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
 import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
-import {withRouter, useHistory} from 'react-router-dom';
+import {useHistory, withRouter} from 'react-router-dom';
 import {ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
@@ -22,7 +14,6 @@ import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
 import UsersContext from '../common/contexts/UsersContext';
 import {getDisplayName} from "../common/utils/userUtils";
-import PathMetadata from "../metadata/metadata/PathMetadata";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -152,7 +143,6 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                         <Typography component="p">
                             {collection.description}
                         </Typography>
-                        <PathMetadata path={collection.location} />
                     </CardContent>
                 </Card>
 
