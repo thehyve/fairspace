@@ -250,7 +250,7 @@ fs:dateCreatedShape a fs:DatatypePropertyShape ;
 
 fs:dateModifiedShape a fs:DatatypePropertyShape ;
     sh:name "Modified" ;
-    sh:description "Date created" ;
+    sh:description "Date modified" ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
