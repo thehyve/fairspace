@@ -315,7 +315,7 @@ fs:userEmailShape a fs:DatatypePropertyShape ;
 
 ## Relation Shapes
 
-fs:createdByShape a sh:PropertyShape ;
+fs:createdByShape a fs:RelationShape ;
     sh:name "Created By" ;
     sh:description "User that created this resource." ;
     sh:class fs:User ;
@@ -324,7 +324,7 @@ fs:createdByShape a sh:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:createdBy .
 
-fs:modifiedByShape a sh:PropertyShape ;
+fs:modifiedByShape a fs:RelationShape ;
     sh:name "Last Modified By" ;
     sh:description "User that last modified this resource." ;
     sh:class fs:User ;
@@ -333,7 +333,7 @@ fs:modifiedByShape a sh:PropertyShape ;
     fs:fixedShape true ;
     sh:path fs:modifiedBy .
 
-fs:deletedByShape a sh:PropertyShape ;
+fs:deletedByShape a fs:RelationShape ;
     sh:name "Deleted By" ;
     sh:description "User that deleted this resource." ;
     sh:class fs:User ;
