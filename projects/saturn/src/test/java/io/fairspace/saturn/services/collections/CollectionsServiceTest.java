@@ -38,7 +38,7 @@ public class CollectionsServiceTest {
         setCurrentUser(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
-        collections = new CollectionsService(new DAO(new DatasetJobSupportInMemory()), eventListener, permissions);
+        collections = new CollectionsService("http://fairspace.io/", new DAO(new DatasetJobSupportInMemory()), eventListener, permissions);
     }
 
     @Test

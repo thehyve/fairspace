@@ -94,9 +94,6 @@ public class CompoundFileSystemTest {
 
         fs.mkdir("dir5/path");
         verify(vfs3).mkdir("dir5/path");
-
-        fs.iri("dir1/path");
-        verify(vfs1).iri("dir1/path");
     }
 
     @Test(expected = FileNotFoundException.class)

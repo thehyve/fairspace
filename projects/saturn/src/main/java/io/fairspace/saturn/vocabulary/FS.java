@@ -18,21 +18,10 @@ public class FS {
     public static final String FILE_URI = NS + "File";
     public static final Resource File = createResource(FILE_URI);
 
-    public static final String EXTERNAL_DIRECTORY_URI = NS + "ExternalDirectory";
-    public static final Resource ExternalDirectory = createResource(EXTERNAL_DIRECTORY_URI);
-
-    public static final String EXTERNAL_FILE_URI = NS + "ExternalFile";
-    public static final Resource ExternalFile = createResource(EXTERNAL_FILE_URI);
-
-
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 
-    public static final String OWNED_BY_LOCAL_PART = "ownedBy";
-    public static final String CHECKSUM_LOCAL_PART = "checksum";
-
-    public static final String CREATED_BY_LOCAL_PART = "createdBy";
-    public static final String CREATED_BY_URI = NS + CREATED_BY_LOCAL_PART;
+    public static final String CREATED_BY_URI = NS + "createdBy";
     public static final Property createdBy = createProperty(CREATED_BY_URI);
 
     public static final String DATE_CREATED_URI = NS + "dateCreated";
@@ -51,6 +40,9 @@ public class FS {
     public static final String DATE_DELETED_URI = NS + "dateDeleted";
     public static final Property dateDeleted = createProperty(DATE_DELETED_URI);
 
+    public static final String MOVED_TO_URI = NS + "movedTo";
+    public static final Property movedTo = createProperty(MOVED_TO_URI);
+
     public static final String ID_URI = NS + "id";
     public static final Property id = createProperty(ID_URI);
 
@@ -63,8 +55,14 @@ public class FS {
     public static final String FILE_PATH_URI = NS + "filePath";
     public static final Property filePath = createProperty(FILE_PATH_URI);
 
+    public static final String CONTAINS_URI = NS + "contains";
+    public static final Property contains = createProperty(CONTAINS_URI);
+
     public static final String FILE_SIZE_URI = NS + "fileSize";
     public static final Property fileSize = createProperty(FILE_SIZE_URI);
+
+    public static final String BLOB_ID_URI = NS + "blobId";
+    public static final Property blobId = createProperty(BLOB_ID_URI);
 
     public static final String MD5_URI = NS + "md5";
     public static final Property md5 = createProperty(MD5_URI);

@@ -87,6 +87,8 @@ public class TextIndexESBulk extends TextIndexES {
                         response.getIngestTook().millis() + response.getTook().millis());
                 if (response.hasFailures()) {
                     LOGGER.error(response.buildFailureMessage());
+
+                    throw new RuntimeException(response.buildFailureMessage());
                 }
             }
         } finally {

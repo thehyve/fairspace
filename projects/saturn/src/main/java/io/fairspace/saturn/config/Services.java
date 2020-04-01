@@ -16,7 +16,6 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.vfs.AuditedFileSystem;
 import io.fairspace.saturn.vfs.CompoundFileSystem;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
-import io.fairspace.saturn.vfs.irods.IRODSVirtualFileSystem;
 import io.fairspace.saturn.vfs.managed.BlobStore;
 import io.fairspace.saturn.vfs.managed.LocalBlobStore;
 import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
@@ -52,7 +51,7 @@ public class Services {
     private final VirtualFileSystem fileSystem;
 
 
-    public Services(@NonNull Config config, @NonNull DatasetJobSupport dataset) throws Exception {
+    public Services(@NonNull Config config, @NonNull DatasetJobSupport dataset) {
         this.config = config;
         this.dataset = dataset;
         this.dao = new DAO(dataset);
@@ -64,7 +63,7 @@ public class Services {
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService);
 
-        collectionsService = new CollectionsService(dao, eventBus::post, permissionsService);
+        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", dao, eventBus::post, permissionsService);
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
 
@@ -93,7 +92,6 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus),
-                IRODSVirtualFileSystem.TYPE, new IRODSVirtualFileSystem(dataset, collectionsService))));
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus))));
     }
 }

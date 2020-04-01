@@ -1,9 +1,7 @@
 import React, {useCallback} from "react";
-import {Grid} from "@material-ui/core";
-import {isNonEmptyValue, MessageDisplay, useAsync} from '../../common';
+import {MessageDisplay, useAsync} from '../../common';
 
 import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
-import TechnicalMetadata from "../../file/TechnicalMetadata";
 import FileAPI from "../../file/FileAPI";
 
 const PathMetadata = ({
@@ -28,27 +26,10 @@ const PathMetadata = ({
         return (<div>No metadata found</div>);
     }
     return (
-        <Grid container>
-            <Grid item xs={12} style={{marginBottom: 8}}>
-                <TechnicalMetadata
-                    fileProps={{
-                        dateCreated: fileProps.creationdate,
-                        createdBy: fileProps.createdBy,
-                        dateModified: fileProps.getlastmodified,
-                        modifiedBy: fileProps.modifiedBy,
-                        ownedBy: fileProps.ownedBy,
-                        fileSize: isNonEmptyValue(fileProps.getcontentlength) ? parseInt(fileProps.getcontentlength, 10) : undefined,
-                        checksum: fileProps.checksum
-                    }}
-                />
-            </Grid>
-            <Grid item xs={12}>
-                <LinkedDataEntityFormWithLinkedData
-                    subject={fileProps.iri}
-                    {...otherProps}
-                />
-            </Grid>
-        </Grid>
+        <LinkedDataEntityFormWithLinkedData
+            subject={fileProps.iri}
+            {...otherProps}
+        />
     );
 };
 

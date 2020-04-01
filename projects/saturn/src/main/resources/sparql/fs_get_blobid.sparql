@@ -1,8 +1,0 @@
-# Returns file's blob id by path
-# 0 - path
-
-PREFIX fs: <http://fairspace.io/ontology#>
-SELECT ?blobId
-WHERE { ?s fs:filePath %1$s; fs:blobId ?blobId .
-FILTER(NOT EXISTS {?s fs:dateDeleted ?dateDeleted})
-}

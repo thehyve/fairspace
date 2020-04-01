@@ -68,7 +68,7 @@ fs:FileShape a fs:ClassShape ;
     sh:name "File" ;
     sh:targetClass fs:File ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId fs:movedTo) ;
     fs:fixedShape true ;
     fs:systemProperties
         fs:fileSizeShape,
@@ -100,9 +100,10 @@ fs:DirectoryShape a fs:ClassShape ;
     sh:name "Directory" ;
     sh:targetClass fs:Directory ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:contains fs:movedTo) ;
     fs:fixedShape true ;
     fs:systemProperties
+        fs:containsShape,
         fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
@@ -150,34 +151,6 @@ fs:CollectionShape a fs:ClassShape ;
         fs:dateModifiedShape,
         fs:deletedByShape,
         fs:dateDeletedShape,
-        fs:labelShape,
-        fs:commentShape .
-
-fs:ExternalFileShape a fs:ClassShape ;
-    sh:description "A single file." ;
-    sh:name "External File" ;
-    sh:targetClass fs:ExternalFile ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId ) ;
-    fs:fixedShape true ;
-    fs:machineOnly true ;
-    fs:systemProperties
-        fs:labelShape,
-        fs:commentShape ;
-    sh:property
-        fs:labelShape,
-        fs:commentShape .
-
-fs:ExternalDirectoryShape a fs:ClassShape ;
-    sh:description "A directory containing multiple files." ;
-    sh:name "External Directory" ;
-    sh:targetClass fs:ExternalDirectory ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:fixedShape true ;
-    fs:machineOnly true ;
-    fs:systemProperties
-        fs:labelShape,
-        fs:commentShape ;
-    sh:property
         fs:labelShape,
         fs:commentShape .
 
@@ -267,8 +240,8 @@ fs:commentShape a fs:DatatypePropertyShape ;
     sh:path rdfs:comment .
 
 fs:dateCreatedShape a fs:DatatypePropertyShape ;
-    sh:name "Date created" ;
-    sh:description "Time at point of creation" ;
+    sh:name "Created" ;
+    sh:description "Date created" ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
@@ -276,8 +249,8 @@ fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:path fs:dateCreated .
 
 fs:dateModifiedShape a fs:DatatypePropertyShape ;
-    sh:name "Modified time" ;
-    sh:description "Time at point last modification" ;
+    sh:name "Modified" ;
+    sh:description "Date modified" ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;
@@ -285,8 +258,8 @@ fs:dateModifiedShape a fs:DatatypePropertyShape ;
     sh:path fs:dateModified .
 
 fs:dateDeletedShape a fs:DatatypePropertyShape ;
-    sh:name "Deleted at" ;
-    sh:description "Time at point deletion." ;
+    sh:name "Deleted" ;
+    sh:description "Date deleted" ;
     sh:datatype xsd:dateTime ;
     sh:maxCount 1 ;
     fs:machineOnly true ;

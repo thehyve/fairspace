@@ -30,6 +30,7 @@ public class PathUtils {
     }
 
     public static String parentPath(String path) {
-        return path.substring(0, path.lastIndexOf('/'));
+        var idx = path.lastIndexOf('/');
+        return idx > 0 ? path.substring(0, idx) : null;
     }
 }
