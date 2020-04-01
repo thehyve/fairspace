@@ -9,6 +9,7 @@ export type User = {
     name: string;
     email?: string;
     admin: boolean;
+    access: string;
 }
 
 const requestOptions = {
@@ -19,6 +20,9 @@ export const getUser = () => axios.get('/api/v1/users/current')
     .catch(handleHttpError("Failure when retrieving user's information"))
     .then(extractJsonData)
     .then(user => ({...user, iri: createMetadataIri(user.id)}));
+
+export const logoutUser = () => axios.post('/api/v1/users/current/logout', {}, {headers: {'Content-Type': 'application/json'}})
+    .catch(handleHttpError("Failure when logging out user"));
 
 export const getUsers = () => axios.get('/api/v1/users/', requestOptions)
     .catch(handleHttpError('Error while loading users'))

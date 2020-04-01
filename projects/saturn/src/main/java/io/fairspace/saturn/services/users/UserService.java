@@ -11,6 +11,8 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UsersResource;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +61,14 @@ public class UserService {
         try {
             return users.get(false);
         } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void logoutCurrent(HttpServletRequest request) {
+        try {
+            request.logout();
+        } catch (ServletException e) {
             throw new RuntimeException(e);
         }
     }

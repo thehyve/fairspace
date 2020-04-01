@@ -68,7 +68,7 @@ const PermissionsViewer = ({
                         key={key}
                     >
                         <ListItemText
-                            primary={permission.userName}
+                            primary={permission.name}
                             secondary={permission.access}
                             data-testid="collaborator"
                         />
@@ -137,9 +137,8 @@ const PermissionsViewer = ({
         }
 
         // TODO: Refactor variable naming: user vs iri vs id.
-        // TODO: Use descriptive variable names. E.g. user.name contains the name of the user
         const user = permissions.find(p => p.user === selectedPermission.user) || {};
-        const content = `Are you sure you want to remove "${user.userName}" from the collaborator list?`;
+        const content = `Are you sure you want to remove "${user.name}" from the collaborator list?`;
 
         return (
             <ConfirmationDialog

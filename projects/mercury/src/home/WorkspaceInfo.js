@@ -1,36 +1,26 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {Paper} from '@material-ui/core';
 
 import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';
 import useLinkedData from '../metadata/UseLinkedData';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import {currentWorkspace} from "../workspaces/workspaces";
-import {LoadingInlay} from "../common";
 
-const WorkspaceInfoWithProvider = () => (
+const WorkspaceInfoWithProvider = (props) => (
     <LinkedDataMetadataProvider>
-        <WorkspaceInfo />
+        <WorkspaceInfo {...props} />
     </LinkedDataMetadataProvider>
 );
 
-const WorkspaceInfo = () => {
-    const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
-    const id = currentWorkspace();
-    const ws = workspaces.find(w => w.id === id);
-    const iri = ws && ws.iri;
+const WorkspaceInfo = (props) => {
+    const {workspace} = props;
+    const {iri} = workspace;
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
-    if (workspacesLoading) {
-        return (<LoadingInlay />);
-    }
-    if (workspacesError || !iri) {
-        return 'Error loading workspaces';
-    }
+
     return (
         <>
             <Paper style={{padding: 20}}>
-                {ws.canManage ? (
+                {workspace.canManage ? (
                     <LinkedDataEntityFormContainer
                         subject={iri}
                         properties={properties}

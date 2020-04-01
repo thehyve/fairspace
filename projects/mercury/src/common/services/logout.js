@@ -1,12 +1,7 @@
+import {logoutUser} from "../../users/UsersAPI";
+
 export default function logout() {
-    const performLocalLogout = () => {window.location.href = '/logout';};
+    const navigateToRoot = () => {window.location.href = '/';};
 
-    // TODO: Fix me
-    // if (jupyterhub) {
-    //     return axios.get(`${jupyterhub}/hub/logout`, {withCredentials: true})
-    //         .catch(() => {})
-    //         .then(performLocalLogout);
-    // }
-
-    return Promise.resolve().then(performLocalLogout);
+    return logoutUser().then(navigateToRoot);
 }

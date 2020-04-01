@@ -2,21 +2,21 @@ import {canAlterPermission, sortPermissions} from "../permissionUtils";
 
 describe('permissionUtils', () => {
     describe('sortPermissions', () => {
-        it('should sort first by access then by userName', () => {
+        it('should sort first by access then by name', () => {
             expect(sortPermissions([])).toEqual([]);
-            expect(sortPermissions([{access: 'Read', userName: 's1'}, {access: 'Write', userName: 's2'}, {
+            expect(sortPermissions([{access: 'Read', name: 's1'}, {access: 'Write', name: 's2'}, {
                 access: 'Manage',
-                userName: 's3'
+                name: 's3'
             }]))
-                .toEqual([{access: 'Manage', userName: 's3'}, {access: 'Write', userName: 's2'}, {
+                .toEqual([{access: 'Manage', name: 's3'}, {access: 'Write', name: 's2'}, {
                     access: 'Read',
-                    userName: 's1'
+                    name: 's1'
                 }]);
-            expect(sortPermissions([{access: 'Read', userName: 's3'}, {access: 'Read', userName: 's1'}, {
+            expect(sortPermissions([{access: 'Read', name: 's3'}, {access: 'Read', name: 's1'}, {
                 access: 'Read',
-                userName: 's2'
+                name: 's2'
             }]))
-                .toEqual([{access: 'Read', userName: 's1'}, {access: 'Read', userName: 's2'}, {access: 'Read', userName: 's3'}]);
+                .toEqual([{access: 'Read', name: 's1'}, {access: 'Read', name: 's2'}, {access: 'Read', name: 's3'}]);
         });
     });
 

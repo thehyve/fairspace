@@ -71,9 +71,10 @@ describe('PermissionProvider', () => {
             );
         });
 
-        // Expect the usernames to be added to the permissions. One of the
+        // Expect the user names to be added to the permissions. One of the
         // permissions does not have a user associated
-        expect(permissionContextOutput.permissions.map(p => p.userName)).toEqual(expect.arrayContaining([
+        expect(permissionContextOutput.permissions.length).toEqual(3);
+        expect(permissionContextOutput.permissions.map(p => p.name)).toEqual(expect.arrayContaining([
             "Ygritte",
             "Gregor Clegane",
             ""
@@ -89,9 +90,9 @@ describe('PermissionProvider', () => {
             ]);
         });
 
-        // Expect the usernames to be added to the permissions. One of the
+        // Expect the user names to be added to the permissions. One of the
         // permissions does not have a user associated
-        expect(permissionContextOutput.permissions.map(p => p.userName)).toEqual(expect.arrayContaining([
+        expect(permissionContextOutput.permissions.map(p => p.name)).toEqual(expect.arrayContaining([
             "Ygritte",
             "Gregor Clegane",
             "Updated user"
