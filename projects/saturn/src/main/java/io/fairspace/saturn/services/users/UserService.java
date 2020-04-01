@@ -68,8 +68,7 @@ public class UserService {
         }
     }
 
-    public void logoutCurrent(HttpServletRequest request, User user) {
-        usersResource.get(user.getId()).logout();
+    public void logoutCurrent(HttpServletRequest request) {
         try {
             request.logout();
         } catch (ServletException e) {
