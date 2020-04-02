@@ -3,6 +3,8 @@ package io.fairspace.saturn.vocabulary;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ShaclSimpleValidator;
 import org.apache.jena.util.FileManager;
 import org.junit.Before;
@@ -36,7 +38,11 @@ public class VocabulariesTest {
     }
 
     private void validate(Model dataModel, Model shapesModel) {
-        assertTrue(new ShaclSimpleValidator().conforms(shapesModel.getGraph(), dataModel.getGraph()));
-
+        var report = new ShaclSimpleValidator().validate(Shapes.parse(shapesModel.getGraph()), dataModel.getGraph());
+        if (!report.conforms()) {
+            System.err.println("Validation errors:");
+            report.getEntries().forEach(System.err::println);
+        }
+        assertTrue(report.conforms());
     }
 }

@@ -164,15 +164,7 @@ fs:UserShape a fs:ClassShape ;
     sh:property
         fs:labelShape,
         fs:commentShape,
-        fs:userEmailShape,
-          [
-            sh:path fs:hasRole ;
-            fs:machineOnly true ;
-            a fs:DatatypePropertyShape ;
-            sh:name "Has a role" ;
-            sh:description "Roles assigned to the user" ;
-            sh:datatype xsd:string ;
-          ].
+        fs:userEmailShape .
 
 fs:Workspace a fs:ClassShape ;
   sh:description "Resource description for the current workspace." ;
