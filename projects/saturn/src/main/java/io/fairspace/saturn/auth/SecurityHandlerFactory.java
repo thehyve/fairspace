@@ -4,10 +4,7 @@ import io.fairspace.saturn.config.Config;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.SecurityHandler;
-import org.eclipse.jetty.security.ServerAuthException;
-import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.security.Constraint;
 import org.keycloak.adapters.AdapterTokenStore;
 import org.keycloak.adapters.KeycloakDeployment;
@@ -21,14 +18,11 @@ import org.keycloak.common.enums.SslRequired;
 import org.keycloak.enums.TokenStore;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.lang.System.getenv;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 public class SecurityHandlerFactory {
     public static SecurityHandler createSecurityHandler(Config.Auth config) {
@@ -39,18 +33,18 @@ public class SecurityHandlerFactory {
                 return new Jetty94RequestAuthenticator(facade, deployment, tokenStore, -1, request) {
                     @Override
                     public AuthChallenge getChallenge() {
-                        // No redirects for API calls
+                        // No redirects for API requests
                         if (request.getOriginalURI().startsWith("/api/")) {
                             return new AuthChallenge() {
                                 @Override
                                 public boolean challenge(HttpFacade exchange) {
-                                    exchange.getResponse().setStatus(401);
+                                    exchange.getResponse().setStatus(getResponseCode());
                                     return true;
                                 }
 
                                 @Override
                                 public int getResponseCode() {
-                                    return 401;
+                                    return SC_UNAUTHORIZED;
                                 }
                             };
                         }
