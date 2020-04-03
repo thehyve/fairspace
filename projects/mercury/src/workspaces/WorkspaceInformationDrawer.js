@@ -15,6 +15,15 @@ export const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWor
             && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
     }
 
+    if (!workspace.canRead) {
+        return atLeastSingleWorkspaceExists
+            && (
+                <EmptyInformationDrawer message="You don't have access to see the metadata of this workspace.
+                                                Please contact the administrator to get the access."
+                />
+            );
+    }
+
     return (
         <>
             <WorkspaceDetails

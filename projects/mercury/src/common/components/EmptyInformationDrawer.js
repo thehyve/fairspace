@@ -17,6 +17,7 @@ const EmptyInformationDrawer = (props) => {
                     variant="h6"
                     withIcon={false}
                     isError={false}
+                    noWrap={false}
                     messageColor="textSecondary"
                 />
             </Grid>
