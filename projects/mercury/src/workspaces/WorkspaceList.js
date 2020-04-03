@@ -49,7 +49,7 @@ const WorkspaceList = ({
             history.push(`/workspaces/${workspace.id}/`);
         }
     };
-    const onWorkspaceClick = (workspace: Workspace) => {
+    const onWorkspaceClick = (workspace: Workspace & Accessible) => {
         toggleWorkspace(workspace);
     };
 
