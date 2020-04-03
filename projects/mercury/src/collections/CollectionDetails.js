@@ -6,8 +6,6 @@ import {useHistory, withRouter} from 'react-router-dom';
 import {ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
-import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
-import PermissionsCard from "../permissions/PermissionsCard";
 import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from '../common/contexts/CollectionsContext';
 import {workspacePrefix} from '../workspaces/workspaces';
@@ -145,18 +143,6 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                         </Typography>
                     </CardContent>
                 </Card>
-
-                <PermissionProvider iri={collection.iri}>
-                    <PermissionContext.Consumer>
-                        {({permissions}) => (
-                            <PermissionsCard
-                                permissions={permissions}
-                                iri={collection.iri}
-                                canManage={collection.canManage}
-                            />
-                        )}
-                    </PermissionContext.Consumer>
-                </PermissionProvider>
 
                 {editing ? (
                     <CollectionEditor
