@@ -11,6 +11,7 @@ export type CollectionProperties = {|
     description: string;
     connectionString: string;
     location: string;
+    ownerWorkspace: string;
 |};
 
 export type CollectionType = {|

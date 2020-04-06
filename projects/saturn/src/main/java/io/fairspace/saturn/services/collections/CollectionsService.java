@@ -6,10 +6,12 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.audit.Audit.audit;
@@ -55,9 +57,10 @@ public class CollectionsService {
         }
 
         var storedCollection = dao.getDataset().calculateWrite(() -> {
+            checkWorkspace(collection.getOwnerWorkspace());
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
-            permissions.createResource(collection.getIri());
+
             collection.setAccess(Access.Manage);
             eventListener.accept(new CollectionCreatedEvent(collection));
             return collection;
@@ -88,6 +91,16 @@ public class CollectionsService {
                 .nextOptional()
                 .map(r -> entityFromResource(Collection.class, r));
     }
+
+    private void checkWorkspace(Node ownerWorkspace) {
+        validate(ownerWorkspace != null, "ownerWorkspace is missing");
+
+        var ws = dao.getDataset().getDefaultModel().asRDFNode(ownerWorkspace).asResource();
+        validate(ws.hasProperty(RDF.type, FS.Workspace), "Invalid workspace IRI");
+        validate(!ws.hasProperty(FS.dateDeleted), "Workspace is deleted");
+        permissions.ensureAccess(Set.of(ownerWorkspace), Access.Write);
+    }
+
 
     private void ensureLocationIsNotUsed(String location) {
         if(getByLocationWithoutAccess(location).isPresent()) {
@@ -172,6 +185,9 @@ public class CollectionsService {
             if (patch.getDescription() != null) {
                 collection.setDescription(patch.getDescription());
             }
+            
+            validate(patch.getOwnerWorkspace() == null || patch.getOwnerWorkspace().equals(collection.getOwnerWorkspace()),
+                    "Collection ownership cannot be changed");
 
             validateFields(collection);
             collection = dao.write(collection);

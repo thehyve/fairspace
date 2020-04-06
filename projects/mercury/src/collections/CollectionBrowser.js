@@ -14,7 +14,8 @@ export const CollectionBrowser = ({
     isSelected = () => false,
     toggleCollection = () => {},
     users = [],
-    history
+    history,
+    workspaceIri
 }) => {
     const [addingNewCollection, setAddingNewCollection] = useState(false);
 
@@ -44,8 +45,8 @@ export const CollectionBrowser = ({
                 />
                 {addingNewCollection ? (
                     <CollectionEditor
-                        title="Add collection"
                         onClose={handleCancelAddCollection}
+                        workspaceIri={workspaceIri}
                     />
                 ) : null}
             </>
@@ -59,16 +60,21 @@ export const CollectionBrowser = ({
     return (
         <>
             {loading ? <LoadingInlay /> : renderCollectionList()}
-            <Button
-                style={{marginTop: 8}}
-                color="primary"
-                variant="contained"
-                aria-label="Add"
-                title="Create a new collection"
-                onClick={handleAddCollectionClick}
-            >
-                New
-            </Button>
+            {
+                window.location.pathname.startsWith('/workspaces/')
+                && (
+                    <Button
+                        style={{marginTop: 8}}
+                        color="primary"
+                        variant="contained"
+                        aria-label="Add"
+                        title="Create a new collection"
+                        onClick={handleAddCollectionClick}
+                    >
+                    New
+                    </Button>
+                )
+            }
         </>
     );
 };
@@ -78,10 +84,14 @@ const ContextualCollectionBrowser = (props) => {
     const {users, usersLoading, usersError} = useContext(UsersContext);
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
 
+    const filteredCollections = props.workspaceIri
+        ? collections.filter(c => c.ownerWorkspace === props.workspaceIri)
+        : collections;
+
     return (
         <CollectionBrowser
             {...props}
-            collections={collections}
+            collections={filteredCollections}
             users={users}
             loading={collectionsLoading || currentUserLoading || usersLoading}
             error={collectionsError || currentUserError || usersError}

@@ -23,14 +23,14 @@ const WorkspaceRoutes = () => (
     <Switch>
         <Route path="/workspaces" exact component={WorkspacePage} />
 
-        <Route path="/workspaces/:workspace" exact component={WorkspaceOverview} />
+        <Route path="/workspaces/:workspace" exact render={props => (<WorkspaceOverview {...props} />)} />
 
         <Route
             path="/collections"
             exact
             render={(props) => (
                 <LinkedDataMetadataProvider>
-                    <Collections history={props.history} />
+                    <Collections history={props.history} showBreadCrumbs />
                 </LinkedDataMetadataProvider>
             )}
         />

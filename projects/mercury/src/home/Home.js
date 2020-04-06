@@ -10,6 +10,8 @@ import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import {currentWorkspace} from "../workspaces/workspaces";
+import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
+import Collections from "../collections/CollectionsPage";
 
 export const TabPanel = (props) => {
     const {children, value, index, ...other} = props;
@@ -39,7 +41,7 @@ const a11yProps = (index) => ({
     'aria-controls': `workspace-tabpanel-${index}`,
 });
 
-export default () => {
+export default (props) => {
     const [value, setValue] = React.useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
@@ -67,6 +69,7 @@ export default () => {
             >
                 <Tab label="Overview" {...a11yProps(0)} />
                 <Tab label="Users" {...a11yProps(1)} />
+                <Tab label="Collections" {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
                 <BreadCrumbs />
@@ -74,6 +77,11 @@ export default () => {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <UserList workspace={workspace} />
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                <LinkedDataMetadataProvider>
+                    <Collections history={props.history} workspaceIri={workspace.iri}/>
+                </LinkedDataMetadataProvider>
             </TabPanel>
         </>
     );

@@ -7,6 +7,7 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.AccessInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
 
 import static io.fairspace.saturn.vocabulary.FS.*;
@@ -27,6 +28,8 @@ public class Collection extends LifecycleAwarePersistentEntity implements Access
     @RDFProperty(value = CONNECTION_STRING_URI)
     private String connectionString;
 
+    @RDFProperty(value = OWNED_BY_URI)
+    private Node ownerWorkspace;
 
     private Access access;
 
