@@ -86,7 +86,7 @@ export default (props) => {
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <LinkedDataMetadataProvider>
-                    <Collections history={props.history} workspaceIri={workspace.iri}/>
+                    <Collections history={props.history} workspaceIri={workspace.iri} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
         </>
