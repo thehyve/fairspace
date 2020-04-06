@@ -22,7 +22,6 @@ describe('FileOperations', () => {
     const fileActionsMock = {
         getDownloadLink: () => 'http://a',
         createDirectory: () => Promise.resolve(),
-        renameFile: () => Promise.resolve(),
         copyPaths: () => new Promise(resolve => setTimeout(resolve, 500))
     };
 
@@ -72,11 +71,10 @@ describe('FileOperations', () => {
 
     it('should clear selection and refresh files after all successful file operations', () => {
         const createDir = () => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir");
-        const renameFile = () => wrapper.find('RenameButton').prop("onRename")("new-name");
         const paste = () => clickHandler('Paste')({stopPropagation: () => {}});
 
         return Promise.all(
-            [createDir, renameFile, paste].map(op => {
+            [createDir, paste].map(op => {
                 refreshFiles.mockReset();
                 clearSelection.mockReset();
 

@@ -1,7 +1,6 @@
 import {useCallback} from "react";
 import {useAsync} from "../common";
 import FileAPI from "./FileAPI";
-import {joinPaths} from "../common/utils/fileUtils";
 
 /**
  * This hook contains logic about files for a certain directory.
@@ -12,15 +11,6 @@ export const useFiles = (path, fileApi = FileAPI) => {
     ));
 
     const {getDownloadLink} = fileApi;
-
-    const renameFile = (currentFilename, newFilename) => {
-        const from = joinPaths(path, currentFilename);
-        const to = joinPaths(path, newFilename);
-
-        return fileApi
-            .move(from, to)
-            .then(refresh);
-    };
 
     const createDirectory = directoryPath => fileApi
         .createDirectory(directoryPath)
@@ -38,7 +28,6 @@ export const useFiles = (path, fileApi = FileAPI) => {
         fileActions: {
             createDirectory,
             getDownloadLink,
-            renameFile,
             copyPaths
         }
     };

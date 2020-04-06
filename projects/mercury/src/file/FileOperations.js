@@ -1,13 +1,13 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
-import {BorderColor, CreateNewFolder} from '@material-ui/icons';
+import {CreateNewFolder} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
 import {ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
-import {CreateDirectoryButton, RenameButton} from "./buttons";
+import {CreateDirectoryButton} from "./buttons";
 import {joinPaths} from "../common/utils/fileUtils";
 import {COPY} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
@@ -15,7 +15,6 @@ import ClipboardContext from '../common/contexts/ClipboardContext';
 
 export const Operations = {
     PASTE: 'PASTE',
-    RENAME: 'RENAME',
     MKDIR: 'MKDIR'
 };
 Object.freeze(Operations);
@@ -87,12 +86,6 @@ export const FileOperations = ({
             return true;
         });
 
-    const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
-        .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => handlePathRename(path, newName));
-            return false;
-        });
-
     const addBadgeIfNotEmpty = (badgeContent, children) => {
         if (badgeContent) {
             return (
@@ -133,21 +126,6 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
-                <ProgressButton active={activeOperation === Operations.RENAME}>
-                    <RenameButton
-                        currentName={selectedItem.basename}
-                        onRename={newName => handlePathRename(selectedItem, newName)}
-                        disabled={isWritingDisabled || isDisabledForMoreThanOneSelection || busy}
-                    >
-                        <IconButton
-                            title={`Rename ${selectedItem.basename}`}
-                            aria-label={`Rename ${selectedItem.basename}`}
-                            disabled={isWritingDisabled || isDisabledForMoreThanOneSelection || busy}
-                        >
-                            <BorderColor />
-                        </IconButton>
-                    </RenameButton>
-                </ProgressButton>
             </FileOperationsGroup>
             <FileOperationsGroup>
                 <IconButton
