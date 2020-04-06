@@ -23,6 +23,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.StreamSupport.stream;
+import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
@@ -34,8 +35,12 @@ public class PermissionsService {
     private final PermissionChangeEventHandler permissionChangeEventHandler;
 
     public void createResource(Node resource) {
+        createResource(resource, getCurrentUser().getIri());
+    }
+
+    public void createResource(Node resource, Node owner) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getCurrentUser().getIri()));
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(owner));
 
         audit("RESOURCE_CREATED",
                 "resource", resource.getURI());
@@ -211,14 +216,7 @@ public class PermissionsService {
             var it = dataset.getDefaultModel()
                     .listSubjectsWithProperty(RDF.type, FS.Workspace)
                     .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
-                    .mapWith(ws -> {
-                        var workspaceAccess = getResourceAccess(ws, user);
-                        if (workspaceAccess == Access.None || r.hasProperty(FS.ownedBy, ws)) {
-                            return workspaceAccess;
-                        }
-                        var shareType = getResourceAccess(r, ws);
-                        return workspaceAccess.compareTo(shareType) > 0 ? shareType : workspaceAccess;
-                    });
+                    .mapWith(ws -> min(getResourceAccess(ws, user), getResourceAccess(r, ws)));
             return stream(spliteratorUnknownSize(it, 0), false)
                     .max(naturalOrder())
                     .orElse(Access.None);

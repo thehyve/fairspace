@@ -60,7 +60,7 @@ public class CollectionsService {
             checkWorkspace(collection.getOwnerWorkspace());
             ensureLocationIsNotUsed(collection.getLocation());
             dao.write(collection);
-
+            permissions.createResource(collection.getIri(), collection.getOwnerWorkspace());
             collection.setAccess(Access.Manage);
             eventListener.accept(new CollectionCreatedEvent(collection));
             return collection;
