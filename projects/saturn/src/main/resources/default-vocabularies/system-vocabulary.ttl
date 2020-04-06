@@ -81,7 +81,9 @@ fs:FileShape a fs:ClassShape ;
         fs:deletedByShape,
         fs:dateDeletedShape,
         fs:labelShape,
-        fs:commentShape ;
+        fs:commentShape,
+        fs:replacesShape,
+        fs:isReplacedByShape ;
     sh:property
         fs:fileSizeShape,
         fs:md5Shape,
@@ -93,7 +95,9 @@ fs:FileShape a fs:ClassShape ;
         fs:deletedByShape,
         fs:dateDeletedShape,
         fs:labelShape,
-        fs:commentShape .
+        fs:commentShape,
+        fs:replacesShape,
+        fs:isReplacedByShape .
 
 fs:DirectoryShape a fs:ClassShape ;
     sh:description "A directory containing multiple files." ;
@@ -334,6 +338,24 @@ fs:deletedByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:deletedBy .
 
+
+fs:replacesShape a fs:RelationShape ;
+                  sh:name "Replaces" ;
+                  sh:description "Old version of this file." ;
+                  sh:class fs:File ;
+                  sh:maxCount 1 ;
+                  fs:machineOnly true ;
+                  fs:fixedShape true ;
+                  sh:path fs:replaces .
+
+fs:isReplacedByShape a fs:RelationShape ;
+                   sh:name "Is Replaced By" ;
+                   sh:description "New version of this file." ;
+                   sh:class fs:File ;
+                   sh:maxCount 1 ;
+                   fs:machineOnly true ;
+                   fs:fixedShape true ;
+                   sh:path fs:isReplacedBy .
 
 ########################
 ### Fixed Vocabulary ###
