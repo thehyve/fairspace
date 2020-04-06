@@ -344,8 +344,7 @@ fs:replacesShape a fs:RelationShape ;
                   sh:description "Old version of this file." ;
                   sh:class fs:File ;
                   sh:maxCount 1 ;
-                  fs:machineOnly true ;
-                  fs:fixedShape true ;
+                  fs:inverseRelation <isReplacedByShape> ;
                   sh:path fs:replaces .
 
 fs:isReplacedByShape a fs:RelationShape ;
@@ -353,8 +352,7 @@ fs:isReplacedByShape a fs:RelationShape ;
                    sh:description "New version of this file." ;
                    sh:class fs:File ;
                    sh:maxCount 1 ;
-                   fs:machineOnly true ;
-                   fs:fixedShape true ;
+                   fs:inverseRelation <replacesShape> ;
                    sh:path fs:isReplacedBy .
 
 ########################
