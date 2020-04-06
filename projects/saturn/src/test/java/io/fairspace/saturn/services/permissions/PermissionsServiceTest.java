@@ -4,7 +4,6 @@ import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Resource;
@@ -28,7 +27,6 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,9 +49,6 @@ public class PermissionsServiceTest {
     private PermissionChangeEventHandler permissionChangeEventHandler;
 
     @Mock
-    private UserService userService;
-
-    @Mock
     private User currentUser;
 
     private Node currentUserIri = USER1;
@@ -63,16 +58,12 @@ public class PermissionsServiceTest {
         ds = new DatasetJobSupportInMemory();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
-
-        when(userService.getUser(any())).thenReturn(new User());
-
         setCurrentUser(currentUser);
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
 
-
-        service = new PermissionsService(ds, permissionChangeEventHandler, userService);
+        service = new PermissionsService(ds, permissionChangeEventHandler);
         service.createResource(RESOURCE);
     }
 

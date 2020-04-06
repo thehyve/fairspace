@@ -60,7 +60,7 @@ public class Services {
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(dataset, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsService(dataset, permissionNotificationHandler, userService);
+        permissionsService = new PermissionsService(dataset, permissionNotificationHandler);
 
         workspaceService = new WorkspaceService(dao, permissionsService);
         collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", dao, eventBus::post, permissionsService);

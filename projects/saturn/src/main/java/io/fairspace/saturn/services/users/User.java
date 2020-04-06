@@ -7,9 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import static io.fairspace.saturn.vocabulary.FS.*;
 
 @RDFType(USER_URI)

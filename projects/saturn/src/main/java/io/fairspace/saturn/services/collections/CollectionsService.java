@@ -95,7 +95,7 @@ public class CollectionsService {
     private void checkWorkspace(Node ownerWorkspace) {
         validate(ownerWorkspace != null, "ownerWorkspace is missing");
 
-        var ws = dao.getDataset().getDefaultModel().asRDFNode(ownerWorkspace).asResource();
+        var ws = dao.getDataset().getDefaultModel().wrapAsResource(ownerWorkspace);
         validate(ws.hasProperty(RDF.type, FS.Workspace), "Invalid workspace IRI");
         validate(!ws.hasProperty(FS.dateDeleted), "Workspace is deleted");
         permissions.ensureAccess(Set.of(ownerWorkspace), Access.Write);

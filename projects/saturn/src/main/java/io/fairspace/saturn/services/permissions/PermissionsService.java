@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.permissions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,10 @@ import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.StreamSupport.stream;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
@@ -30,8 +32,6 @@ public class PermissionsService {
 
     private final DatasetJobSupport dataset;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
-    private final UserService userService;
-
 
     public void createResource(Node resource) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -55,8 +55,6 @@ public class PermissionsService {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
-
-            validate(userService.getUser(user) != null, "A user must be known to the system");
 
             if (!isCollection(resource) && !isWorkspace(resource)) {
                 validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
@@ -201,38 +199,45 @@ public class PermissionsService {
             return result;
         }
 
-        Access defaultAccess = Access.Read;
         var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
         var userResource = g.wrapAsResource(userObject.getIri());
-        authorities.forEach(a -> getResourceAccess(g.wrapAsResource(a), userResource)
-                .ifPresentOrElse(
-                        accessLevel -> result.put(a, accessLevel),
-                        () -> result.put(a, defaultAccess)
-                )
-        );
+        authorities.forEach(a -> result.put(a,getResourceAccess(g.wrapAsResource(a), userResource)));
 
         return result;
     }
 
-    private Optional<Access> getResourceAccess(Resource r, Resource user) {
+    private Access getResourceAccess(Resource r, Resource user) {
+        if (r.hasProperty(RDF.type, FS.Collection)) {
+            var it = dataset.getDefaultModel()
+                    .listSubjectsWithProperty(RDF.type, FS.Workspace)
+                    .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
+                    .mapWith(ws -> {
+                        var workspaceAccess = getResourceAccess(ws, user);
+                        if (workspaceAccess == Access.None || r.hasProperty(FS.ownedBy, ws)) {
+                            return workspaceAccess;
+                        }
+                        var shareType = getResourceAccess(r, ws);
+                        return workspaceAccess.compareTo(shareType) > 0 ? shareType : workspaceAccess;
+                    });
+            return stream(spliteratorUnknownSize(it, 0), false)
+                    .max(naturalOrder())
+                    .orElse(Access.None);
+        }
         if (r.hasProperty(FS.manage, user)) {
-            return Optional.of(Access.Manage);
+            return Access.Manage;
         }
         if (r.hasProperty(FS.write, user)) {
-            return Optional.of(Access.Write);
+            return Access.Write;
         }
         if (r.hasProperty(FS.read, user)) {
-            return Optional.of(Access.Read);
+            return Access.Read;
         }
         if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection) ||
             r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Workspace)) {
-            return Optional.of(Access.None);
-        }
-        if (r.hasLiteral(FS.writeRestricted, true)) {
-            return Optional.of(Access.Read);
+            return Access.None;
         }
 
-        return Optional.empty();
+        return Access.Read;
     }
 
     private boolean isCollection(Node resource) {
