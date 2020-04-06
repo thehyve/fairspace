@@ -26,10 +26,6 @@ export const useFiles = (path, fileApi = FileAPI) => {
         .createDirectory(directoryPath)
         .then(refresh);
 
-    const movePaths = paths => fileApi
-        .movePaths(paths, path)
-        .then(refresh);
-
     const copyPaths = paths => fileApi
         .copyPaths(paths, path)
         .then(refresh);
@@ -43,7 +39,6 @@ export const useFiles = (path, fileApi = FileAPI) => {
             createDirectory,
             getDownloadLink,
             renameFile,
-            movePaths,
             copyPaths
         }
     };

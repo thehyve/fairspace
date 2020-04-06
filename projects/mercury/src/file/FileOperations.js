@@ -2,15 +2,14 @@ import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
 import {BorderColor, CreateNewFolder} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
-import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
 import {ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";
-import {getParentPath, joinPaths} from "../common/utils/fileUtils";
-import {COPY, CUT} from '../constants';
+import {joinPaths} from "../common/utils/fileUtils";
+import {COPY} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
 
@@ -40,8 +39,7 @@ export const FileOperations = ({
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
-    const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
+    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty();
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
@@ -58,11 +56,6 @@ export const FileOperations = ({
             });
     };
 
-    const handleCut = e => {
-        if (e) e.stopPropagation();
-        clipboard.cut(selectedPaths);
-    };
-
     const handleCopy = e => {
         if (e) e.stopPropagation();
         clipboard.copy(selectedPaths);
@@ -73,9 +66,7 @@ export const FileOperations = ({
 
         let operation;
 
-        if (clipboard.method === CUT) {
-            operation = fileActions.movePaths(clipboard.filenames);
-        } if (clipboard.method === COPY) {
+        if (clipboard.method === COPY) {
             operation = fileActions.copyPaths(clipboard.filenames);
         }
 
@@ -166,14 +157,6 @@ export const FileOperations = ({
                     disabled={noPathSelected || busy}
                 >
                     <ContentCopy />
-                </IconButton>
-                <IconButton
-                    aria-label="Cut"
-                    title="Cut"
-                    onClick={e => handleCut(e)}
-                    disabled={isWritingDisabled || noPathSelected || busy}
-                >
-                    <ContentCut />
                 </IconButton>
                 <ProgressButton active={activeOperation === Operations.PASTE}>
                     <IconButton
