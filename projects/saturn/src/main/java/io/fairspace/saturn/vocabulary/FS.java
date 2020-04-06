@@ -21,7 +21,7 @@ public class FS {
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 
-    public static final String OWNED_BY_URI = NS + "owneedBy";
+    public static final String OWNED_BY_URI = NS + "ownedBy";
     public static final Property ownedBy = createProperty(OWNED_BY_URI);
 
     public static final String CREATED_BY_URI = NS + "createdBy";
