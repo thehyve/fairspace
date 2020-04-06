@@ -18,7 +18,8 @@ const collection: CollectionProperties = {
     name: 'Collection',
     description: 'description',
     location: 'location',
-    connectionString: 'scheme://info'
+    connectionString: 'scheme://info',
+    ownerWorkspace: "http://owner"
 };
 
 const longName = 'aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrrssssstttttuuuuuuvvvvvvwwwwwwxxxxxyyyyyzzzzz';
@@ -114,6 +115,7 @@ describe('CollectionEditor', () => {
         const description = 'new-description';
         const location = 'new-location';
         const connectionString = 'scheme://new';
+        const ownerWorkspace = 'http://owner';
 
         beforeEach(() => {
             collectionEditor = (
@@ -146,7 +148,7 @@ describe('CollectionEditor', () => {
             wrapper.instance().handleSave();
 
             expect(saveCallback).toHaveBeenCalledTimes(1);
-            expect(saveCallback).toHaveBeenCalledWith({name, description, location, connectionString});
+            expect(saveCallback).toHaveBeenCalledWith({name, description, location, connectionString, ownerWorkspace});
         });
 
         it('does not invoke the save callback when no name is present', () => {
