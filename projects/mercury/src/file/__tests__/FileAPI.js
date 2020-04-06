@@ -67,15 +67,6 @@ describe('FileAPI', () => {
         });
     });
 
-    describe('Deleting', () => {
-        it('should result in a clear error on 403 response', () => {
-            FileAPI.client = () => ({deleteFile: jest.fn(() => Promise.reject({response: {status: 403}}))});
-
-            return expect(FileAPI.delete('path'))
-                .rejects.toThrow(/write permissions/);
-        });
-    });
-
     describe('uniqueDestinationPaths', () => {
         it('generates unique names', async () => {
             FileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]));

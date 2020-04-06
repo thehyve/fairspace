@@ -1,17 +1,7 @@
 // @flow
 import React, {useContext} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    IconButton,
-    List,
-    Menu,
-    MenuItem,
-    Typography
-} from '@material-ui/core';
+import {Card, CardContent, CardHeader, IconButton, List, Menu, MenuItem, Typography} from '@material-ui/core';
 import {CloudDownload, FolderOpen, HighlightOffSharp, MoreVert} from '@material-ui/icons';
-import {useHistory, withRouter} from 'react-router-dom';
 import LockOpen from "@material-ui/icons/LockOpen";
 import ListItem from "@material-ui/core/ListItem";
 import Button from "@material-ui/core/Button";
@@ -26,10 +16,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
-import type {Collection, Resource} from './CollectionAPI';
-import CollectionsContext from '../common/contexts/CollectionsContext';
-import {workspacePrefix} from '../workspaces/workspaces';
-import type {History} from '../types';
+import type {Collection} from './CollectionAPI';
 import UsersContext from '../common/contexts/UsersContext';
 import {getDisplayName} from "../common/utils/userUtils";
 import SharingContext, {SharingProvider} from "../common/contexts/SharingContext";
@@ -132,7 +119,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
             workspaces.splice(idx, 1);
         }
         this.setState({workspacesToAdd: workspaces});
-    }
+    };
 
     render() {
         const {loading, collection, inCollectionsBrowser = false} = this.props;
@@ -165,9 +152,6 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                 >
                                     <MenuItem onClick={this.handleEdit}>
                                         Edit
-                                    </MenuItem>
-                                    <MenuItem onClick={this.handleDelete}>
-                                        Delete
                                     </MenuItem>
                                 </Menu>
                             </>
@@ -329,9 +313,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
 }
 
 const ContextualCollectionDetails = (props) => {
-    const history = useHistory();
     const {users} = useContext(UsersContext);
-    const {deleteCollection} = useContext(CollectionsContext);
     const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
@@ -340,10 +322,8 @@ const ContextualCollectionDetails = (props) => {
             loading={props.loading || workspacesLoading}
             users={users}
             workspaces={workspaces}
-            history={history}
-            deleteCollection={deleteCollection}
         />
     );
 };
 
-export default withRouter(ContextualCollectionDetails);
+export default ContextualCollectionDetails;

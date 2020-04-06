@@ -1,11 +1,11 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
-import {BorderColor, CreateNewFolder, Delete} from '@material-ui/icons';
+import {BorderColor, CreateNewFolder} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
-import {ConfirmationButton, ErrorDialog} from "../common";
+import {ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";
@@ -17,8 +17,7 @@ import ClipboardContext from '../common/contexts/ClipboardContext';
 export const Operations = {
     PASTE: 'PASTE',
     RENAME: 'RENAME',
-    MKDIR: 'MKDIR',
-    DELETE: 'DELETE'
+    MKDIR: 'MKDIR'
 };
 Object.freeze(Operations);
 
@@ -97,11 +96,6 @@ export const FileOperations = ({
             return true;
         });
 
-    const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
-        .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
-        });
-
     const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
         .catch((err) => {
             ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => handlePathRename(path, newName));
@@ -162,24 +156,6 @@ export const FileOperations = ({
                             <BorderColor />
                         </IconButton>
                     </RenameButton>
-                </ProgressButton>
-                <ProgressButton active={activeOperation === Operations.DELETE}>
-                    <ConfirmationButton
-                        message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
-                        agreeButtonText="Remove"
-                        dangerous
-                        onClick={handleDelete}
-                        disabled={noPathSelected || isWritingDisabled || busy}
-                    >
-                        <IconButton
-                            title="Delete"
-                            aria-label="Delete"
-                            disabled={noPathSelected || isWritingDisabled || busy}
-                        >
-                            <Delete />
-                        </IconButton>
-
-                    </ConfirmationButton>
                 </ProgressButton>
             </FileOperationsGroup>
             <FileOperationsGroup>

@@ -916,23 +916,6 @@ paths:
           description: Collection with the given IRI could not be found
         '409':
           description: Conflict - location is already in use
-    delete:
-      summary: Delete a collection and its contents
-      operationId: deleteCollection
-      tags:
-        - collections
-      parameters:
-        - $ref: '#/components/parameters/projectParam'
-        - name: iri
-          in: query
-          description: The iri of the collection to delete
-          required: true
-          schema:
-            type: string
-            format: iri
-      responses:
-        '204':
-          description: Succesfully deleted the collection
 
   /account:
     get:

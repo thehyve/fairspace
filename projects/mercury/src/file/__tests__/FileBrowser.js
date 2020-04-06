@@ -35,7 +35,6 @@ const fileActionsMock = {
     getDownloadLink: () => 'http://a',
     createDirectory: () => Promise.resolve(),
     renameFile: () => Promise.resolve(),
-    deleteMultiple: () => Promise.resolve(),
     movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
 };
 

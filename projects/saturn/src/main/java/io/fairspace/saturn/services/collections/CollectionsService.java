@@ -125,33 +125,6 @@ public class CollectionsService {
         });
     }
 
-    public void delete(String iri) {
-        validateIRI(iri);
-        var c = dao.getDataset().calculateWrite(() -> {
-            var collection = get(iri);
-            if (collection == null) {
-                log.info("Collection not found {}", iri);
-                throw new CollectionNotFoundException(iri);
-            }
-            if (!collection.getAccess().canManage()) {
-                log.info("No enough permissions to delete a collection {}", iri);
-                throw new AccessDeniedException("Insufficient permissions for collection " + iri);
-            }
-
-            dao.markAsDeleted(collection);
-
-            // Emit event on internal eventbus so the filesystem can act accordingly
-            eventListener.accept(new CollectionDeletedEvent(collection));
-
-            return collection;
-        });
-
-        audit("COLLECTION_DELETED",
-                "iri", iri,
-                "name", c.getName(),
-                "location", c.getLocation());
-    }
-
     public Collection update(Collection patch) {
         validate(patch.getIri() != null, "No IRI");
 

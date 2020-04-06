@@ -60,13 +60,6 @@ class CollectionAPI {
             {headers}
         ).catch(handleHttpError("Failure while updating a collection"));
     }
-
-    deleteCollection(collection: Resource): Promise<void> {
-        return axios.delete(
-            `${collectionsUrl}?iri=${encodeURIComponent(collection.iri)}`,
-            {headers}
-        ).catch(handleHttpError("Failure while deleting collection"));
-    }
 }
 
 export default new CollectionAPI();

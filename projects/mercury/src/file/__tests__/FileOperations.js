@@ -23,7 +23,6 @@ describe('FileOperations', () => {
         getDownloadLink: () => 'http://a',
         createDirectory: () => Promise.resolve(),
         renameFile: () => Promise.resolve(),
-        deleteMultiple: () => Promise.resolve(),
         movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
     };
 
@@ -74,11 +73,10 @@ describe('FileOperations', () => {
     it('should clear selection and refresh files after all successful file operations', () => {
         const createDir = () => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir");
         const renameFile = () => wrapper.find('RenameButton').prop("onRename")("new-name");
-        const deleteFile = () => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")();
         const paste = () => clickHandler('Paste')({stopPropagation: () => {}});
 
         return Promise.all(
-            [createDir, renameFile, deleteFile, paste].map(op => {
+            [createDir, renameFile, paste].map(op => {
                 refreshFiles.mockReset();
                 clearSelection.mockReset();
 

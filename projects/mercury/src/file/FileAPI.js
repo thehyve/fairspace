@@ -111,28 +111,6 @@ class FileAPI {
     getDownloadLink = (path = '') => `/api/v1${workspacePrefix()}/webdav${path}`;
 
     /**
-     * Deletes the file given by path
-     * @param path
-     * @returns Promise<any>
-     */
-    delete(path) {
-        if (!path) return Promise.reject(Error("No path specified for deletion"));
-
-        return this.client().deleteFile(path, defaultOptions)
-            .catch(e => {
-                if (e && e.response) {
-                    // eslint-disable-next-line default-case
-                    switch (e.response.status) {
-                        case 403:
-                            throw new Error("Could not delete file or directory. Do you have write permissions to the collection?");
-                    }
-                }
-
-                return Promise.reject(e);
-            });
-    }
-
-    /**
      * Move the file specified by {source} to {destination}
      * @param source
      * @param destination
@@ -202,19 +180,6 @@ class FileAPI {
 
                 return Promise.reject(e);
             });
-    }
-
-    /**
-     * Delete one or more files
-     * @param filenames
-     * @returns {Promise}
-     */
-    deleteMultiple(filenames) {
-        if (!filenames || filenames.length === 0) {
-            return Promise.reject(new Error("No filenames given to delete"));
-        }
-
-        return Promise.all(filenames.map(filename => this.delete(filename)));
     }
 
     /**
