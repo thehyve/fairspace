@@ -6,7 +6,9 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionsServiceTest {
     private static final Node userIri = createURI("http://ex.com/user");
+    private static final Node workspaceIri = createURI("http://ex.com/ws");
 
     @Mock
     private Consumer<Object> eventListener;
@@ -38,18 +41,14 @@ public class CollectionsServiceTest {
         setCurrentUser(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
-        collections = new CollectionsService("http://fairspace.io/", new DAO(new DatasetJobSupportInMemory()), eventListener, permissions);
+        var ds = new DatasetJobSupportInMemory();
+        ds.getDefaultModel().add(ds.getDefaultModel().asRDFNode(workspaceIri).asResource(), RDF.type, FS.Workspace);
+        collections = new CollectionsService("http://fairspace.io/", new DAO(ds), eventListener, permissions);
     }
 
     @Test
     public void serviceReturnsAnEmptyListIfNoCollectionsExist() {
         assertTrue(collections.list().isEmpty());
-    }
-
-    @Test
-    public void creationOfACollectionTriggersACallToPermissionsAPI() {
-        var created = collections.create(newCollection());
-        verify(permissions).createResource(created.getIri());
     }
 
     @Test
@@ -88,7 +87,8 @@ public class CollectionsServiceTest {
         c.setName("c1");
         c.setLocation("dir1");
         c.setDescription("descr");
-        c.setConnectionString("");;
+        c.setConnectionString("");
+        c.setOwnerWorkspace(workspaceIri);
         return c;
     }
 
@@ -153,7 +153,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("Az_1-2");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        c1.setOwnerWorkspace(workspaceIri);
 
         assertEquals(c1.getLocation(), collections.create(c1).getLocation());
     }
@@ -165,7 +166,8 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir?");
             c1.setDescription("descr");
-            c1.setConnectionString("managed://example.com");;
+            c1.setConnectionString("managed://example.com");
+            c1.setOwnerWorkspace(workspaceIri);
 
             collections.create(c1);
         } finally {
@@ -180,7 +182,8 @@ public class CollectionsServiceTest {
             c1.setName("c1");
             c1.setLocation("dir1");
             c1.setDescription("descr");
-            c1.setConnectionString("managed://example.com");;
+            c1.setConnectionString("managed://example.com");
+            c1.setOwnerWorkspace(workspaceIri);
 
             collections.create(c1);
             c1.setIri(null);
@@ -194,19 +197,14 @@ public class CollectionsServiceTest {
     @Test(expected = LocationAlreadyExistsException.class)
     public void checksForLocationsUniquenessOnUpdate() {
         try {
-            var c1 = new Collection();
-            c1.setName("c1");
-            c1.setLocation("dir1");
-            c1.setDescription("descr");
-            c1.setConnectionString("managed://example.com");;
-
-            c1 = collections.create(c1);
+            var c1 = collections.create(newCollection());
 
             var c2 = new Collection();
             c2.setName("c2");
             c2.setLocation("dir2");
             c2.setDescription("descr");
-            c2.setConnectionString("managed://example.com");;
+            c2.setConnectionString("managed://example.com");
+            c2.setOwnerWorkspace(workspaceIri);
 
             collections.create(c2);
 
@@ -227,7 +225,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        c1.setOwnerWorkspace(workspaceIri);
         c1 = collections.create(c1);
 
         mockPermissions(Access.None);
@@ -243,7 +242,8 @@ public class CollectionsServiceTest {
         c1.setName("c1");
         c1.setLocation("dir");
         c1.setDescription("descr");
-        c1.setConnectionString("managed://example.com");;
+        c1.setConnectionString("managed://example.com");
+        c1.setOwnerWorkspace(workspaceIri);
         c1 = collections.create(c1);
 
         mockPermissions(Access.Write);
@@ -260,6 +260,7 @@ public class CollectionsServiceTest {
         c1.setLocation("dir");
         c1.setDescription("descr");
         c1.setConnectionString("managed://example.com");;
+        c1.setOwnerWorkspace(workspaceIri);
         c1 = collections.create(c1);
 
         mockPermissions(Access.Read);
@@ -270,12 +271,7 @@ public class CollectionsServiceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void collectionsWithoutManagePermissionCannotBeDeleted() {
-        var c1 = new Collection();
-        c1.setName("c1");
-        c1.setLocation("dir");
-        c1.setDescription("descr");
-        c1.setConnectionString("");
-        c1 = collections.create(c1);
+        var c1 = collections.create(newCollection());
 
         mockPermissions(Access.Write);
 
