@@ -3,7 +3,10 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.services.BaseApp;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.stream.Collectors;
+
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
+import static java.util.stream.Collectors.toList;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;

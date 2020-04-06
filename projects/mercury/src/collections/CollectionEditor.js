@@ -15,7 +15,7 @@ import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import type {Match, History} from '../types';
 
 
-const fields = ['name', 'description', 'location', 'connectionString'];
+const fields = ['name', 'description', 'location', 'connectionString', 'ownerWorkspace'];
 
 const copyProperties = (properties: CollectionProperties): CollectionProperties => ((fields
     .reduce((copy, field) => { copy[field] = properties ? properties[field] || '' : ''; return copy; }, {}): any): CollectionProperties);
@@ -61,7 +61,8 @@ type CollectionEditorProps = {
     onClose: () => void,
     setBusy: (boolean) => void,
     match: Match<PathParam>,
-    history: History
+    history: History,
+    workspaceIri: string
 };
 
 type CollectionEditorState = {
@@ -76,9 +77,12 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         inCollectionsBrowser: false
     };
 
+
     state = {
         editing: true,
-        properties: copyProperties(this.props.collection)
+        properties: this.props.collection
+            ? copyProperties(this.props.collection)
+            : {name: '', description: '', location: '', connectionString: '', ownerWorkspace: this.props.workspaceIri}
     };
 
     handleAddCollection = (properties: CollectionProperties) => {
@@ -171,7 +175,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 aria-labelledby="form-dialog-title"
             >
                 <DialogTitle id="form-dialog-title">
-                    Edit collection
+                    {this.props.collection ? 'Edit collection' : 'Add collection'}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>You can edit the collection details here.</DialogContentText>

@@ -10,7 +10,7 @@ import {useSingleSelection} from "../file/UseSelection";
 import {LoadingOverlay} from "../common/components";
 import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
 
-const CollectionsPage = ({history}) => {
+const CollectionsPage = ({history, showBreadCrumbs, workspaceIri}) => {
     usePageTitleUpdater("Collections");
 
     const [busy, setBusy] = useState(false);
@@ -41,7 +41,7 @@ const CollectionsPage = ({history}) => {
 
     return (
         <CollectionBreadcrumbsContextProvider>
-            <BreadCrumbs />
+            {showBreadCrumbs && <BreadCrumbs /> }
             <div style={{marginBottom: 16, width: consts.MAIN_CONTENT_WIDTH}}>
                 <SearchBar
                     placeholder="Search"
@@ -54,6 +54,7 @@ const CollectionsPage = ({history}) => {
                     <CollectionBrowser
                         isSelected={collection => isSelected(collection.iri)}
                         toggleCollection={collection => toggleCollection(collection.iri)}
+                        workspaceIri={workspaceIri}
                     />
                 </Grid>
                 <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
