@@ -1,9 +1,28 @@
 // @flow
 import React, {useContext} from 'react';
-import {Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
-import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    IconButton,
+    List,
+    Menu,
+    MenuItem,
+    Typography
+} from '@material-ui/core';
+import {CloudDownload, FolderOpen, HighlightOffSharp, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
-import {ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
+import LockOpen from "@material-ui/icons/LockOpen";
+import ListItem from "@material-ui/core/ListItem";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import Checkbox from "@material-ui/core/Checkbox";
+import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
@@ -12,6 +31,10 @@ import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
 import UsersContext from '../common/contexts/UsersContext';
 import {getDisplayName} from "../common/utils/userUtils";
+import SharingContext, {SharingProvider} from "../common/contexts/SharingContext";
+import {sortPermissions} from "../common/utils/permissionUtils";
+import WorkspaceContext from "../workspaces/WorkspaceContext";
+import type {Workspace} from "../workspaces/WorkspacesAPI";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -25,6 +48,7 @@ const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 type CollectionDetailsProps = {
     loading: boolean;
     collection: Collection;
+    workspaces: Array<Workspace>;
     users: any[];
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
@@ -47,7 +71,9 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
     state = {
         editing: false,
         anchorEl: null,
-        deleting: false
+        deleting: false,
+        showAddShareDialog: false,
+        workspacesToAdd: []
     };
 
     handleEdit = () => {
@@ -94,6 +120,18 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
         const user = users.find(u => u.iri === iri);
         return user ? getDisplayName(user) : iri;
     };
+
+    toggleWorkspaceToAdd = (ws) => {
+        // eslint-disable-next-line react/no-access-state-in-setstate
+        const workspaces = [...this.state.workspacesToAdd];
+        const idx = workspaces.indexOf(ws);
+        if (idx < 0) {
+            workspaces.push(ws);
+        } else {
+            workspaces.splice(idx, 1);
+        }
+        this.setState({workspacesToAdd: workspaces});
+    }
 
     render() {
         const {loading, collection, inCollectionsBrowser = false} = this.props;
@@ -165,6 +203,102 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                         onClose={this.handleCloseDelete}
                     />
                 ) : null}
+
+                <SharingProvider iri={collection.iri}>
+                    <SharingContext.Consumer>
+                        {({permissions, alterPermission}) => (
+                            <div>
+                                <Card>
+                                    <CardHeader
+                                        titleTypographyProps={{variant: 'h6'}}
+                                        title="Share"
+                                        avatar={(
+                                            <LockOpen />
+                                        )}
+                                    />
+                                    <CardContent />
+                                    <List dense disablePadding>
+                                        {
+                                            sortPermissions(permissions).map(p => (
+                                                <ListItem key={p.user}>
+                                                    {p.name}
+                                                    {collection.canManage && (
+                                                        <ConfirmationButton
+                                                            onClick={() => alterPermission(p.user, collection.iri, 'None')
+                                                                .then(() => this.forceUpdate())}
+                                                            disabled={p.access === 'Manage'}
+                                                            message="Are you sure you want to remove this share?"
+                                                            agreeButtonText="Ok"
+                                                            dangerous
+                                                        >
+                                                            <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
+                                                                <HighlightOffSharp />
+                                                            </IconButton>
+                                                        </ConfirmationButton>
+                                                    )}
+                                                </ListItem>
+                                            ))
+                                        }
+                                    </List>
+
+                                    {collection.canManage && (
+                                        <Button
+                                            style={{marginTop: 8}}
+                                            color="primary"
+                                            variant="contained"
+                                            aria-label="Add"
+                                            title="Add a new share"
+                                            onClick={() => this.setState({showAddShareDialog: true, workspacesToAdd: []})}
+                                        >
+                                    Share
+                                        </Button>
+                                    )}
+
+                                </Card>
+                                <Dialog open={this.state.showAddShareDialog}>
+                                    <DialogTitle>Share collection {collection.name} with another workspace</DialogTitle>
+                                    <DialogContent>
+                                        <List>
+                                            {
+                                                this.props.workspaces
+                                                    .filter(ws => permissions.every(p => p.user !== ws.iri))
+                                                    .map(ws => (
+                                                        <ListItem key={ws.iri} onClick={() => this.toggleWorkspaceToAdd(ws.iri)}>
+                                                            <ListItemIcon>
+                                                                <Checkbox
+                                                                    edge="start"
+                                                                    checked={this.state.workspacesToAdd.includes(ws.iri)}
+                                                                    tabIndex={-1}
+                                                                    disableRipple
+                                                                />
+                                                            </ListItemIcon>
+                                                            <ListItemText primary={ws.name} />
+                                                        </ListItem>
+                                                    ))
+                                            }
+                                        </List>
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button
+                                            onClick={() => this.setState({showAddShareDialog: false},
+                                                () => Promise.all(this.state.workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read'))))}
+                                            color="default"
+                                        >
+                                            Ok
+                                        </Button>
+                                        <Button
+                                            onClick={() => this.setState({showAddShareDialog: false})}
+                                            color="default"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </div>
+                        )}
+
+                    </SharingContext.Consumer>
+                </SharingProvider>
             </>
         );
     }
@@ -174,11 +308,14 @@ const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {users} = useContext(UsersContext);
     const {deleteCollection} = useContext(CollectionsContext);
+    const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
         <CollectionDetails
             {...props}
+            loading={props.loading || workspacesLoading}
             users={users}
+            workspaces={workspaces}
             history={history}
             deleteCollection={deleteCollection}
         />
