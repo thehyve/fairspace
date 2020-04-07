@@ -7,7 +7,7 @@ import {ProgressButton} from '../../common/components';
 import LinkedDataContext from "../LinkedDataContext";
 
 const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
-    const {deleteLinkedDataEntity, hasEditRight} = useContext(LinkedDataContext);
+    const {deleteLinkedDataEntity, hasModifyMetadataRight} = useContext(LinkedDataContext);
     const [isDeleting, setDeleting] = useState(false);
 
     const isMounted = useIsMounted();
@@ -21,7 +21,7 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
             .then(() => isMounted() && setDeleting(false));
     };
 
-    if (!hasEditRight) {
+    if (!hasModifyMetadataRight) {
         return <div />;
     }
 

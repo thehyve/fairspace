@@ -14,11 +14,11 @@ import useLinkedData from "../UseLinkedData";
 import {DATE_DELETED_URI} from "../../constants";
 
 const LinkedDataEntityFormContainer = ({
-    subject, editable = true, showEditButtons = false, fullpage = false,
+    subject, editable = false, showEditButtons = false, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons);
-    const {submitLinkedDataChanges, extendProperties, hasEditRight} = useContext(LinkedDataContext);
+    const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
 
     const {
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
@@ -36,8 +36,7 @@ const LinkedDataEntityFormContainer = ({
         subject
     );
     const isDeleted = values[DATE_DELETED_URI];
-    // TODO: handle workspaces
-    const canEdit = editingEnabled && hasEditRight && !isDeleted;
+    const canEdit = editingEnabled && !isDeleted;
 
     const {
         confirmationShown, hideConfirmation, executeNavigation

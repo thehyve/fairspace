@@ -1,14 +1,17 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Paper} from "@material-ui/core";
-import {BreadCrumbs, usePageTitleUpdater} from "../../common";
-import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from './index';
+import {BreadCrumbs, usePageTitleUpdater, UserContext} from "../../common";
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 import useLinkedData from '../UseLinkedData';
+import {isDataSteward} from "../../common/utils/userUtils";
+import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
+import LinkedDataEntityHeader from "./LinkedDataEntityHeader";
 
 export default ({title, subject}) => {
     const iri = useNamespacedIri(subject);
     usePageTitleUpdater(`${iri} - ${title}`);
 
+    const {currentUser} = useContext(UserContext);
     const {properties, values, linkedDataLoading, linkedDataError, typeInfo, updateLinkedData} = useLinkedData(subject);
 
     return (
@@ -31,6 +34,7 @@ export default ({title, subject}) => {
                     linkedDataLoading={linkedDataLoading}
                     linkedDataError={linkedDataError}
                     updateLinkedData={updateLinkedData}
+                    editable={isDataSteward(currentUser)}
                 />
             </Paper>
         </>

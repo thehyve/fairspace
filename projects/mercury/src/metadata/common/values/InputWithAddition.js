@@ -8,7 +8,7 @@ import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import {normalizeMetadataResource, simplifyUriPredicates} from "../../../common/utils/linkeddata/metadataUtils";
 
 const InputWithAddition = ({
-    children, onChange,
+    children, onChange, canAddNew = false,
     pending, error, shape, requireIdentifier = true
 }) => {
     const [adding, setAdding] = useState(false);
@@ -56,9 +56,11 @@ const InputWithAddition = ({
             <Grid item xs={10}>
                 {children}
             </Grid>
-            <Grid item xs={2}>
-                {renderAddFunctionality()}
-            </Grid>
+            {canAddNew && (
+                <Grid item xs={2}>
+                    {renderAddFunctionality()}
+                </Grid>
+            )}
         </Grid>
     );
 };
@@ -66,6 +68,7 @@ const InputWithAddition = ({
 InputWithAddition.propTypes = {
     shape: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    canAddNew: PropTypes.bool,
     requireIdentifier: PropTypes.bool,
     error: PropTypes.bool,
     pending: PropTypes.bool
