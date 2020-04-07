@@ -206,16 +206,17 @@ public class PermissionsService {
 
         var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
         var userResource = g.wrapAsResource(userObject.getIri());
-        authorities.forEach(a -> result.put(a,getResourceAccess(g.wrapAsResource(a), userResource)));
+        authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
 
         return result;
     }
 
     private Access getResourceAccess(Resource r, Resource user) {
-        if (r.hasProperty(RDF.type, FS.Collection)) {
+        if (isCollection(r.asNode()) && isUser(user.asNode())) {
             var it = dataset.getDefaultModel()
                     .listSubjectsWithProperty(RDF.type, FS.Workspace)
                     .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
+                    .mapWith(ws -> ws.inModel(dataset.getNamedModel(PERMISSIONS_GRAPH)))
                     .mapWith(ws -> min(getResourceAccess(ws, user), getResourceAccess(r, ws)));
             return stream(spliteratorUnknownSize(it, 0), false)
                     .max(naturalOrder())
@@ -230,20 +231,23 @@ public class PermissionsService {
         if (r.hasProperty(FS.read, user)) {
             return Access.Read;
         }
-        if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection) ||
-            r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Workspace)) {
+        if (isCollection(r.asNode()) || isWorkspace(r.asNode())) {
             return Access.None;
         }
 
         return Access.Read;
     }
 
+    private boolean isUser(Node resource) {
+        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.User);
+    }
+
     private boolean isCollection(Node resource) {
-        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Collection);
+        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Collection);
     }
 
     private boolean isWorkspace(Node resource) {
-        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Workspace);
+        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Workspace);
     }
 
     /**
