@@ -224,8 +224,12 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                                     {p.name}
                                                     {collection.canManage && (
                                                         <ConfirmationButton
-                                                            onClick={() => alterPermission(p.user, collection.iri, 'None')
-                                                                .then(() => this.forceUpdate())}
+                                                            onClick={() => {
+                                                                this.props.setBusy(true);
+                                                                alterPermission(p.user, collection.iri, 'None')
+                                                                    .catch(e => ErrorDialog.showError(e, 'Error unsharing the workspace'))
+                                                                    .finally(() => this.props.setBusy(false));
+                                                            }}
                                                             disabled={p.access === 'Manage'}
                                                             message="Are you sure you want to remove this share?"
                                                             agreeButtonText="Ok"
@@ -280,8 +284,16 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                     </DialogContent>
                                     <DialogActions>
                                         <Button
-                                            onClick={() => this.setState({showAddShareDialog: false},
-                                                () => Promise.all(this.state.workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read'))))}
+                                            onClick={
+                                                () => {
+                                                    this.props.setBusy(true);
+                                                    this.setState({showAddShareDialog: false});
+
+                                                    Promise.all(this.state.workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read')))
+                                                        .catch(e => ErrorDialog.showError(e, 'Error sharing the workspace'))
+                                                        .finally(() => this.props.setBusy(false));
+                                                }
+                                            }
                                             color="default"
                                         >
                                             Ok
