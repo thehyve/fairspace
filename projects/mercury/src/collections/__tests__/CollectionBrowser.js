@@ -52,6 +52,12 @@ describe('<CollectionBrowser />', () => {
         expect(collectionsContextMock.addCollection.mock.calls.length).toEqual(1);
     });
 
+    it('should not show add button if adding disabled', async () => {
+        const wrapper = shallow(<CollectionBrowser canAddCollection={false} />);
+
+        expect(wrapper.find('[aria-label="Add"]').length).toBe(0);
+    });
+
     it('is loading as long as the user, users or collections are pending', () => {
         const wrapper = shallow(<CollectionBrowser loading />);
 

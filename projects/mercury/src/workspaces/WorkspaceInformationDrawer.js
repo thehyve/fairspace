@@ -35,13 +35,13 @@ export const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWor
 };
 
 const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) => {
-    const {loading, workspaces} = useContext(WorkspaceContext);
+    const {workspacesLoading, workspaces} = useContext(WorkspaceContext);
     const workspace = workspaces.find(c => c.iri === selectedWorkspaceIri);
     const atLeastSingleWorkspaceExists = workspaces.length > 0;
     return (
         <WorkspaceInformationDrawer
             {...props}
-            loading={loading}
+            loading={workspacesLoading}
             workspace={workspace}
             atLeastSingleWorkspaceExists={atLeastSingleWorkspaceExists}
         />

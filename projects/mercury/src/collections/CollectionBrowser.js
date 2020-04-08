@@ -6,6 +6,7 @@ import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import CollectionsContext from "../common/contexts/CollectionsContext";
+import WorkspaceContext from "../workspaces/WorkspaceContext";
 
 export const CollectionBrowser = ({
     loading = false,
@@ -15,7 +16,8 @@ export const CollectionBrowser = ({
     toggleCollection = () => {},
     users = [],
     history,
-    workspaceIri
+    workspaceIri,
+    canAddCollection = true
 }) => {
     const [addingNewCollection, setAddingNewCollection] = useState(false);
 
@@ -61,7 +63,7 @@ export const CollectionBrowser = ({
         <>
             {loading ? <LoadingInlay /> : renderCollectionList()}
             {
-                window.location.pathname.startsWith('/workspaces/')
+                canAddCollection
                 && (
                     <Button
                         style={{marginTop: 8}}
@@ -83,6 +85,10 @@ const ContextualCollectionBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
+    const {workspacesLoading, workspacesError, workspaces} = useContext(WorkspaceContext);
+    const workspace = props.workspaceIri ? workspaces.find(w => w.iri === props.workspaceIri) : {};
+
+    const canAdd = window.location.pathname.startsWith('/workspaces/') && workspace.canWrite;
 
     const filteredCollections = props.workspaceIri
         ? collections.filter(c => c.ownerWorkspace === props.workspaceIri)
@@ -93,8 +99,9 @@ const ContextualCollectionBrowser = (props) => {
             {...props}
             collections={filteredCollections}
             users={users}
-            loading={collectionsLoading || currentUserLoading || usersLoading}
-            error={collectionsError || currentUserError || usersError}
+            canAddCollection={canAdd}
+            loading={collectionsLoading || currentUserLoading || usersLoading || workspacesLoading}
+            error={collectionsError || currentUserError || usersError || workspacesError}
         />
     );
 };
