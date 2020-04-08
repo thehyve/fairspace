@@ -89,7 +89,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                         <ExpansionPanelDetails>
                             <PathMetadata
                                 path={metadataPath}
-                                isMetaDataEditable={collection.canManage && metadataPath === paths[paths.length - 1]}
+                                isMetaDataEditable={collection.canWrite && metadataPath === paths[paths.length - 1]}
                                 style={{width: '100%'}}
                             />
                         </ExpansionPanelDetails>
