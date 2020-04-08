@@ -235,7 +235,7 @@ public class PermissionsService {
             return Access.None;
         }
 
-        return Access.Read;
+        return Access.Write;
     }
 
     private boolean isUser(Node resource) {

@@ -77,14 +77,14 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
     };
 
     handleEdit = () => {
-        if (this.props.collection.canManage) {
+        if (this.props.collection.canWrite) {
             this.setState({editing: true});
             this.handleMenuClose();
         }
     };
 
     handleDelete = () => {
-        if (this.props.collection.canManage) {
+        if (this.props.collection.canWrite) {
             this.setState({deleting: true});
             this.handleMenuClose();
         }
@@ -146,7 +146,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
             <>
                 <Card>
                     <CardHeader
-                        action={!collection.canManage ? null : (
+                        action={!collection.canWrite ? null : (
                             <>
                                 <IconButton
                                     aria-label="More"
