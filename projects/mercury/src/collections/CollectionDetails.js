@@ -227,7 +227,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                                             onClick={() => {
                                                                 this.props.setBusy(true);
                                                                 alterPermission(p.user, collection.iri, 'None')
-                                                                    .catch(e => ErrorDialog.showError(e, 'Error unsharing the workspace'))
+                                                                    .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
                                                                     .finally(() => this.props.setBusy(false));
                                                             }}
                                                             disabled={p.access === 'Manage'}
@@ -290,7 +290,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                                     this.setState({showAddShareDialog: false});
 
                                                     Promise.all(this.state.workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read')))
-                                                        .catch(e => ErrorDialog.showError(e, 'Error sharing the workspace'))
+                                                        .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
                                                         .finally(() => this.props.setBusy(false));
                                                 }
                                             }
