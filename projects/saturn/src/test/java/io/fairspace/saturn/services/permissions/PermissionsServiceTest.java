@@ -88,7 +88,6 @@ public class PermissionsServiceTest {
     @Test
     public void testSetPermission() {
         assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setWriteRestricted(RESOURCE, true);
         service.setPermission(RESOURCE, USER2, Access.Write);
 
         verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
@@ -124,28 +123,6 @@ public class PermissionsServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testMetadataEntitiesMustBeMarkedAsRestrictedBeforeGrantingWritePermissions() {
         service.setPermission(RESOURCE, USER2, Access.Write);
-    }
-
-    @Test
-    public void testGetPermissions() {
-        service.setWriteRestricted(RESOURCE, true);
-        service.setPermission(RESOURCE, USER2, Access.Write);
-        service.setPermission(RESOURCE, USER3, Access.Manage);
-        assertEquals(new HashMap<>() {{
-                         put(createURI("http://example.com/user1"), Access.Manage);
-                         put(createURI("http://example.com/user2"), Access.Write);
-                         put(createURI("http://example.com/user3"), Access.Manage);
-                     }},
-                service.getPermissions(RESOURCE));
-    }
-
-    @Test
-    public void testSetWriteRestricted() {
-        assertFalse(service.isWriteRestricted(RESOURCE));
-        service.setWriteRestricted(RESOURCE, true);
-        assertTrue(service.isWriteRestricted(RESOURCE));
-        service.setWriteRestricted(RESOURCE, false);
-        assertFalse(service.isWriteRestricted(RESOURCE));
     }
 
     @Test
@@ -201,12 +178,6 @@ public class PermissionsServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCollectionsCanNotBeMarkedAsRestricted() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, FS.Collection);
-        service.setWriteRestricted(RESOURCE, true);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void testWriteAccessToEntitiesCanNotBeGrantedBeforeMarkingThemRestricted() {
         service.setPermission(RESOURCE, USER2, Access.Write);
     }
@@ -215,14 +186,6 @@ public class PermissionsServiceTest {
     public void testSettingPermissionToNoneIfNoPermissionIsPresent() {
         service.setPermission(RESOURCE, USER2, Access.None);
         assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
-    }
-
-    @Test
-    public void testSettingWriteRestrictedToTrueTwiceShouldNotClearPermissions() {
-        service.setWriteRestricted(RESOURCE, true);
-        service.setPermission(RESOURCE, USER2, Access.Write);
-        service.setWriteRestricted(RESOURCE, true);
-        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -279,14 +242,6 @@ public class PermissionsServiceTest {
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
     }
 
-    @Test(expected = MetadataAccessDeniedException.class)
-    public void testEnsureAccessToRestrictedEntities() {
-        setupAccessCheckForMultipleNodes();
-
-        currentUserIri = USER2;
-
-        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Write);
-    }
 
     @Test
     public void testSetPermissionForAWorkspace() {
@@ -324,7 +279,7 @@ public class PermissionsServiceTest {
 
         // The exception thrown by ensureAccess should return the failing entity
         try {
-            service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Write);
+            service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Manage);
             fail();
         } catch(MetadataAccessDeniedException e) {
             assertEquals(RESOURCE, e.getSubject());
@@ -366,7 +321,6 @@ public class PermissionsServiceTest {
         service.createResource(COLLECTION_1);
         service.createResource(COLLECTION_2);
 
-        service.setWriteRestricted(RESOURCE, true);
         service.setPermission(COLLECTION_2, USER2, Access.Write);
     }
 }

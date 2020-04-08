@@ -35,6 +35,7 @@ import SharingContext, {SharingProvider} from "../common/contexts/SharingContext
 import {sortPermissions} from "../common/utils/permissionUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -221,24 +222,26 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                         {
                                             sortPermissions(permissions).map(p => (
                                                 <ListItem key={p.user}>
-                                                    {p.name}
+                                                    <ListItemText primary={p.name} />
                                                     {collection.canManage && (
-                                                        <ConfirmationButton
-                                                            onClick={() => {
-                                                                this.props.setBusy(true);
-                                                                alterPermission(p.user, collection.iri, 'None')
-                                                                    .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
-                                                                    .finally(() => this.props.setBusy(false));
-                                                            }}
-                                                            disabled={p.access === 'Manage'}
-                                                            message="Are you sure you want to remove this share?"
-                                                            agreeButtonText="Ok"
-                                                            dangerous
-                                                        >
-                                                            <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
-                                                                <HighlightOffSharp />
-                                                            </IconButton>
-                                                        </ConfirmationButton>
+                                                        <ListItemSecondaryAction>
+                                                            <ConfirmationButton
+                                                                onClick={() => {
+                                                                    this.props.setBusy(true);
+                                                                    alterPermission(p.user, collection.iri, 'None')
+                                                                        .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
+                                                                        .finally(() => this.props.setBusy(false));
+                                                                }}
+                                                                disabled={p.access === 'Manage'}
+                                                                message="Are you sure you want to remove this share?"
+                                                                agreeButtonText="Ok"
+                                                                dangerous
+                                                            >
+                                                                <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
+                                                                    <HighlightOffSharp />
+                                                                </IconButton>
+                                                            </ConfirmationButton>
+                                                        </ListItemSecondaryAction>
                                                     )}
                                                 </ListItem>
                                             ))
@@ -247,7 +250,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
 
                                     {collection.canManage && (
                                         <Button
-                                            style={{marginTop: 8}}
+                                            style={{margin: 8}}
                                             color="primary"
                                             variant="contained"
                                             aria-label="Add"

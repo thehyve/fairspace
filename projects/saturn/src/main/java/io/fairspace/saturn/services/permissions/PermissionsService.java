@@ -61,12 +61,7 @@ public class PermissionsService {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
 
-            if (!isCollection(resource) && !isWorkspace(resource)) {
-                validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
-                var isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
-                validate(!isSpecifyingWriteAccessOnNonRestrictedResource,
-                        "Regular metadata entities must be marked as write-restricted before granting permissions");
-            }
+            validate (isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
 
             g.removeAll(g.asRDFNode(resource).asResource(), null, g.asRDFNode(user));
 
@@ -123,36 +118,6 @@ public class PermissionsService {
                     });
             return result;
         });
-    }
-
-    boolean isWriteRestricted(Node resource) {
-        return dataset.calculateRead(() ->
-                dataset.getNamedModel(PERMISSIONS_GRAPH).createResource(resource.getURI()).hasLiteral(FS.writeRestricted, true));
-    }
-
-    void setWriteRestricted(Node resource, boolean restricted) {
-        var success = dataset.calculateWrite(() -> {
-            ensureAccess(resource, Access.Manage);
-            validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
-            validate(!isWorkspace(resource), "A workspace cannot be marked as write-restricted");
-            if (restricted != isWriteRestricted(resource)) {
-                var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-                var s = g.asRDFNode(resource).asResource();
-                g.removeAll(s, FS.writeRestricted, null);
-                if (restricted) {
-                    g.add(s, FS.writeRestricted, g.createTypedLiteral(true));
-                } else {
-                    g.removeAll(s, FS.write, null);
-                }
-                return true;
-            }
-            return false;
-        });
-
-        if (success) {
-                audit("SET_WRITE_RESTRICTED",
-                        "resource", resource.getURI());
-        }
     }
 
     private void ensureAccess(Node resource, Access access) {

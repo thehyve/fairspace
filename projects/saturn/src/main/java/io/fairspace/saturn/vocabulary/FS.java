@@ -85,9 +85,6 @@ public class FS {
     public static final String MANAGE_URI = NS + "manage";
     public static final Property manage = createProperty(MANAGE_URI);
 
-    public static final String WRITE_RESTRICTED_URI = NS + "writeRestricted";
-    public static final Property writeRestricted = createProperty(WRITE_RESTRICTED_URI);
-
     public static final String CLASS_SHAPE_META_SHAPE_URI = NS + "ClassShapeMetaShape";
     public static final Resource ClassShapeMetaShape = createResource(CLASS_SHAPE_META_SHAPE_URI);
 
