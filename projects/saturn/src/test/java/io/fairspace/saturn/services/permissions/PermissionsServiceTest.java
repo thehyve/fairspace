@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +29,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+// TODO: Add more tests
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionsServiceTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
@@ -86,20 +86,6 @@ public class PermissionsServiceTest {
     }
 
     @Test
-    public void testSetPermission() {
-        assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER2, Access.Write);
-
-        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
-
-        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER2, Access.None);
-        assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER3, Access.Manage);
-        assertEquals(Access.Manage, service.getPermissions(RESOURCE).get(USER3));
-    }
-
-    @Test
     public void testSetPermissionForACollection() {
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, createResource("http://fairspace.io/ontology#Collection"));
         assertNull(service.getPermissions(RESOURCE).get(USER2));
@@ -148,13 +134,6 @@ public class PermissionsServiceTest {
         assertEquals(Access.None, service.getPermission(coll.asNode()));
     }
 
-    @Test
-    public void testDefaultPermissionForRegularEntities() {
-        var entity = createResource("http://example.com/entity");
-        ds.getDefaultModel().add(entity, RDF.type, createResource("http://fairspace.io/ontology#Entity"));
-        assertEquals(Access.Read, service.getPermission(entity.asNode()));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testUserCannotModifyHisOwnPermission() {
         service.setPermission(RESOURCE, USER1, Access.Write);
@@ -182,14 +161,13 @@ public class PermissionsServiceTest {
         service.setPermission(RESOURCE, USER2, Access.Write);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSettingPermissionToNoneIfNoPermissionIsPresent() {
         service.setPermission(RESOURCE, USER2, Access.None);
-        assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
     }
 
     @Test(expected = AccessDeniedException.class)
-    public void testSettingPermissionsWithoutManageAccess() {
+    public void testCannotSetPermission() {
         service.setPermission(createURI("http://example.com/not-my-resource"), USER1, Access.Write);
     }
 
