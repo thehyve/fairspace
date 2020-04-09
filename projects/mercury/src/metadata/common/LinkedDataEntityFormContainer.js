@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid, IconButton} from "@material-ui/core";
 import {Edit} from '@material-ui/icons';
@@ -17,7 +17,8 @@ const LinkedDataEntityFormContainer = ({
     subject, editable = false, showEditButtons = false, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
-    const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons);
+    const isDeleted = values[DATE_DELETED_URI];
+    const [editingEnabled, setEditingEnabled] = useState(editable && !showEditButtons && !isDeleted);
     const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
 
     const {
@@ -27,6 +28,10 @@ const LinkedDataEntityFormContainer = ({
 
     setHasUpdates(hasFormUpdates);
 
+    useEffect(() => {
+        setEditingEnabled(editable && !showEditButtons && !isDeleted);
+    }, [editable, isDeleted, showEditButtons]);
+
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
             .then(() => {
@@ -35,15 +40,13 @@ const LinkedDataEntityFormContainer = ({
             }),
         subject
     );
-    const isDeleted = values[DATE_DELETED_URI];
-    const canEdit = editingEnabled && !isDeleted;
 
     const {
         confirmationShown, hideConfirmation, executeNavigation
-    } = useNavigationBlocker(hasFormUpdates && canEdit);
+    } = useNavigationBlocker(hasFormUpdates && editingEnabled);
 
     // Apply context-specific logic to the properties and filter on visibility
-    const extendedProperties = extendProperties({properties, subject, isEntityEditable: canEdit});
+    const extendedProperties = extendProperties({properties, subject, isEntityEditable: editingEnabled});
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
 
@@ -54,7 +57,7 @@ const LinkedDataEntityFormContainer = ({
     let footer;
     if (isUpdating) {
         footer = <CircularProgress />;
-    } else if (canEdit) {
+    } else if (editingEnabled) {
         footer = (
             <div>
                 <Button
@@ -90,7 +93,7 @@ const LinkedDataEntityFormContainer = ({
                             <LinkedDataEntityForm
                                 {...otherProps}
                                 id={formId}
-                                editable={canEdit}
+                                editable={editingEnabled}
                                 onSubmit={validateAndSubmit}
                                 errorMessage={linkedDataError}
                                 loading={linkedDataLoading}
@@ -120,7 +123,7 @@ const LinkedDataEntityFormContainer = ({
             </Grid>
             {showEditButtons ? (
                 <Grid item xs={1}>
-                    {!canEdit && (
+                    {!editingEnabled && (
                         <IconButton
                             aria-label="Edit"
                             onClick={() => {
