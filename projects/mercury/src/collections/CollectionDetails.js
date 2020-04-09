@@ -22,6 +22,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
@@ -35,7 +36,6 @@ import SharingContext, {SharingProvider} from "../common/contexts/SharingContext
 import {sortPermissions} from "../common/utils/permissionUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -207,110 +207,119 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
 
                 <SharingProvider iri={collection.iri}>
                     <SharingContext.Consumer>
-                        {({permissions, alterPermission}) => (
-                            <div>
-                                <Card>
-                                    <CardHeader
-                                        titleTypographyProps={{variant: 'h6'}}
-                                        title="Share"
-                                        avatar={(
-                                            <LockOpen />
-                                        )}
-                                    />
-                                    <CardContent />
-                                    <List dense disablePadding>
-                                        {
-                                            sortPermissions(permissions).map(p => (
-                                                <ListItem key={p.user}>
-                                                    <ListItemText primary={p.name} />
-                                                    {collection.canManage && (
-                                                        <ListItemSecondaryAction>
-                                                            <ConfirmationButton
-                                                                onClick={() => {
-                                                                    this.props.setBusy(true);
-                                                                    alterPermission(p.user, collection.iri, 'None')
-                                                                        .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
-                                                                        .finally(() => this.props.setBusy(false));
-                                                                }}
-                                                                disabled={p.access === 'Manage'}
-                                                                message="Are you sure you want to remove this share?"
-                                                                agreeButtonText="Ok"
-                                                                dangerous
-                                                            >
-                                                                <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
-                                                                    <HighlightOffSharp />
-                                                                </IconButton>
-                                                            </ConfirmationButton>
-                                                        </ListItemSecondaryAction>
-                                                    )}
-                                                </ListItem>
-                                            ))
-                                        }
-                                    </List>
-
-                                    {collection.canManage && (
-                                        <Button
-                                            style={{margin: 8}}
-                                            color="primary"
-                                            variant="contained"
-                                            aria-label="Add"
-                                            title="Add a new share"
-                                            onClick={() => this.setState({showAddShareDialog: true, workspacesToAdd: []})}
-                                        >
-                                    Share
-                                        </Button>
-                                    )}
-
-                                </Card>
-                                <Dialog open={this.state.showAddShareDialog}>
-                                    <DialogTitle>Share collection {collection.name} with another workspace</DialogTitle>
-                                    <DialogContent>
-                                        <List>
+                        {({permissions, alterPermission}) => {
+                            const workspacesToShareWith = this.props.workspaces
+                                .filter(ws => permissions.every(p => p.user !== ws.iri));
+                            return (
+                                <div>
+                                    <Card>
+                                        <CardHeader
+                                            titleTypographyProps={{variant: 'h6'}}
+                                            title="Share"
+                                            avatar={(
+                                                <LockOpen />
+                                            )}
+                                        />
+                                        <CardContent />
+                                        <List dense disablePadding>
                                             {
-                                                this.props.workspaces
-                                                    .filter(ws => permissions.every(p => p.user !== ws.iri))
-                                                    .map(ws => (
-                                                        <ListItem key={ws.iri} onClick={() => this.toggleWorkspaceToAdd(ws.iri)}>
-                                                            <ListItemIcon>
-                                                                <Checkbox
-                                                                    edge="start"
-                                                                    checked={this.state.workspacesToAdd.includes(ws.iri)}
-                                                                    tabIndex={-1}
-                                                                    disableRipple
-                                                                />
-                                                            </ListItemIcon>
-                                                            <ListItemText primary={ws.name} />
-                                                        </ListItem>
-                                                    ))
+                                                sortPermissions(permissions.filter(p => p.access === 'Read')).map(p => (
+                                                    <ListItem key={p.user}>
+                                                        <ListItemText primary={p.name} />
+                                                        {collection.canManage && (
+                                                            <ListItemSecondaryAction>
+                                                                <ConfirmationButton
+                                                                    onClick={() => {
+                                                                        this.props.setBusy(true);
+                                                                        alterPermission(p.user, collection.iri, 'None')
+                                                                            .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
+                                                                            .finally(() => this.props.setBusy(false));
+                                                                    }}
+                                                                    disabled={p.access === 'Manage'}
+                                                                    message="Are you sure you want to remove this share?"
+                                                                    agreeButtonText="Ok"
+                                                                    dangerous
+                                                                >
+                                                                    <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
+                                                                        <HighlightOffSharp />
+                                                                    </IconButton>
+                                                                </ConfirmationButton>
+                                                            </ListItemSecondaryAction>
+                                                        )}
+                                                    </ListItem>
+                                                ))
                                             }
                                         </List>
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button
-                                            onClick={
-                                                () => {
-                                                    this.props.setBusy(true);
-                                                    this.setState({showAddShareDialog: false});
 
-                                                    Promise.all(this.state.workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read')))
-                                                        .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
-                                                        .finally(() => this.props.setBusy(false));
-                                                }
+                                        {collection.canManage && (
+                                            <Button
+                                                style={{margin: 8}}
+                                                color="primary"
+                                                variant="contained"
+                                                aria-label="Add"
+                                                title="Add a new share"
+                                                onClick={() => this.setState({showAddShareDialog: true, workspacesToAdd: []})}
+                                            >
+                                                Share
+                                            </Button>
+                                        )}
+
+                                    </Card>
+                                    <Dialog open={this.state.showAddShareDialog}>
+                                        <DialogTitle>Share collection {collection.name} with other workspaces</DialogTitle>
+                                        <DialogContent>
+                                            {
+                                                workspacesToShareWith.length
+                                                    ? (
+                                                        <List>
+                                                            {
+                                                                workspacesToShareWith.map(ws => (
+                                                                    <ListItem key={ws.iri} onClick={() => this.toggleWorkspaceToAdd(ws.iri)}>
+                                                                        <ListItemIcon>
+                                                                            <Checkbox
+                                                                                edge="start"
+                                                                                checked={this.state.workspacesToAdd.includes(ws.iri)}
+                                                                                tabIndex={-1}
+                                                                                disableRipple
+                                                                            />
+                                                                        </ListItemIcon>
+                                                                        <ListItemText primary={ws.name} />
+                                                                    </ListItem>
+                                                                ))
+                                                            }
+                                                        </List>
+                                                    )
+                                                    : 'This collection has been already shared with all workspaces'
                                             }
-                                            color="default"
-                                        >
-                                            Ok
-                                        </Button>
-                                        <Button
-                                            onClick={() => this.setState({showAddShareDialog: false})}
-                                            color="default"
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </DialogActions>
-                                </Dialog>
-                            </div>
-                        )}
+
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button
+                                                onClick={
+                                                    () => {
+                                                        this.props.setBusy(true);
+                                                        this.setState({showAddShareDialog: false});
+
+                                                        Promise.all(this.state.workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read')))
+                                                            .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
+                                                            .finally(() => this.props.setBusy(false));
+                                                    }
+                                                }
+                                                color="default"
+                                            >
+                                                Ok
+                                            </Button>
+                                            <Button
+                                                onClick={() => this.setState({showAddShareDialog: false})}
+                                                color="default"
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </DialogActions>
+                                    </Dialog>
+                                </div>
+                            );
+                        }}
 
                     </SharingContext.Consumer>
                 </SharingProvider>
