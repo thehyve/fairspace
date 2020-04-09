@@ -225,7 +225,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                             {
                                                 sortPermissions(permissions.filter(p => p.access === 'Read')).map(p => (
                                                     <ListItem key={p.user}>
-                                                        <ListItemText primary={p.name} />
+                                                        <ListItemText primary={p.name} style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}} />
                                                         {collection.canManage && (
                                                             <ListItemSecondaryAction>
                                                                 <ConfirmationButton
@@ -283,7 +283,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                                                                 disableRipple
                                                                             />
                                                                         </ListItemIcon>
-                                                                        <ListItemText primary={ws.name} />
+                                                                        <ListItemText primary={ws.name} style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}} />
                                                                     </ListItem>
                                                                 ))
                                                             }

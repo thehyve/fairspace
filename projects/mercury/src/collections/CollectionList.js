@@ -107,10 +107,10 @@ const CollectionList = ({
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                     {collection.name}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160}}>
                                     {collection.workspaceName}
                                 </TableCell>
-                                <TableCell padding="none">
+                                <TableCell>
                                     {formatDateTime(collection.dateCreated)}
                                 </TableCell>
                                 <TableCell>
