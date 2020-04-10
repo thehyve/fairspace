@@ -3,7 +3,7 @@ import {shallow} from "enzyme";
 import {IconButton} from "@material-ui/core";
 
 import {FileOperations} from "../FileOperations";
-import {COPY} from "../../constants";
+import {COPY, CUT} from "../../constants";
 
 describe('FileOperations', () => {
     const clearSelection = jest.fn();
@@ -22,6 +22,7 @@ describe('FileOperations', () => {
     const fileActionsMock = {
         getDownloadLink: () => 'http://a',
         createDirectory: () => Promise.resolve(),
+        deleteMultiple: () => Promise.resolve(),
         copyPaths: () => new Promise(resolve => setTimeout(resolve, 500))
     };
 
@@ -72,9 +73,10 @@ describe('FileOperations', () => {
     it('should clear selection and refresh files after all successful file operations', () => {
         const createDir = () => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir");
         const paste = () => clickHandler('Paste')({stopPropagation: () => {}});
+        const deleteFile = () => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")();
 
         return Promise.all(
-            [createDir, paste].map(op => {
+            [createDir, deleteFile, paste].map(op => {
                 refreshFiles.mockReset();
                 clearSelection.mockReset();
 
@@ -102,7 +104,30 @@ describe('FileOperations', () => {
             wrapper = renderFileOperations(emptyClipboard, fileActionsMock);
             expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(true);
         });
+        it('should be disabled if the clipboard contains files cut from the current directory', () => {
+            const openedPath = '/subdirectory';
+            const currentDirClipboard = {
+                method: CUT,
+                filenames: ['/subdirectory/test.txt'],
+                isEmpty: () => false,
+                length: () => 1
+            };
 
+            wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
+            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(true);
+        });
+        it('should be enabled if the clipboard contains files cut from the other directory', () => {
+            const openedPath = '/other-directory';
+            const currentDirClipboard = {
+                method: CUT,
+                filenames: ['/subdirectory/test.txt'],
+                isEmpty: () => false,
+                length: () => 1
+            };
+
+            wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
+            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
+        });
         it('should be enabled if the clipboard contains files copied from the current directory', () => {
             const openedPath = '/subdirectory';
             const currentDirClipboard = {

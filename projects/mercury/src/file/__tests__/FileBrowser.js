@@ -34,6 +34,8 @@ const openedCollection = {
 const fileActionsMock = {
     getDownloadLink: () => 'http://a',
     createDirectory: () => Promise.resolve(),
+    deleteMultiple: () => Promise.resolve(),
+    renameFile: () => Promise.resolve(),
     copyPaths: () => new Promise(resolve => setTimeout(resolve, 500))
 };
 

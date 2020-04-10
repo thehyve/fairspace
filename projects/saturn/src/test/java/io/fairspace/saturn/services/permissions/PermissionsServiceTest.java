@@ -134,6 +134,13 @@ public class PermissionsServiceTest {
         assertEquals(Access.None, service.getPermission(coll.asNode()));
     }
 
+    @Test
+    public void testDefaultPermissionForRegularEntities() {
+        var entity = createResource("http://example.com/entity");
+        ds.getDefaultModel().add(entity, RDF.type, createResource("http://fairspace.io/ontology#Entity"));
+        assertEquals(Access.Write, service.getPermission(entity.asNode()));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testUserCannotModifyHisOwnPermission() {
         service.setPermission(RESOURCE, USER1, Access.Write);

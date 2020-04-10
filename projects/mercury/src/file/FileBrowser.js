@@ -110,7 +110,7 @@ export const DisconnectedFileBrowser = ({
                 onPathDoubleClick={handlePathDoubleClick}
                 onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
             />
-            {openedCollection.canWrite && renderFileOperations()}
+            {renderFileOperations()}
         </div>
     );
 

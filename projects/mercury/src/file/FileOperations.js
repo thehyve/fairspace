@@ -1,21 +1,27 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
-import {CreateNewFolder} from '@material-ui/icons';
+import {BorderColor, CreateNewFolder, Delete} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
+import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
 import {ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
-import {CreateDirectoryButton} from "./buttons";
-import {joinPaths} from "../common/utils/fileUtils";
-import {COPY} from '../constants';
+import {CreateDirectoryButton, RenameButton} from "./buttons";
+import {getParentPath, joinPaths} from "../common/utils/fileUtils";
+import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
+import ConfirmationButton from "../common/components/ConfirmationButton";
+import {UserContext} from "../common/contexts";
+import {isDataSteward} from "../common/utils/userUtils";
 
 export const Operations = {
     PASTE: 'PASTE',
-    MKDIR: 'MKDIR'
+    MKDIR: 'MKDIR',
+    RENAME: 'RENAME',
+    DELETE: 'DELETE'
 };
 Object.freeze(Operations);
 
@@ -33,12 +39,15 @@ export const FileOperations = ({
     const [activeOperation, setActiveOperation] = useState();
     const busy = !!activeOperation;
 
+    const {currentUser} = useContext(UserContext);
+
     const noPathSelected = selectedPaths.length === 0;
     const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
-    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty();
+    const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
+    const isPasteDisabled = clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
@@ -55,6 +64,11 @@ export const FileOperations = ({
             });
     };
 
+    const handleCut = e => {
+        if (e) e.stopPropagation();
+        clipboard.cut(selectedPaths);
+    };
+
     const handleCopy = e => {
         if (e) e.stopPropagation();
         clipboard.copy(selectedPaths);
@@ -65,6 +79,9 @@ export const FileOperations = ({
 
         let operation;
 
+        if (clipboard.method === CUT) {
+            operation = fileActions.movePaths(clipboard.filenames);
+        }
         if (clipboard.method === COPY) {
             operation = fileActions.copyPaths(clipboard.filenames);
         }
@@ -86,6 +103,12 @@ export const FileOperations = ({
             return true;
         });
 
+    const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
+        .catch((err) => {
+            ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => handlePathRename(path, newName));
+            return false;
+        });
+
     const addBadgeIfNotEmpty = (badgeContent, children) => {
         if (badgeContent) {
             return (
@@ -97,23 +120,30 @@ export const FileOperations = ({
         return children;
     };
 
+    const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
+        .catch((err) => {
+            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
+        });
+
     return (
         <>
             <FileOperationsGroup>
-                <ProgressButton active={activeOperation === Operations.MKDIR}>
-                    <CreateDirectoryButton
-                        onCreate={name => handleCreateDirectory(name)}
-                        disabled={isWritingDisabled || busy}
-                    >
-                        <IconButton
-                            aria-label="Create directory"
-                            title="Create directory"
-                            disabled={isWritingDisabled || busy}
+                {isWritingDisabled && (
+                    <ProgressButton active={activeOperation === Operations.MKDIR}>
+                        <CreateDirectoryButton
+                            onCreate={name => handleCreateDirectory(name)}
+                            disabled={busy}
                         >
-                            <CreateNewFolder />
-                        </IconButton>
-                    </CreateDirectoryButton>
-                </ProgressButton>
+                            <IconButton
+                                aria-label="Create directory"
+                                title="Create directory"
+                                disabled={isWritingDisabled || busy}
+                            >
+                                <CreateNewFolder />
+                            </IconButton>
+                        </CreateDirectoryButton>
+                    </ProgressButton>
+                )}
             </FileOperationsGroup>
             <FileOperationsGroup>
                 <IconButton
@@ -126,6 +156,42 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
+                {isDataSteward(currentUser) && (
+                    <>
+                        <ProgressButton active={activeOperation === Operations.RENAME}>
+                            <RenameButton
+                                currentName={selectedItem.basename}
+                                onRename={newName => handlePathRename(selectedItem, newName)}
+                                disabled={isDisabledForMoreThanOneSelection || busy}
+                            >
+                                <IconButton
+                                    title={`Rename ${selectedItem.basename}`}
+                                    aria-label={`Rename ${selectedItem.basename}`}
+                                    disabled={isDisabledForMoreThanOneSelection || busy}
+                                >
+                                    <BorderColor />
+                                </IconButton>
+                            </RenameButton>
+                        </ProgressButton>
+                        <ProgressButton active={activeOperation === Operations.DELETE}>
+                            <ConfirmationButton
+                                message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
+                                agreeButtonText="Remove"
+                                dangerous
+                                onClick={handleDelete}
+                                disabled={noPathSelected || busy}
+                            >
+                                <IconButton
+                                    title="Delete"
+                                    aria-label="Delete"
+                                    disabled={noPathSelected || busy}
+                                >
+                                    <Delete />
+                                </IconButton>
+                            </ConfirmationButton>
+                        </ProgressButton>
+                    </>
+                )}
             </FileOperationsGroup>
             <FileOperationsGroup>
                 <IconButton
@@ -136,16 +202,28 @@ export const FileOperations = ({
                 >
                     <ContentCopy />
                 </IconButton>
-                <ProgressButton active={activeOperation === Operations.PASTE}>
+                {isDataSteward(currentUser) && (
                     <IconButton
-                        aria-label="Paste"
-                        title="Paste"
-                        onClick={e => handlePaste(e)}
-                        disabled={isPasteDisabled || busy}
+                        aria-label="Cut"
+                        title="Cut"
+                        onClick={e => handleCut(e)}
+                        disabled={noPathSelected || busy}
                     >
-                        {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
+                        <ContentCut />
                     </IconButton>
-                </ProgressButton>
+                )}
+                {!isWritingDisabled && (
+                    <ProgressButton active={activeOperation === Operations.PASTE}>
+                        <IconButton
+                            aria-label="Paste"
+                            title="Paste"
+                            onClick={e => handlePaste(e)}
+                            disabled={isPasteDisabled || busy}
+                        >
+                            {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
+                        </IconButton>
+                    </ProgressButton>
+                )}
             </FileOperationsGroup>
         </>
     );

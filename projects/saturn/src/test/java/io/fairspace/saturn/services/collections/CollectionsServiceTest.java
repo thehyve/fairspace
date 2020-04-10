@@ -127,6 +127,27 @@ public class CollectionsServiceTest {
     }
 
     @Test
+    public void deletedCollectionIsNoLongerVisible() {
+        var c = collections.create(newCollection());
+
+        mockPermissions(Access.Manage);
+
+        collections.delete(c.getIri().getURI());
+        assertNull(collections.get(c.getIri().getURI()));
+        assertNull(collections.getByLocation(c.getLocation()));
+        assertTrue(collections.list().isEmpty());
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
+    }
+
+    @Test
+    public void deletionEmitsAnEvent() {
+        var c = collections.create(newCollection());
+        mockPermissions(Access.Manage);
+        collections.delete(c.getIri().getURI());
+        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
+    }
+
+    @Test
     public void standardCharactersInLocationAreAllowed() {
         var c1 = new Collection();
         c1.setName("c1");
@@ -246,6 +267,15 @@ public class CollectionsServiceTest {
 
         c1.setDescription("new description");
         collections.update(c1);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void collectionsWithoutManagePermissionCannotBeDeleted() {
+        var c1 = collections.create(newCollection());
+
+        mockPermissions(Access.Write);
+
+        collections.delete(c1.getIri().getURI());
     }
 
     private void mockPermissions(Access access) {

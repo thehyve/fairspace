@@ -55,6 +55,12 @@ public class CollectionsApp extends BaseApp {
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
         });
+        delete("/", (req, res) -> {
+            var iri = req.queryParams("iri");
+            service.delete(iri);
+            res.status(SC_NO_CONTENT);
+            return "";
+        });
 
         exception(CollectionNotFoundException.class, exceptionHandler(SC_NOT_FOUND, null));
         exception(LocationAlreadyExistsException.class, exceptionHandler(SC_CONFLICT, null));

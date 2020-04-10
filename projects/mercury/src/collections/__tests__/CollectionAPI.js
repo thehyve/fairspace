@@ -59,4 +59,16 @@ describe('CollectionAPI', () => {
             {headers: {'Content-Type': 'application/json'}}
         );
     });
+
+    it('makes a proper call to delete a collection', async () => {
+        await CollectionAPI.deleteCollection({
+            iri: 'id'
+        });
+
+        expect(mockAxios.delete).toHaveBeenCalledTimes(1);
+        expect(mockAxios.delete).toHaveBeenCalledWith(
+            `/api/v1/collections/?iri=${encodeURIComponent('id')}`,
+            {headers: {'Content-Type': 'application/json'}}
+        );
+    });
 });

@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.permissions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -96,6 +97,12 @@ public class PermissionsService {
                         getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
             }
         });
+    }
+
+    public void ensureAdmin() {
+        if(!getCurrentUser().isAdmin()) {
+            throw new AccessDeniedException(format("User %s has to bean administrator.", getCurrentUser().getIri()));
+        }
     }
 
     Map<Node, Access> getPermissions(Node resource) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import {useAsync} from '../hooks';
-import type {Collection, CollectionProperties} from '../../collections/CollectionAPI';
+import type {Collection, CollectionProperties, Resource} from '../../collections/CollectionAPI';
 import CollectionAPI from "../../collections/CollectionAPI";
 
 const CollectionsContext = React.createContext({});
@@ -10,6 +10,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
 
     const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection).then(refresh);
     const updateCollection = (collection: Collection) => collectionApi.updateCollection(collection).then(refresh);
+    const deleteCollection = (collection: Resource) => collectionApi.deleteCollection(collection).then(refresh);
 
     return (
         <CollectionsContext.Provider
@@ -19,6 +20,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 loading,
                 refresh,
                 addCollection,
+                deleteCollection,
                 updateCollection
             }}
         >

@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {COPY} from "../../constants";
+import {COPY, CUT} from "../../constants";
 
 const ClipboardContext = React.createContext({
+    cut: () => {},
     copy: () => {},
     isEmpty: () => {},
     length: () => {},
@@ -11,8 +12,13 @@ const ClipboardContext = React.createContext({
 });
 
 export const ClipboardProvider = ({children}) => {
-    const [method, setMethod] = useState(COPY);
+    const [method, setMethod] = useState(CUT);
     const [filenames, setFilenames] = useState([]);
+
+    const cut = paths => {
+        setMethod(CUT);
+        setFilenames(paths);
+    };
 
     const copy = paths => {
         setMethod(COPY);
@@ -26,6 +32,7 @@ export const ClipboardProvider = ({children}) => {
     return (
         <ClipboardContext.Provider
             value={{
+                cut,
                 copy,
                 isEmpty,
                 length,

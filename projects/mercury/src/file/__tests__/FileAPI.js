@@ -24,6 +24,25 @@ describe('FileAPI', () => {
         });
     });
 
+    describe('Moving', () => {
+        it('ignores cut-and-paste into same folder', async () => {
+            const moveFile = jest.fn(() => Promise.resolve());
+            FileAPI.client = () => ({moveFile});
+
+            await FileAPI.move('/coll/path/file.ext', '/coll/path/file.ext');
+
+            expect(moveFile).toHaveBeenCalledTimes(0);
+        });
+
+        it('should result in a clear error on 400 response', () => {
+            const moveFile = jest.fn(() => Promise.reject({response: {status: 400}}));
+            FileAPI.client = () => ({moveFile});
+
+            return expect(FileAPI.move("/test", "special-characters"))
+                .rejects.toThrow(/contains special characters/);
+        });
+    });
+
     describe('Copying', () => {
         it('should result in a clear error on 403 response', () => {
             const copyFile = jest.fn(() => Promise.reject({response: {status: 403}}));
@@ -47,6 +66,15 @@ describe('FileAPI', () => {
 
             return expect(FileAPI.copy("/test", "special-characters"))
                 .rejects.toThrow(/already exists/);
+        });
+    });
+
+    describe('Deleting', () => {
+        it('should result in a clear error on 403 response', () => {
+            FileAPI.client = () => ({deleteFile: jest.fn(() => Promise.reject({response: {status: 403}}))});
+
+            return expect(FileAPI.delete('path'))
+                .rejects.toThrow(/write permissions/);
         });
     });
 

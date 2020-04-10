@@ -1,6 +1,9 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
+import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
@@ -64,7 +67,12 @@ class MetadataEntityLifeCycleManager {
     }
 
     boolean softDelete(Resource resource) {
-        permissionsService.ensureAccess(Set.of(resource.asNode()), Access.Write);
+        try {
+            permissionsService.ensureAdmin();
+        } catch (AccessDeniedException e) {
+            throw new MetadataAccessDeniedException("Insufficient permissions to delete entities.", resource.asNode());
+        }
+        permissionsService.ensureAdmin();
         var model = dataset.getNamedModel(graph.getURI());
         resource = resource.inModel(model);
         if (isMachineOnly(resource)) {
