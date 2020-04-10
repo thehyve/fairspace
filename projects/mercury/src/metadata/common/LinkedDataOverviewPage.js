@@ -18,7 +18,7 @@ import {workspacePrefix} from "../../workspaces/workspaces";
 const getEntityRelativeUrl = (editorPath, id) => `${workspacePrefix()}${editorPath}?iri=` + encodeURIComponent(id);
 
 const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent, showGraphSelection = false}) => {
-    const {requireIdentifier, editorPath, hasModifyMetadataRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
+    const {requireIdentifier, editorPath, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
 
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
@@ -107,7 +107,7 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                 />
             )}
             {
-                hasModifyMetadataRight ? (
+                hasEditRight ? (
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
                         shapesError={shapesError}

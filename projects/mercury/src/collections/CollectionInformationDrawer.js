@@ -48,7 +48,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             && <EmptyInformationDrawer message="Select a collection to display its metadata" />;
     }
 
-    const isMetaDataEditable = collection && collection.canWrite && paths.length === 0;
+    const hasEditRight = collection && collection.canWrite && paths.length === 0;
     const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
 
     return (
@@ -66,7 +66,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                 <ExpansionPanelDetails>
                     <LinkedDataEntityFormWithLinkedData
                         subject={collection.iri}
-                        isMetaDataEditable={isMetaDataEditable}
+                        hasEditRight={hasEditRight}
                         setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
                     />
                 </ExpansionPanelDetails>

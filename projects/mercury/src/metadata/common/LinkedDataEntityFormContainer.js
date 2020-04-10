@@ -14,7 +14,7 @@ import useLinkedData from "../UseLinkedData";
 import {DATE_DELETED_URI} from "../../constants";
 
 const LinkedDataEntityFormContainer = ({
-    subject, editable = false, showEditButtons = false, fullpage = false,
+    subject, editable = true, showEditButtons = false, fullpage = false,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
@@ -144,13 +144,13 @@ LinkedDataEntityFormContainer.propTypes = {
 };
 
 
-export const LinkedDataEntityFormWithLinkedData = ({subject, isMetaDataEditable, setHasCollectionMetadataUpdates}) => {
+export const LinkedDataEntityFormWithLinkedData = ({subject, hasEditRight, setHasCollectionMetadataUpdates}) => {
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
     return (
         <LinkedDataEntityFormContainer
             subject={subject}
-            editable={isMetaDataEditable}
+            editable={hasEditRight}
             properties={properties}
             values={values}
             linkedDataLoading={linkedDataLoading}

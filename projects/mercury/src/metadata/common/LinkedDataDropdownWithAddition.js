@@ -7,7 +7,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import {determineShapeForTypes} from '../../common/utils/linkeddata/vocabularyUtils';
 
 const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => {
-    const {shapes, shapesPending, shapesError, requireIdentifier, hasModifyMetadataRight} = useContext(LinkedDataContext);
+    const {shapes, shapesPending, shapesError, requireIdentifier} = useContext(LinkedDataContext);
 
     const shape = (!shapesPending && !shapesError) ? determineShapeForTypes(shapes, [property.className]) : {};
 
@@ -18,7 +18,6 @@ const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => 
             error={shapesError}
             pending={shapesPending}
             onChange={onChange}
-            canAddNew={hasModifyMetadataRight}
             requireIdentifier={requireIdentifier}
         >
             <LinkedDataDropdown

@@ -38,6 +38,8 @@ describe('FileOperations', () => {
         clearSelection={clearSelection}
         fileActions={fileActions}
         openedPath={openedPath}
+        isWritingDisabled={false}
+        currentUser={{admin: true}}
     />);
 
     beforeEach(() => {

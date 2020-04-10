@@ -8,12 +8,9 @@ import valueComponentFactory from "./common/values/LinkedDataValueComponentFacto
 import VocabularyContext from './VocabularyContext';
 import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
 import {MetadataAPI} from './LinkedDataAPI';
-import {isDataSteward} from '../common/utils/userUtils';
-import {UserContext} from "../common/contexts";
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
-    const {currentUser} = useContext(UserContext);
 
     const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, includeObjectProperties: true})
         .catch(() => {
@@ -58,7 +55,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 submitLinkedDataChanges,
 
                 // Fixed properties
-                hasModifyMetadataRight: isDataSteward(currentUser),
+                hasEditRight: true,
                 requireIdentifier: true,
                 editorPath: METADATA_PATH,
                 namespaces,

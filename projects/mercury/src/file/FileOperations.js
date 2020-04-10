@@ -27,6 +27,7 @@ Object.freeze(Operations);
 
 export const FileOperations = ({
     isWritingDisabled,
+    currentUser,
     openedPath,
     selectedPaths,
     clearSelection,
@@ -38,8 +39,6 @@ export const FileOperations = ({
 }) => {
     const [activeOperation, setActiveOperation] = useState();
     const busy = !!activeOperation;
-
-    const {currentUser} = useContext(UserContext);
 
     const noPathSelected = selectedPaths.length === 0;
     const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
@@ -128,7 +127,7 @@ export const FileOperations = ({
     return (
         <>
             <FileOperationsGroup>
-                {isWritingDisabled && (
+                {!isWritingDisabled && (
                     <ProgressButton active={activeOperation === Operations.MKDIR}>
                         <CreateDirectoryButton
                             onCreate={name => handleCreateDirectory(name)}
@@ -137,7 +136,7 @@ export const FileOperations = ({
                             <IconButton
                                 aria-label="Create directory"
                                 title="Create directory"
-                                disabled={isWritingDisabled || busy}
+                                disabled={busy}
                             >
                                 <CreateNewFolder />
                             </IconButton>
@@ -212,18 +211,16 @@ export const FileOperations = ({
                         <ContentCut />
                     </IconButton>
                 )}
-                {!isWritingDisabled && (
-                    <ProgressButton active={activeOperation === Operations.PASTE}>
-                        <IconButton
-                            aria-label="Paste"
-                            title="Paste"
-                            onClick={e => handlePaste(e)}
-                            disabled={isPasteDisabled || busy}
-                        >
-                            {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
-                        </IconButton>
-                    </ProgressButton>
-                )}
+                <ProgressButton active={activeOperation === Operations.PASTE}>
+                    <IconButton
+                        aria-label="Paste"
+                        title="Paste"
+                        onClick={e => handlePaste(e)}
+                        disabled={isPasteDisabled || isWritingDisabled || busy}
+                    >
+                        {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
+                    </IconButton>
+                </ProgressButton>
             </FileOperationsGroup>
         </>
     );
@@ -231,7 +228,9 @@ export const FileOperations = ({
 
 const ContextualFileOperations = props => {
     const clipboard = useContext(ClipboardContext);
-    return <FileOperations clipboard={clipboard} {...props} />;
+    const {currentUser} = useContext(UserContext);
+
+    return <FileOperations clipboard={clipboard} currentUser={currentUser} {...props} />;
 };
 
 export default ContextualFileOperations;

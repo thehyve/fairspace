@@ -30,7 +30,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
 
     const {currentUser} = useContext(UserContext);
 
-    const hasModifyMetadataRight = isDataSteward(currentUser);
+    const canEdit = isDataSteward(currentUser);
 
     const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type);
 
@@ -47,7 +47,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
             properties,
             isFixed: isFixedShape(shape),
             systemProperties: getSystemProperties(shape),
-            isEditable: isEntityEditable && hasModifyMetadataRight
+            isEditable: isEntityEditable && canEdit
         });
     };
 
@@ -70,7 +70,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
                 // Fixed properties
                 namespaces,
                 requireIdentifier: false,
-                hasModifyMetadataRight,
+                hasEditRight: canEdit,
                 editorPath: VOCABULARY_PATH,
 
                 shapesLoading,
