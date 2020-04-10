@@ -63,7 +63,7 @@ public class SecurityHandlerFactory {
         authenticator.setAdapterConfig(adapterConfig);
         securityHandler.setAuthenticator(authenticator);
         var localhost = CONFIG.auth.authServerUrl.startsWith("http://localhost:");
-        adapterConfig.setSslRequired((localhost ? SslRequired.NONE : SslRequired.ALL).name());
+        adapterConfig.setSslRequired((localhost ? SslRequired.NONE : SslRequired.EXTERNAL).name());
         if(!localhost) {
             adapterConfig.setConfidentialPort(443);
         }
