@@ -1,5 +1,6 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.auth.UserIdentityFilter;
 import io.fairspace.saturn.config.SaturnSparkFilter;
 import io.fairspace.saturn.config.Services;
@@ -13,7 +14,6 @@ import org.eclipse.jetty.server.session.SessionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static io.fairspace.saturn.auth.SecurityHandlerFactory.createSecurityHandler;
 import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
@@ -29,7 +29,7 @@ public class App {
         var svc = new Services(CONFIG, ds);
 
         var server = FusekiServer.create()
-                .securityHandler(createSecurityHandler(CONFIG.auth))
+                .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", ds, false)
                 .addFilter("/*", new UserIdentityFilter(svc))
                 .addServlet(API_PREFIX + "/webdav/*", new WebDAVServlet(svc))
