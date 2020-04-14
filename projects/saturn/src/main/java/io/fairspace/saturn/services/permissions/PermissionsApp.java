@@ -39,18 +39,6 @@ public class PermissionsApp extends BaseApp {
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(dto);
         });
-
-        path("/restricted", () -> {
-            get("", APPLICATION_JSON.asString(), (req, res) -> {
-                res.type(APPLICATION_JSON.asString());
-                return mapper.writeValueAsString(new RestrictedDto(permissionsService.isWriteRestricted(getIri(req))));
-            });
-
-            put("", (req, res) -> {
-                permissionsService.setWriteRestricted(getIri(req), mapper.readValue(req.body(), RestrictedDto.class).isRestricted());
-                return "";
-            });
-        });
     }
 
     private static Node getIri(Request request) {

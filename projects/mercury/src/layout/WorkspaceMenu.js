@@ -12,6 +12,7 @@ const WorkspaceMenu = ({location: {pathname}}) => {
             <WorkspaceListMenuItem location={pathname} />
             <List>
                 <ListItem
+                    key="collections"
                     component={NavLink}
                     to="/collections"
                     button
@@ -23,6 +24,7 @@ const WorkspaceMenu = ({location: {pathname}}) => {
                     <ListItemText primary="Collections" />
                 </ListItem>
                 <ListItem
+                    key="metadata"
                     component={NavLink}
                     to="/metadata"
                     button
@@ -33,6 +35,7 @@ const WorkspaceMenu = ({location: {pathname}}) => {
                     <ListItemText primary="Metadata" />
                 </ListItem>
                 <ListItem
+                    key="vocabulary"
                     component={NavLink}
                     to="/vocabulary"
                     button
@@ -50,7 +53,7 @@ const WorkspaceMenu = ({location: {pathname}}) => {
                 <List>
                     {
                         Object.keys(services).map(key => (
-                            <ListItem button component="a" href={services[key]}>
+                            <ListItem button component="a" href={services[key]} key={'service-' + key}>
                                 <ListItemIcon>
                                     <OpenInNew />
                                 </ListItemIcon>

@@ -4,7 +4,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shacl.Shapes;
-import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ShaclSimpleValidator;
 import org.apache.jena.util.FileManager;
 import org.junit.Before;

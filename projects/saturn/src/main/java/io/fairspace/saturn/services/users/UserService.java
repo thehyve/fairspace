@@ -18,9 +18,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.System.getenv;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 public class UserService {

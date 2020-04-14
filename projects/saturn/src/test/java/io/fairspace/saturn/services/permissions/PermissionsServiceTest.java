@@ -4,7 +4,6 @@ import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Resource;
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,10 +26,10 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+// TODO: Add more tests
 @RunWith(MockitoJUnitRunner.class)
 public class PermissionsServiceTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
@@ -51,9 +49,6 @@ public class PermissionsServiceTest {
     private PermissionChangeEventHandler permissionChangeEventHandler;
 
     @Mock
-    private UserService userService;
-
-    @Mock
     private User currentUser;
 
     private Node currentUserIri = USER1;
@@ -63,16 +58,12 @@ public class PermissionsServiceTest {
         ds = new DatasetJobSupportInMemory();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
-
-        when(userService.getUser(any())).thenReturn(new User());
-
         setCurrentUser(currentUser);
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
 
-
-        service = new PermissionsService(ds, permissionChangeEventHandler, userService);
+        service = new PermissionsService(ds, permissionChangeEventHandler);
         service.createResource(RESOURCE);
     }
 
@@ -92,21 +83,6 @@ public class PermissionsServiceTest {
 
         assertEquals(Access.Manage, service.getPermission(RESOURCE));
         assertEquals(Access.Manage, service.getPermission(RESOURCE2));
-    }
-
-    @Test
-    public void testSetPermission() {
-        assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setWriteRestricted(RESOURCE, true);
-        service.setPermission(RESOURCE, USER2, Access.Write);
-
-        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
-
-        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER2, Access.None);
-        assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER3, Access.Manage);
-        assertEquals(Access.Manage, service.getPermissions(RESOURCE).get(USER3));
     }
 
     @Test
@@ -136,28 +112,6 @@ public class PermissionsServiceTest {
     }
 
     @Test
-    public void testGetPermissions() {
-        service.setWriteRestricted(RESOURCE, true);
-        service.setPermission(RESOURCE, USER2, Access.Write);
-        service.setPermission(RESOURCE, USER3, Access.Manage);
-        assertEquals(new HashMap<>() {{
-                         put(createURI("http://example.com/user1"), Access.Manage);
-                         put(createURI("http://example.com/user2"), Access.Write);
-                         put(createURI("http://example.com/user3"), Access.Manage);
-                     }},
-                service.getPermissions(RESOURCE));
-    }
-
-    @Test
-    public void testSetWriteRestricted() {
-        assertFalse(service.isWriteRestricted(RESOURCE));
-        service.setWriteRestricted(RESOURCE, true);
-        assertTrue(service.isWriteRestricted(RESOURCE));
-        service.setWriteRestricted(RESOURCE, false);
-        assertFalse(service.isWriteRestricted(RESOURCE));
-    }
-
-    @Test
     public void testGettingPermissionsForFiles() {
         var collection = createResource("http://example.com/collection");
         var file = createResource("http://example.com/file");
@@ -178,13 +132,6 @@ public class PermissionsServiceTest {
         var coll = createResource("http://example.com/collection");
         ds.getDefaultModel().add(coll, RDF.type, FS.Collection);
         assertEquals(Access.None, service.getPermission(coll.asNode()));
-    }
-
-    @Test
-    public void testDefaultPermissionForRegularEntities() {
-        var entity = createResource("http://example.com/entity");
-        ds.getDefaultModel().add(entity, RDF.type, createResource("http://fairspace.io/ontology#Entity"));
-        assertEquals(Access.Read, service.getPermission(entity.asNode()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -210,32 +157,17 @@ public class PermissionsServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCollectionsCanNotBeMarkedAsRestricted() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, FS.Collection);
-        service.setWriteRestricted(RESOURCE, true);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void testWriteAccessToEntitiesCanNotBeGrantedBeforeMarkingThemRestricted() {
         service.setPermission(RESOURCE, USER2, Access.Write);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSettingPermissionToNoneIfNoPermissionIsPresent() {
         service.setPermission(RESOURCE, USER2, Access.None);
-        assertFalse(service.getPermissions(RESOURCE).containsKey(USER2));
-    }
-
-    @Test
-    public void testSettingWriteRestrictedToTrueTwiceShouldNotClearPermissions() {
-        service.setWriteRestricted(RESOURCE, true);
-        service.setPermission(RESOURCE, USER2, Access.Write);
-        service.setWriteRestricted(RESOURCE, true);
-        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
     }
 
     @Test(expected = AccessDeniedException.class)
-    public void testSettingPermissionsWithoutManageAccess() {
+    public void testCannotSetPermission() {
         service.setPermission(createURI("http://example.com/not-my-resource"), USER1, Access.Write);
     }
 
@@ -288,14 +220,6 @@ public class PermissionsServiceTest {
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
     }
 
-    @Test(expected = MetadataAccessDeniedException.class)
-    public void testEnsureAccessToRestrictedEntities() {
-        setupAccessCheckForMultipleNodes();
-
-        currentUserIri = USER2;
-
-        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Write);
-    }
 
     @Test
     public void testSetPermissionForAWorkspace() {
@@ -333,7 +257,7 @@ public class PermissionsServiceTest {
 
         // The exception thrown by ensureAccess should return the failing entity
         try {
-            service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Write);
+            service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Manage);
             fail();
         } catch(MetadataAccessDeniedException e) {
             assertEquals(RESOURCE, e.getSubject());
@@ -375,7 +299,6 @@ public class PermissionsServiceTest {
         service.createResource(COLLECTION_1);
         service.createResource(COLLECTION_2);
 
-        service.setWriteRestricted(RESOURCE, true);
         service.setPermission(COLLECTION_2, USER2, Access.Write);
     }
 }

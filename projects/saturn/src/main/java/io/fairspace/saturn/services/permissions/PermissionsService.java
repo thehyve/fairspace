@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.permissions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,11 @@ import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.StreamSupport.stream;
+import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
@@ -30,12 +33,14 @@ public class PermissionsService {
 
     private final DatasetJobSupport dataset;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
-    private final UserService userService;
-
 
     public void createResource(Node resource) {
+        createResource(resource, getCurrentUser().getIri());
+    }
+
+    public void createResource(Node resource, Node owner) {
         var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(getCurrentUser().getIri()));
+        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(owner));
 
         audit("RESOURCE_CREATED",
                 "resource", resource.getURI());
@@ -56,14 +61,7 @@ public class PermissionsService {
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
 
-            validate(userService.getUser(user) != null, "A user must be known to the system");
-
-            if (!isCollection(resource) && !isWorkspace(resource)) {
-                validate(access != Access.Read, "Regular metadata entities can not be marked as read-only");
-                var isSpecifyingWriteAccessOnNonRestrictedResource = access == Access.Write && !isWriteRestricted(resource);
-                validate(!isSpecifyingWriteAccessOnNonRestrictedResource,
-                        "Regular metadata entities must be marked as write-restricted before granting permissions");
-            }
+            validate (isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
 
             g.removeAll(g.asRDFNode(resource).asResource(), null, g.asRDFNode(user));
 
@@ -122,36 +120,6 @@ public class PermissionsService {
         });
     }
 
-    boolean isWriteRestricted(Node resource) {
-        return dataset.calculateRead(() ->
-                dataset.getNamedModel(PERMISSIONS_GRAPH).createResource(resource.getURI()).hasLiteral(FS.writeRestricted, true));
-    }
-
-    void setWriteRestricted(Node resource, boolean restricted) {
-        var success = dataset.calculateWrite(() -> {
-            ensureAccess(resource, Access.Manage);
-            validate(!isCollection(resource), "A collection cannot be marked as write-restricted");
-            validate(!isWorkspace(resource), "A workspace cannot be marked as write-restricted");
-            if (restricted != isWriteRestricted(resource)) {
-                var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-                var s = g.asRDFNode(resource).asResource();
-                g.removeAll(s, FS.writeRestricted, null);
-                if (restricted) {
-                    g.add(s, FS.writeRestricted, g.createTypedLiteral(true));
-                } else {
-                    g.removeAll(s, FS.write, null);
-                }
-                return true;
-            }
-            return false;
-        });
-
-        if (success) {
-                audit("SET_WRITE_RESTRICTED",
-                        "resource", resource.getURI());
-        }
-    }
-
     private void ensureAccess(Node resource, Access access) {
         // Organisation admins are allowed to do anything
         if (getCurrentUser().isAdmin()) {
@@ -201,46 +169,50 @@ public class PermissionsService {
             return result;
         }
 
-        Access defaultAccess = Access.Read;
         var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
         var userResource = g.wrapAsResource(userObject.getIri());
-        authorities.forEach(a -> getResourceAccess(g.wrapAsResource(a), userResource)
-                .ifPresentOrElse(
-                        accessLevel -> result.put(a, accessLevel),
-                        () -> result.put(a, defaultAccess)
-                )
-        );
+        authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
 
         return result;
     }
 
-    private Optional<Access> getResourceAccess(Resource r, Resource user) {
+    private Access getResourceAccess(Resource r, Resource user) {
+        if (isCollection(r.asNode()) && isUser(user.asNode())) {
+            var it = dataset.getDefaultModel()
+                    .listSubjectsWithProperty(RDF.type, FS.Workspace)
+                    .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
+                    .mapWith(ws -> ws.inModel(dataset.getNamedModel(PERMISSIONS_GRAPH)))
+                    .mapWith(ws -> min(getResourceAccess(ws, user), getResourceAccess(r, ws)));
+            return stream(spliteratorUnknownSize(it, 0), false)
+                    .max(naturalOrder())
+                    .orElse(Access.None);
+        }
         if (r.hasProperty(FS.manage, user)) {
-            return Optional.of(Access.Manage);
+            return Access.Manage;
         }
         if (r.hasProperty(FS.write, user)) {
-            return Optional.of(Access.Write);
+            return Access.Write;
         }
         if (r.hasProperty(FS.read, user)) {
-            return Optional.of(Access.Read);
+            return Access.Read;
         }
-        if (r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Collection) ||
-            r.inModel(dataset.getDefaultModel()).hasProperty(RDF.type, FS.Workspace)) {
-            return Optional.of(Access.None);
-        }
-        if (r.hasLiteral(FS.writeRestricted, true)) {
-            return Optional.of(Access.Read);
+        if (isCollection(r.asNode()) || isWorkspace(r.asNode())) {
+            return Access.None;
         }
 
-        return Optional.empty();
+        return Access.Write;
+    }
+
+    private boolean isUser(Node resource) {
+        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.User);
     }
 
     private boolean isCollection(Node resource) {
-        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Collection);
+        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Collection);
     }
 
     private boolean isWorkspace(Node resource) {
-        return dataset.getDefaultModel().createResource(resource.getURI()).hasProperty(RDF.type, FS.Workspace);
+        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Workspace);
     }
 
     /**
