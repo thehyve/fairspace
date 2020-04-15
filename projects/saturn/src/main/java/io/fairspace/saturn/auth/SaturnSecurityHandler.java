@@ -3,11 +3,18 @@ package io.fairspace.saturn.auth;
 import io.fairspace.saturn.config.Config;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.enums.TokenStore;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
@@ -44,5 +51,13 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         mapping.setConstraint(constraint);
         mapping.setPathSpec(pathSpec);
         return mapping;
+    }
+
+    @Override
+    public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        var cookie = new Cookie("JSESSIONID", ((SessionHandler.SessionIf)request.getSession()).getSession().getExtendedId());
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        super.handle(pathInContext, baseRequest, request, response);
     }
 }
