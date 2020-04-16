@@ -1,8 +1,10 @@
 package io.fairspace.saturn.auth;
 
 import org.eclipse.jetty.server.Request;
+import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.AdapterTokenStore;
 import org.keycloak.adapters.KeycloakDeployment;
+import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
 import org.keycloak.adapters.jetty.Jetty94RequestAuthenticator;
 import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
 import org.keycloak.adapters.jetty.core.JettyRequestAuthenticator;
@@ -40,6 +42,12 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
                 }
 
                 return super.getChallenge();
+            }
+
+            @Override
+            protected void completeBearerAuthentication(KeycloakPrincipal<RefreshableKeycloakSecurityContext> principal, String method) {
+                // Stores the token in the session
+                completeOAuthAuthentication(principal);
             }
         };
     }
