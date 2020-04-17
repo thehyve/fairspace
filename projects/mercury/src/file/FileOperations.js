@@ -26,7 +26,7 @@ export const Operations = {
 Object.freeze(Operations);
 
 export const FileOperations = ({
-    isWritingDisabled,
+    isWritingEnabled,
     currentUser,
     openedPath,
     selectedPaths,
@@ -40,13 +40,15 @@ export const FileOperations = ({
     const [activeOperation, setActiveOperation] = useState();
     const busy = !!activeOperation;
 
+    const hasRestrictedOperationsRight = isDataSteward(currentUser);
+
     const noPathSelected = selectedPaths.length === 0;
     const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
+    const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
@@ -127,7 +129,7 @@ export const FileOperations = ({
     return (
         <>
             <FileOperationsGroup>
-                {!isWritingDisabled && (
+                {isWritingEnabled && (
                     <ProgressButton active={activeOperation === Operations.MKDIR}>
                         <CreateDirectoryButton
                             onCreate={name => handleCreateDirectory(name)}
@@ -155,7 +157,7 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
-                {isDataSteward(currentUser) && (
+                {hasRestrictedOperationsRight && (
                     <>
                         <ProgressButton active={activeOperation === Operations.RENAME}>
                             <RenameButton
@@ -201,7 +203,7 @@ export const FileOperations = ({
                 >
                     <ContentCopy />
                 </IconButton>
-                {isDataSteward(currentUser) && (
+                {hasRestrictedOperationsRight && (
                     <IconButton
                         aria-label="Cut"
                         title="Cut"
@@ -216,7 +218,7 @@ export const FileOperations = ({
                         aria-label="Paste"
                         title="Paste"
                         onClick={e => handlePaste(e)}
-                        disabled={isPasteDisabled || isWritingDisabled || busy}
+                        disabled={isPasteDisabled || busy}
                     >
                         {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                     </IconButton>

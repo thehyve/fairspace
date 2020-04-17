@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from "prop-types";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
 
-const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, onChange, onDelete, canAdd, labelId, addComponent, editComponent: EditComponent}) => {
+const LinkedDataInputFieldsTable = (
+    {property, values, validationErrors, onAdd, onChange, onDelete, canAdd,
+        hasRestrictedOperationsRight, labelId, addComponent, checkValueAddedNotSubmitted, editComponent: EditComponent}
+) => {
     // For input fields there is only a single input field
     const hasErrors = validationErrors && validationErrors.length > 0;
 
@@ -31,6 +34,8 @@ const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, 
             labelId={labelId}
             canAdd={canAdd}
             addComponent={addComponent}
+            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
+            hasRestrictedOperationsRight={hasRestrictedOperationsRight}
         />
     );
 };
@@ -38,9 +43,12 @@ const LinkedDataInputFieldsTable = ({property, values, validationErrors, onAdd, 
 LinkedDataInputFieldsTable.propTypes = {
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
+    checkValueAddedNotSubmitted: PropTypes.func,
+    addComponent: PropTypes.func,
     property: PropTypes.object,
     labelId: PropTypes.string,
-    addComponent: PropTypes.func
+    hasRestrictedOperationsRight: PropTypes.bool,
+    canAdd: PropTypes.bool
 };
 
 LinkedDataInputFieldsTable.defaultProps = {

@@ -68,6 +68,8 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
         workspacesToAdd: []
     };
 
+    hasRestrictedOperationsRight = isDataSteward(this.props.currentUser);
+
     handleEdit = () => {
         if (this.props.collection.canWrite) {
             this.setState({editing: true});
@@ -151,7 +153,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                     <MenuItem onClick={this.handleEdit}>
                                         Edit
                                     </MenuItem>
-                                    {isDataSteward(this.props.currentUser) && (
+                                    {this.hasRestrictedOperationsRight && (
                                         <MenuItem onClick={this.handleDelete}>
                                             Delete
                                         </MenuItem>

@@ -74,7 +74,7 @@ describe('FileAPI', () => {
             FileAPI.client = () => ({deleteFile: jest.fn(() => Promise.reject({response: {status: 403}}))});
 
             return expect(FileAPI.delete('path'))
-                .rejects.toThrow(/write permissions/);
+                .rejects.toThrow(/Only admins can delete/);
         });
     });
 

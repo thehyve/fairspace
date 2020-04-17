@@ -99,6 +99,9 @@ const useFormData = (values, initialProperties = []) => {
 
     const validateAll = properties => !!properties.map(p => validateProperty(p, current(p.key))).find(v => v);
 
+    // Check if value is newly added and the form with this update is not submitted yet.
+    const checkValueAddedNotSubmitted = (key, value) => !(formValues && formValues[key] && formValues[key].find(iv => iv === value));
+
     return {
         addValue,
         updateValue,
@@ -109,6 +112,7 @@ const useFormData = (values, initialProperties = []) => {
         getUpdates: () => updatesToReturn,
         updates,
         valuesWithUpdates,
+        checkValueAddedNotSubmitted,
 
         validateAll,
         validateProperty,

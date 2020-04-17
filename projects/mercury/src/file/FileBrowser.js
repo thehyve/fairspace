@@ -31,6 +31,7 @@ export const DisconnectedFileBrowser = ({
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
 
+    const isWritingEnabled = openedCollection && openedCollection.canWrite;
     const existingFilenames = files ? files.map(file => file.basename) : [];
     const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
 
@@ -92,7 +93,7 @@ export const DisconnectedFileBrowser = ({
                 selectedPaths={selection.selected}
                 files={files}
                 openedPath={openedPath}
-                isWritingDisabled={!openedCollection.canWrite}
+                isWritingEnabled={isWritingEnabled}
                 fileActions={fileActions}
                 clearSelection={selection.deselectAll}
                 refreshFiles={refreshFiles}
@@ -144,7 +145,7 @@ export const DisconnectedFileBrowser = ({
                 style={{marginBottom: 8}}
             >
                 <Tab value={TAB_FILES} label="Files" />
-                {openedCollection.canWrite && (
+                {isWritingEnabled && (
                     <Tab value={TAB_UPLOAD} label="Upload" data-testid="upload-tab" />
                 )}
             </Tabs>

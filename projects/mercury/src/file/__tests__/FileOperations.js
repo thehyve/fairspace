@@ -38,7 +38,7 @@ describe('FileOperations', () => {
         clearSelection={clearSelection}
         fileActions={fileActions}
         openedPath={openedPath}
-        isWritingDisabled={false}
+        isWritingEnabled
         currentUser={{admin: true}}
     />);
 
