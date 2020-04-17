@@ -72,7 +72,6 @@ class MetadataEntityLifeCycleManager {
         } catch (AccessDeniedException e) {
             throw new MetadataAccessDeniedException("Insufficient permissions to delete entities.", resource.asNode());
         }
-        permissionsService.ensureAdmin();
         var model = dataset.getNamedModel(graph.getURI());
         resource = resource.inModel(model);
         if (isMachineOnly(resource)) {

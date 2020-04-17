@@ -99,9 +99,36 @@ public class PermissionsService {
         });
     }
 
+    private void ensureAccess(Node resource, Access access) {
+        // Organisation admins are allowed to do anything
+        if (getCurrentUser().isAdmin()) {
+            return;
+        }
+
+        if (getPermission(resource).compareTo(access) < 0) {
+            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
+        }
+    }
+
+    public void ensureAdminAccess(Set<Node> nodes) {
+        // Only admins can remove or overwrite metadata
+        if (getCurrentUser().isAdmin()) {
+            return;
+        }
+
+        // Workspace metadata is an exception
+        nodes.forEach(node -> {
+            if(isWorkspace(node)) {
+                ensureAccess(node, Access.Manage);
+            } else {
+                throw new MetadataAccessDeniedException("Only admins can remove or overwrite metadata.", node);
+            }
+        });
+    }
+
     public void ensureAdmin() {
         if(!getCurrentUser().isAdmin()) {
-            throw new AccessDeniedException(format("User %s has to bean administrator.", getCurrentUser().getIri()));
+            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUser().getIri()));
         }
     }
 
@@ -125,17 +152,6 @@ public class PermissionsService {
                     });
             return result;
         });
-    }
-
-    private void ensureAccess(Node resource, Access access) {
-        // Organisation admins are allowed to do anything
-        if (getCurrentUser().isAdmin()) {
-            return;
-        }
-
-        if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
-        }
     }
 
     public Access getPermission(Node resource) {

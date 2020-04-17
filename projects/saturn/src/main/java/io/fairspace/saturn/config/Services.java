@@ -92,6 +92,6 @@ public class Services {
 
         blobStore =  new LocalBlobStore(new File(config.webDAV.blobStorePath));
         fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus))));
+                ManagedFileSystem.TYPE, new ManagedFileSystem(dataset, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus, permissionsService))));
     }
 }

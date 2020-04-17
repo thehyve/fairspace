@@ -4,6 +4,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
@@ -269,11 +270,11 @@ public class CollectionsServiceTest {
         collections.update(c1);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test(expected = CollectionAccessDeniedException.class)
     public void collectionsWithoutManagePermissionCannotBeDeleted() {
         var c1 = collections.create(newCollection());
 
-        mockPermissions(Access.Write);
+        doThrow(new AccessDeniedException()).when(permissions).ensureAdmin();
 
         collections.delete(c1.getIri().getURI());
     }
