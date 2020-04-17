@@ -131,7 +131,7 @@ public class CollectionsServiceTest {
     public void deletedCollectionIsNoLongerVisible() {
         var c = collections.create(newCollection());
 
-        mockPermissions(Access.Manage);
+        doNothing().when(permissions).ensureAdmin();
 
         collections.delete(c.getIri().getURI());
         assertNull(collections.get(c.getIri().getURI()));
@@ -143,7 +143,7 @@ public class CollectionsServiceTest {
     @Test
     public void deletionEmitsAnEvent() {
         var c = collections.create(newCollection());
-        mockPermissions(Access.Manage);
+        doNothing().when(permissions).ensureAdmin();
         collections.delete(c.getIri().getURI());
         verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
     }
@@ -271,7 +271,7 @@ public class CollectionsServiceTest {
     }
 
     @Test(expected = CollectionAccessDeniedException.class)
-    public void collectionsWithoutManagePermissionCannotBeDeleted() {
+    public void collectionsWithoutAdminRoleCannotBeDeleted() {
         var c1 = collections.create(newCollection());
 
         doThrow(new AccessDeniedException()).when(permissions).ensureAdmin();
