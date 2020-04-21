@@ -34,7 +34,7 @@ public class LocalBlobStoreTest {
         var id = blobStore.write(new ByteArrayInputStream(contents1));
         assertNotNull(id);
         var out = new ByteArrayOutputStream();
-        blobStore.read(id, out);
+        blobStore.read(id, out, 0, null);
         assertArrayEquals(contents1, out.toByteArray());
     }
 

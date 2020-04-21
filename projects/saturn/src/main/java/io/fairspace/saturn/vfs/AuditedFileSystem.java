@@ -50,8 +50,8 @@ public class AuditedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out) throws IOException {
-        fs.read(path, out);
+    public void read(String path, OutputStream out, long start, Long finish) throws IOException {
+        fs.read(path, out, start, finish);
         audit("FS_READ", "path", path);
     }
 

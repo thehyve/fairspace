@@ -200,7 +200,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out) throws IOException {
+    public void read(String path, OutputStream out, long start, Long finish) throws IOException {
         var blobId = dataset.calculateRead(() ->
                 dataset.getDefaultModel()
                         .createResource(iri(path))
@@ -208,7 +208,7 @@ public class ManagedFileSystem extends BaseFileSystem {
                         .nextOptional()
                         .map(Statement::getString)
                         .orElseThrow(() -> new FileNotFoundException(path)));
-        store.read(blobId, out);
+        store.read(blobId, out, start, finish);
     }
 
     @Override

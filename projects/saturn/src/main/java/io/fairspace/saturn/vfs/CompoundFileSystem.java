@@ -58,8 +58,8 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out) throws IOException {
-        fileSystemByPath(path, false).read(path, out);
+    public void read(String path, OutputStream out, long start, Long finish) throws IOException {
+        fileSystemByPath(path, false).read(path, out, start, finish);
     }
 
     @Override

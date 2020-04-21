@@ -1,6 +1,9 @@
 package io.fairspace.saturn.vfs.managed;
 
 
+import io.milton.common.RangeUtils;
+import io.milton.http.Range;
+
 import java.io.*;
 
 import static java.util.UUID.randomUUID;
@@ -30,9 +33,10 @@ public class LocalBlobStore implements BlobStore {
     }
 
     @Override
-    public void read(String id, OutputStream out) throws IOException {
+    public void read(String id, OutputStream out, long start, Long finish) throws IOException {
         var src = new File(dir, id);
         try(var in = new BufferedInputStream(new FileInputStream(src))) {
+            RangeUtils.writeRange(in, new Range(start, finish), out);
             copyLarge(in, out);
         }
     }
