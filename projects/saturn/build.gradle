@@ -1,7 +1,7 @@
 buildscript {
     ext {
         jena_version = '3.14.0'
-        milton_version = '2.7.4.9'
+        milton_version = '2.8.0.1'
         mockitoVersion = '3.2.4'
         jacksonVersion = '2.10.1' // check what version is used by Jena
     }
@@ -33,10 +33,6 @@ repositories {
 
     maven {
         url "http://dl.bintray.com/milton/Milton"
-    }
-
-    maven {
-        url "https://raw.githubusercontent.com/DICE-UNC/DICE-Maven/master/releases"
     }
 
     maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
