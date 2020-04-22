@@ -294,10 +294,13 @@ public class ManagedFileSystem extends BaseFileSystem {
     private void copyOrMoveNoCheck(boolean move, String from, String to) throws IOException {
         var src = dataset.getDefaultModel().createResource(iri(from));
         var dst = dataset.getDefaultModel().createResource(iri(to));
-        var parent = dataset.getDefaultModel().createResource(iri(parentPath(to)));
         dst.removeProperties();
         dst.addProperty(FS.filePath, to);
-        parent.addProperty(FS.contains, dst);
+        var dir = parentPath(to);
+        if (dir != null) {
+            var parent = dataset.getDefaultModel().createResource(iri(dir));
+            parent.addProperty(FS.contains, dst);
+        }
 
         src.listProperties(FS.contains)
                 .mapWith(Statement::getResource)
