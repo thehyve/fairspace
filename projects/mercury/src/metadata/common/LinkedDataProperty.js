@@ -27,17 +27,23 @@ const LinkedDataProperty = (
     const labelId = `label-${key}`;
     const hasRestrictedOperationsRight = isDataSteward(currentUser);
 
+    const isSingleValuePropertyWithExistingValue = (
+        maxValuesCount === 1
+            && values.length === 1 && values[0].value !== ""
+            && !checkValueAddedNotSubmitted(property, values[0])
+    );
+
     // Checks whether the configuration of this property disallowed editing of existing values
     // This is the case if
     // - the property is machineOnly
     // - the field refers to a url (marked as RESOURCE_URI)
     // - the value is taken from a set of allowed values
-    // - property already has a value and the current user does not have permission to modify existing values
+    // - single-value property already has a value and the current user does not have permission to modify existing values
     const disallowEditingOfExistingValues = (
         machineOnly
         || property.isGenericIriResource
         || property.allowedValues
-        || (!hasRestrictedOperationsRight && maxValuesCount === 1 && values.length === 1 && values[0].value !== "")
+        || (!hasRestrictedOperationsRight && isSingleValuePropertyWithExistingValue)
     );
 
     // The edit component should not actually allow editing the value if editable is set to false

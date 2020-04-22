@@ -38,7 +38,8 @@ export const LinkedDataValuesTable = (
     // - given entry can be deleted for the property specified
     // - user has a right to perform delete operations or given entry was just added and not submitted yet
     const isDeleteButtonEnabled = (entry) => (
-        canDelete(property, entry) && (hasRestrictedOperationsRight || checkValueAddedNotSubmitted(property.key, entry))
+        canDelete(property, entry)
+        && (hasRestrictedOperationsRight || checkValueAddedNotSubmitted(property, entry))
     );
 
     return (

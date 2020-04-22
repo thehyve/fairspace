@@ -35,17 +35,17 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
 const useFormData = (values, initialProperties = []) => {
     const [updates, setUpdates] = useState({});
     const {validateProperty, validationErrors, isValid} = useValidation();
-    const [formValues, setFormValues] = useState(values);
+    const [initialFormValues, setInitialFormValues] = useState(values);
 
     const resetUpdates = () => setUpdates({});
 
     useDeepCompareEffect(() => {
-        populateDefaultFormValues(initialProperties, values, setFormValues);
+        populateDefaultFormValues(initialProperties, values, setInitialFormValues);
         resetUpdates();
     }, [initialProperties, values]);
 
     const hasFormUpdates = Object.keys(updates).length > 0;
-    const valuesWithUpdates = {...formValues, ...updates};
+    const valuesWithUpdates = {...initialFormValues, ...updates};
 
     let updatesToReturn = updates;
 
@@ -78,7 +78,7 @@ const useFormData = (values, initialProperties = []) => {
     };
 
     const updateValue = (property, value, index) => {
-        if (!first(formValues[property.key]) || first(formValues[property.key]).value !== value.value) {
+        if (!first(initialFormValues[property.key]) || first(initialFormValues[property.key]).value !== value.value) {
             const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
             save(property, newValue);
         } else if (updates[property.key]) {
@@ -100,7 +100,15 @@ const useFormData = (values, initialProperties = []) => {
     const validateAll = properties => !!properties.map(p => validateProperty(p, current(p.key))).find(v => v);
 
     // Check if value is newly added and the form with this update is not submitted yet.
-    const checkValueAddedNotSubmitted = (key, value) => !(formValues && formValues[key] && formValues[key].find(iv => iv === value));
+    const checkValueAddedNotSubmitted = (property, value) => {
+        if (!initialFormValues || !initialFormValues[property.key]) {
+            return true;
+        }
+        if (property.maxValuesCount === 1) {
+            return !initialFormValues[property.key].find(iv => iv.value === value.value);
+        }
+        return !initialFormValues[property.key].find(iv => iv === value);
+    };
 
     return {
         addValue,
