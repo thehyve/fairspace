@@ -36,9 +36,9 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
                 }
             }}
             onKeyUp={(e) => {
-                if (property.maxValuesCount === 1) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
+                if (property.maxValuesCount === 1 && !property.isGenericIriResource) {
                     updateOuterState(e.target.value);
                 }
             }}
