@@ -27,7 +27,7 @@ export const getFirstPredicateList = (metadataEntry: any, predicate: string, def
  * @param jsonLd
  * @returns {{}}
  */
-export const normalizeJsonLdResource = (jsonLd: any): any => Object.getOwnPropertyNames(jsonLd).reduce((res: any, key: string) => {
+export const normalizeJsonLdResource = (jsonLd: any): any => Object.getOwnPropertyNames(jsonLd || {}).reduce((res: any, key: string) => {
     const values = jsonLd[key];
     res[key] = Array.isArray(values)
         ? values.map((v: any) => {
