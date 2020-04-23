@@ -4,6 +4,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
@@ -130,7 +131,7 @@ public class CollectionsServiceTest {
     public void deletedCollectionIsNoLongerVisible() {
         var c = collections.create(newCollection());
 
-        mockPermissions(Access.Manage);
+        doNothing().when(permissions).ensureAdmin();
 
         collections.delete(c.getIri().getURI());
         assertNull(collections.get(c.getIri().getURI()));
@@ -142,7 +143,7 @@ public class CollectionsServiceTest {
     @Test
     public void deletionEmitsAnEvent() {
         var c = collections.create(newCollection());
-        mockPermissions(Access.Manage);
+        doNothing().when(permissions).ensureAdmin();
         collections.delete(c.getIri().getURI());
         verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
     }
@@ -269,11 +270,11 @@ public class CollectionsServiceTest {
         collections.update(c1);
     }
 
-    @Test(expected = AccessDeniedException.class)
-    public void collectionsWithoutManagePermissionCannotBeDeleted() {
+    @Test(expected = CollectionAccessDeniedException.class)
+    public void collectionsWithoutAdminRoleCannotBeDeleted() {
         var c1 = collections.create(newCollection());
 
-        mockPermissions(Access.Write);
+        doThrow(new AccessDeniedException()).when(permissions).ensureAdmin();
 
         collections.delete(c1.getIri().getURI());
     }

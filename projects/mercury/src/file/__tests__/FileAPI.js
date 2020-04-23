@@ -41,28 +41,30 @@ describe('FileAPI', () => {
             return expect(FileAPI.move("/test", "special-characters"))
                 .rejects.toThrow(/contains special characters/);
         });
+    });
 
+    describe('Copying', () => {
         it('should result in a clear error on 403 response', () => {
-            const moveFile = jest.fn(() => Promise.reject({response: {status: 403}}));
-            FileAPI.client = () => ({moveFile});
+            const copyFile = jest.fn(() => Promise.reject({response: {status: 403}}));
+            FileAPI.client = () => ({copyFile});
 
-            return expect(FileAPI.move("/test", "special-characters"))
+            return expect(FileAPI.copy("/test", "special-characters"))
                 .rejects.toThrow(/write permission/);
         });
 
         it('should result in a clear error on 409 response', () => {
-            const moveFile = jest.fn(() => Promise.reject({response: {status: 409}}));
-            FileAPI.client = () => ({moveFile});
+            const copyFile = jest.fn(() => Promise.reject({response: {status: 409}}));
+            FileAPI.client = () => ({copyFile});
 
-            return expect(FileAPI.move("/test", "special-characters"))
+            return expect(FileAPI.copy("/test", "special-characters"))
                 .rejects.toThrow(/destination can not be copied to/);
         });
 
         it('should result in a clear error on 412 response', () => {
-            const moveFile = jest.fn(() => Promise.reject({response: {status: 412}}));
-            FileAPI.client = () => ({moveFile});
+            const copyFile = jest.fn(() => Promise.reject({response: {status: 412}}));
+            FileAPI.client = () => ({copyFile});
 
-            return expect(FileAPI.move("/test", "special-characters"))
+            return expect(FileAPI.copy("/test", "special-characters"))
                 .rejects.toThrow(/already exists/);
         });
     });
@@ -72,7 +74,7 @@ describe('FileAPI', () => {
             FileAPI.client = () => ({deleteFile: jest.fn(() => Promise.reject({response: {status: 403}}))});
 
             return expect(FileAPI.delete('path'))
-                .rejects.toThrow(/write permissions/);
+                .rejects.toThrow(/Only admins can delete/);
         });
     });
 

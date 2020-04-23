@@ -13,7 +13,7 @@ describe('FileOperations', () => {
     let clickHandler;
 
     const clipboardMock = {
-        method: CUT,
+        method: COPY,
         filenames: ['a'],
         isEmpty: () => false,
         length: () => 1
@@ -22,9 +22,8 @@ describe('FileOperations', () => {
     const fileActionsMock = {
         getDownloadLink: () => 'http://a',
         createDirectory: () => Promise.resolve(),
-        renameFile: () => Promise.resolve(),
         deleteMultiple: () => Promise.resolve(),
-        movePaths: () => new Promise(resolve => setTimeout(resolve, 500))
+        copyPaths: () => new Promise(resolve => setTimeout(resolve, 500))
     };
 
     const renderFileOperations = (clipboard, fileActions, openedPath) => shallow(<FileOperations
@@ -39,6 +38,8 @@ describe('FileOperations', () => {
         clearSelection={clearSelection}
         fileActions={fileActions}
         openedPath={openedPath}
+        isWritingEnabled
+        currentUser={{admin: true}}
     />);
 
     beforeEach(() => {
@@ -73,12 +74,11 @@ describe('FileOperations', () => {
 
     it('should clear selection and refresh files after all successful file operations', () => {
         const createDir = () => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir");
-        const renameFile = () => wrapper.find('RenameButton').prop("onRename")("new-name");
-        const deleteFile = () => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")();
         const paste = () => clickHandler('Paste')({stopPropagation: () => {}});
+        const deleteFile = () => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")();
 
         return Promise.all(
-            [createDir, renameFile, deleteFile, paste].map(op => {
+            [createDir, deleteFile, paste].map(op => {
                 refreshFiles.mockReset();
                 clearSelection.mockReset();
 
@@ -97,7 +97,7 @@ describe('FileOperations', () => {
     describe('paste button', () => {
         it('should be disabled if clipboard is empty', () => {
             const emptyClipboard = {
-                method: CUT,
+                method: COPY,
                 filenames: [],
                 isEmpty: () => true,
                 length: () => 0

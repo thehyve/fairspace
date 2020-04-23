@@ -8,6 +8,7 @@ import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
@@ -33,8 +34,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ManagedFileSystemTest {
@@ -42,6 +42,8 @@ public class ManagedFileSystemTest {
     private final byte[] content2 = new byte[]{1, 2, 3, 4};
     @Mock
     private CollectionsService collections;
+    @Mock
+    private PermissionsService permissions;
 
     private DatasetJobSupport ds;
     private ManagedFileSystem fs;
@@ -58,7 +60,7 @@ public class ManagedFileSystemTest {
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
 
-        fs = new ManagedFileSystem(ds, store, userIriSupplier, collections, eventBus);
+        fs = new ManagedFileSystem(ds, store, userIriSupplier, collections, eventBus, permissions);
 
         var collection1 = new Collection();
         collection1.setLocation("coll");
@@ -214,6 +216,7 @@ public class ManagedFileSystemTest {
         assertTrue(ds.getDefaultModel().contains(dir, FS.createdBy, user));
         assertTrue(ds.getDefaultModel().contains(dir, FS.modifiedBy, user));
 
+        doNothing().when(permissions).ensureAdmin();
         fs.delete("coll/dir");
         assertTrue(ds.getDefaultModel().contains(dir, FS.deletedBy, user));
     }
@@ -226,6 +229,7 @@ public class ManagedFileSystemTest {
         assertTrue(ds.getDefaultModel().contains(file, FS.createdBy, user));
         assertTrue(ds.getDefaultModel().contains(file, FS.modifiedBy, user));
 
+        doNothing().when(permissions).ensureAdmin();
         fs.delete("coll/file");
         assertEquals(user, file.inModel(ds.getDefaultModel()).getPropertyResourceValue(FS.deletedBy));
     }
@@ -276,7 +280,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir1");
         fs.mkdir("coll/dir1/subdir");
         fs.create("coll/dir1/subdir/file", new ByteArrayInputStream(content1));
-        var oldIri = fs.iri("coll/dir1");
+        doNothing().when(permissions).ensureAdmin();
         fs.move("coll/dir1", "coll/dir2");
         assertFalse(fs.exists("coll/dir1"));
         assertTrue(fs.exists("coll/dir2"));
@@ -288,18 +292,35 @@ public class ManagedFileSystemTest {
         assertTrue(ds.getDefaultModel().contains(createResource(fs.iri("coll/dir2")), RDFS.label, createStringLiteral("dir2")));
     }
 
+    @Test(expected = AccessDeniedException.class)
+    public void moveDirWithoutAdminRole() throws IOException {
+        fs.mkdir("coll/dir1");
+        fs.mkdir("coll/dir1/subdir");
+        doThrow(new io.fairspace.saturn.services.AccessDeniedException()).when(permissions).ensureAdmin();
+        fs.move("coll/dir1", "coll/dir2");
+    }
+
     @Test
     public void moveFile() throws IOException {
         fs.mkdir("coll/dir1");
         fs.create("coll/dir1/file1", new ByteArrayInputStream(content1));
         fs.mkdir("coll/dir2");
-        var oldIri = fs.iri("coll/dir1/file1");
+        doNothing().when(permissions).ensureAdmin();
         fs.move("coll/dir1/file1", "coll/dir2/file2");
         assertFalse(fs.exists("coll/dir1/file1"));
         assertTrue(fs.exists("coll/dir2/file2"));
         var os = new ByteArrayOutputStream();
         fs.read("coll/dir2/file2", os);
         assertArrayEquals(content1, os.toByteArray());
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void moveFileWithoutAdminRole() throws IOException {
+        fs.mkdir("coll/dir1");
+        fs.create("coll/dir1/file1", new ByteArrayInputStream(content1));
+        fs.mkdir("coll/dir2");
+        doThrow(new io.fairspace.saturn.services.AccessDeniedException()).when(permissions).ensureAdmin();
+        fs.move("coll/dir1/file1", "coll/dir2/file2");
     }
 
     @Test(expected = IOException.class)
@@ -313,6 +334,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir/subdir");
         fs.create("coll/dir/file", new ByteArrayInputStream(content1));
 
+        doNothing().when(permissions).ensureAdmin();
         fs.delete("coll/dir");
 
         assertFalse(fs.exists("coll/dir"));
@@ -320,11 +342,19 @@ public class ManagedFileSystemTest {
         assertFalse(fs.exists("coll/dir/file"));
     }
 
+    @Test(expected = AccessDeniedException.class)
+    public void deleteDirectoryWithoutAdminRole() throws IOException {
+        fs.mkdir("coll/dir");
+        doThrow(new io.fairspace.saturn.services.AccessDeniedException()).when(permissions).ensureAdmin();
+        fs.delete("coll/dir");
+    }
+
     @Test
     public void deleteFile() throws IOException {
         fs.mkdir("coll/dir");
         fs.create("coll/dir/file", new ByteArrayInputStream(content1));
 
+        doNothing().when(permissions).ensureAdmin();
         fs.delete("coll/dir/file");
 
         assertFalse(fs.exists("coll/dir/file"));
@@ -333,6 +363,13 @@ public class ManagedFileSystemTest {
 
         assertTrue(fs.exists("coll/dir/file"));
         assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    public void deleteFileWithoutAdminRole() throws IOException {
+        fs.create("coll/file", new ByteArrayInputStream(content1));
+        doThrow(new io.fairspace.saturn.services.AccessDeniedException()).when(permissions).ensureAdmin();
+        fs.delete("coll/file");
     }
 
     @Test(expected = IOException.class)
@@ -348,6 +385,7 @@ public class ManagedFileSystemTest {
 
     @Test(expected = IOException.class)
     public void cannotDeleteANonExistingFile() throws IOException {
+        doNothing().when(permissions).ensureAdmin();
         fs.delete("coll/dir/file");
     }
 

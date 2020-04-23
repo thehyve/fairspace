@@ -14,7 +14,9 @@ import {workspacePrefix} from '../../workspaces/workspaces';
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 
-export const LinkedDataRelationTable = ({property, values, onDelete, onAdd, canAdd, addComponent, editorPath, history}) => {
+export const LinkedDataRelationTable = (
+    {property, values, onDelete, onAdd, canAdd, addComponent, checkValueAddedNotSubmitted, editorPath, history}
+) => {
     // Determine the columns to show. If no important property shapes are defined or a shape is empty, only
     // the URI will be shown
     let columnDefinitions: any[];
@@ -65,6 +67,7 @@ export const LinkedDataRelationTable = ({property, values, onDelete, onAdd, canA
             showHeader={columnDefinitions.length > 1}
             canAdd={canAdd}
             addComponent={addComponent}
+            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
             rowDecorator={rowDecorator}
         />
     );
@@ -73,6 +76,7 @@ export const LinkedDataRelationTable = ({property, values, onDelete, onAdd, canA
 LinkedDataRelationTable.propTypes = {
     onAdd: PropTypes.func,
     onDelete: PropTypes.func,
+    checkValueAddedNotSubmitted: PropTypes.func,
     property: PropTypes.object,
     canAdd: PropTypes.bool,
     editorPath: PropTypes.string

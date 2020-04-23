@@ -47,8 +47,8 @@ export const useFiles = (path, fileApi = FileAPI) => {
             createDirectory,
             deleteMultiple,
             getDownloadLink,
-            renameFile,
             movePaths,
+            renameFile,
             copyPaths
         }
     };

@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.collections;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
@@ -126,6 +127,12 @@ public class CollectionsService {
     }
 
     public void delete(String iri) {
+        try {
+            permissions.ensureAdmin();
+        } catch (AccessDeniedException e) {
+            log.info("Not enough permissions to delete collections, {}", iri);
+            throw new CollectionAccessDeniedException("Insufficient permissions to delete collections.", iri);
+        }
         validateIRI(iri);
         var c = dao.getDataset().calculateWrite(() -> {
             var collection = get(iri);
@@ -133,11 +140,6 @@ public class CollectionsService {
                 log.info("Collection not found {}", iri);
                 throw new CollectionNotFoundException(iri);
             }
-            if (!collection.getAccess().canManage()) {
-                log.info("No enough permissions to delete a collection {}", iri);
-                throw new AccessDeniedException("Insufficient permissions for collection " + iri);
-            }
-
             dao.markAsDeleted(collection);
 
             // Emit event on internal eventbus so the filesystem can act accordingly
@@ -164,8 +166,8 @@ public class CollectionsService {
                 throw new CollectionNotFoundException(patch.getIri().getURI());
             }
             if (!collection.getAccess().canWrite()) {
-                log.info("No enough permissions to modify a collection {}", patch.getIri());
-                throw new AccessDeniedException("Insufficient permissions for collection " + patch.getIri().getURI());
+                log.info("Not enough permissions to modify a collection {}", patch.getIri());
+                throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
             }
 
             var oldLocation = collection.getLocation();
@@ -185,7 +187,7 @@ public class CollectionsService {
             if (patch.getDescription() != null) {
                 collection.setDescription(patch.getDescription());
             }
-            
+
             validate(patch.getOwnerWorkspace() == null || patch.getOwnerWorkspace().equals(collection.getOwnerWorkspace()),
                     "Collection ownership cannot be changed");
 

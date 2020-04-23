@@ -1,9 +1,10 @@
 import React from 'react';
 import {Paper} from "@material-ui/core";
 import {BreadCrumbs, usePageTitleUpdater} from "../../common";
-import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from './index';
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 import useLinkedData from '../UseLinkedData';
+import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
+import LinkedDataEntityHeader from "./LinkedDataEntityHeader";
 
 export default ({title, subject}) => {
     const iri = useNamespacedIri(subject);

@@ -31,6 +31,7 @@ export const DisconnectedFileBrowser = ({
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
 
+    const isWritingEnabled = openedCollection && openedCollection.canWrite;
     const existingFilenames = files ? files.map(file => file.basename) : [];
     const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
 
@@ -86,6 +87,54 @@ export const DisconnectedFileBrowser = ({
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
+    const renderFileOperations = () => (
+        <div style={{marginTop: 8}}>
+            <FileOperations
+                selectedPaths={selection.selected}
+                files={files}
+                openedPath={openedPath}
+                isWritingEnabled={isWritingEnabled}
+                fileActions={fileActions}
+                clearSelection={selection.deselectAll}
+                refreshFiles={refreshFiles}
+            />
+        </div>
+    );
+
+    const renderTabFiles = () => (
+        <div data-testid="files-view">
+            <FileList
+                selectionEnabled
+                files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                onPathCheckboxClick={path => selection.toggle(path.filename)}
+                onPathHighlight={handlePathHighlight}
+                onPathDoubleClick={handlePathDoubleClick}
+                onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
+            />
+            {renderFileOperations()}
+        </div>
+    );
+
+    const renderTabUpload = () => (
+        <div data-testid="upload-view">
+            <UploadList
+                uploads={uploads}
+                enqueue={enqueue}
+            />
+            <div style={{marginTop: 12}}>
+                <Button
+                    data-testid="upload-button"
+                    color="primary"
+                    variant="contained"
+                    disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
+                    onClick={startAll}
+                >
+                    <Play /> Start uploading
+                </Button>
+            </div>
+        </div>
+    );
+
     return (
         <>
             <Tabs
@@ -96,50 +145,11 @@ export const DisconnectedFileBrowser = ({
                 style={{marginBottom: 8}}
             >
                 <Tab value={TAB_FILES} label="Files" />
-                <Tab value={TAB_UPLOAD} label="Upload" data-testid="upload-tab" />
+                {isWritingEnabled && (
+                    <Tab value={TAB_UPLOAD} label="Upload" data-testid="upload-tab" />
+                )}
             </Tabs>
-
-            {(currentTab === TAB_FILES) ? (
-                <div data-testid="files-view">
-                    <FileList
-                        selectionEnabled
-                        files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
-                        onPathCheckboxClick={path => selection.toggle(path.filename)}
-                        onPathHighlight={handlePathHighlight}
-                        onPathDoubleClick={handlePathDoubleClick}
-                        onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
-                    />
-                    <div style={{marginTop: 8}}>
-                        <FileOperations
-                            selectedPaths={selection.selected}
-                            files={files}
-                            openedPath={openedPath}
-                            isWritingDisabled={!openedCollection.canWrite}
-                            fileActions={fileActions}
-                            clearSelection={selection.deselectAll}
-                            refreshFiles={refreshFiles}
-                        />
-                    </div>
-                </div>
-            ) : (
-                <div data-testid="upload-view">
-                    <UploadList
-                        uploads={uploads}
-                        enqueue={enqueue}
-                    />
-                    <div style={{marginTop: 12}}>
-                        <Button
-                            data-testid="upload-button"
-                            color="primary"
-                            variant="contained"
-                            disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
-                            onClick={startAll}
-                        >
-                            <Play /> Start uploading
-                        </Button>
-                    </div>
-                </div>
-            )}
+            {(currentTab === TAB_FILES) ? renderTabFiles() : renderTabUpload()}
         </>
     );
 };

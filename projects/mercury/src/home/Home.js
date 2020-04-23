@@ -5,7 +5,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import {BreadCrumbs, LoadingInlay} from "../common";
+import {BreadCrumbs, LoadingInlay, MessageDisplay} from "../common";
 import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
@@ -50,8 +50,14 @@ export default (props) => {
     if (workspacesLoading) {
         return (<LoadingInlay />);
     }
+    if (!workspace) {
+        return (<MessageDisplay message="Workspace does not exist." />);
+    }
+    if (!workspace.canRead) {
+        return (<MessageDisplay message="You don't have sufficient permissions to access the workspace." />);
+    }
     if (workspacesError || !workspace.iri) {
-        return 'Error loading workspaces';
+        return (<MessageDisplay message="Error loading workspaces" />);
     }
 
     const handleChange = (event, newValue) => {
@@ -80,7 +86,7 @@ export default (props) => {
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <LinkedDataMetadataProvider>
-                    <Collections history={props.history} workspaceIri={workspace.iri}/>
+                    <Collections history={props.history} workspaceIri={workspace.iri} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
         </>

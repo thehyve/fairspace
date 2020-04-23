@@ -1,7 +1,7 @@
 import React from 'react';
 import {useAsync} from '../hooks';
-import CollectionAPI from "../../collections/CollectionAPI";
 import type {Collection, CollectionProperties, Resource} from '../../collections/CollectionAPI';
+import CollectionAPI from "../../collections/CollectionAPI";
 
 const CollectionsContext = React.createContext({});
 
@@ -20,8 +20,8 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 loading,
                 refresh,
                 addCollection,
-                updateCollection,
-                deleteCollection
+                deleteCollection,
+                updateCollection
             }}
         >
             {children}

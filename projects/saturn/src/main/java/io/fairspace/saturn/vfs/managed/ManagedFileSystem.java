@@ -7,6 +7,7 @@ import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
 import io.fairspace.saturn.vfs.FileInfo;
 import io.fairspace.saturn.vocabulary.FS;
@@ -45,12 +46,15 @@ public class ManagedFileSystem extends BaseFileSystem {
     private final DatasetJobSupport dataset;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
+    private final PermissionsService permissions;
 
-    public ManagedFileSystem(DatasetJobSupport dataset, BlobStore store, Supplier<Node> userIriSupplier, CollectionsService collections, EventBus eventBus) {
+    public ManagedFileSystem(DatasetJobSupport dataset, BlobStore store, Supplier<Node> userIriSupplier,
+                             CollectionsService collections, EventBus eventBus, PermissionsService permissions) {
         super(collections);
         this.dataset = dataset;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
+        this.permissions = permissions;
         eventBus.register(this);
     }
 
@@ -218,11 +222,21 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected void doMove(String from, String to) throws IOException {
+        try {
+            permissions.ensureAdmin();
+        } catch (io.fairspace.saturn.services.AccessDeniedException e) {
+            throw new AccessDeniedException(from, to, "Only admins can move files." );
+        }
         copyOrMove(true, from, to);
     }
 
     @Override
     public void doDelete(String path) throws IOException {
+        try {
+            permissions.ensureAdmin();
+        } catch (io.fairspace.saturn.services.AccessDeniedException e) {
+            throw new AccessDeniedException(path, null, "Only admins can delete files." );
+        }
         dataset.executeWrite(() -> {
             var info = stat(path);
             if (info == null) {

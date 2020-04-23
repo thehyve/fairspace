@@ -1,15 +1,6 @@
 // @flow
 import React, {useContext} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    IconButton,
-    List,
-    Menu,
-    MenuItem,
-    Typography
-} from '@material-ui/core';
+import {Card, CardContent, CardHeader, IconButton, List, Menu, MenuItem, Typography} from '@material-ui/core';
 import {CloudDownload, FolderOpen, HighlightOffSharp, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 import LockOpen from "@material-ui/icons/LockOpen";
@@ -30,12 +21,12 @@ import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from '../common/contexts/CollectionsContext';
 import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
-import UsersContext from '../common/contexts/UsersContext';
-import {getDisplayName} from "../common/utils/userUtils";
+import UserContext from '../common/contexts/UserContext';
 import SharingContext, {SharingProvider} from "../common/contexts/SharingContext";
 import {sortPermissions} from "../common/utils/permissionUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
+import {isDataSteward} from "../common/utils/userUtils";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -50,7 +41,7 @@ type CollectionDetailsProps = {
     loading: boolean;
     collection: Collection;
     workspaces: Array<Workspace>;
-    users: any[];
+    currentUser: any;
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
     setBusy: (boolean) => void;
@@ -116,12 +107,6 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
             .finally(() => setBusy(false));
     };
 
-    getUsernameByIri = (iri: string) => {
-        const {users} = this.props;
-        const user = users.find(u => u.iri === iri);
-        return user ? getDisplayName(user) : iri;
-    };
-
     toggleWorkspaceToAdd = (ws) => {
         // eslint-disable-next-line react/no-access-state-in-setstate
         const workspaces = [...this.state.workspacesToAdd];
@@ -132,7 +117,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
             workspaces.splice(idx, 1);
         }
         this.setState({workspacesToAdd: workspaces});
-    }
+    };
 
     render() {
         const {loading, collection, inCollectionsBrowser = false} = this.props;
@@ -166,9 +151,11 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
                                     <MenuItem onClick={this.handleEdit}>
                                         Edit
                                     </MenuItem>
-                                    <MenuItem onClick={this.handleDelete}>
-                                        Delete
-                                    </MenuItem>
+                                    {isDataSteward(this.props.currentUser) && (
+                                        <MenuItem onClick={this.handleDelete}>
+                                            Delete
+                                        </MenuItem>
+                                    )}
                                 </Menu>
                             </>
                         )}
@@ -330,7 +317,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
 
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();
-    const {users} = useContext(UsersContext);
+    const {currentUser} = useContext(UserContext);
     const {deleteCollection} = useContext(CollectionsContext);
     const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
@@ -338,7 +325,7 @@ const ContextualCollectionDetails = (props) => {
         <CollectionDetails
             {...props}
             loading={props.loading || workspacesLoading}
-            users={users}
+            currentUser={currentUser}
             workspaces={workspaces}
             history={history}
             deleteCollection={deleteCollection}

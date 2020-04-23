@@ -124,7 +124,7 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not delete file or directory. Do you have write permissions to the collection?");
+                            throw new Error("Could not delete file or directory. Only admins can delete them.");
                     }
                 }
 
@@ -160,7 +160,7 @@ class FileAPI {
                         case 400:
                             throw new Error("Could not move one or more files. Possibly the filename contains special characters.");
                         case 403:
-                            throw new Error("Could not move one or more files. Do you have write permission to both the source and destination collection?");
+                            throw new Error("Could not move one or more files. Only admins can move files.");
                         case 409:
                             throw new Error("Could not move one or more files. The destination can not be copied to.");
                         case 412:
@@ -202,19 +202,6 @@ class FileAPI {
 
                 return Promise.reject(e);
             });
-    }
-
-    /**
-     * Delete one or more files
-     * @param filenames
-     * @returns {Promise}
-     */
-    deleteMultiple(filenames) {
-        if (!filenames || filenames.length === 0) {
-            return Promise.reject(new Error("No filenames given to delete"));
-        }
-
-        return Promise.all(filenames.map(filename => this.delete(filename)));
     }
 
     /**
@@ -269,6 +256,19 @@ class FileAPI {
                 const destinationFile = joinPaths(destinationDir, destinationFilename);
                 return [sourceFile, destinationFile];
             }));
+    }
+
+    /**
+     * Delete one or more files
+     * @param filenames
+     * @returns {Promise}
+     */
+    deleteMultiple(filenames) {
+        if (!filenames || filenames.length === 0) {
+            return Promise.reject(new Error("No filenames given to delete"));
+        }
+
+        return Promise.all(filenames.map(filename => this.delete(filename)));
     }
 }
 

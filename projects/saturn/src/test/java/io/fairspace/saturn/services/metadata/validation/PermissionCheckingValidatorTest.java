@@ -57,18 +57,33 @@ public class PermissionCheckingValidatorTest {
 
         doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
-        verify(violationHandler).onViolation("Cannot modify read-only resource", STATEMENT.getSubject(), null, null);
+        verify(violationHandler).onViolation("Cannot modify resource", STATEMENT.getSubject(), null, null);
     }
 
     @Test
-    public void itShouldCheckPermissionsForSubject() {
+    public void itShouldCheckPermissionsForAddedSubject() {
         var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
+        verify(permissions).ensureAdminAccess(Set.of());
         verify(permissions).ensureAccess(nodes, Access.Write);
+
+        verifyNoMoreInteractions(permissions);
+    }
+
+    @Test
+    public void itShouldCheckPermissionsForRemovedSubject() {
+        var model = modelOf(STATEMENT);
+        Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
+
+        validator.validate(EMPTY_MODEL, model, model, EMPTY_MODEL, null, violationHandler);
+
+        verifyZeroInteractions(violationHandler);
+        verify(permissions).ensureAdminAccess(nodes);
+        verify(permissions).ensureAccess(Set.of(), Access.Write);
 
         verifyNoMoreInteractions(permissions);
     }

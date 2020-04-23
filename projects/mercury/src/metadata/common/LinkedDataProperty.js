@@ -8,22 +8,14 @@ import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import GenericTooltip from "../../common/components/GenericTooltip";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
+import UserContext from "../../common/contexts/UserContext";
+import {isDataSteward} from "../../common/utils/userUtils";
 
-/**
-     * Checks whether the configuration of this property disallowed editing of existing values
-     * This is the case if
-     *   - the property is machineOnly
-     *   - the field refers to a url (marked as RESOURCE_URI)
-     *   - the value is taken from a set of allowed values
-     * @param property
-     * @returns {Boolean}
-     */
-const disallowEditingOfExistingValues = ({machineOnly, isGenericIriResource, allowedValues}) => machineOnly
-    || isGenericIriResource
-    || allowedValues;
-
-const LinkedDataProperty = ({formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete}) => {
+const LinkedDataProperty = (
+    {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete, checkValueAddedNotSubmitted}
+) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
+    const {currentUser} = useContext(UserContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = validationErrors && validationErrors.length > 0;
@@ -34,9 +26,29 @@ const LinkedDataProperty = ({formEditable = true, property, values = [], validat
     const canAdd = formEditable && property.isEditable && !machineOnly && !maxValuesReached;
     const labelId = `label-${key}`;
 
+    const isSingleValuePropertyWithExistingValue = (
+        maxValuesCount === 1
+            && values.length === 1 && values[0].value !== ""
+            && !checkValueAddedNotSubmitted(property, values[0])
+    );
+
+    // Checks whether the configuration of this property disallowed editing of existing values
+    // This is the case if
+    // - the property is machineOnly
+    // - the field refers to a url (marked as RESOURCE_URI)
+    // - the value is taken from a set of allowed values
+    // - single-value property already has a value and the current user does not have permission to modify existing values
+    const disallowEditingOfExistingValues = (
+        machineOnly
+        || property.isGenericIriResource
+        || property.allowedValues
+        || (!isDataSteward(currentUser) && isSingleValuePropertyWithExistingValue)
+    );
+
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
-    const disableEditing = !formEditable || !property.isEditable || disallowEditingOfExistingValues(property);
+    const disableEditing = !formEditable || !property.isEditable || disallowEditingOfExistingValues;
+
     const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
     const addInputComponent = valueComponentFactory.addComponent(property);
 
@@ -68,6 +80,7 @@ const LinkedDataProperty = ({formEditable = true, property, values = [], validat
                             onDelete={onDelete}
                             addComponent={addInputComponent}
                             editorPath={editorPath}
+                            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                         />
                     ) : (
                         <LinkedDataInputFieldsTable
@@ -81,11 +94,14 @@ const LinkedDataProperty = ({formEditable = true, property, values = [], validat
                             labelId={labelId}
                             editComponent={editInputComponent}
                             addComponent={addInputComponent}
+                            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                         />
                     )
                 }
             </FormGroup>
-            {formEditable && hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null}
+            {formEditable && (
+                hasErrors ? <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText> : null
+            )}
         </FormControl>
     );
 };

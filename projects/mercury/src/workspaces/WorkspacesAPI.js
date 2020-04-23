@@ -12,7 +12,7 @@ export type WorkspacePermissions = {|
 |};
 
 export type WorkspaceProperties = {|
-    iri: string;
+    id: string;
     name?: string;
     description?: string;
     node: string;

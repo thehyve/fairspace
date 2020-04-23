@@ -5,7 +5,7 @@ import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
-import {ConfirmationButton, ErrorDialog} from "../common";
+import {ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";
@@ -13,17 +13,21 @@ import {getParentPath, joinPaths} from "../common/utils/fileUtils";
 import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
+import ConfirmationButton from "../common/components/ConfirmationButton";
+import {UserContext} from "../common/contexts";
+import {isDataSteward} from "../common/utils/userUtils";
 
 export const Operations = {
     PASTE: 'PASTE',
-    RENAME: 'RENAME',
     MKDIR: 'MKDIR',
+    RENAME: 'RENAME',
     DELETE: 'DELETE'
 };
 Object.freeze(Operations);
 
 export const FileOperations = ({
-    isWritingDisabled,
+    isWritingEnabled,
+    currentUser,
     openedPath,
     selectedPaths,
     clearSelection,
@@ -42,7 +46,7 @@ export const FileOperations = ({
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = isWritingDisabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
+    const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
@@ -76,7 +80,8 @@ export const FileOperations = ({
 
         if (clipboard.method === CUT) {
             operation = fileActions.movePaths(clipboard.filenames);
-        } if (clipboard.method === COPY) {
+        }
+        if (clipboard.method === COPY) {
             operation = fileActions.copyPaths(clipboard.filenames);
         }
 
@@ -97,11 +102,6 @@ export const FileOperations = ({
             return true;
         });
 
-    const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
-        .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
-        });
-
     const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
         .catch((err) => {
             ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => handlePathRename(path, newName));
@@ -119,23 +119,30 @@ export const FileOperations = ({
         return children;
     };
 
+    const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
+        .catch((err) => {
+            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
+        });
+
     return (
         <>
             <FileOperationsGroup>
-                <ProgressButton active={activeOperation === Operations.MKDIR}>
-                    <CreateDirectoryButton
-                        onCreate={name => handleCreateDirectory(name)}
-                        disabled={isWritingDisabled || busy}
-                    >
-                        <IconButton
-                            aria-label="Create directory"
-                            title="Create directory"
-                            disabled={isWritingDisabled || busy}
+                {isWritingEnabled && (
+                    <ProgressButton active={activeOperation === Operations.MKDIR}>
+                        <CreateDirectoryButton
+                            onCreate={name => handleCreateDirectory(name)}
+                            disabled={busy}
                         >
-                            <CreateNewFolder />
-                        </IconButton>
-                    </CreateDirectoryButton>
-                </ProgressButton>
+                            <IconButton
+                                aria-label="Create directory"
+                                title="Create directory"
+                                disabled={busy}
+                            >
+                                <CreateNewFolder />
+                            </IconButton>
+                        </CreateDirectoryButton>
+                    </ProgressButton>
+                )}
             </FileOperationsGroup>
             <FileOperationsGroup>
                 <IconButton
@@ -148,39 +155,42 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
-                <ProgressButton active={activeOperation === Operations.RENAME}>
-                    <RenameButton
-                        currentName={selectedItem.basename}
-                        onRename={newName => handlePathRename(selectedItem, newName)}
-                        disabled={isWritingDisabled || isDisabledForMoreThanOneSelection || busy}
-                    >
-                        <IconButton
-                            title={`Rename ${selectedItem.basename}`}
-                            aria-label={`Rename ${selectedItem.basename}`}
-                            disabled={isWritingDisabled || isDisabledForMoreThanOneSelection || busy}
-                        >
-                            <BorderColor />
-                        </IconButton>
-                    </RenameButton>
-                </ProgressButton>
-                <ProgressButton active={activeOperation === Operations.DELETE}>
-                    <ConfirmationButton
-                        message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
-                        agreeButtonText="Remove"
-                        dangerous
-                        onClick={handleDelete}
-                        disabled={noPathSelected || isWritingDisabled || busy}
-                    >
-                        <IconButton
-                            title="Delete"
-                            aria-label="Delete"
-                            disabled={noPathSelected || isWritingDisabled || busy}
-                        >
-                            <Delete />
-                        </IconButton>
-
-                    </ConfirmationButton>
-                </ProgressButton>
+                {isDataSteward(currentUser) && (
+                    <>
+                        <ProgressButton active={activeOperation === Operations.RENAME}>
+                            <RenameButton
+                                currentName={selectedItem.basename}
+                                onRename={newName => handlePathRename(selectedItem, newName)}
+                                disabled={isDisabledForMoreThanOneSelection || busy}
+                            >
+                                <IconButton
+                                    title={`Rename ${selectedItem.basename}`}
+                                    aria-label={`Rename ${selectedItem.basename}`}
+                                    disabled={isDisabledForMoreThanOneSelection || busy}
+                                >
+                                    <BorderColor />
+                                </IconButton>
+                            </RenameButton>
+                        </ProgressButton>
+                        <ProgressButton active={activeOperation === Operations.DELETE}>
+                            <ConfirmationButton
+                                message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
+                                agreeButtonText="Remove"
+                                dangerous
+                                onClick={handleDelete}
+                                disabled={noPathSelected || busy}
+                            >
+                                <IconButton
+                                    title="Delete"
+                                    aria-label="Delete"
+                                    disabled={noPathSelected || busy}
+                                >
+                                    <Delete />
+                                </IconButton>
+                            </ConfirmationButton>
+                        </ProgressButton>
+                    </>
+                )}
             </FileOperationsGroup>
             <FileOperationsGroup>
                 <IconButton
@@ -191,14 +201,16 @@ export const FileOperations = ({
                 >
                     <ContentCopy />
                 </IconButton>
-                <IconButton
-                    aria-label="Cut"
-                    title="Cut"
-                    onClick={e => handleCut(e)}
-                    disabled={isWritingDisabled || noPathSelected || busy}
-                >
-                    <ContentCut />
-                </IconButton>
+                {isDataSteward(currentUser) && (
+                    <IconButton
+                        aria-label="Cut"
+                        title="Cut"
+                        onClick={e => handleCut(e)}
+                        disabled={noPathSelected || busy}
+                    >
+                        <ContentCut />
+                    </IconButton>
+                )}
                 <ProgressButton active={activeOperation === Operations.PASTE}>
                     <IconButton
                         aria-label="Paste"
@@ -216,7 +228,9 @@ export const FileOperations = ({
 
 const ContextualFileOperations = props => {
     const clipboard = useContext(ClipboardContext);
-    return <FileOperations clipboard={clipboard} {...props} />;
+    const {currentUser} = useContext(UserContext);
+
+    return <FileOperations clipboard={clipboard} currentUser={currentUser} {...props} />;
 };
 
 export default ContextualFileOperations;

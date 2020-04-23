@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
 import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, withStyles} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
 import {canDelete} from "../../common/utils/linkeddata/metadataUtils";
 import {STRING_URI} from '../../constants';
+import {UserContext} from "../../common/contexts";
+import {isDataSteward} from "../../common/utils/userUtils";
 
 const styles = {
     buttonColumn: {
@@ -20,7 +22,10 @@ const styles = {
     }
 };
 
-export const LinkedDataValuesTable = ({classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd, showHeader, labelId, addComponent: AddComponent}) => {
+export const LinkedDataValuesTable = (
+    {classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd,
+        showHeader, labelId, checkValueAddedNotSubmitted, currentUser, addComponent: AddComponent}
+) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
     const showRowDividers = property.maxValuesCount !== 1 && !(property.isEditable && property.datatype === STRING_URI);
@@ -30,6 +35,14 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
     const [serialNumber, setSerialNumber] = useState(0);
 
     const incrementSerialNumber = () => setSerialNumber(serialNumber + 1);
+
+    // Delete button is enabled, if both:
+    // - given entry can be deleted for the property specified
+    // - user has a right to perform delete operations or given entry was just added and not submitted yet
+    const isDeleteButtonEnabled = (entry) => (
+        canDelete(property, entry)
+        && (isDataSteward(currentUser) || checkValueAddedNotSubmitted(property, entry))
+    );
 
     return (
         <Table padding="none" className={showRowDividers ? '' : classes.noRowDividers}>
@@ -53,17 +66,24 @@ export const LinkedDataValuesTable = ({classes, property, values, columnDefiniti
                         // eslint-disable-next-line react/no-array-index-key
                         key={idx}
                     >
-                        {columnDefinitions.map(columnDef => <TableCell className={classes.valueColumn} key={columnDef.id}>{columnDef.getValue(entry, idx)}</TableCell>)}
+                        {columnDefinitions.map(columnDef => (
+                            <TableCell className={classes.valueColumn} key={columnDef.id}>
+                                {columnDef.getValue(entry, idx)}
+                            </TableCell>
+                        ))}
                         {
                             property.isEditable
                             && (
                                 <TableCell className={classes.buttonColumn}>{
-                                    canDelete(property, entry)
+                                    isDeleteButtonEnabled(entry)
                                     && (
                                         <IconButton
                                             data-testid="delete-btn"
                                             title="Delete"
-                                            onClick={() => {onDelete(idx); incrementSerialNumber();}}
+                                            onClick={() => {
+                                                onDelete(idx);
+                                                incrementSerialNumber();
+                                            }}
                                             style={{opacity: hoveredIndex === idx ? 1 : 0}}
                                             aria-label="Delete"
                                         >
@@ -109,6 +129,7 @@ LinkedDataValuesTable.propTypes = {
     onAdd: PropTypes.func,
     onDelete: PropTypes.func,
     rowDecorator: PropTypes.func,
+    checkValueAddedNotSubmitted: PropTypes.func,
     showHeader: PropTypes.bool,
     canAdd: PropTypes.bool,
 
@@ -129,6 +150,7 @@ LinkedDataValuesTable.defaultProps = {
     onOpen: () => {},
     onDelete: () => {},
     rowDecorator: (entry, children) => children,
+    checkValueAddedNotSubmitted: () => false,
     showHeader: true,
     canAdd: true,
     columnDefinitions: [],
@@ -136,4 +158,15 @@ LinkedDataValuesTable.defaultProps = {
     values: []
 };
 
-export default withStyles(styles)(LinkedDataValuesTable);
+const ContextualCollectionBrowser = (props) => {
+    const {currentUser} = useContext(UserContext);
+
+    return (
+        <LinkedDataValuesTable
+            {...props}
+            currentUser={currentUser}
+        />
+    );
+};
+
+export default withStyles(styles)(ContextualCollectionBrowser);
