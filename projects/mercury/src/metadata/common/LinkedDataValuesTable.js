@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
 import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, withStyles} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
 import {canDelete} from "../../common/utils/linkeddata/metadataUtils";
 import {STRING_URI} from '../../constants';
+import {UserContext} from "../../common/contexts";
+import {isDataSteward} from "../../common/utils/userUtils";
 
 const styles = {
     buttonColumn: {
@@ -22,7 +24,7 @@ const styles = {
 
 export const LinkedDataValuesTable = (
     {classes, property, values, columnDefinitions, onOpen, onAdd, onDelete, rowDecorator, canAdd,
-        hasRestrictedOperationsRight, showHeader, labelId, checkValueAddedNotSubmitted, addComponent: AddComponent}
+        showHeader, labelId, checkValueAddedNotSubmitted, currentUser, addComponent: AddComponent}
 ) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -39,7 +41,7 @@ export const LinkedDataValuesTable = (
     // - user has a right to perform delete operations or given entry was just added and not submitted yet
     const isDeleteButtonEnabled = (entry) => (
         canDelete(property, entry)
-        && (hasRestrictedOperationsRight || checkValueAddedNotSubmitted(property, entry))
+        && (isDataSteward(currentUser) || checkValueAddedNotSubmitted(property, entry))
     );
 
     return (
@@ -130,7 +132,6 @@ LinkedDataValuesTable.propTypes = {
     checkValueAddedNotSubmitted: PropTypes.func,
     showHeader: PropTypes.bool,
     canAdd: PropTypes.bool,
-    hasRestrictedOperationsRight: PropTypes.bool,
 
     columnDefinitions: PropTypes.arrayOf(
         PropTypes.shape({
@@ -148,8 +149,8 @@ LinkedDataValuesTable.propTypes = {
 LinkedDataValuesTable.defaultProps = {
     onOpen: () => {},
     onDelete: () => {},
-    hasRestrictedOperationsRight: () => {},
     rowDecorator: (entry, children) => children,
+    checkValueAddedNotSubmitted: () => false,
     showHeader: true,
     canAdd: true,
     columnDefinitions: [],
@@ -157,4 +158,15 @@ LinkedDataValuesTable.defaultProps = {
     values: []
 };
 
-export default withStyles(styles)(LinkedDataValuesTable);
+const ContextualCollectionBrowser = (props) => {
+    const {currentUser} = useContext(UserContext);
+
+    return (
+        <LinkedDataValuesTable
+            {...props}
+            currentUser={currentUser}
+        />
+    );
+};
+
+export default withStyles(styles)(ContextualCollectionBrowser);

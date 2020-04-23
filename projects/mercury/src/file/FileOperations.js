@@ -40,8 +40,6 @@ export const FileOperations = ({
     const [activeOperation, setActiveOperation] = useState();
     const busy = !!activeOperation;
 
-    const hasRestrictedOperationsRight = isDataSteward(currentUser);
-
     const noPathSelected = selectedPaths.length === 0;
     const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
@@ -157,7 +155,7 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
-                {hasRestrictedOperationsRight && (
+                {isDataSteward(currentUser) && (
                     <>
                         <ProgressButton active={activeOperation === Operations.RENAME}>
                             <RenameButton
@@ -203,7 +201,7 @@ export const FileOperations = ({
                 >
                     <ContentCopy />
                 </IconButton>
-                {hasRestrictedOperationsRight && (
+                {isDataSteward(currentUser) && (
                     <IconButton
                         aria-label="Cut"
                         title="Cut"

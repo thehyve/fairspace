@@ -57,7 +57,7 @@ describe('LinkedDataValuesTable elements', () => {
             ...defaultProperty,
             isEditable: true
         };
-        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} />);
+        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} currentUser={{admin: true}} />);
         expect(wrapper.find(TableHead).find(TableCell).length).toEqual(1);
         expect(wrapper.find(TableBody).find(TableRow).first().find('[data-testid="delete-btn"]').length).toEqual(1);
     });

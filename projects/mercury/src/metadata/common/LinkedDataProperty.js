@@ -25,7 +25,6 @@ const LinkedDataProperty = (
     const maxValuesReached = (maxValuesCount && (values.length >= maxValuesCount)) || false;
     const canAdd = formEditable && property.isEditable && !machineOnly && !maxValuesReached;
     const labelId = `label-${key}`;
-    const hasRestrictedOperationsRight = isDataSteward(currentUser);
 
     const isSingleValuePropertyWithExistingValue = (
         maxValuesCount === 1
@@ -43,7 +42,7 @@ const LinkedDataProperty = (
         machineOnly
         || property.isGenericIriResource
         || property.allowedValues
-        || (!hasRestrictedOperationsRight && isSingleValuePropertyWithExistingValue)
+        || (!isDataSteward(currentUser) && isSingleValuePropertyWithExistingValue)
     );
 
     // The edit component should not actually allow editing the value if editable is set to false
@@ -82,7 +81,6 @@ const LinkedDataProperty = (
                             addComponent={addInputComponent}
                             editorPath={editorPath}
                             checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
-                            hasRestrictedOperationsRight={hasRestrictedOperationsRight}
                         />
                     ) : (
                         <LinkedDataInputFieldsTable
@@ -97,7 +95,6 @@ const LinkedDataProperty = (
                             editComponent={editInputComponent}
                             addComponent={addInputComponent}
                             checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
-                            hasRestrictedOperationsRight={hasRestrictedOperationsRight}
                         />
                     )
                 }
