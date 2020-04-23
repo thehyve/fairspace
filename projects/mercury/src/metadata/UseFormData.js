@@ -87,10 +87,12 @@ const useFormData = (values, initialProperties = []) => {
     };
 
     const deleteValue = (property, index) => {
-        if (property.isGenericIriResource) {
-            deleteUpdate(property.key);
-        } else if (property.maxValuesCount === 1) {
-            updateValue(property, {value: ''}, index);
+        if (property.maxValuesCount === 1) {
+            if (DEFAULTABLE_DATATYPES.includes(property.datatype)) {
+                updateValue(property, {value: ""}, index);
+            } else {
+                deleteUpdate(property.key);
+            }
         } else {
             const newValue = current(property.key).filter((el, idx) => idx !== index);
             save(property, newValue);
