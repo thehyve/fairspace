@@ -8,20 +8,16 @@ const MarkdownValue = (props) => {
     // or if there is no value yet
     const [showEdit, setShowEdit] = useState(!props.entry.value);
 
-    if (showEdit || !props.entry.value || !props.entry.value.trim()) {
-        return (
-            <BaseInputValue
-                {...props}
-                autoFocus={showEdit && !!props.entry.value}
-                onBlur={() => setShowEdit(false)}
-                type="text"
-            />
-        );
-    }
-
     return (
         <div onClick={() => setShowEdit(true)}>
-            <ReactMarkdown source={props.entry.value} />
+            {showEdit || !props.entry.value || !props.entry.value.trim() ? (
+                <BaseInputValue
+                    {...props}
+                    autoFocus={showEdit && !!props.entry.value}
+                    onBlur={() => setShowEdit(false)}
+                    type="text"
+                />
+            ) : (<ReactMarkdown source={props.entry.value} />)}
         </div>
     );
 };
