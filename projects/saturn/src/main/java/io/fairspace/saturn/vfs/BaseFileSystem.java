@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
@@ -59,7 +61,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     @Override
     public String iri(String path) throws IOException {
-        return collections.getBaseIri() + path;
+        return collections.getBaseIri() + encode(path, UTF_8);
     }
 
     @Override
