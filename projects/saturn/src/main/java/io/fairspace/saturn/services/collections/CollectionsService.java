@@ -19,6 +19,7 @@ import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.dao.DAO.entityFromResource;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+import static io.fairspace.saturn.vfs.PathUtils.encodePath;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -46,7 +47,7 @@ public class CollectionsService {
     public Collection create(Collection collection) {
         validate(collection.getIri() == null, "Field iri must be left empty");
 
-        collection.setIri(createURI(baseIri + collection.getLocation()));
+        collection.setIri(createURI(baseIri + encodePath(collection.getLocation())));
 
         if (isBlank(collection.getConnectionString())) {
             collection.setConnectionString("");
