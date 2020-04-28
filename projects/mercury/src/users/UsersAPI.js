@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
-import {createMetadataIri} from '../common/utils/linkeddata/metadataUtils';
+import {createMetadataIri} from '../metadata/common/metadataUtils';
 
 export type User = {
     iri: string;

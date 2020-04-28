@@ -15,8 +15,8 @@ import {
     isRdfList,
     isRelationShape,
 } from '../vocabularyUtils';
-import vocabularyJsonLd from '../test.vocabulary.json';
-import * as constants from "../../../../constants";
+import vocabularyJsonLd from './test.vocabulary.json';
+import * as constants from "../../../constants";
 import {getFirstPredicateId} from "../jsonLdUtils";
 
 describe('getLabelForPredicate', () => {

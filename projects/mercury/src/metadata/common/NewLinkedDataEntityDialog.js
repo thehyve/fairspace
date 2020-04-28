@@ -11,8 +11,8 @@ import {
 } from "@material-ui/core";
 import {ConfirmationDialog} from '../../common';
 
-import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "../../common/utils/linkeddata/metadataUtils";
-import {getFirstPredicateId, getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";
+import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import * as consts from "../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
 import useFormData from '../UseFormData';
@@ -21,7 +21,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../UseFormSubmission";
 import FormContext from "./FormContext";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import {getPropertiesForNodeShape} from "../../common/utils/linkeddata/vocabularyUtils";
+import {getPropertiesForNodeShape} from "./vocabularyUtils";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');

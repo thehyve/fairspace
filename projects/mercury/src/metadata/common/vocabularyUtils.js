@@ -1,4 +1,4 @@
-import * as constants from "../../../constants";
+import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
 
 const TYPE_PROPERTY = {

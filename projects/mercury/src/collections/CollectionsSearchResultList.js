@@ -15,7 +15,7 @@ import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from '../comm
 import {getParentPath} from '../common/utils/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
-import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';
+import {getLabelForPredicate} from '../metadata/common/vocabularyUtils';
 
 const styles = {
     tableRoot: {

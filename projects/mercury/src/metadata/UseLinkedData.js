@@ -1,9 +1,9 @@
 import {useCallback, useContext, useEffect, useState} from 'react';
 
 import LinkedDataContext from './LinkedDataContext';
-import {fromJsonLd, getJsonLdForSubject} from "../common/utils/linkeddata/jsonLdConverter";
-import {determinePropertyShapesForTypes, getProperties} from '../common/utils/linkeddata/vocabularyUtils';
-import {getTypeInfo} from '../common/utils/linkeddata/metadataUtils';
+import {fromJsonLd, getJsonLdForSubject} from "./common/jsonLdConverter";
+import {determinePropertyShapesForTypes, getProperties} from './common/vocabularyUtils';
+import {getTypeInfo} from './common/metadataUtils';
 
 /**
  * This custom hook is a helper for many Linked Data functions, such as fetching, searching and transforming/parsing metadata.

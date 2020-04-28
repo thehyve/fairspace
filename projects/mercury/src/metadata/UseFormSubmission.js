@@ -3,9 +3,9 @@ import useIsMounted from "react-is-mounted-hook";
 import {ErrorDialog} from "../common";
 
 import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
-import {getNamespacedIri, partitionErrors} from "../common/utils/linkeddata/metadataUtils";
+import {getNamespacedIri, partitionErrors} from "./common/metadataUtils";
 import VocabularyContext from "./VocabularyContext";
-import {getNamespaces} from "../common/utils/linkeddata/vocabularyUtils";
+import {getNamespaces} from "./common/vocabularyUtils";
 
 export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);

@@ -2,11 +2,11 @@ import React, {useContext} from "react";
 
 import Iri from "../common/components/Iri";
 import LinkedDataContext from "./LinkedDataContext";
-import {getLabel} from "../common/utils/linkeddata/metadataUtils";
+import {getLabel} from "./common/metadataUtils";
 import LinkedDataList from "./common/LinkedDataList";
 import LinkedDataLink from "./common/LinkedDataLink";
 import {VOCABULARY_PATH} from "../constants";
-import {determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
+import {determineShapeForTypes} from "./common/vocabularyUtils";
 
 export default ({items, ...otherProps}) => {
     const {shapes} = useContext(LinkedDataContext);

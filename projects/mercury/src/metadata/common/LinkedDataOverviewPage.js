@@ -9,10 +9,10 @@ import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
 import LinkedDataOverviewHeader from "./LinkedDataOverviewHeader";
 import useLinkedDataSearchParams from "../UseLinkedDataSearchParams";
-import {getFirstPredicateId} from "../../common/utils/linkeddata/jsonLdUtils";
+import {getFirstPredicateId} from "./jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
-import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
-import {getClassesInCatalog} from '../../common/utils/linkeddata/vocabularyUtils';
+import {getLabel} from "./metadataUtils";
+import {getClassesInCatalog} from './vocabularyUtils';
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIComponent(id)}`;
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import InputWithAddition from "./values/InputWithAddition";
 import LinkedDataDropdown from "./LinkedDataDropdown";
 import LinkedDataContext from "../LinkedDataContext";
-import {determineShapeForTypes} from '../../common/utils/linkeddata/vocabularyUtils';
+import {determineShapeForTypes} from './vocabularyUtils';
 
 const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => {
     const {shapes, shapesPending, shapesError, requireIdentifier} = useContext(LinkedDataContext);

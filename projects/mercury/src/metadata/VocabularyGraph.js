@@ -11,9 +11,9 @@ import NetworkGraphVisualization, {
     EDGE_LENGTH_SMALL
 } from "../common/components/NetworkGraphVisualization";
 import LinkedDataContext from "./LinkedDataContext";
-import {getFirstPredicateId} from "../common/utils/linkeddata/jsonLdUtils";
+import {getFirstPredicateId} from "./common/jsonLdUtils";
 import {SHACL_CLASS} from "../constants";
-import {determinePropertyShapesForTypes, determineShapeForTypes} from "../common/utils/linkeddata/vocabularyUtils";
+import {determinePropertyShapesForTypes, determineShapeForTypes} from "./common/vocabularyUtils";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIComponent(id)}`;
 

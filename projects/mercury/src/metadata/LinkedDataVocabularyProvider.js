@@ -7,8 +7,8 @@ import {
     getShape,
     getSystemProperties,
     isFixedShape
-} from "../common/utils/linkeddata/vocabularyUtils";
-import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
+} from "./common/vocabularyUtils";
+import {getFirstPredicateValue} from "./common/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";

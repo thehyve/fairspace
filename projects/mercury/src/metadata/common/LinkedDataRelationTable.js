@@ -4,12 +4,12 @@ import {withRouter} from "react-router-dom";
 import {compareBy, joinWithSeparator} from '../../common';
 
 import {SHACL_NAME, SHACL_ORDER, SHACL_PATH, TOOLTIP_ENTER_DELAY} from "../../constants";
-import {getFirstPredicateId, getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";
-import {getLocalPart} from "../../common/utils/linkeddata/metadataUtils";
+import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {getLocalPart} from "./metadataUtils";
 import LinkedDataValuesTable from "./LinkedDataValuesTable";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
-import {isGenericIriResource, isRelationShape} from "../../common/utils/linkeddata/vocabularyUtils";
+import {isGenericIriResource, isRelationShape} from "./vocabularyUtils";
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 

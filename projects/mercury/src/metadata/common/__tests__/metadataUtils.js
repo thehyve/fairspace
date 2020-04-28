@@ -17,7 +17,7 @@ import {
     url2iri,
     valuesContainsValueOrId
 } from "../metadataUtils";
-import * as constants from "../../../../constants";
+import * as constants from "../../../constants";
 import {normalizeJsonLdResource} from "../jsonLdUtils";
 
 describe('Metadata Utils', () => {

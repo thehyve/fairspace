@@ -38,7 +38,7 @@ Most feature folders contain:
 - /permissions
 
 ## Forms
-This could be the most complex area of the project. The main models used to render forms are properties which are the  blueprints of each field, they are plain objects that are built using generatePropertyEntry from [vocabularyUtils](./src/common/utils/linkeddata/vocabularyUtils.js). Properties have some generic attributes such as label, description and datatype, plus some helping attributes that are defined by the 'shape' of the linked data entity, such as minValuesCount, order and machineOnly etc.  
+This could be the most complex area of the project. The main models used to render forms are properties which are the  blueprints of each field, they are plain objects that are built using generatePropertyEntry from [vocabularyUtils](src/metadata/common/vocabularyUtils.js). Properties have some generic attributes such as label, description and datatype, plus some helping attributes that are defined by the 'shape' of the linked data entity, such as minValuesCount, order and machineOnly etc.  
 The values are objects in which each object links to the property by the IRI of the property and the value of the key/IRI is the list of values for this property.
 
 The forms components can be broken down as:

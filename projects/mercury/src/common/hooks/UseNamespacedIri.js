@@ -1,7 +1,7 @@
 import {useContext} from 'react';
-import {getNamespacedIri} from "../utils/linkeddata/metadataUtils";
+import {getNamespacedIri} from "../../metadata/common/metadataUtils";
 import VocabularyContext from '../../metadata/VocabularyContext';
-import {getNamespaces} from '../utils/linkeddata/vocabularyUtils';
+import {getNamespaces} from '../../metadata/common/vocabularyUtils';
 
 export default (iri) => {
     const {vocabulary} = useContext(VocabularyContext);

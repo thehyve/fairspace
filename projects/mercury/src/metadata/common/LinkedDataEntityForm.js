@@ -4,7 +4,7 @@ import {List, ListItem} from '@material-ui/core';
 import {compareBy, comparing, LoadingInlay, MessageDisplay} from '../../common';
 
 import LinkedDataProperty from "./LinkedDataProperty";
-import {hasValue, shouldPropertyBeHidden} from "../../common/utils/linkeddata/metadataUtils";
+import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";
 import {LABEL_URI} from '../../constants';
 
 type PropertyType = {

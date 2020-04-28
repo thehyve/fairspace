@@ -5,7 +5,7 @@ import Add from '@material-ui/icons/Add';
 import {LoadingInlay, MessageDisplay} from '../../../common';
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
-import {normalizeMetadataResource, simplifyUriPredicates} from "../../../common/utils/linkeddata/metadataUtils";
+import {normalizeMetadataResource, simplifyUriPredicates} from "../metadataUtils";
 
 const InputWithAddition = ({
     children, onChange,

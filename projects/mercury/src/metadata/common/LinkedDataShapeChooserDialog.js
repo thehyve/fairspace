@@ -12,8 +12,8 @@ import {
 import * as PropTypes from "prop-types";
 import {compareBy, LoadingInlay} from '../../common';
 
-import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
-import {getFirstPredicateValue} from "../../common/utils/linkeddata/jsonLdUtils";
+import {getLabel} from "./metadataUtils";
+import {getFirstPredicateValue} from "./jsonLdUtils";
 import * as consts from "../../constants";
 
 const LinkedDataShapeChooserDialog = props => {

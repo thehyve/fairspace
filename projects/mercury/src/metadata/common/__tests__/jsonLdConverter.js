@@ -1,4 +1,4 @@
-import * as constants from "../../../../constants";
+import * as constants from "../../../constants";
 import {fromJsonLd, getJsonLdForSubject, normalizeTypes, toJsonLd} from "../jsonLdConverter";
 
 describe('jsonLdConverter', () => {
