@@ -1,8 +1,8 @@
 import React, {useCallback} from "react";
-import {MessageDisplay, useAsync} from '../../common';
+import {MessageDisplay, useAsync} from '../common';
 
-import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
-import FileAPI from "../../file/FileAPI";
+import {LinkedDataEntityFormWithLinkedData} from './common/LinkedDataEntityFormContainer';
+import FileAPI from "../file/FileAPI";
 
 const PathMetadata = ({
     path,
