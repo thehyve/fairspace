@@ -1,16 +1,26 @@
 import React, {useContext} from 'react';
-import {NavLink, withRouter} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Code, FolderOpen, OpenInNew} from "@material-ui/icons";
-import WorkspaceListMenuItem from "./WorkspaceListMenuItem";
+import {Assignment, Code, FolderOpen, OpenInNew, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
 
-const WorkspaceMenu = ({location: {pathname}}) => {
+export default () => {
+    const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     return (
         <>
-            <WorkspaceListMenuItem location={pathname} />
             <List>
+                <ListItem
+                    component={NavLink}
+                    to="/workspaces"
+                    button
+                    selected={pathname === '/workspaces'}
+                >
+                    <ListItemIcon>
+                        <Widgets />
+                    </ListItemIcon>
+                    <ListItemText primary="Workspaces" />
+                </ListItem>
                 <ListItem
                     key="collections"
                     component={NavLink}
@@ -66,5 +76,3 @@ const WorkspaceMenu = ({location: {pathname}}) => {
         </>
     );
 };
-
-export default withRouter(WorkspaceMenu);

@@ -2,7 +2,7 @@ import React from 'react';
 import {VocabularyProvider} from '../metadata/VocabularyContext';
 import {CollectionsProvider} from '../common/contexts/CollectionsContext';
 import {Layout, TopBar, usePageTitleUpdater, UsersProvider} from '../common';
-import WorkspaceMenu from './WorkspaceMenu';
+import WorkspaceMenu from './MainMenu';
 import {currentWorkspace} from '../workspaces/workspaces';
 import WorkspaceRoutes from '../routes/WorkspaceRoutes';
 import {WorkspacesProvider} from "../workspaces/WorkspaceContext";
