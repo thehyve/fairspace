@@ -6,7 +6,7 @@ import WorkspaceOverview from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import FilesPage from "../file/FilesPage";
 import SearchPage from '../search/SearchPage';
-import {createMetadataIri, createVocabularyIri} from "../metadata/common/metadataUtils";
+import {createVocabularyIri} from "../metadata/common/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
