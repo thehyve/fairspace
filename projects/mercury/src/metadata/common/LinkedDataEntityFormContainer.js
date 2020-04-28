@@ -7,7 +7,6 @@ import {ConfirmationDialog} from '../../common';
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from '../UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
-import FormContext from "./FormContext";
 import useFormSubmission from "../UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "../UseLinkedData";
@@ -87,28 +86,26 @@ const LinkedDataEntityFormContainer = ({
     return (
         <Grid container direction="row">
             <Grid item xs={11}>
-                <FormContext.Provider value={{submit: validateAndSubmit}}>
-                    <Grid container>
-                        <Grid item xs={12}>
-                            <LinkedDataEntityForm
-                                {...otherProps}
-                                id={formId}
-                                editable={editingEnabled}
-                                onSubmit={validateAndSubmit}
-                                errorMessage={linkedDataError}
-                                loading={linkedDataLoading}
-                                properties={extendedProperties}
-                                values={valuesWithUpdates}
-                                checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
-                                validationErrors={validationErrors}
-                                onAdd={addValue}
-                                onChange={updateValue}
-                                onDelete={deleteValue}
-                            />
-                        </Grid>
-                        {footer && <Grid item>{footer}</Grid>}
+                <Grid container>
+                    <Grid item xs={12}>
+                        <LinkedDataEntityForm
+                            {...otherProps}
+                            id={formId}
+                            editable={editingEnabled}
+                            onSubmit={validateAndSubmit}
+                            errorMessage={linkedDataError}
+                            loading={linkedDataLoading}
+                            properties={extendedProperties}
+                            values={valuesWithUpdates}
+                            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
+                            validationErrors={validationErrors}
+                            onAdd={addValue}
+                            onChange={updateValue}
+                            onDelete={deleteValue}
+                        />
                     </Grid>
-                </FormContext.Provider>
+                    {footer && <Grid item>{footer}</Grid>}
+                </Grid>
                 {confirmationShown && (
                     <ConfirmationDialog
                         open

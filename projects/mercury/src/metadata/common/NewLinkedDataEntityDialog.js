@@ -19,7 +19,6 @@ import useFormData from '../UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "../UseFormSubmission";
-import FormContext from "./FormContext";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import {getPropertiesForNodeShape} from "./vocabularyUtils";
 
@@ -139,9 +138,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     <Typography variant="subtitle1">{typeDescription}</Typography>
                 </DialogTitle>
                 <DialogContent style={{overflowX: 'hidden'}}>
-                    <FormContext.Provider value={{submit: createEntity}}>
-                        {renderDialogContent()}
-                    </FormContext.Provider>
+                    {renderDialogContent()}
                 </DialogContent>
                 <DialogActions>
                     <Button
