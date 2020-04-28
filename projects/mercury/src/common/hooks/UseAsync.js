@@ -22,7 +22,7 @@ const useAsync = (callback) => {
         .catch((e) => setError(e || true))
         .finally(() => setLoading(false)), [callback]);
 
-    useEffect(() => {refresh();}, [refresh]);
+    useEffect(() => {refresh();}, []);
 
     return {
         data,
