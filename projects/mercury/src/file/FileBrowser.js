@@ -11,7 +11,6 @@ import UploadList from "./UploadList";
 import useUploads from "./UseUploads";
 import {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
 import {useFiles} from "./UseFiles";
-import {workspacePrefix} from "../workspaces/workspaces";
 
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
@@ -62,7 +61,7 @@ export const DisconnectedFileBrowser = ({
 
     const handlePathDoubleClick = (path) => {
         if (path.type === 'directory') {
-            history.push(`${workspacePrefix()}/collections${path.filename}`);
+            history.push(`/collections${path.filename}`);
         } else {
             FileAPI.open(path.filename);
         }

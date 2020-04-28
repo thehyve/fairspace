@@ -3,7 +3,6 @@ import axios from 'axios';
 import {compareBy, comparing} from '../common';
 
 import {generateUniqueFileName, getFileName, joinPaths} from '../common/utils/fileUtils';
-import {workspacePrefix} from "../workspaces/workspaces";
 
 
 // Ensure that the client passes along the credentials
@@ -25,7 +24,7 @@ axios.interceptors.request.use((config) => {
 
 class FileAPI {
     client() {
-        return createClient(`/api/v1${workspacePrefix()}/webdav`);
+        return createClient('/api/v1/webdav');
     }
 
     stat(path) {
@@ -108,7 +107,7 @@ class FileAPI {
     /**
      * It creates a full download like to the path provided
      */
-    getDownloadLink = (path = '') => `/api/v1${workspacePrefix()}/webdav${path}`;
+    getDownloadLink = (path = '') => `/api/v1/webdav${path}`;
 
     /**
      * Deletes the file given by path

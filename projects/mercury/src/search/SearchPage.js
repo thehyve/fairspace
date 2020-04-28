@@ -22,7 +22,7 @@ export const SearchPage = ({classes, items = [], loading, error, history}) => {
         if (type === WORKSPACE_URI) {
             return workspacePrefix(index);
         }
-        return `${workspacePrefix(index)}${METADATA_PATH}?iri=` + encodeURIComponent(id);
+        return `${METADATA_PATH}?iri=${encodeURIComponent(id)}`;
     };
 
     /**
@@ -73,7 +73,7 @@ export const SearchPage = ({classes, items = [], loading, error, history}) => {
                                 <TableCell>
                                     <Link
                                         to={{
-                                            pathname: `${workspacePrefix(item.index)}/vocabulary`,
+                                            pathname: '/vocabulary',
                                             search: "?iri=" + encodeURIComponent(item.type)
                                         }}
                                     >

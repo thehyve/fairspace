@@ -19,7 +19,6 @@ import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from '../common/contexts/CollectionsContext';
-import {workspacePrefix} from '../workspaces/workspaces';
 import type {History} from '../types';
 import UserContext from '../common/contexts/UserContext';
 import SharingContext, {SharingProvider} from "../common/contexts/SharingContext";
@@ -98,7 +97,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
         const {setBusy, deleteCollection, history} = this.props;
         setBusy(true);
         deleteCollection(collection)
-            .then(() => history.push(`${workspacePrefix()}/collections`))
+            .then(() => history.push('/collections'))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",
