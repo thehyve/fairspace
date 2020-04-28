@@ -19,7 +19,7 @@ const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIC
 
 const VocabularyGraph = ({history}) => {
     const {vocabulary, editorPath} = useContext(LinkedDataContext);
-    const {data, error, loading} = useAsync(useCallback(() => VocabularyAPI.graph(), []));
+    const {data, error, loading} = useAsync(() => VocabularyAPI.graph());
     const [showEdgesLabels, setShowEdgesLabels] = useState(false);
     const [edgesLength, setEdgesLength] = useState(EDGE_LENGTH_SMALL);
 
