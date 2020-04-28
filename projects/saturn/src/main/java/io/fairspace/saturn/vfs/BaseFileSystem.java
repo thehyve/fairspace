@@ -2,6 +2,7 @@ package io.fairspace.saturn.vfs;
 
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +11,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
-import static java.net.URLEncoder.encode;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
@@ -61,7 +60,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     @Override
     public String iri(String path) throws IOException {
-        return collections.getBaseIri() + encode(path, UTF_8);
+        return collections.getBaseIri() + URLEncodedUtils.formatSegments(splitPath(path));
     }
 
     @Override
