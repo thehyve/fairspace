@@ -14,18 +14,6 @@ import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
 public abstract class BaseFileSystem implements VirtualFileSystem {
-    // The file system must be compatible with many external systems.
-    // For that reason, we disallow many special characters, as they
-    // may cause problems in certain other systems.
-    // This list is taken from
-    // https://blogs.msdn.microsoft.com/robert_mcmurray/2011/04/27/bad-characters-to-use-in-web-based-filenames/
-    // and is mainly based on characters that should not be in a URI
-    private static final Character[] INVALID_BASENAME_CHARACTERS = {
-            ';', '?', ':', '@',
-            '&', '=', '+', '$', ',',
-            '<', '>', '#', '%', '"',
-            '{', '}', '|', '\\', '^', '[', ']', '`'
-    };
 
     private static final FileInfo ROOT = FileInfo.builder()
             .path("")
@@ -140,15 +128,6 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
         if (isCollection(path)) {
             throw new AccessDeniedException("Use Collections API for operations on collections");
         }
-
-        if (containsInvalidPathName(path)) {
-            throw new InvalidFilenameException("The given path name contains invalid special characters");
-        }
-    }
-
-    static boolean containsInvalidPathName(String path) {
-        return Stream.of(INVALID_BASENAME_CHARACTERS)
-                .anyMatch(character -> path.indexOf(character) > -1);
     }
 
     private static FileInfo fileInfo(Collection collection) {
