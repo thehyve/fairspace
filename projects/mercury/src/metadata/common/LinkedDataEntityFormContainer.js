@@ -5,11 +5,11 @@ import {Edit} from '@material-ui/icons';
 
 import {ConfirmationDialog} from '../../common';
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
-import useFormData from '../UseFormData';
+import useFormData from './UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "../UseFormSubmission";
+import useFormSubmission from "./UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import useLinkedData from "../UseLinkedData";
+import useLinkedData from "./UseLinkedData";
 import {DATE_DELETED_URI} from "../../constants";
 
 const LinkedDataEntityFormContainer = ({

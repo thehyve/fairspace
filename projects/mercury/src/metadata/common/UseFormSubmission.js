@@ -1,11 +1,10 @@
 import {useContext, useState} from "react";
 import useIsMounted from "react-is-mounted-hook";
-import {ErrorDialog} from "../common";
-
-import ValidationErrorsDisplay from './common/ValidationErrorsDisplay';
-import {getNamespacedIri, partitionErrors} from "./common/metadataUtils";
-import VocabularyContext from "./VocabularyContext";
-import {getNamespaces} from "./common/vocabularyUtils";
+import {getNamespacedIri, partitionErrors} from "./metadataUtils";
+import ValidationErrorsDisplay from "./ValidationErrorsDisplay";
+import ErrorDialog from "../../common/components/ErrorDialog";
+import VocabularyContext from "../vocabulary/VocabularyContext";
+import {getNamespaces} from "./vocabularyUtils";
 
 export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);

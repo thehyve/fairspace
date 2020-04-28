@@ -2,7 +2,7 @@ import React from 'react';
 import {Paper} from "@material-ui/core";
 import {BreadCrumbs, usePageTitleUpdater} from "../../common";
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
-import useLinkedData from '../UseLinkedData';
+import useLinkedData from './UseLinkedData';
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import LinkedDataEntityHeader from "./LinkedDataEntityHeader";
 

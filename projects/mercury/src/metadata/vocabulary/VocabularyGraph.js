@@ -3,17 +3,17 @@ import {withRouter} from "react-router-dom";
 import {Checkbox, FormControlLabel, Grid, Radio, RadioGroup} from "@material-ui/core";
 import {uniqBy} from 'lodash';
 
-import {LoadingInlay, MessageDisplay, useAsync} from "../common";
-import {VocabularyAPI} from "./LinkedDataAPI";
+import {LoadingInlay, MessageDisplay, useAsync} from "../../common";
+import {VocabularyAPI} from "../common/LinkedDataAPI";
 import NetworkGraphVisualization, {
     EDGE_LENGTH_LARGE,
     EDGE_LENGTH_MEDIUM,
     EDGE_LENGTH_SMALL
-} from "../common/components/NetworkGraphVisualization";
-import LinkedDataContext from "./LinkedDataContext";
-import {getFirstPredicateId} from "./common/jsonLdUtils";
-import {SHACL_CLASS} from "../constants";
-import {determinePropertyShapesForTypes, determineShapeForTypes} from "./common/vocabularyUtils";
+} from "../../common/components/NetworkGraphVisualization";
+import LinkedDataContext from "../LinkedDataContext";
+import {getFirstPredicateId} from "../common/jsonLdUtils";
+import {SHACL_CLASS} from "../../constants";
+import {determinePropertyShapesForTypes, determineShapeForTypes} from "../common/vocabularyUtils";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIComponent(id)}`;
 

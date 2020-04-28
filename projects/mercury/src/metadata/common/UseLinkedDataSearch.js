@@ -1,7 +1,7 @@
 import {useContext, useState} from 'react';
 
 import useDeepCompareEffect from "use-deep-compare-effect";
-import LinkedDataContext from './LinkedDataContext';
+import LinkedDataContext from '../LinkedDataContext';
 
 const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) => {
     const {shapesLoading, searchLinkedData} = useContext(LinkedDataContext);

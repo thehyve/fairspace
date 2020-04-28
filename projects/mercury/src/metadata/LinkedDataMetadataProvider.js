@@ -5,9 +5,9 @@ import {getFirstPredicateValue} from "./common/jsonLdUtils";
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
-import VocabularyContext from './VocabularyContext';
+import VocabularyContext from './vocabulary/VocabularyContext';
 import {getNamespaces} from './common/vocabularyUtils';
-import {MetadataAPI} from './LinkedDataAPI';
+import {MetadataAPI} from './common/LinkedDataAPI';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);

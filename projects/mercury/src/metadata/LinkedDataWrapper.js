@@ -1,7 +1,7 @@
 import React from 'react';
 import {Assignment, Code} from "@material-ui/icons";
 import {BreadcrumbsContext} from "../common";
-import LinkedDataVocabularyProvider from './LinkedDataVocabularyProvider';
+import LinkedDataVocabularyProvider from './vocabulary/LinkedDataVocabularyProvider';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
 
 export const MetadataWrapper = ({children}) => (

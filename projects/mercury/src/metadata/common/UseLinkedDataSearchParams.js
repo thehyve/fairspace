@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {SEARCH_DEFAULT_SIZE} from "../constants";
+import {SEARCH_DEFAULT_SIZE} from "../../constants";
 
 /**
  * This hook keeps track of the search parameters as provided on

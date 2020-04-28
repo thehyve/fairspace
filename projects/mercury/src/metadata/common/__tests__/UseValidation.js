@@ -1,7 +1,7 @@
 import {act} from 'react-dom/test-utils';
-import {testHook} from "../../common";
+import {testHook} from "../../../common";
 import useValidation from "../UseValidation";
-import {SHACL_MIN_COUNT} from "../../constants";
+import {SHACL_MIN_COUNT} from "../../../constants";
 
 let validation;
 beforeEach(() => {

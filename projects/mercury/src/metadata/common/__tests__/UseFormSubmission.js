@@ -2,7 +2,7 @@ import {renderHook} from "@testing-library/react-hooks";
 import {act} from 'react-test-renderer';
 
 import {useFormSubmission} from "../UseFormSubmission";
-import ValidationErrorsDisplay from '../common/ValidationErrorsDisplay';
+import ValidationErrorsDisplay from '../ValidationErrorsDisplay';
 
 describe('UseFormSubmission', () => {
     it('should call the submit function when the form is submitted', async () => {

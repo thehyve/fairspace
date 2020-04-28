@@ -1,5 +1,5 @@
 import React from "react";
-import useLinkedDataSearch from "../UseLinkedDataSearch";
+import useLinkedDataSearch from "./UseLinkedDataSearch";
 
 export default ({
     selectedTypes,

@@ -1,5 +1,5 @@
 import React from 'react';
-import {VocabularyProvider} from '../metadata/VocabularyContext';
+import {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
 import {CollectionsProvider} from '../common/contexts/CollectionsContext';
 import {Layout, TopBar, usePageTitleUpdater, UsersProvider} from '../common';
 import MainMenu from './MainMenu';

@@ -1,21 +1,21 @@
 import React, {useCallback, useContext, useEffect} from 'react';
 // Utils
-import {isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward} from "../../common/utils/userUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo,
     getNamespaces,
     getShape,
     getSystemProperties,
     isFixedShape
-} from "./common/vocabularyUtils";
-import {getFirstPredicateValue} from "./common/jsonLdUtils";
+} from "../common/vocabularyUtils";
+import {getFirstPredicateValue} from "../common/jsonLdUtils";
 // Other
-import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
-import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../constants";
-import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
+import LinkedDataContext, {searchLinkedData} from '../LinkedDataContext';
+import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
+import valueComponentFactory from "../common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
 import useMetaVocabulary from './UseMetaVocabulary';
-import {UserContext} from "../common/contexts";
+import {UserContext} from "../../common/contexts";
 
 const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps}) => {
     const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = useMetaVocabulary();

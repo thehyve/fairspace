@@ -20,20 +20,20 @@ Most feature folders contain:
   - common (shared components between Vocabulary and Metadata)
     - values (the different form fields, text input, dates, dropdown etc.)
     - [LinkedDataEntityForm](./src/metadata/common/LinkedDataEntityForm.js) This component and its child components are probably the most complex areas in the frontend code. Some refactoring might be required in case there is any expected changes and in order to make the code easier to maintain.
-  - [LinkedDataContext](./src/metadata/LinkedDataContext.js) with 2 providers, [LinkedDataVocabularyProvider](./src/metadata/LinkedDataVocabularyProvider.js) and [LinkedDataMetadataProvider](./src/metadata/LinkedDataMetadataProvider.js)
+  - [LinkedDataContext](./src/metadata/LinkedDataContext.js) with 2 providers, [LinkedDataVocabularyProvider](src/metadata/vocabulary/LinkedDataVocabularyProvider.js) and [LinkedDataMetadataProvider](./src/metadata/LinkedDataMetadataProvider.js)
   - [LinkedDataWrapper](./src/metadata/LinkedDataWrapper.js)
     - 2 Wrappers to provide needed values to either metadata or vocabulary
-  - [UseLinkedData](./src/metadata/UseLinkedData.js)
+  - [UseLinkedData](src/metadata/common/UseLinkedData.js)
     - Fetches the entity whether it's part of the metadata or vocabulary, using the provided subject
-  - [UseFormData](./src/metadata/UseFormData.js)
+  - [UseFormData](src/metadata/common/UseFormData.js)
     - Contains the currently loaded form/entity values, changes, validation state and form operations.
-  - [UseFormSubmission](./src/metadata/UseFormSubmission.js)
+  - [UseFormSubmission](src/metadata/common/UseFormSubmission.js)
     - Submits form changes and handles submission errors
-  - [UseLinkedDataSearch](./src/metadata/UseLinkedDataSearch.js)
+  - [UseLinkedDataSearch](src/metadata/common/UseLinkedDataSearch.js)
     - Logic that handles search concerns
-  - [UseLinkedDataSearchParams](./src/metadata/UseLinkedDataSearchParams.js)
+  - [UseLinkedDataSearchParams](src/metadata/common/UseLinkedDataSearchParams.js)
     - Holds metadata/vocabulary search parameters
-  - [UseMetaVocabulary](./src/metadata/UseMetaVocabulary.js)
+  - [UseMetaVocabulary](src/metadata/vocabulary/UseMetaVocabulary.js)
     - Loads MetaVcabulary, doesn't need to be a context because it's only loaded by the Vocabulary provider.
 - /permissions
 

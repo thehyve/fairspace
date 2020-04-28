@@ -15,10 +15,10 @@ import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUti
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import * as consts from "../../constants";
 import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
-import useFormData from '../UseFormData';
+import useFormData from './UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
 import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "../UseFormSubmission";
+import useFormSubmission from "./UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import {getPropertiesForNodeShape} from "./vocabularyUtils";
 

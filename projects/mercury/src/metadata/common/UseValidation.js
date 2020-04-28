@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {validateValuesAgainstShape} from "./common/validationUtils";
+import {validateValuesAgainstShape} from "./validationUtils";
 
 export const hasValidationError = errors => errors && Array.isArray(errors) && errors.length > 0;
 

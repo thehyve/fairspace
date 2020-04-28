@@ -8,7 +8,7 @@ import {BreadCrumbs, usePageTitleUpdater} from '../../common';
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
 import LinkedDataOverviewHeader from "./LinkedDataOverviewHeader";
-import useLinkedDataSearchParams from "../UseLinkedDataSearchParams";
+import useLinkedDataSearchParams from "./UseLinkedDataSearchParams";
 import {getFirstPredicateId} from "./jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "./metadataUtils";

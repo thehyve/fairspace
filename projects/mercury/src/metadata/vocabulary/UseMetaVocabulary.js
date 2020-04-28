@@ -1,6 +1,6 @@
 import {useCallback, useState} from 'react';
 
-import {MetaVocabularyAPI} from './LinkedDataAPI';
+import {MetaVocabularyAPI} from '../common/LinkedDataAPI';
 
 const UseMetaVocabulary = () => {
     const [metaVocabulary, setMetaVocabulary] = useState([]);

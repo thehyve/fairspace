@@ -10,7 +10,7 @@ import {createMetadataIri, createVocabularyIri} from "../metadata/common/metadat
 import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
-import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
+import VocabularyOverviewPage from "../metadata/vocabulary/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
 import WorkspacePage from "../workspaces/WorkspacePage";

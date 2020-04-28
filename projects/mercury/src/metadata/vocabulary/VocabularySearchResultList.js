@@ -1,12 +1,12 @@
 import React, {useContext} from "react";
 
-import LinkedDataContext from "./LinkedDataContext";
-import {getLabel} from "./common/metadataUtils";
-import LinkedDataList from "./common/LinkedDataList";
-import {getFirstPredicateId} from "./common/jsonLdUtils";
-import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../constants";
-import {determineShapeForTypes} from "./common/vocabularyUtils";
-import LinkedDataLink from "./common/LinkedDataLink";
+import LinkedDataContext from "../LinkedDataContext";
+import {getLabel} from "../common/metadataUtils";
+import LinkedDataList from "../common/LinkedDataList";
+import {getFirstPredicateId} from "../common/jsonLdUtils";
+import {SHACL_TARGET_CLASS, VOCABULARY_PATH} from "../../constants";
+import {determineShapeForTypes} from "../common/vocabularyUtils";
+import LinkedDataLink from "../common/LinkedDataLink";
 
 export default ({items, ...otherProps}) => {
     const {shapes} = useContext(LinkedDataContext);
