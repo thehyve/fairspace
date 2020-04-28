@@ -1,33 +1,14 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 
 import {VocabularyAPI} from '../common/LinkedDataAPI';
 import {getFirstPredicateProperty} from '../common/jsonLdUtils';
 import {SHACL_NAMESPACE, SHACL_PATH, SHACL_TARGET_CLASS} from '../../constants';
+import useAsync from "../../common/hooks/UseAsync";
 
 const VocabularyContext = React.createContext();
 
 export const VocabularyProvider = ({children}) => {
-    const [vocabulary, setVocabulary] = useState([]);
-    const [vocabularyLoading, setVocabularyLoading] = useState(false);
-    const [vocabularyError, setVocabularyError] = useState(false);
-
-    const fetchVocabulary = useCallback(() => {
-        setVocabularyLoading(true);
-        VocabularyAPI.get()
-            .then(data => {
-                setVocabulary(data);
-                setVocabularyLoading(false);
-                setVocabularyError(false);
-            })
-            .catch(() => {
-                setVocabularyError('An error occurred while loading the vocabulary');
-            });
-    }, []);
-
-    useEffect(() => {
-        fetchVocabulary();
-        return function cleanup() {};
-    }, [fetchVocabulary]);
+    const {data: vocabulary = [], loading: vocabularyLoading, error: vocabularyError, refresh: fetchVocabulary} = useAsync(() => VocabularyAPI.get());
 
     const submitVocabularyChanges = (subject, values, metaVocabulary) => VocabularyAPI.updateEntity(subject, values, metaVocabulary);
 
