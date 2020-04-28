@@ -13,7 +13,8 @@ public class PathUtils {
     }
 
     public static String encodePath(String path) {
-        return URLEncodedUtils.formatSegments(splitPath(path));
+        var encodedPath = URLEncodedUtils.formatSegments(splitPath(path));
+        return normalizePath(encodedPath);
     }
 
     public static String[] splitPath(String path) {
