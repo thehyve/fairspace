@@ -2,7 +2,7 @@ import React from 'react';
 import {VocabularyProvider} from '../metadata/VocabularyContext';
 import {CollectionsProvider} from '../common/contexts/CollectionsContext';
 import {Layout, TopBar, usePageTitleUpdater, UsersProvider} from '../common';
-import WorkspaceMenu from './MainMenu';
+import MainMenu from './MainMenu';
 import {currentWorkspace} from '../workspaces/workspaces';
 import WorkspaceRoutes from '../routes/WorkspaceRoutes';
 import {WorkspacesProvider} from "../workspaces/WorkspaceContext";
@@ -19,7 +19,7 @@ const WorkspaceLayout = () => {
                     <CollectionsProvider>
                         <ServicesProvider>
                             <Layout
-                                renderMenu={() => <WorkspaceMenu />}
+                                renderMenu={() => <MainMenu />}
                                 renderMain={() => <WorkspaceRoutes />}
                                 renderTopbar={() => <TopBar title={workspace} />}
                             />
