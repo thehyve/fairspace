@@ -68,12 +68,6 @@ const WorkspaceRoutes = () => (
         />
 
         <Route
-            /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/iri/**"
-            render={({match}) => (<Redirect to={"/metadata?iri=" + encodeURIComponent(createMetadataIri(match.params[0]))} />)}
-        />
-
-        <Route
             path="/vocabulary"
             exact
             render={() => {
