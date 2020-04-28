@@ -33,8 +33,6 @@ Most feature folders contain:
     - Logic that handles search concerns
   - [UseLinkedDataSearchParams](src/metadata/common/UseLinkedDataSearchParams.js)
     - Holds metadata/vocabulary search parameters
-  - [UseMetaVocabulary](src/metadata/vocabulary/UseMetaVocabulary.js)
-    - Loads MetaVcabulary, doesn't need to be a context because it's only loaded by the Vocabulary provider.
 - /permissions
 
 ## Forms

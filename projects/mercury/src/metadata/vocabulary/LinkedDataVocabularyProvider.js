@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect} from 'react';
+import React, {useCallback, useContext} from 'react';
 // Utils
 import {isDataSteward} from "../../common/utils/userUtils";
 import {
@@ -14,15 +14,12 @@ import LinkedDataContext, {searchLinkedData} from '../LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import valueComponentFactory from "../common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
-import useMetaVocabulary from './UseMetaVocabulary';
 import {UserContext} from "../../common/contexts";
+import useAsync from "../../common/hooks/UseAsync";
+import {MetaVocabularyAPI} from "../common/LinkedDataAPI";
 
 const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps}) => {
-    const {metaVocabulary, shapesLoading, shapesError, fetchMetaVocabulary} = useMetaVocabulary();
-
-    useEffect(() => {
-        fetchMetaVocabulary();
-    }, [fetchMetaVocabulary]);
+    const {data: metaVocabulary = [], loading: shapesLoading, error: shapesError} = useAsync(() => MetaVocabularyAPI.get(), []);
 
     const {
         vocabulary, fetchVocabulary, submitVocabularyChanges, createVocabularyEntity, deleteVocabularyEntity
