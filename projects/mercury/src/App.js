@@ -6,7 +6,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import {ErrorDialog} from './common';
 
 import theme from './App.theme';
-import {UploadsProvider} from "./common/contexts/UploadsContext";
+import {UploadsProvider} from "./file/UploadsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';
 import GlobalRoutes from './routes/GlobalRoutes';
 import {LogoutContextProvider} from "./users/LogoutContext";

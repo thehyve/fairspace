@@ -4,7 +4,7 @@ import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import {DisconnectedFileBrowser} from '../FileBrowser';
-import {UploadsProvider} from "../../common/contexts/UploadsContext";
+import {UploadsProvider} from "../UploadsContext";
 
 afterEach(cleanup);
 

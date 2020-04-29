@@ -20,7 +20,7 @@ import {
     UPLOAD_STATUS_FINISHED,
     UPLOAD_STATUS_IN_PROGRESS,
     UPLOAD_STATUS_INITIAL
-} from "../common/contexts/UploadsContext";
+} from "./UploadsContext";
 
 const ROWS_PER_PAGE = [5, 10, 25];
 

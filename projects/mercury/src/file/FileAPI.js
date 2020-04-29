@@ -2,7 +2,7 @@ import {createClient} from "webdav";
 import axios from 'axios';
 import {compareBy, comparing} from '../common';
 
-import {generateUniqueFileName, getFileName, joinPaths} from '../common/utils/fileUtils';
+import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 
 
 // Ensure that the client passes along the credentials

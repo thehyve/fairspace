@@ -6,7 +6,7 @@ import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
-import {getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
+import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 import CollectionsContext from "../collections/CollectionsContext";

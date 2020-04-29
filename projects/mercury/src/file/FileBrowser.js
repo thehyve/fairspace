@@ -9,7 +9,7 @@ import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
 import UploadList from "./UploadList";
 import useUploads from "./UseUploads";
-import {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
+import {UPLOAD_STATUS_INITIAL} from "./UploadsContext";
 import {useFiles} from "./UseFiles";
 
 const TAB_FILES = 'FILES';

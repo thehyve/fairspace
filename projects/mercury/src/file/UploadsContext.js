@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import FileAPI from "../../file/FileAPI";
+import FileAPI from "./FileAPI";
 
 export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';

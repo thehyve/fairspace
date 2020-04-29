@@ -1,4 +1,4 @@
-import {PATH_SEPARATOR} from "../../constants";
+import {PATH_SEPARATOR} from "../constants";
 
 export function splitPathIntoArray(path) {
     return path.split(PATH_SEPARATOR).filter(s => s.length > 0);

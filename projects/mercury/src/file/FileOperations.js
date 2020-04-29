@@ -9,7 +9,7 @@ import {ErrorDialog} from "../common";
 
 import {ProgressButton} from '../common/components';
 import {CreateDirectoryButton, RenameButton} from "./buttons";
-import {getParentPath, joinPaths} from "../common/utils/fileUtils";
+import {getParentPath, joinPaths} from "./fileUtils";
 import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';

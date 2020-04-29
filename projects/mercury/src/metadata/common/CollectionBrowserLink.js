@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 
 import {COLLECTION_URI, COLLECTIONS_PATH, DIRECTORY_URI, FILE_URI} from "../../constants";
 import {hasValue} from "./metadataUtils";
-import {getParentPath} from "../../common/utils/fileUtils";
+import {getParentPath} from "../../file/fileUtils";
 
 const CollectionBrowserLink = ({type, filePath}) => {
     if (![COLLECTION_URI, DIRECTORY_URI, FILE_URI].includes(type)) {

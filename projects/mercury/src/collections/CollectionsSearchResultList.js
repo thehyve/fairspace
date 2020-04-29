@@ -6,7 +6,7 @@ import {
 } from '../common';
 
 import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
-import {getParentPath} from '../common/utils/fileUtils';
+import {getParentPath} from '../file/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
 import {getLabelForPredicate} from '../metadata/common/vocabularyUtils';

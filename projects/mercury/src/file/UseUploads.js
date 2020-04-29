@@ -1,6 +1,6 @@
 import {useContext} from "react";
-import {generateUniqueFileName} from "../common/utils/fileUtils";
-import UploadsContext, {UPLOAD_STATUS_INITIAL} from "../common/contexts/UploadsContext";
+import {generateUniqueFileName} from "./fileUtils";
+import UploadsContext, {UPLOAD_STATUS_INITIAL} from "./UploadsContext";
 
 /**
  * This hook contains logic about uploads for a certain directory.
