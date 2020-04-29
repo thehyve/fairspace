@@ -6,10 +6,10 @@ import styles from './Layout.styles';
 import Footer from './Footer';
 import TopBar from "./TopBar";
 import MenuDrawer from "./MenuDrawer";
-import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../constants";
-import LoadingInlay from "../LoadingInlay";
-import versionInfo from '../../VersionInfo';
-import UserContext from "../../contexts/UserContext";
+import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../common/constants";
+import LoadingInlay from "../common/components/LoadingInlay";
+import versionInfo from '../common/VersionInfo';
+import UserContext from "../common/contexts/UserContext";
 
 const Layout = ({
     classes,

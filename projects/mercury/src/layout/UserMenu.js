@@ -3,9 +3,9 @@ import {Avatar, Button, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popp
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
-import UserContext from "../../contexts/UserContext";
-import LogoutContext from "../../contexts/LogoutContext";
-import {getDisplayName} from "../../utils/userUtils";
+import UserContext from "../common/contexts/UserContext";
+import LogoutContext from "../common/contexts/LogoutContext";
+import {getDisplayName} from "../common/utils/userUtils";
 
 const styles = {
     row: {

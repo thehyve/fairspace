@@ -6,11 +6,6 @@ export {default as ConfirmationDialog} from './components/ConfirmationDialog';
 export {default as ErrorDialog} from './components/ErrorDialog';
 export {default as LoadingInlay} from './components/LoadingInlay';
 export {default as MessageDisplay} from './components/MessageDisplay';
-export {default as Layout} from './components/Layout/Layout';
-export {default as TopBar} from './components/Layout/TopBar';
-export {default as Footer} from './components/Layout/Footer';
-export {default as MenuDrawer} from './components/Layout/MenuDrawer';
-export {default as UserMenu} from './components/Layout/UserMenu';
 
 /** ************************ CONTEXTS ************************* */
 export {default as BreadcrumbsContext} from './contexts/BreadcrumbsContext';
