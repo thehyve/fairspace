@@ -8,7 +8,7 @@
  */
 import ErrorDialog from "../components/ErrorDialog";
 
-const handleAuthError = (status) => {
+export const handleAuthError = (status) => {
     switch (status) {
         case 401:
             ErrorDialog.showError(null, 'Your session has expired. Please log in again.',
@@ -46,21 +46,6 @@ export function handleHttpError(providedMessage) {
         }
     };
 }
-
-/**
- * Error handler for search queries. Handles HTTP statuses 400 and 401 separately
- * @param e
- */
-export const handleSearchError = (e) => {
-    switch (e.status) {
-        case 400: throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
-        case 401:
-        case 403:
-            handleAuthError(e.status);
-            break;
-        default: throw new Error("Error retrieving search results");
-    }
-};
 
 /**
  * This function will extract the data property of the axios response if the content-type in the headers contains 'json'

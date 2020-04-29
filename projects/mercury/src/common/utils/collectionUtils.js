@@ -1,4 +1,4 @@
-import {buildSearchUrl} from "../index";
+import {buildSearchUrl} from "../../search/searchUtils";
 
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 

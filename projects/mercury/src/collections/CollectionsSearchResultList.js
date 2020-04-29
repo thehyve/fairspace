@@ -1,8 +1,6 @@
 import React, {useContext} from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
 import {
-    getSearchQueryFromString,
-    handleSearchError,
     LoadingInlay,
     MessageDisplay,
     SearchAPI,
@@ -17,6 +15,7 @@ import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../const
 import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
 import {getLabelForPredicate} from '../metadata/common/vocabularyUtils';
 import useAsync from "../common/hooks/UseAsync";
+import {getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
 
 const styles = {
     tableRoot: {

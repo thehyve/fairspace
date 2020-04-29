@@ -32,11 +32,11 @@ export {
     compareBy, comparing, stableSort, isNonEmptyValue, formatDateTime
 } from './utils/genericUtils';
 
-export {handleHttpError, extractJsonData, handleSearchError} from './utils/httpUtils';
+export {handleHttpError, extractJsonData} from './utils/httpUtils';
 
 export {testHook} from './utils/testUtils';
 
-export {buildSearchUrl, getSearchQueryFromString} from './utils/searchUtils';
+export {buildSearchUrl, getSearchQueryFromString} from '../search/searchUtils';
 
 /** ************************ OTHER ************************* */
 export {default as logout} from './services/logout';
