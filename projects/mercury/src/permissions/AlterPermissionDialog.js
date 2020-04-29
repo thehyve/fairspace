@@ -168,7 +168,6 @@ export class AlterPermissionDialog extends React.Component {
                                         key={access}
                                         value={access}
                                         control={<Radio />}
-                                        Sparqlq
                                         label={access}
                                     />
                                 ))}
