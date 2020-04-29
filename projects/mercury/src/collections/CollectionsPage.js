@@ -8,7 +8,7 @@ import CollectionBrowser from "./CollectionBrowser";
 import CollectionInformationDrawer from './CollectionInformationDrawer';
 import {useSingleSelection} from "../file/UseSelection";
 import {LoadingOverlay} from "../common/components";
-import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
+import {handleCollectionSearchRedirect} from "./collectionUtils";
 import SearchBar from "../search/SearchBar";
 
 const CollectionsPage = ({history, showBreadCrumbs, workspaceIri}) => {

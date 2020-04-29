@@ -12,7 +12,7 @@ import CollectionBreadcrumbsContextProvider from "../collections/CollectionBread
 import CollectionsContext from "../common/contexts/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
 import {LoadingOverlay} from "../common/components";
-import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
+import {handleCollectionSearchRedirect} from "../collections/collectionUtils";
 import SearchBar from "../search/SearchBar";
 
 export const FilesPage = ({

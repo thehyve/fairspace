@@ -4,7 +4,7 @@ import Button from "@material-ui/core/Button";
 import {LoadingInlay, MessageDisplay} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
-import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
+import {getCollectionAbsolutePath} from './collectionUtils';
 import CollectionsContext from "../common/contexts/CollectionsContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import UserContext from "../users/UserContext";
