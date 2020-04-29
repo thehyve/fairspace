@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {mount} from "enzyme";
 import {act} from "@testing-library/react";
-import UsersContext from "../../users/UserContext";
+import UsersContext from "../../users/UsersContext";
 import PermissionContext, {PermissionProvider} from "../PermissionContext";
 
 const defaultPermissions = [
