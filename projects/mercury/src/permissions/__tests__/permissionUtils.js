@@ -1,4 +1,4 @@
-import {canAlterPermission, sortPermissions} from "../../../permissions/permissionUtils";
+import {canAlterPermission, sortPermissions} from "../permissionUtils";
 
 describe('permissionUtils', () => {
     describe('sortPermissions', () => {
