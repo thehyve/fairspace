@@ -13,7 +13,7 @@ type WorkspaceDetailsProps = {
     workspace: Workspace;
 };
 
-export const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
+const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
     const {loading, workspace} = props;
 
     if (loading) {

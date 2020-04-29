@@ -18,7 +18,7 @@ type WorkspaceBrowserProps = {
     toggleWorkspace: () => {}
 }
 
-export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
+const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
     const {loading, error, workspaces, history, createWorkspace, refreshWorkspaces, toggleWorkspace, isSelected} = props;
     const [creatingWorkspace, setCreatingWorkspace] = useState(false);
     const [loadingCreatedWorkspace, setLoadingCreatedWorkspace] = useState(false);

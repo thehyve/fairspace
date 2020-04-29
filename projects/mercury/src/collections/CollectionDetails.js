@@ -53,7 +53,7 @@ type CollectionDetailsState = {
     anchorEl: any;
 }
 
-export class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
+class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
         inCollectionsBrowser: false,
         setBusy: () => {}

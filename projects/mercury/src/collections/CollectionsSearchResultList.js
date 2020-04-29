@@ -35,7 +35,7 @@ const styles = {
 
 const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
-export const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
+const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
     const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {
             case COLLECTION_URI:

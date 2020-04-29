@@ -9,7 +9,7 @@ import WorkspaceContext from "./WorkspaceContext";
 import WorkspaceDetails from "./WorkspaceDetails";
 
 
-export const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWorkspaceExists}) => {
+const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWorkspaceExists}) => {
     if (!workspace) {
         return atLeastSingleWorkspaceExists
             && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
