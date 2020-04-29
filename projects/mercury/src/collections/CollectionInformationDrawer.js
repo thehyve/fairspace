@@ -7,7 +7,7 @@ import {withRouter} from 'react-router-dom';
 import styles from '../common/components/InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
 import PathMetadata from "../metadata/PathMetadata";
-import CollectionsContext from "../common/contexts/CollectionsContext";
+import CollectionsContext from "./CollectionsContext";
 import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
 import type {Collection} from './CollectionAPI';
 import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";

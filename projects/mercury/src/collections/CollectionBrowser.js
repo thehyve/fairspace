@@ -5,7 +5,7 @@ import {LoadingInlay, MessageDisplay} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from './collectionUtils';
-import CollectionsContext from "../common/contexts/CollectionsContext";
+import CollectionsContext from "./CollectionsContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import UserContext from "../users/UserContext";
 import UsersContext from "../users/UsersContext";

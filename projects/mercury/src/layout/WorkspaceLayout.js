@@ -1,6 +1,6 @@
 import React from 'react';
 import {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
-import {CollectionsProvider} from '../common/contexts/CollectionsContext';
+import {CollectionsProvider} from '../collections/CollectionsContext';
 import {usePageTitleUpdater} from '../common';
 import MainMenu from './MainMenu';
 import {currentWorkspace} from '../workspaces/workspaces';

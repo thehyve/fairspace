@@ -10,7 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import {ErrorDialog} from '../common';
 import type {Collection, CollectionProperties} from './CollectionAPI';
-import CollectionsContext from '../common/contexts/CollectionsContext';
+import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath} from './collectionUtils';
 import type {Match, History} from '../types';
 

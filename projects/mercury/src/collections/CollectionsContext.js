@@ -1,7 +1,7 @@
 import React from 'react';
-import {useAsync} from '../hooks';
-import type {Collection, CollectionProperties, Resource} from '../../collections/CollectionAPI';
-import CollectionAPI from "../../collections/CollectionAPI";
+import {useAsync} from '../common/hooks';
+import type {Collection, CollectionProperties, Resource} from './CollectionAPI';
+import CollectionAPI from "./CollectionAPI";
 
 const CollectionsContext = React.createContext({});
 

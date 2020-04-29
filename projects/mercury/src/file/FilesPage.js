@@ -9,7 +9,7 @@ import CollectionInformationDrawer from '../collections/CollectionInformationDra
 import {getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
-import CollectionsContext from "../common/contexts/CollectionsContext";
+import CollectionsContext from "../collections/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
 import {LoadingOverlay} from "../common/components";
 import {handleCollectionSearchRedirect} from "../collections/collectionUtils";

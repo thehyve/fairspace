@@ -18,7 +18,7 @@ import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from 
 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
-import CollectionsContext from '../common/contexts/CollectionsContext';
+import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
 import UserContext from '../users/UserContext';
 import SharingContext, {SharingProvider} from "../permissions/SharingContext";

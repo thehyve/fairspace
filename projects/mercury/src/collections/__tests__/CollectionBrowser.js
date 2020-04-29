@@ -3,7 +3,7 @@ import {mount, shallow} from "enzyme";
 import {MemoryRouter} from "react-router-dom";
 import {LoadingInlay, MessageDisplay} from '../../common';
 
-import CollectionsContext from "../../common/contexts/CollectionsContext";
+import CollectionsContext from "../CollectionsContext";
 import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
 
 let collectionBrowser;
