@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {List, ListItem} from '@material-ui/core';
-import {compareBy, comparing, LoadingInlay, MessageDisplay} from '../../common';
 
 import LinkedDataProperty from "./LinkedDataProperty";
 import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";
 import {LABEL_URI} from '../../constants';
+import LoadingInlay from "../../common/components/LoadingInlay";
+import MessageDisplay from "../../common/components/MessageDisplay";
+import {compareBy, comparing} from "../../common/utils/genericUtils";
 
 type PropertyType = {
     key: string;

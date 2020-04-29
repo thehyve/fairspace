@@ -3,7 +3,7 @@ import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {ErrorDialog} from './common';
+import ErrorDialog from './common/components/ErrorDialog';
 
 import theme from './App.theme';
 import {UploadsProvider} from "./file/UploadsContext";

@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 import axios from 'axios';
-import {extractJsonData, handleHttpError} from '../common';
+import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 const permissionsUrl = '/api/v1/permissions/';
 

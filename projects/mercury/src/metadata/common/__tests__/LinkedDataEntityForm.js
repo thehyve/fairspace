@@ -1,7 +1,7 @@
 import React from 'react';
 import {shallow} from "enzyme";
 import {List} from '@material-ui/core';
-import {MessageDisplay} from '../../../common';
+import MessageDisplay from '../../../common/components/MessageDisplay';
 
 import LinkedDataEntityForm from "../LinkedDataEntityForm";
 import {STRING_URI} from "../../../constants";

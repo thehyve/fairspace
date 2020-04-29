@@ -2,11 +2,13 @@ import React, {useState} from 'react';
 import {Button, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Menu} from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
 import MoreIcon from '@material-ui/icons/MoreVert';
-import {ConfirmationDialog, LoadingInlay, MessageDisplay} from '../common';
 
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import {canAlterPermission, sortPermissions} from './permissionUtils';
 import LoadingOverlay from "../common/components/LoadingOverlay";
+import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
 
 const PermissionsViewer = ({
     permissions, error, loading, altering, iri,

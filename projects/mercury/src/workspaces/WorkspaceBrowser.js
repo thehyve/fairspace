@@ -2,7 +2,6 @@
 import React, {useContext, useState} from 'react';
 import Button from "@material-ui/core/Button";
 import {useHistory, withRouter} from "react-router-dom";
-import {ErrorDialog, LoadingInlay, MessageDisplay} from '../common';
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
 import type {Workspace} from './WorkspacesAPI';
@@ -10,6 +9,9 @@ import WorkspaceEditor from './WorkspaceEditor';
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UsersContext from "../users/UsersContext";
+import ErrorDialog from "../common/components/ErrorDialog";
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
 
 
 type WorkspaceBrowserProps = {

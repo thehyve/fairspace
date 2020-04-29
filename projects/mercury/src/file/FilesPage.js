@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import queryString from "query-string";
-import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
@@ -11,9 +10,11 @@ import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 import CollectionsContext from "../collections/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
-import {LoadingOverlay} from "../common/components";
+import LoadingOverlay from "../common/components/LoadingOverlay";
 import {handleCollectionSearchRedirect} from "../collections/collectionUtils";
 import SearchBar from "../search/SearchBar";
+import BreadCrumbs from "../common/components/BreadCrumbs";
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater"
 
 export const FilesPage = ({
     match,

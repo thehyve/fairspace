@@ -5,7 +5,7 @@ import useLinkedData from './UseLinkedData';
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
 import LinkedDataEntityHeader from "./LinkedDataEntityHeader";
 import BreadCrumbs from "../../common/components/BreadCrumbs";
-import {usePageTitleUpdater} from "../../common";
+import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 
 export default ({title, subject}) => {
     const iri = useNamespacedIri(subject);

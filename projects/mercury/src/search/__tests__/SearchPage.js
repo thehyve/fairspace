@@ -2,7 +2,7 @@ import React from 'react';
 import {TableBody, TableRow} from '@material-ui/core';
 import {mount, shallow} from 'enzyme';
 import {act} from 'react-dom/test-utils';
-import {MessageDisplay} from '../../common';
+import MessageDisplay from '../../common/components/MessageDisplay';
 import {SearchPage, SearchPageContainer} from '../SearchPage';
 
 describe('<SearchPage />', () => {

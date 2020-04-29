@@ -1,6 +1,6 @@
 import React from 'react';
 import {Assignment, Code} from "@material-ui/icons";
-import {BreadcrumbsContext} from "../common";
+import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import LinkedDataVocabularyProvider from './vocabulary/LinkedDataVocabularyProvider';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
 

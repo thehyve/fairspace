@@ -1,4 +1,4 @@
-import {isNonEmptyValue} from '../../common';
+import {isNonEmptyValue} from '../../common/utils/genericUtils';
 
 import {getFirstPredicateValue} from "./jsonLdUtils";
 import * as constants from "../../constants";

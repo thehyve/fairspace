@@ -1,7 +1,7 @@
 import {useState} from "react";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import useValidation from "./UseValidation";
-import {first} from "../../common/utils";
+import {first} from "../../common/utils/genericUtils";
 import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from "../../constants";
 
 const DEFAULTABLE_DATATYPES = [STRING_URI, INTEGER_URI, DECIMAL_URI, LONG_URI, MARKDOWN_URI];

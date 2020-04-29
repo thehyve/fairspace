@@ -11,11 +11,13 @@ import {
     TableSortLabel,
 } from "@material-ui/core";
 import {Lock} from "@material-ui/icons";
-import {MessageDisplay, usePagination, useSorting} from '../common';
 
 import type {Workspace} from './WorkspacesAPI';
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
+import MessageDisplay from "../common/components/MessageDisplay";
+import useSorting from "../common/hooks/UseSorting";
+import usePagination from "../common/hooks/UsePagination";
 
 type Accessible = {
     hasAccess: boolean

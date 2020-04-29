@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {getUsers} from './UsersAPI';
-import {useAsync} from "../common";
+import useAsync from "../common/hooks/UseAsync";
 
 const UsersContext = React.createContext({});
 

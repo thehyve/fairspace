@@ -1,9 +1,5 @@
 import React, {useContext} from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
-import {
-    LoadingInlay,
-    MessageDisplay
-} from '../common';
 
 import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
 import {getParentPath} from '../file/fileUtils';
@@ -15,6 +11,8 @@ import {getSearchQueryFromString, handleSearchError} from "../search/searchUtils
 import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
 import SearchResultHighlights from "../search/SearchResultHighlights";
 import SearchBar from "../search/SearchBar";
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
 
 const styles = {
     tableRoot: {

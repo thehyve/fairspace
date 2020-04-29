@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid, IconButton} from "@material-ui/core";
 import {Edit} from '@material-ui/icons';
 
-import {ConfirmationDialog} from '../../common';
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from './UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
@@ -11,6 +10,7 @@ import useFormSubmission from "./UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "./UseLinkedData";
 import {DATE_DELETED_URI} from "../../constants";
+import ConfirmationDialog from "../../common/components/ConfirmationDialog";
 
 const LinkedDataEntityFormContainer = ({
     subject, hasEditRight = true, showEditButtons = false, fullpage = false,

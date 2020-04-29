@@ -2,11 +2,12 @@ import React, {useContext, useState} from 'react';
 import {IconButton} from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
 import useIsMounted from "react-is-mounted-hook";
-import {ConfirmationButton, ErrorDialog} from "../../common";
-import {ProgressButton} from '../../common/components';
 import LinkedDataContext from "../LinkedDataContext";
 import UserContext from "../../users/UserContext";
 import {isDataSteward} from "../../users/userUtils";
+import ErrorDialog from "../../common/components/ErrorDialog";
+import ProgressButton from "../../common/components/ProgressButton";
+import ConfirmationButton from "../../common/components/ConfirmationButton";
 
 const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
     const {deleteLinkedDataEntity} = useContext(LinkedDataContext);

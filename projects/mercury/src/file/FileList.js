@@ -15,9 +15,11 @@ import {
 } from "@material-ui/core";
 import {FolderOpen, NoteOutlined} from "@material-ui/icons";
 import filesize from 'filesize';
-import {compareBy, formatDateTime, stableSort, usePagination, useSorting} from '../common';
 
 import styles from './FileList.styles';
+import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
+import useSorting from "../common/hooks/UseSorting";
+import usePagination from "../common/hooks/UsePagination";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,

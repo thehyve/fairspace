@@ -1,7 +1,7 @@
 import React from 'react';
 import WorkspaceDialog from "./WorkspaceDialog";
 import {useFormField} from "../common/hooks/UseFormField";
-import {LoadingOverlay} from "../common/components";
+import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 

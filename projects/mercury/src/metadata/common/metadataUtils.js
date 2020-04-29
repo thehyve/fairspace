@@ -3,7 +3,7 @@ import _, {mapValues} from 'lodash';
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
 import {determineShapeForTypes} from './vocabularyUtils';
-import {isNonEmptyValue} from "../../common/utils";
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 /**
  * Returns the local part of the given uri

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
-import {compareBy, joinWithSeparator} from '../../common';
 
 import {SHACL_NAME, SHACL_ORDER, SHACL_PATH, TOOLTIP_ENTER_DELAY} from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
@@ -10,6 +9,7 @@ import LinkedDataValuesTable from "./LinkedDataValuesTable";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
 import {isGenericIriResource, isRelationShape} from "./vocabularyUtils";
+import {compareBy, joinWithSeparator} from "../../common/utils/genericUtils";
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry['@id']};
 

@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import Grid from '@material-ui/core/Grid';
-import {usePageTitleUpdater} from "../common";
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import * as consts from '../constants';
 import {useSingleSelection} from "../file/UseSelection";
-import {LoadingOverlay} from "../common/components";
+import LoadingOverlay from "../common/components/LoadingOverlay";
 import WorkspaceBrowser from "./WorkspaceBrowser";
 import WorkspaceInformationDrawer from "./WorkspaceInformationDrawer";
 

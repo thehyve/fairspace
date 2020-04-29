@@ -2,7 +2,7 @@ import * as constants from "../../constants";
 import {getFirstPredicateId, normalizeJsonLdResource} from "./jsonLdUtils";
 import {determineShapeForProperty, isRdfList} from "./vocabularyUtils";
 import {simplifyUriPredicates} from "./metadataUtils";
-import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../common/utils";
+import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 /**
  * Generates an entry to describe a single value for a property

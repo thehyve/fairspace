@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import {extractJsonData, handleHttpError} from '../common';
+import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 
 const collectionsUrl = "/api/v1/collections/";

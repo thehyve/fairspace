@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import {handleAuthError} from "../common/utils";
+import {handleAuthError} from "../common/utils/httpUtils";
 
 /**
  * Builds a search URL with the given query

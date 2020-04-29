@@ -1,7 +1,6 @@
 import React, {useContext, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import {LoadingInlay, MessageDisplay} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from './collectionUtils';
@@ -9,6 +8,8 @@ import CollectionsContext from "./CollectionsContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import UserContext from "../users/UserContext";
 import UsersContext from "../users/UsersContext";
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
 
 export const CollectionBrowser = ({
     loading = false,

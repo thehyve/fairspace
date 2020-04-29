@@ -1,12 +1,13 @@
 import React from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
 import {Link} from "react-router-dom";
-import {LoadingInlay, MessageDisplay} from '../common';
 import {workspacePrefix} from "../workspaces/workspaces";
 import crossWorkspacesSearchAPI from "./CrossWorkspacesSearchAPI";
 import {METADATA_PATH, WORKSPACE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
 import {getSearchQueryFromString, handleSearchError} from "./searchUtils";
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
 
 const styles = {
     tableRoot: {

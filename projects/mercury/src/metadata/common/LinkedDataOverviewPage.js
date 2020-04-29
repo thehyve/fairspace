@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {Grid, Switch} from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {BreadCrumbs, usePageTitleUpdater} from '../../common';
+import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
@@ -13,6 +13,7 @@ import {getFirstPredicateId} from "./jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "./metadataUtils";
 import {getClassesInCatalog} from './vocabularyUtils';
+import BreadCrumbs from "../../common/components/BreadCrumbs";
 
 const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIComponent(id)}`;
 

@@ -10,12 +10,15 @@ import {
     TableSortLabel,
     withStyles,
 } from "@material-ui/core";
-import {formatDateTime, MessageDisplay, usePagination, useSorting} from '../common';
 
 import styles from './CollectionList.styles';
 import {getDisplayName} from "../users/userUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
+import {formatDateTime} from "../common/utils/genericUtils";
+import useSorting from "../common/hooks/UseSorting";
+import usePagination from "../common/hooks/UsePagination";
 
 const columns = {
     name: {

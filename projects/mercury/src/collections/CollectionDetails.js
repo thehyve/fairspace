@@ -14,7 +14,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
@@ -26,6 +25,10 @@ import {sortPermissions} from "../permissions/permissionUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import {isDataSteward} from "../users/userUtils";
+import ErrorDialog from "../common/components/ErrorDialog";
+import LoadingInlay from "../common/components/LoadingInlay";
+import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import ConfirmationButton from "../common/components/ConfirmationButton";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,

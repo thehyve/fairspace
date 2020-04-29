@@ -13,7 +13,6 @@ import {
 import {CloudUpload} from "@material-ui/icons";
 import Dropzone from "react-dropzone";
 import filesize from "filesize";
-import {usePagination} from '../common';
 
 import {
     UPLOAD_STATUS_ERROR,
@@ -21,6 +20,7 @@ import {
     UPLOAD_STATUS_IN_PROGRESS,
     UPLOAD_STATUS_INITIAL
 } from "./UploadsContext";
+import usePagination from "../common/hooks/UsePagination";
 
 const ROWS_PER_PAGE = [5, 10, 25];
 

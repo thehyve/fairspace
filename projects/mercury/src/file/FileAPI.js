@@ -1,6 +1,6 @@
 import {createClient} from "webdav";
 import axios from 'axios';
-import {compareBy, comparing} from '../common';
+import {compareBy, comparing} from '../common/utils/genericUtils';
 
 import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 

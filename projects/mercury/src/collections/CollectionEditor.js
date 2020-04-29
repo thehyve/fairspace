@@ -8,11 +8,11 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import {ErrorDialog} from '../common';
 import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath} from './collectionUtils';
 import type {Match, History} from '../types';
+import ErrorDialog from "../common/components/ErrorDialog";
 
 
 const fields = ['name', 'description', 'location', 'connectionString', 'ownerWorkspace'];

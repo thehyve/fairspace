@@ -9,7 +9,6 @@ import {
     DialogTitle,
     Typography
 } from "@material-ui/core";
-import {ConfirmationDialog} from '../../common';
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
@@ -21,6 +20,7 @@ import LinkedDataContext from "../LinkedDataContext";
 import useFormSubmission from "./UseFormSubmission";
 import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import {getPropertiesForNodeShape} from "./vocabularyUtils";
+import ConfirmationDialog from "../../common/components/ConfirmationDialog";
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
