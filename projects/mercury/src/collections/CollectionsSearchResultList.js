@@ -2,11 +2,7 @@ import React, {useContext} from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
 import {
     LoadingInlay,
-    MessageDisplay,
-    SearchAPI,
-    SearchBar,
-    SearchResultHighlights,
-    SORT_DATE_CREATED
+    MessageDisplay
 } from '../common';
 
 import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from '../common/utils/collectionUtils';
@@ -16,6 +12,9 @@ import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/Voca
 import {getLabelForPredicate} from '../metadata/common/vocabularyUtils';
 import useAsync from "../common/hooks/UseAsync";
 import {getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
+import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
+import SearchResultHighlights from "../search/SearchResultHighlights";
+import SearchBar from "../search/SearchBar";
 
 const styles = {
     tableRoot: {

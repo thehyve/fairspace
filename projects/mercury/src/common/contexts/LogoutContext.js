@@ -1,6 +1,6 @@
 import React from 'react';
 
-import onLogout from "../services/logout";
+import onLogout from "../../routes/logout";
 
 const LogoutContext = React.createContext(() => {});
 

@@ -11,8 +11,6 @@ export {default as TopBar} from './components/Layout/TopBar';
 export {default as Footer} from './components/Layout/Footer';
 export {default as MenuDrawer} from './components/Layout/MenuDrawer';
 export {default as UserMenu} from './components/Layout/UserMenu';
-export {default as SearchBar} from './components/search/SearchBar';
-export {default as SearchResultHighlights} from './components/search/SearchResultHighlights';
 
 /** ************************ CONTEXTS ************************* */
 export {default as BreadcrumbsContext} from './contexts/BreadcrumbsContext';
@@ -36,11 +34,6 @@ export {handleHttpError, extractJsonData} from './utils/httpUtils';
 
 export {testHook} from './utils/testUtils';
 
-export {buildSearchUrl, getSearchQueryFromString} from '../search/searchUtils';
-
 /** ************************ OTHER ************************* */
-export {default as logout} from './services/logout';
-export {SORT_DATE_CREATED, SORT_ALPHABETICALLY} from './services/SearchAPI';
-export {default as SearchAPI} from './services/SearchAPI';
 
 export {default as VersionInfo} from './VersionInfo';

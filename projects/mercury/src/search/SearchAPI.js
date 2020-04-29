@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import elasticsearch from "elasticsearch";
 
-import {SEARCH_DEFAULT_SIZE} from '../constants';
+import {SEARCH_DEFAULT_SIZE} from '../common/constants';
 
 const SORT_SCORE = ["_score"];
 

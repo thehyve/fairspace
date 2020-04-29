@@ -1,8 +1,8 @@
 import React from 'react';
-import {SearchAPI, SORT_DATE_CREATED} from '../common';
 
 import StringValue from "./common/values/StringValue";
 import {handleSearchError} from "../search/searchUtils";
+import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
 
 const LinkedDataContext = React.createContext({
     valueComponentFactory: {

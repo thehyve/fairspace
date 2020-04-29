@@ -1,4 +1,4 @@
-import {logoutUser} from "../../users/UsersAPI";
+import {logoutUser} from "../users/UsersAPI";
 
 export default function logout() {
     const navigateToRoot = () => {window.location.href = '/';};

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import Grid from '@material-ui/core/Grid';
-import {BreadCrumbs, ConfirmationDialog, SearchBar, usePageTitleUpdater} from "../common";
+import {BreadCrumbs, ConfirmationDialog, usePageTitleUpdater} from "../common";
 
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
@@ -9,6 +9,7 @@ import CollectionInformationDrawer from './CollectionInformationDrawer';
 import {useSingleSelection} from "../file/UseSelection";
 import {LoadingOverlay} from "../common/components";
 import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
+import SearchBar from "../search/SearchBar";
 
 const CollectionsPage = ({history, showBreadCrumbs, workspaceIri}) => {
     usePageTitleUpdater("Collections");

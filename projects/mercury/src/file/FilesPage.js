@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import queryString from "query-string";
-import {BreadCrumbs, SearchBar, usePageTitleUpdater} from "../common";
+import {BreadCrumbs, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
@@ -13,6 +13,7 @@ import CollectionsContext from "../common/contexts/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
 import {LoadingOverlay} from "../common/components";
 import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
+import SearchBar from "../search/SearchBar";
 
 export const FilesPage = ({
     match,

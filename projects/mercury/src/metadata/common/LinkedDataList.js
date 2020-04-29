@@ -11,12 +11,13 @@ import {
     TableRow,
     withStyles,
 } from "@material-ui/core";
-import {LoadingInlay, MessageDisplay, SearchResultHighlights} from '../../common';
+import {LoadingInlay, MessageDisplay} from '../../common';
 
 import styles from './LinkedDataList.styles';
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
+import SearchResultHighlights from "../../search/SearchResultHighlights";
 
 const ROWS_PER_PAGE = [5, 10, 25];
 

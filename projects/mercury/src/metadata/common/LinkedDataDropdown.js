@@ -1,6 +1,6 @@
 import React, {useContext, useRef} from 'react';
 import {PropTypes} from 'prop-types';
-import {LoadingInlay, MessageDisplay, SearchAPI, SORT_ALPHABETICALLY} from '../../common';
+import {LoadingInlay, MessageDisplay} from '../../common';
 
 import {valuesContainsValueOrId} from "./metadataUtils";
 import Dropdown from './values/Dropdown';
@@ -8,6 +8,7 @@ import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
 import LinkedDataContext from "../LinkedDataContext";
 import {getDescendants} from './vocabularyUtils';
 import {handleSearchError} from "../../search/searchUtils";
+import SearchAPI, {SORT_ALPHABETICALLY} from "../../search/SearchAPI";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);

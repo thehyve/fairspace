@@ -1,8 +1,9 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import {SearchBar, TopBar} from "../common";
+import {TopBar} from "../common";
 import {CROSS_WORKSPACES_SEARCH_PATH} from "../constants";
 import {buildSearchUrl, getSearchQueryFromString} from "../search/searchUtils";
+import SearchBar from "../search/SearchBar";
 
 const WorkspaceListTopBar = ({location, history}) => {
     const searchQuery = getSearchQueryFromString(location.search);
