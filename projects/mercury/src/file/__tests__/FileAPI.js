@@ -125,9 +125,4 @@ describe('FileAPI', () => {
                 .rejects.toThrow(/already exists/);
         });
     });
-
-    it('Generates proper download link', () => {
-        const downloadLink = FileAPI.getDownloadLink('/filePath');
-        expect(downloadLink).toEqual('/api/v1/webdav/filePath');
-    });
 });
