@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React from "react";
 import {MessageDisplay, useAsync} from '../common';
 
 import {LinkedDataEntityFormWithLinkedData} from './common/LinkedDataEntityFormContainer';
@@ -8,9 +8,7 @@ const PathMetadata = ({
     path,
     ...otherProps
 }) => {
-    const {data, error, loading} = useAsync(useCallback(
-        () => FileAPI.stat(path), [path]
-    ));
+    const {data, error, loading} = useAsync(() => FileAPI.stat(path), [path]);
 
     if (error) {
         return (<MessageDisplay message="An error occurred while determining metadata subject" />);
