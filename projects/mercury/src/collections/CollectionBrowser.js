@@ -1,12 +1,14 @@
 import React, {useContext, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import {LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
+import {LoadingInlay, MessageDisplay} from '../common';
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from '../common/utils/collectionUtils';
 import CollectionsContext from "../common/contexts/CollectionsContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
+import UserContext from "../users/UserContext";
+import UsersContext from "../users/UsersContext";
 
 export const CollectionBrowser = ({
     loading = false,

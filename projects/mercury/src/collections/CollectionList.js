@@ -13,7 +13,7 @@ import {
 import {formatDateTime, MessageDisplay, usePagination, useSorting} from '../common';
 
 import styles from './CollectionList.styles';
-import {getDisplayName} from "../common/utils/userUtils";
+import {getDisplayName} from "../users/userUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import LoadingInlay from "../common/components/LoadingInlay";
 

@@ -1,6 +1,6 @@
 import React, {useCallback, useContext} from 'react';
 // Utils
-import {isDataSteward} from "../../common/utils/userUtils";
+import {isDataSteward} from "../../users/userUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo,
     getNamespaces,
@@ -14,9 +14,9 @@ import LinkedDataContext, {searchLinkedData} from '../LinkedDataContext';
 import {USABLE_IN_VOCABULARY_URI, VOCABULARY_PATH} from "../../constants";
 import valueComponentFactory from "../common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './VocabularyContext';
-import {UserContext} from "../../common/contexts";
 import useAsync from "../../common/hooks/UseAsync";
 import {MetaVocabularyAPI} from "../common/LinkedDataAPI";
+import UserContext from "../../users/UserContext";
 
 const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps}) => {
     const {data: metaVocabulary = [], loading: shapesLoading, error: shapesError} = useAsync(() => MetaVocabularyAPI.get(), []);

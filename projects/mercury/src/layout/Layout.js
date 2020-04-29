@@ -9,7 +9,7 @@ import MenuDrawer from "./MenuDrawer";
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../common/constants";
 import LoadingInlay from "../common/components/LoadingInlay";
 import versionInfo from '../common/VersionInfo';
-import UserContext from "../common/contexts/UserContext";
+import UserContext from "../users/UserContext";
 
 const Layout = ({
     classes,

@@ -5,8 +5,8 @@ import ClearIcon from '@material-ui/icons/Clear';
 
 import {canDelete} from "./metadataUtils";
 import {STRING_URI} from '../../constants';
-import {UserContext} from "../../common/contexts";
-import {isDataSteward} from "../../common/utils/userUtils";
+import {isDataSteward} from "../../users/userUtils";
+import UserContext from "../../users/UserContext";
 
 const styles = {
     buttonColumn: {

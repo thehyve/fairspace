@@ -14,8 +14,8 @@ import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
 import ConfirmationButton from "../common/components/ConfirmationButton";
-import {UserContext} from "../common/contexts";
-import {isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward} from "../users/userUtils";
+import UserContext from "../users/UserContext";
 
 export const Operations = {
     PASTE: 'PASTE',

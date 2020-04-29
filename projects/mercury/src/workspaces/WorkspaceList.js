@@ -14,8 +14,8 @@ import {Lock} from "@material-ui/icons";
 import {MessageDisplay, usePagination, useSorting} from '../common';
 
 import type {Workspace} from './WorkspacesAPI';
-import {UserContext} from "../common/contexts";
-import {isAdmin} from "../common/utils/userUtils";
+import {isAdmin} from "../users/userUtils";
+import UserContext from "../users/UserContext";
 
 type Accessible = {
     hasAccess: boolean

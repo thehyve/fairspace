@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {mount} from "enzyme";
 import {MemoryRouter} from "react-router-dom";
 
-import UserContext from "../../common/contexts/UserContext";
+import UserContext from "../../users/UserContext";
 import Layout from "../Layout";
 import MenuDrawer from "../MenuDrawer";
 

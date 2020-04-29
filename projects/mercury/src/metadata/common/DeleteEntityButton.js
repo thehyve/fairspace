@@ -5,8 +5,8 @@ import useIsMounted from "react-is-mounted-hook";
 import {ConfirmationButton, ErrorDialog} from "../../common";
 import {ProgressButton} from '../../common/components';
 import LinkedDataContext from "../LinkedDataContext";
-import UserContext from "../../common/contexts/UserContext";
-import {isDataSteward} from "../../common/utils/userUtils";
+import UserContext from "../../users/UserContext";
+import {isDataSteward} from "../../users/userUtils";
 
 const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
     const {deleteLinkedDataEntity} = useContext(LinkedDataContext);

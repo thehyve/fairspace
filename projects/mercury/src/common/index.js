@@ -9,9 +9,6 @@ export {default as MessageDisplay} from './components/MessageDisplay';
 
 /** ************************ CONTEXTS ************************* */
 export {default as BreadcrumbsContext} from './contexts/BreadcrumbsContext';
-export {default as UserContext, UserProvider} from './contexts/UserContext';
-export {default as UsersContext, UsersProvider} from './contexts/UsersContext';
-export {default as LogoutContext, LogoutContextProvider} from './contexts/LogoutContext';
 
 /** ************************ HOOKS ************************* */
 export {default as useAsync} from './hooks/UseAsync';

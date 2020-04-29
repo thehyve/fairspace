@@ -1,4 +1,4 @@
-import {getDisplayName} from "../userUtils";
+import {getDisplayName} from "../../../users/userUtils";
 
 describe('usersUtils', () => {
     const mockUser = {

@@ -20,12 +20,12 @@ import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from '../common/contexts/CollectionsContext';
 import type {History} from '../types';
-import UserContext from '../common/contexts/UserContext';
+import UserContext from '../users/UserContext';
 import SharingContext, {SharingProvider} from "../common/contexts/SharingContext";
 import {sortPermissions} from "../common/utils/permissionUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import {isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward} from "../users/userUtils";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,

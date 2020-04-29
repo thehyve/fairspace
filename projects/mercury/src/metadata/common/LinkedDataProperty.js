@@ -8,8 +8,8 @@ import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import GenericTooltip from "../../common/components/GenericTooltip";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
-import UserContext from "../../common/contexts/UserContext";
-import {isDataSteward} from "../../common/utils/userUtils";
+import UserContext from "../../users/UserContext";
+import {isDataSteward} from "../../users/userUtils";
 
 const LinkedDataProperty = (
     {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete, checkValueAddedNotSubmitted}

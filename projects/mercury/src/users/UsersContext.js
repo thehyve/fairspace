@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {getUsers} from '../../users/UsersAPI';
-import {useAsync} from "../index";
+import {getUsers} from './UsersAPI';
+import {useAsync} from "../common";
 
 const UsersContext = React.createContext({});
 
