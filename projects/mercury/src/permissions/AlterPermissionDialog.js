@@ -12,7 +12,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
-import {AccessRights} from "../common/utils/permissionUtils";
+import {AccessRights} from "./permissionUtils";
 import UserSelect from "./UserSelect";
 
 export const styles = {

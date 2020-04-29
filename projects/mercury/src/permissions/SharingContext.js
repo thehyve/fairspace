@@ -1,8 +1,8 @@
 import React, {useContext, useState} from 'react';
 
-import PermissionAPI from "../../permissions/PermissionAPI";
-import WorkspaceContext from "../../workspaces/WorkspaceContext";
-import useAsync from "../hooks/UseAsync";
+import PermissionAPI from "./PermissionAPI";
+import WorkspaceContext from "../workspaces/WorkspaceContext";
+import useAsync from "../common/hooks/UseAsync";
 
 const SharingContext = React.createContext({});
 

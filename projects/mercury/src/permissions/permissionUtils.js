@@ -1,4 +1,4 @@
-import {compareBy, comparing} from "..";
+import {compareBy, comparing} from "../common";
 
 export const AccessRights = ['Read', 'Write', 'Manage'];
 

@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 
-import PermissionContext from "../common/contexts/PermissionContext";
+import PermissionContext from "./PermissionContext";
 import PermissionsViewer from "./PermissionsViewer";
 import UserContext from "../users/UserContext";
 import UsersContext from "../users/UsersContext";

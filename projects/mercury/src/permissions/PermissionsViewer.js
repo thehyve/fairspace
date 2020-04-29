@@ -5,7 +5,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import {ConfirmationDialog, LoadingInlay, MessageDisplay} from '../common';
 
 import AlterPermissionContainer from "./AlterPermissionContainer";
-import {canAlterPermission, sortPermissions} from '../common/utils/permissionUtils';
+import {canAlterPermission, sortPermissions} from './permissionUtils';
 import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const PermissionsViewer = ({

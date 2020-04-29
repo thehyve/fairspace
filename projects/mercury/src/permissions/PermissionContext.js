@@ -1,9 +1,9 @@
 import React, {useContext, useState} from 'react';
 
-import PermissionAPI from "../../permissions/PermissionAPI";
-import {getDisplayName, getEmail} from "../../users/userUtils";
-import useAsync from "../hooks/UseAsync";
-import UsersContext from "../../users/UsersContext";
+import PermissionAPI from "./PermissionAPI";
+import {getDisplayName, getEmail} from "../users/userUtils";
+import useAsync from "../common/hooks/UseAsync";
+import UsersContext from "../users/UsersContext";
 
 const PermissionContext = React.createContext({});
 
