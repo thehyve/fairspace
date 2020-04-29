@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
 import {Link} from "react-router-dom";
 import {getSearchQueryFromString, handleSearchError, LoadingInlay, MessageDisplay} from '../common';
 import {workspacePrefix} from "../workspaces/workspaces";
 import crossWorkspacesSearchAPI from "./CrossWorkspacesSearchAPI";
 import {METADATA_PATH, WORKSPACE_URI} from "../constants";
+import useAsync from "../common/hooks/UseAsync";
 
 const styles = {
     tableRoot: {
@@ -93,25 +94,11 @@ export const SearchPageContainer = ({
     location: {search}, query = getSearchQueryFromString(search),
     classes, history, searchFunction = crossWorkspacesSearchAPI.search
 }) => {
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
-
-    useEffect(() => {
-        setLoading(true);
-        searchFunction(({query}))
-            .catch(handleSearchError)
-            .then(data => {
-                setItems(data);
-                setError(undefined);
-            })
-            .catch((e) => setError(e || true))
-            .finally(() => setLoading(false));
-    }, [search, query, searchFunction]);
+    const {data, loading, error} = useAsync(() => searchFunction(({query})).catch(handleSearchError), [search, query, searchFunction]);
 
     return (
         <SearchPage
-            items={items}
+            items={data}
             loading={loading}
             error={error}
             classes={classes}
