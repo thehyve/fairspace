@@ -1,10 +1,9 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import {Layout} from '../common';
 import {WorkspacesProvider} from '../workspaces/WorkspaceContext';
 import WorkspaceListTopBar from "./WorkspaceListTopBar";
-import WorkspaceListMenuItem from "./WorkspaceListMenuItem";
 import SearchPage from "../search/SearchPage";
+import Layout from "./Layout";
 
 
 const WorkspaceListSearchLayout = ({location, history}) => (

@@ -14,19 +14,21 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import {ConfirmationButton, ConfirmationDialog, ErrorDialog, LoadingInlay} from '../common';
 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
-import CollectionsContext from '../common/contexts/CollectionsContext';
-import {workspacePrefix} from '../workspaces/workspaces';
+import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
-import UserContext from '../common/contexts/UserContext';
-import SharingContext, {SharingProvider} from "../common/contexts/SharingContext";
-import {sortPermissions} from "../common/utils/permissionUtils";
+import UserContext from '../users/UserContext';
+import SharingContext, {SharingProvider} from "../permissions/SharingContext";
+import {sortPermissions} from "../permissions/permissionUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import {isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward} from "../users/userUtils";
+import ErrorDialog from "../common/components/ErrorDialog";
+import LoadingInlay from "../common/components/LoadingInlay";
+import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import ConfirmationButton from "../common/components/ConfirmationButton";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -54,7 +56,7 @@ type CollectionDetailsState = {
     anchorEl: any;
 }
 
-export class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
+class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
         inCollectionsBrowser: false,
         setBusy: () => {}
@@ -98,7 +100,7 @@ export class CollectionDetails extends React.Component<CollectionDetailsProps, C
         const {setBusy, deleteCollection, history} = this.props;
         setBusy(true);
         deleteCollection(collection)
-            .then(() => history.push(`${workspacePrefix()}/collections`))
+            .then(() => history.push('/collections'))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",

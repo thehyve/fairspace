@@ -3,7 +3,7 @@ import {Paper} from '@material-ui/core';
 
 import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';
-import useLinkedData from '../metadata/UseLinkedData';
+import useLinkedData from '../metadata/common/UseLinkedData';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 
 const WorkspaceInfoWithProvider = (props) => (

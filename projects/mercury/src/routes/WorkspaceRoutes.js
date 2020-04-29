@@ -6,11 +6,11 @@ import WorkspaceOverview from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import FilesPage from "../file/FilesPage";
 import SearchPage from '../search/SearchPage';
-import {createMetadataIri, createVocabularyIri} from "../common/utils/linkeddata/metadataUtils";
+import {createVocabularyIri} from "../metadata/common/metadataUtils";
 import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
-import VocabularyOverviewPage from "../metadata/VocabularyOverviewPage";
+import VocabularyOverviewPage from "../metadata/vocabulary/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
 import WorkspacePage from "../workspaces/WorkspacePage";
@@ -65,12 +65,6 @@ const WorkspaceRoutes = () => (
                     </MetadataWrapper>
                 );
             }}
-        />
-
-        <Route
-            /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/iri/**"
-            render={({match}) => (<Redirect to={"/metadata?iri=" + encodeURIComponent(createMetadataIri(match.params[0]))} />)}
         />
 
         <Route

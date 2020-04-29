@@ -2,12 +2,16 @@
 import React, {useContext, useState} from 'react';
 import Button from "@material-ui/core/Button";
 import {useHistory, withRouter} from "react-router-dom";
-import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext, UsersContext} from '../common';
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
 import type {Workspace} from './WorkspacesAPI';
 import WorkspaceEditor from './WorkspaceEditor';
-import {isAdmin} from "../common/utils/userUtils";
+import {isAdmin} from "../users/userUtils";
+import UserContext from "../users/UserContext";
+import UsersContext from "../users/UsersContext";
+import ErrorDialog from "../common/components/ErrorDialog";
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
 
 
 type WorkspaceBrowserProps = {
@@ -18,7 +22,7 @@ type WorkspaceBrowserProps = {
     toggleWorkspace: () => {}
 }
 
-export const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
+const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
     const {loading, error, workspaces, history, createWorkspace, refreshWorkspaces, toggleWorkspace, isSelected} = props;
     const [creatingWorkspace, setCreatingWorkspace] = useState(false);
     const [loadingCreatedWorkspace, setLoadingCreatedWorkspace] = useState(false);

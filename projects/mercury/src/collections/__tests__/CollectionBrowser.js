@@ -1,10 +1,11 @@
 import React from 'react';
 import {mount, shallow} from "enzyme";
 import {MemoryRouter} from "react-router-dom";
-import {LoadingInlay, MessageDisplay} from '../../common';
 
-import CollectionsContext from "../../common/contexts/CollectionsContext";
+import CollectionsContext from "../CollectionsContext";
 import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
+import MessageDisplay from "../../common/components/MessageDisplay";
+import LoadingInlay from "../../common/components/LoadingInlay";
 
 let collectionBrowser;
 

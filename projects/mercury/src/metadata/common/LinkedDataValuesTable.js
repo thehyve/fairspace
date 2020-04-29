@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, withStyles} from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
 
-import {canDelete} from "../../common/utils/linkeddata/metadataUtils";
+import {canDelete} from "./metadataUtils";
 import {STRING_URI} from '../../constants';
-import {UserContext} from "../../common/contexts";
-import {isDataSteward} from "../../common/utils/userUtils";
+import {isDataSteward} from "../../users/userUtils";
+import UserContext from "../../users/UserContext";
 
 const styles = {
     buttonColumn: {

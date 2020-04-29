@@ -1,5 +1,5 @@
 import axios from "axios";
-import {extractJsonData, handleHttpError} from "../common";
+import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 
 const crossWorkspacesSearchUrl = "/api/v1/search/_all";
 

@@ -1,12 +1,11 @@
 import React from 'react';
 import {Assignment, Code} from "@material-ui/icons";
-import {BreadcrumbsContext} from "../common";
-import LinkedDataVocabularyProvider from './LinkedDataVocabularyProvider';
+import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
+import LinkedDataVocabularyProvider from './vocabulary/LinkedDataVocabularyProvider';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
-import {workspacePrefix} from "../workspaces/workspaces";
 
 export const MetadataWrapper = ({children}) => (
-    <BreadcrumbsContext.Provider value={{segments: [{label: 'Metadata', href: `${workspacePrefix()}/metadata`, icon: <Assignment />}]}}>
+    <BreadcrumbsContext.Provider value={{segments: [{label: 'Metadata', href: '/metadata', icon: <Assignment />}]}}>
         <LinkedDataMetadataProvider>
             {children}
         </LinkedDataMetadataProvider>
@@ -14,7 +13,7 @@ export const MetadataWrapper = ({children}) => (
 );
 
 export const VocabularyWrapper = ({children}) => (
-    <BreadcrumbsContext.Provider value={{segments: [{label: 'Vocabulary', href: `${workspacePrefix()}/vocabulary`, icon: <Code />}]}}>
+    <BreadcrumbsContext.Provider value={{segments: [{label: 'Vocabulary', href: '/vocabulary', icon: <Code />}]}}>
         <LinkedDataVocabularyProvider>
             {children}
         </LinkedDataVocabularyProvider>

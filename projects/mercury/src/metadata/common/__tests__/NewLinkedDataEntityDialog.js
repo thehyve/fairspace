@@ -6,7 +6,7 @@ import {MemoryRouter} from "react-router-dom";
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LinkedDataContext from '../../LinkedDataContext';
-import VocabularyContext from '../../VocabularyContext';
+import VocabularyContext from '../../vocabulary/VocabularyContext';
 
 const shape = {
     "@type": [

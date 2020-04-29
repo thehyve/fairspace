@@ -1,15 +1,12 @@
-import {useCallback} from "react";
-import {useAsync} from "../common";
 import FileAPI from "./FileAPI";
-import {joinPaths} from "../common/utils/fileUtils";
+import {joinPaths} from "./fileUtils";
+import useAsync from "../common/hooks/UseAsync";
 
 /**
  * This hook contains logic about files for a certain directory.
  */
 export const useFiles = (path, fileApi = FileAPI) => {
-    const {loading, error, data = [], refresh} = useAsync(useCallback(
-        () => fileApi.list(path), [path, fileApi]
-    ));
+    const {loading, error, data = [], refresh} = useAsync(() => fileApi.list(path), [path, fileApi]);
 
     const {getDownloadLink} = fileApi;
 

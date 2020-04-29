@@ -1,8 +1,9 @@
 import React, {useContext} from "react";
-import {UserContext, UsersContext} from '../common';
 
-import PermissionContext from "../common/contexts/PermissionContext";
+import PermissionContext from "./PermissionContext";
 import PermissionsViewer from "./PermissionsViewer";
+import UserContext from "../users/UserContext";
+import UsersContext from "../users/UsersContext";
 
 export default ({iri, canManage}) => {
     const {permissions, loading: permissionsLoading, error: permissionsError, alterPermission, altering} = useContext(PermissionContext);

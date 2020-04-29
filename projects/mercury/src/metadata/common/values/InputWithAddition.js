@@ -2,10 +2,11 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Grid, IconButton} from "@material-ui/core";
 import Add from '@material-ui/icons/Add';
-import {LoadingInlay, MessageDisplay} from '../../../common';
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
-import {normalizeMetadataResource, simplifyUriPredicates} from "../../../common/utils/linkeddata/metadataUtils";
+import {normalizeMetadataResource, simplifyUriPredicates} from "../metadataUtils";
+import LoadingInlay from "../../../common/components/LoadingInlay";
+import MessageDisplay from "../../../common/components/MessageDisplay";
 
 const InputWithAddition = ({
     children, onChange,

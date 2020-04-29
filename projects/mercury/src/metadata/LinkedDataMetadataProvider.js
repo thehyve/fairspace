@@ -1,13 +1,13 @@
 import React, {useCallback, useContext} from 'react';
 // Utils
-import {getFirstPredicateValue} from "../common/utils/linkeddata/jsonLdUtils";
+import {getFirstPredicateValue} from "./common/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
 import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
-import VocabularyContext from './VocabularyContext';
-import {getNamespaces} from '../common/utils/linkeddata/vocabularyUtils';
-import {MetadataAPI} from './LinkedDataAPI';
+import VocabularyContext from './vocabulary/VocabularyContext';
+import {getNamespaces} from './common/vocabularyUtils';
+import {MetadataAPI} from './common/LinkedDataAPI';
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);

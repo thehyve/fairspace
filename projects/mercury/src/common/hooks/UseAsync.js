@@ -9,7 +9,7 @@ import {useCallback, useEffect, useState} from "react";
  * @param callback that will return a promise
  * @returns {any[]}
  */
-const useAsync = (callback) => {
+const useAsync = (callback, deps = []) => {
     const [data, setData] = useState();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
@@ -20,9 +20,10 @@ const useAsync = (callback) => {
             setError(undefined);
         })
         .catch((e) => setError(e || true))
-        .finally(() => setLoading(false)), [callback]);
-
-    useEffect(() => {refresh();}, [refresh]);
+        // eslint-disable-next-line
+        .finally(() => setLoading(false)), deps);
+    // eslint-disable-next-line
+    useEffect(() => {refresh();}, deps);
 
     return {
         data,

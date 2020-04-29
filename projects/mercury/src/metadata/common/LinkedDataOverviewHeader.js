@@ -1,6 +1,6 @@
 import React from 'react';
 import {Checkbox, Chip, Grid, Input, ListItemText, MenuItem, Select, withStyles} from "@material-ui/core";
-import {SearchBar} from '../../common';
+import SearchBar from "../../search/SearchBar";
 
 const styles = theme => ({
     chips: {

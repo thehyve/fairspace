@@ -1,12 +1,15 @@
 import React from 'react';
-import {VocabularyProvider} from '../metadata/VocabularyContext';
-import {CollectionsProvider} from '../common/contexts/CollectionsContext';
-import {Layout, TopBar, usePageTitleUpdater, UsersProvider} from '../common';
-import WorkspaceMenu from './WorkspaceMenu';
+import {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
+import {CollectionsProvider} from '../collections/CollectionsContext';
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
+import MainMenu from './MainMenu';
 import {currentWorkspace} from '../workspaces/workspaces';
 import WorkspaceRoutes from '../routes/WorkspaceRoutes';
 import {WorkspacesProvider} from "../workspaces/WorkspaceContext";
 import {ServicesProvider} from '../common/contexts/ServicesContext';
+import Layout from "./Layout";
+import TopBar from "./TopBar";
+import {UsersProvider} from "../users/UsersContext";
 
 const WorkspaceLayout = () => {
     const workspace = currentWorkspace();
@@ -19,7 +22,7 @@ const WorkspaceLayout = () => {
                     <CollectionsProvider>
                         <ServicesProvider>
                             <Layout
-                                renderMenu={() => <WorkspaceMenu />}
+                                renderMenu={() => <MainMenu />}
                                 renderMain={() => <WorkspaceRoutes />}
                                 renderTopbar={() => <TopBar title={workspace} />}
                             />

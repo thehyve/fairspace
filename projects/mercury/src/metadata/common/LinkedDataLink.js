@@ -1,7 +1,6 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 import * as PropTypes from "prop-types";
-import {workspacePrefix} from '../../workspaces/workspaces';
 
 /**
  * Renders a link to a the editor for the given entity.
@@ -12,7 +11,7 @@ import {workspacePrefix} from '../../workspaces/workspaces';
  * @param props
  * @constructor
  */
-const LinkedDataLink = ({uri, editorPath, children}) => <Link to={{pathname: `${workspacePrefix()}${editorPath}`, search: "?iri=" + encodeURIComponent(uri)}}>{children}</Link>;
+const LinkedDataLink = ({uri, editorPath, children}) => <Link to={{pathname: editorPath, search: "?iri=" + encodeURIComponent(uri)}}>{children}</Link>;
 
 LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,

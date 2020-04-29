@@ -1,20 +1,12 @@
 import axios from 'axios';
-import React, {useEffect, useState} from 'react';
-import {extractJsonData} from "../utils";
+import React from 'react';
+import {extractJsonData} from "../utils/httpUtils";
+import useAsync from "../hooks/UseAsync";
 
 const ServicesContext = React.createContext({});
 
 export const ServicesProvider = ({children}) => {
-    const [services, setServices] = useState({});
-    const [servicesLoading, setServicesLoading] = useState(true);
-    const [servicesError, setServicesError] = useState(false);
-
-    useEffect(() => axios.get('/api/v1/services/')
-        .then(extractJsonData)
-        .then(setServices)
-        .then(() => setServicesLoading(false))
-        .catch(() => setServicesError(true)),
-    []);
+    const {data: services = [], loading: servicesLoading, error: servicesError} = useAsync(() => axios.get('/api/v1/services/').then(extractJsonData));
 
     return (
         <ServicesContext.Provider

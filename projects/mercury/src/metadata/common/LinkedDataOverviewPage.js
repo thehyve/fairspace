@@ -3,19 +3,19 @@ import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import {Grid, Switch} from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {BreadCrumbs, usePageTitleUpdater} from '../../common';
+import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 
 import LinkedDataCreator from "./LinkedDataCreator";
 import LinkedDataContext from '../LinkedDataContext';
 import LinkedDataOverviewHeader from "./LinkedDataOverviewHeader";
-import useLinkedDataSearchParams from "../UseLinkedDataSearchParams";
-import {getFirstPredicateId} from "../../common/utils/linkeddata/jsonLdUtils";
+import useLinkedDataSearchParams from "./UseLinkedDataSearchParams";
+import {getFirstPredicateId} from "./jsonLdUtils";
 import {SHACL_TARGET_CLASS} from "../../constants";
-import {getLabel} from "../../common/utils/linkeddata/metadataUtils";
-import {getClassesInCatalog} from '../../common/utils/linkeddata/vocabularyUtils';
-import {workspacePrefix} from "../../workspaces/workspaces";
+import {getLabel} from "./metadataUtils";
+import {getClassesInCatalog} from './vocabularyUtils';
+import BreadCrumbs from "../../common/components/BreadCrumbs";
 
-const getEntityRelativeUrl = (editorPath, id) => `${workspacePrefix()}${editorPath}?iri=` + encodeURIComponent(id);
+const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIComponent(id)}`;
 
 const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent, showGraphSelection = false}) => {
     const {requireIdentifier, editorPath, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);

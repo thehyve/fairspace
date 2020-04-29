@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios';
 
-import {extractJsonData, handleHttpError} from '../common';
+import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 const workspacesUrl = "/api/v1/workspaces/";
 

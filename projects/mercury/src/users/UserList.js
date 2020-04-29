@@ -19,14 +19,19 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import {ConfirmationButton, LoadingInlay, MessageDisplay, usePagination, UsersContext, useSorting} from '../common';
 import UserSelect from "../permissions/UserSelect";
-import {UserContext} from "../common/contexts";
-import PermissionContext, {PermissionProvider} from "../common/contexts/PermissionContext";
+import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
 import LoadingOverlay from "../common/components/LoadingOverlay";
-import {canAlterPermission} from "../common/utils/permissionUtils";
+import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User} from "./UsersAPI";
+import UserContext from "./UserContext";
+import UsersContext from "./UsersContext";
+import useSorting from "../common/hooks/UseSorting";
+import usePagination from "../common/hooks/UsePagination";
+import ConfirmationButton from "../common/components/ConfirmationButton";
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
 
 const columns = {
     name: {

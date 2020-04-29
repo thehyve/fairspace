@@ -21,6 +21,7 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
         <Breadcrumbs aria-label="Breadcrumbs" className={classes.root}>
             {allSegments.map(({label, icon, href}, idx) => (
                 <Typography
+                    component="span"
                     key={href}
                     className={classes.link}
                     color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}

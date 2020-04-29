@@ -1,21 +1,18 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
-import {
-    getSearchQueryFromString,
-    handleSearchError,
-    LoadingInlay,
-    MessageDisplay,
-    SearchAPI,
-    SearchBar,
-    SearchResultHighlights,
-    SORT_DATE_CREATED
-} from '../common';
 
-import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from '../common/utils/collectionUtils';
-import {getParentPath} from '../common/utils/fileUtils';
+import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
+import {getParentPath} from '../file/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
-import VocabularyContext, {VocabularyProvider} from '../metadata/VocabularyContext';
-import {getLabelForPredicate} from '../common/utils/linkeddata/vocabularyUtils';
+import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
+import {getLabelForPredicate} from '../metadata/common/vocabularyUtils';
+import useAsync from "../common/hooks/UseAsync";
+import {getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
+import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
+import SearchResultHighlights from "../search/SearchResultHighlights";
+import SearchBar from "../search/SearchBar";
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
 
 const styles = {
     tableRoot: {
@@ -35,7 +32,7 @@ const styles = {
 
 const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
-export const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
+const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
     const getPathOfResult = ({type, filePath}) => {
         switch (type[0]) {
             case COLLECTION_URI:
@@ -120,22 +117,8 @@ export const CollectionSearchResultListContainer = ({
     vocabulary, vocabularyLoading, vocabularyError,
     classes, history, searchFunction = SearchAPI.search
 }) => {
-    const [items, setItems] = useState([]);
-    const [total, setTotal] = useState();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
-
-    useEffect(() => {
-        searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
-            .catch(handleSearchError)
-            .then(data => {
-                setItems(data.items);
-                setTotal(data.total);
-                setError(undefined);
-            })
-            .catch((e) => setError(e || true))
-            .finally(() => setLoading(false));
-    }, [search, query, searchFunction]);
+    const {data: {items = [], total}, loading, error} = useAsync(() => searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
+        .catch(handleSearchError), [search, query, searchFunction]);
 
     const handleSearch = (value) => {
         handleCollectionSearchRedirect(history, value);

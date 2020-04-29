@@ -13,7 +13,7 @@ import {
     FILE_URI,
     FIXED_SHAPE_URI
 } from "../../../constants";
-import VocabularyContext from '../../VocabularyContext';
+import VocabularyContext from '../../vocabulary/VocabularyContext';
 
 describe('LinkedDataEntityHeader', () => {
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';

@@ -5,13 +5,15 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import {BreadCrumbs, LoadingInlay, MessageDisplay} from "../common";
 import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import {currentWorkspace} from "../workspaces/workspaces";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import Collections from "../collections/CollectionsPage";
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
+import BreadCrumbs from "../common/components/BreadCrumbs";
 
 export const TabPanel = (props) => {
     const {children, value, index, ...other} = props;

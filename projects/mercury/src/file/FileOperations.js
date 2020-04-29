@@ -5,17 +5,18 @@ import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
-import {ErrorDialog} from "../common";
+import ErrorDialog from "../common/components/ErrorDialog";
 
-import {ProgressButton} from '../common/components';
-import {CreateDirectoryButton, RenameButton} from "./buttons";
-import {getParentPath, joinPaths} from "../common/utils/fileUtils";
+import {getParentPath, joinPaths} from "./fileUtils";
 import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
 import ConfirmationButton from "../common/components/ConfirmationButton";
-import {UserContext} from "../common/contexts";
-import {isDataSteward} from "../common/utils/userUtils";
+import {isDataSteward} from "../users/userUtils";
+import UserContext from "../users/UserContext";
+import CreateDirectoryButton from "./buttons/CreateDirectoryButton";
+import ProgressButton from "../common/components/ProgressButton";
+import RenameButton from "./buttons/RenameButton";
 
 export const Operations = {
     PASTE: 'PASTE',

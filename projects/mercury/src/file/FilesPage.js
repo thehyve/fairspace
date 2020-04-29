@@ -2,18 +2,19 @@ import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import queryString from "query-string";
-import {BreadCrumbs, SearchBar, usePageTitleUpdater} from "../common";
 
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
-import {getPathInfoFromParams, splitPathIntoArray} from "../common/utils/fileUtils";
+import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";
 import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
-import CollectionsContext from "../common/contexts/CollectionsContext";
+import CollectionsContext from "../collections/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
-import {LoadingOverlay} from "../common/components";
-import {workspacePrefix} from "../workspaces/workspaces";
-import {handleCollectionSearchRedirect} from "../common/utils/collectionUtils";
+import LoadingOverlay from "../common/components/LoadingOverlay";
+import {handleCollectionSearchRedirect} from "../collections/collectionUtils";
+import SearchBar from "../search/SearchBar";
+import BreadCrumbs from "../common/components/BreadCrumbs";
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater"
 
 export const FilesPage = ({
     match,
@@ -53,9 +54,9 @@ export const FilesPage = ({
     const breadcrumbSegments = collection.name
         ? pathSegments.map((segment, idx) => ({
             label: idx === 0 ? collection.name : segment,
-            href: workspacePrefix() + consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
+            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
         }))
-        : [{label: '...', href: workspacePrefix() + consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + openedPath}];
+        : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + openedPath}];
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
