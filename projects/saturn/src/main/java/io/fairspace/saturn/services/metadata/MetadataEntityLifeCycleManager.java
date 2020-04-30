@@ -1,8 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;

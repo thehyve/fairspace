@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.collections.Collection;
 import lombok.Getter;
 import lombok.NonNull;
 

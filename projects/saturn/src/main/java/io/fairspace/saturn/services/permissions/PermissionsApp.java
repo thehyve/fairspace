@@ -7,7 +7,8 @@ import spark.Request;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.*;
+import static spark.Spark.get;
+import static spark.Spark.put;
 
 public class PermissionsApp extends BaseApp {
     private final PermissionsService permissionsService;
