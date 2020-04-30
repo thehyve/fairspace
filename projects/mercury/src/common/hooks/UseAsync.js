@@ -19,7 +19,10 @@ const useAsync = (callback, deps = []) => {
             setData(d);
             setError(undefined);
         })
-        .catch((e) => setError(e || true))
+        .catch((e) => {
+            setError(e || true);
+            console.error(e || new Error('Unknown error'));
+        })
         // eslint-disable-next-line
         .finally(() => setLoading(false)), deps);
     // eslint-disable-next-line
