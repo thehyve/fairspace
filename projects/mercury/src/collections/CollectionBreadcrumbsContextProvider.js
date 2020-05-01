@@ -7,7 +7,7 @@ export default ({children}) => (
         {
             label: 'Collections',
             icon: <FolderOpen />,
-            href: 'collections'
+            href: '/collections'
         }
     ]}}
     >
