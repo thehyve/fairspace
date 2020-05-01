@@ -17,7 +17,7 @@ else
 fi
 
 # Only execute build if something has changed within the project
-if $DIR/build-condition.sh $COMMIT_TRIGGER $PROJECT; then
+if $DIR/build-condition.sh $COMMIT_TRIGGER $PROJECT/..; then
     echo "Building $APPNAME...";
     cd $PROJECT
 
