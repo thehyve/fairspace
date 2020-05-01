@@ -1,4 +1,6 @@
 import {
+    decodePath,
+    encodePath,
     generateUniqueFileName,
     getBaseNameAndExtension,
     getFileName,
@@ -94,5 +96,25 @@ describe('getPathInfoFromParams', () => {
             collectionLocation: 'collectionX',
             openedPath: '/collectionX/something/something'
         });
+    });
+});
+
+describe('encodePath', () => {
+    it('encodes the path', () => {
+        expect(encodePath('aaa/abc$/d&s##a')).toEqual('aaa/abc%24/d%26s%23%23a');
+        expect(encodePath('test name')).toEqual('test%20name');
+        expect(encodePath('/?/test')).toEqual('/%3F/test');
+        expect(encodePath('/x.1/x_y-_.!~*()')).toEqual('/x.1/x_y-_.!~*()');
+        expect(encodePath(';,/?:@&=+$')).toEqual('%3B%2C/%3F%3A%40%26%3D%2B%24');
+    });
+});
+
+describe('decodePath', () => {
+    it('decodes the path', () => {
+        expect(decodePath('aaa/abc%24/d%26s%23%23a')).toEqual('aaa/abc$/d&s##a');
+        expect(decodePath('test%20name')).toEqual('test name');
+        expect(decodePath('/%3F/test')).toEqual('/?/test');
+        expect(decodePath('/x.1/x_y-_.!~*()')).toEqual('/x.1/x_y-_.!~*()');
+        expect(decodePath('%3B%2C/%3F%3A%40%26%3D%2B%24')).toEqual(';,/?:@&=+$');
     });
 });

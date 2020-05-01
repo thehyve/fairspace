@@ -49,9 +49,13 @@ export function getFileName(path) {
     return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;
 }
 
+export const encodePath = (path) => path.split(PATH_SEPARATOR).map(encodeURIComponent).join(PATH_SEPARATOR);
+
+export const decodePath = (path) => path.split(PATH_SEPARATOR).map(decodeURIComponent).join(PATH_SEPARATOR);
+
 export const getPathInfoFromParams = ({collection, path}) => (
     {
         collectionLocation: collection,
-        openedPath: `/${collection || ''}${path ? `/${path}` : ''}`
+        openedPath: `/${collection || ''}${path ? `/${decodePath(path)}` : ''}`
     }
 );
