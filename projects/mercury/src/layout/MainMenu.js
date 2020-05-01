@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Code, FolderOpen, OpenInNew, Widgets} from "@material-ui/icons";
+import {Assignment, Book, FolderOpen, OpenInNew, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
 
 export default () => {
@@ -52,7 +52,7 @@ export default () => {
                     selected={pathname.startsWith('/vocabulary')}
                 >
                     <ListItemIcon>
-                        <Code />
+                        <Book />
                     </ListItemIcon>
                     <ListItemText primary="Vocabulary" />
                 </ListItem>
