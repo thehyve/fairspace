@@ -1,15 +1,19 @@
 import React, {useState} from 'react';
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 import useIsMounted from "react-is-mounted-hook";
+import FileNameDialog from "./FileNameDialog";
+import {useFormField} from "../../common/hooks/UseFormField";
+import {isValidFileName} from "../fileUtils";
 
 const CreateDirectoryButton = ({children, disabled, onCreate}) => {
     const [opened, setOpened] = useState(false);
-    const [name, setName] = useState('');
     const isMounted = useIsMounted();
 
+    const nameControl = useFormField('', value => (
+        !!value && isValidFileName(value)
+    ));
     const openDialog = (e) => {
         if (e) e.stopPropagation();
-        setName('');
+        nameControl.setValue('');
         setOpened(true);
     };
 
@@ -18,43 +22,31 @@ const CreateDirectoryButton = ({children, disabled, onCreate}) => {
         setOpened(false);
     };
 
-    const createDirectory = (e) => {
-        if (e) e.stopPropagation();
-
-        onCreate(name)
+    const createDirectory = () => {
+        onCreate(nameControl.value)
             .then(shouldClose => isMounted() && shouldClose && closeDialog());
     };
+
+    const validateAndCreate = () => nameControl.valid && createDirectory();
 
     return (
         <>
             <span style={{display: 'inherit'}} onClick={e => !disabled && openDialog(e)}>
                 {children}
             </span>
-
-            <Dialog
-                open={opened}
-                onClick={e => e.stopPropagation()}
-                onClose={closeDialog}
-                aria-labelledby="form-dialog-title"
-            >
-                <DialogTitle id="form-dialog-title">Create new directory</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Name"
-                        value={name}
-                        name="name"
-                        onChange={e => setName(e.target.value)}
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={createDirectory} color="primary" disabled={!name}>Create</Button>
-                    <Button onClick={closeDialog} color="default">Cancel</Button>
-                </DialogActions>
-            </Dialog>
+            {opened ? (
+                <FileNameDialog
+                    onClose={closeDialog}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        validateAndCreate();
+                    }}
+                    submitDisabled={Boolean(!nameControl.valid)}
+                    title="Create new directory"
+                    control={nameControl}
+                />
+            ) : null}
         </>
     );
 };

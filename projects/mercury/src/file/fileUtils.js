@@ -1,5 +1,8 @@
 import {PATH_SEPARATOR} from "../constants";
 
+const NON_SAFE_FILE_NAME_CHARACTER = '/';
+const NON_SAFE_FILE_NAMES = ['.', '..'];
+
 export function splitPathIntoArray(path) {
     return path.split(PATH_SEPARATOR).filter(s => s.length > 0);
 }
@@ -58,4 +61,9 @@ export const getPathInfoFromParams = ({collection, path}) => (
         collectionLocation: collection,
         openedPath: `/${collection || ''}${path ? `/${decodePath(path)}` : ''}`
     }
+);
+
+export const isValidFileName = (fileName) => (
+    fileName.indexOf(NON_SAFE_FILE_NAME_CHARACTER) === -1
+        && !NON_SAFE_FILE_NAMES.includes(fileName)
 );
