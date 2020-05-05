@@ -14,7 +14,7 @@ import LoadingOverlay from "../common/components/LoadingOverlay";
 import {handleCollectionSearchRedirect} from "../collections/collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
-import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater"
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 export const FilesPage = ({
     match,
