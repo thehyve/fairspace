@@ -2,10 +2,8 @@ package io.fairspace.saturn;
 
 import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.auth.UserIdentityFilter;
-import io.fairspace.saturn.config.SaturnSparkFilter;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.services.web.StaticFilesApp;
 import io.fairspace.saturn.webdav.WebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
@@ -14,7 +12,7 @@ import org.eclipse.jetty.server.session.SessionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static io.fairspace.saturn.config.ApiFilterFactory.createApiFilter;
+import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
 @Slf4j
@@ -39,8 +37,7 @@ public class App {
                         return clientRequest.getRequestURI().replace(API_PREFIX + "/search", CONFIG.elasticsearchUrl);
                     }
                 })
-                .addFilter(API_PREFIX + "/*", createApiFilter(API_PREFIX, svc, CONFIG))
-                .addFilter("/*", new SaturnSparkFilter(new StaticFilesApp()))
+                .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port)
                 .build();
 

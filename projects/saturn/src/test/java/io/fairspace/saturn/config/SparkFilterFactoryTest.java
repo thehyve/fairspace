@@ -8,12 +8,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApiFilterFactoryTest {
+public class SparkFilterFactoryTest {
     @Mock
     private Services svc;
 
     @Test
     public void itCreatesAFilter() {
-        assertNotNull(ApiFilterFactory.createApiFilter("/some/path", svc, new Config()));
+        assertNotNull(SparkFilterFactory.createSparkFilter("/some/path", svc, new Config()));
     }
 }
