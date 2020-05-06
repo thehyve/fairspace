@@ -1,7 +1,6 @@
 import React from 'react';
 import {fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-
 import RenameButton from '../RenameButton';
 
 describe('<RenameButton />', () => {
@@ -51,7 +50,7 @@ describe('<RenameButton />', () => {
         fireEvent.click(container.firstChild);
         const input = getByLabelText('Name');
         fireEvent.change(input, {target: {value: 'new filename'}});
-        fireEvent.click(getByTestId('rename-button'));
+        fireEvent.submit(getByTestId('form'));
 
         expect(onRename).toHaveBeenCalledTimes(1);
     });
@@ -71,5 +70,41 @@ describe('<RenameButton />', () => {
         fireEvent.click(container.firstChild);
         expect(queryByLabelText('Name')).not.toBeInTheDocument();
         expect(onRename).toHaveBeenCalledTimes(0);
+    });
+
+    it('should disable if invalid file name', () => {
+        const onRename = jest.fn(() => Promise.resolve());
+        const {container, getByTestId, getByLabelText} = render(
+            <RenameButton
+                onRename={onRename}
+                currentName="filename"
+            >
+                <div>something</div>
+            </RenameButton>
+        );
+
+        // Open dialog -> change input -> click rename
+        fireEvent.click(container.firstChild);
+        const input = getByLabelText('Name');
+
+        // Invalid name: '.'
+        fireEvent.change(input, {target: {value: '.'}});
+        fireEvent.submit(getByTestId('form'));
+        expect(onRename).toHaveBeenCalledTimes(0);
+
+        // Invalid name: '..'
+        fireEvent.change(input, {target: {value: '..'}});
+        fireEvent.submit(getByTestId('form'));
+        expect(onRename).toHaveBeenCalledTimes(0);
+
+        // Invalid name with '/'
+        fireEvent.change(input, {target: {value: 'test/value'}});
+        fireEvent.submit(getByTestId('form'));
+        expect(onRename).toHaveBeenCalledTimes(0);
+
+        // Valid name
+        fireEvent.change(input, {target: {value: 'valid name'}});
+        fireEvent.submit(getByTestId('form'));
+        expect(onRename).toHaveBeenCalledTimes(1);
     });
 });

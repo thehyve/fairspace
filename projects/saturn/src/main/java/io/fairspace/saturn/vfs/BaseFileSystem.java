@@ -6,28 +6,16 @@ import io.fairspace.saturn.services.collections.CollectionsService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.AccessDeniedException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
-import static io.fairspace.saturn.vfs.PathUtils.splitPath;
-import static java.net.URLEncoder.encode;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static io.fairspace.saturn.vfs.PathUtils.*;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
 
 public abstract class BaseFileSystem implements VirtualFileSystem {
-    // The file system must be compatible with many external systems.
-    // For that reason, we disallow many special characters, as they
-    // may cause problems in certain other systems.
-    // This list is taken from
-    // https://blogs.msdn.microsoft.com/robert_mcmurray/2011/04/27/bad-characters-to-use-in-web-based-filenames/
-    // and is mainly based on characters that should not be in a URI
-    private static final Character[] INVALID_BASENAME_CHARACTERS = {
-            ';', '?', ':', '@',
-            '&', '=', '+', '$', ',',
-            '<', '>', '#', '%', '"',
-            '{', '}', '|', '\\', '^', '[', ']', '`'
-    };
+
+    private static final String[] INVALID_BASENAMES = {".", ".."};
 
     private static final FileInfo ROOT = FileInfo.builder()
             .path("")
@@ -61,7 +49,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     @Override
     public String iri(String path) throws IOException {
-        return collections.getBaseIri() + encode(path, UTF_8);
+        return collections.getBaseIri() + encodePath(path);
     }
 
     @Override
@@ -149,8 +137,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     }
 
     static boolean containsInvalidPathName(String path) {
-        return Stream.of(INVALID_BASENAME_CHARACTERS)
-                .anyMatch(character -> path.indexOf(character) > -1);
+        return Arrays.asList(INVALID_BASENAMES).contains(name(path));
     }
 
     private static FileInfo fileInfo(Collection collection) {

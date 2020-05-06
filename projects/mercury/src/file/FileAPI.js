@@ -105,9 +105,9 @@ class FileAPI {
     }
 
     /**
-     * It creates a full download like to the path provided
+     * It returns a public link where a file can be downloaded.
      */
-    getDownloadLink = (path = '') => `/api/v1/webdav${path}`;
+    getDownloadLink = (path = '') => this.client().getFileDownloadLink(path);
 
     /**
      * Deletes the file given by path

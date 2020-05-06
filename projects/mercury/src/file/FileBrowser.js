@@ -12,6 +12,7 @@ import {UPLOAD_STATUS_INITIAL} from "./UploadsContext";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
+import {encodePath} from "./fileUtils";
 
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
@@ -62,7 +63,7 @@ export const DisconnectedFileBrowser = ({
 
     const handlePathDoubleClick = (path) => {
         if (path.type === 'directory') {
-            history.push(`/collections${path.filename}`);
+            history.push(`/collections${encodePath(path.filename)}`);
         } else {
             FileAPI.open(path.filename);
         }

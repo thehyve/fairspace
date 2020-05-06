@@ -1,5 +1,7 @@
 package io.fairspace.saturn.vfs;
 
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -8,6 +10,11 @@ import static org.apache.commons.lang3.StringUtils.strip;
 public class PathUtils {
     public static String normalizePath(String path) {
         return strip(path, "/");
+    }
+
+    public static String encodePath(String path) {
+        var encodedPath = URLEncodedUtils.formatSegments(splitPath(path));
+        return normalizePath(encodedPath);
     }
 
     public static String[] splitPath(String path) {
