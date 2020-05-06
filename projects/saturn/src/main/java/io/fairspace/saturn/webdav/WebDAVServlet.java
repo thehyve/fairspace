@@ -6,6 +6,7 @@ import io.milton.http.AuthenticationService;
 import io.milton.http.HttpManager;
 import io.milton.http.http11.DefaultHttp11ResponseHandler;
 import io.milton.servlet.ServletRequest;
+import io.milton.servlet.ServletResponse;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +35,7 @@ public class WebDAVServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try {
             setThreadlocals(req, res);
-            httpManager.process(new ServletRequest(req, req.getServletContext()), new io.milton.servlet.ServletResponse(res));
+            httpManager.process(new ServletRequest(req, req.getServletContext()), new ServletResponse(res));
         } finally {
             clearThreadlocals();
             res.getOutputStream().flush();
