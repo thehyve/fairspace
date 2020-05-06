@@ -35,7 +35,7 @@ public class WorkspaceService {
 
     public Workspace createWorkspace(String id) {
         var ws = dao.getDataset().calculateWrite(() -> {
-            Workspace workspace = new Workspace(id, id, null, Access.Manage);
+            Workspace workspace = new Workspace(id, id, null, WorkspaceStatus.Active, Access.Manage);
             dao.write(workspace);
             permissions.createResource(workspace.getIri());
             return workspace;

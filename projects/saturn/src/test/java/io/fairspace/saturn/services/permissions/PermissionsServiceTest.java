@@ -262,23 +262,23 @@ public class PermissionsServiceTest {
         service.ensureAdmin();
     }
 
-    @Test(expected = AccessDeniedException.class)
-    public void testEnsureAdminAccess() {
+    @Test(expected = MetadataAccessDeniedException.class)
+    public void testEnsureRemoveMetadataAccess() {
         when(currentUser.isAdmin()).thenReturn(false);
         Resource c1 = createResource(COLLECTION_1.getURI());
         ds.getDefaultModel().add(c1, RDF.type, FS.Collection);
-        service.ensureAdminAccess(Set.of(c1.asNode()));
+        service.ensureRemoveMetadataAccess(Set.of(c1.asNode()));
     }
 
     @Test(expected = MetadataAccessDeniedException.class)
-    public void testEnsureAdminAccessWorkspaceWithNoManagePermission() {
+    public void testEnsureRemoveWorkspaceMetadataWithNoManagePermission() {
         when(currentUser.isAdmin()).thenReturn(false);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
-        service.ensureAdminAccess(Set.of(w1.asNode()));
+        service.ensureRemoveMetadataAccess(Set.of(w1.asNode()));
     }
 
     @Test
-    public void testEnsureAdminAccessWorkspace() {
+    public void testEnsureRemoveWorkspaceMetadataAccess() {
         when(currentUser.isAdmin()).thenReturn(true);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
         ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
@@ -288,7 +288,7 @@ public class PermissionsServiceTest {
         currentUserIri = USER2;
 
         try {
-            service.ensureAdminAccess(Set.of(w1.asNode()));
+            service.ensureRemoveMetadataAccess(Set.of(w1.asNode()));
         } catch(Exception e) {
             fail("Should not have thrown any exception");
         }

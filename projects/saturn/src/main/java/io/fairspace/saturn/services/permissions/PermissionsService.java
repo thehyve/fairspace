@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,6 +86,12 @@ public class PermissionsService {
             permissionChangeEventHandler.onPermissionChange(managingUser, resource, user, access);
     }
 
+    public void ensureAdmin() {
+        if(!getCurrentUser().isAdmin()) {
+            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUser().getIri()));
+        }
+    }
+
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
         // Organisation admins are allowed to do anything
         if (getCurrentUser().isAdmin()) {
@@ -104,32 +111,42 @@ public class PermissionsService {
         if (getCurrentUser().isAdmin()) {
             return;
         }
-
         if (getPermission(resource).compareTo(access) < 0) {
-            throw new MetadataAccessDeniedException(format("User %s has no %s access to resource %s", getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
+            throw new MetadataAccessDeniedException(
+                    format("User %s has no %s access to resource %s",
+                            getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
         }
     }
 
-    public void ensureAdminAccess(Set<Node> nodes) {
-        // Only admins can remove or overwrite metadata
-        if (getCurrentUser().isAdmin()) {
-            return;
+    private void ensureAdminAccess(Node resource) {
+        try {
+            ensureAdmin();
+        } catch (AccessDeniedException e) {
+            throw new MetadataAccessDeniedException("Only admins can remove or overwrite metadata.", resource);
         }
+    }
 
+    public void ensureAddMetadataAccess(Set<Node> nodes) {
+        // Workspace metadata is an exception
+        var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
+        nodes.forEach(node -> {
+            if(isWorkspace(node) && getStringProperty(g.asRDFNode(node).asResource(), FS.status) != null) {
+                ensureAdminAccess(node);
+            } else {
+                ensureAccess(node, Access.Write);
+            }
+        });
+    }
+
+    public void ensureRemoveMetadataAccess(Set<Node> nodes) {
         // Workspace metadata is an exception
         nodes.forEach(node -> {
             if(isWorkspace(node)) {
                 ensureAccess(node, Access.Manage);
             } else {
-                throw new MetadataAccessDeniedException("Only admins can remove or overwrite metadata.", node);
+                ensureAdminAccess(node);
             }
         });
-    }
-
-    public void ensureAdmin() {
-        if(!getCurrentUser().isAdmin()) {
-            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUser().getIri()));
-        }
     }
 
     Map<Node, Access> getPermissions(Node resource) {
@@ -209,6 +226,9 @@ public class PermissionsService {
             return stream(spliteratorUnknownSize(it, 0), false)
                     .max(naturalOrder())
                     .orElse(Access.None);
+        }
+        if(isWorkspace(r.asNode()) && Objects.equals(getStringProperty(r, FS.status), WorkspaceStatus.Archived.toString())) {
+            return Access.Read;
         }
         if (r.hasProperty(FS.manage, user)) {
             return Access.Manage;

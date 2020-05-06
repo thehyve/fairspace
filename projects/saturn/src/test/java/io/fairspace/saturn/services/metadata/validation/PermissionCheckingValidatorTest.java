@@ -46,7 +46,8 @@ public class PermissionCheckingValidatorTest {
     public void noChecksShouldBePerformedOnAnEmptyModel() {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
 
-        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAddMetadataAccess(Collections.emptySet());
+        verify(permissions).ensureRemoveMetadataAccess(Collections.emptySet());
         verifyZeroInteractions(violationHandler);
     }
 
@@ -55,7 +56,7 @@ public class PermissionCheckingValidatorTest {
         var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
+        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAddMetadataAccess(nodes);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
         verify(violationHandler).onViolation("Cannot modify resource", STATEMENT.getSubject(), null, null);
     }
@@ -68,8 +69,8 @@ public class PermissionCheckingValidatorTest {
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
-        verify(permissions).ensureAdminAccess(Set.of());
-        verify(permissions).ensureAccess(nodes, Access.Write);
+        verify(permissions).ensureRemoveMetadataAccess(Set.of());
+        verify(permissions).ensureAddMetadataAccess(nodes);
 
         verifyNoMoreInteractions(permissions);
     }
@@ -82,8 +83,8 @@ public class PermissionCheckingValidatorTest {
         validator.validate(EMPTY_MODEL, model, model, EMPTY_MODEL, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
-        verify(permissions).ensureAdminAccess(nodes);
-        verify(permissions).ensureAccess(Set.of(), Access.Write);
+        verify(permissions).ensureRemoveMetadataAccess(nodes);
+        verify(permissions).ensureAddMetadataAccess(Set.of());
 
         verifyNoMoreInteractions(permissions);
     }

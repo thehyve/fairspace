@@ -25,16 +25,15 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     }
 
     private void validateAdded(Model added) {
-        permissions.ensureAccess(added.listSubjects()
+        permissions.ensureAddMetadataAccess(added.listSubjects()
                         .filterKeep(Resource::isURIResource)
                         .mapWith(FrontsNode::asNode)
-                        .toSet(),
-                Access.Write
+                        .toSet()
         );
     }
 
     private void validateRemoved(Model removed) {
-        permissions.ensureAdminAccess(removed.listSubjects()
+        permissions.ensureRemoveMetadataAccess(removed.listSubjects()
                 .filterKeep(Resource::isURIResource)
                 .mapWith(FrontsNode::asNode)
                 .toSet()

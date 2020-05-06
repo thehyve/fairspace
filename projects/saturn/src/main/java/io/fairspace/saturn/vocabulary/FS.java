@@ -43,6 +43,9 @@ public class FS {
     public static final String DATE_DELETED_URI = NS + "dateDeleted";
     public static final Property dateDeleted = createProperty(DATE_DELETED_URI);
 
+    public static final String STATUS_URI = NS + "status";
+    public static final Property status = createProperty(STATUS_URI);
+
     public static final String MOVED_TO_URI = NS + "movedTo";
     public static final Property movedTo = createProperty(MOVED_TO_URI);
 

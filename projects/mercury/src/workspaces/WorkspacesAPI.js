@@ -16,6 +16,7 @@ export type WorkspaceProperties = {|
     name?: string;
     description?: string;
     node: string;
+    status: string;
 |}
 
 export type Resource = {|

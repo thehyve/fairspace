@@ -179,6 +179,7 @@ fs:Workspace a fs:ClassShape ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
   sh:property
       fs:labelShape,
+      fs:statusShape,
       [
         a fs:DatatypePropertyShape ;
         sh:path fs:workspaceDescription ;
@@ -187,7 +188,7 @@ fs:Workspace a fs:ClassShape ;
         sh:datatype fs:markdown ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
-        sh:order 1 ;
+        sh:order 2 ;
       ]
 #     ,[
 #        a fs:ExternalIRIPropertyShape ;
@@ -230,10 +231,20 @@ fs:labelShape a fs:DatatypePropertyShape ;
 fs:commentShape a fs:DatatypePropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
-    sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:fixedShape true ;
     sh:path rdfs:comment .
+
+fs:statusShape a fs:DatatypePropertyShape ;
+    sh:name "Status" ;
+    sh:description "Status of this resource." ;
+    sh:in (
+      "Active"
+      "Archived"
+      ) ;
+    sh:maxCount 1 ;
+    sh:path fs:status ;
+    sh:order 1.
 
 fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:name "Created" ;

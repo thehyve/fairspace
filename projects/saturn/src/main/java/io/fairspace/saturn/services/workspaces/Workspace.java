@@ -11,8 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.jena.vocabulary.RDFS;
 
-import static io.fairspace.saturn.vocabulary.FS.ID_URI;
-import static io.fairspace.saturn.vocabulary.FS.WORKSPACE_URI;
+import static io.fairspace.saturn.vocabulary.FS.*;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
@@ -28,6 +27,9 @@ public class Workspace extends LifecycleAwarePersistentEntity implements AccessI
 
     @RDFProperty(value = RDFS.uri + "comment")
     private String description;
+
+    @RDFProperty(value = STATUS_URI)
+    private WorkspaceStatus status;
 
     private Access access;
 }
