@@ -1,12 +1,13 @@
 package io.fairspace.saturn.services.web;
 
+import lombok.SneakyThrows;
 import spark.servlet.SparkApplication;
-import spark.staticfiles.StaticFilesConfiguration;
-import spark.utils.IOUtils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.File;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.io.FileUtils.readFileToString;
+import static spark.Spark.externalStaticFileLocation;
 import static spark.Spark.notFound;
 
 public class StaticFilesApp implements SparkApplication {
@@ -15,14 +16,12 @@ public class StaticFilesApp implements SparkApplication {
     private String index;
 
     @Override
+    @SneakyThrows
     public void init() {
-        try (var fis = new FileInputStream(STATIC_FILES + "/index.html")) {
-            index = IOUtils.toString(fis);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        externalStaticFileLocation(STATIC_FILES);
 
-        StaticFilesConfiguration.servletInstance.configureExternal(STATIC_FILES);
+        index = readFileToString(new File(STATIC_FILES + "/index.html"), UTF_8);
+
         notFound((req, res) -> {
             if (req.pathInfo().startsWith("/api/")) {
                 return null;
