@@ -7,7 +7,6 @@ import io.milton.http.HttpManager;
 import io.milton.http.http11.DefaultHttp11ResponseHandler;
 import io.milton.servlet.ServletRequest;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,17 +31,14 @@ public class WebDAVServlet extends HttpServlet {
     }
 
     @Override
-    public void service(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) throws ServletException, IOException {
-        var req = (HttpServletRequest) servletRequest;
-        var res = (HttpServletResponse) servletResponse;
-
+    protected void service(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try {
             setThreadlocals(req, res);
-            httpManager.process(new ServletRequest(req, servletRequest.getServletContext()), new io.milton.servlet.ServletResponse(res));
+            httpManager.process(new ServletRequest(req, req.getServletContext()), new io.milton.servlet.ServletResponse(res));
         } finally {
             clearThreadlocals();
-            servletResponse.getOutputStream().flush();
-            servletResponse.flushBuffer();
+            res.getOutputStream().flush();
+            res.flushBuffer();
         }
     }
 }
