@@ -63,7 +63,11 @@ export const DisconnectedFileBrowser = ({
 
     const handlePathDoubleClick = (path) => {
         if (path.type === 'directory') {
-            history.push(`/collections${encodePath(path.filename)}`);
+            /* TODO Remove additional encoding (encodeURI) after upgrading to history to version>=4.10
+             *      This version contains this fix: https://github.com/ReactTraining/history/pull/656
+             *      It requires react-router-dom version>=6 to be released.
+             */
+            history.push(`/collections${encodeURI(encodePath(path.filename))}`);
         } else {
             FileAPI.open(path.filename);
         }
