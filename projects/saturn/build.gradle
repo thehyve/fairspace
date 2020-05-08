@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'io.franzbecker.gradle-lombok' version '2.0'
+    id 'io.franzbecker.gradle-lombok' version '3.3.0'
     id 'application'
     id 'jacoco'
 //    id  'com.github.spotbugs' version '1.6.10'
@@ -20,19 +20,20 @@ group 'io.fairspace'
 version '1.0-SNAPSHOT'
 
 compileJava {
-    sourceCompatibility = 12
-    targetCompatibility = 12
+    sourceCompatibility = 14
+    targetCompatibility = 14
 }
 
 application {
     mainClassName = "io.fairspace.saturn.App"
+    applicationDefaultJvmArgs = ['-XX:+ShowCodeDetailsInExceptionMessages']
 }
 
 repositories {
     mavenCentral()
 
     maven {
-        url "http://dl.bintray.com/milton/Milton"
+        url "https://dl.bintray.com/milton/Milton"
     }
 
     maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
@@ -61,7 +62,7 @@ dependencies {
 
     implementation 'net.logstash.log4j:jsonevent-layout:1.7'
 
-    compile group: 'org.eclipse.jetty', name: 'jetty-proxy', version: '9.4.15.v20190215'
+    implementation 'org.eclipse.jetty:jetty-proxy:9.4.15.v20190215'
 
     implementation 'org.keycloak:keycloak-jetty94-adapter:9.0.0'
     implementation 'org.keycloak:keycloak-admin-client:9.0.0'
