@@ -20,12 +20,13 @@ group 'io.fairspace'
 version '1.0-SNAPSHOT'
 
 compileJava {
-    sourceCompatibility = 12
-    targetCompatibility = 12
+    sourceCompatibility = 14
+    targetCompatibility = 14
 }
 
 application {
     mainClassName = "io.fairspace.saturn.App"
+    applicationDefaultJvmArgs = ['-XX:+ShowCodeDetailsInExceptionMessages']
 }
 
 repositories {

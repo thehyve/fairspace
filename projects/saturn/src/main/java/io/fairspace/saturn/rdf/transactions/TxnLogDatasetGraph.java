@@ -39,12 +39,8 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 transactionLog.onMetadata(user.getId(), user.getName(), currentTimeMillis());
             }
             switch (action) {
-                case ADD:
-                    transactionLog.onAdd(graph, subject, predicate, object);
-                    break;
-                case DELETE:
-                    transactionLog.onDelete(graph, subject, predicate, object);
-                    break;
+                case ADD -> transactionLog.onAdd(graph, subject, predicate, object);
+                case DELETE -> transactionLog.onDelete(graph, subject, predicate, object);
             }
         });
     }
