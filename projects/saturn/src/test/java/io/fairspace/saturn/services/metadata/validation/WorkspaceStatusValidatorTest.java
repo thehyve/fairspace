@@ -19,8 +19,7 @@ import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkspaceStatusValidatorTest {
@@ -50,7 +49,7 @@ public class WorkspaceStatusValidatorTest {
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
 
-        verifyNoMoreInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test
@@ -71,6 +70,6 @@ public class WorkspaceStatusValidatorTest {
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
 
-        verifyNoMoreInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 }

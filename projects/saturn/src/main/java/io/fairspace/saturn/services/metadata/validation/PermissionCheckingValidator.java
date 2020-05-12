@@ -21,7 +21,7 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
         try {
             validateRemoved(removed, before);
-            validateAdded(added, before);
+            validateAdded(added);
         } catch (MetadataAccessDeniedException e) {
             violationHandler.onViolation("Cannot modify resource", createResource(e.getSubject().getURI()), null, null);
         }
@@ -48,18 +48,15 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
         );
     }
 
-    private void validateAdded(Model added, Model before) {
-        added.listStatements()
-                .filterKeep(statement -> isWorkspaceStatus(before, statement))
-                .mapWith(Statement::getSubject)
+    private void validateAdded(Model added) {
+        added.listSubjectsWithProperty(FS.status)
                 .filterKeep(Resource::isURIResource)
                 .mapWith(FrontsNode::asNode)
                 .forEachRemaining(permissions::ensureAdminAccess);
 
         permissions.ensureAccess(
-                added.listStatements()
-                        .filterDrop(statement -> isWorkspaceStatus(before, statement))
-                        .mapWith(Statement::getSubject)
+                added.listSubjects()
+                        .filterDrop(s -> s.hasProperty(FS.status))
                         .filterKeep(Resource::isURIResource)
                         .mapWith(FrontsNode::asNode)
                         .toSet(),
@@ -69,10 +66,5 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
 
     private boolean isWorkspaceProperty(Model model, Statement statement) {
         return statement.getSubject().inModel(model).hasProperty(RDF.type, FS.Workspace);
-    }
-
-    private boolean isWorkspaceStatus(Model model, Statement statement) {
-        return isWorkspaceProperty(model, statement)
-                && statement.getPredicate().equals(FS.status);
     }
 }
