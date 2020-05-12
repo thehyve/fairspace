@@ -48,8 +48,6 @@ public class PermissionCheckingValidatorTest {
 
         verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
         verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
-        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
-        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
         verifyZeroInteractions(violationHandler);
     }
 
