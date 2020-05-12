@@ -267,14 +267,15 @@ public class PermissionsServiceTest {
         when(currentUser.isAdmin()).thenReturn(false);
         Resource c1 = createResource(COLLECTION_1.getURI());
         ds.getDefaultModel().add(c1, RDF.type, FS.Collection);
-        service.ensureRemoveMetadataAccess(Set.of(c1.asNode()));
+        service.ensureAdminAccess(c1.asNode());
     }
 
     @Test(expected = MetadataAccessDeniedException.class)
     public void testEnsureRemoveWorkspaceMetadataWithNoManagePermission() {
         when(currentUser.isAdmin()).thenReturn(false);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
-        service.ensureRemoveMetadataAccess(Set.of(w1.asNode()));
+        service.setPermission(w1.asNode(), USER2, Access.Write);
+        service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
     }
 
     @Test
@@ -288,7 +289,7 @@ public class PermissionsServiceTest {
         currentUserIri = USER2;
 
         try {
-            service.ensureRemoveMetadataAccess(Set.of(w1.asNode()));
+            service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
         } catch(Exception e) {
             fail("Should not have thrown any exception");
         }

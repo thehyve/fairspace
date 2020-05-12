@@ -187,7 +187,6 @@ fs:Workspace a fs:ClassShape ;
         sh:description "A markdown formatted description for the workspace homepage." ;
         sh:datatype fs:markdown ;
         sh:maxCount 1 ;
-        sh:minCount 1 ;
         sh:order 2 ;
       ]
 #     ,[
@@ -244,7 +243,7 @@ fs:statusShape a fs:DatatypePropertyShape ;
       ) ;
     sh:maxCount 1 ;
     sh:path fs:status ;
-    sh:order 1.
+    sh:order 1 .
 
 fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:name "Created" ;

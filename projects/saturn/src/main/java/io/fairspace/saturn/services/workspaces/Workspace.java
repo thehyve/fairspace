@@ -29,7 +29,7 @@ public class Workspace extends LifecycleAwarePersistentEntity implements AccessI
     private String description;
 
     @RDFProperty(value = STATUS_URI)
-    private WorkspaceStatus status;
+    private WorkspaceStatus workspaceStatus;
 
     private Access access;
 }

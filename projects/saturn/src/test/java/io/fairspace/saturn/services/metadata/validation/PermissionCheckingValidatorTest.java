@@ -46,8 +46,10 @@ public class PermissionCheckingValidatorTest {
     public void noChecksShouldBePerformedOnAnEmptyModel() {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
 
-        verify(permissions).ensureAddMetadataAccess(Collections.emptySet());
-        verify(permissions).ensureRemoveMetadataAccess(Collections.emptySet());
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
         verifyZeroInteractions(violationHandler);
     }
 
@@ -56,7 +58,7 @@ public class PermissionCheckingValidatorTest {
         var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAddMetadataAccess(nodes);
+        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
         verify(violationHandler).onViolation("Cannot modify resource", STATEMENT.getSubject(), null, null);
     }
@@ -69,8 +71,8 @@ public class PermissionCheckingValidatorTest {
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
-        verify(permissions).ensureRemoveMetadataAccess(Set.of());
-        verify(permissions).ensureAddMetadataAccess(nodes);
+        verify(permissions).ensureAccess(nodes, Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
 
         verifyNoMoreInteractions(permissions);
     }
@@ -83,8 +85,9 @@ public class PermissionCheckingValidatorTest {
         validator.validate(EMPTY_MODEL, model, model, EMPTY_MODEL, null, violationHandler);
 
         verifyZeroInteractions(violationHandler);
-        verify(permissions).ensureRemoveMetadataAccess(nodes);
-        verify(permissions).ensureAddMetadataAccess(Set.of());
+        nodes.iterator().forEachRemaining(n-> verify(permissions).ensureAdminAccess(n));
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
 
         verifyNoMoreInteractions(permissions);
     }

@@ -64,6 +64,10 @@ public class PermissionsService {
             validate(!user.equals(managingUser), "A user may not change his own permissions");
 
             validate (isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
+            if (isWorkspace(resource)) {
+                validate (!dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
+                        "Cannot set permissions for an inactive workspace");
+            }
 
             g.removeAll(g.asRDFNode(resource).asResource(), null, g.asRDFNode(user));
 
@@ -93,24 +97,17 @@ public class PermissionsService {
     }
 
     public void ensureAccess(Set<Node> nodes, Access requestedAccess) {
-        // Organisation admins are allowed to do anything
-        if (getCurrentUser().isAdmin()) {
-            return;
+        if(!nodes.isEmpty()) {
+            getPermissions(nodes).forEach((node, access) -> {
+                if (access.compareTo(requestedAccess) < 0) {
+                    throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
+                            getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
+                }
+            });
         }
-
-        getPermissions(nodes).forEach((node, access) -> {
-            if (access.compareTo(requestedAccess) < 0) {
-                throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                        getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
-            }
-        });
     }
 
     private void ensureAccess(Node resource, Access access) {
-        // Organisation admins are allowed to do anything
-        if (getCurrentUser().isAdmin()) {
-            return;
-        }
         if (getPermission(resource).compareTo(access) < 0) {
             throw new MetadataAccessDeniedException(
                     format("User %s has no %s access to resource %s",
@@ -118,35 +115,12 @@ public class PermissionsService {
         }
     }
 
-    private void ensureAdminAccess(Node resource) {
+    public void ensureAdminAccess(Node resource) {
         try {
             ensureAdmin();
         } catch (AccessDeniedException e) {
             throw new MetadataAccessDeniedException("Only admins can remove or overwrite metadata.", resource);
         }
-    }
-
-    public void ensureAddMetadataAccess(Set<Node> nodes) {
-        // Workspace metadata is an exception
-        var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        nodes.forEach(node -> {
-            if(isWorkspace(node) && getStringProperty(g.asRDFNode(node).asResource(), FS.status) != null) {
-                ensureAdminAccess(node);
-            } else {
-                ensureAccess(node, Access.Write);
-            }
-        });
-    }
-
-    public void ensureRemoveMetadataAccess(Set<Node> nodes) {
-        // Workspace metadata is an exception
-        nodes.forEach(node -> {
-            if(isWorkspace(node)) {
-                ensureAccess(node, Access.Manage);
-            } else {
-                ensureAdminAccess(node);
-            }
-        });
     }
 
     Map<Node, Access> getPermissions(Node resource) {
@@ -199,15 +173,7 @@ public class PermissionsService {
      */
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         var result = new HashMap<Node, Access>();
-
         var userObject = getCurrentUser();
-
-        // Organisation admins are allowed to do anything, so they have manage right
-        // to any resource
-        if (userObject.isAdmin()) {
-            authorities.forEach(node -> result.put(node, Access.Manage));
-            return result;
-        }
 
         var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
         var userResource = g.wrapAsResource(userObject.getIri());
@@ -217,6 +183,13 @@ public class PermissionsService {
     }
 
     private Access getResourceAccess(Resource r, Resource user) {
+        if(isWorkspace(r.asNode())
+                && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
+            return Access.Read;
+        }
+        if(getCurrentUser().isAdmin()) {
+            return Access.Manage;
+        }
         if (isCollection(r.asNode()) && isUser(user.asNode())) {
             var it = dataset.getDefaultModel()
                     .listSubjectsWithProperty(RDF.type, FS.Workspace)
@@ -227,9 +200,7 @@ public class PermissionsService {
                     .max(naturalOrder())
                     .orElse(Access.None);
         }
-        if(isWorkspace(r.asNode()) && Objects.equals(getStringProperty(r, FS.status), WorkspaceStatus.Archived.toString())) {
-            return Access.Read;
-        }
+
         if (r.hasProperty(FS.manage, user)) {
             return Access.Manage;
         }
