@@ -14,9 +14,9 @@ describe('WorkspaceList', () => {
 
     it('displays the list of workspaces', () => {
         const workspaces: Workspace[] = [{
-            id: 'workspace1', name: 'workspace-1'
+            id: 'workspace1', name: 'workspace-1', status: 'Active'
         }, {
-            id: 'workspace2', name: 'workspace-2'
+            id: 'workspace2', name: 'workspace-2', status: 'Active'
         }];
         const {getByText} = render(<MemoryRouter><WorkspaceList workspaces={workspaces} /></MemoryRouter>);
         expect(getByText('Id'))

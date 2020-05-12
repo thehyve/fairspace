@@ -9,7 +9,7 @@ import WorkspaceContext from "./WorkspaceContext";
 import WorkspaceDetails from "./WorkspaceDetails";
 
 
-const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWorkspaceExists}) => {
+const WorkspaceInformationDrawer = ({workspace, loading, refreshWorkspaces, atLeastSingleWorkspaceExists}) => {
     if (!workspace) {
         return atLeastSingleWorkspaceExists
             && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
@@ -28,6 +28,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWorkspaceE
         <>
             <WorkspaceDetails
                 workspace={workspace}
+                refreshWorkspaces={refreshWorkspaces}
                 loading={loading}
             />
         </>
@@ -35,7 +36,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, atLeastSingleWorkspaceE
 };
 
 const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) => {
-    const {workspacesLoading, workspaces} = useContext(WorkspaceContext);
+    const {workspacesLoading, refreshWorkspaces, workspaces} = useContext(WorkspaceContext);
     const workspace = workspaces.find(c => c.iri === selectedWorkspaceIri);
     const atLeastSingleWorkspaceExists = workspaces.length > 0;
     return (
@@ -43,6 +44,7 @@ const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) 
             {...props}
             loading={workspacesLoading}
             workspace={workspace}
+            refreshWorkspaces={refreshWorkspaces}
             atLeastSingleWorkspaceExists={atLeastSingleWorkspaceExists}
         />
     );
@@ -51,7 +53,8 @@ const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) 
 WorkspaceInformationDrawer.propTypes = {
     atLeastSingleWorkspaceExists: PropTypes.bool,
     workspace: PropTypes.object,
-    loading: PropTypes.bool
+    loading: PropTypes.bool,
+    refreshWorkspaces: PropTypes.func
 };
 
 export default withRouter(withStyles(styles)(ContextualWorkspaceInformationDrawer));

@@ -34,6 +34,7 @@ const WorkspaceInfo = (props) => {
                 ) : (
                     <LinkedDataEntityForm
                         hasEditRight={false}
+                        editable={false}
                         errorMessage={linkedDataError}
                         loading={linkedDataLoading}
                         properties={properties}

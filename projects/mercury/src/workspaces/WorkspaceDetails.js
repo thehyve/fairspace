@@ -1,23 +1,64 @@
 // @flow
-import React from 'react';
+import React, {useContext} from 'react';
 import {withRouter} from 'react-router-dom';
-import {Card, CardContent, CardHeader} from "@material-ui/core";
+import {Card, CardContent, CardHeader, Grid, withStyles} from "@material-ui/core";
 import {Widgets} from "@material-ui/icons";
 import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
 import PermissionsCard from "../permissions/PermissionsCard";
 import type {Workspace} from "./WorkspacesAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
+import UserContext from "../users/UserContext";
+import {isAdmin} from "../users/userUtils";
+import WorkspaceStatusFormContainer from "./WorkspaceStatusFormContainer";
+
+
+const styles = {
+    statusLabel: {
+        color: 'gray'
+    },
+    statusText: {
+        fontSize: 'small',
+        margin: 0,
+        paddingInlineStart: 2
+    },
+    statusCard: {
+        paddingTop: 0
+    }
+};
 
 type WorkspaceDetailsProps = {
     loading: boolean;
     workspace: Workspace;
+    classes: Object;
 };
 
 const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
-    const {loading, workspace} = props;
+    const {loading, workspace, refreshWorkspaces, classes} = props;
+    const {currentUser} = useContext(UserContext);
 
     if (loading) {
         return <LoadingInlay />;
+    }
+
+    function renderWorkspaceStatus() {
+        return (
+            <Grid container direction="row">
+                <Grid item xs={11}>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            {isAdmin(currentUser) ? (
+                                <WorkspaceStatusFormContainer workspaceIri={workspace.iri} refreshWorkspaces={refreshWorkspaces} />
+                            ) : (
+                                <div>
+                                    <legend className={classes.statusLabel}>Status</legend>
+                                    <p className={classes.statusText}>{workspace.status}</p>
+                                </div>
+                            )}
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        );
     }
 
     const renderWorkspaceSettingsCard = () => (
@@ -29,8 +70,8 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
                     <Widgets />
                 )}
             />
-            <CardContent style={{paddingTop: 0}}>
-                {/* TODO add status handling */}
+            <CardContent className={classes.statusCard}>
+                {renderWorkspaceStatus()}
             </CardContent>
         </Card>
     );
@@ -57,4 +98,4 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
     );
 };
 
-export default withRouter(WorkspaceDetails);
+export default withRouter(withStyles(styles)(WorkspaceDetails));
