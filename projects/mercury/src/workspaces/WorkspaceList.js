@@ -132,7 +132,7 @@ const WorkspaceList = ({
                                     scope="row"
                                     key="label"
                                 >
-                                    {workspace.status !== 'Active' ? workspace.status.toLocaleUpperCase() : ''}
+                                    {workspace.status ? workspace.status.toLocaleUpperCase() : ''}
                                 </TableCell>
                             </TableRow>
                         );

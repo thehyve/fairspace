@@ -177,9 +177,14 @@ fs:Workspace a fs:ClassShape ;
   fs:machineOnly true ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+  fs:systemProperties
+      fs:statusDateModifiedShape,
+      fs:statusModifiedByShape ;
   sh:property
       fs:labelShape,
       fs:statusShape,
+      fs:statusDateModifiedShape,
+      fs:statusModifiedByShape,
       [
         a fs:DatatypePropertyShape ;
         sh:path fs:workspaceDescription ;
@@ -244,6 +249,24 @@ fs:statusShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     sh:path fs:status ;
     sh:order 1 .
+
+fs:statusDateModifiedShape a fs:DatatypePropertyShape ;
+                     sh:name "Modified" ;
+                     sh:description "Date modified" ;
+                     sh:datatype xsd:dateTime ;
+                     sh:maxCount 1 ;
+                     fs:machineOnly true ;
+                     fs:fixedShape true ;
+                     sh:path fs:statusDateModified .
+
+fs:statusModifiedByShape a fs:RelationShape ;
+                   sh:name "Last Modified By" ;
+                   sh:description "User that last modified this resource." ;
+                   sh:class fs:User ;
+                   sh:maxCount 1 ;
+                   fs:machineOnly true ;
+                   fs:fixedShape true ;
+                   sh:path fs:statusModifiedBy .
 
 fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:name "Created" ;
