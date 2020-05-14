@@ -236,38 +236,10 @@ fs:labelShape a fs:DatatypePropertyShape ;
 fs:commentShape a fs:DatatypePropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
+    sh:datatype xsd:string ;
     sh:maxCount 1 ;
     fs:fixedShape true ;
     sh:path rdfs:comment .
-
-fs:statusShape a fs:DatatypePropertyShape ;
-    sh:name "Status" ;
-    sh:description "Status of this resource." ;
-    sh:in (
-      "Active"
-      "Archived"
-      ) ;
-    sh:maxCount 1 ;
-    sh:path fs:status ;
-    sh:order 1 .
-
-fs:statusDateModifiedShape a fs:DatatypePropertyShape ;
-                     sh:name "Modified" ;
-                     sh:description "Date modified" ;
-                     sh:datatype xsd:dateTime ;
-                     sh:maxCount 1 ;
-                     fs:machineOnly true ;
-                     fs:fixedShape true ;
-                     sh:path fs:statusDateModified .
-
-fs:statusModifiedByShape a fs:RelationShape ;
-                   sh:name "Last Modified By" ;
-                   sh:description "User that last modified this resource." ;
-                   sh:class fs:User ;
-                   sh:maxCount 1 ;
-                   fs:machineOnly true ;
-                   fs:fixedShape true ;
-                   sh:path fs:statusModifiedBy .
 
 fs:dateCreatedShape a fs:DatatypePropertyShape ;
     sh:name "Created" ;
@@ -342,6 +314,25 @@ fs:userEmailShape a fs:DatatypePropertyShape ;
     fs:fixedShape true ;
     sh:path fs:email .
 
+fs:statusShape a fs:ControlledVocabularyPropertyShape ;
+    sh:name "Status" ;
+    sh:description "Status of this resource." ;
+    sh:in (
+      "Active"
+      "Archived"
+      ) ;
+    sh:maxCount 1 ;
+    sh:path fs:status ;
+    sh:order 1 .
+
+fs:statusDateModifiedShape a fs:DatatypePropertyShape ;
+    sh:name "Modified" ;
+    sh:description "Date modified" ;
+    sh:datatype xsd:dateTime ;
+    sh:maxCount 1 ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:statusDateModified .
 
 ## Relation Shapes
 
@@ -372,6 +363,14 @@ fs:deletedByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:deletedBy .
 
+fs:statusModifiedByShape a fs:RelationShape ;
+    sh:name "Last Modified By" ;
+    sh:description "User that last modified this resource." ;
+    sh:class fs:User ;
+    sh:maxCount 1 ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:statusModifiedBy .
 
 fs:replacesShape a fs:RelationShape ;
                   sh:name "Replaces" ;
