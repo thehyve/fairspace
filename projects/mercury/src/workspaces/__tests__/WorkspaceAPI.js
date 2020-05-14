@@ -47,4 +47,29 @@ describe('WorkspacesAPI', () => {
             done();
         }
     });
+
+    it('Updates a workspace status', async () => {
+        const workspaceData: Workspace = {
+            id: 'workspace1',
+            name: 'w1',
+            description: 'Description of workspace1',
+            status: 'Active'
+        };
+        const patchResponse: AxiosResponse = {
+            headers: {'content-type': 'application/json'}
+        };
+        mockAxios.patch.mockImplementationOnce(() => Promise.resolve(patchResponse));
+        await workspacesAPI.updateWorkspaceStatus(workspaceData);
+        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
+        expect(mockAxios.patch).toHaveBeenCalledWith(
+            '/api/v1/workspaces/workspace1/status',
+            JSON.stringify({
+                id: 'workspace1',
+                name: 'w1',
+                description: 'Description of workspace1',
+                status: 'Active'
+            }),
+            {headers: {Accept: 'application/json'}}
+        );
+    });
 });

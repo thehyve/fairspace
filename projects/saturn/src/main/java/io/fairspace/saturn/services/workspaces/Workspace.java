@@ -9,7 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
+
+import java.time.Instant;
 
 import static io.fairspace.saturn.vocabulary.FS.*;
 
@@ -29,7 +32,13 @@ public class Workspace extends LifecycleAwarePersistentEntity implements AccessI
     private String description;
 
     @RDFProperty(value = STATUS_URI)
-    private WorkspaceStatus workspaceStatus;
+    private WorkspaceStatus status;
+
+    @RDFProperty(value = STATUS_DATE_MODIFIED_URI)
+    private Instant statusDateModified;
+
+    @RDFProperty(value = STATUS_MODIFIED_BY_URI)
+    private Node statusModifiedBy;
 
     private Access access;
 }

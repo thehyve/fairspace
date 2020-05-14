@@ -17,6 +17,8 @@ export type WorkspaceProperties = {|
     description?: string;
     node: string;
     status: string;
+    statusDateModified?: string;
+    statusModifiedBy?: string; // iri
 |}
 
 export type Resource = {|
@@ -40,6 +42,14 @@ class WorkspacesAPI {
         })
             .then(extractJsonData)
             .catch(handleHttpError("Failure while creating a workspace"));
+    }
+
+    updateWorkspaceStatus(workspace: Workspace): Promise<void> {
+        return axios.patch(`${workspacesUrl}${workspace.id}/status`, JSON.stringify(workspace), {
+            headers: {Accept: 'application/json'},
+        })
+            .then(extractJsonData)
+            .catch(handleHttpError("Failure while updating a workspace status"));
     }
 }
 

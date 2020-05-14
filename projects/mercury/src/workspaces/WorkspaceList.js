@@ -8,7 +8,8 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TableSortLabel, withStyles,
+    TableSortLabel,
+    withStyles,
 } from "@material-ui/core";
 import {Lock} from "@material-ui/icons";
 
@@ -45,7 +46,7 @@ const columns = {
     },
     status: {
         valueExtractor: 'status',
-        label: ' '
+        label: 'Status'
     }
 };
 
@@ -132,7 +133,7 @@ const WorkspaceList = ({
                                     scope="row"
                                     key="label"
                                 >
-                                    {workspace.status !== 'Active' ? workspace.status.toLocaleUpperCase() : ''}
+                                    {workspace.status ? workspace.status.toLocaleUpperCase() : ''}
                                 </TableCell>
                             </TableRow>
                         );
