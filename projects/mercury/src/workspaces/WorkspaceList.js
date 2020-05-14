@@ -8,7 +8,8 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TableSortLabel, withStyles,
+    TableSortLabel,
+    withStyles,
 } from "@material-ui/core";
 import {Lock} from "@material-ui/icons";
 
@@ -45,7 +46,7 @@ const columns = {
     },
     status: {
         valueExtractor: 'status',
-        label: ' '
+        label: 'Status'
     }
 };
 

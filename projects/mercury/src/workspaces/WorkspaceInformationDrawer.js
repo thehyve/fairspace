@@ -9,7 +9,7 @@ import WorkspaceContext from "./WorkspaceContext";
 import WorkspaceDetails from "./WorkspaceDetails";
 
 
-const WorkspaceInformationDrawer = ({workspace, loading, refreshWorkspaces, atLeastSingleWorkspaceExists}) => {
+const WorkspaceInformationDrawer = ({workspace, loading, updateWorkspaceStatus, atLeastSingleWorkspaceExists}) => {
     if (!workspace) {
         return atLeastSingleWorkspaceExists
             && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
@@ -28,7 +28,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, refreshWorkspaces, atLe
         <>
             <WorkspaceDetails
                 workspace={workspace}
-                refreshWorkspaces={refreshWorkspaces}
+                updateWorkspaceStatus={updateWorkspaceStatus}
                 loading={loading}
             />
         </>
@@ -36,7 +36,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, refreshWorkspaces, atLe
 };
 
 const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) => {
-    const {workspacesLoading, refreshWorkspaces, workspaces} = useContext(WorkspaceContext);
+    const {workspacesLoading, updateWorkspaceStatus, workspaces} = useContext(WorkspaceContext);
     const workspace = workspaces.find(c => c.iri === selectedWorkspaceIri);
     const atLeastSingleWorkspaceExists = workspaces.length > 0;
     return (
@@ -44,7 +44,7 @@ const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) 
             {...props}
             loading={workspacesLoading}
             workspace={workspace}
-            refreshWorkspaces={refreshWorkspaces}
+            updateWorkspaceStatus={updateWorkspaceStatus}
             atLeastSingleWorkspaceExists={atLeastSingleWorkspaceExists}
         />
     );
@@ -54,7 +54,7 @@ WorkspaceInformationDrawer.propTypes = {
     atLeastSingleWorkspaceExists: PropTypes.bool,
     workspace: PropTypes.object,
     loading: PropTypes.bool,
-    refreshWorkspaces: PropTypes.func
+    updateWorkspaceStatus: PropTypes.func
 };
 
 export default withRouter(withStyles(styles)(ContextualWorkspaceInformationDrawer));

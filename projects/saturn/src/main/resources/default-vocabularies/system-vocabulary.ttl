@@ -178,6 +178,7 @@ fs:Workspace a fs:ClassShape ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
   fs:systemProperties
+      fs:statusShape,
       fs:statusDateModifiedShape,
       fs:statusModifiedByShape ;
   sh:property

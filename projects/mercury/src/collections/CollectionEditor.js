@@ -118,7 +118,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 }
             })
             .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while creating a collection";
+                const message = err && err.message ? err.message : "An error occurred while updating a collection";
                 ErrorDialog.showError(err, message);
             })
             .finally(() => setBusy(false));
