@@ -25,6 +25,9 @@ const styles = {
         marginBottom: 0,
         marginInlineStart: 4
     },
+    statusDetails: {
+        marginLeft: 8
+    },
     statusCard: {
         paddingTop: 0
     }
@@ -100,15 +103,17 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
                 <Grid container>
                     <Grid item xs={12}>
                         <legend className={classes.statusLabel}>Status</legend>
-                        <p className={classes.statusText}>
-                            {workspace.status}
-                        </p>
-                        <p className={`${classes.statusLabel} ${classes.statusText}`}>
-                            Modified by: {getUserName(workspace.statusModifiedBy)}
-                        </p>
-                        <p className={`${classes.statusLabel} ${classes.statusText}`}>
-                            Modification date: {formatDateTime(workspace.statusDateModified) || '-'}
-                        </p>
+                        <div className={classes.statusDetails}>
+                            <p className={classes.statusText}>
+                                {workspace.status}
+                            </p>
+                            <p className={`${classes.statusLabel} ${classes.statusText}`}>
+                                Modified by: {getUserName(workspace.statusModifiedBy)}
+                            </p>
+                            <p className={`${classes.statusLabel} ${classes.statusText}`}>
+                                Modification date: {formatDateTime(workspace.statusDateModified) || '-'}
+                            </p>
+                        </div>
                     </Grid>
                 </Grid>
             </Grid>
