@@ -32,8 +32,8 @@ const LinkedDataProperty = (
             && !checkValueAddedNotSubmitted(property, values[0])
     );
 
-    // Checks whether the configuration of this property disallowed editing of existing values
-    // This is the case if
+    // Checks whether the configuration of this property disallow editing of existing values
+    // This is the case if:
     // - the property is machineOnly
     // - the field refers to a url (marked as RESOURCE_URI)
     // - the value is taken from a set of allowed values

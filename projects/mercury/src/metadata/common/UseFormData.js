@@ -87,7 +87,7 @@ const useFormData = (values, initialProperties = []) => {
     };
 
     const deleteValue = (property, index) => {
-        if (property.maxValuesCount === 1) {
+        if (property.maxValuesCount === 1 && !property.allowedValues) {
             if (DEFAULTABLE_DATATYPES.includes(property.datatype)) {
                 updateValue(property, {value: ""}, index);
             } else {

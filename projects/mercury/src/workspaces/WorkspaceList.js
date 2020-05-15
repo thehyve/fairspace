@@ -9,6 +9,7 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
+    withStyles,
 } from "@material-ui/core";
 import {Lock} from "@material-ui/icons";
 
@@ -23,6 +24,13 @@ type Accessible = {
     hasAccess: boolean
 }
 
+const styles = () => ({
+    statusColumn: {
+        fontSize: 'small',
+        color: 'gray',
+    }
+});
+
 const columns = {
     hasAccess: {
         valueExtractor: 'hasAccess',
@@ -35,13 +43,18 @@ const columns = {
     label: {
         valueExtractor: 'name',
         label: 'Name'
+    },
+    status: {
+        valueExtractor: 'status',
+        label: 'Status'
     }
 };
 
 const WorkspaceList = ({
     workspaces = [],
     isSelected = () => false,
-    toggleWorkspace = () => {}
+    toggleWorkspace = () => {},
+    classes = {}
 }) => {
     const {currentUser = {authorizations: []}} = useContext(UserContext);
     const history = useHistory();
@@ -113,6 +126,15 @@ const WorkspaceList = ({
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row" key="label">
                                     {workspace.name}
                                 </TableCell>
+                                <TableCell
+                                    style={{maxWidth: 80}}
+                                    className={`${classes.statusColumn}`}
+                                    component="th"
+                                    scope="row"
+                                    key="label"
+                                >
+                                    {workspace.status ? workspace.status.toLocaleUpperCase() : ''}
+                                </TableCell>
                             </TableRow>
                         );
                     })}
@@ -131,4 +153,4 @@ const WorkspaceList = ({
     );
 };
 
-export default WorkspaceList;
+export default withStyles(styles)(WorkspaceList);

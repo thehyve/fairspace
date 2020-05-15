@@ -3,19 +3,29 @@ package io.fairspace.saturn.services.metadata.validation;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
+import static junit.framework.TestCase.assertEquals;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 
@@ -30,10 +40,11 @@ public class PermissionCheckingValidatorTest {
 
     @Mock
     private PermissionsService permissions;
-
     @Mock
     private ViolationHandler violationHandler;
 
+    @Captor
+    ArgumentCaptor<Node> valueCaptor;
 
     private PermissionCheckingValidator validator;
 
@@ -42,12 +53,14 @@ public class PermissionCheckingValidatorTest {
         validator = new PermissionCheckingValidator(permissions);
     }
 
+
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
 
         verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
-        verifyZeroInteractions(violationHandler);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
+        verifyNoMoreInteractions(violationHandler);
     }
 
     @Test
@@ -67,9 +80,9 @@ public class PermissionCheckingValidatorTest {
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
-        verify(permissions).ensureAdminAccess(Set.of());
+        verifyNoInteractions(violationHandler);
         verify(permissions).ensureAccess(nodes, Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
 
         verifyNoMoreInteractions(permissions);
     }
@@ -81,10 +94,55 @@ public class PermissionCheckingValidatorTest {
 
         validator.validate(EMPTY_MODEL, model, model, EMPTY_MODEL, null, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
-        verify(permissions).ensureAdminAccess(nodes);
-        verify(permissions).ensureAccess(Set.of(), Access.Write);
+        verifyNoInteractions(violationHandler);
+        nodes.iterator().forEachRemaining(n-> verify(permissions).ensureAdminAccess(n));
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
 
         verifyNoMoreInteractions(permissions);
     }
+
+
+    @Test
+    public void itShouldCheckPermissionsForChangedWorkspaceProperty() {
+        var before = createDefaultModel();
+        var resource = before.createResource("http://example.com/workspace1");
+        resource.addProperty(RDF.type, FS.Workspace);
+        var toAdd = modelOf(resource, RDFS.comment, createTypedLiteral(123));
+        var toRemove = modelOf(resource, RDFS.label, createTypedLiteral("test"));
+        var after = before.union(toAdd).union(toRemove);
+        var nodeAdded = toAdd.listSubjects().next().asNode();
+        var nodeRemoved = toRemove.listSubjects().next().asNode();
+
+        validator.validate(before, after, toRemove, toAdd, null, violationHandler);
+
+        verify(permissions).ensureAccess(Set.of(nodeRemoved), Access.Manage);
+        verify(permissions).ensureAccess(Set.of(nodeAdded), Access.Write);
+
+        verifyNoMoreInteractions(permissions);
+    }
+
+    @Test
+    public void itShouldCheckPermissionsForChangedWorkspaceStatus() {
+        var before = createDefaultModel();
+        var resource = before.createResource("http://example.com/workspace1");
+        resource.addProperty(RDF.type, FS.Workspace);
+        var toAdd = modelOf(resource, FS.status, createTypedLiteral(WorkspaceStatus.Active.name()));
+        var toRemove = modelOf(resource, FS.status, createTypedLiteral(WorkspaceStatus.Archived.name()));
+        var after = before.union(toAdd).union(toRemove);
+        var nodeAdded = toAdd.listSubjects().next().asNode();
+        var nodeRemoved = toRemove.listSubjects().next().asNode();
+
+        validator.validate(before, after, toRemove, toAdd, null, violationHandler);
+
+        verify(permissions, times(2)).ensureAdminAccess(valueCaptor.capture());
+        List<Node> values = valueCaptor.getAllValues();
+        assertEquals(Arrays.asList(nodeAdded, nodeRemoved), values);
+
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+
+        verifyNoMoreInteractions(permissions);
+    }
+
 }
