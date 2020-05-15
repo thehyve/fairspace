@@ -33,7 +33,9 @@ public class GraphVizSerializer implements Serializer {
         var stringBuilder = new StringBuilder("digraph {\n");
 
         var addedRelationShapes = new HashSet<>();
-        model.listSubjectsWithProperty(RDF.type, FS.ClassShape).forEachRemaining(classShape-> {
+        model.listSubjectsWithProperty(RDF.type, FS.ClassShape)
+                .filterDrop(classShape -> classShape.hasProperty(FS.dateDeleted))
+                .forEachRemaining(classShape-> {
             var classLabel = getStringProperty(classShape, SHACLM.name);
             var targetClassResource = classShape.getPropertyResourceValue(SHACLM.targetClass);
 
@@ -47,6 +49,10 @@ public class GraphVizSerializer implements Serializer {
 
             // Add relation properties as edges
             getResourceProperties(classShape, SHACLM.property).forEach(propertyShape -> {
+                if (propertyShape.hasProperty(FS.dateDeleted)) {
+                    return;
+                }
+
                 // Skip everything but relationshapes
                 var type = getType(propertyShape);
                 if(type == null || !type.equals(FS.RelationShape))
