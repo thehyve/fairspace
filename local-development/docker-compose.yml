@@ -35,6 +35,7 @@ services:
       WORKSPACE_CLIENT_ID: ${WORKSPACE_CLIENT_ID:?Please configure WORKSPACE_CLIENT_ID}
       PROXY_ADDRESS_FORWARDING: 'true'
       WORKSPACE_URL: ${WORKSPACE_URL:?Please configure WORKSPACE_URL.}
+      WORKSPACE_DEBUG_URL: ${WORKSPACE_DEBUG_URL:?Please configure WORKSPACE_DEBUG_URL.}
     ports:
       - ${KEYCLOAK_PORT:-5100}:8080
     depends_on:
