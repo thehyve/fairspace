@@ -1258,10 +1258,12 @@
       "secret": "**********",
       "baseUrl": "${WORKSPACE_URL}",
       "redirectUris": [
-        "${WORKSPACE_URL}/*"
+        "${WORKSPACE_URL}/*",
+        "${WORKSPACE_DEBUG_URL}/*"
       ],
       "webOrigins": [
-        "${WORKSPACE_URL}"
+        "${WORKSPACE_URL}",
+        "${WORKSPACE_DEBUG_URL}"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1269,8 +1271,8 @@
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {},
