@@ -183,9 +183,6 @@ fs:Workspace a fs:ClassShape ;
       fs:statusModifiedByShape ;
   sh:property
       fs:labelShape,
-      fs:statusShape,
-      fs:statusDateModifiedShape,
-      fs:statusModifiedByShape,
       [
         a fs:DatatypePropertyShape ;
         sh:path fs:workspaceDescription ;
@@ -193,6 +190,7 @@ fs:Workspace a fs:ClassShape ;
         sh:description "A markdown formatted description for the workspace homepage." ;
         sh:datatype fs:markdown ;
         sh:maxCount 1 ;
+        sh:minCount 1 ;
         sh:order 2 ;
       ]
 #     ,[
@@ -322,6 +320,7 @@ fs:statusShape a fs:ControlledVocabularyPropertyShape ;
       "Archived"
       ) ;
     sh:maxCount 1 ;
+    sh:minCount 1 ;
     sh:path fs:status ;
     sh:order 1 .
 
