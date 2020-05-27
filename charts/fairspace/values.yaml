@@ -162,6 +162,8 @@ services:
 # Specific settings for Saturn subchart
 #####################################################################
 saturn:
+  auth:
+    enableBasicAuth: true
   persistence:
     files:
       ## A manually managed Persistent Volume and Claim

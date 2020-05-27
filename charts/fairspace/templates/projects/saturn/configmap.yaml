@@ -33,6 +33,7 @@ data:
       authServerUrl: {{ .Values.external.keycloak.baseUrl }}/auth/
       realm: {{ .Values.external.keycloak.realm }}
       clientId: {{ .Values.external.keycloak.clientId }}
+      enableBasicAuth: {{ .Values.saturn.auth.enableBasicAuth }}
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     services:
