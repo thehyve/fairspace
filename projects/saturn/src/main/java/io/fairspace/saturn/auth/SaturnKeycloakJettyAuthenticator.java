@@ -30,7 +30,7 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
                     return new AuthChallenge() {
                         @Override
                         public boolean challenge(HttpFacade exchange) {
-                            if (deployment.isEnableBasicAuth()) {
+                            if (deployment.isEnableBasicAuth() && exchange.getRequest().getCookie("JSESSIONID") == null) {
                                 exchange.getResponse().addHeader("WWW-Authenticate", "Basic realm=\"Fairspace\"");
                             }
                             exchange.getResponse().setStatus(getResponseCode());
