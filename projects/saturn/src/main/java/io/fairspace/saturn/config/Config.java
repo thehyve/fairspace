@@ -73,6 +73,7 @@ public class Config {
         public String authServerUrl = "http://localhost:5100/auth/";
         public String realm = "fairspace";
         public String clientId = "workspace-client";
+        public boolean enableBasicAuth;
     }
 
     public static class WebDAV {
