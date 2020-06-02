@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -146,6 +145,24 @@ public class CollectionsServiceTest {
         assertNull(collections.getByLocation(c.getLocation()));
         assertTrue(collections.list().isEmpty());
         verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
+    }
+
+    @Test
+    public void deletedCollectionIsStillReachable() {
+        var c = collections.create(newCollection());
+
+        doNothing().when(permissions).ensureAdmin();
+
+        collections.delete(c.getIri().getURI());
+
+        when(request.getHeader("Show-Deleted")).thenReturn("on");
+        when(permissions.getPermissions(any())).thenReturn(Map.of(c.getIri(), Access.Read));
+
+        assertNotNull(collections.get(c.getIri().getURI()));
+        assertNotNull(collections.get(c.getIri().getURI()).getDateDeleted());
+        assertNotNull(collections.get(c.getIri().getURI()).getDeletedBy());
+        assertNotNull(collections.getByLocation(c.getLocation()));
+        assertFalse(collections.list().isEmpty());
     }
 
     @Test

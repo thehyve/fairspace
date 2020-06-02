@@ -143,9 +143,13 @@ public class DAO {
      * @return The found entity or null if no entity was found or it was marked as deleted
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri) {
+        return read(type, iri, false);
+    }
+
+    public <T extends PersistentEntity> T read(Class<T> type, Node iri, boolean showDeleted) {
         var m = dataset.getDefaultModel();
         var resource = m.createResource(iri.getURI());
-        return (m.containsResource(resource) && !resource.hasProperty(FS.dateDeleted))
+        return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
                 ? entityFromResource(type, resource)
                 : null;
     }

@@ -78,7 +78,7 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        return addPermissionsToObject(dao.read(Collection.class, createURI(iri)));
+        return addPermissionsToObject(dao.read(Collection.class, createURI(iri), showDeletedFiles()));
     }
 
     public Collection getByLocation(String location) {

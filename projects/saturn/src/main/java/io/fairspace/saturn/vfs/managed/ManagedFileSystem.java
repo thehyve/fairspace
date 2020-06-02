@@ -84,7 +84,7 @@ public class ManagedFileSystem extends BaseFileSystem {
                 .isDirectory(r.hasProperty(RDF.type, FS.Directory))
                 .createdBy(r.getPropertyResourceValue(FS.createdBy).asNode())
                 .modifiedBy(r.getPropertyResourceValue(FS.modifiedBy).asNode())
-                .modifiedBy(r.hasProperty(FS.deletedBy) ? r.getPropertyResourceValue(FS.deletedBy).asNode() : null)
+                .deletedBy(r.hasProperty(FS.deletedBy) ? r.getPropertyResourceValue(FS.deletedBy).asNode() : null)
                 .created(parseXSDDateTimeLiteral(r.getProperty(FS.dateCreated).getLiteral()))
                 .modified(parseXSDDateTimeLiteral(r.getProperty(FS.dateModified).getLiteral()))
                 .deleted(r.hasProperty(FS.dateDeleted) ? parseXSDDateTimeLiteral(r.getProperty(FS.dateDeleted).getLiteral()) : null)
