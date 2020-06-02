@@ -1,13 +1,14 @@
 package io.fairspace.saturn.auth;
 
 import io.fairspace.saturn.config.Services;
+import io.fairspace.saturn.services.users.User;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
 
 public class UserIdentityFilter implements Filter {
     public static final String ADMIN_ROLE = "organisation-admin";
@@ -25,10 +26,16 @@ public class UserIdentityFilter implements Filter {
             if (user != null) {
                 user.setAdmin(((HttpServletRequest) request).isUserInRole(ADMIN_ROLE));
             }
-            setCurrentUser(user);
+            request.setAttribute(User.class.getName(), user);
         }
 
-        chain.doFilter(request, response);
+        currentRequest.set((HttpServletRequest) request);
+
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            currentRequest.remove();
+        }
     }
 
     @Override

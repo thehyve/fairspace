@@ -22,8 +22,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -186,6 +186,10 @@ public class DAO {
 
     }
 
+    public <T extends PersistentEntity> List<T> list(Class<T> type) {
+        return list(type, false);
+    }
+
     /**
      * Lists entities of a specific type (except to marked as deleted)
      *
@@ -193,9 +197,9 @@ public class DAO {
      * @param <T>
      * @return
      */
-    public <T extends PersistentEntity> List<T> list(Class<T> type) {
+    public <T extends PersistentEntity> List<T> list(Class<T> type, boolean includeDeleted) {
         return dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
-                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .filterKeep(r -> includeDeleted || !r.hasProperty(FS.dateDeleted))
                 .mapWith(r -> entityFromResource(type, r))
                 .toList();
     }

@@ -147,6 +147,10 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
                 .isDirectory(true)
                 .created(collection.getDateCreated())
                 .modified(collection.getDateCreated())
+                .deleted(collection.getDateDeleted())
+                .createdBy(collection.getCreatedBy())
+                .modifiedBy(collection.getModifiedBy())
+                .deletedBy(collection.getDeletedBy())
                 .readOnly(!collection.canWrite())
                 .build();
     }

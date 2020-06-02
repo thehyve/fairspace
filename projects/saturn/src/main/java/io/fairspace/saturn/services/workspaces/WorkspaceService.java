@@ -10,7 +10,7 @@ import org.elasticsearch.ResourceNotFoundException;
 import java.util.List;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.time.Instant.now;

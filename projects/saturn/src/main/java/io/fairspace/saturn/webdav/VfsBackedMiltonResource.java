@@ -26,16 +26,19 @@ import java.util.List;
 
 import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
+import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 
 @Slf4j
 public abstract class VfsBackedMiltonResource implements
         Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource {
     private static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
-    private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, String.class);
+    private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
     private static final QName ISREADONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
-    private static final PropertyMetaData ISREADONLY_PROPERTY_META = new PropertyMetaData(PropertyAccessibility.READ_ONLY, Boolean.class);
+    private static final PropertyMetaData ISREADONLY_PROPERTY_META = new PropertyMetaData(READ_ONLY, Boolean.class);
+    private static final QName DATE_DELETED_PROPERTY = new QName(FS.NS, "dateDeleted");
+    private static final PropertyMetaData DATE_DELETE_PROPERTY_META = new PropertyMetaData(READ_ONLY, Date.class);
 
-    private static final List<QName> DEFAULT_PROPERTIES = List.of(IRI_PROPERTY, ISREADONLY_PROPERTY);
+    private static final List<QName> DEFAULT_PROPERTIES = List.of(IRI_PROPERTY, ISREADONLY_PROPERTY, DATE_DELETED_PROPERTY);
 
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
@@ -145,6 +148,7 @@ public abstract class VfsBackedMiltonResource implements
             }
         }
         if (name.equals(ISREADONLY_PROPERTY)) return info.isReadOnly();
+        if (name.equals(DATE_DELETED_PROPERTY)) return info.getDeleted();
 
         return propertySource.getProperty(name);
     }
@@ -158,6 +162,7 @@ public abstract class VfsBackedMiltonResource implements
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
         if (name.equals(IRI_PROPERTY)) return IRI_PROPERTY_META;
         if (name.equals(ISREADONLY_PROPERTY)) return ISREADONLY_PROPERTY_META;
+        if (name.equals(DATE_DELETED_PROPERTY)) return DATE_DELETE_PROPERTY_META;
 
         return propertySource.getPropertyMeta(name);
     }

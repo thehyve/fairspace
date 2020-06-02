@@ -17,8 +17,8 @@ import org.apache.jena.vocabulary.RDF;
 import java.time.Instant;
 import java.util.Set;
 
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;

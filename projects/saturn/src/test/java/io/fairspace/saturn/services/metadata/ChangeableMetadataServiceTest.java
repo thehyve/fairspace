@@ -17,11 +17,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import static io.fairspace.saturn.TestUtils.isomorphic;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -29,7 +32,9 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceTest {
@@ -48,13 +53,16 @@ public class ChangeableMetadataServiceTest {
 
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
+    @Mock
+    private HttpServletRequest request;
 
     @Before
     public void setUp() {
         var user = new User();
         user.setIri(createURI("http://example.com#user"));
         user.setName("user");
-        setCurrentUser(user);
+        currentRequest.set(request);
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());
     }
 

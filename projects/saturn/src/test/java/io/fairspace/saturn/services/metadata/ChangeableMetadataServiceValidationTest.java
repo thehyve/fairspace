@@ -20,10 +20,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import static io.fairspace.saturn.TestUtils.isomorphic;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -63,13 +66,16 @@ public class ChangeableMetadataServiceValidationTest {
 
     private DatasetJobSupport ds;
     private ChangeableMetadataService api;
+    @Mock
+    private HttpServletRequest request;
 
     @Before
     public void setUp() {
         ds = new DatasetJobSupportInMemory();
         api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
 
-        setCurrentUser(user);
+        currentRequest.set(request);
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(createURI("http://ex.com/user"));
         when(user.getName()).thenReturn("name");
     }

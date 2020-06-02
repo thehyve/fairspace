@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static java.util.Arrays.asList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
@@ -44,12 +47,16 @@ public class ManagedFileSystemTest {
     private CollectionsService collections;
     @Mock
     private PermissionsService permissions;
+    @Mock
+    private HttpServletRequest request;
 
     private DatasetJobSupport ds;
     private ManagedFileSystem fs;
 
     @Before
     public void before()  {
+        currentRequest.set(request);
+
         var store = new MemoryBlobStore();
         ds = new DatasetJobSupportInMemory();
 

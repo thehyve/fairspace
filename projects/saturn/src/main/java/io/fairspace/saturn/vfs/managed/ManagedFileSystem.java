@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
 import static io.fairspace.saturn.rdf.ModelUtils.copyProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
@@ -63,7 +64,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         return dataset.calculateRead(() -> {
             var model = dataset.getDefaultModel();
             var resource = model.createResource(iri(path));
-            if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted) && !resource.hasProperty(FS.movedTo)) {
+            if (model.containsResource(resource) && (showDeletedFiles() || !resource.hasProperty(FS.dateDeleted)) && !resource.hasProperty(FS.movedTo)) {
                 var fileInfo = fileInfo(resource);
                 var collection = collections.getByLocation(splitPath(path)[0]);
                 if (collection == null) {
@@ -77,15 +78,17 @@ public class ManagedFileSystem extends BaseFileSystem {
         });
     }
 
-    private FileInfo fileInfo(Resource resource) {
+    private FileInfo fileInfo(Resource r) {
         return FileInfo.builder()
-                .path(resource.getProperty(FS.filePath).getString())
-                .isDirectory(resource.hasProperty(RDF.type, FS.Directory))
-                .createdBy(resource.getPropertyResourceValue(FS.createdBy).asNode())
-                .modifiedBy(resource.getPropertyResourceValue(FS.modifiedBy).asNode())
-                .created(parseXSDDateTimeLiteral(resource.getProperty(FS.dateCreated).getLiteral()))
-                .modified(parseXSDDateTimeLiteral(resource.getProperty(FS.dateModified).getLiteral()))
-                .size(resource.hasProperty(FS.fileSize) ? resource.getProperty(FS.fileSize).getLong() : 0)
+                .path(r.getProperty(FS.filePath).getString())
+                .isDirectory(r.hasProperty(RDF.type, FS.Directory))
+                .createdBy(r.getPropertyResourceValue(FS.createdBy).asNode())
+                .modifiedBy(r.getPropertyResourceValue(FS.modifiedBy).asNode())
+                .modifiedBy(r.hasProperty(FS.deletedBy) ? r.getPropertyResourceValue(FS.deletedBy).asNode() : null)
+                .created(parseXSDDateTimeLiteral(r.getProperty(FS.dateCreated).getLiteral()))
+                .modified(parseXSDDateTimeLiteral(r.getProperty(FS.dateModified).getLiteral()))
+                .deleted(r.hasProperty(FS.dateDeleted) ? parseXSDDateTimeLiteral(r.getProperty(FS.dateDeleted).getLiteral()) : null)
+                .size(r.hasProperty(FS.fileSize) ? r.getProperty(FS.fileSize).getLong() : 0)
                 .build();
     }
 
@@ -99,9 +102,10 @@ public class ManagedFileSystem extends BaseFileSystem {
             }
             var readOnly = !collection.canWrite();
             var parent = dataset.getDefaultModel().createResource(iri(path));
+            var showDeleted = showDeletedFiles();
             return parent.listProperties(FS.contains)
                     .mapWith(Statement::getResource)
-                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                    .filterKeep(r -> showDeleted || !r.hasProperty(FS.dateDeleted))
                     .mapWith(this::fileInfo)
                     .mapWith(f -> {
                         f.setReadOnly(readOnly);
@@ -254,11 +258,6 @@ public class ManagedFileSystem extends BaseFileSystem {
         var resource = dataset.getDefaultModel().createResource(iri(path));
         var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
         var now = toXSDDateTimeLiteral(Instant.now());
-        var dir = parentPath(path);
-        if (dir != null) {
-            var parent = dataset.getDefaultModel().createResource(iri(dir));
-            parent.getModel().removeAll(parent, FS.contains, resource);
-        }
         deleteRecursively(resource, now, user);
     }
 
@@ -266,6 +265,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         if (resource.hasProperty(RDF.type, FS.Directory) || resource.hasProperty(RDF.type, FS.Collection)) {
             resource.listProperties(FS.contains)
                     .mapWith(Statement::getResource)
+                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
                     .forEachRemaining(child -> deleteRecursively(child, date, user));
         }
 

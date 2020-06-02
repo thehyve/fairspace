@@ -8,9 +8,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -24,13 +25,16 @@ public class TxnLogDatasetGraphTest {
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
+    @Mock
+    private HttpServletRequest request;
 
     @Before
     public void before() {
         var user = new User();
         user.setId("userId");
         user.setName("fullName");
-        setCurrentUser(user);
+        currentRequest.set(request);
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         ds = new DatasetJobSupportImpl(new DatasetGraphBatch(new TxnLogDatasetGraph(createTxnMem(), log)));
     }
 

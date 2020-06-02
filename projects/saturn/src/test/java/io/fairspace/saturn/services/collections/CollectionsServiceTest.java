@@ -16,9 +16,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 import java.util.function.Consumer;
 
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.*;
@@ -34,12 +37,15 @@ public class CollectionsServiceTest {
     @Mock
     private User user;
     @Mock
+    private HttpServletRequest request;
+    @Mock
     private PermissionsService permissions;
     private CollectionsService collections;
 
     @Before
     public void before() {
-        setCurrentUser(user);
+        currentRequest.set(request);
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
         var ds = new DatasetJobSupportInMemory();
@@ -58,6 +64,7 @@ public class CollectionsServiceTest {
         verify(eventListener, times(1)).accept(new CollectionCreatedEvent(created));
     }
 
+    @Test
     public void newlyCreatedCollectionIsProperlyInitialized() {
         var prototype = newCollection();
         var created = collections.create(prototype);
@@ -66,17 +73,18 @@ public class CollectionsServiceTest {
         assertEquals(prototype.getDescription(), created.getDescription());
         assertEquals(prototype.getLocation(), created.getLocation());
         assertEquals(prototype.getConnectionString(), created.getConnectionString());
-        assertEquals("http://example.com/user", created.getCreatedBy().getURI());
+        assertEquals(userIri.getURI(), created.getCreatedBy().getURI());
         assertNotNull(created.getDateCreated());
         assertEquals(created.getDateCreated(), created.getDateModified());
         assertEquals(Access.Manage, created.getAccess());
     }
 
+    @Test
     public void newlyCreatedCollectionIsAccessible() {
         var created = collections.create(newCollection());
+        when(permissions.getPermissions(any())).thenReturn(Map.of(created.getIri(), Access.Write));
         assertNotNull(collections.getByLocation("dir1"));
         assertNull(collections.getByLocation("dir2"));
-
         assertEquals(1, collections.list().size());
         assertTrue(collections.list().contains(created));
 
