@@ -14,11 +14,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
@@ -29,6 +30,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +39,10 @@ public class MetadataEntityLifeCycleManagerTest {
     @Mock
     private User user;
     @Mock
+    private HttpServletRequest request;
+    @Mock
     private PermissionsService permissionsService;
+
 
     private MetadataEntityLifeCycleManager lifeCycleManager;
     private Dataset ds;
@@ -58,7 +63,8 @@ public class MetadataEntityLifeCycleManagerTest {
 
         initVocabularies(ds);
 
-        setCurrentUser(user);
+        currentRequest.set(request);
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(userIri);
 
         lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, permissionsService);

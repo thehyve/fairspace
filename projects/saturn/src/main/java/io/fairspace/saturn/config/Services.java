@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.util.Map;
 
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;

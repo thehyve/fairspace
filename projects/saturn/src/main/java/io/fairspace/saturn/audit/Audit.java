@@ -3,7 +3,7 @@ package io.fairspace.saturn.audit;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 
 
 public class Audit {

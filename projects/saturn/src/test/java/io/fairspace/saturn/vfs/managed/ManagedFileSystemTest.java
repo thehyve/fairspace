@@ -9,6 +9,7 @@ import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
@@ -19,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static java.util.Arrays.asList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
@@ -44,12 +47,18 @@ public class ManagedFileSystemTest {
     private CollectionsService collections;
     @Mock
     private PermissionsService permissions;
+    @Mock
+    private HttpServletRequest request;
+    @Mock
+    private User user;
 
     private DatasetJobSupport ds;
     private ManagedFileSystem fs;
 
     @Before
     public void before()  {
+        currentRequest.set(request);
+
         var store = new MemoryBlobStore();
         ds = new DatasetJobSupportInMemory();
 
@@ -340,6 +349,28 @@ public class ManagedFileSystemTest {
         assertFalse(fs.exists("coll/dir"));
         assertFalse(fs.exists("coll/dir/subdir"));
         assertFalse(fs.exists("coll/dir/file"));
+    }
+
+    @Test
+    public void showDeletedDir() throws IOException {
+        fs.mkdir("coll/dir");
+        fs.mkdir("coll/dir/subdir");
+        fs.create("coll/dir/file", new ByteArrayInputStream(content1));
+
+        doNothing().when(permissions).ensureAdmin();
+        fs.delete("coll/dir");
+
+        when(request.getHeader("Show-Deleted")).thenReturn("on");
+
+        assertTrue(fs.exists("coll/dir"));
+        assertNotNull(fs.stat("coll/dir").getDeleted());
+        assertNotNull(fs.stat("coll/dir").getDeletedBy());
+        assertTrue(fs.exists("coll/dir/subdir"));
+        assertNotNull(fs.stat("coll/dir/subdir").getDeleted());
+        assertNotNull(fs.stat("coll/dir/subdir").getDeletedBy());
+        assertTrue(fs.exists("coll/dir/file"));
+        assertNotNull(fs.stat("coll/dir/file").getDeleted());
+        assertNotNull(fs.stat("coll/dir/file").getDeletedBy());
     }
 
     @Test(expected = AccessDeniedException.class)

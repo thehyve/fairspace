@@ -16,9 +16,9 @@ import org.apache.jena.vocabulary.RDF;
 import java.util.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.Comparator.naturalOrder;

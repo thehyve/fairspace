@@ -12,8 +12,6 @@ import static io.fairspace.saturn.vocabulary.FS.*;
 @RDFType(USER_URI)
 @Getter @Setter
 public class User extends PersistentEntity {
-    private static final ThreadLocal<User> current = new ThreadLocal<>();
-
     @RDFProperty(value = ID_URI, required = true)
     private String id;
 
@@ -24,12 +22,4 @@ public class User extends PersistentEntity {
     private String email;
 
     private boolean admin;
-
-    public static User getCurrentUser() {
-        return current.get();
-    }
-
-    public static void setCurrentUser(User user) {
-        current.set(user);
-    }
 }

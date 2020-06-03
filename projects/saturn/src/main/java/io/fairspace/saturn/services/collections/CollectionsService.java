@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import static io.fairspace.saturn.audit.Audit.audit;
+import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
 import static io.fairspace.saturn.rdf.dao.DAO.entityFromResource;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
@@ -77,7 +78,7 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        return addPermissionsToObject(dao.read(Collection.class, createURI(iri)));
+        return addPermissionsToObject(dao.read(Collection.class, createURI(iri), showDeletedFiles()));
     }
 
     public Collection getByLocation(String location) {
@@ -88,8 +89,7 @@ public class CollectionsService {
 
     private Optional<Collection> getByLocationWithoutAccess(String location) {
         return dao.getDataset().getDefaultModel().listSubjectsWithProperty(FS.filePath, location)
-                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
-                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection) && (showDeletedFiles() || !r.hasProperty(FS.dateDeleted)))
                 .nextOptional()
                 .map(r -> entityFromResource(Collection.class, r));
     }
@@ -112,7 +112,7 @@ public class CollectionsService {
 
     public List<Collection> list() {
         return dao.getDataset().calculateRead(() -> {
-            var collections = dao.list(Collection.class);
+            var collections = dao.list(Collection.class, showDeletedFiles());
 
             var iris = collections.stream().map(Collection::getIri).collect(toList());
             var userPermissions = permissions.getPermissions(iris);

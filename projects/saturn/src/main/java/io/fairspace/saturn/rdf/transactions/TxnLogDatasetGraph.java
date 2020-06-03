@@ -10,7 +10,7 @@ import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
 
-import static io.fairspace.saturn.services.users.User.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static java.lang.System.currentTimeMillis;
 
 @Slf4j

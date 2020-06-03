@@ -9,7 +9,11 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,14 +21,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DAOTest {
 
     private DatasetJobSupport dataset;
@@ -32,6 +39,8 @@ public class DAOTest {
     private Entity entity;
     private EntityWithInheritedProperties entityWithInheritedProperties;
     private LifecycleAwareEntity basicEntity;
+    @Mock
+    private HttpServletRequest request;
 
     @Before
     public void before() {
@@ -42,7 +51,8 @@ public class DAOTest {
         basicEntity = new LifecycleAwareEntity();
         var user = new User();
         user.setIri(createURI("http://ex.com/user"));
-        setCurrentUser(user);
+        currentRequest.set(request);
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
     }
 
     @Test

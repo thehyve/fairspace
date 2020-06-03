@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
 import static java.util.stream.Collectors.joining;
+import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 
 public class VfsBackedMiltonResourceFactory implements ResourceFactory {
     private final VirtualFileSystem fs;
@@ -50,5 +51,9 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
         } else {
             return new VfsBackedMiltonFileResource(fs, info);
         }
+    }
+
+    static boolean showDeleted() {
+        return "on".equals(getCurrentConnection().getHttpChannel().getRequest().getHeader("Show-Deleted"));
     }
 }

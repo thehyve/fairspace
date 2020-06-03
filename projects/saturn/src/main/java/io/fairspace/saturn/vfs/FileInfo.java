@@ -19,6 +19,8 @@ public class FileInfo implements Comparable<FileInfo> {
     private Node createdBy;
     private Instant modified;
     private Node modifiedBy;
+    private Instant deleted;
+    private Node deletedBy;
 
     @Builder.Default
     private Map<String, String> customProperties = Collections.emptyMap();

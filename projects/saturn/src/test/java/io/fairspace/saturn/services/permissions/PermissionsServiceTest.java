@@ -16,16 +16,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.services.users.User.setCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,14 +53,22 @@ public class PermissionsServiceTest {
     @Mock
     private User currentUser;
 
+    @Mock
+    private HttpServletRequest request;
+
     private Node currentUserIri = USER1;
+
+
+
 
     @Before
     public void setUp() {
         ds = new DatasetJobSupportInMemory();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
-        setCurrentUser(currentUser);
+        currentRequest.set(request);
+
+        when(request.getAttribute(eq(User.class.getName()))).thenReturn(currentUser);
 
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
