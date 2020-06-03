@@ -48,8 +48,15 @@ public class CollectionsServiceTest {
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
         var ds = new DatasetJobSupportInMemory();
+        var dao = new DAO(ds);
         ds.getDefaultModel().add(ds.getDefaultModel().asRDFNode(workspaceIri).asResource(), RDF.type, FS.Workspace);
-        collections = new CollectionsService("http://fairspace.io/", new DAO(ds), eventListener, permissions);
+        collections = new CollectionsService("http://fairspace.io/", dao, eventListener, permissions);
+
+        doAnswer(invocation -> {
+            CollectionDeletedEvent e = invocation.getArgument(0);
+            dao.markAsDeleted(e.getCollection());
+            return null;
+        }).when(eventListener).accept(any(CollectionDeletedEvent.class));
     }
 
     @Test
