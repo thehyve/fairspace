@@ -146,6 +146,15 @@ public class DAO {
         return read(type, iri, false);
     }
 
+    /**
+     * Reads an entity
+     *
+     * @param type
+     * @param iri
+     * @param showDeleted
+     * @param <T>
+     * @return The found entity or null if no entity was found or it was marked as deleted and showDeleted is set to false
+     */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri, boolean showDeleted) {
         var m = dataset.getDefaultModel();
         var resource = m.createResource(iri.getURI());
@@ -190,14 +199,22 @@ public class DAO {
 
     }
 
+    /**
+     * Lists entities of a specific type (except to marked as deleted)
+     *
+     * @param type
+     * @param <T>
+     * @return
+     */
     public <T extends PersistentEntity> List<T> list(Class<T> type) {
         return list(type, false);
     }
 
     /**
-     * Lists entities of a specific type (except to marked as deleted)
+     * Lists entities of a specific type
      *
      * @param type
+     * @param includeDeleted
      * @param <T>
      * @return
      */
