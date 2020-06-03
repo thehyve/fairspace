@@ -237,9 +237,9 @@ public class ManagedFileSystem extends BaseFileSystem {
     @Override
     public void doDelete(String path) throws IOException {
         try {
-            permissions.ensureAdmin();
+            permissions.ensureAdmin(); // TODO: Should be some different check
         } catch (io.fairspace.saturn.services.AccessDeniedException e) {
-            throw new AccessDeniedException(path, null, "Only admins can delete files." );
+            throw new AccessDeniedException(path, null, "Only admins can delete files.");
         }
         dataset.executeWrite(() -> {
             var info = stat(path);
@@ -258,19 +258,29 @@ public class ManagedFileSystem extends BaseFileSystem {
         var resource = dataset.getDefaultModel().createResource(iri(path));
         var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
         var now = toXSDDateTimeLiteral(Instant.now());
-        deleteRecursively(resource, now, user);
+        var purge = resource.hasProperty(FS.dateDeleted);
+        if (purge) {
+            permissions.ensureAdmin();
+        }
+        deleteRecursively(resource, now, user, purge);
     }
 
-    private void deleteRecursively(Resource resource, Literal date, Resource user) {
+    private void deleteRecursively(Resource resource, Literal date, Resource user, boolean purge) {
         if (resource.hasProperty(RDF.type, FS.Directory) || resource.hasProperty(RDF.type, FS.Collection)) {
             resource.listProperties(FS.contains)
                     .mapWith(Statement::getResource)
-                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
-                    .forEachRemaining(child -> deleteRecursively(child, date, user));
+                    .filterKeep(r -> purge || !r.hasProperty(FS.dateDeleted))
+                    .forEachRemaining(child -> deleteRecursively(child, date, user, purge));
         }
 
-        resource.addLiteral(FS.dateDeleted, date)
-                .addProperty(FS.deletedBy, user);
+        if (purge) {
+            resource.getModel()
+                    .removeAll(resource, null, null)
+                    .removeAll(null, null, resource);
+        } else {
+            resource.addLiteral(FS.dateDeleted, date)
+                    .addProperty(FS.deletedBy, user);
+        }
     }
 
     @Override
