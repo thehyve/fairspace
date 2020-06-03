@@ -141,7 +141,6 @@ public class CollectionsService {
                 log.info("Collection not found {}", iri);
                 throw new CollectionNotFoundException(iri);
             }
-            dao.markAsDeleted(collection);
 
             // Emit event on internal eventbus so the filesystem can act accordingly
             eventListener.accept(new CollectionDeletedEvent(collection));
