@@ -5,13 +5,14 @@ import io.fairspace.saturn.vfs.InvalidFilenameException;
 import io.fairspace.saturn.vfs.VirtualFileSystem;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
+import io.milton.http.ConditionalCompatibleResource;
 import io.milton.http.Request;
+import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
-import io.milton.property.PropertySource.PropertyAccessibility;
 import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.resource.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +28,17 @@ import java.util.List;
 import static io.fairspace.saturn.vfs.PathUtils.name;
 import static io.fairspace.saturn.vfs.PathUtils.normalizePath;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
+import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
 @Slf4j
 public abstract class VfsBackedMiltonResource implements
-        Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource {
+        Resource, PropFindableResource, DeletableResource, CopyableResource, MoveableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource {
     private static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertyMetaData IRI_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
     private static final QName ISREADONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
     private static final PropertyMetaData ISREADONLY_PROPERTY_META = new PropertyMetaData(READ_ONLY, Boolean.class);
     private static final QName DATE_DELETED_PROPERTY = new QName(FS.NS, "dateDeleted");
-    private static final PropertyMetaData DATE_DELETE_PROPERTY_META = new PropertyMetaData(READ_ONLY, Date.class);
+    private static final PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertyMetaData(WRITABLE, Date.class);
 
     private static final List<QName> DEFAULT_PROPERTIES = List.of(IRI_PROPERTY, ISREADONLY_PROPERTY, DATE_DELETED_PROPERTY);
 
@@ -155,14 +157,24 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
-
+        if (name.equals(DATE_DELETED_PROPERTY)) {
+            if (value == null) {
+                try {
+                    fs.restore(info.getPath());
+                } catch (IOException e) {
+                    throw new PropertySource.PropertySetException(Response.Status.SC_PRECONDITION_FAILED, "Error restoring");
+                }
+            } else {
+                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Cannot modify \"dateDeleted\" property");
+            }
+        }
     }
 
     @Override
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
         if (name.equals(IRI_PROPERTY)) return IRI_PROPERTY_META;
         if (name.equals(ISREADONLY_PROPERTY)) return ISREADONLY_PROPERTY_META;
-        if (name.equals(DATE_DELETED_PROPERTY)) return DATE_DELETE_PROPERTY_META;
+        if (name.equals(DATE_DELETED_PROPERTY)) return DATE_DELETED_PROPERTY_META;
 
         return propertySource.getPropertyMeta(name);
     }
@@ -202,5 +214,14 @@ public abstract class VfsBackedMiltonResource implements
         if (info.isReadOnly()) {
             throw new NotAuthorizedException(this);
         }
+    }
+
+    @Override
+    public boolean isCompatible(Request.Method method) {
+        if (info.getDeleted() != null) {
+            return !method.isWrite || (method == Request.Method.DELETE || method == Request.Method.PROPPATCH);
+        }
+
+        return true;
     }
 }

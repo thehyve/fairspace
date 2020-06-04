@@ -74,6 +74,12 @@ public class AuditedFileSystem implements VirtualFileSystem {
     }
 
     @Override
+    public void restore(String path) throws IOException {
+        fs.restore(path);
+        audit("FS_RESTORE", "path", path);
+    }
+
+    @Override
     public void close() throws IOException {
         fs.close();
     }
