@@ -6,10 +6,10 @@ import useAsync from "../common/hooks/UseAsync";
 import MessageDisplay from "../common/components/MessageDisplay";
 
 const PathMetadata = ({
-    path,
+    path, showDeleted,
     ...otherProps
 }) => {
-    const {data, error, loading} = useAsync(() => FileAPI.stat(path), [path]);
+    const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
 
     if (error) {
         return (<MessageDisplay message="An error occurred while determining metadata subject" />);

@@ -3,6 +3,8 @@ import Grid from '@material-ui/core/Grid';
 import {withRouter} from "react-router-dom";
 import queryString from "query-string";
 
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import {Switch, withStyles} from "@material-ui/core";
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
 import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";
@@ -15,19 +17,23 @@ import {handleCollectionSearchRedirect} from "../collections/collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
+import styles from "./FilesPage.styles";
+import useAsync from "../common/hooks/UseAsync";
+import FileAPI from "./FileAPI";
 
 export const FilesPage = ({
-    match,
     location,
     history,
     fileApi,
-    collections = [],
+    collection,
+    openedPath,
     loading = false,
-    error = false
+    error = false,
+    showDeleted,
+    setShowDeleted,
+    isOpenedPathDeleted = false,
+    classes
 }) => {
-    const {params} = match;
-    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
-    const collection = collections.find(c => c.location === collectionLocation) || {};
     const selection = useMultipleSelection();
     const [busy, setBusy] = useState(false);
 
@@ -65,33 +71,51 @@ export const FilesPage = ({
 
     return (
         <CollectionBreadcrumbsContextProvider>
-            <div style={{position: 'relative', zIndex: 1}}>
+            <div className={classes.breadcrumbs}>
                 <BreadCrumbs additionalSegments={breadcrumbSegments} />
             </div>
-            <div style={{marginBottom: 16, width: consts.MAIN_CONTENT_WIDTH}}>
-                <SearchBar
-                    placeholder="Search"
-                    disableUnderline={false}
-                    onSearchChange={handleSearch}
-                />
-            </div>
+            <Grid container justify="space-between" alignItems="center" className={classes.topBar}>
+                <Grid item xs={9}>
+                    <SearchBar
+                        placeholder="Search"
+                        disableUnderline={false}
+                        onSearchChange={handleSearch}
+                    />
+                </Grid>
+                <Grid item xs={3} className={classes.topBarSwitch}>
+                    <FormControlLabel
+                        control={(
+                            <Switch
+                                color="primary"
+                                checked={showDeleted}
+                                onChange={() => setShowDeleted(!showDeleted)}
+                                disabled={isOpenedPathDeleted}
+                            />
+                        )}
+                        label="Show deleted"
+                    />
+                </Grid>
+            </Grid>
             <Grid container spacing={1}>
-                <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
+                <Grid item className={classes.centralPanel}>
                     <FileBrowser
                         data-testid="file-browser"
                         openedCollection={collection}
                         openedPath={openedPath}
+                        isOpenedPathDeleted={isOpenedPathDeleted}
                         collectionsLoading={loading}
                         collectionsError={error}
                         fileApi={fileApi}
                         selection={selection}
+                        showDeleted={showDeleted}
                     />
                 </Grid>
-                <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
+                <Grid item className={classes.sidePanel}>
                     <CollectionInformationDrawer
                         setBusy={setBusy}
                         path={path}
                         selectedCollectionIri={collection.iri}
+                        showDeleted={showDeleted}
                     />
                 </Grid>
             </Grid>
@@ -100,16 +124,54 @@ export const FilesPage = ({
     );
 };
 
-const ContextualFilesPage = (props) => {
-    const {collections, loading, error} = useContext(CollectionsContext);
+const ParentAwareFilesPage = (props) => {
+    const {data, error, loading} = useAsync(
+        () => (FileAPI.stat(props.openedPath, true)),
+        [props.openedPath]
+    );
+
+    // Parse stat data
+    const parentFileProps = data && data.props;
+    const isFileDeleted = parentFileProps && parentFileProps.dateDeleted;
+    const isOpenedPathDeleted = props.collection.dateDeleted || isFileDeleted;
+
     return (
         <FilesPage
-            collections={collections}
-            loading={loading}
-            error={error}
+            isOpenedPathDeleted={isOpenedPathDeleted}
+            loading={loading && props.loading}
+            error={error && props.error}
             {...props}
         />
     );
 };
 
-export default withRouter(ContextualFilesPage);
+const ContextualFilesPage = (props) => {
+    const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
+    const {params} = props.match;
+    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
+    const collection = collections.find(c => c.location === collectionLocation) || {};
+
+    return showDeleted ? (
+        <ParentAwareFilesPage
+            collection={collection}
+            openedPath={openedPath}
+            loading={loading}
+            error={error}
+            showDeleted={showDeleted}
+            setShowDeleted={setShowDeleted}
+            {...props}
+        />
+    ) : (
+        <FilesPage
+            collection={collection}
+            openedPath={openedPath}
+            loading={loading}
+            error={error}
+            showDeleted={showDeleted}
+            setShowDeleted={setShowDeleted}
+            {...props}
+        />
+    );
+};
+
+export default withRouter(withStyles(styles)(ContextualFilesPage));

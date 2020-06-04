@@ -5,6 +5,7 @@ import {act} from 'react-dom/test-utils';
 import {FilesPage} from "../FilesPage";
 import CollectionInformationDrawer from "../../collections/CollectionInformationDrawer";
 import FileBrowser from '../FileBrowser';
+import {getPathInfoFromParams} from "../fileUtils";
 
 const collections = [
     {
@@ -15,21 +16,24 @@ const collections = [
     }
 ];
 
-function shallowRender(history, openedPath, locationSearch = '') {
+function shallowRender(history, path, locationSearch = '') {
+    const match = {
+        params: {
+            collection: 'location1',
+            path
+        }
+    };
+    const {openedPath} = getPathInfoFromParams(match.params);
     return shallow(
         <FilesPage
-            match={{
-                params: {
-                    collection: 'location1',
-                    path: openedPath
-                }
-            }}
+            openedPath={openedPath}
             location={{
                 search: locationSearch
             }}
             history={history}
             selectCollection={() => {}}
-            collections={collections}
+            collection={collections[0]}
+            classes={{}}
         />
     );
 }

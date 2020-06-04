@@ -45,6 +45,7 @@ export const FileOperations = ({
     const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
     const moreThanOneItemSelected = selectedPaths.length > 1;
+    const deletedItemSelected = selectedItems.filter(f => f.dateDeleted).length > 0;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
     const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
@@ -149,7 +150,7 @@ export const FileOperations = ({
                 <IconButton
                     title={`Download ${selectedItem.basename}`}
                     aria-label={`Download ${selectedItem.basename}`}
-                    disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || busy}
+                    disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || deletedItemSelected || busy}
                     component="a"
                     href={fileActions.getDownloadLink(selectedItem.filename)}
                     download
@@ -162,12 +163,12 @@ export const FileOperations = ({
                             <RenameButton
                                 currentName={selectedItem.basename}
                                 onRename={newName => handlePathRename(selectedItem, newName)}
-                                disabled={isDisabledForMoreThanOneSelection || busy}
+                                disabled={isDisabledForMoreThanOneSelection || deletedItemSelected || busy}
                             >
                                 <IconButton
                                     title={`Rename ${selectedItem.basename}`}
                                     aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={isDisabledForMoreThanOneSelection || busy}
+                                    disabled={isDisabledForMoreThanOneSelection || deletedItemSelected || busy}
                                 >
                                     <BorderColor />
                                 </IconButton>
@@ -179,12 +180,12 @@ export const FileOperations = ({
                                 agreeButtonText="Remove"
                                 dangerous
                                 onClick={handleDelete}
-                                disabled={noPathSelected || busy}
+                                disabled={noPathSelected || deletedItemSelected || busy}
                             >
                                 <IconButton
                                     title="Delete"
                                     aria-label="Delete"
-                                    disabled={noPathSelected || busy}
+                                    disabled={noPathSelected || deletedItemSelected || busy}
                                 >
                                     <Delete />
                                 </IconButton>
@@ -198,7 +199,7 @@ export const FileOperations = ({
                     aria-label="Copy"
                     title="Copy"
                     onClick={e => handleCopy(e)}
-                    disabled={noPathSelected || busy}
+                    disabled={noPathSelected || deletedItemSelected || busy}
                 >
                     <ContentCopy />
                 </IconButton>
@@ -207,7 +208,7 @@ export const FileOperations = ({
                         aria-label="Cut"
                         title="Cut"
                         onClick={e => handleCut(e)}
-                        disabled={noPathSelected || busy}
+                        disabled={noPathSelected || deletedItemSelected || busy}
                     >
                         <ContentCut />
                     </IconButton>
@@ -217,7 +218,7 @@ export const FileOperations = ({
                         aria-label="Paste"
                         title="Paste"
                         onClick={e => handlePaste(e)}
-                        disabled={isPasteDisabled || busy}
+                        disabled={isPasteDisabled || deletedItemSelected || busy}
                     >
                         {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                     </IconButton>
