@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
-import {BorderColor, CreateNewFolder, Delete} from '@material-ui/icons';
+import {BorderColor, CreateNewFolder, Delete, RestoreFromTrash} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
@@ -22,13 +22,15 @@ export const Operations = {
     PASTE: 'PASTE',
     MKDIR: 'MKDIR',
     RENAME: 'RENAME',
-    DELETE: 'DELETE'
+    DELETE: 'DELETE',
+    RESTORE: 'RESTORE'
 };
 Object.freeze(Operations);
 
 export const FileOperations = ({
     isWritingEnabled,
     currentUser,
+    showDeleted,
     openedPath,
     selectedPaths,
     clearSelection,
@@ -140,6 +142,11 @@ export const FileOperations = ({
         return `Are you sure you want to remove ${selectedPaths.length} item(s)? `;
     };
 
+    const handleRestore = () => fileOperation(Operations.RESTORE, fileActions.restoreMultiple(selectedPaths))
+        .catch((err) => {
+            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleRestore());
+        });
+
     return (
         <>
             <FileOperationsGroup>
@@ -205,6 +212,26 @@ export const FileOperations = ({
                                 </IconButton>
                             </ConfirmationButton>
                         </ProgressButton>
+                        {showDeleted && (
+                            <ProgressButton active={activeOperation === Operations.RESTORE}>
+                                <ConfirmationButton
+                                    message={`Are you sure you want to restore ${selectedPaths.length} item(s)?`}
+                                    agreeButtonText="Restore"
+                                    dangerous
+                                    onClick={handleRestore}
+                                    disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
+                                >
+                                    <IconButton
+                                        title="Restore"
+                                        aria-label="Restore"
+                                        disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
+                                    >
+                                        <RestoreFromTrash />
+                                    </IconButton>
+                                </ConfirmationButton>
+                            </ProgressButton>
+                        )}
+
                     </>
                 )}
             </FileOperationsGroup>
