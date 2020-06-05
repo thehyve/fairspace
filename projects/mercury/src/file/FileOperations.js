@@ -45,7 +45,8 @@ export const FileOperations = ({
     const selectedItems = files.filter(f => selectedPaths.includes(f.filename)) || [];
     const selectedItem = selectedItems && selectedItems.length === 1 ? selectedItems[0] : {};
     const moreThanOneItemSelected = selectedPaths.length > 1;
-    const deletedItemSelected = selectedItems.filter(f => f.dateDeleted).length > 0;
+    const selectedDeletedItems = selectedItems.filter(f => f.dateDeleted);
+    const isDeletedItemSelected = selectedDeletedItems.length > 0;
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
     const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
@@ -126,6 +127,19 @@ export const FileOperations = ({
             ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
         });
 
+
+    const getDeletionConfirmationMessage = () => {
+        if (isDeletedItemSelected) {
+            if (selectedDeletedItems.length === 1) {
+                return 'Selected item is already marked as deleted. '
+                    + 'By clicking "Remove" you agree to remove the item permanently!';
+            }
+            return `${selectedDeletedItems.length} of ${selectedPaths.length} selected items are already marked as deleted. 
+            By clicking "Remove" you agree to remove these items permanently!`;
+        }
+        return `Are you sure you want to remove ${selectedPaths.length} item(s)? `;
+    };
+
     return (
         <>
             <FileOperationsGroup>
@@ -150,7 +164,7 @@ export const FileOperations = ({
                 <IconButton
                     title={`Download ${selectedItem.basename}`}
                     aria-label={`Download ${selectedItem.basename}`}
-                    disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || deletedItemSelected || busy}
+                    disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
                     component="a"
                     href={fileActions.getDownloadLink(selectedItem.filename)}
                     download
@@ -163,12 +177,12 @@ export const FileOperations = ({
                             <RenameButton
                                 currentName={selectedItem.basename}
                                 onRename={newName => handlePathRename(selectedItem, newName)}
-                                disabled={isDisabledForMoreThanOneSelection || deletedItemSelected || busy}
+                                disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
                             >
                                 <IconButton
                                     title={`Rename ${selectedItem.basename}`}
                                     aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={isDisabledForMoreThanOneSelection || deletedItemSelected || busy}
+                                    disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
                                 >
                                     <BorderColor />
                                 </IconButton>
@@ -176,16 +190,16 @@ export const FileOperations = ({
                         </ProgressButton>
                         <ProgressButton active={activeOperation === Operations.DELETE}>
                             <ConfirmationButton
-                                message={`Are you sure you want to remove ${selectedPaths.length} item(s)?`}
+                                message={getDeletionConfirmationMessage()}
                                 agreeButtonText="Remove"
                                 dangerous
                                 onClick={handleDelete}
-                                disabled={noPathSelected || deletedItemSelected || busy}
+                                disabled={noPathSelected || busy}
                             >
                                 <IconButton
                                     title="Delete"
                                     aria-label="Delete"
-                                    disabled={noPathSelected || deletedItemSelected || busy}
+                                    disabled={noPathSelected || busy}
                                 >
                                     <Delete />
                                 </IconButton>
@@ -199,7 +213,7 @@ export const FileOperations = ({
                     aria-label="Copy"
                     title="Copy"
                     onClick={e => handleCopy(e)}
-                    disabled={noPathSelected || deletedItemSelected || busy}
+                    disabled={noPathSelected || isDeletedItemSelected || busy}
                 >
                     <ContentCopy />
                 </IconButton>
@@ -208,7 +222,7 @@ export const FileOperations = ({
                         aria-label="Cut"
                         title="Cut"
                         onClick={e => handleCut(e)}
-                        disabled={noPathSelected || deletedItemSelected || busy}
+                        disabled={noPathSelected || isDeletedItemSelected || busy}
                     >
                         <ContentCut />
                     </IconButton>
@@ -218,7 +232,7 @@ export const FileOperations = ({
                         aria-label="Paste"
                         title="Paste"
                         onClick={e => handlePaste(e)}
-                        disabled={isPasteDisabled || deletedItemSelected || busy}
+                        disabled={isPasteDisabled || isDeletedItemSelected || busy}
                     >
                         {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                     </IconButton>

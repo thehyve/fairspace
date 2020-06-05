@@ -27,7 +27,7 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         .then(refresh);
 
     const deleteMultiple = paths => fileApi
-        .deleteMultiple(paths)
+        .deleteMultiple(paths, showDeleted)
         .then(refresh);
 
     const movePaths = paths => fileApi

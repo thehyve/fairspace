@@ -104,6 +104,26 @@ describe('FileAPI', () => {
             return expect(FileAPI.delete('path'))
                 .rejects.toThrow(/Only admins can delete/);
         });
+
+        it('deletes files', async () => {
+            const deleteFile = jest.fn(() => Promise.resolve({}));
+            FileAPI.client = () => ({deleteFile});
+            await FileAPI.deleteMultiple(['/src']);
+
+            expect(deleteFile).toHaveBeenCalledTimes(1);
+            expect(deleteFile).toHaveBeenCalledWith('/src', {withCredentials: true});
+        });
+
+        it('deletes files permanently', async () => {
+            const deleteFile = jest.fn(() => Promise.resolve({}));
+            FileAPI.client = () => ({deleteFile});
+            await FileAPI.deleteMultiple(['/src'], true);
+
+            expect(deleteFile).toHaveBeenCalledTimes(1);
+            expect(deleteFile).toHaveBeenCalledWith(
+                '/src', {headers: {"Show-Deleted": "on"}, withCredentials: true}
+            );
+        });
     });
 
     describe('uniqueDestinationPaths', () => {
