@@ -130,7 +130,7 @@ export const FileOperations = ({
 
     const getDeletionConfirmationMessage = () => {
         if (isDeletedItemSelected) {
-            if (selectedDeletedItems.length === 1) {
+            if (selectedDeletedItems.length === 1 && selectedItems.length === 1) {
                 return 'Selected item is already marked as deleted. '
                     + 'By clicking "Remove" you agree to remove the item permanently!';
             }
