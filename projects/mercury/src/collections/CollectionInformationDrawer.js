@@ -30,6 +30,7 @@ type CollectionInformationDrawerProps = {
     inCollectionsBrowser: boolean;
     atLeastSingleCollectionExists: boolean;
     setBusy: (boolean) => void;
+    showDeleted: boolean;
 
     collection: Collection;
     loading: boolean;
@@ -38,7 +39,7 @@ type CollectionInformationDrawerProps = {
 export const CollectionInformationDrawer = (props: CollectionInformationDrawerProps) => {
     const {
         classes, collection, loading, atLeastSingleCollectionExists, setHasCollectionMetadataUpdates,
-        inCollectionsBrowser, path
+        inCollectionsBrowser, path, showDeleted
     } = props;
 
     const paths = pathHierarchy(path);
@@ -89,6 +90,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                         <ExpansionPanelDetails>
                             <PathMetadata
                                 path={metadataPath}
+                                showDeleted={showDeleted}
                                 isMetaDataEditable={collection.canWrite && metadataPath === paths[paths.length - 1]}
                                 style={{width: '100%'}}
                             />
@@ -107,7 +109,7 @@ CollectionInformationDrawer.defaultProps = {
 };
 
 const ContextualCollectionInformationDrawer = ({selectedCollectionIri, ...props}) => {
-    const {loading, collections} = useContext(CollectionsContext);
+    const {loading, collections, showDeleted} = useContext(CollectionsContext);
     const collection = collections.find(c => c.iri === selectedCollectionIri);
     const atLeastSingleCollectionExists = collections.length > 0;
 
@@ -116,6 +118,7 @@ const ContextualCollectionInformationDrawer = ({selectedCollectionIri, ...props}
             {...props}
             loading={loading}
             collection={collection}
+            showDeleted={showDeleted}
             atLeastSingleCollectionExists={atLeastSingleCollectionExists}
         />
     );

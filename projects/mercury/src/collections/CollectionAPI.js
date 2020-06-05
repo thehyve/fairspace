@@ -33,14 +33,20 @@ export type CollectionAuditInfo = {|
     createdBy?: string; // iri
     dateModified?: string;
     modifiedBy?: string; // iri
+    dateDeleted?: string;
+    deletedBy?: string; // iri
 |};
 
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;
 
 
 class CollectionAPI {
-    getCollections(): Promise<Collection[]> {
-        return axios.get(collectionsUrl, {headers: {Accept: 'application/json'}})
+    getCollections(showDeleted = false): Promise<Collection[]> {
+        const getCollectionsHeader = {Accept: 'application/json'};
+        if (showDeleted) {
+            getCollectionsHeader['Show-Deleted'] = 'on';
+        }
+        return axios.get(collectionsUrl, {headers: getCollectionsHeader})
             .catch(handleHttpError("Failure when retrieving a list of collections"))
             .then(extractJsonData);
     }

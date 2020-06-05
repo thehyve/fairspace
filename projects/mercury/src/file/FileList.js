@@ -23,7 +23,8 @@ import usePagination from "../common/hooks/UsePagination";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
-    selectionEnabled, onAllSelection, onPathHighlight
+    selectionEnabled, onAllSelection, onPathHighlight,
+    showDeleted
 }) => {
     const [hoveredFileName, setHoveredFileName] = useState('');
 
@@ -39,6 +40,10 @@ const FileList = ({
         lastmodified: {
             valueExtractor: f => f.lastmod,
             label: 'Last modified'
+        },
+        showDeleted: {
+            valueExtractor: f => f.showDeleted,
+            label: 'Deletion date'
         }
     };
 
@@ -106,6 +111,17 @@ const FileList = ({
                                 Last modified
                             </TableSortLabel>
                         </TableCell>
+                        {showDeleted && (
+                            <TableCell align="right">
+                                <TableSortLabel
+                                    active={orderBy === 'dateDeleted'}
+                                    direction={orderAscending ? 'asc' : 'desc'}
+                                    onClick={() => toggleSort('dateDeleted')}
+                                >
+                                    Deletion date
+                                </TableSortLabel>
+                            </TableCell>
+                        )}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -121,6 +137,7 @@ const FileList = ({
                                 onDoubleClick={() => onPathDoubleClick(file)}
                                 onMouseEnter={() => setHoveredFileName(file.filename)}
                                 onMouseLeave={() => setHoveredFileName('')}
+                                className={file.dateDeleted && classes.deletedFileRow}
                             >
                                 {
                                     selectionEnabled ? (
@@ -150,6 +167,11 @@ const FileList = ({
                                 <TableCell align="right">
                                     {file.lastmod ? formatDateTime(file.lastmod) : null}
                                 </TableCell>
+                                {showDeleted && (
+                                    <TableCell align="right">
+                                        {file.dateDeleted ? formatDateTime(file.dateDeleted) : null}
+                                    </TableCell>
+                                )}
                             </TableRow>
                         );
                     })}

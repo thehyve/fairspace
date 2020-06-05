@@ -2,6 +2,34 @@
 import FileAPI from "../FileAPI";
 
 describe('FileAPI', () => {
+    describe('Retrieving', () => {
+        it('retrieves files', async () => {
+            const getDirectoryContents = jest.fn(() => Promise.resolve(
+                {data: [{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]}
+            ));
+            FileAPI.client = () => ({getDirectoryContents});
+            const result = await FileAPI.list('/src');
+
+            expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
+            expect(getDirectoryContents).toHaveBeenCalledTimes(1);
+            expect(getDirectoryContents).toHaveBeenCalledWith('/src', {details: true, withCredentials: true});
+        });
+
+        it('retrieves files including deleted', async () => {
+            const getDirectoryContents = jest.fn(() => Promise.resolve(
+                {data: [{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]}
+            ));
+            FileAPI.client = () => ({getDirectoryContents});
+            const result = await FileAPI.list('/src', true);
+
+            expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
+            expect(getDirectoryContents).toHaveBeenCalledTimes(1);
+            expect(getDirectoryContents).toHaveBeenCalledWith(
+                '/src', {details: true, headers: {"Show-Deleted": "on"}, withCredentials: true}
+            );
+        });
+    });
+
     describe('Uploading', () => {
         it('uploads a file', async () => {
             const putFileContents = jest.fn(() => Promise.resolve({}));

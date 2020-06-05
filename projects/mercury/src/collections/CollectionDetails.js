@@ -150,9 +150,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                     open={Boolean(anchorEl)}
                                     onClose={this.handleMenuClose}
                                 >
-                                    <MenuItem onClick={this.handleEdit}>
-                                        Edit
-                                    </MenuItem>
+                                    {!collection.dateDeleted && (
+                                        <MenuItem onClick={this.handleEdit}>
+                                            Edit
+                                        </MenuItem>
+                                    )}
                                     {isDataSteward(this.props.currentUser) && (
                                         <MenuItem onClick={this.handleDelete}>
                                             Delete
@@ -240,7 +242,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             }
                                         </List>
 
-                                        {collection.canManage && (
+                                        {collection.canManage && !collection.dateDeleted && (
                                             <Button
                                                 style={{margin: 8}}
                                                 color="primary"
