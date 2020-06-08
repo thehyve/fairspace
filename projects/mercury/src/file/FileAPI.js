@@ -157,6 +157,49 @@ class FileAPI {
     }
 
     /**
+     * Restores the file given by path
+     * @param path
+     * @returns Promise<any>
+     */
+    restore(path) {
+        if (!path) return Promise.reject(Error("No path specified for restoring"));
+        const resetDateDeletedPropRequest = ""
+            + "<?xml version=\"1.0\"?>"
+            + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
+            + "<d:remove>"
+            + "<d:prop>"
+            + "<fs:dateDeleted/>"
+            + "</d:prop>"
+            + "</d:remove>"
+            + "</d:propertyupdate>";
+
+
+        const requestOptions = {
+            method: "PROPPATCH",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "text/xml",
+                "Show-Deleted": "on"
+            },
+            responseType: "text",
+            data: resetDateDeletedPropRequest
+        };
+
+        return this.client().customRequest(path, requestOptions)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("Could not restore file or directory. Only admins can restore them.");
+                    }
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
+    /**
      * Move the file specified by {source} to {destination}
      * @param source
      * @param destination
@@ -285,6 +328,7 @@ class FileAPI {
     /**
      * Delete one or more files
      * @param filenames
+     * @param showDeleted
      * @returns {Promise}
      */
     deleteMultiple(filenames, showDeleted) {
@@ -293,6 +337,13 @@ class FileAPI {
         }
 
         return Promise.all(filenames.map(filename => this.delete(filename, showDeleted)));
+    }
+
+    restoreMultiple(filenames) {
+        if (!filenames || filenames.length === 0) {
+            return Promise.reject(new Error("No filenames given to restore"));
+        }
+        return Promise.all(filenames.map(filename => this.restore(filename)));
     }
 
     mapToFile: File = (fileObject) => ({

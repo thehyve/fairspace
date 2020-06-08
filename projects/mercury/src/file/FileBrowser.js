@@ -100,6 +100,7 @@ export const DisconnectedFileBrowser = ({
                 files={files}
                 openedPath={openedPath}
                 isWritingEnabled={isWritingEnabled}
+                showDeleted={showDeleted}
                 fileActions={fileActions}
                 clearSelection={selection.deselectAll}
                 refreshFiles={refreshFiles}

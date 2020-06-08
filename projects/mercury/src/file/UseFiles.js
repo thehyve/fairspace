@@ -30,6 +30,10 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         .deleteMultiple(paths, showDeleted)
         .then(refresh);
 
+    const restoreMultiple = paths => fileApi
+        .restoreMultiple(paths)
+        .then(refresh);
+
     const movePaths = paths => fileApi
         .movePaths(paths, path)
         .then(refresh);
@@ -46,6 +50,7 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         fileActions: {
             createDirectory,
             deleteMultiple,
+            restoreMultiple,
             getDownloadLink,
             movePaths,
             renameFile,
