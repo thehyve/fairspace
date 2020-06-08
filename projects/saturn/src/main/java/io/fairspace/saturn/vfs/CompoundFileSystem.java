@@ -86,6 +86,11 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     @Override
+    protected void doRestore(String path) throws IOException {
+        fileSystemByPath(path, true).restore(path);
+    }
+
+    @Override
     public void close() throws IOException {
         for (var c: fileSystemsByType.values()) {
             c.close();

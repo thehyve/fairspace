@@ -102,6 +102,19 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     }
 
     @Override
+    public void restore(String path) throws IOException {
+        ensureValidPath(path);
+
+        var parent = stat(parentPath(path));
+
+        if (parent == null || parent.getDeleted() != null) {
+            throw new IOException("You need to restore the parent directory first");
+        }
+
+        doRestore(path);
+    };
+
+    @Override
     public void close() throws IOException {
     }
 
@@ -118,6 +131,8 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     protected abstract void doMove(String from, String to) throws IOException;
 
     protected abstract void doDelete(String path) throws IOException;
+
+    protected abstract void doRestore(String path) throws IOException;
 
     private static boolean isCollection(String path) {
         return splitPath(path).length == 1;

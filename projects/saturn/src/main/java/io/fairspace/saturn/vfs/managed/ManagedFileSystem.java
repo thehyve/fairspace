@@ -229,7 +229,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         try {
             permissions.ensureAdmin();
         } catch (io.fairspace.saturn.services.AccessDeniedException e) {
-            throw new AccessDeniedException(from, to, "Only admins can move files." );
+            throw new AccessDeniedException(from, to, "Only admins can move files.");
         }
         copyOrMove(true, from, to);
     }
@@ -281,6 +281,39 @@ public class ManagedFileSystem extends BaseFileSystem {
             resource.addLiteral(FS.dateDeleted, date)
                     .addProperty(FS.deletedBy, user);
         }
+    }
+
+
+    @Override
+    protected void doRestore(String path) throws IOException {
+        dataset.executeWrite(() -> {
+            var info = stat(path);
+            if (info == null) {
+                throw new FileNotFoundException(path);
+            }
+            if (info.isReadOnly() || info.getDeleted() == null) {
+                throw new IOException("Cannot restore " + path);
+            }
+
+            var resource = dataset.getDefaultModel().createResource(iri(path));
+
+            var date = resource.getProperty(FS.dateDeleted).getLiteral();
+            var user = resource.getPropertyResourceValue(FS.deletedBy);
+
+            restoreRecursively(resource, date, user);
+        });
+    }
+
+    private void restoreRecursively(Resource resource, Literal date, Resource user) {
+        if (resource.hasProperty(RDF.type, FS.Directory) || resource.hasProperty(RDF.type, FS.Collection)) {
+            resource.listProperties(FS.contains)
+                    .mapWith(Statement::getResource)
+                    .filterKeep(r -> r.hasProperty(FS.dateDeleted, date) && r.hasProperty(FS.deletedBy, user))
+                    .forEachRemaining(child -> restoreRecursively(child, date, user));
+        }
+
+        resource.removeAll(FS.dateDeleted)
+                .removeAll(FS.deletedBy);
     }
 
     @Override

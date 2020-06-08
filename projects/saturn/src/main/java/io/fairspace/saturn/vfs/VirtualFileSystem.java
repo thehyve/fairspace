@@ -45,4 +45,6 @@ public interface VirtualFileSystem extends Closeable {
     void move(String from, String to) throws IOException;
 
     void delete(String path) throws IOException;
+
+    void restore(String path) throws IOException;
 }
