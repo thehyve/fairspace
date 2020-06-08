@@ -291,7 +291,7 @@ public class ManagedFileSystem extends BaseFileSystem {
             if (info == null) {
                 throw new FileNotFoundException(path);
             }
-            if (info.isReadOnly() || info.getDeleted() != null) {
+            if (info.isReadOnly() || info.getDeleted() == null) {
                 throw new IOException("Cannot restore " + path);
             }
 
