@@ -143,4 +143,97 @@ describe('FileOperations', () => {
             expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
         });
     });
+
+    describe('restore button', () => {
+        const emptyClipboard = {
+            method: COPY,
+            filenames: [],
+            isEmpty: () => true,
+            length: () => 0
+        };
+        it('should not be shown if not in showDeleted mode', () => {
+            const render = (fileActions) => shallow(<FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a'}]}
+                selectedPaths={[]}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={{}}
+                isWritingEnabled
+                currentUser={{admin: true}}
+                clipboard={emptyClipboard}
+                showDeleted={false}
+            />);
+
+            wrapper = render(fileActionsMock);
+            expect(wrapper.find('[aria-label="Restore"]')).toEqual({});
+        });
+        it('should be disabled if no file selected', () => {
+            const render = (fileActions) => shallow(<FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a'}]}
+                selectedPaths={[]}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={{}}
+                isWritingEnabled
+                currentUser={{admin: true}}
+                clipboard={emptyClipboard}
+                showDeleted
+            />);
+
+            wrapper = render(fileActionsMock);
+            expect(wrapper.find('[aria-label="Restore"]').prop("disabled")).toEqual(true);
+        });
+        it('should be disabled if non-deleted file selected', () => {
+            const render = (fileActions) => shallow(<FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a'}]}
+                selectedPaths={['a']}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={{}}
+                isWritingEnabled
+                currentUser={{admin: true}}
+                clipboard={emptyClipboard}
+                showDeleted
+            />);
+
+            wrapper = render(fileActionsMock);
+            expect(wrapper.find('[aria-label="Restore"]').prop("disabled")).toEqual(true);
+        });
+        it('should be enabled if deleted file selected', () => {
+            const render = (fileActions) => shallow(<FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a', dateDeleted: '08-06-2020'}]}
+                selectedPaths={['a']}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={{}}
+                isWritingEnabled
+                currentUser={{admin: true}}
+                clipboard={emptyClipboard}
+                showDeleted
+            />);
+
+            wrapper = render(fileActionsMock);
+            expect(wrapper.find('[aria-label="Restore"]').prop("disabled")).toEqual(false);
+        });
+    });
 });
