@@ -134,7 +134,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={!collection.canWrite ? null : (
+                        action={collection.canWrite && !collection.dateDeleted && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -150,11 +150,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                     open={Boolean(anchorEl)}
                                     onClose={this.handleMenuClose}
                                 >
-                                    {!collection.dateDeleted && (
-                                        <MenuItem onClick={this.handleEdit}>
-                                            Edit
-                                        </MenuItem>
-                                    )}
+                                    <MenuItem onClick={this.handleEdit}>
+                                        Edit
+                                    </MenuItem>
                                     {isDataSteward(this.props.currentUser) && (
                                         <MenuItem onClick={this.handleDelete}>
                                             Delete

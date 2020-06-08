@@ -41,8 +41,8 @@ const FileList = ({
             valueExtractor: f => f.lastmod,
             label: 'Last modified'
         },
-        showDeleted: {
-            valueExtractor: f => f.showDeleted,
+        dateDeleted: {
+            valueExtractor: f => f.dateDeleted,
             label: 'Deletion date'
         }
     };

@@ -20,7 +20,7 @@ import {formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 
-const columns = {
+const baseColumns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
@@ -39,6 +39,14 @@ const columns = {
     }
 };
 
+const allColumns = {
+    ...baseColumns,
+    dateDeleted: {
+        valueExtractor: 'dateDeleted',
+        label: 'Deleted'
+    }
+};
+
 const CollectionList = ({
     collections = [],
     isSelected = () => false,
@@ -53,7 +61,7 @@ const CollectionList = ({
         displayName: getDisplayName(collection.creatorObj)
     }));
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, columns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, allColumns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
@@ -82,7 +90,7 @@ const CollectionList = ({
                 <TableHead>
                     <TableRow>
                         {
-                            Object.entries(columns).map(([key, column]) => (
+                            Object.entries(baseColumns).map(([key, column]) => (
                                 <TableCell key={key}>
                                     <TableSortLabel
                                         active={orderBy === key}

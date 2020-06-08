@@ -132,12 +132,17 @@ class FileAPI {
     /**
      * Deletes the file given by path
      * @param path
+     * @param showDeleted
      * @returns Promise<any>
      */
-    delete(path) {
+    delete(path, showDeleted = false) {
+        const options = {...defaultOptions};
+        if (showDeleted) {
+            options.headers = {"Show-Deleted": "on"};
+        }
         if (!path) return Promise.reject(Error("No path specified for deletion"));
 
-        return this.client().deleteFile(path, defaultOptions)
+        return this.client().deleteFile(path, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
@@ -282,12 +287,12 @@ class FileAPI {
      * @param filenames
      * @returns {Promise}
      */
-    deleteMultiple(filenames) {
+    deleteMultiple(filenames, showDeleted) {
         if (!filenames || filenames.length === 0) {
             return Promise.reject(new Error("No filenames given to delete"));
         }
 
-        return Promise.all(filenames.map(filename => this.delete(filename)));
+        return Promise.all(filenames.map(filename => this.delete(filename, showDeleted)));
     }
 
     mapToFile: File = (fileObject) => ({
