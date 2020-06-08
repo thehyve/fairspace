@@ -212,7 +212,7 @@ export const FileOperations = ({
                                 </IconButton>
                             </ConfirmationButton>
                         </ProgressButton>
-                        {showDeleted && (
+                        {isWritingEnabled && showDeleted && (
                             <ProgressButton active={activeOperation === Operations.RESTORE}>
                                 <ConfirmationButton
                                     message={`Are you sure you want to restore ${selectedPaths.length} item(s)?`}

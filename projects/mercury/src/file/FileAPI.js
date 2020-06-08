@@ -163,14 +163,22 @@ class FileAPI {
      */
     restore(path) {
         if (!path) return Promise.reject(Error("No path specified for restoring"));
-        const resetDateDeletedPropRequest = `<propertyupdate><set><prop><fs:dateDeleted>null</fs:dateDeleted></prop></set></propertyupdate>`;
+        const resetDateDeletedPropRequest = ""
+            + "<?xml version=\"1.0\"?>"
+            + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
+            + "<d:remove>"
+            + "<d:prop>"
+            + "<fs:dateDeleted/>"
+            + "</d:prop>"
+            + "</d:remove>"
+            + "</d:propertyupdate>";
+
 
         const requestOptions = {
             method: "PROPPATCH",
             headers: {
                 "Accept": "text/plain",
-                "Depth": 0,
-                "Content-Type": "text/plain",
+                "Content-Type": "text/xml",
                 "Show-Deleted": "on"
             },
             responseType: "text",
