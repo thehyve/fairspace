@@ -108,7 +108,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
         var parent = stat(parentPath(path));
 
         if (parent == null || parent.getDeleted() != null) {
-            throw new IOException("You need to first delete the parent directory");
+            throw new IOException("You need to restore the parent directory first");
         }
 
         doRestore(path);
