@@ -30,6 +30,18 @@ describe('FileList', () => {
         const {queryByText} = render(<FileList files={files} />);
 
         expect(queryByText(/empty directory/i)).not.toBeInTheDocument();
+        expect(queryByText(/deletion date/i)).not.toBeInTheDocument();
+        expect(queryByText(/name/i)).toBeInTheDocument();
+        expect(queryByText(/size/i)).toBeInTheDocument();
+        expect(queryByText(/last modified/i)).toBeInTheDocument();
+        expect(queryByText(/base-file/i)).toBeInTheDocument();
+    });
+
+    it('renders view with deleted column in "show deleted" mode', () => {
+        const {queryByText} = render(<FileList files={files} showDeleted />);
+
+        expect(queryByText(/empty directory/i)).not.toBeInTheDocument();
+        expect(queryByText(/deletion date/i)).toBeInTheDocument();
         expect(queryByText(/name/i)).toBeInTheDocument();
         expect(queryByText(/size/i)).toBeInTheDocument();
         expect(queryByText(/last modified/i)).toBeInTheDocument();
@@ -52,7 +64,7 @@ describe('FileList', () => {
         expect(onPathCheckboxClick).toHaveBeenCalledTimes(1);
     });
 
-    it('does not render the chekbox when selection is disabled', () => {
+    it('does not render the checkbox when selection is disabled', () => {
         const {queryByTestId} = render(<FileList
             selectionEnabled={false}
             files={files}

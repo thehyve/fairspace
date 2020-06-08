@@ -15,31 +15,51 @@ axios.interceptors.request.use((config) => {
     // For stat requests we want to retrieve all available webdav properties
     // We can only distinguish between a directory listing and a stat request
     // based on the Depth header send to the backend.
-    if (config.method === 'propfind' && config.headers.Depth === 0) {
+    if (config.method === 'propfind') {
         config.headers['content-type'] = 'application/xml';
         config.data = `<propfind><allprop /></propfind>`;
     }
     return config;
 }, (error) => Promise.reject(error));
 
+export type File = {
+    filename: string;
+    basename: string;
+    lastmod: string;
+    size: number;
+    type: string;
+    dateDeleted?: string;
+}
+
 class FileAPI {
     client() {
         return createClient('/api/v1/webdav');
     }
 
-    stat(path) {
-        return this.client().stat(path, includeDetails)
+    stat(path, showDeleted) {
+        const options = {...includeDetails};
+        if (showDeleted) {
+            options.headers = {"Show-Deleted": "on"};
+        }
+        return this.client().stat(path, options)
             .then(result => result.data);
     }
 
     /**
      * List directory contents
-     * @param path      Full path within the collection
+     * @param path        Full path within the collection
+     * @param showDeleted Include deleted files and directories in the response
      * @returns {Promise<T>}
      */
-    list(path) {
-        return this.client().getDirectoryContents(path, defaultOptions)
-            .then(files => files.sort(comparing(compareBy('type'), compareBy('filename'))));
+    list(path, showDeleted = false): File[] {
+        const options = {...includeDetails};
+        if (showDeleted) {
+            options.headers = {"Show-Deleted": "on"};
+        }
+        return this.client().getDirectoryContents(path, options)
+            .then(result => result.data
+                .sort(comparing(compareBy('type'), compareBy('filename')))
+                .map(this.mapToFile));
     }
 
     /**
@@ -269,6 +289,15 @@ class FileAPI {
 
         return Promise.all(filenames.map(filename => this.delete(filename)));
     }
+
+    mapToFile: File = (fileObject) => ({
+        filename: fileObject.filename,
+        basename: fileObject.basename,
+        lastmod: fileObject.lastmod,
+        size: fileObject.size,
+        type: fileObject.type,
+        dateDeleted: fileObject.props && fileObject.props.dateDeleted
+    })
 }
 
 export default new FileAPI();

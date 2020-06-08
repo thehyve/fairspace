@@ -5,8 +5,11 @@ import useAsync from "../common/hooks/UseAsync";
 /**
  * This hook contains logic about files for a certain directory.
  */
-export const useFiles = (path, fileApi = FileAPI) => {
-    const {loading, error, data = [], refresh} = useAsync(() => fileApi.list(path), [path, fileApi]);
+export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
+    const {loading, error, data = [], refresh} = useAsync(
+        () => fileApi.list(path, showDeleted),
+        [path, showDeleted, fileApi]
+    );
 
     const {getDownloadLink} = fileApi;
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import type {Collection, CollectionProperties, Resource} from './CollectionAPI';
 import CollectionAPI from "./CollectionAPI";
 import useAsync from "../common/hooks/UseAsync";
@@ -6,10 +6,15 @@ import useAsync from "../common/hooks/UseAsync";
 const CollectionsContext = React.createContext({});
 
 export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) => {
-    const {data: collections = [], error, loading, refresh} = useAsync(collectionApi.getCollections);
+    const [showDeleted, setShowDeleted] = useState(false);
 
+    const {data: collections = [], error, loading, refresh} = useAsync(
+        () => collectionApi.getCollections(showDeleted),
+        [showDeleted]
+    );
     const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection).then(refresh);
     const updateCollection = (collection: Collection) => collectionApi.updateCollection(collection).then(refresh);
+
     const deleteCollection = (collection: Resource) => collectionApi.deleteCollection(collection).then(refresh);
 
     return (
@@ -21,7 +26,9 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 refresh,
                 addCollection,
                 deleteCollection,
-                updateCollection
+                updateCollection,
+                showDeleted,
+                setShowDeleted
             }}
         >
             {children}

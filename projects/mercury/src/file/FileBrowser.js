@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {Button, Tab, Tabs} from "@material-ui/core";
 import Play from "mdi-material-ui/Play";
-
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
@@ -23,16 +22,18 @@ export const DisconnectedFileBrowser = ({
     collectionsLoading = false,
     collectionsError = false,
     openedPath,
+    isOpenedPathDeleted,
     files = [],
     loading = false,
     error = false,
+    showDeleted,
     refreshFiles = () => {},
     fileActions = {},
     selection = {}
 }) => {
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
 
-    const isWritingEnabled = openedCollection && openedCollection.canWrite;
+    const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const existingFilenames = files ? files.map(file => file.basename) : [];
     const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
 
@@ -50,7 +51,7 @@ export const DisconnectedFileBrowser = ({
 
     // Reload the files after returning from the upload tab
     useEffect(() => {
-        refreshFiles(openedPath);
+        refreshFiles(openedPath, showDeleted);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentTab, openedPath]);
@@ -115,6 +116,7 @@ export const DisconnectedFileBrowser = ({
                 onPathHighlight={handlePathHighlight}
                 onPathDoubleClick={handlePathDoubleClick}
                 onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
+                showDeleted={showDeleted}
             />
             {renderFileOperations()}
         </div>
@@ -159,13 +161,14 @@ export const DisconnectedFileBrowser = ({
     );
 };
 
-export default withRouter(({openedPath, fileApi, ...props}) => {
-    const {files, loading, error, refresh, fileActions} = useFiles(openedPath, fileApi);
+export default withRouter(({openedPath, fileApi, showDeleted, ...props}) => {
+    const {files, loading, error, refresh, fileActions} = useFiles(openedPath, showDeleted, fileApi);
     return (
         <DisconnectedFileBrowser
             files={files}
             loading={loading}
             error={error}
+            showDeleted={showDeleted}
             refreshFiles={refresh}
             fileActions={fileActions}
             openedPath={openedPath}

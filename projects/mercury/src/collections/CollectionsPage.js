@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import Grid from '@material-ui/core/Grid';
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import {Switch, withStyles} from "@material-ui/core";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
-import * as consts from '../constants';
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
 import CollectionBrowser from "./CollectionBrowser";
 import CollectionInformationDrawer from './CollectionInformationDrawer';
@@ -12,11 +13,13 @@ import {handleCollectionSearchRedirect} from "./collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import styles from "./CollectionsPage.styles";
 
-const CollectionsPage = ({history, showBreadCrumbs, workspaceIri}) => {
+const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
     usePageTitleUpdater("Collections");
 
     const [busy, setBusy] = useState(false);
+    const [showDeletedCollections, setShowDeletedCollections] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [hasCollectionMetadataUpdates, setHasCollectionMetadataUpdates] = useState(false);
     const {isSelected, toggle, selected} = useSingleSelection();
@@ -45,22 +48,37 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri}) => {
     return (
         <CollectionBreadcrumbsContextProvider>
             {showBreadCrumbs && <BreadCrumbs /> }
-            <div style={{marginBottom: 16, width: consts.MAIN_CONTENT_WIDTH}}>
-                <SearchBar
-                    placeholder="Search"
-                    disableUnderline={false}
-                    onSearchChange={handleSearch}
-                />
-            </div>
+            <Grid container justify="space-between" alignItems="center" className={classes.topBar}>
+                <Grid item xs={9}>
+                    <SearchBar
+                        placeholder="Search"
+                        disableUnderline={false}
+                        onSearchChange={handleSearch}
+                    />
+                </Grid>
+                <Grid item xs={3} className={classes.topBarSwitch}>
+                    <FormControlLabel
+                        control={(
+                            <Switch
+                                color="primary"
+                                checked={showDeletedCollections}
+                                onChange={() => setShowDeletedCollections(!showDeletedCollections)}
+                            />
+                        )}
+                        label="Show deleted"
+                    />
+                </Grid>
+            </Grid>
             <Grid container spacing={1}>
-                <Grid item style={{width: consts.MAIN_CONTENT_WIDTH, maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
+                <Grid item className={classes.centralPanel}>
                     <CollectionBrowser
                         isSelected={collection => isSelected(collection.iri)}
                         toggleCollection={collection => toggleCollection(collection.iri)}
                         workspaceIri={workspaceIri}
+                        showDeletedCollections={showDeletedCollections}
                     />
                 </Grid>
-                <Grid item style={{width: consts.SIDE_PANEL_WIDTH}}>
+                <Grid item className={classes.sidePanel}>
                     <CollectionInformationDrawer
                         inCollectionsBrowser
                         setBusy={setBusy}
@@ -86,4 +104,4 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri}) => {
     );
 };
 
-export default CollectionsPage;
+export default withStyles(styles)(CollectionsPage);

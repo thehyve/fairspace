@@ -42,6 +42,7 @@ const columns = {
 const CollectionList = ({
     collections = [],
     isSelected = () => false,
+    showDeleted,
     onCollectionClick,
     onCollectionDoubleClick,
     classes
@@ -93,6 +94,17 @@ const CollectionList = ({
                                 </TableCell>
                             ))
                         }
+                        {showDeleted && (
+                            <TableCell key="dateDeleted">
+                                <TableSortLabel
+                                    active={orderBy === 'dateDeleted'}
+                                    direction={orderAscending ? 'asc' : 'desc'}
+                                    onClick={() => toggleSort('dateDeleted')}
+                                >
+                                    Deleted
+                                </TableSortLabel>
+                            </TableCell>
+                        )}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -106,6 +118,7 @@ const CollectionList = ({
                                 onClick={() => onCollectionClick(collection)}
                                 onDoubleClick={() => onCollectionDoubleClick(collection)}
                                 selected={selected}
+                                className={collection.dateDeleted && classes.deletedCollectionRow}
                             >
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                     {collection.name}
@@ -119,6 +132,11 @@ const CollectionList = ({
                                 <TableCell>
                                     {getDisplayName(collection.creatorObj)}
                                 </TableCell>
+                                {showDeleted && (
+                                    <TableCell>
+                                        {formatDateTime(collection.dateDeleted)}
+                                    </TableCell>
+                                )}
                             </TableRow>
                         );
                     })}

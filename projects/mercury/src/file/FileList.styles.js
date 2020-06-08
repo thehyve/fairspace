@@ -10,6 +10,9 @@ const styles = () => ({
         '-ms-user-select': 'none', /* Internet Explorer/Edge */
         'user-select': 'none', /* Non-prefixed version, currently supported by Chrome and Opera */
     },
+    deletedFileRow: {
+        opacity: "0.4"
+    }
 });
 
 export default styles;

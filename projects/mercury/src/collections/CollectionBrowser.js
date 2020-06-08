@@ -20,7 +20,8 @@ export const CollectionBrowser = ({
     users = [],
     history,
     workspaceIri,
-    canAddCollection = true
+    canAddCollection = true,
+    showDeleted
 }) => {
     const [addingNewCollection, setAddingNewCollection] = useState(false);
 
@@ -47,6 +48,7 @@ export const CollectionBrowser = ({
                     isSelected={isSelected}
                     onCollectionClick={handleCollectionClick}
                     onCollectionDoubleClick={handleCollectionDoubleClick}
+                    showDeleted={showDeleted}
                 />
                 {addingNewCollection ? (
                     <CollectionEditor
@@ -87,7 +89,7 @@ export const CollectionBrowser = ({
 const ContextualCollectionBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
+    const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} = useContext(CollectionsContext);
     const {workspacesLoading, workspacesError, workspaces} = useContext(WorkspaceContext);
     const workspace = props.workspaceIri ? workspaces.find(w => w.iri === props.workspaceIri) : {};
 
@@ -97,12 +99,15 @@ const ContextualCollectionBrowser = (props) => {
         ? collections.filter(c => c.ownerWorkspace === props.workspaceIri)
         : collections;
 
+    setShowDeleted(props.showDeletedCollections);
+
     return (
         <CollectionBrowser
             {...props}
             collections={filteredCollections}
             users={users}
             canAddCollection={canAdd}
+            showDeleted={showDeleted}
             loading={collectionsLoading || currentUserLoading || usersLoading || workspacesLoading}
             error={collectionsError || currentUserError || usersError || workspacesError}
         />

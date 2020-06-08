@@ -11,7 +11,8 @@ let collectionBrowser;
 
 const collectionsContextMock = {
     addCollection: jest.fn(() => Promise.resolve()),
-    collections: []
+    collections: [],
+    setShowDeleted: () => {}
 };
 
 beforeEach(() => {
