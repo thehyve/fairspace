@@ -1,12 +1,13 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -27,6 +28,7 @@ import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
@@ -63,15 +65,17 @@ public class ChangeableMetadataServiceValidationTest {
 
     private static final Statement LBL_STMT1 = createStatement(resource1, RDFS.label, createStringLiteral("subject1"));
 
-    private DatasetJobSupport ds;
+    private Dataset ds;
+    private Transactions txn;
     private ChangeableMetadataService api;
     @Mock
     private HttpServletRequest request;
 
     @Before
     public void setUp() {
-        ds = new DatasetJobSupportInMemory();
-        api = new ChangeableMetadataService(ds, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
+        ds = createTxnMem();
+        txn = new SimpleTransactions(ds);
+        api = new ChangeableMetadataService(txn, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
 
         currentRequest.set(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
@@ -119,7 +123,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testSoftDeleteShouldSucceedOnValidationSuccess() {
-        ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1));
+        txn.executeWrite(ds -> ds.getNamedModel(GRAPH).add(STMT1));
 
         api.softDelete(resource1);
 
@@ -135,7 +139,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
-        ds.executeWrite(() -> ds.getNamedModel(GRAPH).add(STMT1));
+        txn.executeWrite(ds -> ds.getNamedModel(GRAPH).add(STMT1));
 
         api.delete(modelOf(LBL_STMT1));
 
@@ -155,7 +159,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, createTypedLiteral(1));
 
-        ds.executeWrite(() -> {
+        txn.executeWrite(ds -> {
             api.put(toAdd);
             ds.abort();
         });
@@ -177,7 +181,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, resource2);
 
-        ds.executeWrite(() -> {
+        txn.executeWrite(ds -> {
             api.put(toAdd);
             ds.abort();
         });
@@ -215,7 +219,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property1, resource2);
 
-        ds.executeWrite(() -> {
+        txn.executeWrite(ds -> {
             api.put(toAdd);
             ds.abort();
         });
@@ -257,7 +261,7 @@ public class ChangeableMetadataServiceValidationTest {
 
         var toAdd = modelOf(resource1, property2, resource2);
 
-        ds.executeWrite(() -> {
+        txn.executeWrite(ds -> {
             api.put(toAdd);
             ds.abort();
         });

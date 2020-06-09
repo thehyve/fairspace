@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.workspaces;
 
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
@@ -20,17 +21,17 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 
 @Slf4j
 public class WorkspaceService {
-    private final DAO dao;
+    private final Transactions transactions;
     private final PermissionsService permissions;
 
-    public WorkspaceService(DAO dao, PermissionsService permissions) {
-        this.dao = dao;
+    public WorkspaceService(Transactions transactions, PermissionsService permissions) {
+        this.transactions = transactions;
         this.permissions = permissions;
     }
 
     public List<Workspace> listWorkspaces() {
-        return dao.getDataset().calculateRead(() -> {
-            var workspaces = dao.list(Workspace.class);
+        return transactions.calculateRead(dataset -> {
+            var workspaces = new DAO(transactions).list(Workspace.class);
             var iris = workspaces.stream().map(Workspace::getIri).collect(toList());
             var userPermissions = permissions.getPermissions(iris);
             return workspaces.stream()
@@ -41,9 +42,9 @@ public class WorkspaceService {
     }
 
     public Workspace createWorkspace(String id) {
-        var ws = dao.getDataset().calculateWrite(() -> {
-            Workspace workspace = new Workspace(id, id, null, WorkspaceStatus.Active, null, null, Access.Manage);
-            dao.write(workspace);
+        var ws = transactions.calculateWrite(dataset -> {
+            var workspace = new Workspace(id, id, null, WorkspaceStatus.Active, null, null, Access.Manage);
+            new DAO(transactions).write(workspace);
             permissions.createResource(workspace.getIri());
             return workspace;
         });
@@ -52,14 +53,14 @@ public class WorkspaceService {
     }
 
     public Workspace getWorkspace(String iri) {
-        return addPermissionsToObject(dao.read(Workspace.class, createURI(iri)));
+        return addPermissionsToObject(new DAO(transactions).read(Workspace.class, createURI(iri)));
     }
 
     public Workspace updateStatus(Workspace patch) {
         validate(patch.getIri() != null, "No IRI");
         validateIRI(patch.getIri().getURI());
 
-        var w = dao.getDataset().calculateWrite(() -> {
+        var w = transactions.calculateWrite(dataset -> {
             var workspace = getWorkspace(patch.getIri().getURI());
             if (workspace == null) {
                 log.info("Workspace not found {}", patch.getIri());
@@ -76,7 +77,7 @@ public class WorkspaceService {
                 workspace.setStatusModifiedBy(user.getIri());
             }
 
-            workspace = dao.write(workspace);
+            workspace = new DAO(transactions).write(workspace);
 
             return workspace;
         });

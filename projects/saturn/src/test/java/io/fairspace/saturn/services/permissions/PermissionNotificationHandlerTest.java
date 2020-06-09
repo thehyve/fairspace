@@ -1,12 +1,12 @@
 package io.fairspace.saturn.services.permissions;
 
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -21,6 +21,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -32,7 +33,7 @@ public class PermissionNotificationHandlerTest {
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node COLLECTION_1 = createURI("http://example.com/collection1");
 
-    private DatasetJobSupport ds;
+    private Dataset ds;
     private PermissionNotificationHandler permissionNotificationHandler;
 
     @Mock
@@ -55,13 +56,13 @@ public class PermissionNotificationHandlerTest {
         }});
         when(mailService.newMessage()).thenReturn(message);
 
-        ds = new DatasetJobSupportInMemory();
+        ds = createTxnMem();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDF.type, FS.Collection);
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDFS.label, "COLLECTION");
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), FS.filePath, "location");
 
-        permissionNotificationHandler = new PermissionNotificationHandler(ds, userService, mailService, "http://public-url");
+        permissionNotificationHandler = new PermissionNotificationHandler(new SimpleTransactions(ds), userService, mailService, "http://public-url");
     }
 
     @Test

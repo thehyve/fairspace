@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.metadata;
 
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
@@ -13,18 +13,17 @@ import static io.fairspace.saturn.vocabulary.Inference.getPropertyShapesForResou
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.system.Txn.executeRead;
 
 @AllArgsConstructor
 public
 class ReadableMetadataService {
-    protected final Dataset dataset;
+    protected final Transactions transactions;
     protected final Node graph;
     protected final Node vocabulary;
     protected final long tripleLimit;
 
-    public ReadableMetadataService(Dataset dataset, Node graph, Node vocabulary) {
-        this(dataset, graph, vocabulary, 0);
+    public ReadableMetadataService(Transactions transactions, Node graph, Node vocabulary) {
+        this(transactions, graph, vocabulary, 0);
     }
 
     /**
@@ -41,7 +40,7 @@ class ReadableMetadataService {
     Model get(String subject, boolean withObjectProperties) {
         var model = createDefaultModel();
 
-        executeRead(dataset, () -> {
+        transactions.executeRead(dataset -> {
             var voc = withObjectProperties ? dataset.getNamedModel(vocabulary.getURI()) : null;
             dataset.getNamedModel(graph.getURI())
                     .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)

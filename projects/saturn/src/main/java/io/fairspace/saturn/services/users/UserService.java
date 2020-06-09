@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.keycloak.OAuth2Constants;
@@ -28,7 +29,7 @@ public class UserService {
     private final UsersResource usersResource;
 
 
-    public UserService(Config.Auth config, DAO dao) {
+    public UserService(Config.Auth config, Transactions transactions) {
         usersResource = KeycloakBuilder.builder()
                 .serverUrl(config.authServerUrl)
                 .realm(config.realm)
@@ -47,7 +48,8 @@ public class UserService {
                     @Override
                     public List<User> load(Boolean key) {
                         var users = fetchKeycloakUsers();
-                        dao.getDataset().executeWrite(() -> users.forEach(dao::write));
+
+                        transactions.executeWrite(dataset -> users.forEach(new DAO(transactions)::write));
                         return users;
                     }
                 });

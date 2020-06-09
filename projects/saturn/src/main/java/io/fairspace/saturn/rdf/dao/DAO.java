@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -68,10 +68,10 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final DatasetJobSupport dataset;
+    private final Transactions transactions;
 
-    public DAO(DatasetJobSupport dataset) {
-        this.dataset = dataset;
+    public DAO(Transactions transactions) {
+        this.transactions = transactions;
     }
 
     /**
@@ -87,7 +87,7 @@ public class DAO {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
 
-            dataset.executeWrite(() -> {
+            transactions.executeWrite(dataset -> {
                 var graph = dataset.getDefaultModel().getGraph();
 
                 if (entity instanceof LifecycleAwarePersistentEntity) {
@@ -156,11 +156,13 @@ public class DAO {
      * @return The found entity or null if no entity was found or it was marked as deleted and showDeleted is set to false
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri, boolean showDeleted) {
-        var m = dataset.getDefaultModel();
-        var resource = m.createResource(iri.getURI());
-        return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
-                ? entityFromResource(type, resource)
-                : null;
+        return transactions.calculateRead(dataset -> {
+            var m = dataset.getDefaultModel();
+            var resource = m.createResource(iri.getURI());
+            return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
+                    ? entityFromResource(type, resource)
+                    : null;
+        });
     }
 
     /**
@@ -178,7 +180,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        dataset.executeWrite(() ->
+        transactions.executeWrite(dataset ->
                 dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
     }
 
@@ -189,14 +191,15 @@ public class DAO {
      * @return the entity passed as an argument if no entity was found or it was already marked as deleted
      */
     public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
-        var existing = (T) read(entity.getClass(), entity.getIri());
-        if (existing != null) {
-            existing.setDateDeleted(now());
-            existing.setDeletedBy(getUserIRI());
-            return write(existing);
-        }
-        return null;
-
+        return transactions.calculateWrite(ds -> {
+            var existing = (T) read(entity.getClass(), entity.getIri());
+            if (existing != null) {
+                existing.setDateDeleted(now());
+                existing.setDeletedBy(getUserIRI());
+                return write(existing);
+            }
+            return null;
+        });
     }
 
     /**
@@ -219,10 +222,10 @@ public class DAO {
      * @return
      */
     public <T extends PersistentEntity> List<T> list(Class<T> type, boolean includeDeleted) {
-        return dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
+        return transactions.calculateRead(dataset -> dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
                 .filterKeep(r -> includeDeleted || !r.hasProperty(FS.dateDeleted))
                 .mapWith(r -> entityFromResource(type, r))
-                .toList();
+                .toList());
     }
 
     public static <T extends PersistentEntity> T entityFromResource(Class<T> type, Resource resource) {

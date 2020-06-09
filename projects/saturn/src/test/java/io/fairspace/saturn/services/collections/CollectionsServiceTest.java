@@ -1,7 +1,7 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -47,14 +48,14 @@ public class CollectionsServiceTest {
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");
-        var ds = new DatasetJobSupportInMemory();
-        var dao = new DAO(ds);
+        var ds = createTxnMem();
+        var transactions = new SimpleTransactions(ds);
         ds.getDefaultModel().add(ds.getDefaultModel().asRDFNode(workspaceIri).asResource(), RDF.type, FS.Workspace);
-        collections = new CollectionsService("http://fairspace.io/", dao, eventListener, permissions);
+        collections = new CollectionsService("http://fairspace.io/", transactions, eventListener, permissions);
 
         doAnswer(invocation -> {
             CollectionDeletedEvent e = invocation.getArgument(0);
-            dao.markAsDeleted(e.getCollection());
+            new DAO(transactions).markAsDeleted(e.getCollection());
             return null;
         }).when(eventListener).accept(any(CollectionDeletedEvent.class));
     }

@@ -1,8 +1,7 @@
 package io.fairspace.saturn.vfs.managed;
 
 import com.google.common.eventbus.EventBus;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
@@ -12,6 +11,7 @@ import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -34,6 +34,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.md5;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.*;
@@ -52,7 +53,7 @@ public class ManagedFileSystemTest {
     @Mock
     private User user;
 
-    private DatasetJobSupport ds;
+    private Dataset ds;
     private ManagedFileSystem fs;
 
     @Before
@@ -60,7 +61,7 @@ public class ManagedFileSystemTest {
         currentRequest.set(request);
 
         var store = new MemoryBlobStore();
-        ds = new DatasetJobSupportInMemory();
+        ds = createTxnMem();
 
         ds.getDefaultModel()
                 .add(createResource("http://example.com/user"), RDFS.label, "user")
@@ -69,7 +70,7 @@ public class ManagedFileSystemTest {
         Supplier<Node> userIriSupplier = () -> createURI("http://example.com/user");
         var eventBus = new EventBus();
 
-        fs = new ManagedFileSystem(ds, store, userIriSupplier, collections, eventBus, permissions);
+        fs = new ManagedFileSystem(new SimpleTransactions(ds), store, userIriSupplier, collections, eventBus, permissions);
 
         var collection1 = new Collection();
         collection1.setLocation("coll");

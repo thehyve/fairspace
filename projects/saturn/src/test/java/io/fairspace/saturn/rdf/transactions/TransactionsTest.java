@@ -4,6 +4,8 @@ package io.fairspace.saturn.rdf.transactions;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.TxnType;
 import org.apache.jena.shared.LockMRSW;
 import org.apache.jena.sparql.JenaTransactionException;
 import org.junit.After;
@@ -20,8 +22,10 @@ import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
 
 public class TransactionsTest {
-    private DatasetJobSupport ds;
     private Config.Jena config = new Config.Jena();
+    private Dataset ds;
+    private Transactions txn;
+
 
     @Before
     public void before() throws IOException {
@@ -30,6 +34,7 @@ public class TransactionsTest {
         config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
         ds = SaturnDatasetFactory.connect(config);
+        txn = new BulkTransactions(ds);
     }
 
     @After
@@ -74,16 +79,6 @@ public class TransactionsTest {
         ds.begin(WRITE);
         ds.commit();
         ds.commit();
-    }
-
-    @Test(expected = JenaTransactionException.class)
-    public void readToWritePromotionIsNotPossible() {
-        ds.executeRead(() -> ds.executeWrite(() -> {}));
-    }
-
-    @Test
-    public void writeToReadDemotionIsPossible() {
-        ds.executeWrite(() -> ds.executeRead(() -> {}));
     }
 
 }

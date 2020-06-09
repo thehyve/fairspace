@@ -56,6 +56,8 @@ public class Config {
 
         public long maxTriplesToReturn = 50000;
 
+        public boolean bulkTransactions = true;
+
         public ElasticSearch elasticSearch = new ElasticSearch();
 
         public static class ElasticSearch {
