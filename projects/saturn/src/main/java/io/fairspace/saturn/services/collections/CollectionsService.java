@@ -170,6 +170,10 @@ public class CollectionsService {
                 throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
             }
 
+            if (collection.getDateDeleted() != null && patch.getDateDeleted() == null) {
+                eventListener.accept(new CollectionRestoredEvent(collection));
+            }
+
             var oldLocation = collection.getLocation();
             if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
                 ensureLocationIsNotUsed(patch.getLocation());
@@ -197,6 +201,7 @@ public class CollectionsService {
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
             }
+
             return collection;
         });
 

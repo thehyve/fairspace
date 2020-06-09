@@ -6,6 +6,7 @@ import com.pivovarit.function.ThrowingConsumer;
 import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
+import io.fairspace.saturn.services.collections.CollectionRestoredEvent;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vfs.BaseFileSystem;
@@ -330,6 +331,12 @@ public class ManagedFileSystem extends BaseFileSystem {
     @Subscribe
     public void onCollectionMoved(CollectionMovedEvent e) {
         dataset.executeWrite(() -> copyOrMoveNoCheck(true, e.getOldLocation(), e.getCollection().getLocation()));
+    }
+
+    @SneakyThrows
+    @Subscribe
+    public void onCollectionRestored(CollectionRestoredEvent e) {
+        dataset.executeWrite(() -> doRestore(e.getCollection().getLocation()));
     }
 
     private void copyOrMove(boolean move, String from, String to) throws IOException {
