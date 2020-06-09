@@ -170,7 +170,8 @@ public class CollectionsService {
                 throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
             }
 
-            if (collection.getDateDeleted() != null && patch.getDateDeleted() == null) {
+            if (collection.getDateDeleted() != null) {
+                validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
                 eventListener.accept(new CollectionRestoredEvent(collection));
             }
 
