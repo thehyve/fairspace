@@ -163,7 +163,7 @@ class FileAPI {
      */
     restore(path) {
         if (!path) return Promise.reject(Error("No path specified for restoring"));
-        const resetDateDeletedPropRequest = ""
+        const removeDateDeletedPropRequest = ""
             + "<?xml version=\"1.0\"?>"
             + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
             + "<d:remove>"
@@ -182,17 +182,13 @@ class FileAPI {
                 "Show-Deleted": "on"
             },
             responseType: "text",
-            data: resetDateDeletedPropRequest
+            data: removeDateDeletedPropRequest
         };
 
         return this.client().customRequest(path, requestOptions)
             .catch(e => {
                 if (e && e.response) {
-                    // eslint-disable-next-line default-case
-                    switch (e.response.status) {
-                        case 403:
-                            throw new Error("Could not restore file or directory. Only admins can restore them.");
-                    }
+                    throw new Error("Could not restore file or directory.");
                 }
 
                 return Promise.reject(e);
