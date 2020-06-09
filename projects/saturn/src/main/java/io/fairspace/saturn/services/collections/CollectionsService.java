@@ -158,6 +158,7 @@ public class CollectionsService {
         validate(patch.getIri() != null, "No IRI");
 
         validateIRI(patch.getIri().getURI());
+        var restored = new boolean[] {false};
 
         var c = dao.getDataset().calculateWrite(() -> {
             var collection = get(patch.getIri().getURI());
@@ -173,6 +174,7 @@ public class CollectionsService {
             if (collection.getDateDeleted() != null) {
                 validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
                 eventListener.accept(new CollectionRestoredEvent(collection));
+                restored[0] = true;
             }
 
             var oldLocation = collection.getLocation();
@@ -206,7 +208,7 @@ public class CollectionsService {
             return collection;
         });
 
-        audit("COLLECTION_UPDATED",
+        audit(restored[0] ? "COLLECTION_RESTORED" : "COLLECTION_UPDATED",
                 "iri", c.getIri().getURI(),
                 "name", c.getName(),
                 "location", c.getLocation());
