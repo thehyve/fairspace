@@ -1,13 +1,13 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -68,10 +68,10 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final Transactions transactions;
+    private final Dataset dataset;
 
-    public DAO(Transactions transactions) {
-        this.transactions = transactions;
+    public DAO(Dataset dataset) {
+        this.dataset = dataset;
     }
 
     /**
@@ -87,43 +87,41 @@ public class DAO {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
 
-            transactions.executeWrite(dataset -> {
-                var graph = dataset.getDefaultModel().getGraph();
+            var graph = dataset.getDefaultModel().getGraph();
 
-                if (entity instanceof LifecycleAwarePersistentEntity) {
-                    var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                    var user = getUserIRI();
-                    basicEntity.setDateModified(now());
-                    basicEntity.setModifiedBy(user);
+            if (entity instanceof LifecycleAwarePersistentEntity) {
+                var basicEntity = (LifecycleAwarePersistentEntity) entity;
+                var user = getUserIRI();
+                basicEntity.setDateModified(now());
+                basicEntity.setModifiedBy(user);
 
-                    if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY) || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
-                        basicEntity.setDateCreated(basicEntity.getDateModified());
-                        basicEntity.setCreatedBy(user);
-                    }
+                if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY) || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
+                    basicEntity.setDateCreated(basicEntity.getDateModified());
+                    basicEntity.setCreatedBy(user);
+                }
+            }
+
+            if (entity.getIri() == null) {
+                entity.setIri(generateMetadataIri());
+            }
+
+            graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
+
+            processFields(entity.getClass(), (field, annotation) -> {
+                var propertyNode = createURI(annotation.value());
+                var value = field.get(entity);
+
+                if (value == null && annotation.required()) {
+                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
                 }
 
-                if (entity.getIri() == null) {
-                    entity.setIri(generateMetadataIri());
+                graph.remove(entity.getIri(), propertyNode, null);
+
+                if (value instanceof Iterable) {
+                    ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
+                } else if (value != null) {
+                    graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
                 }
-
-                graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
-
-                processFields(entity.getClass(), (field, annotation) -> {
-                    var propertyNode = createURI(annotation.value());
-                    var value = field.get(entity);
-
-                    if (value == null && annotation.required()) {
-                        throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
-                    }
-
-                    graph.remove(entity.getIri(), propertyNode, null);
-
-                    if (value instanceof Iterable) {
-                        ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
-                    } else if (value != null) {
-                        graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
-                    }
-                });
             });
 
             return entity;
@@ -156,13 +154,11 @@ public class DAO {
      * @return The found entity or null if no entity was found or it was marked as deleted and showDeleted is set to false
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri, boolean showDeleted) {
-        return transactions.calculateRead(dataset -> {
-            var m = dataset.getDefaultModel();
-            var resource = m.createResource(iri.getURI());
-            return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
-                    ? entityFromResource(type, resource)
-                    : null;
-        });
+        var m = dataset.getDefaultModel();
+        var resource = m.createResource(iri.getURI());
+        return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
+                ? entityFromResource(type, resource)
+                : null;
     }
 
     /**
@@ -180,8 +176,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        transactions.executeWrite(dataset ->
-                dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
+        dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null);
     }
 
     /**
@@ -191,15 +186,13 @@ public class DAO {
      * @return the entity passed as an argument if no entity was found or it was already marked as deleted
      */
     public <T extends LifecycleAwarePersistentEntity> T markAsDeleted(T entity) {
-        return transactions.calculateWrite(ds -> {
-            var existing = (T) read(entity.getClass(), entity.getIri());
-            if (existing != null) {
-                existing.setDateDeleted(now());
-                existing.setDeletedBy(getUserIRI());
-                return write(existing);
-            }
-            return null;
-        });
+        var existing = (T) read(entity.getClass(), entity.getIri());
+        if (existing != null) {
+            existing.setDateDeleted(now());
+            existing.setDeletedBy(getUserIRI());
+            return write(existing);
+        }
+        return null;
     }
 
     /**
@@ -222,10 +215,10 @@ public class DAO {
      * @return
      */
     public <T extends PersistentEntity> List<T> list(Class<T> type, boolean includeDeleted) {
-        return transactions.calculateRead(dataset -> dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
+        return dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
                 .filterKeep(r -> includeDeleted || !r.hasProperty(FS.dateDeleted))
                 .mapWith(r -> entityFromResource(type, r))
-                .toList());
+                .toList();
     }
 
     public static <T extends PersistentEntity> T entityFromResource(Class<T> type, Resource resource) {

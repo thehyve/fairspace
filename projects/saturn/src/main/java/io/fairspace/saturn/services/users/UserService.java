@@ -48,8 +48,7 @@ public class UserService {
                     @Override
                     public List<User> load(Boolean key) {
                         var users = fetchKeycloakUsers();
-
-                        transactions.executeWrite(dataset -> users.forEach(new DAO(transactions)::write));
+                        transactions.executeWrite(ds -> users.forEach(new DAO(ds)::write));
                         return users;
                     }
                 });

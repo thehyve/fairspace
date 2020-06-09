@@ -63,7 +63,7 @@ public class CollectionsService {
         var storedCollection = transactions.calculateWrite(dataset -> {
             checkWorkspace(collection.getOwnerWorkspace());
             ensureLocationIsNotUsed(collection.getLocation());
-            new DAO(transactions).write(collection);
+            new DAO(dataset).write(collection);
             permissions.createResource(collection.getIri(), collection.getOwnerWorkspace());
             collection.setAccess(Access.Manage);
             eventListener.accept(new CollectionCreatedEvent(collection));
@@ -79,7 +79,7 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        return addPermissionsToObject(new DAO(transactions).read(Collection.class, createURI(iri), showDeletedFiles()));
+        return transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Collection.class, createURI(iri), showDeletedFiles())));
     }
 
     public Collection getByLocation(String location) {
@@ -115,7 +115,7 @@ public class CollectionsService {
 
     public List<Collection> list() {
         return transactions.calculateRead(ds -> {
-            var collections = new DAO(transactions).list(Collection.class, showDeletedFiles());
+            var collections = new DAO(ds).list(Collection.class, showDeletedFiles());
 
             var iris = collections.stream().map(Collection::getIri).collect(toList());
             var userPermissions = permissions.getPermissions(iris);
@@ -195,7 +195,7 @@ public class CollectionsService {
                     "Collection ownership cannot be changed");
 
             validateFields(collection);
-            collection = new DAO(transactions).write(collection);
+            collection = new DAO(ds).write(collection);
 
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.dao;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.users.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,7 +44,7 @@ public class DAOTest {
     @Before
     public void before() {
         dataset = createTxnMem();
-        dao = new DAO(new SimpleTransactions(dataset));
+        dao = new DAO(dataset);
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();

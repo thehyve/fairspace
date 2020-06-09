@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingFunction;
-import com.pivovarit.function.ThrowingSupplier;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.JenaTransactionException;

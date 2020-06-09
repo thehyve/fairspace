@@ -31,7 +31,7 @@ public class WorkspaceService {
 
     public List<Workspace> listWorkspaces() {
         return transactions.calculateRead(dataset -> {
-            var workspaces = new DAO(transactions).list(Workspace.class);
+            var workspaces = new DAO(dataset).list(Workspace.class);
             var iris = workspaces.stream().map(Workspace::getIri).collect(toList());
             var userPermissions = permissions.getPermissions(iris);
             return workspaces.stream()
@@ -44,7 +44,7 @@ public class WorkspaceService {
     public Workspace createWorkspace(String id) {
         var ws = transactions.calculateWrite(dataset -> {
             var workspace = new Workspace(id, id, null, WorkspaceStatus.Active, null, null, Access.Manage);
-            new DAO(transactions).write(workspace);
+            new DAO(dataset).write(workspace);
             permissions.createResource(workspace.getIri());
             return workspace;
         });
@@ -53,7 +53,7 @@ public class WorkspaceService {
     }
 
     public Workspace getWorkspace(String iri) {
-        return addPermissionsToObject(new DAO(transactions).read(Workspace.class, createURI(iri)));
+        return transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Workspace.class, createURI(iri))));
     }
 
     public Workspace updateStatus(Workspace patch) {
@@ -77,7 +77,7 @@ public class WorkspaceService {
                 workspace.setStatusModifiedBy(user.getIri());
             }
 
-            workspace = new DAO(transactions).write(workspace);
+            workspace = new DAO(dataset).write(workspace);
 
             return workspace;
         });

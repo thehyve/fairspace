@@ -55,7 +55,7 @@ public class CollectionsServiceTest {
 
         doAnswer(invocation -> {
             CollectionDeletedEvent e = invocation.getArgument(0);
-            new DAO(transactions).markAsDeleted(e.getCollection());
+            new DAO(ds).markAsDeleted(e.getCollection());
             return null;
         }).when(eventListener).accept(any(CollectionDeletedEvent.class));
     }
