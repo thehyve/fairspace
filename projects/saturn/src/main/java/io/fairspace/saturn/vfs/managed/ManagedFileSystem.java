@@ -336,7 +336,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     @SneakyThrows
     @Subscribe
     public void onCollectionRestored(CollectionRestoredEvent e) {
-        dataset.executeWrite(() -> doRestore(e.getCollection().getLocation()));
+        doRestore(e.getCollection().getLocation());
     }
 
     private void copyOrMove(boolean move, String from, String to) throws IOException {

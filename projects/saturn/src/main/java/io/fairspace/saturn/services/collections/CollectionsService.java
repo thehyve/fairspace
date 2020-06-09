@@ -174,6 +174,7 @@ public class CollectionsService {
             if (collection.getDateDeleted() != null) {
                 validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
                 eventListener.accept(new CollectionRestoredEvent(collection));
+                collection = get(patch.getIri().getURI());
                 restored[0] = true;
             }
 
