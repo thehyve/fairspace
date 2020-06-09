@@ -237,9 +237,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={`Delete collection ${collection.name}`}
+                        content={`Collection ${collection.name} is already marked as deleted.`
+                         + " Are you sure you want to delete it permanently?"}
                         dangerous
-                        agreeButtonText="Delete"
+                        agreeButtonText="Delete permanently"
                         onAgree={() => this.handleCollectionDelete(this.props.collection)}
                         onDisagree={this.handleCloseDelete}
                         onClose={this.handleCloseDelete}
