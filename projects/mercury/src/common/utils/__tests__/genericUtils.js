@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator,
+    joinWithSeparator, stableSort,
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -132,5 +132,13 @@ describe('formatDateTime', () => {
         invalidDates.forEach(date => {
             expect(formatDateTime(date)).toEqual(date);
         });
+    });
+});
+
+describe('stableSort', () => {
+    it('respects sorting direction', () => {
+        const a = ["c", "a", "b"];
+        expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
+        expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
     });
 });
