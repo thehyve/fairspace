@@ -4,6 +4,7 @@ import CollectionAPI from "../CollectionAPI";
 
 beforeEach(() => {
     mockAxios.get.mockClear();
+    mockAxios.patch.mockClear();
 });
 
 describe('CollectionAPI', () => {
@@ -77,6 +78,22 @@ describe('CollectionAPI', () => {
                 location: 'location'
             }),
             {headers: {'Content-Type': 'application/json'}}
+        );
+    });
+
+    it('makes a proper call to restore a collection', async () => {
+        await CollectionAPI.restoreCollection({
+            iri: 'id'
+        });
+
+        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
+        expect(mockAxios.patch).toHaveBeenCalledWith(
+            '/api/v1/collections/',
+            JSON.stringify({
+                iri: 'id',
+                dateDeleted: null
+            }),
+            {headers: {'Content-Type': 'application/json', "Show-Deleted": "on"}}
         );
     });
 

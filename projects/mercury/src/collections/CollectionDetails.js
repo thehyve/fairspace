@@ -46,6 +46,7 @@ type CollectionDetailsProps = {
     currentUser: any;
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
+    restoreCollection: (Resource) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
 };
@@ -53,6 +54,7 @@ type CollectionDetailsProps = {
 type CollectionDetailsState = {
     editing: boolean;
     deleting: boolean;
+    restoring: boolean;
     anchorEl: any;
 }
 
@@ -66,6 +68,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         editing: false,
         anchorEl: null,
         deleting: false,
+        restoring: false,
         showAddShareDialog: false,
         workspacesToAdd: []
     };
@@ -84,8 +87,19 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
     };
 
+    handleRestore = () => {
+        if (this.props.collection.canWrite) {
+            this.setState({restoring: true});
+            this.handleMenuClose();
+        }
+    };
+
     handleCloseDelete = () => {
         this.setState({deleting: false});
+    };
+
+    handleCloseRestore = () => {
+        this.setState({restoring: false});
     };
 
     handleMenuClick = (event: Event) => {
@@ -100,11 +114,30 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {setBusy, deleteCollection, history} = this.props;
         setBusy(true);
         deleteCollection(collection)
-            .then(() => history.push('/collections'))
+            .then(() => {
+                this.handleCloseDelete();
+                history.push('/collections');
+            })
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",
                 this.handleCollectionDelete
+            ))
+            .finally(() => setBusy(false));
+    };
+
+    handleCollectionRestore = (collection: Collection) => {
+        const {setBusy, restoreCollection, history} = this.props;
+        setBusy(true);
+        restoreCollection(collection)
+            .then(() => {
+                this.handleCloseRestore();
+                history.push('/collections');
+            })
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while restoring a collection",
+                this.handleCollectionRestore
             ))
             .finally(() => setBusy(false));
     };
@@ -123,7 +156,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     render() {
         const {loading, collection, inCollectionsBrowser = false} = this.props;
-        const {anchorEl, editing, deleting} = this.state;
+        const {anchorEl, editing, deleting, restoring} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (loading) {
@@ -134,7 +167,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={collection.canWrite && !collection.dateDeleted && (
+                        action={collection.canWrite && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -150,12 +183,19 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                     open={Boolean(anchorEl)}
                                     onClose={this.handleMenuClose}
                                 >
-                                    <MenuItem onClick={this.handleEdit}>
-                                        Edit
-                                    </MenuItem>
+                                    {!collection.dateDeleted && (
+                                        <MenuItem onClick={this.handleEdit}>
+                                            Edit
+                                        </MenuItem>
+                                    )}
                                     {isDataSteward(this.props.currentUser) && (
                                         <MenuItem onClick={this.handleDelete}>
-                                            Delete
+                                            {collection && collection.dateDeleted ? 'Delete permanently' : 'Delete'}
+                                        </MenuItem>
+                                    )}
+                                    {collection.dateDeleted && (
+                                        <MenuItem onClick={this.handleRestore}>
+                                            Restore
                                         </MenuItem>
                                     )}
                                 </Menu>
@@ -181,7 +221,32 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onClose={() => this.setState({editing: false})}
                     />
                 ) : null}
-                {deleting ? (
+                {restoring ? (
+                    <ConfirmationDialog
+                        open
+                        title="Confirmation"
+                        content={`Restore collection ${collection.name}`}
+                        dangerous
+                        agreeButtonText="Restore"
+                        onAgree={() => this.handleCollectionRestore(this.props.collection)}
+                        onDisagree={this.handleCloseRestore}
+                        onClose={this.handleCloseRestore}
+                    />
+                ) : null}
+                {deleting && collection.dateDeleted && (
+                    <ConfirmationDialog
+                        open
+                        title="Confirmation"
+                        content={`Collection ${collection.name} is already marked as deleted.`
+                         + " Are you sure you want to delete it permanently?"}
+                        dangerous
+                        agreeButtonText="Delete permanently"
+                        onAgree={() => this.handleCollectionDelete(this.props.collection)}
+                        onDisagree={this.handleCloseDelete}
+                        onClose={this.handleCloseDelete}
+                    />
+                )}
+                {deleting && !collection.dateDeleted && (
                     <ConfirmationDialog
                         open
                         title="Confirmation"
@@ -192,7 +257,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onDisagree={this.handleCloseDelete}
                         onClose={this.handleCloseDelete}
                     />
-                ) : null}
+                )}
 
                 <SharingProvider iri={collection.iri}>
                     <SharingContext.Consumer>
@@ -320,7 +385,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {currentUser} = useContext(UserContext);
-    const {deleteCollection} = useContext(CollectionsContext);
+    const {deleteCollection, restoreCollection} = useContext(CollectionsContext);
     const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
@@ -331,6 +396,7 @@ const ContextualCollectionDetails = (props) => {
             workspaces={workspaces}
             history={history}
             deleteCollection={deleteCollection}
+            restoreCollection={restoreCollection}
         />
     );
 };

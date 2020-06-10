@@ -67,11 +67,28 @@ class CollectionAPI {
         ).catch(handleHttpError("Failure while updating a collection"));
     }
 
-    deleteCollection(collection: Resource): Promise<void> {
+    deleteCollection(collection: Resource, showDeleted = false): Promise<void> {
+        const deleteCollectionsHeader = {...headers};
+        if (showDeleted) {
+            deleteCollectionsHeader['Show-Deleted'] = 'on';
+        }
         return axios.delete(
             `${collectionsUrl}?iri=${encodeURIComponent(collection.iri)}`,
-            {headers}
+            {headers: deleteCollectionsHeader}
         ).catch(handleHttpError("Failure while deleting collection"));
+    }
+
+    restoreCollection(collection: Resource): Promise<void> {
+        collection.dateDeleted = null;
+        const restoreCollectionsHeader = {
+            ...headers,
+            'Show-Deleted': 'on'
+        };
+        return axios.patch(
+            collectionsUrl,
+            JSON.stringify(collection),
+            {headers: restoreCollectionsHeader}
+        ).catch(handleHttpError("Failure while restoring collection"));
     }
 }
 
