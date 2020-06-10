@@ -75,19 +75,9 @@ export function comparing(...comparators) {
  * @param ascending
  * @returns {*}
  */
-export const stableSort = (array, cmp, ascending = true) => {
-    if (!Array.isArray(array)) {
-        return array;
-    }
-
-    const arrayWithIndices = array.map((el, index) => [el, index]);
-    arrayWithIndices.sort((a, b) => {
-        const order = cmp(a[0], b[0]);
-        if (order !== 0) return order;
-        return ascending ? a[1] - b[1] : b[1] - a[1];
-    });
-    return arrayWithIndices.map(el => el[0]);
-};
+export const stableSort = (array, cmp, ascending = true) => array.map((el, index) => [el, index])
+    .sort((a, b) => (cmp(a[0], b[0]) || (a[1] - b[1])) * (ascending ? 1 : -1))
+    .map(el => el[0]);
 
 /**
  * Returns true if the given value is truthy or zero or false
