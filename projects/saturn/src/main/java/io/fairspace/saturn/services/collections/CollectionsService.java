@@ -158,6 +158,7 @@ public class CollectionsService {
         validate(patch.getIri() != null, "No IRI");
 
         validateIRI(patch.getIri().getURI());
+        var restored = new boolean[] {false};
 
         var c = dao.getDataset().calculateWrite(() -> {
             var collection = get(patch.getIri().getURI());
@@ -168,6 +169,13 @@ public class CollectionsService {
             if (!collection.getAccess().canWrite()) {
                 log.info("Not enough permissions to modify a collection {}", patch.getIri());
                 throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
+            }
+
+            if (collection.getDateDeleted() != null) {
+                validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
+                eventListener.accept(new CollectionRestoredEvent(collection));
+                collection = get(patch.getIri().getURI());
+                restored[0] = true;
             }
 
             var oldLocation = collection.getLocation();
@@ -197,10 +205,11 @@ public class CollectionsService {
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
             }
+
             return collection;
         });
 
-        audit("COLLECTION_UPDATED",
+        audit(restored[0] ? "COLLECTION_RESTORED" : "COLLECTION_UPDATED",
                 "iri", c.getIri().getURI(),
                 "name", c.getName(),
                 "location", c.getLocation());
