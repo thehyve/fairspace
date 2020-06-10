@@ -1,9 +1,10 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -25,8 +26,8 @@ import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +48,7 @@ public class ChangeableMetadataServiceTest {
     private static final Statement STMT2 = createStatement(S2, P1, S3);
 
 
-    private DatasetJobSupport ds = new DatasetJobSupportInMemory();
+    private Transactions txn = new SimpleTransactions(createTxnMem());
     private ChangeableMetadataService api;
 
     @Mock
@@ -62,7 +63,7 @@ public class ChangeableMetadataServiceTest {
         user.setName("user");
         currentRequest.set(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
-        api = new ChangeableMetadataService(ds, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());
+        api = new ChangeableMetadataService(txn, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());
     }
 
     @Test
@@ -88,7 +89,7 @@ public class ChangeableMetadataServiceTest {
         // Prepopulate the model
         final Statement EXISTING1 = createStatement(S1, P1, S3);
         final Statement EXISTING2 = createStatement(S2, P2, createPlainLiteral("test"));
-        ds.executeWrite(() -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
 
         // Put new statements
         var delta = modelOf(STMT1, STMT2);
@@ -96,47 +97,54 @@ public class ChangeableMetadataServiceTest {
 
         // Now ensure that the existing triples are still there
         // and the new ones are added
-        Model model = ds.getDefaultModel();
-        assertTrue(model.contains(EXISTING1));
-        assertTrue(model.contains(EXISTING2));
-        assertTrue(model.contains(STMT1));
-        assertTrue(model.contains(STMT2));
+        txn.executeRead(ds -> {
+            Model model = ds.getDefaultModel();
+            assertTrue(model.contains(EXISTING1));
+            assertTrue(model.contains(EXISTING2));
+            assertTrue(model.contains(STMT1));
+            assertTrue(model.contains(STMT2));
+        });
     }
 
     @Test
     public void deleteModel() {
-        ds.executeWrite(() -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
         api.delete(modelOf(STMT1));
 
-        assertFalse(ds.getDefaultModel().contains(STMT1));
-        assertTrue(ds.getDefaultModel().contains(STMT2));
+        txn.executeRead(ds -> {
+            assertFalse(ds.getDefaultModel().contains(STMT1));
+            assertTrue(ds.getDefaultModel().contains(STMT2));
+        });
     }
 
     @Test
     public void patch() {
-        ds.executeWrite(() -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
         Statement newStmt1 = createStatement(S1, P1, S3);
         Statement newStmt2 = createStatement(S2, P1, S1);
         Statement newStmt3 = createStatement(S1, P2, S3);
 
         api.patch(modelOf(newStmt1, newStmt2, newStmt3));
-        assertTrue(ds.getDefaultModel().contains(newStmt1));
-        assertTrue(ds.getDefaultModel().contains(newStmt2));
-        assertTrue(ds.getDefaultModel().contains(newStmt3));
-        assertFalse(ds.getDefaultModel().contains(STMT1));
-        assertFalse(ds.getDefaultModel().contains(STMT2));
+
+        txn.executeRead(ds -> {
+            assertTrue(ds.getDefaultModel().contains(newStmt1));
+            assertTrue(ds.getDefaultModel().contains(newStmt2));
+            assertTrue(ds.getDefaultModel().contains(newStmt3));
+            assertFalse(ds.getDefaultModel().contains(STMT1));
+            assertFalse(ds.getDefaultModel().contains(STMT2));
+        });
     }
 
     @Test
     public void patchWithNil() {
-        ds.executeWrite(() -> ds.getDefaultModel().add(S1, P1, S2).add(S1, P1, S3));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(S1, P1, S2).add(S1, P1, S3));
 
 
         api.patch(createDefaultModel().add(S1, P1, NIL));
 
-        assertFalse(ds.getDefaultModel().contains(S1, P1));
+        assertFalse(txn.calculateRead(ds -> ds.getDefaultModel().contains(S1, P1)));
     }
 
     @Test
@@ -148,22 +156,27 @@ public class ChangeableMetadataServiceTest {
 
     @Test
     public void testInference() {
-        initVocabularies(ds);
-        ds.getDefaultModel()
-                .add(S1, RDF.type, FOAF.Person)
-                .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI()));
+        txn.executeWrite(Vocabularies::initVocabularies);
+        txn.executeWrite(ds ->
+                ds.getDefaultModel()
+                        .add(S1, RDF.type, FOAF.Person)
+                        .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI())));
 
         var gaveConsent = createProperty(generateVocabularyIri("gaveConsent").getURI());
         var isConsentOf = createProperty(generateVocabularyIri("isConsentOf").getURI());
 
         api.put(modelOf(S1, gaveConsent, S2));
 
-        assertTrue(ds.getDefaultModel().contains(S1, gaveConsent, S2));
-        assertTrue(ds.getDefaultModel().contains(S2, isConsentOf, S1));
+        txn.executeRead(ds -> {
+            assertTrue(ds.getDefaultModel().contains(S1, gaveConsent, S2));
+            assertTrue(ds.getDefaultModel().contains(S2, isConsentOf, S1));
+        });
 
         api.delete(modelOf(S2, isConsentOf, S1));
 
-        assertFalse(ds.getDefaultModel().contains(S1, gaveConsent, S2));
-        assertFalse(ds.getDefaultModel().contains(S2, isConsentOf, S1));
+        txn.executeRead(ds -> {
+            assertFalse(ds.getDefaultModel().contains(S1, gaveConsent, S2));
+            assertFalse(ds.getDefaultModel().contains(S2, isConsentOf, S1));
+        });
     }
 }

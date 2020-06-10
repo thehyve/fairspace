@@ -3,7 +3,7 @@ package io.fairspace.saturn.vfs.managed;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.pivovarit.function.ThrowingConsumer;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.collections.CollectionDeletedEvent;
 import io.fairspace.saturn.services.collections.CollectionMovedEvent;
 import io.fairspace.saturn.services.collections.CollectionRestoredEvent;
@@ -45,15 +45,15 @@ import static org.apache.commons.codec.binary.Hex.encodeHexString;
 public class ManagedFileSystem extends BaseFileSystem {
     public static final String TYPE = "";
 
-    private final DatasetJobSupport dataset;
+    private final Transactions transactions;
     private final BlobStore store;
     private final Supplier<Node> userIriSupplier;
     private final PermissionsService permissions;
 
-    public ManagedFileSystem(DatasetJobSupport dataset, BlobStore store, Supplier<Node> userIriSupplier,
+    public ManagedFileSystem(Transactions transactions, BlobStore store, Supplier<Node> userIriSupplier,
                              CollectionsService collections, EventBus eventBus, PermissionsService permissions) {
         super(collections);
-        this.dataset = dataset;
+        this.transactions = transactions;
         this.store = store;
         this.userIriSupplier = userIriSupplier;
         this.permissions = permissions;
@@ -62,7 +62,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo statRegularFile(String path) throws IOException {
-        return dataset.calculateRead(() -> {
+        return transactions.calculateRead(dataset -> {
             var model = dataset.getDefaultModel();
             var resource = model.createResource(iri(path));
             if (model.containsResource(resource) && (showDeletedFiles() || !resource.hasProperty(FS.dateDeleted)) && !resource.hasProperty(FS.movedTo)) {
@@ -96,7 +96,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     @Override
     protected List<FileInfo> listCollectionOrDirectory(String path) throws IOException {
         var collectionLocation = splitPath(path)[0];
-        return dataset.calculateRead(() -> {
+        return transactions.calculateRead(dataset -> {
             var collection = collections.getByLocation(collectionLocation);
             if (collection == null) {
                 throw new AccessDeniedException("User has no access to collection " + collectionLocation);
@@ -118,7 +118,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected FileInfo doMkdir(String path) throws IOException {
-        return dataset.calculateWrite(() -> {
+        return transactions.calculateWrite(dataset -> {
             ensureCanCreate(path);
 
             var resource = dataset.getDefaultModel().createResource(iri(path));
@@ -149,7 +149,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     protected FileInfo doCreate(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        return dataset.calculateWrite(() -> {
+        return transactions.calculateWrite(dataset -> {
             ensureCanCreate(path);
 
             var resource = dataset.getDefaultModel().createResource(iri(path));
@@ -181,7 +181,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     public void modify(String path, InputStream in) throws IOException {
         var blobInfo = write(in);
 
-        dataset.executeWrite(() -> {
+        transactions.executeWrite(dataset -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -210,7 +210,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     public void read(String path, OutputStream out, long start, Long finish) throws IOException {
-        var blobId = dataset.calculateRead(() ->
+        var blobId = transactions.calculateRead(dataset ->
                 dataset.getDefaultModel()
                         .createResource(iri(path))
                         .listProperties(FS.blobId)
@@ -242,7 +242,7 @@ public class ManagedFileSystem extends BaseFileSystem {
         } catch (io.fairspace.saturn.services.AccessDeniedException e) {
             throw new AccessDeniedException(path, null, "Only admins can delete files.");
         }
-        dataset.executeWrite(() -> {
+        transactions.executeWrite(dataset -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -256,14 +256,16 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     private void deleteWithoutChecks(String path) throws IOException {
-        var resource = dataset.getDefaultModel().createResource(iri(path));
-        var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
-        var now = toXSDDateTimeLiteral(Instant.now());
-        var purge = resource.hasProperty(FS.dateDeleted);
-        if (purge) {
-            permissions.ensureAdmin();
-        }
-        deleteRecursively(resource, now, user, purge);
+        transactions.executeWrite(dataset -> {
+            var resource = dataset.getDefaultModel().createResource(iri(path));
+            var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
+            var now = toXSDDateTimeLiteral(Instant.now());
+            var purge = resource.hasProperty(FS.dateDeleted);
+            if (purge) {
+                permissions.ensureAdmin();
+            }
+            deleteRecursively(resource, now, user, purge);
+        });
     }
 
     private void deleteRecursively(Resource resource, Literal date, Resource user, boolean purge) {
@@ -287,7 +289,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
     @Override
     protected void doRestore(String path) throws IOException {
-        dataset.executeWrite(() -> {
+        transactions.executeWrite(dataset -> {
             var info = stat(path);
             if (info == null) {
                 throw new FileNotFoundException(path);
@@ -324,13 +326,13 @@ public class ManagedFileSystem extends BaseFileSystem {
     @SneakyThrows
     @Subscribe
     public void onCollectionDeleted(CollectionDeletedEvent e) {
-        dataset.executeWrite(() -> deleteWithoutChecks(e.getCollection().getLocation()));
+        transactions.executeWrite(dataset -> deleteWithoutChecks(e.getCollection().getLocation()));
     }
 
     @SneakyThrows
     @Subscribe
     public void onCollectionMoved(CollectionMovedEvent e) {
-        dataset.executeWrite(() -> copyOrMoveNoCheck(true, e.getOldLocation(), e.getCollection().getLocation()));
+        transactions.executeWrite(dataset -> copyOrMoveNoCheck(true, e.getOldLocation(), e.getCollection().getLocation()));
     }
 
     @SneakyThrows
@@ -345,7 +347,7 @@ public class ManagedFileSystem extends BaseFileSystem {
             throw new FileAlreadyExistsException("Cannot" + verb + " a file or a directory to itself");
         }
 
-        dataset.executeWrite(() -> {
+        transactions.executeWrite(dataset -> {
             ensureCanCreate(to);
             var source = stat(from);
             if (source == null) {
@@ -356,48 +358,50 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     private void copyOrMoveNoCheck(boolean move, String from, String to) throws IOException {
-        var src = dataset.getDefaultModel().createResource(iri(from));
-        var dst = dataset.getDefaultModel().createResource(iri(to));
-        dst.removeProperties();
-        dst.addProperty(FS.filePath, to);
-        var dir = parentPath(to);
-        if (dir != null) {
-            var parent = dataset.getDefaultModel().createResource(iri(dir));
-            parent.addProperty(FS.contains, dst);
-        }
-
-        src.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
-                .mapWith(r -> r.getProperty(RDFS.label).getString())
-                .forEachRemaining(ThrowingConsumer.sneaky(name -> copyOrMoveNoCheck(move, joinPaths(from, name), joinPaths(to, name))));
-
-        if (move) {
-            src.listProperties()
-                    .filterDrop(s -> s.getPredicate().equals(FS.contains))
-                    .filterDrop(s -> s.getPredicate().equals(FS.filePath))
-                    .filterDrop(s -> s.getPredicate().equals(RDFS.label))
-                    .forEachRemaining(s -> dst.addProperty(s.getPredicate(), s.getObject()));
-
-            if (src.hasProperty(RDF.type, FS.Collection)) {
-                copyProperty(RDFS.label, src, dst);
-            } else {
-                dst.addProperty(RDFS.label, name(to));
+        transactions.executeWrite(dataset -> {
+            var src = dataset.getDefaultModel().createResource(iri(from));
+            var dst = dataset.getDefaultModel().createResource(iri(to));
+            dst.removeProperties();
+            dst.addProperty(FS.filePath, to);
+            var dir = parentPath(to);
+            if (dir != null) {
+                var parent = dataset.getDefaultModel().createResource(iri(dir));
+                parent.addProperty(FS.contains, dst);
             }
 
-            dataset.getDefaultModel()
-                    .listStatements(null, null, src)
-                    .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
-                    .forEachRemaining(stmt -> dataset.getDefaultModel().add(stmt.getSubject(), stmt.getPredicate(), dst));
+            src.listProperties(FS.contains)
+                    .mapWith(Statement::getResource)
+                    .mapWith(r -> r.getProperty(RDFS.label).getString())
+                    .forEachRemaining(ThrowingConsumer.sneaky(name -> copyOrMoveNoCheck(move, joinPaths(from, name), joinPaths(to, name))));
 
-            dataset.getDefaultModel()
-                    .removeAll(null, null, src)
-                    .removeAll(src, null, null)
-                    .add(src, FS.movedTo, dst);
-        } else {
-            List.of(RDF.type, FS.blobId, FS.fileSize, FS.md5, FS.dateCreated, FS.dateModified, FS.createdBy, FS.modifiedBy)
-                    .forEach(p -> copyProperty(p, src, dst));
-            dst.addProperty(RDFS.label, name(to));
-        }
+            if (move) {
+                src.listProperties()
+                        .filterDrop(s -> s.getPredicate().equals(FS.contains))
+                        .filterDrop(s -> s.getPredicate().equals(FS.filePath))
+                        .filterDrop(s -> s.getPredicate().equals(RDFS.label))
+                        .forEachRemaining(s -> dst.addProperty(s.getPredicate(), s.getObject()));
+
+                if (src.hasProperty(RDF.type, FS.Collection)) {
+                    copyProperty(RDFS.label, src, dst);
+                } else {
+                    dst.addProperty(RDFS.label, name(to));
+                }
+
+                dataset.getDefaultModel()
+                        .listStatements(null, null, src)
+                        .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
+                        .forEachRemaining(stmt -> dataset.getDefaultModel().add(stmt.getSubject(), stmt.getPredicate(), dst));
+
+                dataset.getDefaultModel()
+                        .removeAll(null, null, src)
+                        .removeAll(src, null, null)
+                        .add(src, FS.movedTo, dst);
+            } else {
+                List.of(RDF.type, FS.blobId, FS.fileSize, FS.md5, FS.dateCreated, FS.dateModified, FS.createdBy, FS.modifiedBy)
+                        .forEach(p -> copyProperty(p, src, dst));
+                dst.addProperty(RDFS.label, name(to));
+            }
+        });
     }
 
     private void ensureCanCreate(String path) throws IOException {

@@ -2,14 +2,18 @@ package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.search.*;
-import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
+import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
+import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.text.TextDatasetFactory;
 import org.apache.jena.query.text.TextIndexConfig;
 import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.system.Txn;
 import org.elasticsearch.client.Client;
 
 import java.io.File;
@@ -30,7 +34,7 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static DatasetJobSupport connect(Config.Jena config) throws IOException {
+    public static Dataset connect(Config.Jena config) throws IOException {
         var elasticsearchClient = config.elasticSearch.enabled
                 ? ElasticSearchClientFactory.build(config.elasticSearch.settings, config.elasticSearch.advancedSettings)
                 : null;
@@ -55,20 +59,15 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog);
 
-        var dsgb = new DatasetGraphBatch(dsg);
+        var ds = DatasetFactory.wrap(dsg);
 
-        dsgb.calculateWrite(() -> {
-            // Create a dataset
-            var ds = DatasetFactory.wrap(dsgb);
-
+        Txn.executeWrite(ds, () -> {
             TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
             initVocabularies(ds);
-
-            return null;
         });
 
-        return new DatasetJobSupportImpl(dsgb);
+        return ds;
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {

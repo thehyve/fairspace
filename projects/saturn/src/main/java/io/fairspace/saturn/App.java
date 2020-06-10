@@ -12,8 +12,8 @@ import org.eclipse.jetty.server.session.SessionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
 @Slf4j
 public class App {

@@ -41,52 +41,43 @@ public class RestoreTest {
     }
 
     @Test
-    public void restoreWorksAsExpected() throws IOException {
-        var ds1 = newDataset();
+    public void restoreWorksAsExpected() throws Exception {
+        try (var txn1 = newDataset()) {
 
-        ds1.executeWrite(() -> ds1.getDefaultModel().add(stmt1));
-        ds1.executeWrite(() -> ds1.getDefaultModel().add(stmt2));
-
-        ds1.close();
+            txn1.executeWrite(ds -> ds.getDefaultModel().add(stmt1));
+            txn1.executeWrite(ds -> ds.getDefaultModel().add(stmt2));
+        }
 
         deleteDirectory(config.datasetPath);
         assertFalse(config.datasetPath.exists());
 
-        var ds2 = newDataset();
-
-        try {
-            ds2.executeRead(() -> {
-                assertTrue(ds2.getDefaultModel().contains(stmt1));
-                assertTrue(ds2.getDefaultModel().contains(stmt2));
+        try (var txn2 = newDataset()) {
+            txn2.executeRead(ds -> {
+                assertTrue(ds.getDefaultModel().contains(stmt1));
+                assertTrue(ds.getDefaultModel().contains(stmt2));
             });
-        } finally {
-            ds2.close();
         }
     }
 
     @Test
-    public void restoreListsWorksAsExpected() throws IOException {
-        var ds1 = newDataset();
-        ds1.executeWrite(() -> ds1.getDefaultModel()
-                .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), ds1.getDefaultModel().createList(createTypedLiteral(1), createTypedLiteral(2)))
-                .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), ds1.getDefaultModel().createList(createTypedLiteral("a"), createTypedLiteral("b"))));
+    public void restoreListsWorksAsExpected() throws Exception {
+        var txn1 = newDataset();
+        txn1.executeWrite(ds -> ds.getDefaultModel()
+                .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), ds.getDefaultModel().createList(createTypedLiteral(1), createTypedLiteral(2)))
+                .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), ds.getDefaultModel().createList(createTypedLiteral("a"), createTypedLiteral("b"))));
 
-        var before  = ds1.calculateRead(() -> ds1.getDefaultModel().listStatements().toSet());
+        var before = txn1.calculateRead(ds -> ds.getDefaultModel().listStatements().toSet());
 
-        ds1.close();
+        txn1.close();
 
         deleteDirectory(config.datasetPath);
 
-        var ds2 = newDataset();
-
-        try {
-            ds2.executeRead(() -> assertEquals(before, ds2.getDefaultModel().listStatements().toSet()));
-        } finally {
-            ds2.close();
+        try (var txn2 = newDataset()) {
+            txn2.executeRead(ds -> assertEquals(before, ds.getDefaultModel().listStatements().toSet()));
         }
     }
 
-    private DatasetJobSupport newDataset() throws IOException {
-        return SaturnDatasetFactory.connect(config);
+    private Transactions newDataset() throws IOException {
+        return new BulkTransactions(SaturnDatasetFactory.connect(config));
     }
 }

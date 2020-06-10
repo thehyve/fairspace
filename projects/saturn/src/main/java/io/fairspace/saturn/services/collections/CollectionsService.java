@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.collections;
 
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
@@ -30,13 +31,13 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 @Slf4j
 public class CollectionsService {
     private final String baseIri;
-    private final DAO dao;
+    private final Transactions transactions;
     private final Consumer<Object> eventListener;
     private final PermissionsService permissions;
 
-    public CollectionsService(String baseIri, DAO dao, Consumer<Object> eventListener, PermissionsService permissions) {
+    public CollectionsService(String baseIri, Transactions transactions, Consumer<Object> eventListener, PermissionsService permissions) {
         this.baseIri = baseIri;
-        this.dao = dao;
+        this.transactions = transactions;
         this.eventListener = eventListener;
         this.permissions = permissions;
     }
@@ -59,10 +60,10 @@ public class CollectionsService {
             collection.setDescription("");
         }
 
-        var storedCollection = dao.getDataset().calculateWrite(() -> {
+        var storedCollection = transactions.calculateWrite(dataset -> {
             checkWorkspace(collection.getOwnerWorkspace());
             ensureLocationIsNotUsed(collection.getLocation());
-            dao.write(collection);
+            new DAO(dataset).write(collection);
             permissions.createResource(collection.getIri(), collection.getOwnerWorkspace());
             collection.setAccess(Access.Manage);
             eventListener.accept(new CollectionCreatedEvent(collection));
@@ -78,29 +79,31 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        return addPermissionsToObject(dao.read(Collection.class, createURI(iri), showDeletedFiles()));
+        return transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Collection.class, createURI(iri), showDeletedFiles())));
     }
 
     public Collection getByLocation(String location) {
-        return dao.getDataset().calculateRead(() -> getByLocationWithoutAccess(location)
+        return transactions.calculateRead(dataset -> getByLocationWithoutAccess(location)
                 .map(this::addPermissionsToObject)
                 .orElse(null));
     }
 
     private Optional<Collection> getByLocationWithoutAccess(String location) {
-        return dao.getDataset().getDefaultModel().listSubjectsWithProperty(FS.filePath, location)
+        return transactions.calculateRead(ds -> ds.getDefaultModel().listSubjectsWithProperty(FS.filePath, location)
                 .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection) && (showDeletedFiles() || !r.hasProperty(FS.dateDeleted)))
                 .nextOptional()
-                .map(r -> entityFromResource(Collection.class, r));
+                .map(r -> entityFromResource(Collection.class, r)));
     }
 
     private void checkWorkspace(Node ownerWorkspace) {
         validate(ownerWorkspace != null, "ownerWorkspace is missing");
 
-        var ws = dao.getDataset().getDefaultModel().wrapAsResource(ownerWorkspace);
-        validate(ws.hasProperty(RDF.type, FS.Workspace), "Invalid workspace IRI");
-        validate(!ws.hasProperty(FS.dateDeleted), "Workspace is deleted");
-        permissions.ensureAccess(Set.of(ownerWorkspace), Access.Write);
+        transactions.executeRead(ds -> {
+            var ws = ds.getDefaultModel().wrapAsResource(ownerWorkspace);
+            validate(ws.hasProperty(RDF.type, FS.Workspace), "Invalid workspace IRI");
+            validate(!ws.hasProperty(FS.dateDeleted), "Workspace is deleted");
+            permissions.ensureAccess(Set.of(ownerWorkspace), Access.Write);
+        });
     }
 
 
@@ -111,8 +114,8 @@ public class CollectionsService {
     }
 
     public List<Collection> list() {
-        return dao.getDataset().calculateRead(() -> {
-            var collections = dao.list(Collection.class, showDeletedFiles());
+        return transactions.calculateRead(ds -> {
+            var collections = new DAO(ds).list(Collection.class, showDeletedFiles());
 
             var iris = collections.stream().map(Collection::getIri).collect(toList());
             var userPermissions = permissions.getPermissions(iris);
@@ -135,7 +138,7 @@ public class CollectionsService {
             throw new CollectionAccessDeniedException("Insufficient permissions to delete collections.", iri);
         }
         validateIRI(iri);
-        var c = dao.getDataset().calculateWrite(() -> {
+        var c = transactions.calculateWrite(ds -> {
             var collection = get(iri);
             if (collection == null) {
                 log.info("Collection not found {}", iri);
@@ -160,7 +163,7 @@ public class CollectionsService {
         validateIRI(patch.getIri().getURI());
         var restored = new boolean[] {false};
 
-        var c = dao.getDataset().calculateWrite(() -> {
+        var c = transactions.calculateWrite(ds -> {
             var collection = get(patch.getIri().getURI());
             if (collection == null) {
                 log.info("Collection not found {}", patch.getIri());
@@ -200,7 +203,7 @@ public class CollectionsService {
                     "Collection ownership cannot be changed");
 
             validateFields(collection);
-            collection = dao.write(collection);
+            collection = new DAO(ds).write(collection);
 
             if (!collection.getLocation().equals(oldLocation)) {
                 eventListener.accept(new CollectionMovedEvent(collection, oldLocation));

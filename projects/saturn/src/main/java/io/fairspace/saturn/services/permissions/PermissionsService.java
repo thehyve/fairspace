@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.permissions;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
@@ -33,7 +33,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 public class PermissionsService {
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
 
-    private final DatasetJobSupport dataset;
+    private final Transactions transactions;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
 
     public void createResource(Node resource) {
@@ -41,8 +41,10 @@ public class PermissionsService {
     }
 
     public void createResource(Node resource, Node owner) {
-        var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(owner));
+        transactions.executeWrite(dataset -> {
+            var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
+            model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(owner));
+        });
 
         audit("RESOURCE_CREATED",
                 "resource", resource.getURI());
@@ -52,20 +54,20 @@ public class PermissionsService {
         var resourcePermissions = createDefaultModel();
         var user = resourcePermissions.asRDFNode(getCurrentUser().getIri());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
-        dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions);
+        transactions.executeWrite(dataset -> dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions));
     }
 
     public void setPermission(Node resource, Node user, Access access) {
         var managingUser = getCurrentUser().getIri();
 
-        var success = dataset.calculateWrite(() -> {
+        var success = transactions.calculateWrite(dataset -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             ensureAccess(resource, Access.Manage);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
 
-            validate (isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
+            validate(isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
             if (isWorkspace(resource)) {
-                validate (!dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
+                validate(!dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
                         "Cannot set permissions for an inactive workspace");
             }
 
@@ -124,13 +126,13 @@ public class PermissionsService {
     }
 
     Map<Node, Access> getPermissions(Node resource) {
-        return dataset.calculateRead(() -> {
+        return transactions.calculateRead(dataset -> {
             var authority = getAuthority(resource);
             ensureAccess(authority, Access.Read);
 
             var result = new HashMap<Node, Access>();
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-            g.listStatements(g.asRDFNode(authority).asResource(), null, (RDFNode)null)
+            g.listStatements(g.asRDFNode(authority).asResource(), null, (RDFNode) null)
                     .forEachRemaining(stmt -> {
                         var user = stmt.getObject().asNode();
                         if (stmt.getPredicate().equals(FS.read)) {
@@ -156,7 +158,7 @@ public class PermissionsService {
      * @return
      */
     public Map<Node, Access> getPermissions(Collection<Node> nodes) {
-        return dataset.calculateRead(() -> {
+        return transactions.calculateRead(dataset -> {
             var authorities = getAuthorities(nodes);
             var permissionsForAuthorities = getPermissionsForAuthorities(authorities.keys());
             var result = new HashMap<Node, Access>();
@@ -172,61 +174,65 @@ public class PermissionsService {
      * @return a map from resource to permission level.
      */
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
-        var result = new HashMap<Node, Access>();
-        var userObject = getCurrentUser();
+        return transactions.calculateRead(dataset -> {
+            var result = new HashMap<Node, Access>();
+            var userObject = getCurrentUser();
 
-        var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-        var userResource = g.wrapAsResource(userObject.getIri());
-        authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
+            var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
+            var userResource = g.wrapAsResource(userObject.getIri());
+            authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
 
-        return result;
+            return result;
+        });
     }
 
     private Access getResourceAccess(Resource r, Resource user) {
-        if(isWorkspace(r.asNode())
-                && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
-            return Access.Read;
-        }
-        if(getCurrentUser().isAdmin()) {
-            return Access.Manage;
-        }
-        if (isCollection(r.asNode()) && isUser(user.asNode())) {
-            var it = dataset.getDefaultModel()
-                    .listSubjectsWithProperty(RDF.type, FS.Workspace)
-                    .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
-                    .mapWith(ws -> ws.inModel(dataset.getNamedModel(PERMISSIONS_GRAPH)))
-                    .mapWith(ws -> min(getResourceAccess(ws, user), getResourceAccess(r, ws)));
-            return stream(spliteratorUnknownSize(it, 0), false)
-                    .max(naturalOrder())
-                    .orElse(Access.None);
-        }
+        return transactions.calculateRead(dataset -> {
+            if (isWorkspace(r.asNode())
+                    && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
+                return Access.Read;
+            }
+            if (getCurrentUser().isAdmin()) {
+                return Access.Manage;
+            }
+            if (isCollection(r.asNode()) && isUser(user.asNode())) {
+                var it = dataset.getDefaultModel()
+                        .listSubjectsWithProperty(RDF.type, FS.Workspace)
+                        .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
+                        .mapWith(ws -> ws.inModel(dataset.getNamedModel(PERMISSIONS_GRAPH)))
+                        .mapWith(ws -> min(getResourceAccess(ws, user), getResourceAccess(r, ws)));
+                return stream(spliteratorUnknownSize(it, 0), false)
+                        .max(naturalOrder())
+                        .orElse(Access.None);
+            }
 
-        if (r.hasProperty(FS.manage, user)) {
-            return Access.Manage;
-        }
-        if (r.hasProperty(FS.write, user)) {
+            if (r.hasProperty(FS.manage, user)) {
+                return Access.Manage;
+            }
+            if (r.hasProperty(FS.write, user)) {
+                return Access.Write;
+            }
+            if (r.hasProperty(FS.read, user)) {
+                return Access.Read;
+            }
+            if (isCollection(r.asNode()) || isWorkspace(r.asNode())) {
+                return Access.None;
+            }
+
             return Access.Write;
-        }
-        if (r.hasProperty(FS.read, user)) {
-            return Access.Read;
-        }
-        if (isCollection(r.asNode()) || isWorkspace(r.asNode())) {
-            return Access.None;
-        }
-
-        return Access.Write;
+        });
     }
 
     private boolean isUser(Node resource) {
-        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.User);
+        return transactions.calculateRead(dataset -> dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.User));
     }
 
     private boolean isCollection(Node resource) {
-        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Collection);
+        return transactions.calculateRead(dataset -> dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Collection));
     }
 
     private boolean isWorkspace(Node resource) {
-        return dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Workspace);
+        return transactions.calculateRead(dataset -> dataset.getDefaultModel().wrapAsResource(resource).hasProperty(RDF.type, FS.Workspace));
     }
 
     /**
@@ -250,30 +256,32 @@ public class PermissionsService {
         var fileToCollectionPath = new HashMap<Node, String>(fileNodes.size());
         var collectionPaths = new HashSet<String>();
 
-        var model = dataset.getDefaultModel();
-        fileNodes.forEach(node -> {
-            var resource = model.createResource(node.getURI());
-            if (resource.hasProperty(RDF.type, FS.File) || resource.hasProperty(RDF.type, FS.Directory)) {
-                var filePath = getStringProperty(resource, FS.filePath);
-                if (filePath != null) {
-                    var path = collectionPath(filePath);
-                    fileToCollectionPath.put(node, path);
-                    collectionPaths.add(path);
+        return transactions.calculateRead(dataset -> {
+            var model = dataset.getDefaultModel();
+            fileNodes.forEach(node -> {
+                var resource = model.createResource(node.getURI());
+                if (resource.hasProperty(RDF.type, FS.File) || resource.hasProperty(RDF.type, FS.Directory)) {
+                    var filePath = getStringProperty(resource, FS.filePath);
+                    if (filePath != null) {
+                        var path = collectionPath(filePath);
+                        fileToCollectionPath.put(node, path);
+                        collectionPaths.add(path);
+                    }
                 }
-            }
+            });
+
+            var collectionsByPath = new HashMap<String, Node>();
+
+            collectionPaths.forEach(path -> model.listSubjectsWithProperty(FS.filePath, path)
+                    .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
+                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                    .forEachRemaining(r -> collectionsByPath.put(path, r.asNode())));
+
+            return fileToCollectionPath
+                    .entrySet()
+                    .stream()
+                    .collect(toMap(Map.Entry::getKey, e -> collectionsByPath.get(e.getValue())));
         });
-
-        var collectionsByPath = new HashMap<String, Node>();
-
-        collectionPaths.forEach(path -> model.listSubjectsWithProperty(FS.filePath, path)
-                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
-                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
-                .forEachRemaining(r -> collectionsByPath.put(path, r.asNode())));
-
-        return fileToCollectionPath
-                .entrySet()
-                .stream()
-                .collect(toMap(Map.Entry::getKey, e -> collectionsByPath.get(e.getValue())));
     }
 
     private static String collectionPath(String filePath) {

@@ -1,13 +1,13 @@
 package io.fairspace.saturn.rdf.dao;
 
 import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -68,9 +68,9 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final DatasetJobSupport dataset;
+    private final Dataset dataset;
 
-    public DAO(DatasetJobSupport dataset) {
+    public DAO(Dataset dataset) {
         this.dataset = dataset;
     }
 
@@ -87,43 +87,41 @@ public class DAO {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
 
-            dataset.executeWrite(() -> {
-                var graph = dataset.getDefaultModel().getGraph();
+            var graph = dataset.getDefaultModel().getGraph();
 
-                if (entity instanceof LifecycleAwarePersistentEntity) {
-                    var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                    var user = getUserIRI();
-                    basicEntity.setDateModified(now());
-                    basicEntity.setModifiedBy(user);
+            if (entity instanceof LifecycleAwarePersistentEntity) {
+                var basicEntity = (LifecycleAwarePersistentEntity) entity;
+                var user = getUserIRI();
+                basicEntity.setDateModified(now());
+                basicEntity.setModifiedBy(user);
 
-                    if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY) || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
-                        basicEntity.setDateCreated(basicEntity.getDateModified());
-                        basicEntity.setCreatedBy(user);
-                    }
+                if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY) || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
+                    basicEntity.setDateCreated(basicEntity.getDateModified());
+                    basicEntity.setCreatedBy(user);
+                }
+            }
+
+            if (entity.getIri() == null) {
+                entity.setIri(generateMetadataIri());
+            }
+
+            graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
+
+            processFields(entity.getClass(), (field, annotation) -> {
+                var propertyNode = createURI(annotation.value());
+                var value = field.get(entity);
+
+                if (value == null && annotation.required()) {
+                    throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
                 }
 
-                if (entity.getIri() == null) {
-                    entity.setIri(generateMetadataIri());
+                graph.remove(entity.getIri(), propertyNode, null);
+
+                if (value instanceof Iterable) {
+                    ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
+                } else if (value != null) {
+                    graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
                 }
-
-                graph.add(new Triple(entity.getIri(), RDF.type.asNode(), type));
-
-                processFields(entity.getClass(), (field, annotation) -> {
-                    var propertyNode = createURI(annotation.value());
-                    var value = field.get(entity);
-
-                    if (value == null && annotation.required()) {
-                        throw new DAOException(format(NO_VALUE_ERROR, field.getName(), entity.getIri()));
-                    }
-
-                    graph.remove(entity.getIri(), propertyNode, null);
-
-                    if (value instanceof Iterable) {
-                        ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
-                    } else if (value != null) {
-                        graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
-                    }
-                });
             });
 
             return entity;
@@ -178,8 +176,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        dataset.executeWrite(() ->
-                dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null));
+        dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null);
     }
 
     /**
@@ -196,7 +193,6 @@ public class DAO {
             return write(existing);
         }
         return null;
-
     }
 
     /**

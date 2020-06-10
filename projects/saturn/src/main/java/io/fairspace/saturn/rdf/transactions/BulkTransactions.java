@@ -1,10 +1,9 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import com.pivovarit.function.ThrowingSupplier;
+import com.pivovarit.function.ThrowingFunction;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.sparql.JenaTransactionException;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetGraphWrapper;
 import org.apache.jena.system.Txn;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,10 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static java.lang.Thread.currentThread;
 
-public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport {
+public class BulkTransactions extends BaseTransactions {
     private final LinkedBlockingQueue<Task<?, ?>> queue = new LinkedBlockingQueue<>();
     private static final AtomicInteger threadCounter = new AtomicInteger();
-    private final Thread worker =  new Thread(() -> {
+    private final Thread worker = new Thread(() -> {
         while (true) {
             var tasks = new ArrayList<Task<?, ?>>();
             try {
@@ -36,18 +35,18 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
         }
     }, "Batch transaction processor " + threadCounter.incrementAndGet());
 
-    public DatasetGraphBatch(DatasetGraph dsg) {
-        super(dsg);
+    public BulkTransactions(Dataset ds) {
+        super(ds);
 
         worker.start();
     }
 
     @Override
-    public <X, E extends Exception> X calculateWrite(ThrowingSupplier<X, E> job) throws E {
+    public <R, E extends Exception> R calculateWrite(ThrowingFunction<? super Dataset, R, E> job) throws E {
         try {
-            if (isInTransaction()) {
-                if (transactionMode() == ReadWrite.WRITE) {
-                    return job.get();
+            if (ds.isInTransaction()) {
+                if (ds.transactionMode() == ReadWrite.WRITE) {
+                    return job.apply(ds);
                 }
                 throw new JenaTransactionException("Can't promote to a write transaction");
             }
@@ -66,13 +65,13 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
             return true;
         }
 
-        return Txn.calculateWrite(this, () -> {
+        return Txn.calculateWrite(ds, () -> {
             for (var it = tasks.iterator(); it.hasNext(); ) {
                 var task = it.next();
-                if (!task.perform()) {
-                    abort();
+                if (!task.perform(ds)) {
+                    ds.abort();
                 }
-                if (!isInTransaction()) {
+                if (!ds.isInTransaction()) {
                     it.remove();
                     task.completed(); // task failed, no need to wait for other tasks
                     return false;
@@ -87,7 +86,7 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
     }
 
     @Override
-    public void close() {
+    public void close() throws Exception {
         worker.interrupt();
         try {
             worker.join();
@@ -99,20 +98,20 @@ public class DatasetGraphBatch extends DatasetGraphWrapper implements JobSupport
     private static class Task<R, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
         private final HttpServletRequest request;
-        private final ThrowingSupplier<R, E> job;
+        private final ThrowingFunction<? super Dataset, R, E> job;
         private R result;
         private Throwable error;
 
-        Task(HttpServletRequest request, ThrowingSupplier<R, E> job) {
+        Task(HttpServletRequest request, ThrowingFunction<? super Dataset, R, E> job) {
             this.request = request;
             this.job = job;
         }
 
-        boolean perform() {
+        boolean perform(Dataset ds) {
             try {
                 currentRequest.set(request);
 
-                result = job.get();
+                result = job.apply(ds);
                 error = null;
                 return true;
             } catch (Exception e) {

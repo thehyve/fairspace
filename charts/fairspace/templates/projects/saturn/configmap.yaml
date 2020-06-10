@@ -20,6 +20,7 @@ data:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}
       transactionLogPath: "/data/saturn/files/log"
       maxTriplesToReturn: {{ .Values.saturn.maxTriplesToReturn }}
+      bulkTransactions: {{ .Values.saturn.bulkTransactions }}
       elasticSearch:
         enabled: {{ .Values.external.elasticsearch.enabled }}
         required: true

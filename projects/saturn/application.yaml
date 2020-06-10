@@ -37,6 +37,7 @@ jena:
       - "GPU"
   # Path of the transaction log
   transactionLogPath: "data/log"
+  bulkTransactions: true
   elasticSearch:
     # Enables ElasticSearch integration
     enabled: true

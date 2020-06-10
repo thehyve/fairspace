@@ -1,11 +1,11 @@
 package io.fairspace.saturn.services.permissions;
 
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupport;
-import io.fairspace.saturn.rdf.transactions.DatasetJobSupportInMemory;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
@@ -44,7 +45,7 @@ public class PermissionsServiceTest {
     private static final Node FILE_1 = createURI("http://example.com/file1");
     private static final Node FILE_2 = createURI("http://example.com/file2");
 
-    private DatasetJobSupport ds;
+    private Dataset ds;
     private PermissionsService service;
 
     @Mock
@@ -63,7 +64,7 @@ public class PermissionsServiceTest {
 
     @Before
     public void setUp() {
-        ds = new DatasetJobSupportInMemory();
+        ds = createTxnMem();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
         currentRequest.set(request);
@@ -73,7 +74,7 @@ public class PermissionsServiceTest {
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
 
-        service = new PermissionsService(ds, permissionChangeEventHandler);
+        service = new PermissionsService(new SimpleTransactions(ds), permissionChangeEventHandler);
         service.createResource(RESOURCE);
     }
 
