@@ -218,6 +218,10 @@ public abstract class VfsBackedMiltonResource implements
 
     @Override
     public boolean isCompatible(Request.Method method) {
+        if (method.isWrite && info.isReadOnly()) {
+            return false;
+        }
+
         if (info.getDeleted() != null) {
             return !method.isWrite || (method == Request.Method.DELETE || method == Request.Method.PROPPATCH);
         }
