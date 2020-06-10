@@ -67,7 +67,7 @@ class CollectionAPI {
         ).catch(handleHttpError("Failure while updating a collection"));
     }
 
-    deleteCollection(collection: Resource, showDeleted = true): Promise<void> {
+    deleteCollection(collection: Resource, showDeleted = false): Promise<void> {
         const deleteCollectionsHeader = {...headers};
         if (showDeleted) {
             deleteCollectionsHeader['Show-Deleted'] = 'on';

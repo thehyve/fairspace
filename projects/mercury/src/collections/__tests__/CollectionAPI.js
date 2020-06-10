@@ -91,7 +91,7 @@ describe('CollectionAPI', () => {
             '/api/v1/collections/',
             JSON.stringify({
                 iri: 'id',
-                isDeleted: false
+                dateDeleted: null
             }),
             {headers: {'Content-Type': 'application/json', "Show-Deleted": "on"}}
         );
