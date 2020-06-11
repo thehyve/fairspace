@@ -66,7 +66,7 @@ public class ManagedFileSystem extends BaseFileSystem {
             var model = dataset.getDefaultModel();
             var resource = model.createResource(iri(path));
             if (model.containsResource(resource) && (showDeletedFiles() || !resource.hasProperty(FS.dateDeleted)) && !resource.hasProperty(FS.movedTo)) {
-                var fileInfo = fileInfo(resource);
+                var fileInfo = fileInfo(resource, version);
                 var collection = collections.getByLocation(splitPath(path)[0]);
                 if (collection == null) {
                     return null;
@@ -79,20 +79,43 @@ public class ManagedFileSystem extends BaseFileSystem {
         });
     }
 
-    private FileInfo fileInfo(Resource r) {
-        var versions = getListProperty(r, FS.versions);
+    @SneakyThrows
+    private FileInfo fileInfo(Resource file, Integer version) {
+        var versions = getListProperty(file, FS.versions);
+        if (version == null) {
+            if (versions != null) {
+                version = versions.size() + 1;
+            } else {
+                version = 1;
+            }
+        }
+        Resource ver = null;
+        if (versions != null) {
+            if (version <= versions.size()) {
+                ver = versions.get(version - 1).asResource();
+            } else if (version == versions.size() + 1) {
+                ver = file;
+            }
+        } else {
+            if (version.equals(1)) {
+                ver = file;
+            }
+        }
+        if (ver == null) {
+            throw new IOException("Invalid file version");
+        }
 
         return FileInfo.builder()
-                .path(r.getProperty(FS.filePath).getString())
-                .isDirectory(r.hasProperty(RDF.type, FS.Directory))
-                .createdBy(r.getPropertyResourceValue(FS.createdBy).asNode())
-                .modifiedBy(r.getPropertyResourceValue(FS.modifiedBy).asNode())
-                .deletedBy(r.hasProperty(FS.deletedBy) ? r.getPropertyResourceValue(FS.deletedBy).asNode() : null)
-                .created(parseXSDDateTimeLiteral(r.getProperty(FS.dateCreated).getLiteral()))
-                .modified(parseXSDDateTimeLiteral(r.getProperty(FS.dateModified).getLiteral()))
-                .deleted(r.hasProperty(FS.dateDeleted) ? parseXSDDateTimeLiteral(r.getProperty(FS.dateDeleted).getLiteral()) : null)
-                .size(r.hasProperty(FS.fileSize) ? r.getProperty(FS.fileSize).getLong() : 0)
-                .version(versions != null ? versions.size() + 1: 1)
+                .path(file.getProperty(FS.filePath).getString())
+                .isDirectory(file.hasProperty(RDF.type, FS.Directory))
+                .createdBy(file.getPropertyResourceValue(FS.createdBy).asNode())
+                .modifiedBy(ver.getPropertyResourceValue(FS.modifiedBy).asNode())
+                .deletedBy(file.hasProperty(FS.deletedBy) ? file.getPropertyResourceValue(FS.deletedBy).asNode() : null)
+                .created(parseXSDDateTimeLiteral(file.getProperty(FS.dateCreated).getLiteral()))
+                .modified(parseXSDDateTimeLiteral(ver.getProperty(FS.dateModified).getLiteral()))
+                .deleted(file.hasProperty(FS.dateDeleted) ? parseXSDDateTimeLiteral(file.getProperty(FS.dateDeleted).getLiteral()) : null)
+                .size(ver.hasProperty(FS.fileSize) ? ver.getProperty(FS.fileSize).getLong() : 0)
+                .version(version)
                 .build();
     }
 
@@ -110,7 +133,7 @@ public class ManagedFileSystem extends BaseFileSystem {
             return parent.listProperties(FS.contains)
                     .mapWith(Statement::getResource)
                     .filterKeep(r -> showDeleted || !r.hasProperty(FS.dateDeleted))
-                    .mapWith(this::fileInfo)
+                    .mapWith(r1 -> fileInfo(r1, null))
                     .mapWith(f -> {
                         f.setReadOnly(readOnly);
                         return f;
@@ -222,7 +245,8 @@ public class ManagedFileSystem extends BaseFileSystem {
                 .addProperty(FS.blobId, file.getProperty(FS.blobId).getString())
                 .addProperty(FS.md5, file.getProperty(FS.md5).getString())
                 .addLiteral(FS.fileSize, file.getProperty(FS.fileSize).getLong())
-                .addProperty(FS.modifiedBy, file.getPropertyResourceValue(FS.modifiedBy));
+                .addProperty(FS.modifiedBy, file.getPropertyResourceValue(FS.modifiedBy))
+                .addProperty(FS.dateModified, file.getProperty(FS.dateModified).getLiteral());
 
         var versions = getListProperty(file, FS.versions);
         if (versions == null) {
@@ -238,9 +262,10 @@ public class ManagedFileSystem extends BaseFileSystem {
         var blobId = transactions.calculateRead(dataset -> {
             var file = dataset.getDefaultModel()
                     .createResource(iri(path));
-            var blobIdHolder = (version == null)
+            var versions = getListProperty(file, FS.versions);
+            var blobIdHolder = (version == null || version == versions.size() + 1)
                     ? file
-                    : getListProperty(file, FS.versions).get(version - 1).asResource();
+                    : versions.get(version - 1).asResource();
             return blobIdHolder
                     .listProperties(FS.blobId)
                     .nextOptional()

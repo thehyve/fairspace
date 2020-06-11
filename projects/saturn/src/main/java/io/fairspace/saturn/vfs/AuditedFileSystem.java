@@ -52,7 +52,7 @@ public class AuditedFileSystem implements VirtualFileSystem {
     @Override
     public void read(String path, Integer version, OutputStream out, long start, Long finish) throws IOException {
         fs.read(path, version, out, start, finish);
-        audit("FS_READ", "path", path);
+        audit("FS_READ", "path", path, "version", version);
     }
 
     @Override

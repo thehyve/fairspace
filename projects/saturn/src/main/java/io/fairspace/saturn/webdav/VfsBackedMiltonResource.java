@@ -172,7 +172,7 @@ public abstract class VfsBackedMiltonResource implements
             }
         } else if (name.equals(VERSION_PROPERTY)) {
             try {
-                fs.revert(info.getPath(), (Integer) value);
+                fs.revert(info.getPath(), Integer.parseInt(value.toString()));
             } catch (IOException e) {
                 throw new PropertySource.PropertySetException(Response.Status.SC_PRECONDITION_FAILED, "Error reverting");
             }

@@ -17,7 +17,7 @@ axios.interceptors.request.use((config) => {
     // based on the Depth header send to the backend.
     if (config.method === 'propfind') {
         config.headers['content-type'] = 'application/xml';
-        config.data = `<propfind><allprop /></propfind>`;
+        config.data = '<propfind><allprop /></propfind>';
     }
     return config;
 }, (error) => Promise.reject(error));
