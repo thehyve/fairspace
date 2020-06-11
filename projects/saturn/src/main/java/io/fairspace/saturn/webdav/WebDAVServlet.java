@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static io.milton.servlet.MiltonServlet.clearThreadlocals;
-import static io.milton.servlet.MiltonServlet.setThreadlocals;
+import static io.milton.servlet.MiltonServlet.*;
 import static java.util.Collections.singletonList;
 
 public class WebDAVServlet extends HttpServlet {
@@ -41,5 +40,10 @@ public class WebDAVServlet extends HttpServlet {
             res.getOutputStream().flush();
             res.flushBuffer();
         }
+    }
+
+    static Integer versionHeader() {
+        var header = request().getHeader("Version");
+        return (header != null) ? Integer.parseInt(header) : null;
     }
 }

@@ -19,7 +19,7 @@ public class VfsBackedMiltonResourceFactoryTest {
 
     @Test
     public void getResourceReturnsNullForFileNotFound() throws IOException {
-        when(fs.stat("/test")).thenThrow(new FileNotFoundException("test"));
+        when(fs.stat("/test", )).thenThrow(new FileNotFoundException("test"));
 
         assertNull(VfsBackedMiltonResourceFactory.getResource(fs, "/test"));
     }

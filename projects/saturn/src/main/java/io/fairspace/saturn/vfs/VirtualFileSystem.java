@@ -14,10 +14,15 @@ public interface VirtualFileSystem extends Closeable {
     /**
      *
      * @param path here and in all other methods paths shall never start or end with a slash
+     * @param version
      * @return file info or null if file doesn't exist
      * @throws IOException
      */
-    FileInfo stat(String path) throws IOException;
+    FileInfo stat(String path, Integer version) throws IOException;
+
+    default FileInfo stat(String path) throws IOException {
+        return stat(path, null);
+    }
 
     String iri(String path) throws IOException;
 
@@ -33,10 +38,10 @@ public interface VirtualFileSystem extends Closeable {
 
     void modify(String path, InputStream in) throws IOException;
 
-    void read(String path, OutputStream out, long start, Long finish) throws IOException;
+    void read(String path, Integer version, OutputStream out, long start, Long finish) throws IOException;
 
-    default void read(String path, OutputStream out) throws IOException {
-        read(path, out, 0, null);
+    default void read(String path, Integer version, OutputStream out) throws IOException {
+        read(path, version, out, 0, null);
     }
 
     void copy(String from, String to) throws IOException;
@@ -45,5 +50,7 @@ public interface VirtualFileSystem extends Closeable {
 
     void delete(String path) throws IOException;
 
-    void restore(String path) throws IOException;
+    void undelete(String path) throws IOException;
+
+    void revert(String path, int version) throws IOException;
 }

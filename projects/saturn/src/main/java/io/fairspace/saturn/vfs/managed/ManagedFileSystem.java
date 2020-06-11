@@ -37,8 +37,8 @@ import java.util.function.Supplier;
 
 import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
 import static io.fairspace.saturn.rdf.ModelUtils.copyProperty;
-import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
+import static io.fairspace.saturn.rdf.SparqlUtils.*;
 import static io.fairspace.saturn.vfs.PathUtils.*;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
@@ -61,7 +61,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected FileInfo statRegularFile(String path) throws IOException {
+    protected FileInfo statRegularFile(String path, Integer version) throws IOException {
         return transactions.calculateRead(dataset -> {
             var model = dataset.getDefaultModel();
             var resource = model.createResource(iri(path));
@@ -80,6 +80,8 @@ public class ManagedFileSystem extends BaseFileSystem {
     }
 
     private FileInfo fileInfo(Resource r) {
+        var versions = getListProperty(r, FS.versions);
+
         return FileInfo.builder()
                 .path(r.getProperty(FS.filePath).getString())
                 .isDirectory(r.hasProperty(RDF.type, FS.Directory))
@@ -90,6 +92,7 @@ public class ManagedFileSystem extends BaseFileSystem {
                 .modified(parseXSDDateTimeLiteral(r.getProperty(FS.dateModified).getLiteral()))
                 .deleted(r.hasProperty(FS.dateDeleted) ? parseXSDDateTimeLiteral(r.getProperty(FS.dateDeleted).getLiteral()) : null)
                 .size(r.hasProperty(FS.fileSize) ? r.getProperty(FS.fileSize).getLong() : 0)
+                .version(versions != null ? versions.size() + 1: 1)
                 .build();
     }
 
@@ -196,10 +199,15 @@ public class ManagedFileSystem extends BaseFileSystem {
             var user = dataset.getDefaultModel().createResource(userIriSupplier.get().getURI());
             var now = toXSDDateTimeLiteral(Instant.now());
 
-            dataset.getDefaultModel().createResource(iri(path))
-                    .removeAll(FS.blobId)
+            var file = dataset.getDefaultModel().createResource(iri(path));
+
+            createVersion(file);
+
+            file.removeAll(FS.blobId)
                     .removeAll(FS.fileSize)
                     .removeAll(FS.md5)
+                    .removeAll(FS.modifiedBy)
+                    .removeAll(FS.dateModified)
                     .addLiteral(FS.blobId, blobInfo.id)
                     .addLiteral(FS.fileSize, blobInfo.size)
                     .addLiteral(FS.md5, blobInfo.md5)
@@ -208,15 +216,37 @@ public class ManagedFileSystem extends BaseFileSystem {
         });
     }
 
+    private void createVersion(Resource file) {
+        var version = file.getModel().asRDFNode(generateMetadataIri()).asResource()
+                .addProperty(RDF.type, FS.FileVersion)
+                .addProperty(FS.blobId, file.getProperty(FS.blobId).getString())
+                .addProperty(FS.md5, file.getProperty(FS.md5).getString())
+                .addLiteral(FS.fileSize, file.getProperty(FS.fileSize).getLong())
+                .addProperty(FS.modifiedBy, file.getPropertyResourceValue(FS.modifiedBy));
+
+        var versions = getListProperty(file, FS.versions);
+        if (versions == null) {
+            versions = file.getModel().createList(version);
+            file.addProperty(FS.versions, versions);
+        } else {
+            versions.add(version);
+        }
+    }
+
     @Override
-    public void read(String path, OutputStream out, long start, Long finish) throws IOException {
-        var blobId = transactions.calculateRead(dataset ->
-                dataset.getDefaultModel()
-                        .createResource(iri(path))
-                        .listProperties(FS.blobId)
-                        .nextOptional()
-                        .map(Statement::getString)
-                        .orElseThrow(() -> new FileNotFoundException(path)));
+    protected void doRead(String path, Integer version, OutputStream out, long start, Long finish) throws IOException {
+        var blobId = transactions.calculateRead(dataset -> {
+            var file = dataset.getDefaultModel()
+                    .createResource(iri(path));
+            var blobIdHolder = (version == null)
+                    ? file
+                    : getListProperty(file, FS.versions).get(version - 1).asResource();
+            return blobIdHolder
+                    .listProperties(FS.blobId)
+                    .nextOptional()
+                    .map(Statement::getString)
+                    .orElseThrow(() -> new FileNotFoundException(path));
+        });
         store.read(blobId, out, start, finish);
     }
 
@@ -288,7 +318,7 @@ public class ManagedFileSystem extends BaseFileSystem {
 
 
     @Override
-    protected void doRestore(String path) throws IOException {
+    protected void doUndelete(String path) throws IOException {
         transactions.executeWrite(dataset -> {
             var info = stat(path);
             if (info == null) {
@@ -303,20 +333,46 @@ public class ManagedFileSystem extends BaseFileSystem {
             var date = resource.getProperty(FS.dateDeleted).getLiteral();
             var user = resource.getPropertyResourceValue(FS.deletedBy);
 
-            restoreRecursively(resource, date, user);
+            undeleteRecursively(resource, date, user);
         });
     }
 
-    private void restoreRecursively(Resource resource, Literal date, Resource user) {
+    private void undeleteRecursively(Resource resource, Literal date, Resource user) {
         if (resource.hasProperty(RDF.type, FS.Directory) || resource.hasProperty(RDF.type, FS.Collection)) {
             resource.listProperties(FS.contains)
                     .mapWith(Statement::getResource)
                     .filterKeep(r -> r.hasProperty(FS.dateDeleted, date) && r.hasProperty(FS.deletedBy, user))
-                    .forEachRemaining(child -> restoreRecursively(child, date, user));
+                    .forEachRemaining(child -> undeleteRecursively(child, date, user));
         }
 
         resource.removeAll(FS.dateDeleted)
                 .removeAll(FS.deletedBy);
+    }
+
+    @Override
+    protected void doRevert(String path, int version) throws IOException {
+        transactions.executeWrite(ds -> {
+            var user = ds.getDefaultModel().createResource(userIriSupplier.get().getURI());
+            var now = toXSDDateTimeLiteral(Instant.now());
+
+            var file = ds.getDefaultModel().createResource(iri(path));
+
+            createVersion(file);
+
+            var versions = getListProperty(file, FS.versions);
+            var ver = versions.get(version - 1).asResource();
+
+            file.removeAll(FS.blobId)
+                    .removeAll(FS.fileSize)
+                    .removeAll(FS.md5)
+                    .removeAll(FS.modifiedBy)
+                    .removeAll(FS.dateModified)
+                    .addLiteral(FS.blobId, ver.getRequiredProperty(FS.blobId).getLiteral())
+                    .addLiteral(FS.fileSize, ver.getRequiredProperty(FS.fileSize).getLiteral())
+                    .addLiteral(FS.md5, ver.getRequiredProperty(FS.md5).getLiteral())
+                    .addProperty(FS.modifiedBy, user)
+                    .addLiteral(FS.dateModified, now);
+        });
     }
 
     @Override
@@ -338,7 +394,7 @@ public class ManagedFileSystem extends BaseFileSystem {
     @SneakyThrows
     @Subscribe
     public void onCollectionRestored(CollectionRestoredEvent e) {
-        doRestore(e.getCollection().getLocation());
+        doUndelete(e.getCollection().getLocation());
     }
 
     private void copyOrMove(boolean move, String from, String to) throws IOException {

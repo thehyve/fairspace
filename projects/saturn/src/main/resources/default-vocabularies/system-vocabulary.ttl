@@ -68,7 +68,7 @@ fs:FileShape a fs:ClassShape ;
     sh:name "File" ;
     sh:targetClass fs:File ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId fs:movedTo) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:blobId fs:movedTo fs:versions) ;
     fs:fixedShape true ;
     fs:systemProperties
         fs:fileSizeShape,
@@ -98,6 +98,8 @@ fs:FileShape a fs:ClassShape ;
         fs:commentShape,
         fs:replacesShape,
         fs:isReplacedByShape .
+
+
 
 fs:DirectoryShape a fs:ClassShape ;
     sh:description "A directory containing multiple files." ;

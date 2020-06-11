@@ -18,6 +18,12 @@ public class FS {
     public static final String FILE_URI = NS + "File";
     public static final Resource File = createResource(FILE_URI);
 
+    public static final String VERSIONS_URI = NS + "versions";
+    public static final Property versions = createProperty(VERSIONS_URI);
+
+    public static final String FILE_VERSION_URI = NS + "FileVersion";
+    public static final Resource FileVersion = createResource(FILE_VERSION_URI);
+
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 

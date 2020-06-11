@@ -3,8 +3,10 @@ package io.fairspace.saturn.vfs;
 import io.fairspace.saturn.services.collections.Collection;
 import io.fairspace.saturn.services.collections.CollectionsService;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +35,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public FileInfo stat(String path) throws IOException {
+    public FileInfo stat(String path, Integer version) throws IOException {
         if (path.isEmpty()) {
             return ROOT;
         }
@@ -44,7 +46,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
             }
             return fileInfo(collection);
         }
-        return statRegularFile(path);
+        return statRegularFile(path, version);
     }
 
     @Override
@@ -102,7 +104,7 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void restore(String path) throws IOException {
+    public void undelete(String path) throws IOException {
         ensureValidPath(path);
 
         var parent = stat(parentPath(path));
@@ -111,14 +113,43 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
             throw new IOException("You need to restore the parent directory first");
         }
 
-        doRestore(path);
-    };
+        doUndelete(path);
+    }
+
+    @Override
+    public void revert(String path, int version) throws IOException {
+        ensureValidPath(path);
+
+        var info = stat(path);
+        if (info.isDirectory()) {
+            throw new IOException("Cannot revert a directory");
+        }
+
+        if (version < 1 || version >= info.getVersion()) {
+            throw new IOException("Invalid file version");
+        }
+
+        doRevert(path, version);
+    }
+
+    @Override
+    public void read(String path, Integer version, OutputStream out, long start, Long finish) throws IOException {
+        var info = stat(path, version);
+        if (info == null) {
+            throw new FileNotFoundException();
+        }
+        if (info.isDirectory() || info.getDeleted() != null) {
+            throw new IOException("Not a file");
+        }
+        doRead(path, version, out, start, finish);
+    }
+
 
     @Override
     public void close() throws IOException {
     }
 
-    protected abstract FileInfo statRegularFile(String path) throws IOException;
+    protected abstract FileInfo statRegularFile(String path, Integer version) throws IOException;
 
     protected abstract List<FileInfo> listCollectionOrDirectory(String parentPath) throws IOException;
 
@@ -132,7 +163,12 @@ public abstract class BaseFileSystem implements VirtualFileSystem {
 
     protected abstract void doDelete(String path) throws IOException;
 
-    protected abstract void doRestore(String path) throws IOException;
+    protected abstract void doUndelete(String path) throws IOException;
+
+    protected abstract void doRevert(String path, int version) throws IOException;
+
+    protected abstract void doRead(String path, Integer version, OutputStream out, long start, Long finish) throws IOException;
+
 
     private static boolean isCollection(String path) {
         return splitPath(path).length == 1;

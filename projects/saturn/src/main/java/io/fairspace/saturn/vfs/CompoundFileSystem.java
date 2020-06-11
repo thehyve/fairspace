@@ -27,14 +27,14 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected FileInfo statRegularFile(String path) throws IOException {
+    protected FileInfo statRegularFile(String path, Integer version) throws IOException {
         VirtualFileSystem vfs;
         try {
             vfs = fileSystemByPath(path, false);
         } catch (FileNotFoundException e) {
             return null;
         }
-        return vfs.stat(path);
+        return vfs.stat(path, version);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out, long start, Long finish) throws IOException {
-        fileSystemByPath(path, false).read(path, out, start, finish);
+    protected void doRead(String path, Integer version, OutputStream out, long start, Long finish) throws IOException {
+        fileSystemByPath(path, false).read(path, version, out, start, finish);
     }
 
     @Override
@@ -86,8 +86,13 @@ public class CompoundFileSystem extends BaseFileSystem {
     }
 
     @Override
-    protected void doRestore(String path) throws IOException {
-        fileSystemByPath(path, true).restore(path);
+    protected void doUndelete(String path) throws IOException {
+        fileSystemByPath(path, true).undelete(path);
+    }
+
+    @Override
+    protected void doRevert(String path, int version) throws IOException {
+        fileSystemByPath(path, true).revert(path, version);
     }
 
     @Override

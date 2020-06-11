@@ -90,15 +90,15 @@ public class ManagedFileSystemTest {
 
     @Test
     public void statCollection() throws IOException {
-        assertEquals("coll", fs.stat("coll").getPath());
-        assertTrue(fs.stat("coll").isDirectory());
+        assertEquals("coll", fs.stat("coll", ).getPath());
+        assertTrue(fs.stat("coll", ).isDirectory());
         assertNotNull(fs.iri("coll"));
     }
 
     @Test
     public void statDirectory() throws IOException {
         fs.mkdir("coll/aaa");
-        var stat = fs.stat("coll/aaa");
+        var stat = fs.stat("coll/aaa", );
         assertEquals("coll/aaa", stat.getPath());
         assertTrue(stat.isDirectory());
         assertNotNull(fs.iri(stat.getPath()));
@@ -106,7 +106,7 @@ public class ManagedFileSystemTest {
 
     @Test
     public void statNonExisting() throws IOException {
-        assertNull(fs.stat("coll/aaa"));
+        assertNull(fs.stat("coll/aaa", ));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/aaa");
         fs.mkdir("coll/aaa/bbb");
         fs.mkdir("coll/aaa/bbb/ccc");
-        var stat = fs.stat("coll/aaa/bbb/ccc");
+        var stat = fs.stat("coll/aaa/bbb/ccc", );
         assertEquals("coll/aaa/bbb/ccc", stat.getPath());
         assertTrue(stat.isDirectory());
         var iri = fs.iri(stat.getPath());
@@ -168,19 +168,19 @@ public class ManagedFileSystemTest {
         fs.mkdir("coll/dir");
 
         fs.create("coll/dir/file", new ByteArrayInputStream(content1));
-        var stat = fs.stat("coll/dir/file");
+        var stat = fs.stat("coll/dir/file", );
         assertEquals("coll/dir/file", stat.getPath());
         assertEquals(content1.length, stat.getSize());
         var os = new ByteArrayOutputStream();
-        fs.read("coll/dir/file", os);
+        fs.read("coll/dir/file", , , os, );
         assertArrayEquals(content1, os.toByteArray());
         ensureRecentInstant(stat.getCreated());
         ensureRecentInstant(stat.getModified());
 
         fs.modify("coll/dir/file", new ByteArrayInputStream(content2));
-        assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+        assertEquals(content2.length, fs.stat("coll/dir/file", ).getSize());
         os = new ByteArrayOutputStream();
-        fs.read("coll/dir/file", os);
+        fs.read("coll/dir/file", , , os, );
         if (!Arrays.equals(content2, os.toByteArray())) {
             assertArrayEquals(content2, os.toByteArray());
         }
@@ -256,7 +256,7 @@ public class ManagedFileSystemTest {
         assertTrue(fs.exists("coll/dir2/subdir"));
         assertTrue(fs.exists("coll/dir2/subdir/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("coll/dir2/subdir/file", os);
+        fs.read("coll/dir2/subdir/file", , , os, );
         assertArrayEquals(content1, os.toByteArray());
         assertNotEquals(oldIri, fs.iri("coll/dir2"));
         assertTrue(ds.getDefaultModel().contains(createResource(fs.iri("coll/dir2")), RDFS.label, createStringLiteral("dir2")));
@@ -280,7 +280,7 @@ public class ManagedFileSystemTest {
         assertTrue(fs.exists("coll/dir1/file"));
         assertTrue(fs.exists("coll/dir2/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("coll/dir2/file", os);
+        fs.read("coll/dir2/file", , , os, );
         assertArrayEquals(content1, os.toByteArray());
         assertNotEquals(oldIri, fs.iri("coll/dir2/file"));
     }
@@ -297,7 +297,7 @@ public class ManagedFileSystemTest {
         assertTrue(fs.exists("coll/dir2/subdir"));
         assertTrue(fs.exists("coll/dir2/subdir/file"));
         var os = new ByteArrayOutputStream();
-        fs.read("coll/dir2/subdir/file", os);
+        fs.read("coll/dir2/subdir/file", , , os, );
         assertArrayEquals(content1, os.toByteArray());
         assertTrue(ds.getDefaultModel().contains(createResource(fs.iri("coll/dir2")), RDFS.label, createStringLiteral("dir2")));
     }
@@ -320,7 +320,7 @@ public class ManagedFileSystemTest {
         assertFalse(fs.exists("coll/dir1/file1"));
         assertTrue(fs.exists("coll/dir2/file2"));
         var os = new ByteArrayOutputStream();
-        fs.read("coll/dir2/file2", os);
+        fs.read("coll/dir2/file2", , , os, );
         assertArrayEquals(content1, os.toByteArray());
     }
 
@@ -364,14 +364,14 @@ public class ManagedFileSystemTest {
         when(request.getHeader("Show-Deleted")).thenReturn("on");
 
         assertTrue(fs.exists("coll/dir"));
-        assertNotNull(fs.stat("coll/dir").getDeleted());
-        assertNotNull(fs.stat("coll/dir").getDeletedBy());
+        assertNotNull(fs.stat("coll/dir", ).getDeleted());
+        assertNotNull(fs.stat("coll/dir", ).getDeletedBy());
         assertTrue(fs.exists("coll/dir/subdir"));
-        assertNotNull(fs.stat("coll/dir/subdir").getDeleted());
-        assertNotNull(fs.stat("coll/dir/subdir").getDeletedBy());
+        assertNotNull(fs.stat("coll/dir/subdir", ).getDeleted());
+        assertNotNull(fs.stat("coll/dir/subdir", ).getDeletedBy());
         assertTrue(fs.exists("coll/dir/file"));
-        assertNotNull(fs.stat("coll/dir/file").getDeleted());
-        assertNotNull(fs.stat("coll/dir/file").getDeletedBy());
+        assertNotNull(fs.stat("coll/dir/file", ).getDeleted());
+        assertNotNull(fs.stat("coll/dir/file", ).getDeletedBy());
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -394,7 +394,7 @@ public class ManagedFileSystemTest {
         fs.create("coll/dir/file", new ByteArrayInputStream(content2));
 
         assertTrue(fs.exists("coll/dir/file"));
-        assertEquals(content2.length, fs.stat("coll/dir/file").getSize());
+        assertEquals(content2.length, fs.stat("coll/dir/file", ).getSize());
     }
 
     @Test(expected = AccessDeniedException.class)

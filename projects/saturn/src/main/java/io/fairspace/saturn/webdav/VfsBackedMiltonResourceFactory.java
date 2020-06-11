@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.vfs.PathUtils.splitPath;
+import static io.fairspace.saturn.webdav.WebDAVServlet.versionHeader;
 import static java.util.stream.Collectors.joining;
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 
@@ -33,7 +34,7 @@ public class VfsBackedMiltonResourceFactory implements ResourceFactory {
 
     static Resource getResource(VirtualFileSystem fs, String path) {
         try {
-            var info = fs.stat(path);
+            var info = fs.stat(path, versionHeader());
             return getResource(fs, info);
         } catch (FileNotFoundException e) {
             return null;

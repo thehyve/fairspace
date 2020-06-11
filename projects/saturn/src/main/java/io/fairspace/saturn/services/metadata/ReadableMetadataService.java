@@ -57,6 +57,11 @@ class ReadableMetadataService {
                                         }
                                     });
                         }
+                        if (stmt.getObject().isAnon()) {
+                            stmt.getResource()
+                                    .listProperties()
+                                    .forEachRemaining(objStmt -> addStmt(model, objStmt));
+                        }
                     });
         });
 

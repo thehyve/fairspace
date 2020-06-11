@@ -15,8 +15,8 @@ public class AuditedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public FileInfo stat(String path) throws IOException {
-        return fs.stat(path);
+    public FileInfo stat(String path, Integer version) throws IOException {
+        return fs.stat(path, version);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class AuditedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void read(String path, OutputStream out, long start, Long finish) throws IOException {
-        fs.read(path, out, start, finish);
+    public void read(String path, Integer version, OutputStream out, long start, Long finish) throws IOException {
+        fs.read(path, version, out, start, finish);
         audit("FS_READ", "path", path);
     }
 
@@ -74,9 +74,15 @@ public class AuditedFileSystem implements VirtualFileSystem {
     }
 
     @Override
-    public void restore(String path) throws IOException {
-        fs.restore(path);
-        audit("FS_RESTORE", "path", path);
+    public void undelete(String path) throws IOException {
+        fs.undelete(path);
+        audit("FS_UNDELETE", "path", path);
+    }
+
+    @Override
+    public void revert(String path, int version) throws IOException {
+        fs.revert(path, version);
+        audit("FS_REVERT", "path", path, "version", version);
     }
 
     @Override

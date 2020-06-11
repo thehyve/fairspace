@@ -39,8 +39,10 @@ public abstract class VfsBackedMiltonResource implements
     private static final PropertyMetaData ISREADONLY_PROPERTY_META = new PropertyMetaData(READ_ONLY, Boolean.class);
     private static final QName DATE_DELETED_PROPERTY = new QName(FS.NS, "dateDeleted");
     private static final PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertyMetaData(WRITABLE, Date.class);
+    private static final QName VERSION_PROPERTY = new QName(FS.NS, "version");
+    private static final PropertyMetaData VERSION_PROPERTY_META = new PropertyMetaData(WRITABLE, Integer.class);
 
-    private static final List<QName> DEFAULT_PROPERTIES = List.of(IRI_PROPERTY, ISREADONLY_PROPERTY, DATE_DELETED_PROPERTY);
+    private static final List<QName> DEFAULT_PROPERTIES = List.of(IRI_PROPERTY, ISREADONLY_PROPERTY, DATE_DELETED_PROPERTY, VERSION_PROPERTY);
 
     protected final VirtualFileSystem fs;
     protected final FileInfo info;
@@ -151,6 +153,7 @@ public abstract class VfsBackedMiltonResource implements
         }
         if (name.equals(ISREADONLY_PROPERTY)) return info.isReadOnly();
         if (name.equals(DATE_DELETED_PROPERTY)) return info.getDeleted();
+        if (name.equals(VERSION_PROPERTY)) return info.getVersion();
 
         return propertySource.getProperty(name);
     }
@@ -160,12 +163,18 @@ public abstract class VfsBackedMiltonResource implements
         if (name.equals(DATE_DELETED_PROPERTY)) {
             if (value == null) {
                 try {
-                    fs.restore(info.getPath());
+                    fs.undelete(info.getPath());
                 } catch (IOException e) {
-                    throw new PropertySource.PropertySetException(Response.Status.SC_PRECONDITION_FAILED, "Error restoring");
+                    throw new PropertySource.PropertySetException(Response.Status.SC_PRECONDITION_FAILED, "Error undeleting");
                 }
             } else {
                 throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Cannot modify \"dateDeleted\" property");
+            }
+        } else if (name.equals(VERSION_PROPERTY)) {
+            try {
+                fs.revert(info.getPath(), (Integer) value);
+            } catch (IOException e) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_PRECONDITION_FAILED, "Error reverting");
             }
         }
     }
@@ -175,6 +184,7 @@ public abstract class VfsBackedMiltonResource implements
         if (name.equals(IRI_PROPERTY)) return IRI_PROPERTY_META;
         if (name.equals(ISREADONLY_PROPERTY)) return ISREADONLY_PROPERTY_META;
         if (name.equals(DATE_DELETED_PROPERTY)) return DATE_DELETED_PROPERTY_META;
+        if (name.equals(VERSION_PROPERTY)) return VERSION_PROPERTY_META;
 
         return propertySource.getPropertyMeta(name);
     }
