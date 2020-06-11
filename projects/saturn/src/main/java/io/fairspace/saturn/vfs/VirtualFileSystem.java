@@ -44,6 +44,10 @@ public interface VirtualFileSystem extends Closeable {
         read(path, version, out, 0, null);
     }
 
+    default void read(String path, OutputStream out) throws IOException {
+        read(path, null, out, 0, null);
+    }
+
     void copy(String from, String to) throws IOException;
 
     void move(String from, String to) throws IOException;

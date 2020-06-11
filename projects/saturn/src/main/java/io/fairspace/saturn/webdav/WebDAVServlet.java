@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 import static io.milton.servlet.MiltonServlet.*;
 import static java.util.Collections.singletonList;
@@ -43,7 +44,9 @@ public class WebDAVServlet extends HttpServlet {
     }
 
     static Integer versionHeader() {
-        var header = request().getHeader("Version");
-        return (header != null) ? Integer.parseInt(header) : null;
+        return Optional.ofNullable(request())
+                .map(r -> r.getHeader("Version"))
+                .map(Integer::parseInt)
+                .orElse(null);
     }
 }

@@ -89,8 +89,8 @@ public class CompoundFileSystemTest {
         verify(vfs1).list("dir1/path");
         verifyZeroInteractions(vfs2);
 
-        fs.stat("dir2/path", );
-        verify(vfs2).stat("dir2/path", );
+        fs.stat("dir2/path");
+        verify(vfs2).stat("dir2/path", null);
 
         fs.mkdir("dir5/path");
         verify(vfs3).mkdir("dir5/path");
@@ -103,16 +103,16 @@ public class CompoundFileSystemTest {
 
     @Test(expected = IOException.class)
     public void handlesUnknownSchemes() throws IOException {
-        fs.stat("dir3/path", );
+        fs.stat("dir3/path");
     }
 
     public void handlesUnknownLocations() throws IOException {
-        assertNull(fs.stat("unknown", ));
+        assertNull(fs.stat("unknown"));
     }
 
     @Test(expected = IOException.class)
     public void handlesMalformedURLs() throws IOException {
-        fs.stat("dir4/path", );
+        fs.stat("dir4/path");
     }
 
     @Test(expected = IOException.class)
