@@ -21,7 +21,7 @@ import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
 import static io.fairspace.saturn.rdf.dao.DAO.entityFromResource;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-import static io.fairspace.saturn.vfs.PathUtils.encodePath;
+import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;

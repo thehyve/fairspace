@@ -1,13 +1,16 @@
-package io.fairspace.saturn.vfs;
+package io.fairspace.saturn.webdav;
 
 import org.apache.http.client.utils.URLEncodedUtils;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.strip;
 
 public class PathUtils {
+    private static final String[] INVALID_BASENAMES = {".", ".."};
+
     public static String normalizePath(String path) {
         return strip(path, "/");
     }
@@ -39,5 +42,9 @@ public class PathUtils {
     public static String parentPath(String path) {
         var idx = path.lastIndexOf('/');
         return idx > 0 ? path.substring(0, idx) : null;
+    }
+
+    public static boolean containsInvalidPathName(String path) {
+        return Arrays.asList(INVALID_BASENAMES).contains(name(path));
     }
 }

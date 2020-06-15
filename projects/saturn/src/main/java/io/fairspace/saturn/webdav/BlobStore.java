@@ -1,4 +1,4 @@
-package io.fairspace.saturn.vfs.managed;
+package io.fairspace.saturn.webdav;
 
 import java.io.IOException;
 import java.io.InputStream;
