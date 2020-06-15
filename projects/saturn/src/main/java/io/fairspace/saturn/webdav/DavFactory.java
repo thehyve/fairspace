@@ -1,16 +1,21 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
 
+import java.time.Instant;
 import java.util.stream.Stream;
 
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.PathUtils.splitPath;
@@ -41,14 +46,18 @@ public class DavFactory implements ResourceFactory {
             return root;
         }
 
-        var collection = resource(splitPath(path)[0]);
+        var collection = pathToSubject(splitPath(path)[0]);
         if (!collection.hasProperty(RDF.type, collection)) {
             return null;
         }
 
-        var subject = resource(path);
+        var subject = pathToSubject(path);
         var access = permissions.getPermission(collection.asNode());
 
+        return getResource(subject, access);
+    }
+
+    Resource getResource(org.apache.jena.rdf.model.Resource subject, Access access) {
         if (subject.hasProperty(FS.dateDeleted) && !showDeleted()) {
             return null;
         }
@@ -65,7 +74,15 @@ public class DavFactory implements ResourceFactory {
         return null;
     }
 
-    org.apache.jena.rdf.model.Resource resource(String path) {
+    org.apache.jena.rdf.model.Resource pathToSubject(String path) {
         return model.createResource(baseUri + encodePath(path));
+    }
+
+    static Literal now() {
+        return toXSDDateTimeLiteral(Instant.now());
+    }
+
+    static org.apache.jena.rdf.model.Resource getUser() {
+        return org.apache.jena.rdf.model.ResourceFactory.createResource(getCurrentUser().getIri().getURI());
     }
 }

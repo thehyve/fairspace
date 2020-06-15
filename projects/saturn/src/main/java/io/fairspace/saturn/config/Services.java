@@ -1,6 +1,5 @@
 package io.fairspace.saturn.config;
 
-import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -38,7 +37,6 @@ public class Services {
     private final Config config;
     private final Transactions transactions;
 
-    private final EventBus eventBus = new EventBus();
     private final WorkspaceService workspaceService;
     private final UserService userService;
     private final MailService mailService;
@@ -63,7 +61,7 @@ public class Services {
         permissionsService = new PermissionsService(transactions, permissionNotificationHandler);
 
         workspaceService = new WorkspaceService(transactions, permissionsService);
-        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, eventBus::post, permissionsService);
+
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
 
@@ -94,5 +92,7 @@ public class Services {
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
         davFactory = new DavFactory(CONFIG.publicUrl + "/api/v1/webdav/", dataset.getDefaultModel(), blobStore, permissionsService);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
+
+        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, davFactory, permissionsService);
     }
 }

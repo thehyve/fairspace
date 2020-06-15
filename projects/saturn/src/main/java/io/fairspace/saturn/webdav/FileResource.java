@@ -26,9 +26,14 @@ import java.util.Map;
 
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
 import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
+import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.lang.Integer.parseInt;
 
 class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
+    private static final QName VERSION_PROPERTY = new QName(FS.NS, "version");
+    private static final PropertySource.PropertyMetaData VERSION_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Integer.class);
+    private static final List<QName> FILE_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, VERSION_PROPERTY);
+
     private final int version;
     private final String blobId;
     private final long contentLength;
@@ -104,7 +109,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     @Override
     public List<QName> getAllPropertyNames() {
-        return List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, VERSION_PROPERTY);
+        return FILE_PROPERTIES;
     }
 
     @Override
@@ -134,8 +139,8 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
                     .createResource();
 
             copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
-            newVer.addProperty(FS.modifiedBy, getUser())
-                    .addLiteral(FS.dateModified, now());
+            newVer.addProperty(FS.modifiedBy, DavFactory.getUser())
+                    .addLiteral(FS.dateModified, DavFactory.now());
 
             versions = versions.cons(newVer);
             var current = subject.getRequiredProperty(FS.currentVersion).getInt() + 1;

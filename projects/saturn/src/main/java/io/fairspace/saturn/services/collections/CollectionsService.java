@@ -7,14 +7,22 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.MiltonException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.CollectionResource;
+import io.milton.resource.DeletableResource;
+import io.milton.resource.MoveableResource;
+import io.milton.resource.MultiNamespaceCustomPropertyResource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 
+import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
@@ -28,22 +36,19 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
+@Deprecated(forRemoval = true) // Access WebDAV directly
 @Slf4j
 public class CollectionsService {
     private final String baseIri;
     private final Transactions transactions;
-    private final Consumer<Object> eventListener;
+    private final ResourceFactory resourceFactory;
     private final PermissionsService permissions;
 
-    public CollectionsService(String baseIri, Transactions transactions, Consumer<Object> eventListener, PermissionsService permissions) {
+    public CollectionsService(String baseIri, Transactions transactions, ResourceFactory resourceFactory, PermissionsService permissions) {
         this.baseIri = baseIri;
         this.transactions = transactions;
-        this.eventListener = eventListener;
+        this.resourceFactory = resourceFactory;
         this.permissions = permissions;
-    }
-
-    public String getBaseIri() {
-        return baseIri;
     }
 
     public Collection create(Collection collection) {
@@ -66,7 +71,6 @@ public class CollectionsService {
             new DAO(dataset).write(collection);
             permissions.createResource(collection.getIri(), collection.getOwnerWorkspace());
             collection.setAccess(Access.Manage);
-            eventListener.accept(new CollectionCreatedEvent(collection));
             return collection;
         });
 
@@ -108,7 +112,7 @@ public class CollectionsService {
 
 
     private void ensureLocationIsNotUsed(String location) {
-        if(getByLocationWithoutAccess(location).isPresent()) {
+        if (getByLocationWithoutAccess(location).isPresent()) {
             throw new LocationAlreadyExistsException(location);
         }
     }
@@ -139,17 +143,22 @@ public class CollectionsService {
         }
         validateIRI(iri);
         var c = transactions.calculateWrite(ds -> {
-            var collection = get(iri);
-            if (collection == null) {
-                log.info("Collection not found {}", iri);
-                throw new CollectionNotFoundException(iri);
+            try {
+                var collection = get(iri);
+                if (collection == null) {
+                    log.info("Collection not found {}", iri);
+                    throw new CollectionNotFoundException(iri);
+                }
+
+                var coll = davRoot().child(collection.getLocation());
+                ((DeletableResource) coll).delete();
+
+                return collection;
+            } catch (MiltonException e) {
+                throw new RuntimeException(e);
             }
-
-            // Emit event on internal eventbus so the filesystem can act accordingly
-            eventListener.accept(new CollectionDeletedEvent(collection));
-
-            return collection;
         });
+
 
         audit("COLLECTION_DELETED",
                 "iri", iri,
@@ -157,59 +166,74 @@ public class CollectionsService {
                 "location", c.getLocation());
     }
 
+    private CollectionResource davRoot() {
+        try {
+            return (CollectionResource) resourceFactory.getResource(null, "");
+        } catch (NotAuthorizedException | BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Collection update(Collection patch) {
         validate(patch.getIri() != null, "No IRI");
 
         validateIRI(patch.getIri().getURI());
-        var restored = new boolean[] {false};
+        var restored = new boolean[]{false};
 
         var c = transactions.calculateWrite(ds -> {
-            var collection = get(patch.getIri().getURI());
-            if (collection == null) {
-                log.info("Collection not found {}", patch.getIri());
-                throw new CollectionNotFoundException(patch.getIri().getURI());
+            try {
+                var collection = get(patch.getIri().getURI());
+                if (collection == null) {
+                    log.info("Collection not found {}", patch.getIri());
+                    throw new CollectionNotFoundException(patch.getIri().getURI());
+                }
+                if (!collection.getAccess().canWrite()) {
+                    log.info("Not enough permissions to modify a collection {}", patch.getIri());
+                    throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
+                }
+
+                if (collection.getDateDeleted() != null) {
+                    validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
+                    var coll = davRoot().child(collection.getLocation());
+                    ((MultiNamespaceCustomPropertyResource) coll).setProperty(new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName()), null);
+                    collection = get(patch.getIri().getURI());
+                    restored[0] = true;
+                }
+
+                var oldLocation = collection.getLocation();
+                if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
+                    ensureLocationIsNotUsed(patch.getLocation());
+                    collection.setLocation(patch.getLocation());
+                }
+
+                if (patch.getConnectionString() != null) {
+                    collection.setConnectionString(patch.getConnectionString());
+                }
+
+                if (patch.getName() != null) {
+                    collection.setName(patch.getName());
+                }
+
+                if (patch.getDescription() != null) {
+                    collection.setDescription(patch.getDescription());
+                }
+
+                validate(patch.getOwnerWorkspace() == null || patch.getOwnerWorkspace().equals(collection.getOwnerWorkspace()),
+                        "Collection ownership cannot be changed");
+
+                validateFields(collection);
+                collection = new DAO(ds).write(collection);
+
+                if (!collection.getLocation().equals(oldLocation)) {
+                    var coll = davRoot().child(collection.getLocation());
+                    ((MoveableResource) coll).moveTo(davRoot(), collection.getLocation());
+                }
+
+                return collection;
+
+            } catch (MiltonException e) {
+                throw new RuntimeException(e);
             }
-            if (!collection.getAccess().canWrite()) {
-                log.info("Not enough permissions to modify a collection {}", patch.getIri());
-                throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
-            }
-
-            if (collection.getDateDeleted() != null) {
-                validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
-                eventListener.accept(new CollectionRestoredEvent(collection));
-                collection = get(patch.getIri().getURI());
-                restored[0] = true;
-            }
-
-            var oldLocation = collection.getLocation();
-            if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
-                ensureLocationIsNotUsed(patch.getLocation());
-                collection.setLocation(patch.getLocation());
-            }
-
-            if (patch.getConnectionString() != null) {
-                collection.setConnectionString(patch.getConnectionString());
-            }
-
-            if (patch.getName() != null) {
-                collection.setName(patch.getName());
-            }
-
-            if (patch.getDescription() != null) {
-                collection.setDescription(patch.getDescription());
-            }
-
-            validate(patch.getOwnerWorkspace() == null || patch.getOwnerWorkspace().equals(collection.getOwnerWorkspace()),
-                    "Collection ownership cannot be changed");
-
-            validateFields(collection);
-            collection = new DAO(ds).write(collection);
-
-            if (!collection.getLocation().equals(oldLocation)) {
-                eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
-            }
-
-            return collection;
         });
 
         audit(restored[0] ? "COLLECTION_RESTORED" : "COLLECTION_UPDATED",
@@ -230,7 +254,7 @@ public class CollectionsService {
     private Collection addPermissionsToObject(Collection c) {
         if (c != null) {
             c.setAccess(permissions.getPermission(c.getIri()));
-            if(c.getAccess() == Access.None) {
+            if (c.getAccess() == Access.None) {
                 return null;
             }
         }

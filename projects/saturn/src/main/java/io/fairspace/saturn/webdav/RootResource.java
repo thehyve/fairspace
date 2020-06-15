@@ -1,18 +1,25 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.Resource;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-class RootResource implements io.milton.resource.CollectionResource {
+import static io.fairspace.saturn.webdav.DavFactory.getUser;
+import static io.fairspace.saturn.webdav.DavFactory.now;
+
+class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource {
 
     private final DavFactory factory;
 
@@ -37,6 +44,27 @@ class RootResource implements io.milton.resource.CollectionResource {
                 })
                 .filterDrop(Objects::isNull)
                 .toList();
+    }
+
+    @Override
+    public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
+        var subj = factory.pathToSubject(newName);
+
+        if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {
+            throw new ConflictException();
+        }
+
+        subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
+
+        subj.addProperty(RDF.type, FS.Collection)
+                .addProperty(FS.filePath, newName)
+                .addProperty(RDFS.label, newName)
+                .addProperty(FS.createdBy, getUser())
+                .addProperty(FS.dateCreated, now());
+
+        factory.permissions.createResource(subj.asNode());
+
+        return new CollectionResource(factory, subj, Access.Manage);
     }
 
     @Override

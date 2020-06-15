@@ -11,38 +11,29 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
 import io.milton.resource.*;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
-import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
+import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
 abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource {
     protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
-    protected static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
+    private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
     protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
-    protected static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
+    private static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
     protected static final QName DATE_DELETED_PROPERTY = new QName(FS.NS, "dateDeleted");
-    protected static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Date.class);
-    protected static final QName VERSION_PROPERTY = new QName(FS.NS, "version");
-    protected static final PropertySource.PropertyMetaData VERSION_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Integer.class);
+    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Date.class);
 
 
     protected final DavFactory factory;
@@ -75,12 +66,6 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         return (method.isWrite ? access.canWrite() : access.canRead()) || getCurrentUser().isAdmin();
     }
 
-    private Node collectionNode() {
-        var uri = subject.getURI();
-        return NodeFactory.createURI(uri.substring(0, uri.indexOf('/', factory.baseUri.length())));
-
-    }
-
     @Override
     public String getRealm() {
         return null;
@@ -105,13 +90,13 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (purge) {
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
-            subject.addProperty(FS.dateDeleted, now())
-                    .addProperty(FS.deletedBy, getUser());
+            subject.addProperty(FS.dateDeleted, DavFactory.now())
+                    .addProperty(FS.deletedBy, DavFactory.getUser());
         }
     }
 
     @Override
-    public final void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+    public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
         var existing = rDest.child(name);
         if (existing != null) {
             throw new ConflictException(existing);
@@ -121,7 +106,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     private void move(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name) {
         var path = joinPaths(parent.getRequiredProperty(FS.filePath).getString(), name);
-        var newSubject = factory.resource(path);
+        var newSubject = factory.pathToSubject(path);
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
         newSubject.addProperty(FS.filePath, path)
@@ -145,17 +130,17 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     @Override
-    public final void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
         var existing = toCollection.child(name);
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, getUser(), now());
+        copy(subject, ((DirectoryResource) toCollection).subject, name, DavFactory.getUser(), DavFactory.now());
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
         var path = joinPaths(parent.getRequiredProperty(FS.filePath).getString(), name);
-        var newSubject = factory.resource(path);
+        var newSubject = factory.pathToSubject(path);
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
         newSubject.addProperty(FS.filePath, path)
@@ -249,8 +234,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addProperty(FS.blobId, blob.id)
                 .addLiteral(FS.fileSize, blob.size)
                 .addProperty(FS.md5, blob.md5)
-                .addProperty(FS.dateModified, now())
-                .addProperty(FS.modifiedBy, getUser());
+                .addProperty(FS.dateModified, DavFactory.now())
+                .addProperty(FS.modifiedBy, DavFactory.getUser());
     }
 
     protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {
@@ -258,13 +243,5 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             return null;
         }
         return Date.from(parseXSDDateTimeLiteral(s.getProperty(p).getLiteral()));
-    }
-
-    protected static Literal now() {
-        return toXSDDateTimeLiteral(Instant.now());
-    }
-
-    protected org.apache.jena.rdf.model.Resource getUser() {
-        return subject.getModel().asRDFNode(getCurrentUser().getIri()).asResource();
     }
 }

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.collections;
 
-import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
@@ -8,6 +7,11 @@ import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.FolderResource;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
@@ -18,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static java.util.stream.Collectors.toMap;
@@ -33,7 +36,11 @@ public class CollectionsServiceTest {
     private static final Node workspaceIri = createURI("http://ex.com/ws");
 
     @Mock
-    private Consumer<Object> eventListener;
+    private ResourceFactory resourceFactory;
+    @Mock
+    private FolderResource rootResource;
+    @Mock
+    private FolderResource collectionResource;
     @Mock
     private User user;
     @Mock
@@ -43,7 +50,7 @@ public class CollectionsServiceTest {
     private CollectionsService collections;
 
     @Before
-    public void before() {
+    public void before() throws NotAuthorizedException, BadRequestException {
         currentRequest.set(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(userIri);
@@ -51,24 +58,15 @@ public class CollectionsServiceTest {
         var ds = createTxnMem();
         var transactions = new SimpleTransactions(ds);
         ds.getDefaultModel().add(ds.getDefaultModel().asRDFNode(workspaceIri).asResource(), RDF.type, FS.Workspace);
-        collections = new CollectionsService("http://fairspace.io/", transactions, eventListener, permissions);
+        collections = new CollectionsService("http://fairspace.io/", transactions, resourceFactory, permissions);
 
-        doAnswer(invocation -> {
-            CollectionDeletedEvent e = invocation.getArgument(0);
-            new DAO(ds).markAsDeleted(e.getCollection());
-            return null;
-        }).when(eventListener).accept(any(CollectionDeletedEvent.class));
+        when(resourceFactory.getResource(any(), any())).thenReturn(rootResource);
+        when(rootResource.child(any())).thenReturn(collectionResource);
     }
 
     @Test
     public void serviceReturnsAnEmptyListIfNoCollectionsExist() {
         assertTrue(collections.list().isEmpty());
-    }
-
-    @Test
-    public void creationOfACollectionTriggersAnEvent() {
-        var created = collections.create(newCollection());
-        verify(eventListener, times(1)).accept(new CollectionCreatedEvent(created));
     }
 
     @Test
@@ -109,7 +107,7 @@ public class CollectionsServiceTest {
     }
 
     @Test
-    public void changingLocationEmitsAnEvent() {
+    public void changingLocationEmitsAnEvent() throws NotAuthorizedException, ConflictException, BadRequestException {
         var created1 = collections.create(newCollection());
 
         mockPermissions(Access.Manage);
@@ -118,11 +116,11 @@ public class CollectionsServiceTest {
         patch.setIri(created1.getIri());
         patch.setLocation("dir2");
         collections.update(patch);
-        verify(eventListener, times(1)).accept(new CollectionMovedEvent(created1, "dir1"));
+        verify(collectionResource, times(1)).moveTo(rootResource, "dir2");
     }
 
     @Test
-    public void updatesWorkAsExpected() {
+    public void updatesWorkAsExpected() throws NotAuthorizedException, ConflictException, BadRequestException {
         var c = collections.create(newCollection());
 
         mockPermissions(Access.Manage);
@@ -133,7 +131,7 @@ public class CollectionsServiceTest {
         patch.setDescription("new descr");
         patch.setLocation("dir2");
         collections.update(patch);
-        verify(eventListener, times(1)).accept(new CollectionMovedEvent(c, "dir1"));
+        verify(collectionResource, times(1)).moveTo(rootResource, "dir2");
 
         var updated = collections.get(c.getIri().getURI());
         assertEquals("new name", updated.getName());
@@ -142,43 +140,13 @@ public class CollectionsServiceTest {
         assertNotEquals(c.getDateModified(), updated.getDateModified());
     }
 
-    @Test
-    public void deletedCollectionIsNoLongerVisible() {
-        var c = collections.create(newCollection());
-
-        doNothing().when(permissions).ensureAdmin();
-
-        collections.delete(c.getIri().getURI());
-        assertNull(collections.get(c.getIri().getURI()));
-        assertNull(collections.getByLocation(c.getLocation()));
-        assertTrue(collections.list().isEmpty());
-        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
-    }
 
     @Test
-    public void deletedCollectionIsStillReachable() {
-        var c = collections.create(newCollection());
-
-        doNothing().when(permissions).ensureAdmin();
-
-        collections.delete(c.getIri().getURI());
-
-        when(request.getHeader("Show-Deleted")).thenReturn("on");
-        when(permissions.getPermissions(any())).thenReturn(Map.of(c.getIri(), Access.Read));
-
-        assertNotNull(collections.get(c.getIri().getURI()));
-        assertNotNull(collections.get(c.getIri().getURI()).getDateDeleted());
-        assertNotNull(collections.get(c.getIri().getURI()).getDeletedBy());
-        assertNotNull(collections.getByLocation(c.getLocation()));
-        assertFalse(collections.list().isEmpty());
-    }
-
-    @Test
-    public void deletionEmitsAnEvent() {
+    public void deletionEmitsAnEvent() throws NotAuthorizedException, ConflictException, BadRequestException {
         var c = collections.create(newCollection());
         doNothing().when(permissions).ensureAdmin();
         collections.delete(c.getIri().getURI());
-        verify(eventListener, times(1)).accept(new CollectionDeletedEvent(c));
+        verify(collectionResource, times(1)).delete();
     }
 
     @Test
@@ -195,7 +163,6 @@ public class CollectionsServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void nonStandardCharactersInLocationAreNotAllowed() {
-        try {
             var c1 = new Collection();
             c1.setName("c1");
             c1.setLocation("dir?");
@@ -204,14 +171,10 @@ public class CollectionsServiceTest {
             c1.setOwnerWorkspace(workspaceIri);
 
             collections.create(c1);
-        } finally {
-            verifyNoMoreInteractions(eventListener);
-        }
     }
 
     @Test(expected = LocationAlreadyExistsException.class)
     public void checksForLocationsUniquenessOnCreate() {
-        try {
             var c1 = new Collection();
             c1.setName("c1");
             c1.setLocation("dir1");
@@ -222,15 +185,10 @@ public class CollectionsServiceTest {
             collections.create(c1);
             c1.setIri(null);
             collections.create(c1);
-        } finally {
-            verify(eventListener, times(1)).accept(any(CollectionCreatedEvent.class));
-            verifyNoMoreInteractions(eventListener);
-        }
     }
 
     @Test(expected = LocationAlreadyExistsException.class)
     public void checksForLocationsUniquenessOnUpdate() {
-        try {
             var c1 = collections.create(newCollection());
 
             var c2 = new Collection();
@@ -247,10 +205,6 @@ public class CollectionsServiceTest {
             patch.setLocation(c2.getLocation());
             mockPermissions(Access.Manage);
             collections.update(patch);
-        } finally {
-            verify(eventListener, times(2)).accept(any(CollectionCreatedEvent.class));
-            verifyNoMoreInteractions(eventListener);
-        }
     }
 
     @Test

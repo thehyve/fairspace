@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
@@ -41,7 +40,7 @@ class DirectoryResource extends BaseResource implements FolderResource {
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
         var subj = createResource(newName).addProperty(RDF.type, FS.Directory);
 
-        return (io.milton.resource.CollectionResource) factory.getResource(subj);
+        return (io.milton.resource.CollectionResource) factory.getResource(subj, access);
     }
 
     @Override
@@ -52,7 +51,7 @@ class DirectoryResource extends BaseResource implements FolderResource {
                 .addLiteral(FS.currentVersion, 1)
                 .addProperty(FS.versions, subj.getModel().createList(newVersion()));
 
-        return factory.getResource(subj);
+        return factory.getResource(subj, access);
     }
 
     private org.apache.jena.rdf.model.Resource createResource(String newName) throws ConflictException, NotAuthorizedException, BadRequestException {
@@ -62,14 +61,14 @@ class DirectoryResource extends BaseResource implements FolderResource {
         }
 
         var path = joinPaths(subject.getRequiredProperty(FS.filePath).getString(), newName);
-        var subj = factory.resource(path);
+        var subj = factory.pathToSubject(path);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
-        var t = now();
+        var t = DavFactory.now();
 
         subj
                 .addProperty(FS.filePath, path)
                 .addProperty(RDFS.label, newName)
-                .addProperty(FS.createdBy, getUser())
+                .addProperty(FS.createdBy, DavFactory.getUser())
                 .addProperty(FS.dateCreated, t);
 
         subject.addProperty(FS.contains, subj);
@@ -78,7 +77,7 @@ class DirectoryResource extends BaseResource implements FolderResource {
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(factory.resource(joinPaths(subject.getRequiredProperty(FS.filePath).getString(), childName)));
+        return factory.getResource(factory.pathToSubject(joinPaths(subject.getRequiredProperty(FS.filePath).getString(), childName)), access);
     }
 
     @Override
@@ -86,8 +85,7 @@ class DirectoryResource extends BaseResource implements FolderResource {
         return subject.listProperties(FS.contains)
                 .mapWith(Statement::getObject)
                 .mapWith(RDFNode::asResource)
-                .mapWith(factory::getResource)
-                .filterDrop(Objects::isNull)
+                .mapWith(r -> factory.getResource(r, access))
                 .toList();
     }
 

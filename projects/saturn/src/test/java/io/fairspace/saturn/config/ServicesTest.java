@@ -39,11 +39,6 @@ public class ServicesTest {
     }
 
     @Test
-    public void getEventBus() {
-        assertNotNull(svc.getEventBus());
-    }
-
-    @Test
     public void getUserService() {
         assertNotNull(svc.getUserService());
     }
