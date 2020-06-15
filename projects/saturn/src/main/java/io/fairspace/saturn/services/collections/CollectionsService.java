@@ -12,14 +12,11 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.MiltonException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
-import io.milton.resource.DeletableResource;
-import io.milton.resource.MoveableResource;
-import io.milton.resource.MultiNamespaceCustomPropertyResource;
+import io.milton.resource.FolderResource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 
-import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -143,20 +140,20 @@ public class CollectionsService {
         }
         validateIRI(iri);
         var c = transactions.calculateWrite(ds -> {
+            var collection = get(iri);
+            if (collection == null) {
+                log.info("Collection not found {}", iri);
+                throw new CollectionNotFoundException(iri);
+            }
+
             try {
-                var collection = get(iri);
-                if (collection == null) {
-                    log.info("Collection not found {}", iri);
-                    throw new CollectionNotFoundException(iri);
-                }
-
-                var coll = davRoot().child(collection.getLocation());
-                ((DeletableResource) coll).delete();
-
-                return collection;
+                collectionResource(collection.getLocation()).delete();
             } catch (MiltonException e) {
                 throw new RuntimeException(e);
             }
+
+            return collection;
+
         });
 
 
@@ -166,9 +163,17 @@ public class CollectionsService {
                 "location", c.getLocation());
     }
 
-    private CollectionResource davRoot() {
+    private CollectionResource rootResource() {
         try {
             return (CollectionResource) resourceFactory.getResource(null, "");
+        } catch (NotAuthorizedException | BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private FolderResource collectionResource(String location) {
+        try {
+            return (FolderResource) rootResource().child(location);
         } catch (NotAuthorizedException | BadRequestException e) {
             throw new RuntimeException(e);
         }
@@ -181,59 +186,55 @@ public class CollectionsService {
         var restored = new boolean[]{false};
 
         var c = transactions.calculateWrite(ds -> {
-            try {
-                var collection = get(patch.getIri().getURI());
-                if (collection == null) {
-                    log.info("Collection not found {}", patch.getIri());
-                    throw new CollectionNotFoundException(patch.getIri().getURI());
-                }
-                if (!collection.getAccess().canWrite()) {
-                    log.info("Not enough permissions to modify a collection {}", patch.getIri());
-                    throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
-                }
-
-                if (collection.getDateDeleted() != null) {
-                    validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
-                    var coll = davRoot().child(collection.getLocation());
-                    ((MultiNamespaceCustomPropertyResource) coll).setProperty(new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName()), null);
-                    collection = get(patch.getIri().getURI());
-                    restored[0] = true;
-                }
-
-                var oldLocation = collection.getLocation();
-                if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
-                    ensureLocationIsNotUsed(patch.getLocation());
-                    collection.setLocation(patch.getLocation());
-                }
-
-                if (patch.getConnectionString() != null) {
-                    collection.setConnectionString(patch.getConnectionString());
-                }
-
-                if (patch.getName() != null) {
-                    collection.setName(patch.getName());
-                }
-
-                if (patch.getDescription() != null) {
-                    collection.setDescription(patch.getDescription());
-                }
-
-                validate(patch.getOwnerWorkspace() == null || patch.getOwnerWorkspace().equals(collection.getOwnerWorkspace()),
-                        "Collection ownership cannot be changed");
-
-                validateFields(collection);
-                collection = new DAO(ds).write(collection);
-
-                if (!collection.getLocation().equals(oldLocation)) {
-                    var coll = davRoot().child(collection.getLocation());
-                    ((MoveableResource) coll).moveTo(davRoot(), collection.getLocation());
-                }
-
-                return collection;
-
-            } catch (MiltonException e) {
-                throw new RuntimeException(e);
+            var collection = get(patch.getIri().getURI());
+            if (collection == null) {
+                log.info("Collection not found {}", patch.getIri());
+                throw new CollectionNotFoundException(patch.getIri().getURI());
             }
+            if (!collection.getAccess().canWrite()) {
+                log.info("Not enough permissions to modify a collection {}", patch.getIri());
+                throw new CollectionAccessDeniedException("Insufficient permissions to modify a collection", patch.getIri().getURI());
+            }
+
+            if (collection.getDateDeleted() != null) {
+                validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
+                collection = new DAO(ds).restore(collection);
+                restored[0] = true;
+            }
+
+            var oldLocation = collection.getLocation();
+            if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
+                ensureLocationIsNotUsed(patch.getLocation());
+                collection.setLocation(patch.getLocation());
+            }
+
+            if (patch.getConnectionString() != null) {
+                collection.setConnectionString(patch.getConnectionString());
+            }
+
+            if (patch.getName() != null) {
+                collection.setName(patch.getName());
+            }
+
+            if (patch.getDescription() != null) {
+                collection.setDescription(patch.getDescription());
+            }
+
+            validate(patch.getOwnerWorkspace() == null || patch.getOwnerWorkspace().equals(collection.getOwnerWorkspace()),
+                    "Collection ownership cannot be changed");
+
+            validateFields(collection);
+            collection = new DAO(ds).write(collection);
+
+            if (!collection.getLocation().equals(oldLocation)) {
+                try {
+                    collectionResource(oldLocation).moveTo(rootResource(), collection.getLocation());
+                } catch (MiltonException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            return collection;
         });
 
         audit(restored[0] ? "COLLECTION_RESTORED" : "COLLECTION_UPDATED",
