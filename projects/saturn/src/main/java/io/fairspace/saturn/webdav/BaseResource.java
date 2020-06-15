@@ -18,7 +18,6 @@ import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
 import java.util.Date;
-import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
@@ -32,7 +31,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
     protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
     private static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
-    protected static final QName DATE_DELETED_PROPERTY = new QName(FS.NS, "dateDeleted");
+    protected static final QName DATE_DELETED_PROPERTY = new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName());
     private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Date.class);
 
 
@@ -90,8 +89,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (purge) {
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
-            subject.addProperty(FS.dateDeleted, DavFactory.now())
-                    .addProperty(FS.deletedBy, DavFactory.getUser());
+            subject.addProperty(FS.dateDeleted, DavFactory.timestampLiteral())
+                    .addProperty(FS.deletedBy, DavFactory.currentUserResource());
         }
     }
 
@@ -124,7 +123,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
         subject.getModel().listStatements(null, null, subject)
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
-                .forEachRemaining(stmt -> factory.model.add(stmt.getSubject(), stmt.getPredicate(), newSubject));
+                .forEachRemaining(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
     }
@@ -135,7 +134,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, DavFactory.getUser(), DavFactory.now());
+        copy(subject, ((DirectoryResource) toCollection).subject, name, DavFactory.currentUserResource(), DavFactory.timestampLiteral());
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
@@ -211,11 +210,6 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     @Override
-    public List<QName> getAllPropertyNames() {
-        return List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
-    }
-
-    @Override
     public boolean isCompatible(Request.Method m) {
         return true;
     }
@@ -234,8 +228,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addProperty(FS.blobId, blob.id)
                 .addLiteral(FS.fileSize, blob.size)
                 .addProperty(FS.md5, blob.md5)
-                .addProperty(FS.dateModified, DavFactory.now())
-                .addProperty(FS.modifiedBy, DavFactory.getUser());
+                .addProperty(FS.dateModified, DavFactory.timestampLiteral())
+                .addProperty(FS.modifiedBy, DavFactory.currentUserResource());
     }
 
     protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {

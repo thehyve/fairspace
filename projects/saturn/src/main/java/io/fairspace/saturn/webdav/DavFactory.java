@@ -16,9 +16,9 @@ import java.util.stream.Stream;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
-import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.PathUtils.splitPath;
+import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 import static java.util.stream.Collectors.joining;
 
 public class DavFactory implements ResourceFactory {
@@ -54,6 +54,10 @@ public class DavFactory implements ResourceFactory {
         var subject = pathToSubject(path);
         var access = permissions.getPermission(collection.asNode());
 
+        if (!access.canRead()) {
+            throw new NotAuthorizedException();
+        }
+
         return getResource(subject, access);
     }
 
@@ -78,11 +82,11 @@ public class DavFactory implements ResourceFactory {
         return model.createResource(baseUri + encodePath(path));
     }
 
-    static Literal now() {
+    static Literal timestampLiteral() {
         return toXSDDateTimeLiteral(Instant.now());
     }
 
-    static org.apache.jena.rdf.model.Resource getUser() {
+    static org.apache.jena.rdf.model.Resource currentUserResource() {
         return org.apache.jena.rdf.model.ResourceFactory.createResource(getCurrentUser().getIri().getURI());
     }
 }

@@ -16,6 +16,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +27,7 @@ import java.util.Map;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
 class DirectoryResource extends BaseResource implements FolderResource {
+    private static final List<QName> DIRECTORY_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
 
     public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
         super(factory, subject, access);
@@ -63,12 +65,12 @@ class DirectoryResource extends BaseResource implements FolderResource {
         var path = joinPaths(subject.getRequiredProperty(FS.filePath).getString(), newName);
         var subj = factory.pathToSubject(path);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
-        var t = DavFactory.now();
+        var t = DavFactory.timestampLiteral();
 
         subj
                 .addProperty(FS.filePath, path)
                 .addProperty(RDFS.label, newName)
-                .addProperty(FS.createdBy, DavFactory.getUser())
+                .addProperty(FS.createdBy, DavFactory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
         subject.addProperty(FS.contains, subj);
@@ -134,5 +136,10 @@ class DirectoryResource extends BaseResource implements FolderResource {
     @Override
     public Long getContentLength() {
         return null;
+    }
+
+    @Override
+    public List<QName> getAllPropertyNames() {
+        return DIRECTORY_PROPERTIES;
     }
 }

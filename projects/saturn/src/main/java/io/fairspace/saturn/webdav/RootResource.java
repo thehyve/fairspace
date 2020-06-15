@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static io.fairspace.saturn.webdav.DavFactory.getUser;
-import static io.fairspace.saturn.webdav.DavFactory.now;
+import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
+import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
 
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource {
 
@@ -36,11 +36,11 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
         return factory.model.listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(s -> {
-                    try {
-                        return factory.getResource(null, s.getRequiredProperty(FS.filePath).getString());
-                    } catch (Exception e) {
+                    var access = factory.permissions.getPermission(s.asNode());
+                    if (!access.canRead()) {
                         return null;
                     }
+                    return factory.getResource(s, access);
                 })
                 .filterDrop(Objects::isNull)
                 .toList();
@@ -59,8 +59,8 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         subj.addProperty(RDF.type, FS.Collection)
                 .addProperty(FS.filePath, newName)
                 .addProperty(RDFS.label, newName)
-                .addProperty(FS.createdBy, getUser())
-                .addProperty(FS.dateCreated, now());
+                .addProperty(FS.createdBy, currentUserResource())
+                .addProperty(FS.dateCreated, timestampLiteral());
 
         factory.permissions.createResource(subj.asNode());
 

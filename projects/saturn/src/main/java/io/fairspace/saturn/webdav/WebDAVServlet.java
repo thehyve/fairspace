@@ -30,7 +30,8 @@ import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.currentRequest;
-import static io.milton.servlet.MiltonServlet.*;
+import static io.milton.servlet.MiltonServlet.clearThreadlocals;
+import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
