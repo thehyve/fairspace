@@ -41,7 +41,7 @@ class FileAPI {
     statForVersion(path, version) {
         const options = {
             ...includeDetails,
-            data: "<propfind><allprop /></propfind>"
+            data: "<propfind><fs:version /><lastmod /></propfind>"
         };
         options.headers = {Version: version};
 
@@ -167,7 +167,7 @@ class FileAPI {
      * @returns Promise<any>
      */
     undelete(path) {
-        if (!path) return Promise.reject(Error("No path specified for restoring"));
+        if (!path) return Promise.reject(Error("No path specified for undeleting"));
         const removeDateDeletedPropRequest = ""
             + "<?xml version=\"1.0\"?>"
             + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
@@ -380,7 +380,7 @@ class FileAPI {
 
     showFileHistory(path) {
         return this.stat(path, false).then(fileWithVersion => {
-            const currentVersion = fileWithVersion.version;
+            const currentVersion = fileWithVersion.props.version;
             const lastVersionToReturn = currentVersion > numberOfLastFileVersions ? currentVersion - numberOfLastFileVersions : 1;
             const versions = [];
             for (let i = currentVersion - 1; i >= lastVersionToReturn; i -= 1) {

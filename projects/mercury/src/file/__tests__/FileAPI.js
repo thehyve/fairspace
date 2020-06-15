@@ -160,7 +160,7 @@ describe('FileAPI', () => {
         });
     });
 
-    describe('createDirectory', () => {
+    describe('Creating directory', () => {
         it('should result in clear error on 400 response', () => {
             FileAPI.client = () => ({createDirectory: () => Promise.reject({response: {status: 400}})});
 
@@ -180,6 +180,78 @@ describe('FileAPI', () => {
 
             return expect(FileAPI.createDirectory("/test"))
                 .rejects.toThrow(/already exists/);
+        });
+    });
+
+    describe('Showing history', () => {
+        it('shows file history', async () => {
+            const stat = jest.fn(() => Promise.resolve(Promise.resolve(
+                {data: {filename: '/f1', props: {version: 5}}}
+            )));
+            FileAPI.client = () => ({stat});
+            await FileAPI.showFileHistory('/f1');
+
+            expect(stat).toHaveBeenCalledTimes(5);
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><fs:version /><lastmod /></propfind>",
+                details: true,
+                headers: {
+                    Version: 4
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><fs:version /><lastmod /></propfind>",
+                details: true,
+                headers: {
+                    Version: 3
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><fs:version /><lastmod /></propfind>",
+                details: true,
+                headers: {
+                    Version: 2
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><fs:version /><lastmod /></propfind>",
+                details: true,
+                headers: {
+                    Version: 1
+                }
+            });
+        });
+
+        it('shows only limited number of file versions', async () => {
+            const stat = jest.fn(() => Promise.resolve(Promise.resolve(
+                {data: {filename: '/f1', props: {version: 297}}}
+            )));
+            FileAPI.client = () => ({stat});
+            await FileAPI.showFileHistory('/f1');
+
+            expect(stat).toHaveBeenCalledTimes(11);
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><fs:version /><lastmod /></propfind>",
+                details: true,
+                headers: {
+                    Version: 287
+                }
+            });
         });
     });
 });
