@@ -2,6 +2,7 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
+import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -9,6 +10,7 @@ import io.milton.property.PropertySource;
 import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
@@ -71,7 +73,17 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             if (subject.hasProperty(FS.ownedBy) && !getCurrentUser().isAdmin()) {
                 throw new NotAuthorizedException();
             }
-            subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, subject.getModel().createResource(value.toString()));
+
+            var ws = subject.getModel().createResource(value.toString());
+            if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
+            }
+            if (!factory.permissions.getPermission(ws.asNode()).canWrite()) {
+                throw new NotAuthorizedException();
+            }
+
+            subject.removeAll(FS.ownedBy)
+                    .addProperty(FS.ownedBy, subject.getModel().createResource(value.toString()));
         }
         super.setProperty(name, value);
     }
