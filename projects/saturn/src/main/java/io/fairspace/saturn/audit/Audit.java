@@ -22,13 +22,15 @@ public class Audit {
 
         var user = getCurrentUser();
 
-        if (user.getName() != null) {
-            MDC.put("user_name", user.getName());
+        if (user != null) {
+            if (user.getName() != null) {
+                MDC.put("user_name", user.getName());
+            }
+            if (user.getEmail() != null) {
+                MDC.put("user_email", user.getEmail());
+            }
+            MDC.put("user_iri", user.getIri().getURI());
         }
-        if (user.getEmail() != null) {
-            MDC.put("user_email", user.getEmail());
-        }
-        MDC.put("user_iri", user.getIri().getURI());
 
         log.info(event);
 

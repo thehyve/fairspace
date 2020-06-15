@@ -21,6 +21,8 @@ import java.util.Date;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
+import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
+import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
@@ -89,8 +91,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (purge) {
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
-            subject.addProperty(FS.dateDeleted, DavFactory.timestampLiteral())
-                    .addProperty(FS.deletedBy, DavFactory.currentUserResource());
+            subject.addProperty(FS.dateDeleted, timestampLiteral())
+                    .addProperty(FS.deletedBy, currentUserResource());
         }
     }
 
@@ -100,14 +102,16 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        move(subject, ((DirectoryResource) rDest).subject, name);
+        move(subject, (rDest instanceof DirectoryResource) ? ((DirectoryResource) rDest).subject : null, name);
     }
 
     private void move(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name) {
-        var path = joinPaths(parent.getRequiredProperty(FS.filePath).getString(), name);
+        var path = (parent != null) ? joinPaths(parent.getRequiredProperty(FS.filePath).getString(), name) : name;
         var newSubject = factory.pathToSubject(path);
         newSubject.removeProperties();
-        parent.addProperty(FS.contains, newSubject);
+        if (parent != null) {
+            parent.addProperty(FS.contains, newSubject);
+        }
         newSubject.addProperty(FS.filePath, path)
                 .addProperty(RDFS.label, name);
         subject.listProperties()
@@ -134,7 +138,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, DavFactory.currentUserResource(), DavFactory.timestampLiteral());
+        copy(subject, ((DirectoryResource) toCollection).subject, name, currentUserResource(), timestampLiteral());
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
@@ -228,8 +232,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addProperty(FS.blobId, blob.id)
                 .addLiteral(FS.fileSize, blob.size)
                 .addProperty(FS.md5, blob.md5)
-                .addProperty(FS.dateModified, DavFactory.timestampLiteral())
-                .addProperty(FS.modifiedBy, DavFactory.currentUserResource());
+                .addProperty(FS.dateModified, timestampLiteral())
+                .addProperty(FS.modifiedBy, currentUserResource());
     }
 
     protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {

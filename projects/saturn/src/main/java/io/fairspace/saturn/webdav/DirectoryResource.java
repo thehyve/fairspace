@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
@@ -47,11 +48,11 @@ class DirectoryResource extends BaseResource implements FolderResource {
 
     @Override
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
-        var subj = createResource(newName);
-
-        subj.addProperty(RDF.type, FS.File)
+        var subj = createResource(newName)
+                .addProperty(RDF.type, FS.File)
                 .addLiteral(FS.currentVersion, 1)
-                .addProperty(FS.versions, subj.getModel().createList(newVersion()));
+                .addProperty(FS.versions, subject.getModel().createList(newVersion()))
+                .addProperty(FS.contentType, contentType);
 
         return factory.getResource(subj, access);
     }
@@ -88,6 +89,7 @@ class DirectoryResource extends BaseResource implements FolderResource {
                 .mapWith(Statement::getObject)
                 .mapWith(RDFNode::asResource)
                 .mapWith(r -> factory.getResource(r, access))
+                .filterDrop(Objects::isNull)
                 .toList();
     }
 

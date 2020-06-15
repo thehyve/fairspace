@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
+import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource {
 
@@ -29,7 +30,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(null, childName);
+        return factory.getResource(null, joinPaths(factory.basePath, childName));
     }
 
     @Override

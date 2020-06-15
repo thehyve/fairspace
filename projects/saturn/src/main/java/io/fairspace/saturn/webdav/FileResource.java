@@ -34,16 +34,21 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     private static final PropertySource.PropertyMetaData VERSION_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Integer.class);
     private static final List<QName> FILE_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, VERSION_PROPERTY);
 
-    private final int version;
-    private final String blobId;
-    private final long contentLength;
-    private final String contentType;
-    private final Date modifiedDate;
+    private int version;
+    private String blobId;
+    private long contentLength;
+    private String contentType;
+    private Date modifiedDate;
 
     @SneakyThrows
     FileResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
 
+        contentType = subject.listProperties(FS.contentType).nextOptional().map(Statement::getString).orElse(null);
+        loadVersion();
+    }
+
+    private void loadVersion() throws BadRequestException {
         var versions = getListProperty(subject, FS.versions);
 
         var ver = fileVersion();
@@ -62,7 +67,6 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
         blobId = current.getRequiredProperty(FS.blobId).getString();
         contentLength = current.getRequiredProperty(FS.fileSize).getLong();
-        contentType = current.listProperties(FS.contentType).nextOptional().map(Statement::getString).orElse(null);
         modifiedDate = parseDate(current, FS.dateModified);
     }
 
@@ -100,6 +104,8 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
                 .removeAll(FS.currentVersion)
                 .addProperty(FS.versions, versions)
                 .addLiteral(FS.currentVersion, current);
+
+        loadVersion();
     }
 
     @Override

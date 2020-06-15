@@ -11,15 +11,13 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
 
+import java.net.URI;
 import java.time.Instant;
-import java.util.stream.Stream;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
-import static io.fairspace.saturn.webdav.PathUtils.encodePath;
-import static io.fairspace.saturn.webdav.PathUtils.splitPath;
+import static io.fairspace.saturn.webdav.PathUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
-import static java.util.stream.Collectors.joining;
 
 public class DavFactory implements ResourceFactory {
     final String baseUri;
@@ -27,6 +25,7 @@ public class DavFactory implements ResourceFactory {
     final BlobStore store;
     final PermissionsService permissions;
     private final Resource root = new RootResource(this);
+    final String basePath;
 
 
     public DavFactory(String baseUri, Model model, BlobStore store, PermissionsService permissions) {
@@ -34,20 +33,20 @@ public class DavFactory implements ResourceFactory {
         this.model = model;
         this.store = store;
         this.permissions = permissions;
+        this.basePath = normalizePath(URI.create(baseUri).getPath());
     }
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
         // /api/v1/webdav/relPath -> relPath
-        path = Stream.of(splitPath(path))
-                .skip(3)
-                .collect(joining("/"));
+        path = normalizePath(normalizePath(path).substring(basePath.length()));
+
         if (path.isEmpty()) {
             return root;
         }
 
         var collection = pathToSubject(splitPath(path)[0]);
-        if (!collection.hasProperty(RDF.type, collection)) {
+        if (!collection.hasProperty(RDF.type, FS.Collection)) {
             return null;
         }
 
