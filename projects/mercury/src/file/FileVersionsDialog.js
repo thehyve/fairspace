@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Dialog, DialogContent, DialogTitle} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
 import FileVersionsList from "./FileVersionsList";
 
 const FileVersionsDialog = ({onClose, selectedFile, onRevertVersion = () => {}}) => (
@@ -11,6 +11,14 @@ const FileVersionsDialog = ({onClose, selectedFile, onRevertVersion = () => {}})
         <DialogContent>
             <FileVersionsList selectedFile={selectedFile} onRevertVersion={onRevertVersion} />
         </DialogContent>
+        <DialogActions>
+            <Button
+                onClick={onClose}
+                color="secondary"
+            >
+                Cancel
+            </Button>
+        </DialogActions>
     </Dialog>
 );
 
