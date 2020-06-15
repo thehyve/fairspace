@@ -46,7 +46,8 @@ class FileAPI {
         options.headers = {Version: version};
 
         return this.client().stat(path, options)
-            .then(result => result.data);
+            .then(result => result.data)
+            .map(this.mapToFile);
     }
 
     /**

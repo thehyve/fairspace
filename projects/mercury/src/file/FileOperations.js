@@ -115,7 +115,7 @@ export const FileOperations = ({
             return false;
         });
 
-    const handleRevert = (versionToRevert) => fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem.filename, versionToRevert))
+    const handleRevert = (versionToRevert) => fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem, versionToRevert))
         .catch((err) => {
             ErrorDialog.showError(err, err.message || "An error occurred while reverting a file to a previous version", () => handleRevert(versionToRevert));
             return false;

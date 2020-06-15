@@ -185,9 +185,9 @@ describe('FileAPI', () => {
 
     describe('Showing history', () => {
         it('shows file history', async () => {
-            const stat = jest.fn(() => Promise.resolve(Promise.resolve(
+            const stat = jest.fn(() => Promise.resolve(
                 {data: {filename: '/f1', props: {version: 5}}}
-            )));
+            ));
             FileAPI.client = () => ({stat});
             await FileAPI.showFileHistory('/f1');
 

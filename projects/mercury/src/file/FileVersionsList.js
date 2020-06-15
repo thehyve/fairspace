@@ -20,9 +20,9 @@ const FileVersionsList = ({selectedFile, onRevertVersion}) => {
             {!data ? (
                 <div>No previous version found.</div>
             ) : data.map((fileVersion) => (
-                <ListItem key={fileVersion.filename} onClick={() => onRevertVersion(fileVersion.iri)}>
+                <ListItem key={fileVersion.version} onClick={() => onRevertVersion(fileVersion.version)}>
                     <ListItem icon>
-                        <ListItemText>{fileVersion.dateModified}</ListItemText>
+                        <ListItemText>{fileVersion.lastmod}</ListItemText>
                     </ListItem>
                 </ListItem>
             ))}
