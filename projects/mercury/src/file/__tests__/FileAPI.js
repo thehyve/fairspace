@@ -12,7 +12,10 @@ describe('FileAPI', () => {
 
             expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
-            expect(getDirectoryContents).toHaveBeenCalledWith('/src', {details: true, withCredentials: true});
+            expect(getDirectoryContents).toHaveBeenCalledWith(
+                '/src',
+                {details: true, withCredentials: true}
+            );
         });
 
         it('retrieves files including deleted', async () => {
@@ -25,7 +28,13 @@ describe('FileAPI', () => {
             expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith(
-                '/src', {details: true, headers: {"Show-Deleted": "on"}, withCredentials: true}
+                '/src',
+                {
+                    details: true,
+                    headers: {"Show-Deleted": "on"},
+                    withCredentials: true,
+                    data: "<propfind><allprop /></propfind>"
+                }
             );
         });
     });

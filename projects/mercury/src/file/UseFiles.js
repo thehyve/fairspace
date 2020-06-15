@@ -30,8 +30,8 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         .deleteMultiple(paths, showDeleted)
         .then(refresh);
 
-    const restoreMultiple = paths => fileApi
-        .restoreMultiple(paths)
+    const undeleteMultiple = paths => fileApi
+        .undeleteMultiple(paths)
         .then(refresh);
 
     const movePaths = paths => fileApi
@@ -42,6 +42,14 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         .copyPaths(paths, path)
         .then(refresh);
 
+    const showFileHistory = file => fileApi
+        .showFileHistory(file.filename)
+        .then(refresh);
+
+    const revertToVersion = (file, versionToRevert) => fileApi
+        .revertToVersion(file.filename, versionToRevert)
+        .then(refresh);
+
     return {
         loading,
         error,
@@ -50,11 +58,13 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         fileActions: {
             createDirectory,
             deleteMultiple,
-            restoreMultiple,
+            undeleteMultiple,
             getDownloadLink,
             movePaths,
             renameFile,
-            copyPaths
+            copyPaths,
+            showFileHistory,
+            revertToVersion
         }
     };
 };
