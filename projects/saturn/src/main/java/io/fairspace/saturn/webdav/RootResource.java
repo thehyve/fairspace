@@ -8,6 +8,7 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.MakeCollectionableResource;
+import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -20,7 +21,7 @@ import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
-class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource {
+class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
 
     private final DavFactory factory;
 
@@ -100,6 +101,11 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public String checkRedirect(Request request) throws NotAuthorizedException, BadRequestException {
+        return null;
+    }
+
+    @Override
+    public Date getCreateDate() {
         return null;
     }
 }
