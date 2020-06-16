@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {Table, TableBody, TableCell, TableRow} from "@material-ui/core";
+import {IconButton, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
+import {SettingsBackupRestore} from "@material-ui/icons";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
 import MessageDisplay from "../common/components/MessageDisplay";
@@ -53,6 +54,14 @@ const FileVersionsList = ({selectedFile, onRevertVersion}) => {
                 <div>No previous version found.</div>
             ) : (
                 <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell padding="none">Version</TableCell>
+                            <TableCell align="left">Last modified</TableCell>
+                            <TableCell align="left">Size</TableCell>
+                            <TableCell padding="none" align="right" />
+                        </TableRow>
+                    </TableHead>
                     <TableBody>
                         {data.map((fileVersion) => (
                             <TableRow
@@ -61,7 +70,22 @@ const FileVersionsList = ({selectedFile, onRevertVersion}) => {
                                 onDoubleClick={() => handleRevertToVersion(fileVersion.version)}
                             >
                                 <TableCell padding="none" align="left">
+                                    {fileVersion.version}
+                                </TableCell>
+                                <TableCell align="left">
                                     {fileVersion.lastmod}
+                                </TableCell>
+                                <TableCell align="left">
+                                    {fileVersion.size}
+                                </TableCell>
+                                <TableCell padding="none" align="right">
+                                    <IconButton
+                                        aria-label="Revert to this version"
+                                        title="Revert to this version"
+                                        onClick={() => handleRevertToVersion(fileVersion.version)}
+                                    >
+                                        <SettingsBackupRestore />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
