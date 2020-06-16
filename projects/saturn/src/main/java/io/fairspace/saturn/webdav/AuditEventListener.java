@@ -1,33 +1,49 @@
 package io.fairspace.saturn.webdav;
 
-import io.milton.http.EventListener;
-import io.milton.http.FileItem;
-import io.milton.http.Request;
-import io.milton.http.Response;
-import io.milton.resource.Resource;
-
-import java.util.Map;
+import io.milton.event.Event;
+import io.milton.event.EventListener;
+import io.milton.event.ResponseEvent;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 
 class AuditEventListener implements EventListener {
     @Override
-    public void onPost(Request request, Response response, Resource resource, Map<String, String> params, Map<String, FileItem> files) { }
+    public void onEvent(Event e) {
+        if (e instanceof ResponseEvent) {
+            var re = (ResponseEvent) e;
+            var success = re.getResponse().getStatus().code < 300;
+            var path = resourcePath(re.getRequest().getAbsolutePath());
 
-    @Override
-    public void onGet(Request request, Response response, Resource resource, Map<String, String> params) { }
-
-    @Override
-    public void onProcessResourceStart(Request request, Response response, Resource resource) { }
-
-    @Override
-    public void onProcessResourceFinish(Request request, Response response, Resource resource, long duration) {
-        if (request.getMethod().isWrite || request.getMethod() == Request.Method.GET) {
-            audit("FS_" + request.getMethod(),
-                    "resource", resource,
-                    "destination", request.getDestinationHeader(),
-                    "version", request.getHeaders().get("version"),
-                    "success", response.getStatus().code < 300);
+            switch (re.getRequest().getMethod()) {
+                case GET -> audit("FS_READ",
+                        "path", path,
+                        "version", re.getRequest().getHeaders().get("Version"),
+                        "success", success);
+                case PROPPATCH -> audit("FS_PROPPATCH",
+                        "path", path,
+                        "success", success);
+                case MKCOL -> audit("FS_MKDIR",
+                        "path", path,
+                        "success", success);
+                case COPY -> audit("FS_COPY",
+                        "path", path,
+                        "destination", resourcePath(re.getRequest().getDestinationHeader()),
+                        "success", success);
+                case MOVE -> audit("FS_MOVE",
+                        "path", path,
+                        "destination", resourcePath(re.getRequest().getDestinationHeader()),
+                        "success", success);
+                case DELETE -> audit("FS_DELETE",
+                        "path", path,
+                        "success", success);
+                case PUT -> audit("FS_WRITE",
+                        "path", path,
+                        "success", success);
+            }
         }
+    }
+
+    private static String resourcePath(String path) {
+        return path.substring("/api/v1/webdav".length());
     }
 }

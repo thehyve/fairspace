@@ -2,6 +2,7 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.config.HttpManagerBuilder;
+import io.milton.event.ResponseEvent;
 import io.milton.http.*;
 import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;
@@ -54,7 +55,7 @@ public class WebDAVServlet extends HttpServlet {
             }
         }.buildHttpManager();
 
-       httpManager.addEventListener(new AuditEventListener());
+       httpManager.getEventManager().registerEventListener(new AuditEventListener(), ResponseEvent.class);
     }
 
     @Override
