@@ -1,9 +1,9 @@
 package io.fairspace.saturn.webdav;
 
+import com.pivovarit.function.ThrowingConsumer;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.http.ResourceFactory;
-import io.milton.resource.FolderResource;
-import org.apache.jena.query.TxnType;
-import org.apache.jena.sparql.core.Transactional;
+import io.milton.resource.GetableResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +25,7 @@ public class WebDAVServletTest {
     @Mock
     ResourceFactory factory;
     @Mock
-    Transactional txn;
+    Transactions txn;
     @Mock
     BlobStore store;
     @Mock
@@ -37,44 +37,34 @@ public class WebDAVServletTest {
     @Mock
     ServletOutputStream out;
     @Mock
-    FolderResource resource;
+    GetableResource resource;
 
     WebDAVServlet servlet;
 
 
     @Before
-    public void before() throws Exception {
+    public void before() throws IOException {
         servlet = new WebDAVServlet(factory, txn, store);
 
-        when(req.getRequestURL()).thenReturn(new StringBuffer("http://ex.com/api/v1/webdav/resource"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("resource"));
         when(req.getInputStream()).thenReturn(in);
-        when(req.getParameterNames()).thenReturn(new Vector<String>().elements());
-        when(req.getHeaderNames()).thenReturn(new Vector<String>().elements());
         when(res.getOutputStream()).thenReturn(out);
-        when(factory.getResource(any(), any())).thenReturn(resource);
+        when(req.getParameterNames()).thenReturn(new Vector<String>().elements());
         when(resource.authorise(any(), any(), any())).thenReturn(true);
-        when(resource.createNew(any(), any(), any(), any())).thenReturn(resource);
-        when(txn.isInTransaction()).thenReturn(false).thenReturn(true);
     }
 
     @Test
     public void testReadTxn() throws IOException {
         when(req.getMethod()).thenReturn("GET");
-
         servlet.service(req, res);
-
-        verify(txn).begin(TxnType.READ);
-        verify(txn).commit();
+        verify(txn).executeRead(any());
     }
 
     @Test
     public void testWriteTxn() throws IOException {
         when(req.getMethod()).thenReturn("DELETE");
-
         servlet.service(req, res);
-
-        verify(txn).begin(TxnType.WRITE);
-        verify(txn).commit();
+        verify(txn).executeWrite(any());
     }
 
     @Test
@@ -86,25 +76,29 @@ public class WebDAVServletTest {
 
         servlet.service(req, res);
 
-        var order = inOrder(store, req, txn);
+        var order = inOrder(store, txn);
 
         order.verify(store).store(in);
-        order.verify(req).setAttribute("BLOB", blob);
         // Transaction is executed afterwards
-        verify(txn).begin(TxnType.WRITE);
-        verify(txn).commit();
+        order.verify(txn).executeWrite(any());
     }
 
     @Test
     public void testGetPayloadIsReadOutsideTransaction() throws Exception {
         when(req.getMethod()).thenReturn("GET");
+        when(factory.getResource(any(), any())).thenReturn(resource);
+
+        doAnswer(invocation -> {
+            ThrowingConsumer job = invocation.getArgument(0);
+            job.accept(null);
+            return null;
+        }).when(txn).executeRead(any());
 
         servlet.service(req, res);
 
         var order = inOrder(txn, resource);
 
-        order.verify(txn).begin(TxnType.READ);
-        order.verify(txn).commit();
+        order.verify(txn).executeRead(any());
         // Called after the transaction is finished
         order.verify(resource).sendContent(eq(out), any(), any(), any());
     }
