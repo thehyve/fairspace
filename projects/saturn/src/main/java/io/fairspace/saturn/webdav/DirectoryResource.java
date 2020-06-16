@@ -51,8 +51,11 @@ class DirectoryResource extends BaseResource implements FolderResource {
         var subj = createResource(newName)
                 .addProperty(RDF.type, FS.File)
                 .addLiteral(FS.currentVersion, 1)
-                .addProperty(FS.versions, subject.getModel().createList(newVersion()))
-                .addProperty(FS.contentType, contentType);
+                .addProperty(FS.versions, subject.getModel().createList(newVersion()));
+
+        if (contentType != null) {
+            subj.addProperty(FS.contentType, contentType);
+        }
 
         return factory.getResource(subj, access);
     }
