@@ -54,7 +54,7 @@ public class WebDAVServlet extends HttpServlet {
             }
         }.buildHttpManager();
 
-        httpManager.addEventListener(new AuditEventListener());
+       // httpManager.addEventListener(new AuditEventListener());
     }
 
     @Override
