@@ -91,7 +91,7 @@ public class Services {
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
         davFactory = new DavFactory(CONFIG.publicUrl + "/api/v1/webdav/", dataset.getDefaultModel(), blobStore, permissionsService);
-        davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
+        davServlet = new WebDAVServlet(davFactory, dataset, blobStore);
 
         collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, davFactory, permissionsService);
     }

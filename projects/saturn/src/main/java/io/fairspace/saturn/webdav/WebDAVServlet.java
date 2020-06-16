@@ -8,6 +8,7 @@ import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;
 import io.milton.servlet.ServletRequest;
 import io.milton.servlet.ServletResponse;
+import org.apache.jena.sparql.core.Transactional;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class WebDAVServlet extends HttpServlet {
     private final HttpManager httpManager;
     private final BlobStore store;
 
-    public WebDAVServlet(ResourceFactory factory, Transactions txn, BlobStore store) {
+    public WebDAVServlet(ResourceFactory factory, Transactional txn, BlobStore store) {
         this.store = store;
 
         httpManager = new HttpManagerBuilder() {
