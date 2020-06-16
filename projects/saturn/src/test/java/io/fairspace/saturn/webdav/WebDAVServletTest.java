@@ -3,7 +3,7 @@ package io.fairspace.saturn.webdav;
 import com.pivovarit.function.ThrowingConsumer;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.http.ResourceFactory;
-import io.milton.resource.GetableResource;
+import io.milton.resource.FolderResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,20 +37,36 @@ public class WebDAVServletTest {
     @Mock
     ServletOutputStream out;
     @Mock
-    GetableResource resource;
+    FolderResource resource;
 
     WebDAVServlet servlet;
 
 
     @Before
-    public void before() throws IOException {
+    public void before() throws Exception {
         servlet = new WebDAVServlet(factory, txn, store);
 
-        when(req.getRequestURL()).thenReturn(new StringBuffer("resource"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://ex.com/api/v1/webdav/resource"));
         when(req.getInputStream()).thenReturn(in);
-        when(res.getOutputStream()).thenReturn(out);
         when(req.getParameterNames()).thenReturn(new Vector<String>().elements());
+        when(req.getHeaderNames()).thenReturn(new Vector<String>().elements());
+        when(res.getOutputStream()).thenReturn(out);
+        when(res.getOutputStream()).thenReturn(out);
+        when(factory.getResource(any(), any())).thenReturn(resource);
         when(resource.authorise(any(), any(), any())).thenReturn(true);
+        when(resource.createNew(any(), any(), any(), any())).thenReturn(resource);
+
+        doAnswer(invocation -> {
+            ThrowingConsumer job = invocation.getArgument(0);
+            job.accept(null);
+            return null;
+        }).when(txn).executeRead(any());
+
+        doAnswer(invocation -> {
+            ThrowingConsumer job = invocation.getArgument(0);
+            job.accept(null);
+            return null;
+        }).when(txn).executeWrite(any());
     }
 
     @Test
@@ -76,9 +92,10 @@ public class WebDAVServletTest {
 
         servlet.service(req, res);
 
-        var order = inOrder(store, txn);
+        var order = inOrder(store, req, txn);
 
         order.verify(store).store(in);
+        order.verify(req).setAttribute("BLOB", blob);
         // Transaction is executed afterwards
         order.verify(txn).executeWrite(any());
     }
@@ -86,13 +103,6 @@ public class WebDAVServletTest {
     @Test
     public void testGetPayloadIsReadOutsideTransaction() throws Exception {
         when(req.getMethod()).thenReturn("GET");
-        when(factory.getResource(any(), any())).thenReturn(resource);
-
-        doAnswer(invocation -> {
-            ThrowingConsumer job = invocation.getArgument(0);
-            job.accept(null);
-            return null;
-        }).when(txn).executeRead(any());
 
         servlet.service(req, res);
 
