@@ -4,11 +4,13 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Range;
+import io.milton.http.Request;
 import io.milton.http.XmlWriter;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
+import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
 import io.milton.resource.Resource;
 import org.apache.jena.rdf.model.RDFNode;
@@ -27,7 +29,7 @@ import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
-class DirectoryResource extends BaseResource implements FolderResource {
+class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
     private static final List<QName> DIRECTORY_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
 
     public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
@@ -146,5 +148,10 @@ class DirectoryResource extends BaseResource implements FolderResource {
     @Override
     public List<QName> getAllPropertyNames() {
         return DIRECTORY_PROPERTIES;
+    }
+
+    @Override
+    public boolean isLockedOutRecursive(Request request) {
+        return false;
     }
 }
