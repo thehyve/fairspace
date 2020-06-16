@@ -22,6 +22,12 @@ class AuditEventListener implements EventListener {
 
     @Override
     public void onProcessResourceFinish(Request request, Response response, Resource resource, long duration) {
-        audit("FS_" + request.getMethod(), "resource", resource, "success", response.getStatus().code < 300);
+        if (request.getMethod().isWrite || request.getMethod() == Request.Method.GET) {
+            audit("FS_" + request.getMethod(),
+                    "resource", resource,
+                    "destination", request.getDestinationHeader(),
+                    "version", request.getHeaders().get("version"),
+                    "success", response.getStatus().code < 300);
+        }
     }
 }
