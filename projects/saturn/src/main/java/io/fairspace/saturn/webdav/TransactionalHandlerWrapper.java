@@ -13,8 +13,9 @@ import lombok.SneakyThrows;
 import org.apache.jena.sparql.core.Transactional;
 
 import static com.pivovarit.function.ThrowingRunnable.sneaky;
-import static org.apache.jena.system.Txn.executeRead;
-import static org.apache.jena.system.Txn.executeWrite;
+import static org.apache.jena.query.TxnType.READ;
+import static org.apache.jena.query.TxnType.WRITE;
+import static org.apache.jena.system.Txn.exec;
 
 class TransactionalHandlerWrapper implements Handler {
     private final Handler wrapped;
@@ -33,11 +34,7 @@ class TransactionalHandlerWrapper implements Handler {
     @Override
     @SneakyThrows
     public void process(HttpManager httpManager, Request request, Response response) throws ConflictException, NotAuthorizedException, BadRequestException, NotFoundException {
-        if (request.getMethod().isWrite) {
-            executeWrite(txn, sneaky(() -> wrapped.process(httpManager, request, response)));
-        } else {
-            executeRead(txn, sneaky(() -> wrapped.process(httpManager, request, response)));
-        }
+        exec(txn, request.getMethod().isWrite ? WRITE : READ, sneaky(() -> wrapped.process(httpManager, request, response)));
     }
 
     @Override
