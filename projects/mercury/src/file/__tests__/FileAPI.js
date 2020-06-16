@@ -199,7 +199,7 @@ describe('FileAPI', () => {
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><fs:version /><lastmod /></propfind>",
+                data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
                     Version: 4
@@ -207,7 +207,7 @@ describe('FileAPI', () => {
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><fs:version /><lastmod /></propfind>",
+                data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
                     Version: 3
@@ -215,7 +215,7 @@ describe('FileAPI', () => {
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><fs:version /><lastmod /></propfind>",
+                data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
                     Version: 2
@@ -223,7 +223,7 @@ describe('FileAPI', () => {
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><fs:version /><lastmod /></propfind>",
+                data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
                     Version: 1
@@ -246,7 +246,7 @@ describe('FileAPI', () => {
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><fs:version /><lastmod /></propfind>",
+                data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
                     Version: 287

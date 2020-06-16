@@ -70,7 +70,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion}) => {
 
             )}
             {renderConfirmationDialog()}
-            {/*TODO: pagination*/}
+            {/* TODO: pagination */}
         </>
     );
 };

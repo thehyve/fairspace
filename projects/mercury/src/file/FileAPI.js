@@ -41,13 +41,12 @@ class FileAPI {
     statForVersion(path, version) {
         const options = {
             ...includeDetails,
-            data: "<propfind><fs:version /><lastmod /></propfind>"
+            data: "<propfind><allprop /></propfind>"
         };
         options.headers = {Version: version};
 
         return this.client().stat(path, options)
-            .then(result => result.data)
-            .map(this.mapToFile);
+            .then(result => this.mapToFile(result.data));
     }
 
     /**
