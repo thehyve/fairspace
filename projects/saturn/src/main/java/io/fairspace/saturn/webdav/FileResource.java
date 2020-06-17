@@ -80,7 +80,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     @Override
     public Long getMaxAgeSeconds(Auth auth) {
-        return null;
+        return Long.MAX_VALUE;
     }
 
     @Override
