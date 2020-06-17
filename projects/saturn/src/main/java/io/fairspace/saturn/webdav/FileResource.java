@@ -13,7 +13,6 @@ import io.milton.property.PropertySource;
 import io.milton.resource.ReplaceableResource;
 import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 
 import javax.xml.namespace.QName;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.lang.Integer.parseInt;
@@ -37,14 +37,12 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     private int version;
     private String blobId;
     private long contentLength;
-    private String contentType;
     private Date modifiedDate;
 
     @SneakyThrows
     FileResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
 
-        contentType = subject.listProperties(FS.contentType).nextOptional().map(Statement::getString).orElse(null);
         loadVersion();
     }
 
@@ -87,7 +85,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     @Override
     public String getContentType(String accepts) {
-        return contentType;
+        return getStringProperty(subject, FS.contentType);
     }
 
     @Override
