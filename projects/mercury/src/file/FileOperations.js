@@ -284,7 +284,6 @@ export const FileOperations = ({
                             aria-label="Show history"
                             title="Show history"
                             disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
-                            showhistory
                         >
                             <Restore />
                         </IconButton>

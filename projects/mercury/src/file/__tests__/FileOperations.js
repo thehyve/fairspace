@@ -66,7 +66,7 @@ describe('FileOperations', () => {
             .then(() => {
                 wrapper.find(IconButton)
                     .not('[download]')
-                    .not('[showhistory]')
+                    .not('[aria-label="Show history"]')
                     .forEach(b => {
                         expect(b.props().disabled).toBe(false);
                     });

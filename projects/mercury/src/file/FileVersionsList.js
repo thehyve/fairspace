@@ -80,8 +80,9 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     if (loading) {
         return (<LoadingInlay />);
     }
-    // eslint-disable-next-line eqeqeq
-    if (!selectedFileDetails.version || selectedFileDetails.version == 1) {
+
+    const selectedFileVersion = selectedFileDetails && parseInt(selectedFileDetails.version, 10);
+    if (!selectedFileVersion || selectedFileVersion.version === 1) {
         return (<div>No previous version found.</div>);
     }
 
@@ -128,7 +129,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     );
 
     const renderActionCell = (rowIndex) => (
-        <TableCell align="right" className={classes.tableCell}>
+        <TableCell align="right" className={classes.tableCell} variant="body" component="div">
             <IconButton
                 aria-label="Revert to this version"
                 title="Revert to this version"
@@ -142,7 +143,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     const renderHeader = ({label}) => (
         <TableCell
             component="div"
-            className={[classes.tableCell, classes.tableHeaderRow]}
+            className={`${classes.tableCell} ${classes.tableHeaderRow}`}
             variant="head"
             align="left"
         >
@@ -179,7 +180,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                     <InfiniteLoader
                         isRowLoaded={isRowLoaded}
                         loadMoreRows={loadMoreRows}
-                        rowCount={selectedFileDetails.version}
+                        rowCount={selectedFileVersion}
                         minimumBatchSize={1}
                         threshold={1}
                     >
