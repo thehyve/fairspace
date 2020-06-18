@@ -14,9 +14,12 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
 
 const styles = (theme) => ({
+    fileVersionDialog: {
+        height: 300,
+        width: 500
+    },
     flexContainer: {
         display: 'flex',
-        alignItems: 'center',
         boxSizing: 'border-box',
     },
     table: {
@@ -37,10 +40,11 @@ const styles = (theme) => ({
     },
     tableCell: {
         flex: 1,
+        borderBottom: 'none',
     },
-    noClick: {
-        cursor: 'initial',
-    },
+    tableHeaderRow: {
+        'text-transform': 'none'
+    }
 });
 
 const columns = [
@@ -50,7 +54,7 @@ const columns = [
         dataKey: 'version',
     },
     {
-        width: 280,
+        width: 250,
         label: 'Modified',
         dataKey: 'lastmod'
     },
@@ -62,7 +66,9 @@ const columns = [
 ];
 
 const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
-    const {data: selectedFileDetails, error, loading} = useAsync(() => FileAPI.stat(selectedFile.filename, false));
+    const {data: selectedFileDetails, error, loading} = useAsync(
+        () => FileAPI.stat(selectedFile.filename, false)
+    );
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
 
@@ -122,7 +128,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     );
 
     const renderActionCell = (rowIndex) => (
-        <TableCell padding="none" align="right">
+        <TableCell align="right" className={classes.tableCell}>
             <IconButton
                 aria-label="Revert to this version"
                 title="Revert to this version"
@@ -136,12 +142,17 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     const renderHeader = ({label}) => (
         <TableCell
             component="div"
-            className={classes.tableCell}
+            className={[classes.tableCell, classes.tableHeaderRow]}
             variant="head"
+            align="left"
         >
             {label}
         </TableCell>
     );
+
+    const getRowClassName = ({index}) => ([classes.tableRow, classes.flexContainer, {
+        [classes.tableRowHover]: index !== -1
+    }]);
 
     const isRowLoaded = ({index}) => !!loadedData[index];
     const isOnlyInitialRowLoaded: boolean = (loadedData.length === 1 && Object.keys(loadedData[0]).length === 0);
@@ -162,7 +173,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     };
 
     return (
-        <div style={{height: 300, width: 500}}>
+        <div className={classes.fileVersionDialog}>
             <AutoSizer>
                 {({height, width}) => (
                     <InfiniteLoader
@@ -183,7 +194,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                 headerHeight={35}
                                 rowGetter={({index}) => loadedData[index]}
                                 onRowsRendered={onRowsRendered}
-                                rowClassName={classes.tableRow}
+                                rowClassName={getRowClassName}
                                 onRowDoubleClick={({index}) => handleRevertToVersion(loadedData[index].version)}
                             >
                                 {columns.map((col) => (
@@ -207,7 +218,6 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                     className={classes.flexContainer}
                                     cellRenderer={({rowIndex}) => renderActionCell(rowIndex)}
                                     width={80}
-                                    align="right"
                                 />
                             </Table>
                         )}
