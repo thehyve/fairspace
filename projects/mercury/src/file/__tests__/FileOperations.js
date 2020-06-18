@@ -66,7 +66,7 @@ describe('FileOperations', () => {
             .then(() => {
                 wrapper.find(IconButton)
                     .not('[download]')
-                    .not('[showHistory]')
+                    .not('[showhistory]')
                     .forEach(b => {
                         expect(b.props().disabled).toBe(false);
                     });

@@ -185,18 +185,15 @@ describe('FileAPI', () => {
 
     describe('Showing history', () => {
         it('shows file history', async () => {
+            const file = {filename: '/f1', version: 5};
             const stat = jest.fn(() => Promise.resolve(
-                {data: {filename: '/f1', props: {version: 5}}}
+                {data: file}
             ));
             FileAPI.client = () => ({stat});
-            await FileAPI.showFileHistory('/f1');
 
-            expect(stat).toHaveBeenCalledTimes(5);
-            expect(stat).toHaveBeenCalledWith('/f1', {
-                withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
-                details: true
-            });
+            await FileAPI.showFileHistory(file, 1, 5);
+
+            expect(stat).toHaveBeenCalledTimes(4);
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
                 data: "<propfind><allprop /></propfind>",
@@ -232,17 +229,21 @@ describe('FileAPI', () => {
         });
 
         it('shows only limited number of file versions', async () => {
+            const file = {filename: '/f1', version: 297};
             const stat = jest.fn(() => Promise.resolve(Promise.resolve(
-                {data: {filename: '/f1', props: {version: 297}}}
+                {data: file}
             )));
             FileAPI.client = () => ({stat});
-            await FileAPI.showFileHistory('/f1');
+            await FileAPI.showFileHistory(file, 1, 11);
 
             expect(stat).toHaveBeenCalledTimes(11);
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
                 data: "<propfind><allprop /></propfind>",
-                details: true
+                details: true,
+                headers: {
+                    Version: 296
+                }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,

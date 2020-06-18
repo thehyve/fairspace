@@ -9,8 +9,6 @@ const defaultOptions = {withCredentials: true};
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
-const numberOfLastFileVersions = 10;
-
 export type File = {
     filename: string;
     basename: string;
@@ -35,7 +33,7 @@ class FileAPI {
             options.headers = {"Show-Deleted": "on"};
         }
         return this.client().stat(path, options)
-            .then(result => result.data);
+            .then(result => this.mapToFile(result.data));
     }
 
     statForVersion(path, version) {
@@ -378,28 +376,16 @@ class FileAPI {
         return Promise.all(filenames.map(filename => this.undelete(filename)));
     }
 
-    showFileHistory(path) {
-        return this.stat(path, false).then(fileWithVersion => {
-            const currentVersion = fileWithVersion.props.version;
-            const lastVersionToReturn = currentVersion > numberOfLastFileVersions ? currentVersion - numberOfLastFileVersions : 1;
-            const versions = [];
-            for (let i = currentVersion - 1; i >= lastVersionToReturn; i -= 1) {
-                versions.push(i);
-            }
-            if (versions.length === 0) return Promise.resolve();
-            return Promise.all(versions.map(v => this.statForVersion(path, v)));
-        });
+    showFileHistory(file, startIndex, endIndex) {
+        const versions = [];
+        for (let i = file.version - startIndex; i >= file.version - endIndex && i >= 1; i -= 1) {
+            versions.push(i);
+        }
+        if (versions.length === 0) return Promise.resolve();
+        return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile: File = (fileObject) => ({
-        filename: fileObject.filename,
-        basename: fileObject.basename,
-        lastmod: fileObject.lastmod,
-        size: fileObject.size,
-        type: fileObject.type,
-        dateDeleted: fileObject.props && fileObject.props.dateDeleted,
-        version: fileObject.props && fileObject.props.version
-    })
+    mapToFile: File = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
 }
 
 export default new FileAPI();
