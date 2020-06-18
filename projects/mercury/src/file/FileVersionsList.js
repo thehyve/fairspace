@@ -147,7 +147,9 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     const isOnlyInitialRowLoaded: boolean = (loadedData.length === 1 && Object.keys(loadedData[0]).length === 0);
 
     const loadMoreRows = ({startIndex, stopIndex}) => {
-        FileAPI.showFileHistory(selectedFileDetails, startIndex, stopIndex + 1)
+        const fromVersion = startIndex === 1 ? startIndex : startIndex + 1;
+        const toVersion = stopIndex + 1;
+        FileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion)
             .then(res => {
                 if (res) {
                     if (isOnlyInitialRowLoaded) {
