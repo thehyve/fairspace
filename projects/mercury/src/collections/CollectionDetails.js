@@ -113,15 +113,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     handleCollectionDelete = (collection: Collection) => {
         const {setBusy, deleteCollection, history} = this.props;
         setBusy(true);
+        this.handleCloseDelete();
         deleteCollection(collection)
-            .then(() => {
-                this.handleCloseDelete();
-                history.push('/collections');
-            })
+            .then(() => history.push('/collections'))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",
-                this.handleCollectionDelete
+                () => this.handleCollectionDelete(collection)
             ))
             .finally(() => setBusy(false));
     };
@@ -129,15 +127,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     handleCollectionRestore = (collection: Collection) => {
         const {setBusy, restoreCollection, history} = this.props;
         setBusy(true);
+        this.handleCloseRestore();
         restoreCollection(collection)
-            .then(() => {
-                this.handleCloseRestore();
-                history.push('/collections');
-            })
+            .then(() => history.push('/collections'))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while restoring a collection",
-                this.handleCollectionRestore
+                () => this.handleCollectionRestore(collection)
             ))
             .finally(() => setBusy(false));
     };
