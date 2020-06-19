@@ -58,7 +58,7 @@ public class Services {
 
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(transactions, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsService(transactions, permissionNotificationHandler);
+        permissionsService = new PermissionsService(transactions, permissionNotificationHandler, CONFIG.publicUrl + "/api/v1/webdav/");
 
         workspaceService = new WorkspaceService(transactions, permissionsService);
 
