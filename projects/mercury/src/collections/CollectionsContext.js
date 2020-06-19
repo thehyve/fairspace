@@ -16,7 +16,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection).then(refresh);
     const updateCollection = (collection: Collection) => collectionApi.updateCollection(collection).then(refresh);
     const deleteCollection = (collection: Resource) => collectionApi.deleteCollection(collection, showDeleted).then(refresh);
-    const restoreCollection = (collection: Resource) => collectionApi.restoreCollection(collection).then(refresh);
+    const undeleteCollection = (collection: Resource) => collectionApi.undeleteCollection(collection).then(refresh);
 
     return (
         <CollectionsContext.Provider
@@ -27,7 +27,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 refresh,
                 addCollection,
                 deleteCollection,
-                restoreCollection,
+                undeleteCollection,
                 updateCollection,
                 showDeleted,
                 setShowDeleted

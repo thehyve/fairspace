@@ -46,7 +46,7 @@ type CollectionDetailsProps = {
     currentUser: any;
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
-    restoreCollection: (Resource) => Promise<void>;
+    undeleteCollection: (Resource) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
 };
@@ -54,7 +54,7 @@ type CollectionDetailsProps = {
 type CollectionDetailsState = {
     editing: boolean;
     deleting: boolean;
-    restoring: boolean;
+    undeleting: boolean;
     anchorEl: any;
 }
 
@@ -68,7 +68,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         editing: false,
         anchorEl: null,
         deleting: false,
-        restoring: false,
+        undeleting: false,
         showAddShareDialog: false,
         workspacesToAdd: []
     };
@@ -87,9 +87,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
     };
 
-    handleRestore = () => {
+    handleUndelete = () => {
         if (this.props.collection.canWrite) {
-            this.setState({restoring: true});
+            this.setState({undeleting: true});
             this.handleMenuClose();
         }
     };
@@ -98,8 +98,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         this.setState({deleting: false});
     };
 
-    handleCloseRestore = () => {
-        this.setState({restoring: false});
+    handleCloseUndelete = () => {
+        this.setState({undeleting: false});
     };
 
     handleMenuClick = (event: Event) => {
@@ -124,16 +124,16 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             .finally(() => setBusy(false));
     };
 
-    handleCollectionRestore = (collection: Collection) => {
-        const {setBusy, restoreCollection, history} = this.props;
+    handleCollectionUndelete = (collection: Collection) => {
+        const {setBusy, undeleteCollection, history} = this.props;
         setBusy(true);
-        this.handleCloseRestore();
-        restoreCollection(collection)
+        this.handleCloseUndelete();
+        undeleteCollection(collection)
             .then(() => history.push('/collections'))
             .catch(err => ErrorDialog.showError(
                 err,
-                "An error occurred while restoring a collection",
-                () => this.handleCollectionRestore(collection)
+                "An error occurred while undeleting a collection",
+                () => this.handleCollectionUndelete(collection)
             ))
             .finally(() => setBusy(false));
     };
@@ -152,7 +152,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     render() {
         const {loading, collection, inCollectionsBrowser = false} = this.props;
-        const {anchorEl, editing, deleting, restoring} = this.state;
+        const {anchorEl, editing, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (loading) {
@@ -190,8 +190,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                         </MenuItem>
                                     )}
                                     {collection.dateDeleted && (
-                                        <MenuItem onClick={this.handleRestore}>
-                                            Restore
+                                        <MenuItem onClick={this.handleUndelete}>
+                                            Undelete
                                         </MenuItem>
                                     )}
                                 </Menu>
@@ -217,16 +217,16 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onClose={() => this.setState({editing: false})}
                     />
                 ) : null}
-                {restoring ? (
+                {undeleting ? (
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={`Restore collection ${collection.name}`}
+                        content={`Undelete collection ${collection.name}`}
                         dangerous
-                        agreeButtonText="Restore"
-                        onAgree={() => this.handleCollectionRestore(this.props.collection)}
-                        onDisagree={this.handleCloseRestore}
-                        onClose={this.handleCloseRestore}
+                        agreeButtonText="Undelete"
+                        onAgree={() => this.handleCollectionUndelete(this.props.collection)}
+                        onDisagree={this.handleCloseUndelete}
+                        onClose={this.handleCloseUndelete}
                     />
                 ) : null}
                 {deleting && collection.dateDeleted && (
@@ -381,7 +381,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {currentUser} = useContext(UserContext);
-    const {deleteCollection, restoreCollection} = useContext(CollectionsContext);
+    const {deleteCollection, undeleteCollection} = useContext(CollectionsContext);
     const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
@@ -392,7 +392,7 @@ const ContextualCollectionDetails = (props) => {
             workspaces={workspaces}
             history={history}
             deleteCollection={deleteCollection}
-            restoreCollection={restoreCollection}
+            undeleteCollection={undeleteCollection}
         />
     );
 };

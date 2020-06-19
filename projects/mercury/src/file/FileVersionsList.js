@@ -212,9 +212,9 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                     />
                                 ))}
                                 <Column
-                                    key="restore"
+                                    key="revert"
                                     label=""
-                                    dataKey="restore"
+                                    dataKey="revert"
                                     headerRenderer={renderHeader}
                                     className={classes.flexContainer}
                                     cellRenderer={({rowIndex}) => renderActionCell(rowIndex)}
