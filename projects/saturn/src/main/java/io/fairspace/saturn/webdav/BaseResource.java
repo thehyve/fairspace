@@ -11,8 +11,9 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
 import io.milton.resource.*;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -20,6 +21,8 @@ import javax.xml.namespace.QName;
 import java.util.Date;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
+import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
@@ -121,8 +124,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
         subject.listProperties(FS.contains)
-                .mapWith(Statement::getObject)
-                .mapWith(RDFNode::asResource)
+                .mapWith(Statement::getResource)
                 .forEachRemaining(r -> move(r, newSubject, r.getProperty(RDFS.label).getString()));
 
         subject.getModel().listStatements(null, null, subject)
@@ -147,26 +149,29 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
         newSubject.addProperty(FS.filePath, path)
-                .addProperty(RDFS.label, name);
-
-        copyProperties(subject, newSubject, FS.blobId, FS.fileSize, FS.contentType, FS.md5, RDF.type);
-
-        newSubject.addProperty(RDFS.label, name)
+                .addProperty(RDFS.label, name)
                 .addProperty(FS.dateCreated, date)
-                .addProperty(FS.dateModified, date)
-                .addProperty(FS.createdBy, user)
-                .addProperty(FS.modifiedBy, user);
+                .addProperty(FS.createdBy, user);
+
+        copyProperties(subject, newSubject, RDF.type, FS.contentType);
+
+        if (subject.hasProperty(FS.versions)) {
+            var src = getListProperty(subject, FS.versions).getHead().asResource();
+
+            var ver = newSubject.getModel().createResource()
+                    .addProperty(RDF.type, FS.FileVersion)
+                    .addProperty(FS.modifiedBy, user)
+                    .addProperty(FS.dateModified, date);
+
+            copyProperties(src, ver, FS.blobId, FS.fileSize, FS.md5);
+
+            newSubject.addLiteral(FS.currentVersion, 1)
+                    .addProperty(FS.versions, newSubject.getModel().createList(ver));
+        }
 
         subject.listProperties(FS.contains)
-                .mapWith(Statement::getObject)
-                .mapWith(RDFNode::asResource)
+                .mapWith(Statement::getResource)
                 .forEachRemaining(r -> copy(r, newSubject, r.getProperty(RDFS.label).getString(), user, date));
-    }
-
-    protected void copyProperties(org.apache.jena.rdf.model.Resource from, org.apache.jena.rdf.model.Resource to, Property... props) {
-        for (var p: props) {
-            from.listProperties(p).forEachRemaining(s -> to.addProperty(p, s.getObject()));
-        }
     }
 
     @Override

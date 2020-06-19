@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.rdf.ModelUtils;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
@@ -142,7 +143,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
             var newVer = subject.getModel()
                     .createResource();
 
-            copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
+            ModelUtils.copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
             newVer.addProperty(FS.modifiedBy, DavFactory.currentUserResource())
                     .addLiteral(FS.dateModified, DavFactory.timestampLiteral());
 
