@@ -78,17 +78,17 @@ class CollectionAPI {
         ).catch(handleHttpError("Failure while deleting collection"));
     }
 
-    restoreCollection(collection: Resource): Promise<void> {
+    undeleteCollection(collection: Resource): Promise<void> {
         collection.dateDeleted = null;
-        const restoreCollectionsHeader = {
+        const undeleteCollectionHeader = {
             ...headers,
             'Show-Deleted': 'on'
         };
         return axios.patch(
             collectionsUrl,
             JSON.stringify(collection),
-            {headers: restoreCollectionsHeader}
-        ).catch(handleHttpError("Failure while restoring collection"));
+            {headers: undeleteCollectionHeader}
+        ).catch(handleHttpError("Failure while undeleting collection"));
     }
 }
 

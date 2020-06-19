@@ -81,8 +81,8 @@ describe('CollectionAPI', () => {
         );
     });
 
-    it('makes a proper call to restore a collection', async () => {
-        await CollectionAPI.restoreCollection({
+    it('makes a proper call to undelete a collection', async () => {
+        await CollectionAPI.undeleteCollection({
             iri: 'id'
         });
 
