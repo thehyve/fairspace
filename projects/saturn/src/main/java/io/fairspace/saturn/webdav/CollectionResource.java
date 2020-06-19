@@ -17,6 +17,8 @@ import javax.xml.namespace.QName;
 import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
@@ -30,12 +32,12 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Override
     public String getName() {
-        return subject.getRequiredProperty(FS.filePath).getString();
+        return decodePath(subject.getLocalName());
     }
 
     @Override
     public String getDisplayName() {
-        return subject.getRequiredProperty(RDFS.label).getString();
+        return getStringProperty(subject, RDFS.label);
     }
 
     @Override
@@ -48,7 +50,9 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
+        var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
+        subject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
     }
 
     @Override
@@ -90,6 +94,9 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Override
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
+        if (name.equals(OWNED_BY_PROPERTY)) {
+            return OWNED_BY_PROPERTY_META;
+        }
         return super.getPropertyMetaData(name);
     }
 

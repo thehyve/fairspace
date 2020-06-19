@@ -1,12 +1,13 @@
 package io.fairspace.saturn.webdav;
 
-import org.apache.http.client.utils.URLEncodedUtils;
-
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.strip;
+import static org.apache.http.client.utils.URLEncodedUtils.formatSegments;
+import static org.apache.http.client.utils.URLEncodedUtils.parsePathSegments;
 
 public class PathUtils {
     private static final String[] INVALID_BASENAMES = {".", ".."};
@@ -16,8 +17,11 @@ public class PathUtils {
     }
 
     public static String encodePath(String path) {
-        var encodedPath = URLEncodedUtils.formatSegments(splitPath(path));
-        return normalizePath(encodedPath);
+        return normalizePath(formatSegments(splitPath(path)));
+    }
+
+    public static String decodePath(String path) {
+        return normalizePath(join(parsePathSegments(path), "/"));
     }
 
     public static String[] splitPath(String path) {

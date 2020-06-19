@@ -81,6 +81,10 @@ public class DavFactory implements ResourceFactory {
         return model.createResource(baseUri + encodePath(path));
     }
 
+    static org.apache.jena.rdf.model.Resource childResource(org.apache.jena.rdf.model.Resource subject, String name) {
+        return subject.getModel().createResource(subject.getURI() + "/" + encodePath(name));
+    }
+
     static Literal timestampLiteral() {
         return toXSDDateTimeLiteral(Instant.now());
     }

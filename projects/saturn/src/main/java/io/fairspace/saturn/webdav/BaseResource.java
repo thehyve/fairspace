@@ -24,8 +24,7 @@ import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
 import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
-import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
+import static io.fairspace.saturn.webdav.DavFactory.*;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
@@ -109,17 +108,14 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     private void move(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name) {
-        var path = (parent != null) ? joinPaths(parent.getRequiredProperty(FS.filePath).getString(), name) : name;
-        var newSubject = factory.pathToSubject(path);
-        newSubject.removeProperties();
+        var newSubject = (parent != null) ? childResource(parent, name) : factory.pathToSubject(name);
+        newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
             parent.addProperty(FS.contains, newSubject);
         }
-        newSubject.addProperty(FS.filePath, path)
-                .addProperty(RDFS.label, name);
+
         subject.listProperties()
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
-                .filterDrop(stmt -> stmt.getPredicate().equals(FS.filePath))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
                 .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
@@ -144,12 +140,10 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
-        var path = joinPaths(parent.getRequiredProperty(FS.filePath).getString(), name);
-        var newSubject = factory.pathToSubject(path);
+        var newSubject = childResource(parent, name);
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
-        newSubject.addProperty(FS.filePath, path)
-                .addProperty(RDFS.label, name)
+        newSubject.addProperty(RDFS.label, name)
                 .addProperty(FS.dateCreated, date)
                 .addProperty(FS.createdBy, user);
 

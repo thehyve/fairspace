@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
+import static io.fairspace.saturn.webdav.DavFactory.childResource;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
     private static final List<QName> DIRECTORY_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
@@ -68,13 +68,11 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             throw new ConflictException(existing);
         }
 
-        var path = joinPaths(subject.getRequiredProperty(FS.filePath).getString(), newName);
-        var subj = factory.pathToSubject(path);
+        var subj = childResource(subject, newName);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         var t = DavFactory.timestampLiteral();
 
         subj
-                .addProperty(FS.filePath, path)
                 .addProperty(RDFS.label, newName)
                 .addProperty(FS.createdBy, DavFactory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
@@ -85,7 +83,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(factory.pathToSubject(joinPaths(subject.getRequiredProperty(FS.filePath).getString(), childName)), access);
+        return factory.getResource(childResource(subject, childName), access);
     }
 
     @Override

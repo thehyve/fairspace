@@ -107,7 +107,7 @@ public class CollectionsServiceTest {
     }
 
     @Test
-    public void changingLocationEmitsAnEvent() throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void changingLocationCallsWebDAV() throws NotAuthorizedException, ConflictException, BadRequestException {
         var created1 = collections.create(newCollection());
 
         mockPermissions(Access.Manage);
@@ -130,7 +130,9 @@ public class CollectionsServiceTest {
         patch.setName("new name");
         patch.setDescription("new descr");
         patch.setLocation("dir2");
-        collections.update(patch);
+
+        c = collections.update(patch);
+
         verify(collectionResource, times(1)).moveTo(rootResource, "dir2");
 
         var updated = collections.get(c.getIri().getURI());

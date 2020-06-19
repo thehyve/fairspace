@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProtectMachineOnlyPredicatesValidatorTest {
-    private static final Property MACHINE_ONLY_PROPERTY = FS.filePath;
+    private static final Property MACHINE_ONLY_PROPERTY = FS.createdBy;
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
