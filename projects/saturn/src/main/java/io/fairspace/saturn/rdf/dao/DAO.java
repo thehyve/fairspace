@@ -155,7 +155,7 @@ public class DAO {
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri, boolean showDeleted) {
         var m = dataset.getDefaultModel();
-        var resource = m.createResource(iri.getURI());
+        var resource = m.wrapAsResource(iri);
         return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
                 ? entityFromResource(type, resource)
                 : null;
