@@ -40,7 +40,7 @@ const columns = {
         valueExtractor: 'id',
         label: 'Id'
     },
-    label: {
+    name: {
         valueExtractor: 'name',
         label: 'Name'
     },
@@ -123,7 +123,7 @@ const WorkspaceList = ({
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row" key="id">
                                     {workspace.id}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 160}} component="th" scope="row" key="label">
+                                <TableCell style={{maxWidth: 160}} component="th" scope="row" key="name">
                                     {workspace.name}
                                 </TableCell>
                                 <TableCell

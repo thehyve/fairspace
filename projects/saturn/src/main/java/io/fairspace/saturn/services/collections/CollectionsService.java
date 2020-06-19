@@ -7,43 +7,50 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.MiltonException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.CollectionResource;
+import io.milton.resource.FolderResource;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
 import static io.fairspace.saturn.rdf.dao.DAO.entityFromResource;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-import static io.fairspace.saturn.vfs.PathUtils.encodePath;
+import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
+@Deprecated(forRemoval = true) // Access WebDAV directly
 @Slf4j
 public class CollectionsService {
     private final String baseIri;
     private final Transactions transactions;
-    private final Consumer<Object> eventListener;
+    private final ResourceFactory resourceFactory;
     private final PermissionsService permissions;
+    private final String basePath;
 
-    public CollectionsService(String baseIri, Transactions transactions, Consumer<Object> eventListener, PermissionsService permissions) {
+    @SneakyThrows
+    public CollectionsService(String baseIri, Transactions transactions, ResourceFactory resourceFactory, PermissionsService permissions) {
         this.baseIri = baseIri;
+        this.basePath = new URI(baseIri).getPath();
         this.transactions = transactions;
-        this.eventListener = eventListener;
+        this.resourceFactory = resourceFactory;
         this.permissions = permissions;
-    }
-
-    public String getBaseIri() {
-        return baseIri;
     }
 
     public Collection create(Collection collection) {
@@ -66,7 +73,6 @@ public class CollectionsService {
             new DAO(dataset).write(collection);
             permissions.createResource(collection.getIri(), collection.getOwnerWorkspace());
             collection.setAccess(Access.Manage);
-            eventListener.accept(new CollectionCreatedEvent(collection));
             return collection;
         });
 
@@ -108,7 +114,7 @@ public class CollectionsService {
 
 
     private void ensureLocationIsNotUsed(String location) {
-        if(getByLocationWithoutAccess(location).isPresent()) {
+        if (getByLocationWithoutAccess(location).isPresent()) {
             throw new LocationAlreadyExistsException(location);
         }
     }
@@ -145,11 +151,16 @@ public class CollectionsService {
                 throw new CollectionNotFoundException(iri);
             }
 
-            // Emit event on internal eventbus so the filesystem can act accordingly
-            eventListener.accept(new CollectionDeletedEvent(collection));
+            try {
+                collectionResource(collection.getLocation()).delete();
+            } catch (MiltonException e) {
+                throw new RuntimeException(e);
+            }
 
             return collection;
+
         });
+
 
         audit("COLLECTION_DELETED",
                 "iri", iri,
@@ -157,11 +168,27 @@ public class CollectionsService {
                 "location", c.getLocation());
     }
 
+    private CollectionResource rootResource() {
+        try {
+            return (CollectionResource) resourceFactory.getResource(null, basePath);
+        } catch (NotAuthorizedException | BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private FolderResource collectionResource(String location) {
+        try {
+            return (FolderResource) rootResource().child(location);
+        } catch (NotAuthorizedException | BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Collection update(Collection patch) {
         validate(patch.getIri() != null, "No IRI");
 
         validateIRI(patch.getIri().getURI());
-        var restored = new boolean[] {false};
+        var restored = new boolean[]{false};
 
         var c = transactions.calculateWrite(ds -> {
             var collection = get(patch.getIri().getURI());
@@ -176,8 +203,7 @@ public class CollectionsService {
 
             if (collection.getDateDeleted() != null) {
                 validate(patch.getDateDeleted() == null, "Cannot update a collection without restoring it");
-                eventListener.accept(new CollectionRestoredEvent(collection));
-                collection = get(patch.getIri().getURI());
+                collection = new DAO(ds).restore(collection);
                 restored[0] = true;
             }
 
@@ -206,10 +232,14 @@ public class CollectionsService {
             collection = new DAO(ds).write(collection);
 
             if (!collection.getLocation().equals(oldLocation)) {
-                eventListener.accept(new CollectionMovedEvent(collection, oldLocation));
+                try {
+                    collectionResource(oldLocation).moveTo(rootResource(), collection.getLocation());
+                } catch (MiltonException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
-            return collection;
+            return addPermissionsToObject(collection);
         });
 
         audit(restored[0] ? "COLLECTION_RESTORED" : "COLLECTION_UPDATED",
@@ -230,7 +260,7 @@ public class CollectionsService {
     private Collection addPermissionsToObject(Collection c) {
         if (c != null) {
             c.setAccess(permissions.getPermission(c.getIri()));
-            if(c.getAccess() == Access.None) {
+            if (c.getAccess() == Access.None) {
                 return null;
             }
         }

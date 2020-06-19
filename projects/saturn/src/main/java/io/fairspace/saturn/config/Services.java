@@ -1,6 +1,5 @@
 package io.fairspace.saturn.config;
 
-import com.google.common.eventbus.EventBus;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -14,21 +13,20 @@ import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.vfs.AuditedFileSystem;
-import io.fairspace.saturn.vfs.CompoundFileSystem;
-import io.fairspace.saturn.vfs.VirtualFileSystem;
-import io.fairspace.saturn.vfs.managed.BlobStore;
-import io.fairspace.saturn.vfs.managed.LocalBlobStore;
-import io.fairspace.saturn.vfs.managed.ManagedFileSystem;
+import io.fairspace.saturn.webdav.BlobStore;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.LocalBlobStore;
+import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.milton.http.ResourceFactory;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
 
+import javax.servlet.http.HttpServlet;
 import java.io.File;
-import java.util.Map;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -39,7 +37,6 @@ public class Services {
     private final Config config;
     private final Transactions transactions;
 
-    private final EventBus eventBus = new EventBus();
     private final WorkspaceService workspaceService;
     private final UserService userService;
     private final MailService mailService;
@@ -49,7 +46,8 @@ public class Services {
     private final ChangeableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
     private final BlobStore blobStore;
-    private final VirtualFileSystem fileSystem;
+    private final ResourceFactory davFactory;
+    private final HttpServlet davServlet;
 
 
     public Services(@NonNull Config config, @NonNull Dataset dataset) {
@@ -63,7 +61,7 @@ public class Services {
         permissionsService = new PermissionsService(transactions, permissionNotificationHandler);
 
         workspaceService = new WorkspaceService(transactions, permissionsService);
-        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, eventBus::post, permissionsService);
+
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
 
@@ -92,7 +90,9 @@ public class Services {
         metaVocabularyService = new ReadableMetadataService(transactions, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        fileSystem = new AuditedFileSystem(new CompoundFileSystem(collectionsService, Map.of(
-                ManagedFileSystem.TYPE, new ManagedFileSystem(transactions, blobStore, () -> getCurrentUser().getIri(), collectionsService, eventBus, permissionsService))));
+        davFactory = new DavFactory(CONFIG.publicUrl + "/api/v1/webdav/", dataset.getDefaultModel(), blobStore, permissionsService);
+        davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
+
+        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, davFactory, permissionsService);
     }
 }

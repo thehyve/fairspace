@@ -12,7 +12,10 @@ describe('FileAPI', () => {
 
             expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
-            expect(getDirectoryContents).toHaveBeenCalledWith('/src', {details: true, withCredentials: true});
+            expect(getDirectoryContents).toHaveBeenCalledWith(
+                '/src',
+                {details: true, withCredentials: true}
+            );
         });
 
         it('retrieves files including deleted', async () => {
@@ -25,7 +28,13 @@ describe('FileAPI', () => {
             expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith(
-                '/src', {details: true, headers: {"Show-Deleted": "on"}, withCredentials: true}
+                '/src',
+                {
+                    details: true,
+                    headers: {"Show-Deleted": "on"},
+                    withCredentials: true,
+                    data: "<propfind><allprop /></propfind>"
+                }
             );
         });
     });
@@ -151,7 +160,7 @@ describe('FileAPI', () => {
         });
     });
 
-    describe('createDirectory', () => {
+    describe('Creating directory', () => {
         it('should result in clear error on 400 response', () => {
             FileAPI.client = () => ({createDirectory: () => Promise.reject({response: {status: 400}})});
 
@@ -171,6 +180,79 @@ describe('FileAPI', () => {
 
             return expect(FileAPI.createDirectory("/test"))
                 .rejects.toThrow(/already exists/);
+        });
+    });
+
+    describe('Showing history', () => {
+        it('shows file history', async () => {
+            const file = {filename: '/f1', version: 5};
+            const stat = jest.fn(() => Promise.resolve(
+                {data: file}
+            ));
+            FileAPI.client = () => ({stat});
+
+            await FileAPI.showFileHistory(file, 1, 5);
+
+            expect(stat).toHaveBeenCalledTimes(4);
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true,
+                headers: {
+                    Version: 4
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true,
+                headers: {
+                    Version: 3
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true,
+                headers: {
+                    Version: 2
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true,
+                headers: {
+                    Version: 1
+                }
+            });
+        });
+
+        it('shows only limited number of file versions', async () => {
+            const file = {filename: '/f1', version: 297};
+            const stat = jest.fn(() => Promise.resolve(Promise.resolve(
+                {data: file}
+            )));
+            FileAPI.client = () => ({stat});
+            await FileAPI.showFileHistory(file, 1, 11);
+
+            expect(stat).toHaveBeenCalledTimes(11);
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true,
+                headers: {
+                    Version: 296
+                }
+            });
+            expect(stat).toHaveBeenCalledWith('/f1', {
+                withCredentials: true,
+                data: "<propfind><allprop /></propfind>",
+                details: true,
+                headers: {
+                    Version: 287
+                }
+            });
         });
     });
 });

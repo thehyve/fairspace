@@ -47,7 +47,6 @@ const Dropdown = ({
                 }
                 inputRef.current.blur();
             }}
-            blurOnSelect
             loading={optionsToShow == null}
             onOpen={() => setTouched(true)}
             options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : []}

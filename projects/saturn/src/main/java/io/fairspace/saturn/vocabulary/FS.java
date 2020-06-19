@@ -18,6 +18,15 @@ public class FS {
     public static final String FILE_URI = NS + "File";
     public static final Resource File = createResource(FILE_URI);
 
+    public static final String CURRENT_VERSION_URI = NS + "currentVersion";
+    public static final Property currentVersion = createProperty(CURRENT_VERSION_URI);
+
+    public static final String VERSIONS_URI = NS + "versions";
+    public static final Property versions = createProperty(VERSIONS_URI);
+
+    public static final String FILE_VERSION_URI = NS + "FileVersion";
+    public static final Resource FileVersion = createResource(FILE_VERSION_URI);
+
     public static final String USER_URI = NS + "User";
     public static final Resource User = createResource(USER_URI);
 
@@ -76,8 +85,12 @@ public class FS {
     public static final String BLOB_ID_URI = NS + "blobId";
     public static final Property blobId = createProperty(BLOB_ID_URI);
 
+    public static final String CONTENT_TYPE_URI = NS + "contentType";
+    public static final Property contentType = createProperty(CONTENT_TYPE_URI);
+
     public static final String MD5_URI = NS + "md5";
     public static final Property md5 = createProperty(MD5_URI);
+
 
     public static final String CONNECTION_STRING_URI = NS + "connectionString";
     public static final Property connectionString = createProperty(CONNECTION_STRING_URI);

@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
-import {BorderColor, CreateNewFolder, Delete, RestoreFromTrash} from '@material-ui/icons';
+import {BorderColor, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
@@ -17,13 +17,15 @@ import UserContext from "../users/UserContext";
 import CreateDirectoryButton from "./buttons/CreateDirectoryButton";
 import ProgressButton from "../common/components/ProgressButton";
 import RenameButton from "./buttons/RenameButton";
+import ShowFileVersionsButton from "./buttons/ShowFileVersionsButton";
 
 export const Operations = {
     PASTE: 'PASTE',
     MKDIR: 'MKDIR',
     RENAME: 'RENAME',
     DELETE: 'DELETE',
-    RESTORE: 'RESTORE'
+    UNDELETE: 'UNDELETE',
+    REVERT: 'REVERT'
 };
 Object.freeze(Operations);
 
@@ -113,6 +115,12 @@ export const FileOperations = ({
             return false;
         });
 
+    const handleRevert = (versionToRevert) => fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem, versionToRevert))
+        .catch((err) => {
+            ErrorDialog.showError(err, err.message || "An error occurred while reverting a file to a previous version", () => handleRevert(versionToRevert));
+            return false;
+        });
+
     const addBadgeIfNotEmpty = (badgeContent, children) => {
         if (badgeContent) {
             return (
@@ -142,9 +150,9 @@ export const FileOperations = ({
         return `Are you sure you want to remove ${selectedPaths.length} item(s)? `;
     };
 
-    const handleRestore = () => fileOperation(Operations.RESTORE, fileActions.restoreMultiple(selectedPaths))
+    const handleUndelete = () => fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleRestore());
+            ErrorDialog.showError(err, err.message || "An error occurred while undeleting file or directory", () => handleUndelete());
         });
 
     return (
@@ -213,17 +221,17 @@ export const FileOperations = ({
                             </ConfirmationButton>
                         </ProgressButton>
                         {isWritingEnabled && showDeleted && (
-                            <ProgressButton active={activeOperation === Operations.RESTORE}>
+                            <ProgressButton active={activeOperation === Operations.UNDELETE}>
                                 <ConfirmationButton
-                                    message={`Are you sure you want to restore ${selectedPaths.length} item(s)?`}
-                                    agreeButtonText="Restore"
+                                    message={`Are you sure you want to undelete ${selectedPaths.length} item(s)?`}
+                                    agreeButtonText="Undelete"
                                     dangerous
-                                    onClick={handleRestore}
+                                    onClick={handleUndelete}
                                     disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
                                 >
                                     <IconButton
-                                        title="Restore"
-                                        aria-label="Restore"
+                                        title="Undelete"
+                                        aria-label="Undelete"
                                         disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
                                     >
                                         <RestoreFromTrash />
@@ -263,6 +271,23 @@ export const FileOperations = ({
                     >
                         {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                     </IconButton>
+                </ProgressButton>
+            </FileOperationsGroup>
+            <FileOperationsGroup>
+                <ProgressButton active={activeOperation === Operations.REVERT}>
+                    <ShowFileVersionsButton
+                        selectedFile={selectedItem}
+                        onRevert={handleRevert}
+                        disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                    >
+                        <IconButton
+                            aria-label="Show history"
+                            title="Show history"
+                            disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                        >
+                            <Restore />
+                        </IconButton>
+                    </ShowFileVersionsButton>
                 </ProgressButton>
             </FileOperationsGroup>
         </>

@@ -308,7 +308,9 @@ public class ModelUtils {
 
     private static final Model DUMMY_MODEL = createDefaultModel();
 
-    public static void copyProperty(Property property, Resource from, Resource to) {
-        from.listProperties(property).forEachRemaining(s -> to.addProperty(property, s.getObject()));
+    public static void copyProperties(Resource from, Resource to, Property... props) {
+        for (var p : props) {
+            from.listProperties(p).forEachRemaining(s -> to.addProperty(p, s.getObject()));
+        }
     }
 }

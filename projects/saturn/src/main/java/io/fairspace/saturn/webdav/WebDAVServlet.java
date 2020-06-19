@@ -1,10 +1,11 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.config.Services;
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.config.HttpManagerBuilder;
-import io.milton.http.AuthenticationService;
-import io.milton.http.HttpManager;
-import io.milton.http.http11.DefaultHttp11ResponseHandler;
+import io.milton.event.ResponseEvent;
+import io.milton.http.*;
+import io.milton.http.webdav.ResourceTypeHelper;
+import io.milton.http.webdav.WebDavResponseHandler;
 import io.milton.servlet.ServletRequest;
 import io.milton.servlet.ServletResponse;
 
@@ -12,29 +13,61 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
+import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
+/**
+ * Ensures that all operations are handled in one transaction.
+ * Contents of PUT requests is received and saved to the blob store BEFORE transaction is started.
+ * Contents of GET responses is sent AFTER transaction is ended.
+ */
 public class WebDAVServlet extends HttpServlet {
+    private static final String BLOB_ATTRIBUTE = "BLOB";
+
     private final HttpManager httpManager;
+    private final BlobStore store;
 
-    public WebDAVServlet(Services svc) {
-        httpManager = new HttpManagerBuilder() {{
-            setResourceFactory(new VfsBackedMiltonResourceFactory(svc.getFileSystem()));
-            setMultiNamespaceCustomPropertySourceEnabled(true);
-            setAuthenticationService(new AuthenticationService(singletonList(new SaturnAuthenticationHandler())));
-            setValueWriters(new NullSafeValueWriters());
+    public WebDAVServlet(ResourceFactory factory, Transactions txn, BlobStore store) {
+        this.store = store;
 
-            setHttp11ResponseHandler(new DefaultHttp11ResponseHandler(getAuthenticationService(), geteTagGenerator(), getContentGenerator()));
-        }}.buildHttpManager();
+        httpManager = new HttpManagerBuilder() {
+            {
+                setResourceFactory(factory);
+                setMultiNamespaceCustomPropertySourceEnabled(true);
+                setAuthenticationService(new AuthenticationService(singletonList(new SaturnAuthenticationHandler())));
+                setValueWriters(new NullSafeValueWriters());setEnabledJson(false);
+                setEnabledCkBrowser(false);
+            }
+
+            @Override
+            protected void buildProtocolHandlers(WebDavResponseHandler webdavResponseHandler, ResourceTypeHelper resourceTypeHelper) {
+                super.buildProtocolHandlers(webdavResponseHandler, resourceTypeHelper);
+
+                setProtocolHandlers(new ProtocolHandlers(getProtocols()
+                        .stream()
+                        .map(p -> new TransactionalHttpExtensionWrapper(p, txn))
+                        .collect(toList())));
+            }
+        }.buildHttpManager();
+
+       httpManager.getEventManager().registerEventListener(new AuditEventListener(), ResponseEvent.class);
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse res) throws IOException {
         try {
             setThreadlocals(req, res);
+
+            if (req.getMethod().equalsIgnoreCase("PUT")) {
+                var blob = store.store(req.getInputStream());
+                req.setAttribute(BLOB_ATTRIBUTE, blob);
+            }
+
             httpManager.process(new ServletRequest(req, req.getServletContext()), new ServletResponse(res));
         } finally {
             clearThreadlocals();
@@ -42,4 +75,26 @@ public class WebDAVServlet extends HttpServlet {
             res.flushBuffer();
         }
     }
+
+
+    static Integer fileVersion() {
+        return Optional.ofNullable(currentRequest.get())
+                .map(r -> r.getHeader("Version"))
+                .map(Integer::parseInt)
+                .orElse(null);
+    }
+
+    static boolean showDeleted() {
+        return Optional.ofNullable(currentRequest.get())
+                .map(r -> r.getHeader("Show-Deleted"))
+                .map("on"::equalsIgnoreCase)
+                .orElse(false);
+    }
+
+    static BlobInfo getBlob() {
+        return Optional.ofNullable(currentRequest.get())
+                .map(r -> (BlobInfo) r.getAttribute(BLOB_ATTRIBUTE))
+                .orElse(null);
+    }
+
 }

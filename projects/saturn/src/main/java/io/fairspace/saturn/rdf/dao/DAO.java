@@ -195,6 +195,24 @@ public class DAO {
         return null;
     }
 
+
+    /**
+     * Restores an entity previously marked as deleted
+     *
+     * @param entity
+     * @return the entity passed as an argument if no entity was found or it was already marked as deleted
+     */
+    public <T extends LifecycleAwarePersistentEntity> T restore(T entity) {
+        var existing = (T) read(entity.getClass(), entity.getIri(), true);
+        if (existing != null) {
+            existing.setDateDeleted(null);
+            existing.setDeletedBy(null);
+            return write(existing);
+        }
+        return null;
+    }
+
+
     /**
      * Lists entities of a specific type (except to marked as deleted)
      *

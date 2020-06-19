@@ -4,7 +4,6 @@ import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.auth.UserIdentityFilter;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.webdav.WebDAVServlet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.eclipse.jetty.proxy.ProxyServlet;
@@ -30,7 +29,7 @@ public class App {
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", ds, false)
                 .addFilter("/*", new UserIdentityFilter(svc))
-                .addServlet(API_PREFIX + "/webdav/*", new WebDAVServlet(svc))
+                .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addServlet(API_PREFIX + "/search/*", new ProxyServlet() {
                     @Override
                     protected String rewriteTarget(HttpServletRequest clientRequest) {

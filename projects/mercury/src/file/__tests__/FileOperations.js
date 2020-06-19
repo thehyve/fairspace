@@ -66,6 +66,7 @@ describe('FileOperations', () => {
             .then(() => {
                 wrapper.find(IconButton)
                     .not('[download]')
+                    .not('[aria-label="Show history"]')
                     .forEach(b => {
                         expect(b.props().disabled).toBe(false);
                     });
@@ -144,7 +145,7 @@ describe('FileOperations', () => {
         });
     });
 
-    describe('restore button', () => {
+    describe('undelete button', () => {
         const emptyClipboard = {
             method: COPY,
             filenames: [],
@@ -170,7 +171,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Restore"]')).toEqual({});
+            expect(wrapper.find('[aria-label="Undelete"]')).toEqual({});
         });
         it('should be disabled if no file selected', () => {
             const render = (fileActions) => shallow(<FileOperations
@@ -191,7 +192,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Restore"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Undelete"]').prop("disabled")).toEqual(true);
         });
         it('should be disabled if non-deleted file selected', () => {
             const render = (fileActions) => shallow(<FileOperations
@@ -212,7 +213,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Restore"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Undelete"]').prop("disabled")).toEqual(true);
         });
         it('should be enabled if deleted file selected', () => {
             const render = (fileActions) => shallow(<FileOperations
@@ -233,7 +234,56 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Restore"]').prop("disabled")).toEqual(false);
+            expect(wrapper.find('[aria-label="Undelete"]').prop("disabled")).toEqual(false);
+        });
+    });
+
+    describe('show history button', () => {
+        const emptyClipboard = {
+            method: COPY,
+            filenames: [],
+            isEmpty: () => true,
+            length: () => 0
+        };
+        it('should be disabled if no file selected', () => {
+            const render = (fileActions) => shallow(<FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a', type: 'file'}]}
+                selectedPaths={[]}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={{}}
+                isWritingEnabled
+                currentUser={{admin: true}}
+                clipboard={emptyClipboard}
+            />);
+
+            wrapper = render(fileActionsMock);
+            expect(wrapper.find('[aria-label="Show history"]').prop("disabled")).toEqual(true);
+        });
+        it('should be enabled if one file selected', () => {
+            const render = (fileActions) => shallow(<FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a', type: 'file'}]}
+                selectedPaths={['a']}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={{}}
+                isWritingEnabled
+                currentUser={{admin: true}}
+                clipboard={emptyClipboard}
+            />);
+
+            wrapper = render(fileActionsMock);
+            expect(wrapper.find('[aria-label="Show history"]').prop("disabled")).toEqual(false);
         });
     });
 });

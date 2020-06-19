@@ -1,4 +1,4 @@
-package io.fairspace.saturn.vfs.managed;
+package io.fairspace.saturn.webdav;
 
 
 import io.milton.common.RangeUtils;
@@ -37,7 +37,6 @@ public class LocalBlobStore implements BlobStore {
         var src = new File(dir, id);
         try(var in = new BufferedInputStream(new FileInputStream(src))) {
             RangeUtils.writeRange(in, new Range(start, finish), out);
-            copyLarge(in, out);
         }
     }
 }
