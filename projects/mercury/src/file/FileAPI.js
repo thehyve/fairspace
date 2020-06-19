@@ -1,7 +1,5 @@
 import {createClient} from "webdav";
-import axios from 'axios';
 import {compareBy, comparing} from '../common/utils/genericUtils';
-
 import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 
 
@@ -11,21 +9,11 @@ const defaultOptions = {withCredentials: true};
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
-axios.interceptors.request.use((config) => {
-    // For stat requests we want to retrieve all available webdav properties
-    // We can only distinguish between a directory listing and a stat request
-    // based on the Depth header send to the backend.
-    if (config.method === 'propfind') {
-        config.headers['content-type'] = 'application/xml';
-        config.data = '<propfind><allprop /></propfind>';
-    }
-    return config;
-}, (error) => Promise.reject(error));
-
 export type File = {
     filename: string;
     basename: string;
     lastmod: string;
+    version: number;
     size: number;
     type: string;
     dateDeleted?: string;
@@ -37,12 +25,26 @@ class FileAPI {
     }
 
     stat(path, showDeleted) {
-        const options = {...includeDetails};
+        const options = {
+            ...includeDetails,
+            data: "<propfind><allprop /></propfind>"
+        };
         if (showDeleted) {
             options.headers = {"Show-Deleted": "on"};
         }
         return this.client().stat(path, options)
-            .then(result => result.data);
+            .then(result => this.mapToFile(result.data));
+    }
+
+    statForVersion(path, version) {
+        const options = {
+            ...includeDetails,
+            data: "<propfind><allprop /></propfind>"
+        };
+        options.headers = {Version: version};
+
+        return this.client().stat(path, options)
+            .then(result => this.mapToFile(result.data));
     }
 
     /**
@@ -55,6 +57,7 @@ class FileAPI {
         const options = {...includeDetails};
         if (showDeleted) {
             options.headers = {"Show-Deleted": "on"};
+            options.data = "<propfind><allprop /></propfind>";
         }
         return this.client().getDirectoryContents(path, options)
             .then(result => result.data
@@ -157,12 +160,12 @@ class FileAPI {
     }
 
     /**
-     * Restores the file given by path
+     * Undeletes the file given by path
      * @param path
      * @returns Promise<any>
      */
-    restore(path) {
-        if (!path) return Promise.reject(Error("No path specified for restoring"));
+    undelete(path) {
+        if (!path) return Promise.reject(Error("No path specified for undeleting"));
         const removeDateDeletedPropRequest = ""
             + "<?xml version=\"1.0\"?>"
             + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
@@ -172,7 +175,6 @@ class FileAPI {
             + "</d:prop>"
             + "</d:remove>"
             + "</d:propertyupdate>";
-
 
         const requestOptions = {
             method: "PROPPATCH",
@@ -188,7 +190,39 @@ class FileAPI {
         return this.client().customRequest(path, requestOptions)
             .catch(e => {
                 if (e && e.response) {
-                    throw new Error("Could not restore file or directory.");
+                    throw new Error("Could not undelete file or directory.");
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
+    revertToVersion(path, version) {
+        if (!path) return Promise.reject(Error("No path specified for version reverting"));
+        const revertToVersionRequest = ""
+            + "<?xml version=\"1.0\"?>"
+            + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
+            + "<d:set>"
+            + "<d:prop>"
+            + `<fs:version>${version}</fs:version>`
+            + "</d:prop>"
+            + "</d:set>"
+            + "</d:propertyupdate>";
+
+        const requestOptions = {
+            method: "PROPPATCH",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "text/xml"
+            },
+            responseType: "text",
+            data: revertToVersionRequest
+        };
+
+        return this.client().customRequest(path, requestOptions)
+            .catch(e => {
+                if (e && e.response) {
+                    throw new Error(`Could not revert file or directory to version ${version}.`);
                 }
 
                 return Promise.reject(e);
@@ -335,21 +369,23 @@ class FileAPI {
         return Promise.all(filenames.map(filename => this.delete(filename, showDeleted)));
     }
 
-    restoreMultiple(filenames) {
+    undeleteMultiple(filenames) {
         if (!filenames || filenames.length === 0) {
-            return Promise.reject(new Error("No filenames given to restore"));
+            return Promise.reject(new Error("No filenames given to undelete"));
         }
-        return Promise.all(filenames.map(filename => this.restore(filename)));
+        return Promise.all(filenames.map(filename => this.undelete(filename)));
     }
 
-    mapToFile: File = (fileObject) => ({
-        filename: fileObject.filename,
-        basename: fileObject.basename,
-        lastmod: fileObject.lastmod,
-        size: fileObject.size,
-        type: fileObject.type,
-        dateDeleted: fileObject.props && fileObject.props.dateDeleted
-    })
+    showFileHistory(file, startIndex, endIndex) {
+        const versions = [];
+        for (let i = file.version - startIndex; i >= file.version - endIndex && i >= 1; i -= 1) {
+            versions.push(i);
+        }
+        if (versions.length === 0) return Promise.resolve();
+        return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
+    }
+
+    mapToFile: File = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
 }
 
 export default new FileAPI();
