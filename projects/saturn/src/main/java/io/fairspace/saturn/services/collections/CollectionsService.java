@@ -13,10 +13,12 @@ import io.milton.http.exceptions.MiltonException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
 import io.milton.resource.FolderResource;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +42,12 @@ public class CollectionsService {
     private final Transactions transactions;
     private final ResourceFactory resourceFactory;
     private final PermissionsService permissions;
+    private final String basePath;
 
+    @SneakyThrows
     public CollectionsService(String baseIri, Transactions transactions, ResourceFactory resourceFactory, PermissionsService permissions) {
         this.baseIri = baseIri;
+        this.basePath = new URI(baseIri).getPath();
         this.transactions = transactions;
         this.resourceFactory = resourceFactory;
         this.permissions = permissions;
@@ -165,7 +170,7 @@ public class CollectionsService {
 
     private CollectionResource rootResource() {
         try {
-            return (CollectionResource) resourceFactory.getResource(null, "");
+            return (CollectionResource) resourceFactory.getResource(null, basePath);
         } catch (NotAuthorizedException | BadRequestException e) {
             throw new RuntimeException(e);
         }
@@ -234,7 +239,7 @@ public class CollectionsService {
                 }
             }
 
-            return collection;
+            return addPermissionsToObject(collection);
         });
 
         audit(restored[0] ? "COLLECTION_RESTORED" : "COLLECTION_UPDATED",
