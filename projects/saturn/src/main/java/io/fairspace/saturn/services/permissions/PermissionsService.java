@@ -9,6 +9,7 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -17,13 +18,11 @@ import java.util.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
-import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.StreamSupport.stream;
 import static org.apache.commons.lang3.ObjectUtils.min;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -35,6 +34,7 @@ public class PermissionsService {
 
     private final Transactions transactions;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
+    private final String baseCollectionsIri;
 
     public void createResource(Node resource) {
         createResource(resource, getCurrentUser().getIri());
@@ -240,53 +240,15 @@ public class PermissionsService {
      * @return an authoritative resource for the given resource: currently either the parent collection (for files and directories) or the resource itself
      */
     private Node getAuthority(Node resource) {
-        return getFileAuthorities(List.of(resource)).getOrDefault(resource, resource);
-    }
+        var uri = resource.getURI();
+        if (uri.startsWith(baseCollectionsIri)) {
+            var pos = uri.indexOf('/', baseCollectionsIri.length());
+            if (pos > 0) {
+                return NodeFactory.createURI(uri.substring(0, pos));
+            }
+        }
 
-    /**
-     * Return a list of enclosing collections for the given nodes
-     * <p>
-     * If any node is given that does not belong to a collection, it will not
-     * be included in the resulting set of authorities.
-     *
-     * @param fileNodes List of file/directory nodes
-     * @return
-     */
-    private Map<Node, Node> getFileAuthorities(Collection<Node> fileNodes) {
-        var fileToCollectionPath = new HashMap<Node, String>(fileNodes.size());
-        var collectionPaths = new HashSet<String>();
-
-        return transactions.calculateRead(dataset -> {
-            var model = dataset.getDefaultModel();
-            fileNodes.forEach(node -> {
-                var resource = model.createResource(node.getURI());
-                if (resource.hasProperty(RDF.type, FS.File) || resource.hasProperty(RDF.type, FS.Directory)) {
-                    var filePath = getStringProperty(resource, FS.filePath);
-                    if (filePath != null) {
-                        var path = collectionPath(filePath);
-                        fileToCollectionPath.put(node, path);
-                        collectionPaths.add(path);
-                    }
-                }
-            });
-
-            var collectionsByPath = new HashMap<String, Node>();
-
-            collectionPaths.forEach(path -> model.listSubjectsWithProperty(FS.filePath, path)
-                    .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
-                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
-                    .forEachRemaining(r -> collectionsByPath.put(path, r.asNode())));
-
-            return fileToCollectionPath
-                    .entrySet()
-                    .stream()
-                    .collect(toMap(Map.Entry::getKey, e -> collectionsByPath.get(e.getValue())));
-        });
-    }
-
-    private static String collectionPath(String filePath) {
-        var pos = filePath.indexOf('/');
-        return pos < 0 ? filePath : filePath.substring(0, pos);
+        return resource;
     }
 
     /**
@@ -297,17 +259,7 @@ public class PermissionsService {
      */
     private Multimap<Node, Node> getAuthorities(Collection<Node> nodes) {
         var result = HashMultimap.<Node, Node>create();
-
-        var fileAuthorities = getFileAuthorities(nodes);
-        fileAuthorities.forEach((file, authority) -> result.put(authority, file));
-        nodes.forEach(node -> {
-            if (!result.containsValue(node)) {
-                result.put(node, node);
-            }
-        });
-
+        nodes.forEach(n -> result.put(getAuthority(n), n));
         return result;
     }
-
-
 }
