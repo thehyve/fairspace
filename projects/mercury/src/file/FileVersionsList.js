@@ -82,7 +82,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     }
 
     const selectedFileVersion = selectedFileDetails && parseInt(selectedFileDetails.version, 10);
-    if (!selectedFileVersion || selectedFileVersion.version === 1) {
+    if (!selectedFileVersion || selectedFileVersion === 1) {
         return (<div>No previous version found.</div>);
     }
 
