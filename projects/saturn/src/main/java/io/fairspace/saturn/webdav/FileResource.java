@@ -39,6 +39,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     private String blobId;
     private long contentLength;
     private Date modifiedDate;
+    private boolean singleVersion;
 
     @SneakyThrows
     FileResource(DavFactory factory, Resource subject, Access access) {
@@ -49,14 +50,8 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     private void loadVersion() throws BadRequestException {
         var versions = getListProperty(subject, FS.versions);
-
         var ver = fileVersion();
-
-        if (ver == null) {
-            version = versions.size();
-        } else {
-            version = ver;
-        }
+        version = (ver != null) ? ver : versions.size();
 
         if (version < 1 || version > versions.size()) {
             throw new BadRequestException("Invalid file version");
@@ -67,6 +62,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
         blobId = current.getRequiredProperty(FS.blobId).getString();
         contentLength = current.getRequiredProperty(FS.fileSize).getLong();
         modifiedDate = parseDate(current, FS.dateModified);
+        singleVersion = versions.size() == 1;
     }
 
     @Override
@@ -81,7 +77,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     @Override
     public Long getMaxAgeSeconds(Auth auth) {
-        return Long.MAX_VALUE;
+        return singleVersion ? Long.MAX_VALUE : null;
     }
 
     @Override
