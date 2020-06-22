@@ -60,7 +60,6 @@ public class PermissionNotificationHandlerTest {
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDF.type, FS.Collection);
         ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), RDFS.label, "COLLECTION");
-        ds.getDefaultModel().add(createResource(COLLECTION_1.getURI()), FS.filePath, "location");
 
         permissionNotificationHandler = new PermissionNotificationHandler(new SimpleTransactions(ds), userService, mailService, "http://public-url");
     }
@@ -79,7 +78,7 @@ public class PermissionNotificationHandlerTest {
         permissionNotificationHandler.onPermissionChange(currentUser, COLLECTION_1, USER2, Access.Write);
 
         verify(mailService).newMessage();
-        verify(message).setText("Your access level for collection COLLECTION (http://public-url/collections/location) was set to Write by John.");
+        verify(message).setText("Your access level for collection COLLECTION (http://public-url/collections/collection1) was set to Write by John.");
         verify(message).setRecipient(Message.RecipientType.TO, new InternetAddress("user@example.com"));
         verify(mailService).send(any());
     }

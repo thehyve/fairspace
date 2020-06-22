@@ -25,9 +25,9 @@ import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.showDeletedFiles;
-import static io.fairspace.saturn.rdf.dao.DAO.entityFromResource;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -85,7 +85,11 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        return transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Collection.class, createURI(iri), showDeletedFiles())));
+        var c = transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Collection.class, createURI(iri), showDeletedFiles())));
+        if (c != null) {
+            c.setLocation(decodePath(c.getIri().getLocalName()));
+        }
+        return c;
     }
 
     public Collection getByLocation(String location) {
@@ -95,10 +99,12 @@ public class CollectionsService {
     }
 
     private Optional<Collection> getByLocationWithoutAccess(String location) {
-        return transactions.calculateRead(ds -> ds.getDefaultModel().listSubjectsWithProperty(FS.filePath, location)
-                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection) && (showDeletedFiles() || !r.hasProperty(FS.dateDeleted)))
-                .nextOptional()
-                .map(r -> entityFromResource(Collection.class, r)));
+        return transactions.calculateRead(ds ->
+            Optional.ofNullable(new DAO(ds).read(Collection.class, locationToURI(location), showDeletedFiles())));
+    }
+
+    private Node locationToURI(String location) {
+        return createURI(baseIri + encodePath(location));
     }
 
     private void checkWorkspace(Node ownerWorkspace) {
@@ -131,6 +137,7 @@ public class CollectionsService {
                         c.setAccess(userPermissions.get(c.getIri()));
                         return c.canRead();
                     })
+                    .peek(c -> c.setLocation(decodePath(c.getIri().getLocalName())))
                     .sorted(comparing(Collection::getName))
                     .collect(toList());
         });
@@ -210,7 +217,13 @@ public class CollectionsService {
             var oldLocation = collection.getLocation();
             if (patch.getLocation() != null && !patch.getLocation().equals(collection.getLocation())) {
                 ensureLocationIsNotUsed(patch.getLocation());
+                try {
+                    collectionResource(oldLocation).moveTo(rootResource(), patch.getLocation());
+                } catch (MiltonException e) {
+                    throw new RuntimeException(e);
+                }
                 collection.setLocation(patch.getLocation());
+                collection.setIri(locationToURI(patch.getLocation()));
             }
 
             if (patch.getConnectionString() != null) {
@@ -230,14 +243,6 @@ public class CollectionsService {
 
             validateFields(collection);
             collection = new DAO(ds).write(collection);
-
-            if (!collection.getLocation().equals(oldLocation)) {
-                try {
-                    collectionResource(oldLocation).moveTo(rootResource(), collection.getLocation());
-                } catch (MiltonException e) {
-                    throw new RuntimeException(e);
-                }
-            }
 
             return addPermissionsToObject(collection);
         });

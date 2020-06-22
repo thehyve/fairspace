@@ -22,9 +22,6 @@ public class Collection extends LifecycleAwarePersistentEntity implements Access
     @RDFProperty(value = RDFS.uri + "comment", required = true)
     private String description;
 
-    @RDFProperty(value = FILE_PATH_URI, required = true)
-    private String location;
-
     @RDFProperty(value = CONNECTION_STRING_URI)
     private String connectionString;
 
@@ -32,6 +29,8 @@ public class Collection extends LifecycleAwarePersistentEntity implements Access
     private Node ownerWorkspace;
 
     private Access access;
+
+    private String location;
 
     public String getConnectionString() {
         return connectionString != null ? connectionString : "";

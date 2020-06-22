@@ -59,7 +59,6 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
 
         subj.addProperty(RDF.type, FS.Collection)
-                .addProperty(FS.filePath, newName)
                 .addProperty(RDFS.label, newName)
                 .addProperty(FS.createdBy, currentUserResource())
                 .addProperty(FS.dateCreated, timestampLiteral());

@@ -79,11 +79,7 @@ public class PermissionNotificationHandler implements PermissionChangeEventHandl
     }
 
     private String getLocation(Resource collection) {
-        return collection
-                .listProperties(FS.filePath)
-                .nextOptional()
-                .map(Statement::getString)
-                .orElse("");
+        return collection.getLocalName();
     }
 }
 

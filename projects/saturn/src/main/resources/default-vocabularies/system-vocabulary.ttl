@@ -71,7 +71,6 @@ fs:FileShape a fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:movedTo fs:versions fs:currentVersion) ;
     fs:fixedShape true ;
     fs:systemProperties
-        fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:deletedByShape,
@@ -81,7 +80,6 @@ fs:FileShape a fs:ClassShape ;
         fs:replacesShape,
         fs:isReplacedByShape ;
     sh:property
-        fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:deletedByShape,
@@ -102,7 +100,6 @@ fs:DirectoryShape a fs:ClassShape ;
     fs:fixedShape true ;
     fs:systemProperties
         fs:containsShape,
-        fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -112,7 +109,6 @@ fs:DirectoryShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape ;
     sh:property
-        fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -127,11 +123,10 @@ fs:CollectionShape a fs:ClassShape ;
     sh:name "Collection" ;
     sh:targetClass fs:Collection ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:collectionType ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     fs:systemProperties
         fs:connectionString,
-        fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -142,7 +137,6 @@ fs:CollectionShape a fs:ClassShape ;
         fs:commentShape ;
     sh:property
         fs:connectionString,
-        fs:filePathShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -268,16 +262,6 @@ fs:connectionString a fs:DatatypePropertyShape ;
     fs:machineOnly true ;
     fs:fixedShape true ;
     sh:path fs:connectionString .
-
-fs:filePathShape a fs:DatatypePropertyShape ;
-    sh:maxCount 1 ;
-    sh:minCount 1 ;
-    sh:name "File path" ;
-    sh:datatype xsd:string ;
-    sh:description "File path" ;
-    fs:machineOnly true ;
-    fs:fixedShape true ;
-    sh:path fs:filePath .
 
 fs:fileSizeShape a fs:DatatypePropertyShape ;
     sh:name "File size" ;

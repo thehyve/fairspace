@@ -40,10 +40,10 @@ public class PermissionsServiceTest {
     private static final Node USER1 = createURI("http://example.com/user1");
     private static final Node USER2 = createURI("http://example.com/user2");
     private static final Node USER3 = createURI("http://example.com/user3");
-    private static final Node COLLECTION_1 = createURI("http://example.com/collection1");
-    private static final Node COLLECTION_2 = createURI("http://example.com/collection2");
-    private static final Node FILE_1 = createURI("http://example.com/file1");
-    private static final Node FILE_2 = createURI("http://example.com/file2");
+    private static final Node COLLECTION_1 = createURI("http://example.com/collections/collection1");
+    private static final Node COLLECTION_2 = createURI("http://example.com/collections/collection2");
+    private static final Node FILE_1 = createURI("http://example.com/collections/collection1/file1");
+    private static final Node FILE_2 = createURI("http://example.com/collections/collection2/file2");
 
     private Dataset ds;
     private PermissionsService service;
@@ -74,7 +74,7 @@ public class PermissionsServiceTest {
         when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
         when(currentUser.getName()).thenReturn("name");
 
-        service = new PermissionsService(new SimpleTransactions(ds), permissionChangeEventHandler);
+        service = new PermissionsService(new SimpleTransactions(ds), permissionChangeEventHandler, "http://example.com/collections/");
         service.createResource(RESOURCE);
     }
 
@@ -124,18 +124,16 @@ public class PermissionsServiceTest {
 
     @Test
     public void testGettingPermissionsForFiles() {
-        var collection = createResource("http://example.com/collection");
-        var file = createResource("http://example.com/file");
+        var collection = createResource("http://example.com/collections/collection");
+        var file = createResource("http://example.com/collections/collection/file");
         ds.getDefaultModel()
                 .add(collection, RDF.type, FS.Collection)
-                .add(collection, FS.filePath, createPlainLiteral("collectionPath"))
-                .add(file, RDF.type, FS.File)
-                .add(file, FS.filePath, createPlainLiteral("collectionPath/filePath"));
+                .add(file, RDF.type, FS.File);
 
 
         service.createResource(collection.asNode());
 
-        assertEquals(Access.Manage, service.getPermission(createURI("http://example.com/file")));
+        assertEquals(Access.Manage, service.getPermission(file.asNode()));
     }
 
     @Test
@@ -344,14 +342,9 @@ public class PermissionsServiceTest {
         //   resource2 owned by user1 and freely-accessible
         ds.getDefaultModel()
                 .add(c1, RDF.type, FS.Collection)
-                .add(c1, FS.filePath, createPlainLiteral("collection1Path"))
                 .add(c1, RDF.type, FS.Collection)
                 .add(f1, RDF.type, FS.File)
-                .add(f1, FS.filePath, createPlainLiteral("collection1Path/filePath"))
-                .add(c2, RDF.type, FS.Collection)
-                .add(c2, FS.filePath, createPlainLiteral("collection2Path"))
-                .add(f2, RDF.type, FS.File)
-                .add(f2, FS.filePath, createPlainLiteral("collection2Path/filePath"));
+                .add(c2, RDF.type, FS.Collection).add(f2, RDF.type, FS.File);
 
         service.createResource(COLLECTION_1);
         service.createResource(COLLECTION_2);

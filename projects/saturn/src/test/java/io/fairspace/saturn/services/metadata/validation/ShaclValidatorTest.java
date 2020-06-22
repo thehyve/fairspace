@@ -98,11 +98,11 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceMissingRequiredProperty() {
-        var model = modelOf(resource1, RDF.type, FS.File);
+        var model = modelOf(resource1, RDF.type, FS.Workspace);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
                 vocabulary, violationHandler);
 
-        expect(resource1, FS.filePath, null);
+        expect(resource1, FS.workspaceDescription, null);
 
         verifyNoMoreInteractions(violationHandler);
     }
@@ -111,10 +111,10 @@ public class ShaclValidatorTest {
     public void validateResourceWithWrongObjectsType() {
         var model = modelOf(
                 resource1, RDF.type, FS.File,
-                resource1, FS.filePath, createTypedLiteral(123));
+                resource1, FS.createdBy, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
-        expect(resource1, FS.filePath, createTypedLiteral(123));
+        expect(resource1, FS.createdBy, createTypedLiteral(123));
     }
 
     @Test
@@ -123,7 +123,6 @@ public class ShaclValidatorTest {
 
         var toAdd = modelOf(
                 resource1, RDF.type, FS.File,
-                resource1, FS.filePath, createStringLiteral("some/path"),
                 resource1, FS.createdBy, resource2);
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
@@ -180,7 +179,6 @@ public class ShaclValidatorTest {
                 .add(resource1, RDF.type, FS.Collection)
                 .add(resource1, RDFS.label, "collection")
                 .add(resource1, RDFS.comment, "bla")
-                .add(resource1, FS.filePath, "/")
                 .add(resource1, FS.connectionString, "a")
                 .add(resource1, FS.createdBy, blankNode);
 
@@ -204,7 +202,6 @@ public class ShaclValidatorTest {
                 .add(resource1, RDF.type, FS.Collection)
                 .add(resource1, RDFS.label, "collection")
                 .add(resource1, RDFS.comment, "bla")
-                .add(resource1, FS.filePath, "/")
                 .add(resource1, FS.connectionString, "a")
                 .add(resource1, FS.createdBy, blankNode);
 
@@ -223,13 +220,13 @@ public class ShaclValidatorTest {
         var model = createDefaultModel();
         for (int i = 0; i < 2 * availableProcessors(); i++) {
             var resource = createResource();
-            model.add(resource, RDF.type, FS.File).add(resource, FS.filePath, createTypedLiteral(123));
+            model.add(resource, RDF.type, FS.File).add(resource, FS.createdBy, createTypedLiteral(123));
         }
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
         model.listSubjects().forEachRemaining(resource ->
-                expect(resource, FS.filePath, createTypedLiteral(123)));
+                expect(resource, FS.createdBy, createTypedLiteral(123)));
 
         verifyNoMoreInteractions(violationHandler);
     }
