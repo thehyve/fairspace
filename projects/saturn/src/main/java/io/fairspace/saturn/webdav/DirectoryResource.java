@@ -70,7 +70,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
         var subj = childResource(subject, newName);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
-        var t = DavFactory.timestampLiteral();
+        var t = WebDAVServlet.timestampLiteral();
 
         subj
                 .addProperty(RDFS.label, newName)

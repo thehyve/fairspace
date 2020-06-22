@@ -3,19 +3,25 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
-import io.milton.http.*;
+import io.milton.http.AuthenticationService;
+import io.milton.http.HttpManager;
+import io.milton.http.ProtocolHandlers;
+import io.milton.http.ResourceFactory;
 import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;
 import io.milton.servlet.ServletRequest;
 import io.milton.servlet.ServletResponse;
+import org.apache.jena.rdf.model.Literal;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
 
 import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
@@ -28,6 +34,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class WebDAVServlet extends HttpServlet {
     private static final String BLOB_ATTRIBUTE = "BLOB";
+    private static final String TIMESTAMP_ATTRIBUTE = "TIMESTAMP";
 
     private final HttpManager httpManager;
     private final BlobStore store;
@@ -40,7 +47,8 @@ public class WebDAVServlet extends HttpServlet {
                 setResourceFactory(factory);
                 setMultiNamespaceCustomPropertySourceEnabled(true);
                 setAuthenticationService(new AuthenticationService(singletonList(new SaturnAuthenticationHandler())));
-                setValueWriters(new NullSafeValueWriters());setEnabledJson(false);
+                setValueWriters(new NullSafeValueWriters());
+                setEnabledJson(false);
                 setEnabledCkBrowser(false);
             }
 
@@ -55,7 +63,7 @@ public class WebDAVServlet extends HttpServlet {
             }
         }.buildHttpManager();
 
-       httpManager.getEventManager().registerEventListener(new AuditEventListener(), ResponseEvent.class);
+        httpManager.getEventManager().registerEventListener(new AuditEventListener(), ResponseEvent.class);
     }
 
     @Override
@@ -85,16 +93,20 @@ public class WebDAVServlet extends HttpServlet {
     }
 
     static boolean showDeleted() {
-        return Optional.ofNullable(currentRequest.get())
-                .map(r -> r.getHeader("Show-Deleted"))
-                .map("on"::equalsIgnoreCase)
-                .orElse(false);
+        return "on".equalsIgnoreCase(currentRequest.get().getHeader("Show-Deleted"));
     }
 
     static BlobInfo getBlob() {
-        return Optional.ofNullable(currentRequest.get())
-                .map(r -> (BlobInfo) r.getAttribute(BLOB_ATTRIBUTE))
-                .orElse(null);
+        return (BlobInfo) currentRequest.get().getAttribute(BLOB_ATTRIBUTE);
     }
 
+    static Literal timestampLiteral() {
+        var r = currentRequest.get();
+        var t = (Literal) r.getAttribute(TIMESTAMP_ATTRIBUTE);
+        if (t == null) {
+            t = toXSDDateTimeLiteral(Instant.now());
+            r.setAttribute(TIMESTAMP_ATTRIBUTE, t);
+        }
+        return t;
+    }
 }
