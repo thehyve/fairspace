@@ -137,6 +137,7 @@ public class CollectionsService {
                         c.setAccess(userPermissions.get(c.getIri()));
                         return c.canRead();
                     })
+                    .peek(c -> c.setLocation(decodePath(c.getIri().getLocalName())))
                     .sorted(comparing(Collection::getName))
                     .collect(toList());
         });
