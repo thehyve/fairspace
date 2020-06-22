@@ -41,7 +41,6 @@ describe('CollectionAPI', () => {
         await CollectionAPI.addCollection({
             name: 'name',
             description: 'description',
-            connectionString: 'connectionString',
             location: 'location'
         });
 
@@ -51,7 +50,6 @@ describe('CollectionAPI', () => {
             JSON.stringify({
                 name: 'name',
                 description: 'description',
-                connectionString: 'connectionString',
                 location: 'location'
             }),
             {headers: {'Content-Type': 'application/json'}}
@@ -63,7 +61,6 @@ describe('CollectionAPI', () => {
             iri: 'iri',
             name: 'name',
             description: 'description',
-            connectionString: 'connectionString',
             location: 'location'
         });
 
@@ -74,7 +71,6 @@ describe('CollectionAPI', () => {
                 iri: 'iri',
                 name: 'name',
                 description: 'description',
-                connectionString: 'connectionString',
                 location: 'location'
             }),
             {headers: {'Content-Type': 'application/json'}}

@@ -15,7 +15,7 @@ import type {Match, History} from '../types';
 import ErrorDialog from "../common/components/ErrorDialog";
 
 
-const fields = ['name', 'description', 'location', 'connectionString', 'ownerWorkspace'];
+const fields = ['name', 'description', 'location', 'ownerWorkspace'];
 
 const copyProperties = (properties: CollectionProperties): CollectionProperties => ((fields
     .reduce((copy, field) => { copy[field] = properties ? properties[field] || '' : ''; return copy; }, {}): any): CollectionProperties);
@@ -58,6 +58,7 @@ type CollectionEditorProps = {
     inCollectionsBrowser: boolean,
     addCollection: (CollectionProperties) => Promise<void>,
     updateCollection: (Collection) => Promise<void>,
+    relocateCollection: (Collection) => Promise<void>,
     onClose: () => void,
     setBusy: (boolean) => void,
     match: Match<PathParam>,
@@ -82,7 +83,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         editing: true,
         properties: this.props.collection
             ? copyProperties(this.props.collection)
-            : {name: '', description: '', location: '', connectionString: '', ownerWorkspace: this.props.workspaceIri}
+            : {name: '', description: '', location: '', ownerWorkspace: this.props.workspaceIri}
     };
 
     handleAddCollection = (properties: CollectionProperties) => {
@@ -96,13 +97,17 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     };
 
     handleCollectionLocationChange = (newLocation: string) => {
-        const {history, inCollectionsBrowser, match: {params: {path}}} = this.props;
-        if (inCollectionsBrowser) {
-            this.close();
-            return;
-        }
-        // If the collection location changes, the URI for the current page should change as well
-        history.push(`${getCollectionAbsolutePath(newLocation)}/${path || ''}`);
+        const {collection, relocateCollection} = this.props;
+        return relocateCollection(collection.location, newLocation)
+            .then(() => {
+                const {history, inCollectionsBrowser, match: {params: {path}}} = this.props;
+                if (inCollectionsBrowser) {
+                    this.close();
+                    return;
+                }
+                // If the collection location changes, the URI for the current page should change as well
+                history.push(`${getCollectionAbsolutePath(newLocation)}/${path || ''}`);
+            });
     };
 
     handleUpdateCollection = (properties: CollectionProperties) => {
@@ -211,16 +216,6 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         fullWidth
                         required
                     />
-                    <TextField
-                        margin="dense"
-                        id="connectionString"
-                        label="Connection string"
-                        helperText="Provider-specific connection string, keep blank for managed collections"
-                        value={this.state.properties.connectionString}
-                        name="connectionString"
-                        onChange={(event) => this.handleInputChange('connectionString', event.target.value)}
-                        fullWidth
-                    />
 
                 </DialogContent>
                 <DialogActions>
@@ -234,7 +229,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
 
 const ContextualCollectionEditor = (props) => {
     const history = useHistory();
-    const {addCollection, updateCollection} = useContext(CollectionsContext);
+    const {addCollection, updateCollection, relocateCollection} = useContext(CollectionsContext);
 
     return (
         <CollectionEditor
@@ -242,6 +237,7 @@ const ContextualCollectionEditor = (props) => {
             history={history}
             addCollection={addCollection}
             updateCollection={updateCollection}
+            relocateCollection={relocateCollection}
         />
     );
 };
