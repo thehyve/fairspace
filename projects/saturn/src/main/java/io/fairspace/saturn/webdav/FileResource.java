@@ -141,7 +141,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
             ModelUtils.copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
             newVer.addProperty(FS.modifiedBy, DavFactory.currentUserResource())
-                    .addLiteral(FS.dateModified, DavFactory.timestampLiteral());
+                    .addLiteral(FS.dateModified, WebDAVServlet.timestampLiteral());
 
             versions = versions.cons(newVer);
             var current = subject.getRequiredProperty(FS.currentVersion).getInt() + 1;

@@ -71,7 +71,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         var path = joinPaths(subject.getRequiredProperty(FS.filePath).getString(), newName);
         var subj = factory.pathToSubject(path);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
-        var t = DavFactory.timestampLiteral();
+        var t = WebDAVServlet.timestampLiteral();
 
         subj
                 .addProperty(FS.filePath, path)

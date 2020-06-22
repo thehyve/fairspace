@@ -25,7 +25,7 @@ import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
 import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
-import static io.fairspace.saturn.webdav.DavFactory.timestampLiteral;
+import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
