@@ -216,7 +216,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     @Override
     public boolean isCompatible(Request.Method m) {
         if (m.isWrite) {
-            return access.canWrite() && (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH);
+            return access.canWrite() && (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH || m == Request.Method.DELETE);
         }
 
         return true;
