@@ -27,7 +27,7 @@ public class App {
 
         var server = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
-                .add(API_PREFIX + "/rdf/", ds, false)
+                .add(API_PREFIX + "/rdf/", svc.getSearchableDatasetGraph(), false)
                 .addFilter("/*", new UserIdentityFilter(svc))
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addServlet(API_PREFIX + "/search/*", new ProxyServlet() {
