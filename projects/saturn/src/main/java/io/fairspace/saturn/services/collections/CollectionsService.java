@@ -85,11 +85,7 @@ public class CollectionsService {
     }
 
     public Collection get(String iri) {
-        var c = transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Collection.class, createURI(iri), showDeletedFiles())));
-        if (c != null) {
-            c.setLocation(decodePath(c.getIri().getLocalName()));
-        }
-        return c;
+        return transactions.calculateRead(ds -> addPermissionsToObject(new DAO(ds).read(Collection.class, createURI(iri), showDeletedFiles())));
     }
 
     public Collection getByLocation(String location) {
@@ -137,7 +133,6 @@ public class CollectionsService {
                         c.setAccess(userPermissions.get(c.getIri()));
                         return c.canRead();
                     })
-                    .peek(c -> c.setLocation(decodePath(c.getIri().getLocalName())))
                     .sorted(comparing(Collection::getName))
                     .collect(toList());
         });

@@ -11,6 +11,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
 
 import static io.fairspace.saturn.vocabulary.FS.*;
+import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
@@ -34,5 +35,13 @@ public class Collection extends LifecycleAwarePersistentEntity implements Access
 
     public String getConnectionString() {
         return connectionString != null ? connectionString : "";
+    }
+
+    public String getLocation() {
+        if (location == null && getIri() != null) {
+            location = decodePath(getIri().getLocalName());
+        }
+
+        return location;
     }
 }
