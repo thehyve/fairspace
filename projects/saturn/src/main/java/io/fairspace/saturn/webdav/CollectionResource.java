@@ -66,7 +66,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     @Override
     public Object getProperty(QName name) {
         if (name.equals(OWNED_BY_PROPERTY)) {
-            return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI);
+            return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
         }
         return super.getProperty(name);
     }
