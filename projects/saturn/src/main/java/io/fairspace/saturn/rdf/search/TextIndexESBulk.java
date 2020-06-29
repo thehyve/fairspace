@@ -1,16 +1,18 @@
 package io.fairspace.saturn.rdf.search;
 
-import org.apache.jena.query.text.Entity;
-import org.apache.jena.query.text.TextIndex;
-import org.apache.jena.query.text.TextIndexConfig;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.text.*;
 import org.apache.jena.query.text.es.TextIndexES;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 
 import static com.google.common.collect.Iterables.partition;
 import static java.lang.Thread.currentThread;
+import static org.apache.jena.query.text.TextQueryFuncs.stringToNode;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
@@ -60,6 +63,55 @@ public class TextIndexESBulk extends TextIndexES {
         super(config, client, indexName);
         this.client = client;
         this.indexName = indexName;
+    }
+
+    @Override
+    public List<TextHit> query(Node property, String qs, String graphURI, String lang, int limit) {
+        if ( limit < 0 )
+            limit = MAX_RESULTS;
+
+        if(property != null) {
+            qs = parse(property.getLocalName(), qs, lang);
+        } else {
+            qs = parse(null, qs, lang);
+        }
+
+        LOGGER.debug("Querying ElasticSearch for QueryString: " + qs);
+        var response = client.prepareSearch(indexName)
+                .setTypes(getDocDef().getEntityField())
+                .setQuery(QueryBuilders.queryStringQuery(qs))
+                // Not fetching the source because we are currently not interested
+                // in the actual values but only Id of the document. This will also speed up search
+                .setFetchSource(false)
+                .setFrom(0)
+                .setSize(limit)
+                .get();
+
+        var results = new ArrayList<TextHit>() ;
+        for (var hit : response.getHits()) {
+            results.add(new TextHit(stringToNode(hit.getId()), hit.getScore(), null));
+        }
+        return results;
+    }
+
+    private String parse(String fieldName, String qs, String lang) {
+        if (fieldName != null && !fieldName.isEmpty()) {
+            if (lang != null && !lang.equals("none")) {
+                if (!"*".equals(lang)) {
+                    fieldName = fieldName + "_" + lang.replaceAll("-", "_");
+                    qs = fieldName + ":" + qs;
+                } else {
+                    fieldName = fieldName + "*";
+                    qs = fieldName + ":" + qs;
+                }
+
+            } else {
+                //Lang is null, but field name is not null
+                qs = fieldName + ":" + qs;
+
+            }
+        }
+        return qs;
     }
 
     @Override
