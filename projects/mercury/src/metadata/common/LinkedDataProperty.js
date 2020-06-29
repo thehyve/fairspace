@@ -49,11 +49,10 @@ const LinkedDataProperty = (
     // or if the property contains settings that disallow editing existing values
     const disableEditing = !formEditable || !property.isEditable || disallowEditingOfExistingValues;
 
-    const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
+    const editInputComponent = (disableEditing || property.isRelationShape) ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
     const addInputComponent = valueComponentFactory.addComponent(property);
 
     const labelTooltip = <><Iri iri={path} /><div style={{marginTop: 4}}>{description}</div></>;
-
     return (
         <FormControl
             required={formEditable && minValuesCount > 0}
