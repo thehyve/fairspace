@@ -28,6 +28,7 @@ data:
           hostToPortMapping:
             {{ .Values.external.elasticsearch.transport.host }}: {{ .Values.external.elasticsearch.transport.port }}
           clusterName: "elasticsearch"
+          indexName: "fairspace"
           shards: 1
           replicas: 1
     auth:

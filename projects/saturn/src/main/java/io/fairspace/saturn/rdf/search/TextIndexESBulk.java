@@ -99,17 +99,12 @@ public class TextIndexESBulk extends TextIndexES {
             if (lang != null && !lang.equals("none")) {
                 if (!"*".equals(lang)) {
                     fieldName = fieldName + "_" + lang.replaceAll("-", "_");
-                    qs = fieldName + ":" + qs;
                 } else {
                     fieldName = fieldName + "*";
-                    qs = fieldName + ":" + qs;
                 }
-
-            } else {
-                //Lang is null, but field name is not null
-                qs = fieldName + ":" + qs;
-
             }
+
+            qs = fieldName + ":" + qs;
         }
         return qs;
     }

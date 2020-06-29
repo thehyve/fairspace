@@ -62,13 +62,13 @@ public class TextIndexESBulkTest {
         });
 
         index = new TextIndexESBulk(config, client, "index");
-        dsg = new DatasetGraphText(DatasetGraphFactory.createTxnMem(), index, new SingleTripleTextDocProducer(index, false));
+        dsg = new DatasetGraphText(DatasetGraphFactory.createTxnMem(), index, new SingleTripleTextDocProducer(index));
     }
 
     @Test
-    public void noInteractionsWithESBeforeCommit() throws InterruptedException, ExecutionException {
+    public void noInteractionsWithESBeforeCommit() {
         update();
-        verifyZeroInteractions(client, actionFuture);
+        verifyNoInteractions(client, actionFuture);
     }
 
     @Test

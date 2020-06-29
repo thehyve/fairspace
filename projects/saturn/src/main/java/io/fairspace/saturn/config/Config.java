@@ -66,6 +66,7 @@ public class Config {
             public ESSettings settings = new ESSettings.Builder()
                     .clusterName("fairspace")
                     .hostAndPort("127.0.0.1", 9300)
+                    .indexName("fairspace")
                     .build();
             public Map<String, String> advancedSettings = new HashMap<>();
         }

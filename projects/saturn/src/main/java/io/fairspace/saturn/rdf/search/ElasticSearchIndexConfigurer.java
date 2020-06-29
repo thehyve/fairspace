@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.text.TextIndexException;
 import org.apache.jena.query.text.es.ESSettings;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 
@@ -26,11 +24,11 @@ public class ElasticSearchIndexConfigurer {
      * Configures the specified index with a specific analyzer for filePaths
      */
     public static void configure(Client client, ESSettings esSettings, boolean recreateIndex) {
-        String indexName = esSettings.getIndexName();
-        IndicesAdminClient indicesAdminClient = client.admin().indices();
+        var indexName = esSettings.getIndexName();
+        var indicesAdminClient = client.admin().indices();
 
         try {
-            IndicesExistsResponse exists = indicesAdminClient.exists(new IndicesExistsRequest(indexName)).get();
+            var exists = indicesAdminClient.exists(new IndicesExistsRequest(indexName)).get();
 
             if (recreateIndex && exists.isExists()) {
                 log.info("Deleting an existing index.");
