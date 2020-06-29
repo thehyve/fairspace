@@ -1,4 +1,4 @@
-import _, {mapValues} from 'lodash';
+import _ from 'lodash';
 
 import * as consts from "../../constants";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
@@ -264,39 +264,3 @@ export const canDelete = (property, entry) => {
     const isSystemProperty = property.systemProperties && property.systemProperties.includes(entry.id);
     return property.isEditable && !isSystemProperty;
 };
-
-/**
- * Simplify the keys of the given object by converting the URIs into its local paths
- * The output of this method is comparable to the results provided by elasticsearch
- *
- * @example {'http://namespace#label': [{'@value': 'abc'}]} -> {label: [{'@value': 'abc'}]}
- * @param jsonLd
- * @returns {{}}
- */
-export const simplifyUriPredicates = jsonLd => (
-    jsonLd
-        ? Object.assign(
-            {},
-            ...Object.keys(jsonLd).map(key => ({[getLocalPart(key)]: jsonLd[key]}))
-        ) : {});
-
-/**
- * Normalize an internal metadata resource by converting the values or iris into a single object
- *
- * The output of this method is comparable to the results provided by elasticsearch
- *
- * @example {'http://namespace#label': [{value: 'abc'}]} -> {http://namespace#label: ['abc']}
- * @param jsonLd
- * @returns {{}}
- */
-export const normalizeMetadataResource = jsonLd => mapValues(
-    jsonLd,
-    values => (
-        Array.isArray(values)
-            ? values.map(v => {
-                if (Object.prototype.hasOwnProperty.call(v, 'value')) return v.value;
-                return v.id || v;
-            })
-            : values
-    )
-);

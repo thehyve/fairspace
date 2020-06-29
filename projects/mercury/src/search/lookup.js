@@ -18,4 +18,4 @@ WHERE {
     {headers: SPARQL_SELECT_HEADERS})
     .catch(handleHttpError("Error while performing search"))
     .then(extractSparqlSelectResults)
-    .then(results => results.map(({id, label}) => ({id, label, otherEntry: {label: [label]}})));
+    .then(results => results.map(({id, label}) => ({id, label})));

@@ -7,7 +7,7 @@ import LinkedDataValuesTable from "./LinkedDataValuesTable";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
 
-const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => (entry.otherEntry && Array.isArray(entry.otherEntry.label) && entry.otherEntry.label[0]) || entry['@id']};
+const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry.label || entry['@id']};
 
 export const LinkedDataRelationTable = (
     {property, values, onDelete, onAdd, canAdd, addComponent, checkValueAddedNotSubmitted, editorPath, history}

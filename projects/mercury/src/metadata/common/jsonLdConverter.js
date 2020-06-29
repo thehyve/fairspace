@@ -1,7 +1,7 @@
 import * as constants from "../../constants";
-import {getFirstPredicateId, normalizeJsonLdResource} from "./jsonLdUtils";
+import {getFirstPredicateId} from "./jsonLdUtils";
 import {determineShapeForProperty, isRdfList} from "./vocabularyUtils";
-import {simplifyUriPredicates} from "./metadataUtils";
+import {getLabel} from "./metadataUtils";
 import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 /**
@@ -13,7 +13,7 @@ import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../commo
 const generateValueEntry = (entry, allMetadata) => ({
     id: entry['@id'],
     value: entry['@value'],
-    otherEntry: entry['@id'] ? simplifyUriPredicates(normalizeJsonLdResource(allMetadata.find(element => element['@id'] === entry['@id']))) : {}
+    label: entry['@id'] && getLabel(allMetadata.find(element => element['@id'] === entry['@id']))
 });
 
 /**
@@ -58,7 +58,7 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
                 // sort the values
                 values = metadata[predicateUri]
                     .map(entry => generateValueEntry(entry, allMetadata))
-                    .sort(comparing(compareBy(e => e.otherEntry && e.otherEntry.label), compareBy('id'), compareBy('value')));
+                    .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
             }
 
             valuesByPredicate[predicateUri] = values;
