@@ -11,7 +11,7 @@ PREFIX text: <http://jena.apache.org/text#>
 
 SELECT ?id ?label
 WHERE { 
-    ?id text:query ('(label: ${query}*) AND (type: "${types.join(' | ')}") AND NOT (dateDeleted: *)' 20);
+    ?id text:query ('(label: ${JSON.stringify(query).slice(1, -1)}*) AND (type: "${types.join(' | ')}") AND NOT (dateDeleted: *)' 20);
     rdfs:label ?label
 }
 `,
