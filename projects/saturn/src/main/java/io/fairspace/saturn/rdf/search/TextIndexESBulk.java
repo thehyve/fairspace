@@ -10,6 +10,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.Iterables.partition;
 import static java.lang.Thread.currentThread;
@@ -47,6 +50,7 @@ public class TextIndexESBulk extends TextIndexES {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextIndexESBulk.class);
     private static final int BULK_SIZE = 1000;
+    private static final TimeValue SCROLL_KEEP_ALIVE = new TimeValue(10, TimeUnit.SECONDS);
 
     private final Client client;
     private final String indexName;
@@ -71,12 +75,16 @@ public class TextIndexESBulk extends TextIndexES {
             limit = MAX_RESULTS;
 
         if(property != null) {
-            qs = parse(property.getLocalName(), qs, lang);
+            qs = parse(getDocDef().getField(property), qs, lang);
         } else {
             qs = parse(null, qs, lang);
         }
 
         LOGGER.debug("Querying ElasticSearch for QueryString: " + qs);
+
+        var results = new ArrayList<TextHit>() ;
+        SearchHit[] hits;
+
         var response = client.prepareSearch(indexName)
                 .setTypes(getDocDef().getEntityField())
                 .setQuery(QueryBuilders.queryStringQuery(qs))
@@ -85,12 +93,23 @@ public class TextIndexESBulk extends TextIndexES {
                 .setFetchSource(false)
                 .setFrom(0)
                 .setSize(limit)
+                .setScroll(SCROLL_KEEP_ALIVE)
                 .get();
 
-        var results = new ArrayList<TextHit>() ;
-        for (var hit : response.getHits()) {
-            results.add(new TextHit(stringToNode(hit.getId()), hit.getScore(), null));
+        scroll: while ((hits = response.getHits().getHits()).length > 0) {
+            for (var hit : hits) {
+                var node = stringToNode(hit.getId());
+                results.add(new TextHit(node, hit.getScore(), null));
+                if (results.size() == limit) {
+                    break scroll;
+                }
+            }
+            response = client.prepareSearchScroll(response.getScrollId())
+                    .setScroll(SCROLL_KEEP_ALIVE)
+                    .execute()
+                    .actionGet();
         }
+
         return results;
     }
 
