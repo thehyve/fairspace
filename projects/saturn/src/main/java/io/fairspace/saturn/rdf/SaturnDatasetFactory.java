@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf;
 
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.search.SearchableDatasetGraph;
+import io.fairspace.saturn.rdf.search.IndexedDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
@@ -38,7 +38,7 @@ public class SaturnDatasetFactory {
 
         if (config.elasticSearch.enabled) {
             try {
-                dsg = new SearchableDatasetGraph(dsg, config.elasticSearch.settings, config.elasticSearch.advancedSettings, restoreNeeded);
+                dsg = new IndexedDatasetGraph(dsg, config.elasticSearch.settings, config.elasticSearch.advancedSettings, restoreNeeded);
             } catch (Exception e) {
                 log.error("Error connecting to ElasticSearch", e);
                 if (config.elasticSearch.required) {
