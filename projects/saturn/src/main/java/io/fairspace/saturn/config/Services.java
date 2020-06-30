@@ -3,6 +3,7 @@ package io.fairspace.saturn.config;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.search.SearchableDatasetGraph;
 import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
@@ -48,6 +49,7 @@ public class Services {
     private final BlobStore blobStore;
     private final ResourceFactory davFactory;
     private final HttpServlet davServlet;
+    private final SearchableDatasetGraph searchableDatasetGraph;
 
 
     public Services(@NonNull Config config, @NonNull Dataset dataset) {
@@ -94,5 +96,7 @@ public class Services {
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
         collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, davFactory, permissionsService);
+
+        searchableDatasetGraph = new SearchableDatasetGraph(dataset.asDatasetGraph(), permissionsService);
     }
 }
