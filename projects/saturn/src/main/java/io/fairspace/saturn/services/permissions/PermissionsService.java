@@ -262,4 +262,13 @@ public class PermissionsService {
         nodes.forEach(n -> result.put(getAuthority(n), n));
         return result;
     }
+
+    public List<Node> getVisibleCollections() {
+        return transactions.calculateRead(ds -> ds.getDefaultModel()
+                .listSubjectsWithProperty(RDF.type, FS.Collection)
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .mapWith(Resource::asNode)
+                .filterDrop(n -> getPermission(n) == Access.None)
+                .toList());
+    }
 }

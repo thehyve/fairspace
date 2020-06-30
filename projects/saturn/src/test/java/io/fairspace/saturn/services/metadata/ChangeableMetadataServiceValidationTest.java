@@ -24,7 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.http.HttpServletRequest;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -77,7 +77,7 @@ public class ChangeableMetadataServiceValidationTest {
         txn = new SimpleTransactions(ds);
         api = new ChangeableMetadataService(txn, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
 
-        currentRequest.set(request);
+        setCurrentRequest(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(createURI("http://ex.com/user"));
         when(user.getName()).thenReturn("name");

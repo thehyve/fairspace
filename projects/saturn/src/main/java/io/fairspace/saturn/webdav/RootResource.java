@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
-import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
+import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
 

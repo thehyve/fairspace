@@ -24,7 +24,7 @@ import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
 import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.webdav.DavFactory.*;
+import static io.fairspace.saturn.webdav.DavFactory.childResource;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;

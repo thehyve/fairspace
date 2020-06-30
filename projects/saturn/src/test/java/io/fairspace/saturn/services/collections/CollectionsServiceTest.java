@@ -23,7 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -51,7 +51,7 @@ public class CollectionsServiceTest {
 
     @Before
     public void before() throws NotAuthorizedException, BadRequestException {
-        currentRequest.set(request);
+        setCurrentRequest(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(userIri);
         when(user.getName()).thenReturn("name");

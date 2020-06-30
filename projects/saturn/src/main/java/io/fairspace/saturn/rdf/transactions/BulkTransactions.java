@@ -13,7 +13,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static java.lang.Thread.currentThread;
 
 public class BulkTransactions extends BaseTransactions {
@@ -51,7 +52,7 @@ public class BulkTransactions extends BaseTransactions {
                 throw new JenaTransactionException("Can't promote to a write transaction");
             }
 
-            var task = new Task<>(currentRequest.get(), job);
+            var task = new Task<>(getCurrentRequest(), job);
 
             queue.offer(task);
             return task.get();
@@ -109,7 +110,7 @@ public class BulkTransactions extends BaseTransactions {
 
         boolean perform(Dataset ds) {
             try {
-                currentRequest.set(request);
+                setCurrentRequest(request);
 
                 result = job.apply(ds);
                 error = null;
@@ -119,7 +120,7 @@ public class BulkTransactions extends BaseTransactions {
                 error = e;
                 return false;
             } finally {
-                currentRequest.remove();
+                setCurrentRequest(null);
             }
         }
 

@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
@@ -63,7 +63,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         initVocabularies(ds);
 
-        currentRequest.set(request);
+        setCurrentRequest(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         when(user.getIri()).thenReturn(userIri);
 

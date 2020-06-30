@@ -12,7 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -34,7 +34,7 @@ public class TxnLogDatasetGraphTest {
         var user = new User();
         user.setId("userId");
         user.setName("fullName");
-        currentRequest.set(request);
+        setCurrentRequest(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         txn = new BulkTransactions(DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log)));
     }

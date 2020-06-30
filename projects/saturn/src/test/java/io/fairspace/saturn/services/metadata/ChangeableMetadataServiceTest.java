@@ -21,7 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.http.HttpServletRequest;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
@@ -61,7 +61,7 @@ public class ChangeableMetadataServiceTest {
         var user = new User();
         user.setIri(createURI("http://example.com#user"));
         user.setName("user");
-        currentRequest.set(request);
+        setCurrentRequest(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
         api = new ChangeableMetadataService(txn, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, 0, lifeCycleManager, new ComposedValidator());
     }

@@ -7,7 +7,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 
 public class UserIdentityFilter implements Filter {
@@ -29,13 +28,7 @@ public class UserIdentityFilter implements Filter {
             request.setAttribute(User.class.getName(), user);
         }
 
-        currentRequest.set((HttpServletRequest) request);
-
-        try {
-            chain.doFilter(request, response);
-        } finally {
-            currentRequest.remove();
-        }
+        chain.doFilter(request, response);
     }
 
     @Override

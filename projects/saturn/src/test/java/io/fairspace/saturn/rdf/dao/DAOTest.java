@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -50,7 +50,7 @@ public class DAOTest {
         basicEntity = new LifecycleAwareEntity();
         var user = new User();
         user.setIri(createURI("http://ex.com/user"));
-        currentRequest.set(request);
+        setCurrentRequest(request);
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
     }
 

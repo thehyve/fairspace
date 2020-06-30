@@ -12,4 +12,19 @@ public class SearchableDatasetGraph extends DatasetGraphFilteredView {
     public SearchableDatasetGraph(DatasetGraph dsg, PermissionsService permissions) {
         super(dsg, q -> q.isDefaultGraph() && permissions.getPermission(q.getSubject()).canRead(), Set.of(defaultGraphIRI));
     }
+
+    @Override
+    public void commit() {
+        super.commit();
+    }
+
+    @Override
+    public void abort() {
+        super.abort();
+    }
+
+    @Override
+    public void end() {
+        super.end();
+    }
 }

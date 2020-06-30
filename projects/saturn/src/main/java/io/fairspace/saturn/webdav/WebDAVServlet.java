@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
@@ -86,22 +86,22 @@ public class WebDAVServlet extends HttpServlet {
 
 
     static Integer fileVersion() {
-        return Optional.ofNullable(currentRequest.get())
+        return Optional.ofNullable(getCurrentRequest())
                 .map(r -> r.getHeader("Version"))
                 .map(Integer::parseInt)
                 .orElse(null);
     }
 
     static boolean showDeleted() {
-        return "on".equalsIgnoreCase(currentRequest.get().getHeader("Show-Deleted"));
+        return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
     }
 
     static BlobInfo getBlob() {
-        return (BlobInfo) currentRequest.get().getAttribute(BLOB_ATTRIBUTE);
+        return (BlobInfo) getCurrentRequest().getAttribute(BLOB_ATTRIBUTE);
     }
 
     static Literal timestampLiteral() {
-        var r = currentRequest.get();
+        var r = getCurrentRequest();
         var t = (Literal) r.getAttribute(TIMESTAMP_ATTRIBUTE);
         if (t == null) {
             t = toXSDDateTimeLiteral(Instant.now());

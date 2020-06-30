@@ -22,10 +22,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -60,14 +59,12 @@ public class PermissionsServiceTest {
     private Node currentUserIri = USER1;
 
 
-
-
     @Before
     public void setUp() {
         ds = createTxnMem();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
-        currentRequest.set(request);
+        setCurrentRequest(request);
 
         when(request.getAttribute(eq(User.class.getName()))).thenReturn(currentUser);
 
