@@ -63,8 +63,12 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
         subj.addProperty(RDF.type, FS.Collection)
                 .addProperty(RDFS.label, newName)
+                .addProperty(RDFS.comment, "")
                 .addProperty(FS.createdBy, currentUserResource())
-                .addProperty(FS.dateCreated, timestampLiteral());
+                .addProperty(FS.dateCreated, timestampLiteral())
+                .addProperty(FS.dateModified, timestampLiteral())
+                .addProperty(FS.modifiedBy, currentUserResource());
+
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
             var ws = subj.getModel().createResource(ownerWorkspace);
