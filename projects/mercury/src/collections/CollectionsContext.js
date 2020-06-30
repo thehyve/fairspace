@@ -3,17 +3,19 @@ import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionAPI from "./CollectionAPI";
 import useAsync from "../common/hooks/UseAsync";
 import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
+import UserContext from "../users/UserContext";
 
 const CollectionsContext = React.createContext({});
 
 export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) => {
     const [showDeleted, setShowDeleted] = useState(false);
     const {vocabulary} = useContext(VocabularyContext);
+    const {currentUser} = useContext(UserContext);
 
 
     const {data: collections = [], error, loading, refresh} = useAsync(
-        () => collectionApi.getCollections(showDeleted),
-        [showDeleted]
+        () => collectionApi.getCollections(currentUser, showDeleted),
+        [currentUser, showDeleted]
     );
 
     const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection, vocabulary).then(refresh);

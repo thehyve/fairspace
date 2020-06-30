@@ -3,6 +3,8 @@ import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import {MetadataAPI} from "../metadata/common/LinkedDataAPI";
 import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
+import PermissionAPI from "../permissions/PermissionAPI";
+import type {User} from "../users/UsersAPI";
 
 const rootUrl = "";
 
@@ -40,14 +42,24 @@ export type Collection = Resource & CollectionProperties & CollectionType & Coll
 
 
 class CollectionAPI {
-    getCollectionProperties(name: string): Promise<Collection[]> {
+    getCollectionPermissions(iri: string, userIri: string): Promise<CollectionPermissions> {
+        return PermissionAPI.getPermissions(iri).then(permissions => permissions.find(p => p.user === userIri));
+    }
+
+    getCollectionProperties(name: string): Promise<Collection> {
         return FileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
-    getCollections(showDeleted = false): Promise<Collection[]> {
-        return FileAPI.list(rootUrl, showDeleted)
-            .then(collections => Promise.all(collections.map(c => this.getCollectionProperties(c.basename))))
-            .catch(handleHttpError("Failure when retrieving a list of collections"));
+    getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
+        if (currentUser.iri) {
+            return FileAPI.list(rootUrl, showDeleted)
+                .then(collections => Promise.all(collections.map(c => (
+                    this.getCollectionProperties(c.basename)
+                        .then(properties => this.getCollectionPermissions(properties.iri, currentUser.iri)
+                            .then(permissions => ({...properties, ...permissions})))))))
+                .catch(handleHttpError("Failure when retrieving a list of collections"));
+        }
+        return Promise.resolve([]);
     }
 
     addCollection(collection: CollectionProperties, vocabulary): Promise<void> {
