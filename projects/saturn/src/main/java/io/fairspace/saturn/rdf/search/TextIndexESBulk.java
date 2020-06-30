@@ -1,28 +1,26 @@
 package io.fairspace.saturn.rdf.search;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.text.*;
-import org.apache.jena.query.text.es.TextIndexES;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.search.SearchHit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.Iterables.partition;
 import static java.lang.Thread.currentThread;
@@ -32,7 +30,8 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 /**
  * Bulk Elastic Search Implementation of {@link TextIndex}
  */
-public class TextIndexESBulk extends TextIndexES {
+public class TextIndexESBulk implements TextIndex {
+    public static final int MAX_RESULTS = 10000;
     /**
      * ES Script for adding/updating the document in the index.
      * The main reason to use scripts is because we want to modify the values of the fields that contains an array of values
@@ -50,31 +49,57 @@ public class TextIndexESBulk extends TextIndexES {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextIndexESBulk.class);
     private static final int BULK_SIZE = 1000;
-    private static final TimeValue SCROLL_KEEP_ALIVE = new TimeValue(10, TimeUnit.SECONDS);
 
+    private final EntityDefinition docDef;
     private final Client client;
     private final String indexName;
     private final List<UpdateRequest> updates = new ArrayList<>();
 
 
-    /**
-     * Constructor used mainly for performing Integration tests
-     *
-     * @param config an instance of {@link TextIndexConfig}
-     * @param client an instance of {@link TransportClient}. The client should already have been initialized with an index
-     */
     public TextIndexESBulk(TextIndexConfig config, Client client, String indexName) {
-        super(config, client, indexName);
+        this.docDef = config.getEntDef();
         this.client = client;
         this.indexName = indexName;
     }
 
     @Override
+    public Map<String, Node> get(String uri) {
+        Map<String, Node> result = new HashMap<>();
+
+        if (uri != null) {
+            var response = client.prepareGet(indexName, docDef.getEntityField(), uri).get();
+            if (response != null && !response.isSourceEmpty()) {
+                String entityField = response.getId();
+                Node entity = NodeFactory.createURI(entityField);
+                result.put(docDef.getEntityField(), entity);
+                Map<String, Object> source = response.getSource();
+                for (String field : docDef.fields()) {
+                    Object fieldResponse = source.get(field);
+
+                    if (fieldResponse instanceof List<?>) {
+                        //We are storing the values of fields as a List always.
+                        //If there are values stored in the list, then we return the first value,
+                        // else we do not include the field in the returned Map of Field -> Node Mapping
+                        List<?> responseList = (List<?>) fieldResponse;
+                        if (responseList.size() > 0) {
+                            String fieldValue = (String) responseList.get(0);
+                            Node fieldNode = NodeFactoryExtra.createLiteralNode(fieldValue, null, null);
+                            result.put(field, fieldNode);
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<TextHit> query(Node property, String qs, String graphURI, String lang, int limit) {
-        if ( limit < 0 )
+        if (limit < 0)
             limit = MAX_RESULTS;
 
-        if(property != null) {
+        if (property != null) {
             qs = parse(getDocDef().getField(property), qs, lang);
         } else {
             qs = parse(null, qs, lang);
@@ -82,8 +107,7 @@ public class TextIndexESBulk extends TextIndexES {
 
         LOGGER.debug("Querying ElasticSearch for QueryString: " + qs);
 
-        var results = new ArrayList<TextHit>() ;
-        SearchHit[] hits;
+        var results = new ArrayList<TextHit>();
 
         var response = client.prepareSearch(indexName)
                 .setTypes(getDocDef().getEntityField())
@@ -93,24 +117,45 @@ public class TextIndexESBulk extends TextIndexES {
                 .setFetchSource(false)
                 .setFrom(0)
                 .setSize(limit)
-                .setScroll(SCROLL_KEEP_ALIVE)
                 .get();
 
-        scroll: while ((hits = response.getHits().getHits()).length > 0) {
-            for (var hit : hits) {
-                var node = stringToNode(hit.getId());
-                results.add(new TextHit(node, hit.getScore(), null));
-                if (results.size() == limit) {
-                    break scroll;
-                }
-            }
-            response = client.prepareSearchScroll(response.getScrollId())
-                    .setScroll(SCROLL_KEEP_ALIVE)
-                    .execute()
-                    .actionGet();
+        for (var hit : response.getHits()) {
+            results.add(new TextHit(stringToNode(hit.getId()), hit.getScore(), null));
         }
 
         return results;
+    }
+
+    @Override
+    public List<TextHit> query(Node property, String qs, String graphURI, String lang) {
+        return query(property, qs, graphURI, lang, MAX_RESULTS);
+    }
+
+    @Override
+    public List<TextHit> query(Node property, String qs, String graphURI, String lang, int limit, String highlight) {
+        return query(property, qs, graphURI, lang, limit);
+    }
+
+    @Override
+    public List<TextHit> query(List<Resource> props, String qs, String graphURI, String lang, int limit, String highlight) {
+        return query((String) null, props, qs, graphURI, lang, limit, highlight);
+    }
+
+    @Override
+    public List<TextHit> query(Node subj, List<Resource> props, String qs, String graphURI, String lang, int limit, String highlight) {
+        var subjectUri = subj == null || Var.isVar(subj) || !subj.isURI() ? null : subj.getURI();
+        return query(subjectUri, props, qs, graphURI, lang, limit, highlight);
+    }
+
+    @Override
+    public List<TextHit> query(String uri, List<Resource> props, String qs, String graphURI, String lang, int limit, String highlight) {
+        var property = props == null || props.isEmpty() ? null : props.get(0).asNode();
+        return query(property, qs, graphURI, lang, limit);
+    }
+
+    @Override
+    public EntityDefinition getDocDef() {
+        return docDef;
     }
 
     private String parse(String fieldName, String qs, String lang) {
@@ -160,6 +205,10 @@ public class TextIndexESBulk extends TextIndexES {
         } finally {
             updates.clear();
         }
+    }
+
+    @Override
+    public void commit() {
     }
 
     @Override
