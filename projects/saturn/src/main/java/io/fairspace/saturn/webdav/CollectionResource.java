@@ -53,6 +53,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
         subject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
+        var newSubject = childResource((Resource) rDest, name);
+        newSubject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
     }
 
     @Override
