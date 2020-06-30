@@ -12,13 +12,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
+import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
@@ -54,7 +53,7 @@ public class ChangeableMetadataServiceTest {
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
     @Mock
-    private HttpServletRequest request;
+    private Request request;
 
     @Before
     public void setUp() {

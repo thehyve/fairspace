@@ -16,7 +16,7 @@ import org.apache.jena.vocabulary.RDFS;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
@@ -74,7 +74,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
         if (name.equals(OWNED_BY_PROPERTY)) {
-            if (subject.hasProperty(FS.ownedBy) && !getCurrentUser().isAdmin()) {
+            if (subject.hasProperty(FS.ownedBy) && !isAdmin()) {
                 throw new NotAuthorizedException();
             }
 

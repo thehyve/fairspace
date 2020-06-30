@@ -20,7 +20,7 @@ import org.apache.jena.vocabulary.RDFS;
 import javax.xml.namespace.QName;
 import java.util.Date;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
 import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
@@ -67,7 +67,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return (method.isWrite ? access.canWrite() : access.canRead()) || getCurrentUser().isAdmin();
+        return (method.isWrite ? access.canWrite() : access.canRead()) || isAdmin();
     }
 
     @Override

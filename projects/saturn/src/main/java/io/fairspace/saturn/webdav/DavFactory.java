@@ -12,7 +12,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUserURI;
 import static io.fairspace.saturn.webdav.PathUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
@@ -83,6 +83,6 @@ public class DavFactory implements ResourceFactory {
     }
 
     static org.apache.jena.rdf.model.Resource currentUserResource() {
-        return org.apache.jena.rdf.model.ResourceFactory.createResource(getCurrentUser().getIri().getURI());
+        return org.apache.jena.rdf.model.ResourceFactory.createResource(getCurrentUserURI().getURI());
     }
 }

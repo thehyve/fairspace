@@ -17,7 +17,8 @@ import org.apache.jena.vocabulary.RDF;
 import java.util.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUserURI;
+import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
@@ -37,7 +38,7 @@ public class PermissionsService {
     private final String baseCollectionsIri;
 
     public void createResource(Node resource) {
-        createResource(resource, getCurrentUser().getIri());
+        createResource(resource, getCurrentUserURI());
     }
 
     public void createResource(Node resource, Node owner) {
@@ -52,13 +53,13 @@ public class PermissionsService {
 
     public void createResources(Collection<Resource> resources) {
         var resourcePermissions = createDefaultModel();
-        var user = resourcePermissions.asRDFNode(getCurrentUser().getIri());
+        var user = resourcePermissions.asRDFNode( getCurrentUserURI());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         transactions.executeWrite(dataset -> dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions));
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = getCurrentUser().getIri();
+        var managingUser =  getCurrentUserURI();
 
         var success = transactions.calculateWrite(dataset -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -82,7 +83,7 @@ public class PermissionsService {
 
         if (success) {
             audit("PERMISSION_UPDATED",
-                    "manager", getCurrentUser().getName(),
+                    "manager", getCurrentUserURI(),
                     "target-user", user.getURI(),
                     "resource", resource.getURI(),
                     "access", access.toString());
@@ -93,8 +94,8 @@ public class PermissionsService {
     }
 
     public void ensureAdmin() {
-        if(!getCurrentUser().isAdmin()) {
-            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUser().getIri()));
+        if(!isAdmin()) {
+            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUserURI()));
         }
     }
 
@@ -103,7 +104,7 @@ public class PermissionsService {
             getPermissions(nodes).forEach((node, access) -> {
                 if (access.compareTo(requestedAccess) < 0) {
                     throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                            getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
+                            getCurrentUserURI(), requestedAccess.name().toLowerCase()), node);
                 }
             });
         }
@@ -113,7 +114,7 @@ public class PermissionsService {
         if (getPermission(resource).compareTo(access) < 0) {
             throw new MetadataAccessDeniedException(
                     format("User %s has no %s access to resource %s",
-                            getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
+                            getCurrentUserURI(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -176,10 +177,10 @@ public class PermissionsService {
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         return transactions.calculateRead(dataset -> {
             var result = new HashMap<Node, Access>();
-            var userObject = getCurrentUser();
+            var user = getCurrentUserURI();
 
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-            var userResource = g.wrapAsResource(userObject.getIri());
+            var userResource = g.wrapAsResource(user);
             authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
 
             return result;
@@ -192,7 +193,7 @@ public class PermissionsService {
                     && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
                 return Access.Read;
             }
-            if (getCurrentUser().isAdmin()) {
+            if (isAdmin()) {
                 return Access.Manage;
             }
             if (isCollection(r.asNode()) && isUser(user.asNode())) {

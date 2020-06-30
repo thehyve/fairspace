@@ -15,13 +15,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
@@ -69,7 +68,7 @@ public class ChangeableMetadataServiceValidationTest {
     private Transactions txn;
     private ChangeableMetadataService api;
     @Mock
-    private HttpServletRequest request;
+    private Request request;
 
     @Before
     public void setUp() {

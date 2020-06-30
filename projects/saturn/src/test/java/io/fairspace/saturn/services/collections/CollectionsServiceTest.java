@@ -14,13 +14,13 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.FolderResource;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
+import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
@@ -44,7 +44,7 @@ public class CollectionsServiceTest {
     @Mock
     private User user;
     @Mock
-    private HttpServletRequest request;
+    private Request request;
     @Mock
     private PermissionsService permissions;
     private CollectionsService collections;

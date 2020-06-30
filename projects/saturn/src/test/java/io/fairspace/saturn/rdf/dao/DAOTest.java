@@ -6,13 +6,13 @@ import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDF;
+import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +39,7 @@ public class DAOTest {
     private EntityWithInheritedProperties entityWithInheritedProperties;
     private LifecycleAwareEntity basicEntity;
     @Mock
-    private HttpServletRequest request;
+    private Request request;
 
     @Before
     public void before() {

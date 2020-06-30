@@ -3,13 +3,13 @@ package io.fairspace.saturn.rdf.transactions;
 import io.fairspace.saturn.services.users.User;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
@@ -27,7 +27,7 @@ public class TxnLogDatasetGraphTest {
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
     @Mock
-    private HttpServletRequest request;
+    private Request request;
 
     @Before
     public void before() {

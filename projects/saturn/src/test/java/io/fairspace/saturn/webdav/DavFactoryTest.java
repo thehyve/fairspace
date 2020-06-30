@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +39,7 @@ public class DavFactoryTest {
     @Mock
     private PermissionsService permissions;
     @Mock
-    HttpServletRequest request;
+    org.eclipse.jetty.server.Request request;
     @Mock
     BlobStore store;
     @Mock

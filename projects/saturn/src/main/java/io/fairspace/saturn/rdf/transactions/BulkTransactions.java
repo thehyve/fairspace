@@ -5,8 +5,8 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.system.Txn;
+import org.eclipse.jetty.server.Request;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -98,12 +98,12 @@ public class BulkTransactions extends BaseTransactions {
 
     private static class Task<R, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
-        private final HttpServletRequest request;
+        private final Request request;
         private final ThrowingFunction<? super Dataset, R, E> job;
         private R result;
         private Throwable error;
 
-        Task(HttpServletRequest request, ThrowingFunction<? super Dataset, R, E> job) {
+        Task(Request request, ThrowingFunction<? super Dataset, R, E> job) {
             this.request = request;
             this.job = job;
         }

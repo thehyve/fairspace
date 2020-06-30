@@ -1,7 +1,6 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.auth.SaturnSecurityHandler;
-import io.fairspace.saturn.auth.UserIdentityFilter;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,6 @@ public class App {
         var server = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getSearchableDatasetGraph(), false)
-                .addFilter("/*", new UserIdentityFilter(svc))
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addServlet(API_PREFIX + "/search/*", new ProxyServlet() {
                     @Override
