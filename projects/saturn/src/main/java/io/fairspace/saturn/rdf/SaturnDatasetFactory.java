@@ -29,20 +29,20 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config config) {
-        var restoreNeeded = isRestoreNeeded(config.jena.datasetPath);
+    public static Dataset connect(Config.Jena config) {
+        var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(config.jena.datasetPath.getAbsolutePath()), config.jena.storeParams).getDatasetGraph();
+        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams).getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(config.jena.transactionLogPath, new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
-        if (config.jena.elasticSearch.enabled) {
+        if (config.elasticSearch.enabled) {
             try {
-                dsg = new IndexedDatasetGraph(dsg, config.jena.elasticSearch.settings, config.jena.elasticSearch.advancedSettings, new IndexDispatcher(config.publicUrl + "/api/v1/webdav/"), restoreNeeded);
+                dsg = new IndexedDatasetGraph(dsg, config.elasticSearch.settings, config.elasticSearch.advancedSettings, new IndexDispatcher(dsg.getContext()), restoreNeeded);
             } catch (Exception e) {
                 log.error("Error connecting to ElasticSearch", e);
-                if (config.jena.elasticSearch.required) {
+                if (config.elasticSearch.required) {
                     throw e; // Terminates Saturn
                 }
             }

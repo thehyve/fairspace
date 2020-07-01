@@ -15,6 +15,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
@@ -33,6 +34,8 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 @AllArgsConstructor
 @Slf4j
 public class PermissionsService {
+    public static final Symbol PERMISSIONS_SERVICE = Symbol.create("permissions_service");
+
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
     private static final String USER_PERMISSIONS_CACHE_ATTRIBUTE = "USER_PERMISSIONS_CACHE";
     private static final int USER_PERMISSIONS_CACHE_SIZE = 1000;

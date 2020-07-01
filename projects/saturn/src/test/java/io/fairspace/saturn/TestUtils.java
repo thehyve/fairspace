@@ -44,7 +44,7 @@ public class TestUtils {
         when(principal.getName()).thenReturn("userid");
         var context = mock(KeycloakSecurityContext.class, withSettings().lenient());
         when(principal.getKeycloakSecurityContext()).thenReturn(context);
-        var token = mock(AccessToken.class);
+        var token = mock(AccessToken.class, withSettings().lenient());
         when(context.getToken()).thenReturn(token);
         when(token.getSubject()).thenReturn("userid");
         when(token.getName()).thenReturn("fullname");

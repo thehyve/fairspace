@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ConfigLoader {
+    // TODO: Get rid of it. Use contexts instead
     public static final Config CONFIG = loadConfig();
 
     private static Config loadConfig() {

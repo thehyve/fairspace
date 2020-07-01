@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_SERVICE;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -61,6 +62,7 @@ public class Services {
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(transactions, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsService(transactions, permissionNotificationHandler, CONFIG.publicUrl + "/api/v1/webdav/");
+        dataset.getContext().set(PERMISSIONS_SERVICE, permissionsService);
 
         workspaceService = new WorkspaceService(transactions, permissionsService);
 

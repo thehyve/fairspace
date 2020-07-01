@@ -46,6 +46,9 @@ public class TextIndexESBulkTest {
     @Mock
     private ActionFuture<BulkResponse> actionFuture;
 
+    @Mock
+    private IndexDispatcher indexDispatcher;
+
     private TextIndex index;
 
     private volatile CountDownLatch latch;
@@ -61,7 +64,9 @@ public class TextIndexESBulkTest {
             return new BulkResponse(new BulkItemResponse[0], 1);
         });
 
-        index = new TextIndexESBulk(config, client, "index");
+        when(indexDispatcher.getIndex(any())).thenReturn("index");
+
+        index = new TextIndexESBulk(config, client, indexDispatcher);
         dsg = new DatasetGraphText(DatasetGraphFactory.createTxnMem(), index, new SingleTripleTextDocProducer(index));
     }
 

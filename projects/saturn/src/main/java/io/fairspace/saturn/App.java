@@ -20,7 +20,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
         var svc = new Services(CONFIG, ds);
 

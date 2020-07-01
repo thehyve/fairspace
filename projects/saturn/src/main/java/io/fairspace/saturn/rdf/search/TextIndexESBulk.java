@@ -1,11 +1,9 @@
 package io.fairspace.saturn.rdf.search;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.text.*;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -17,11 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 
 import static com.google.common.collect.Iterables.partition;
 import static java.lang.Thread.currentThread;
@@ -53,46 +49,20 @@ public class TextIndexESBulk implements TextIndex {
 
     private final EntityDefinition docDef;
     private final Client client;
-    private final Function<String, String> idToIndexMapper;
+    private final IndexDispatcher indexDispatcher;
     private final List<UpdateRequest> updates = new ArrayList<>();
 
 
-    public TextIndexESBulk(TextIndexConfig config, Client client, Function<String, String> idToIndexMapper) {
+    public TextIndexESBulk(TextIndexConfig config, Client client, IndexDispatcher indexDispatcher) {
         this.docDef = config.getEntDef();
         this.client = client;
-        this.idToIndexMapper = idToIndexMapper;
+        this.indexDispatcher = indexDispatcher;
     }
 
     @Override
     public Map<String, Node> get(String uri) {
-        Map<String, Node> result = new HashMap<>();
-
-        if (uri != null) {
-            var response = client.prepareGet("_all", docDef.getEntityField(), uri).get();
-            if (response != null && !response.isSourceEmpty()) {
-                String entityField = response.getId();
-                Node entity = NodeFactory.createURI(entityField);
-                result.put(docDef.getEntityField(), entity);
-                Map<String, Object> source = response.getSource();
-                for (String field : docDef.fields()) {
-                    Object fieldResponse = source.get(field);
-
-                    if (fieldResponse instanceof List<?>) {
-                        //We are storing the values of fields as a List always.
-                        //If there are values stored in the list, then we return the first value,
-                        // else we do not include the field in the returned Map of Field -> Node Mapping
-                        List<?> responseList = (List<?>) fieldResponse;
-                        if (responseList.size() > 0) {
-                            String fieldValue = (String) responseList.get(0);
-                            Node fieldNode = NodeFactoryExtra.createLiteralNode(fieldValue, null, null);
-                            result.put(field, fieldNode);
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
+        // Not used
+        throw new UnsupportedOperationException("TextIndex::get");
     }
 
     @Override
@@ -110,7 +80,7 @@ public class TextIndexESBulk implements TextIndex {
 
         var results = new ArrayList<TextHit>();
 
-        var response = client.prepareSearch("_all")
+        var response = client.prepareSearch(indexDispatcher.getAvailableIndexes())
                 .setTypes(getDocDef().getEntityField())
                 .setQuery(QueryBuilders.queryStringQuery(qs))
                 // Not fetching the source because we are currently not interested
@@ -248,7 +218,7 @@ public class TextIndexESBulk implements TextIndex {
     public void addEntity(Entity entity) {
         LOGGER.trace("Adding/Updating the entity {} in ES", entity.getId());
 
-        var indexName = idToIndexMapper.apply(entity.getId());
+        var indexName = indexDispatcher.getIndex(entity.getId());
         try {
             var entry = getDataEntry(entity);
             var builder = jsonBuilder()
@@ -275,7 +245,7 @@ public class TextIndexESBulk implements TextIndex {
      */
     @Override
     public void deleteEntity(Entity entity) {
-        updates.add(new UpdateRequest(idToIndexMapper.apply(entity.getId()), getDocDef().getEntityField(), entity.getId())
+        updates.add(new UpdateRequest(indexDispatcher.getIndex(entity.getId()), getDocDef().getEntityField(), entity.getId())
                 .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, DELETE_SCRIPT, toParams(entity))));
     }
 
