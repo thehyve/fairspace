@@ -53,7 +53,6 @@ jena:
       shards: 1
       # Number of replicas. Defaults to 1
       replicas: 1
-      indexName: fairspace
     advancedSettings:
 auth:
   authServerUrl: http://localhost:5100/auth/
