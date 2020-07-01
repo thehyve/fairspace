@@ -11,7 +11,7 @@ import org.elasticsearch.ResourceNotFoundException;
 import java.util.List;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUserURI;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
@@ -74,7 +74,7 @@ public class WorkspaceService {
             if (patch.getStatus() != null) {
                 workspace.setStatus(patch.getStatus());
                 workspace.setStatusDateModified(now());
-                workspace.setStatusModifiedBy(getCurrentUserURI());
+                workspace.setStatusModifiedBy(getUserURI());
             }
 
             workspace = new DAO(dataset).write(workspace);

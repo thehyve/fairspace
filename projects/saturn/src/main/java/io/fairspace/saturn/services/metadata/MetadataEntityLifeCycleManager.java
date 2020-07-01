@@ -17,7 +17,7 @@ import org.apache.jena.vocabulary.RDF;
 import java.time.Instant;
 import java.util.Set;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUserURI;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
@@ -77,7 +77,7 @@ class MetadataEntityLifeCycleManager {
         }
         if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
             resource.addLiteral(FS.dateDeleted, toXSDDateTimeLiteral(Instant.now()));
-            resource.addProperty(FS.deletedBy, createResource(getCurrentUserURI().getURI()));
+            resource.addProperty(FS.deletedBy, createResource(getUserURI().getURI()));
             return true;
         }
         return false;
@@ -101,7 +101,7 @@ class MetadataEntityLifeCycleManager {
      */
     private Model generateCreationInformation(Set<Resource> entities) {
         var model = createDefaultModel();
-        var user = model.asRDFNode(getCurrentUserURI());
+        var user = model.asRDFNode(getUserURI());
         var now = toXSDDateTimeLiteral(Instant.now());
 
         entities.forEach(resource -> model.add(resource, createdBy, user).add(resource, dateCreated, now));

@@ -26,25 +26,26 @@ public class RequestContext {
         currentRequest.set(request);
     }
 
-    public static UserIdentity getCurrentUser() {
+    private static Optional<UserIdentity> getUserIdentity() {
         return Optional.ofNullable(getCurrentRequest())
                 .map(Request::getAuthentication)
                 .map(x -> (Authentication.User)x)
-                .map(Authentication.User::getUserIdentity)
-                .orElse(null);
+                .map(Authentication.User::getUserIdentity);
     }
 
-    public static Node getCurrentUserURI() {
-        return Optional.ofNullable(getCurrentUser())
-                .map(UserIdentity::getUserPrincipal)
+    private static Optional<Principal> getPrincipal() {
+        return getUserIdentity().map(UserIdentity::getUserPrincipal);
+    }
+
+    public static Node getUserURI() {
+        return getPrincipal()
                 .map(Principal::getName)
                 .map(SparqlUtils::generateMetadataIri)
                 .orElse(null);
     }
 
     public static AccessToken getAccessToken() {
-        return Optional.ofNullable(getCurrentUser())
-                .map(UserIdentity::getUserPrincipal)
+        return getPrincipal()
                 .map(x -> (KeycloakPrincipal<?>)x)
                 .map(KeycloakPrincipal::getKeycloakSecurityContext)
                 .map(KeycloakSecurityContext::getToken)
@@ -52,7 +53,7 @@ public class RequestContext {
     }
 
     public static boolean isAdmin() {
-        return getCurrentUser().isUserInRole(ADMIN_ROLE, null);
+        return getUserIdentity().map(u -> u.isUserInRole(ADMIN_ROLE, null)).orElse(false);
     }
 
     public static boolean showDeletedFiles() {

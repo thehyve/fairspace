@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
@@ -25,7 +25,7 @@ public class UserApp extends BaseApp {
 
         get("/current", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(getCurrentUser());
+            return mapper.writeValueAsString(service.getUser(getUserURI()));
         });
 
         post("/current/logout", (req, res) -> {

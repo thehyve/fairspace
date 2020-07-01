@@ -42,7 +42,7 @@ public class PermissionsService {
     private final String baseCollectionsIri;
 
     public void createResource(Node resource) {
-        createResource(resource, getCurrentUserURI());
+        createResource(resource, getUserURI());
     }
 
     public void createResource(Node resource, Node owner) {
@@ -57,13 +57,13 @@ public class PermissionsService {
 
     public void createResources(Collection<Resource> resources) {
         var resourcePermissions = createDefaultModel();
-        var user = resourcePermissions.asRDFNode( getCurrentUserURI());
+        var user = resourcePermissions.asRDFNode( getUserURI());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         transactions.executeWrite(dataset -> dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions));
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser =  getCurrentUserURI();
+        var managingUser =  getUserURI();
 
         var success = transactions.calculateWrite(dataset -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -87,7 +87,7 @@ public class PermissionsService {
 
         if (success) {
             audit("PERMISSION_UPDATED",
-                    "manager", getCurrentUserURI(),
+                    "manager", getUserURI(),
                     "target-user", user.getURI(),
                     "resource", resource.getURI(),
                     "access", access.toString());
@@ -99,7 +99,7 @@ public class PermissionsService {
 
     public void ensureAdmin() {
         if(!isAdmin()) {
-            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUserURI()));
+            throw new AccessDeniedException(format("User %s has to be an admin.", getUserURI()));
         }
     }
 
@@ -108,7 +108,7 @@ public class PermissionsService {
             getPermissions(nodes).forEach((node, access) -> {
                 if (access.compareTo(requestedAccess) < 0) {
                     throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                            getCurrentUserURI(), requestedAccess.name().toLowerCase()), node);
+                            getUserURI(), requestedAccess.name().toLowerCase()), node);
                 }
             });
         }
@@ -118,7 +118,7 @@ public class PermissionsService {
         if (getPermission(resource).compareTo(access) < 0) {
             throw new MetadataAccessDeniedException(
                     format("User %s has no %s access to resource %s",
-                            getCurrentUserURI(), access.name().toLowerCase(), resource), resource);
+                            getUserURI(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -181,7 +181,7 @@ public class PermissionsService {
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         return transactions.calculateRead(dataset -> {
             var result = new HashMap<Node, Access>();
-            var user = getCurrentUserURI();
+            var user = getUserURI();
 
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             var userResource = g.wrapAsResource(user);
