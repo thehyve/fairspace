@@ -41,8 +41,8 @@ public class MetadataEntityLifeCycleManagerTest {
     private Model model;
 
     private Node graph = createURI("http://graph");
-    private final Node userIri = createURI("http://user");
-    private Resource userResource = createResource("http://user");
+    private final Node userIri = createURI("http://localhost/iri/userid");
+    private Resource userResource = createResource("http://localhost/iri/userid");
 
     private Resource resource = createResource("http://resource");
     private Property property = ResourceFactory.createProperty("http://property");

@@ -36,7 +36,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             var currentUser = getAccessToken();
             if (currentUser != user) {
                 user = currentUser;
-                transactionLog.onMetadata(user.getId(), user.getName(), currentTimeMillis());
+                transactionLog.onMetadata(user.getSubject(), user.getName(), currentTimeMillis());
             }
             switch (action) {
                 case ADD -> transactionLog.onAdd(graph, subject, predicate, object);

@@ -15,8 +15,7 @@ import static java.time.Instant.now;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TestUtils {
     public static void ensureRecentInstant(Instant instant) {
@@ -40,13 +39,14 @@ public class TestUtils {
         when(request.getAuthentication()).thenReturn(auth);
         var identity = mock(UserIdentity.class);
         when(auth.getUserIdentity()).thenReturn(identity);
-        var principal = mock(KeycloakPrincipal.class);
+        var principal = mock(KeycloakPrincipal.class, withSettings().lenient());
         when(identity.getUserPrincipal()).thenReturn(principal);
         when(principal.getName()).thenReturn("userid");
-        var context = mock(KeycloakSecurityContext.class);
+        var context = mock(KeycloakSecurityContext.class, withSettings().lenient());
         when(principal.getKeycloakSecurityContext()).thenReturn(context);
         var token = mock(AccessToken.class);
         when(context.getToken()).thenReturn(token);
         when(token.getSubject()).thenReturn("userid");
+        when(token.getName()).thenReturn("fullname");
     }
 }

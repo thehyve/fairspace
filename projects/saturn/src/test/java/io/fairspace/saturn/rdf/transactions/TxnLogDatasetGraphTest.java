@@ -39,7 +39,7 @@ public class TxnLogDatasetGraphTest {
                 .remove(statement));
 
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userId"), eq("fullName"), anyLong());
+        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onCommit();
@@ -56,7 +56,7 @@ public class TxnLogDatasetGraphTest {
         });
 
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userId"), eq("fullName"), anyLong());
+        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();
@@ -82,7 +82,7 @@ public class TxnLogDatasetGraphTest {
         } catch (Exception ignore) {
         }
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userId"), eq("fullName"), anyLong());
+        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();

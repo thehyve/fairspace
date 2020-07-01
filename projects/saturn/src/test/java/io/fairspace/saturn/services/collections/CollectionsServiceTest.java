@@ -30,7 +30,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionsServiceTest {
-    private static final Node userIri = createURI("http://ex.com/user");
     private static final Node workspaceIri = createURI("http://ex.com/ws");
 
     @Mock
@@ -70,7 +69,7 @@ public class CollectionsServiceTest {
         assertEquals(prototype.getDescription(), created.getDescription());
         assertEquals(prototype.getLocation(), created.getLocation());
         assertEquals(prototype.getConnectionString(), created.getConnectionString());
-        assertEquals(userIri.getURI(), created.getCreatedBy().getURI());
+        assertEquals("http://localhost/iri/userid", created.getCreatedBy().getURI());
         assertNotNull(created.getDateCreated());
         assertEquals(created.getDateCreated(), created.getDateModified());
         assertEquals(Access.Manage, created.getAccess());
