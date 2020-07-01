@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 import static com.google.common.collect.Iterables.partition;
 import static java.lang.Thread.currentThread;
@@ -52,14 +53,14 @@ public class TextIndexESBulk implements TextIndex {
 
     private final EntityDefinition docDef;
     private final Client client;
-    private final String indexName;
+    private final Function<String, String> idToIndexMapper;
     private final List<UpdateRequest> updates = new ArrayList<>();
 
 
-    public TextIndexESBulk(TextIndexConfig config, Client client, String indexName) {
+    public TextIndexESBulk(TextIndexConfig config, Client client, Function<String, String> idToIndexMapper) {
         this.docDef = config.getEntDef();
         this.client = client;
-        this.indexName = indexName;
+        this.idToIndexMapper = idToIndexMapper;
     }
 
     @Override
@@ -67,7 +68,7 @@ public class TextIndexESBulk implements TextIndex {
         Map<String, Node> result = new HashMap<>();
 
         if (uri != null) {
-            var response = client.prepareGet(indexName, docDef.getEntityField(), uri).get();
+            var response = client.prepareGet("_all", docDef.getEntityField(), uri).get();
             if (response != null && !response.isSourceEmpty()) {
                 String entityField = response.getId();
                 Node entity = NodeFactory.createURI(entityField);
@@ -109,7 +110,7 @@ public class TextIndexESBulk implements TextIndex {
 
         var results = new ArrayList<TextHit>();
 
-        var response = client.prepareSearch(indexName)
+        var response = client.prepareSearch("_all")
                 .setTypes(getDocDef().getEntityField())
                 .setQuery(QueryBuilders.queryStringQuery(qs))
                 // Not fetching the source because we are currently not interested
@@ -247,6 +248,7 @@ public class TextIndexESBulk implements TextIndex {
     public void addEntity(Entity entity) {
         LOGGER.trace("Adding/Updating the entity {} in ES", entity.getId());
 
+        var indexName = idToIndexMapper.apply(entity.getId());
         try {
             var entry = getDataEntry(entity);
             var builder = jsonBuilder()
@@ -273,7 +275,7 @@ public class TextIndexESBulk implements TextIndex {
      */
     @Override
     public void deleteEntity(Entity entity) {
-        updates.add(new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
+        updates.add(new UpdateRequest(idToIndexMapper.apply(entity.getId()), getDocDef().getEntityField(), entity.getId())
                 .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, DELETE_SCRIPT, toParams(entity))));
     }
 
