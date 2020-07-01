@@ -20,7 +20,7 @@ Most feature folders contain:
   - common (shared components between Vocabulary and Metadata)
     - values (the different form fields, text input, dates, dropdown etc.)
     - [LinkedDataEntityForm](./src/metadata/common/LinkedDataEntityForm.js) This component and its child components are probably the most complex areas in the frontend code. Some refactoring might be required in case there is any expected changes and in order to make the code easier to maintain.
-  - [LinkedDataContext](./src/metadata/LinkedDataContext.js) with 2 providers, [LinkedDataVocabularyProvider](src/metadata/vocabulary/LinkedDataVocabularyProvider.js) and [LinkedDataMetadataProvider](./src/metadata/LinkedDataMetadataProvider.js)
+  - [LinkedDataContext](./src/metadata/LinkedDataContext.js) with a provider [LinkedDataMetadataProvider](./src/metadata/LinkedDataMetadataProvider.js)
   - [LinkedDataWrapper](./src/metadata/LinkedDataWrapper.js)
     - 2 Wrappers to provide needed values to either metadata or vocabulary
   - [UseLinkedData](src/metadata/common/UseLinkedData.js)
