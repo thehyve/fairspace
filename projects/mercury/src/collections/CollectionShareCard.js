@@ -160,7 +160,7 @@ export const CollectionShareCard = ({classes, permissions, workspaces, collectio
                         <Button
                             style={{margin: 8}}
                             color="primary"
-                            variant="contained"
+                            variant="text"
                             aria-label="Add"
                             title="Add a new share"
                             onClick={() => {

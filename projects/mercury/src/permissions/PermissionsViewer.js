@@ -112,6 +112,7 @@ const PermissionsViewer = ({
                     variant="text"
                     title="Add a collaborator"
                     aria-label="Add"
+                    color="primary"
                     onClick={() => handleAlterPermission({})}
                     disabled={!canManage}
                 >
