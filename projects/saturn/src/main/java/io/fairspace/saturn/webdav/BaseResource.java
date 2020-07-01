@@ -129,6 +129,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .forEachRemaining(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
+
+        subject.addProperty(FS.movedTo, newSubject);
     }
 
     @Override
