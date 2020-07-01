@@ -10,8 +10,8 @@ export const handleCollectionSearchRedirect = (history, value) => {
 };
 
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({
-    [LABEL_URI]: {value: name},
-    [COMMENT_URI]: {value: description}
+    [LABEL_URI]: [{value: name}],
+    [COMMENT_URI]: [{value: description}]
 });
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({

@@ -69,6 +69,8 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .addProperty(FS.dateModified, timestampLiteral())
                 .addProperty(FS.modifiedBy, currentUserResource());
 
+        factory.permissions.createResource(subj.asNode());
+
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
             var ws = subj.getModel().createResource(ownerWorkspace);
@@ -81,8 +83,6 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             subj.addProperty(FS.ownedBy, ws);
             factory.permissions.createResource(subj.asNode(), ws.asNode());
         }
-
-        factory.permissions.createResource(subj.asNode());
 
         return new CollectionResource(factory, subj, Access.Manage);
     }
