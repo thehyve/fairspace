@@ -1,4 +1,4 @@
-package io.fairspace.saturn.search;
+package io.fairspace.saturn.rdf.search;
 
 import io.fairspace.saturn.services.permissions.PermissionsService;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -8,23 +8,8 @@ import java.util.Set;
 
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
-public class SearchableDatasetGraph extends DatasetGraphFilteredView {
-    public SearchableDatasetGraph(DatasetGraph dsg, PermissionsService permissions) {
+public class FilteredDatasetGraph extends DatasetGraphFilteredView {
+    public FilteredDatasetGraph(DatasetGraph dsg, PermissionsService permissions) {
         super(dsg, q -> q.isDefaultGraph() && permissions.getPermission(q.getSubject()).canRead(), Set.of(defaultGraphIRI));
-    }
-
-    @Override
-    public void commit() {
-        super.commit();
-    }
-
-    @Override
-    public void abort() {
-        super.abort();
-    }
-
-    @Override
-    public void end() {
-        super.end();
     }
 }

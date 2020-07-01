@@ -25,8 +25,6 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 public class UserService {
-    public static final String ADMIN_ROLE = "organisation-admin";
-
     private final LoadingCache<Boolean, List<User>> users;
     private final UsersResource usersResource;
 

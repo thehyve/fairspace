@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -7,6 +9,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -17,8 +20,7 @@ import org.apache.jena.vocabulary.RDF;
 import java.util.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUserURI;
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
+import static io.fairspace.saturn.auth.RequestContext.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
@@ -32,6 +34,8 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 @Slf4j
 public class PermissionsService {
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
+    private static final String USER_PERMISSIONS_CACHE_ATTRIBUTE = "USER_PERMISSIONS_CACHE";
+    private static final int USER_PERMISSIONS_CACHE_SIZE = 1000;
 
     private final Transactions transactions;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
@@ -187,8 +191,9 @@ public class PermissionsService {
         });
     }
 
+    @SneakyThrows
     private Access getResourceAccess(Resource r, Resource user) {
-        return transactions.calculateRead(dataset -> {
+        return transactions.calculateRead(dataset -> getUserPermissionsCache().get(r, () -> {
             if (isWorkspace(r.asNode())
                     && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
                 return Access.Read;
@@ -221,7 +226,21 @@ public class PermissionsService {
             }
 
             return Access.Write;
-        });
+        }));
+    }
+
+    // A short-living (within one transaction) small permissions cache
+    private Cache<Resource, Access> getUserPermissionsCache() {
+        var request = getCurrentRequest();
+
+        var cache = (Cache<Resource, Access>) request.getAttribute(USER_PERMISSIONS_CACHE_ATTRIBUTE);
+        if (cache == null) {
+            cache = CacheBuilder.newBuilder()
+                    .maximumSize(USER_PERMISSIONS_CACHE_SIZE)
+                    .build();
+            request.setAttribute(USER_PERMISSIONS_CACHE_ATTRIBUTE, cache);
+        }
+        return cache;
     }
 
     private boolean isUser(Node resource) {

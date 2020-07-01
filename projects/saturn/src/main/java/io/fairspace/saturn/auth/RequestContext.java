@@ -11,6 +11,8 @@ import java.security.Principal;
 import java.util.Optional;
 
 public class RequestContext {
+    public static final String ADMIN_ROLE = "organisation-admin";
+
     private static final ThreadLocal<Request> currentRequest = new ThreadLocal<>();
 
     public static Request getCurrentRequest() {
@@ -50,7 +52,7 @@ public class RequestContext {
     }
 
     public static boolean isAdmin() {
-        return getCurrentUser().isUserInRole("organisation-admin", null);
+        return getCurrentUser().isUserInRole(ADMIN_ROLE, null);
     }
 
     public static boolean showDeletedFiles() {

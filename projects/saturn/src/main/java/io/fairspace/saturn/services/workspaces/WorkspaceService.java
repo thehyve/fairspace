@@ -11,9 +11,7 @@ import org.elasticsearch.ResourceNotFoundException;
 import java.util.List;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUserURI;
-import static io.fairspace.saturn.services.users.UserService.ADMIN_ROLE;
+import static io.fairspace.saturn.auth.RequestContext.*;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.time.Instant.now;
@@ -68,8 +66,7 @@ public class WorkspaceService {
                 log.info("Workspace not found {}", patch.getIri());
                 throw new ResourceNotFoundException(patch.getIri().getURI());
             }
-            var user = getCurrentUser();
-            if (!user.isUserInRole(ADMIN_ROLE, null)) {
+            if (!isAdmin()) {
                 log.info("Not enough permissions to modify the status of a workspace {}", patch.getIri());
                 throw new AccessDeniedException("Insufficient permissions to modify status of a workspace: " + patch.getIri().getURI());
             }
