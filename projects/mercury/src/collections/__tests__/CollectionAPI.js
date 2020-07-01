@@ -1,107 +1,138 @@
-import mockAxios from 'axios';
-
 import CollectionAPI from "../CollectionAPI";
+import FileAPI from "../../file/FileAPI";
+import PermissionAPI from "../../permissions/PermissionAPI";
+import {MetadataAPI} from "../../metadata/common/LinkedDataAPI";
+import {RDFS_NS} from "../../constants";
 
-beforeEach(() => {
-    mockAxios.get.mockClear();
-    mockAxios.patch.mockClear();
+afterEach(() => {
+    jest.clearAllMocks();
 });
 
 describe('CollectionAPI', () => {
-    it('retrieves data for collections', async () => {
-        mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-            data: [{name: 'collection1'}],
-            headers: {'content-type': 'application/json'}
-        }));
+    describe('Retrieving', () => {
+        FileAPI.list = jest.fn(() => Promise.resolve(
+            [{basename: 'collection1'}, {basename: 'collection2'}, {basename: 'collection3'}]
+        ));
+        FileAPI.stat = jest.fn(() => Promise.resolve(
+            {iri: 'c_iri'}
+        ));
+        PermissionAPI.getPermissions = jest.fn(() => Promise.resolve(
+            [{user: 'user1', canManage: true}]
+        ));
 
-        const collections = await CollectionAPI.getCollections();
+        it('retrieves data for collections', async () => {
+            const result = await CollectionAPI.getCollections({iri: 'user1'});
 
-        expect(collections).toEqual([{name: 'collection1'}]);
-        expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/collections/', {headers: {Accept: 'application/json'}});
-    });
+            expect(FileAPI.list).toHaveBeenCalledTimes(1);
+            expect(FileAPI.list).toHaveBeenCalledWith('', false);
 
-    it('retrieves data for collections including deleted', async () => {
-        mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-            data: [{name: 'collection1'}],
-            headers: {'content-type': 'application/json'}
-        }));
+            expect(FileAPI.stat).toHaveBeenCalledTimes(3);
+            expect(FileAPI.stat).toHaveBeenCalledWith('collection1');
+            expect(FileAPI.stat).toHaveBeenCalledWith('collection2');
+            expect(FileAPI.stat).toHaveBeenCalledWith('collection3');
 
-        const collectionsWithDeleted = await CollectionAPI.getCollections(true);
-
-        expect(collectionsWithDeleted).toEqual([{name: 'collection1'}]);
-        expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith(
-            '/api/v1/collections/',
-            {headers: {'Accept': 'application/json', 'Show-Deleted': 'on'}}
-        );
-    });
-
-    it('makes a proper call to add a collection', async () => {
-        await CollectionAPI.addCollection({
-            name: 'name',
-            description: 'description',
-            location: 'location'
+            expect(PermissionAPI.getPermissions).toHaveBeenCalledTimes(3);
+            expect(result.map(r => r.iri)).toEqual(['c_iri', 'c_iri', 'c_iri']);
+            expect(result.map(r => r.canManage)).toEqual([true, true, true]);
         });
 
-        expect(mockAxios.put).toHaveBeenCalledTimes(1);
-        expect(mockAxios.put).toHaveBeenCalledWith(
-            '/api/v1/collections/',
-            JSON.stringify({
-                name: 'name',
-                description: 'description',
-                location: 'location'
-            }),
-            {headers: {'Content-Type': 'application/json'}}
-        );
+        it('retrieves collections including deleted', async () => {
+            await CollectionAPI.getCollections({iri: 'user1'}, true);
+            expect(FileAPI.list).toHaveBeenCalledTimes(1);
+            expect(FileAPI.list).toHaveBeenCalledWith('', true);
+        });
     });
 
-    it('makes a proper call to update a collection', async () => {
-        await CollectionAPI.updateCollection({
-            iri: 'iri',
-            name: 'name',
-            description: 'description',
-            location: 'location'
-        });
+    describe('Adding', () => {
+        FileAPI.createDirectory = jest.fn(() => Promise.resolve());
+        FileAPI.stat = jest.fn(() => Promise.resolve({iri: 'c_iri'}));
+        MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
 
-        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith(
-            '/api/v1/collections/',
-            JSON.stringify({
-                iri: 'iri',
-                name: 'name',
-                description: 'description',
-                location: 'location'
-            }),
-            {headers: {'Content-Type': 'application/json'}}
-        );
+        it('makes the proper calls to add a collection', async () => {
+            await CollectionAPI.addCollection({
+                name: 'name1',
+                description: 'description1',
+                location: 'location1'
+            }, {});
+
+            expect(FileAPI.createDirectory).toHaveBeenCalledTimes(1);
+
+            expect(FileAPI.stat).toHaveBeenCalledTimes(1);
+            expect(FileAPI.stat).toHaveBeenCalledWith('location1');
+
+            expect(MetadataAPI.updateEntity).toHaveBeenCalledTimes(1);
+            expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
+                'c_iri',
+                {
+                    [RDFS_NS + 'label']: {value: 'name1'},
+                    [RDFS_NS + 'comment']: {value: 'description1'}
+                },
+                {}
+            );
+        });
     });
 
-    it('makes a proper call to undelete a collection', async () => {
-        await CollectionAPI.undeleteCollection({
-            iri: 'id'
-        });
+    describe('Updating', () => {
+        MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
 
-        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith(
-            '/api/v1/collections/',
-            JSON.stringify({
-                iri: 'id',
-                dateDeleted: null
-            }),
-            {headers: {'Content-Type': 'application/json', "Show-Deleted": "on"}}
-        );
+        it('makes a proper call to update a collection', async () => {
+            await CollectionAPI.updateCollection({
+                name: 'name1',
+                description: 'description1',
+                iri: 'c1'
+            }, {});
+
+            expect(MetadataAPI.updateEntity).toHaveBeenCalledTimes(1);
+            expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
+                'c1',
+                {
+                    [RDFS_NS + 'label']: {value: 'name1'},
+                    [RDFS_NS + 'comment']: {value: 'description1'}
+                },
+                {}
+            );
+        });
     });
 
-    it('makes a proper call to delete a collection', async () => {
-        await CollectionAPI.deleteCollection({
-            iri: 'id'
+    describe('Undeleting', () => {
+        FileAPI.undelete = jest.fn(() => Promise.resolve());
+
+        it('makes a proper call to undelete a collection', async () => {
+            await CollectionAPI.undeleteCollection({
+                name: 'name1',
+                description: 'description1',
+                iri: 'c1'
+            }, {});
+
+            expect(FileAPI.undelete).toHaveBeenCalledTimes(1);
+            expect(FileAPI.undelete).toHaveBeenCalledWith('name1');
+        });
+    });
+
+
+    describe('Deleting', () => {
+        FileAPI.delete = jest.fn(() => Promise.resolve());
+
+        it('makes a proper call to delete a collection', async () => {
+            await CollectionAPI.deleteCollection({
+                name: 'name1',
+                description: 'description1',
+                iri: 'c1'
+            });
+
+            expect(FileAPI.delete).toHaveBeenCalledTimes(1);
+            expect(FileAPI.delete).toHaveBeenCalledWith('name1', false);
         });
 
-        expect(mockAxios.delete).toHaveBeenCalledTimes(1);
-        expect(mockAxios.delete).toHaveBeenCalledWith(
-            `/api/v1/collections/?iri=${encodeURIComponent('id')}`,
-            {headers: {'Content-Type': 'application/json'}}
-        );
+        it('makes a proper call to delete a collection permanently', async () => {
+            await CollectionAPI.deleteCollection({
+                name: 'name1',
+                description: 'description1',
+                iri: 'c1'
+            }, true);
+
+            expect(FileAPI.delete).toHaveBeenCalledTimes(1);
+            expect(FileAPI.delete).toHaveBeenCalledWith('name1', true);
+        });
     });
 });
