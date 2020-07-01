@@ -10,7 +10,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,12 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,9 +51,6 @@ public class PermissionsServiceTest {
     @Mock
     private User currentUser;
 
-    @Mock
-    private Request request;
-
     private Node currentUserIri = USER1;
 
 
@@ -64,12 +59,7 @@ public class PermissionsServiceTest {
         ds = createTxnMem();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
-        setCurrentRequest(request);
-
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(currentUser);
-
-        when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
-        when(currentUser.getName()).thenReturn("name");
+        setupRequestContext();
 
         service = new PermissionsService(new SimpleTransactions(ds), permissionChangeEventHandler, "http://example.com/collections/");
         service.createResource(RESOURCE);

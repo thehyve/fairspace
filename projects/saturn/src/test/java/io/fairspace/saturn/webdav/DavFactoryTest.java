@@ -2,7 +2,6 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
@@ -10,8 +9,6 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +19,8 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,23 +36,21 @@ public class DavFactoryTest {
     @Mock
     private PermissionsService permissions;
     @Mock
-    org.eclipse.jetty.server.Request request;
-    @Mock
     BlobStore store;
     @Mock
     InputStream input;
-    private User user = new User();
-    private final Model model = createTxnMem().getDefaultModel();
+    private org.eclipse.jetty.server.Request request;
+
     private ResourceFactory factory;
 
     @Before
     public void before() {
         factory = new DavFactory(baseUri, createTxnMem().getDefaultModel(), store, permissions);
-        setCurrentRequest(request);
-        user.setIri(createURI("http://ex.com/user"));
-        when(request.getAttribute(User.class.getName())).thenReturn(user);
-        model.wrapAsResource(user.getIri()).addProperty(RDF.type, FS.User);
+
+        setupRequestContext();
+        request = getCurrentRequest();
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 3, "md5"));
+
         when(permissions.getPermission(any())).thenReturn(Access.Manage);
     }
 

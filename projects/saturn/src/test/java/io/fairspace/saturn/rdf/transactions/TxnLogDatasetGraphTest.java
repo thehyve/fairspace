@@ -1,9 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.services.users.User;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
-import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 
-import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -26,16 +24,10 @@ public class TxnLogDatasetGraphTest {
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
-    @Mock
-    private Request request;
 
     @Before
     public void before() {
-        var user = new User();
-        user.setId("userId");
-        user.setName("fullName");
-        setCurrentRequest(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
+        setupRequestContext();
         txn = new BulkTransactions(DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log)));
     }
 

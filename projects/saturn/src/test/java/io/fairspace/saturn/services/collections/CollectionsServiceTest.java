@@ -5,7 +5,6 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.permissions.CollectionAccessDeniedException;
 import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -14,7 +13,6 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.FolderResource;
 import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
-import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Map;
 
-import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -42,19 +40,13 @@ public class CollectionsServiceTest {
     @Mock
     private FolderResource collectionResource;
     @Mock
-    private User user;
-    @Mock
-    private Request request;
-    @Mock
     private PermissionsService permissions;
     private CollectionsService collections;
 
     @Before
     public void before() throws NotAuthorizedException, BadRequestException {
-        setCurrentRequest(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
-        when(user.getIri()).thenReturn(userIri);
-        when(user.getName()).thenReturn("name");
+        setupRequestContext();
+
         var ds = createTxnMem();
         var transactions = new SimpleTransactions(ds);
         ds.getDefaultModel().add(ds.getDefaultModel().asRDFNode(workspaceIri).asResource(), RDF.type, FS.Workspace);

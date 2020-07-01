@@ -1,17 +1,12 @@
 package io.fairspace.saturn.rdf.dao;
 
-import io.fairspace.saturn.services.users.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDF;
-import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -28,18 +23,13 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class DAOTest {
     private Dataset dataset;
     private DAO dao;
     private Entity entity;
     private EntityWithInheritedProperties entityWithInheritedProperties;
     private LifecycleAwareEntity basicEntity;
-    @Mock
-    private Request request;
 
     @Before
     public void before() {
@@ -48,10 +38,7 @@ public class DAOTest {
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
-        var user = new User();
-        user.setIri(createURI("http://ex.com/user"));
-        setCurrentRequest(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
+        setupRequestContext();
     }
 
     @Test

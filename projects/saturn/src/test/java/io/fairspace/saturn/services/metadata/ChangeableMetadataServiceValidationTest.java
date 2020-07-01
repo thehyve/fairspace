@@ -5,7 +5,6 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -15,7 +14,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
-import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -33,7 +31,8 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChangeableMetadataServiceValidationTest {
@@ -42,9 +41,6 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
-
-    @Mock
-    private User user;
 
     private static final String GRAPH = "http://localhost/iri/graph";
     private static final String VOCABULARY = "http://localhost/iri/vocabulary";
@@ -67,8 +63,6 @@ public class ChangeableMetadataServiceValidationTest {
     private Dataset ds;
     private Transactions txn;
     private ChangeableMetadataService api;
-    @Mock
-    private Request request;
 
     @Before
     public void setUp() {
@@ -76,10 +70,7 @@ public class ChangeableMetadataServiceValidationTest {
         txn = new SimpleTransactions(ds);
         api = new ChangeableMetadataService(txn, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
 
-        setCurrentRequest(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
-        when(user.getIri()).thenReturn(createURI("http://ex.com/user"));
-        when(user.getName()).thenReturn("name");
+        setupRequestContext();
     }
 
     @Test
