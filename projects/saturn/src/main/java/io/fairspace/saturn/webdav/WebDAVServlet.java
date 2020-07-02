@@ -92,6 +92,12 @@ public class WebDAVServlet extends HttpServlet {
                 .orElse(null);
     }
 
+    static String owner() {
+        return Optional.ofNullable(currentRequest.get())
+                .map(r -> r.getHeader("Owner"))
+                .orElse(null);
+    }
+
     static boolean showDeleted() {
         return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
     }

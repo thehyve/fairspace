@@ -4,9 +4,11 @@ import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Request;
+import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.property.PropertySource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
@@ -18,8 +20,9 @@ import java.util.List;
 import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
-import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
+import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
+import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
 
@@ -60,8 +63,24 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
         subj.addProperty(RDF.type, FS.Collection)
                 .addProperty(RDFS.label, newName)
+                .addProperty(RDFS.comment, "")
                 .addProperty(FS.createdBy, currentUserResource())
-                .addProperty(FS.dateCreated, timestampLiteral());
+                .addProperty(FS.dateCreated, timestampLiteral())
+                .addProperty(FS.dateModified, timestampLiteral())
+                .addProperty(FS.modifiedBy, currentUserResource());
+
+        var ownerWorkspace = owner();
+        if (ownerWorkspace != null) {
+            var ws = subj.getModel().createResource(ownerWorkspace);
+            if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
+            }
+            if (!factory.permissions.getPermission(ws.asNode()).canWrite()) {
+                throw new NotAuthorizedException();
+            }
+            subj.addProperty(FS.ownedBy, ws);
+            factory.permissions.createResource(subj.asNode(), ws.asNode());
+        }
 
         factory.permissions.createResource(subj.asNode());
 

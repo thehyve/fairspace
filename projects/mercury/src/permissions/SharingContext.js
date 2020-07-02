@@ -10,7 +10,15 @@ export const SharingProvider = ({iri, children, getPermissions = PermissionAPI.g
     const {workspaces, refreshWorkspaces} = useContext(WorkspaceContext);
     const [altering, setAltering] = useState(false);
 
-    const extendWithNames = rawPermissions => rawPermissions.map(permission => ({...permission, name: workspaces.find(ws => permission.user === ws.iri).name}));
+    const extendWithNames = rawPermissions => rawPermissions.map(
+        permission => {
+            const workspaceWithPermissions = workspaces.find(ws => permission.user === ws.iri);
+            if (workspaceWithPermissions) {
+                return {...permission, name: workspaceWithPermissions.name};
+            }
+            return {...permission};
+        }
+    );
 
     const {data: permissions = [], loading, error, refresh: refreshPermissions} = useAsync(() => getPermissions(iri), [iri]);
 

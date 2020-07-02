@@ -93,5 +93,7 @@ export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
 export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
 export const WORKSPACE_URI = FAIRSPACE_NS + 'Workspace';
 export const WORKSPACE_STATUS_URI = FAIRSPACE_NS + 'status';
+export const LOCATION_URI = FAIRSPACE_NS + 'location';
+export const OWNED_BY_URI = FAIRSPACE_NS + 'ownedBy';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

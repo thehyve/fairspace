@@ -2,7 +2,6 @@ import {createClient} from "webdav";
 import {compareBy, comparing} from '../common/utils/genericUtils';
 import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 
-
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
 
@@ -68,10 +67,11 @@ class FileAPI {
     /**
      * Creates a new directory within the current collection
      * @param path      Full path within the collection
+     * @param options
      * @returns {*}
      */
-    createDirectory(path) {
-        return this.client().createDirectory(path, defaultOptions)
+    createDirectory(path, options = defaultOptions) {
+        return this.client().createDirectory(path, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
@@ -224,7 +224,6 @@ class FileAPI {
                 if (e && e.response) {
                     throw new Error(`Could not revert file or directory to version ${version}.`);
                 }
-
                 return Promise.reject(e);
             });
     }
