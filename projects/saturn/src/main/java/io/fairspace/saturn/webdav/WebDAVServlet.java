@@ -93,7 +93,7 @@ public class WebDAVServlet extends HttpServlet {
     }
 
     static String owner() {
-        return Optional.ofNullable(currentRequest.get())
+        return Optional.ofNullable(getCurrentRequest())
                 .map(r -> r.getHeader("Owner"))
                 .orElse(null);
     }
