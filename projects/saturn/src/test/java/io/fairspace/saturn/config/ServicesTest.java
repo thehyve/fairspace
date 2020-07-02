@@ -54,11 +54,6 @@ public class ServicesTest {
     }
 
     @Test
-    public void getCollectionsService() {
-        assertNotNull(svc.getCollectionsService());
-    }
-
-    @Test
     public void getMetadataService() {
         assertNotNull(svc.getMetadataService());
     }

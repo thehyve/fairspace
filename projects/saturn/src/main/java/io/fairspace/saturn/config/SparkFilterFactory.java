@@ -1,6 +1,5 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.services.collections.CollectionsApp;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataApp;
 import io.fairspace.saturn.services.metadata.ReadableMetadataApp;
@@ -19,7 +18,6 @@ public class SparkFilterFactory {
                 new ChangeableMetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
                 new ChangeableMetadataApp(apiPathPrefix + "/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
                 new ReadableMetadataApp(apiPathPrefix + "/meta-vocabulary", svc.getMetaVocabularyService()),
-                new CollectionsApp(apiPathPrefix + "/collections", svc.getCollectionsService()),
                 new PermissionsApp(apiPathPrefix + "/permissions", svc.getPermissionsService()),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),
