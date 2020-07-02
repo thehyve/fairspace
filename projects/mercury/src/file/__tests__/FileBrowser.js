@@ -19,7 +19,6 @@ const openedCollection = {
     name: "asd",
     description: "",
     location: "asd",
-    connectionString: "",
     access: "Manage",
     canRead: true,
     canWrite: true,

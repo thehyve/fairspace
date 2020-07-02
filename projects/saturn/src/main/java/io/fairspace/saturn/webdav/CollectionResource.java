@@ -18,13 +18,18 @@ import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static io.fairspace.saturn.webdav.DavFactory.childResource;
 import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
     private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
+    private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
+    private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
     private static final PropertySource.PropertyMetaData OWNED_BY_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, String.class);
-    private static final List<QName> COLLECTION_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, OWNED_BY_PROPERTY);
+    private static final PropertySource.PropertyMetaData CREATED_BY_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, String.class);
+    private static final PropertySource.PropertyMetaData COMMENT_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, String.class);
+    private static final List<QName> COLLECTION_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, OWNED_BY_PROPERTY, CREATED_BY_PROPERTY, COMMENT_PROPERTY);
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -52,7 +57,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
-        subject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
+        var newSubject = factory.pathToSubject(name);
+        newSubject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
     }
 
     @Override
@@ -66,7 +72,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     @Override
     public Object getProperty(QName name) {
         if (name.equals(OWNED_BY_PROPERTY)) {
-            return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI);
+            return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
+        }
+        if (name.equals(CREATED_BY_PROPERTY)) {
+            return subject.listProperties(FS.createdBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
+        }
+        if (name.equals(COMMENT_PROPERTY)) {
+            return subject.listProperties(RDFS.comment).nextOptional().map(Statement::getString).orElse("");
         }
         return super.getProperty(name);
     }
@@ -86,8 +98,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
                 throw new NotAuthorizedException();
             }
 
-            subject.removeAll(FS.ownedBy)
-                    .addProperty(FS.ownedBy, subject.getModel().createResource(value.toString()));
+            subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
+            factory.permissions.createResource(subject.asNode(), ws.asNode());
         }
         super.setProperty(name, value);
     }
@@ -96,6 +108,12 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
         if (name.equals(OWNED_BY_PROPERTY)) {
             return OWNED_BY_PROPERTY_META;
+        }
+        if (name.equals(CREATED_BY_PROPERTY)) {
+            return CREATED_BY_PROPERTY_META;
+        }
+        if (name.equals(COMMENT_PROPERTY)) {
+            return COMMENT_PROPERTY_META;
         }
         return super.getPropertyMetaData(name);
     }

@@ -1,15 +1,16 @@
 // @flow
-import axios from 'axios';
-import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
+import {handleHttpError} from '../common/utils/httpUtils';
+import FileAPI from "../file/FileAPI";
+import {MetadataAPI} from "../metadata/common/LinkedDataAPI";
+import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
+import PermissionAPI from "../permissions/PermissionAPI";
+import type {User} from "../users/UsersAPI";
 
-
-const collectionsUrl = "/api/v1/collections/";
-const headers = {'Content-Type': 'application/json'};
+const rootUrl = "";
 
 export type CollectionProperties = {|
     name: string;
     description: string;
-    connectionString: string;
     location: string;
     ownerWorkspace: string;
 |};
@@ -41,54 +42,60 @@ export type Collection = Resource & CollectionProperties & CollectionType & Coll
 
 
 class CollectionAPI {
-    getCollections(showDeleted = false): Promise<Collection[]> {
-        const getCollectionsHeader = {Accept: 'application/json'};
-        if (showDeleted) {
-            getCollectionsHeader['Show-Deleted'] = 'on';
+    getCollectionPermissions(iri: string, userIri: string): Promise<CollectionPermissions> {
+        return PermissionAPI.getPermissions(iri).then(permissions => permissions.find(p => p.user === userIri));
+    }
+
+    getCollectionProperties(name: string): Promise<Collection> {
+        return FileAPI.stat(name).then(mapFilePropertiesToCollection);
+    }
+
+    getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
+        if (currentUser.iri) {
+            return FileAPI.list(rootUrl, showDeleted)
+                .then(collections => Promise.all(collections.map(c => (
+                    this.getCollectionProperties(c.basename)
+                        .then(properties => this.getCollectionPermissions(properties.iri, currentUser.iri)
+                            .then(permissions => ({...properties, ...permissions})))))))
+                .catch(handleHttpError("Failure when retrieving a list of collections"));
         }
-        return axios.get(collectionsUrl, {headers: getCollectionsHeader})
-            .catch(handleHttpError("Failure when retrieving a list of collections"))
-            .then(extractJsonData);
+        return Promise.resolve([]);
     }
 
-    addCollection(collection: CollectionProperties): Promise<void> {
-        return axios.put(
-            collectionsUrl,
-            JSON.stringify(collection),
-            {headers}
-        ).catch(handleHttpError("Failure while saving a collection"));
-    }
-
-    updateCollection(collection: Collection): Promise<void> {
-        return axios.patch(
-            collectionsUrl,
-            JSON.stringify(collection),
-            {headers}
-        ).catch(handleHttpError("Failure while updating a collection"));
-    }
-
-    deleteCollection(collection: Resource, showDeleted = false): Promise<void> {
-        const deleteCollectionsHeader = {...headers};
-        if (showDeleted) {
-            deleteCollectionsHeader['Show-Deleted'] = 'on';
-        }
-        return axios.delete(
-            `${collectionsUrl}?iri=${encodeURIComponent(collection.iri)}`,
-            {headers: deleteCollectionsHeader}
-        ).catch(handleHttpError("Failure while deleting collection"));
-    }
-
-    undeleteCollection(collection: Resource): Promise<void> {
-        collection.dateDeleted = null;
-        const undeleteCollectionHeader = {
-            ...headers,
-            'Show-Deleted': 'on'
+    addCollection(collection: CollectionProperties, vocabulary): Promise<void> {
+        const options = {
+            headers: {
+                Owner: collection.ownerWorkspace
+            },
+            withCredentials: true
         };
-        return axios.patch(
-            collectionsUrl,
-            JSON.stringify(collection),
-            {headers: undeleteCollectionHeader}
-        ).catch(handleHttpError("Failure while undeleting collection"));
+        return FileAPI.createDirectory(collection.location, options)
+            .then(() => this.getCollectionProperties(collection.location))
+            .then((properties) => {
+                collection.iri = properties.iri;
+                return this.updateCollection(collection, vocabulary);
+            });
+    }
+
+    deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
+        return FileAPI.delete(collection.name, showDeleted)
+            .catch(handleHttpError("Failure while deleting collection"));
+    }
+
+    undeleteCollection(collection: CollectionProperties): Promise<void> {
+        return FileAPI.undelete(collection.name)
+            .catch(handleHttpError("Failure while undeleting collection"));
+    }
+
+    relocateCollection(oldLocation: string, newLocation: string): Promise<void> {
+        return FileAPI.move(oldLocation, newLocation)
+            .catch(handleHttpError("Failure while relocating collection"));
+    }
+
+    updateCollection(collection: Collection, vocabulary): Promise<void> {
+        const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
+        return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
+            .catch(handleHttpError("Failure while updating a collection"));
     }
 }
 
