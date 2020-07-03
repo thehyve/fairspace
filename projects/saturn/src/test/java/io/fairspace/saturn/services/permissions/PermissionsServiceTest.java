@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -10,25 +9,25 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.eclipse.jetty.server.Authentication;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,9 +36,9 @@ import static org.mockito.Mockito.when;
 public class PermissionsServiceTest {
     private static final Node RESOURCE = createURI("http://example.com/resource");
     private static final Node RESOURCE2 = createURI("http://example.com/resource2");
-    private static final Node USER1 = createURI("http://example.com/user1");
-    private static final Node USER2 = createURI("http://example.com/user2");
-    private static final Node USER3 = createURI("http://example.com/user3");
+    private static final Node USER1 = createURI("http://localhost/iri/user1");
+    private static final Node USER2 = createURI("http://localhost/iri/user2");
+    private static final Node USER3 = createURI("http://localhost/iri/user3");
     private static final Node COLLECTION_1 = createURI("http://example.com/collections/collection1");
     private static final Node COLLECTION_2 = createURI("http://example.com/collections/collection2");
     private static final Node FILE_1 = createURI("http://example.com/collections/collection1/file1");
@@ -51,31 +50,26 @@ public class PermissionsServiceTest {
     @Mock
     private PermissionChangeEventHandler permissionChangeEventHandler;
 
-    @Mock
-    private User currentUser;
-
-    @Mock
-    private HttpServletRequest request;
-
-    private Node currentUserIri = USER1;
-
-
-
 
     @Before
     public void setUp() {
         ds = createTxnMem();
         ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDFS.label, "LABEL");
 
-        currentRequest.set(request);
-
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(currentUser);
-
-        when(currentUser.getIri()).thenAnswer(invocation -> currentUserIri);
-        when(currentUser.getName()).thenReturn("name");
+        setupRequestContext();
 
         service = new PermissionsService(new SimpleTransactions(ds), permissionChangeEventHandler, "http://example.com/collections/");
         service.createResource(RESOURCE);
+    }
+
+    private void useAnotherUser() {
+        var principal = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity().getUserPrincipal();
+        when(principal.getName()).thenReturn("user2");
+    }
+
+    private void setAdminFlag(boolean admin) {
+        var id = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity();
+        when(id.isUserInRole("organisation-admin", null)).thenReturn(admin);
     }
 
     @Test
@@ -102,7 +96,7 @@ public class PermissionsServiceTest {
         assertNull(service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.Write);
 
-        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
+        verify(permissionChangeEventHandler).onPermissionChange(getUserURI(), RESOURCE, USER2, Access.Write);
 
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
@@ -200,7 +194,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToVisibleCollections() {
         setupAccessCheckForMultipleNodes();
 
-        currentUserIri = USER2;
+        useAnotherUser();
 
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
@@ -210,7 +204,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToCollections() {
         setupAccessCheckForMultipleNodes();
 
-        currentUserIri = USER2;
+        useAnotherUser();
 
         service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
     }
@@ -219,7 +213,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToFiles() {
         setupAccessCheckForMultipleNodes();
 
-        currentUserIri = USER2;
+        useAnotherUser();
 
         service.ensureAccess(Set.of(FILE_1), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2), Access.Read);
@@ -231,7 +225,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToNonRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
-        currentUserIri = USER2;
+        useAnotherUser();
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
     }
@@ -243,7 +237,7 @@ public class PermissionsServiceTest {
         assertNull(service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.Write);
 
-        verify(permissionChangeEventHandler).onPermissionChange(currentUserIri, RESOURCE, USER2, Access.Write);
+        verify(permissionChangeEventHandler).onPermissionChange(getUserURI(), RESOURCE, USER2, Access.Write);
 
         assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.None);
@@ -254,7 +248,7 @@ public class PermissionsServiceTest {
 
     @Test
     public void getPermissionsForOrganisationAdmins() {
-        when(currentUser.isAdmin()).thenReturn(true);
+        setAdminFlag(true);
 
         assertEquals(
                 Map.of(
@@ -267,13 +261,11 @@ public class PermissionsServiceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testEnsureAdmin() {
-        when(currentUser.isAdmin()).thenReturn(false);
         service.ensureAdmin();
     }
 
     @Test(expected = MetadataAccessDeniedException.class)
     public void testEnsureRemoveMetadataAccess() {
-        when(currentUser.isAdmin()).thenReturn(false);
         Resource c1 = createResource(COLLECTION_1.getURI());
         ds.getDefaultModel().add(c1, RDF.type, FS.Collection);
         service.ensureAdminAccess(c1.asNode());
@@ -281,7 +273,6 @@ public class PermissionsServiceTest {
 
     @Test(expected = MetadataAccessDeniedException.class)
     public void testEnsureRemoveWorkspaceMetadataWithNoManagePermission() {
-        when(currentUser.isAdmin()).thenReturn(false);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
         service.setPermission(w1.asNode(), USER2, Access.Write);
         service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
@@ -289,26 +280,26 @@ public class PermissionsServiceTest {
 
     @Test
     public void testEnsureRemoveWorkspaceMetadataAccess() {
-        when(currentUser.isAdmin()).thenReturn(true);
+        setAdminFlag(true);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
         ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
 
         service.setPermission(w1.asNode(), USER2, Access.Manage);
-        when(currentUser.isAdmin()).thenReturn(false);
-        currentUserIri = USER2;
 
-        try {
-            service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
-        } catch(Exception e) {
-            fail("Should not have thrown any exception");
-        }
+        useAnotherUser();
+        setAdminFlag(false);
+
+
+         service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
     }
+
+
 
     @Test
     public void testReturnedSubjectInEnsureAccessException() {
         setupAccessCheckForMultipleNodes();
 
-        currentUserIri = USER2;
+        useAnotherUser();
 
         // The exception thrown by ensureAccess should return the failing entity
         try {

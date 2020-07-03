@@ -168,8 +168,8 @@ describe('jsonLdConverter', () => {
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
-            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.otherEntry)).toEqual(
-                [{'@id': 'http://a', "label": ['AAA']}, {'@id': 'http://b', "label": ['BBB']}]
+            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.label)).toEqual(
+                ['AAA', 'BBB']
             );
         });
     });

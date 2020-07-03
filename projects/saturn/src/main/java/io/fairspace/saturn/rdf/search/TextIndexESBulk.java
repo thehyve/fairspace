@@ -1,15 +1,15 @@
 package io.fairspace.saturn.rdf.search;
 
-import org.apache.jena.query.text.Entity;
-import org.apache.jena.query.text.TextIndex;
-import org.apache.jena.query.text.TextIndexConfig;
-import org.apache.jena.query.text.es.TextIndexES;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.text.*;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.core.Var;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +21,14 @@ import java.util.concurrent.ExecutionException;
 
 import static com.google.common.collect.Iterables.partition;
 import static java.lang.Thread.currentThread;
+import static org.apache.jena.query.text.TextQueryFuncs.stringToNode;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Bulk Elastic Search Implementation of {@link TextIndex}
  */
-public class TextIndexESBulk extends TextIndexES {
+public class TextIndexESBulk implements TextIndex {
+    public static final int MAX_RESULTS = 10000;
     /**
      * ES Script for adding/updating the document in the index.
      * The main reason to use scripts is because we want to modify the values of the fields that contains an array of values
@@ -45,21 +47,101 @@ public class TextIndexESBulk extends TextIndexES {
     private static final Logger LOGGER = LoggerFactory.getLogger(TextIndexESBulk.class);
     private static final int BULK_SIZE = 1000;
 
+    private final EntityDefinition docDef;
     private final Client client;
-    private final String indexName;
+    private final IndexDispatcher indexDispatcher;
     private final List<UpdateRequest> updates = new ArrayList<>();
 
 
-    /**
-     * Constructor used mainly for performing Integration tests
-     *
-     * @param config an instance of {@link TextIndexConfig}
-     * @param client an instance of {@link TransportClient}. The client should already have been initialized with an index
-     */
-    public TextIndexESBulk(TextIndexConfig config, Client client, String indexName) {
-        super(config, client, indexName);
+    public TextIndexESBulk(TextIndexConfig config, Client client, IndexDispatcher indexDispatcher) {
+        this.docDef = config.getEntDef();
         this.client = client;
-        this.indexName = indexName;
+        this.indexDispatcher = indexDispatcher;
+    }
+
+    @Override
+    public Map<String, Node> get(String uri) {
+        // Not used
+        throw new UnsupportedOperationException("TextIndex::get");
+    }
+
+    @Override
+    public List<TextHit> query(Node property, String qs, String graphURI, String lang, int limit) {
+        if (limit < 0)
+            limit = MAX_RESULTS;
+
+        if (property != null) {
+            qs = parse(getDocDef().getField(property), qs, lang);
+        } else {
+            qs = parse(null, qs, lang);
+        }
+
+        LOGGER.debug("Querying ElasticSearch for QueryString: " + qs);
+
+        var results = new ArrayList<TextHit>();
+
+        var response = client.prepareSearch(indexDispatcher.getAvailableIndexes())
+                .setTypes(getDocDef().getEntityField())
+                .setQuery(QueryBuilders.queryStringQuery(qs))
+                // Not fetching the source because we are currently not interested
+                // in the actual values but only Id of the document. This will also speed up search
+                .setFetchSource(false)
+                .setFrom(0)
+                .setSize(limit)
+                .get();
+
+        for (var hit : response.getHits()) {
+            results.add(new TextHit(stringToNode(hit.getId()), hit.getScore(), null));
+        }
+
+        return results;
+    }
+
+    @Override
+    public List<TextHit> query(Node property, String qs, String graphURI, String lang) {
+        return query(property, qs, graphURI, lang, MAX_RESULTS);
+    }
+
+    @Override
+    public List<TextHit> query(Node property, String qs, String graphURI, String lang, int limit, String highlight) {
+        return query(property, qs, graphURI, lang, limit);
+    }
+
+    @Override
+    public List<TextHit> query(List<Resource> props, String qs, String graphURI, String lang, int limit, String highlight) {
+        return query((String) null, props, qs, graphURI, lang, limit, highlight);
+    }
+
+    @Override
+    public List<TextHit> query(Node subj, List<Resource> props, String qs, String graphURI, String lang, int limit, String highlight) {
+        var subjectUri = subj == null || Var.isVar(subj) || !subj.isURI() ? null : subj.getURI();
+        return query(subjectUri, props, qs, graphURI, lang, limit, highlight);
+    }
+
+    @Override
+    public List<TextHit> query(String uri, List<Resource> props, String qs, String graphURI, String lang, int limit, String highlight) {
+        var property = props == null || props.isEmpty() ? null : props.get(0).asNode();
+        return query(property, qs, graphURI, lang, limit);
+    }
+
+    @Override
+    public EntityDefinition getDocDef() {
+        return docDef;
+    }
+
+    private String parse(String fieldName, String qs, String lang) {
+        if (fieldName != null && !fieldName.isEmpty()) {
+            if (lang != null && !lang.equals("none")) {
+                if (!"*".equals(lang)) {
+                    fieldName = fieldName + "_" + lang.replaceAll("-", "_");
+                } else {
+                    fieldName = fieldName + "*";
+                }
+            }
+
+            qs = fieldName + ":" + qs;
+        }
+        return qs;
     }
 
     @Override
@@ -94,6 +176,10 @@ public class TextIndexESBulk extends TextIndexES {
         } finally {
             updates.clear();
         }
+    }
+
+    @Override
+    public void commit() {
     }
 
     @Override
@@ -132,6 +218,7 @@ public class TextIndexESBulk extends TextIndexES {
     public void addEntity(Entity entity) {
         LOGGER.trace("Adding/Updating the entity {} in ES", entity.getId());
 
+        var indexName = indexDispatcher.getIndex(entity.getId());
         try {
             var entry = getDataEntry(entity);
             var builder = jsonBuilder()
@@ -158,7 +245,7 @@ public class TextIndexESBulk extends TextIndexES {
      */
     @Override
     public void deleteEntity(Entity entity) {
-        updates.add(new UpdateRequest(indexName, getDocDef().getEntityField(), entity.getId())
+        updates.add(new UpdateRequest(indexDispatcher.getIndex(entity.getId()), getDocDef().getEntityField(), entity.getId())
                 .script(new Script(Script.DEFAULT_SCRIPT_TYPE, Script.DEFAULT_SCRIPT_LANG, DELETE_SCRIPT, toParams(entity))));
     }
 

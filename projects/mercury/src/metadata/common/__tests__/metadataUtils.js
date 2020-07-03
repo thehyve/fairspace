@@ -8,17 +8,14 @@ import {
     getTypeInfo,
     hasValue,
     linkLabel,
-    normalizeMetadataResource,
     partitionErrors,
     propertiesToShow,
     relativeLink,
     shouldPropertyBeHidden,
-    simplifyUriPredicates,
     url2iri,
     valuesContainsValueOrId
 } from "../metadataUtils";
 import * as constants from "../../../constants";
-import {normalizeJsonLdResource} from "../jsonLdUtils";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -315,67 +312,6 @@ describe('Metadata Utils', () => {
         it('should return false if only an empty string is is present', () => expect(hasValue([{value: ""}])).toBe(false));
         it('should return true if an id is present', () => expect(hasValue([{id: "http://a"}])).toBe(true));
         it('should return true if a non-empty value is present', () => expect(hasValue([{value: "label"}])).toBe(true));
-    });
-
-    describe('simplifyUriPredicates', () => {
-        it('should convert keys into its localpart', () => {
-            expect(Object.keys(simplifyUriPredicates({
-                'http://namespace#test': [{'@value': 'a'}],
-                'http://other-namespace/something#label': [{'@value': 'b'}],
-                'simple-key': [{'@value': 'c'}]
-            }))).toEqual(expect.arrayContaining(['test', 'label', 'simple-key']));
-        });
-        it('should not change @id and @type keys', () => {
-            expect(Object.keys(normalizeJsonLdResource({
-                '@id': [{'@value': 'a'}],
-                '@type': [{'@value': 'b'}]
-            }))).toEqual(expect.arrayContaining(['@id', '@type']));
-        });
-    });
-
-    describe('normalizeMetadataResource', () => {
-        it('should convert objects with value or id into a literal', () => {
-            expect(Object.values(normalizeMetadataResource({
-                a: [{value: 'a'}],
-                b: [{id: 'b'}],
-                c: [{value: 'c'}, {id: 'd'}]
-            }))).toEqual([
-                ['a'],
-                ['b'],
-                ['c', 'd']
-            ]);
-        });
-        it('should be able to handle regular values', () => {
-            const jsonLd = {
-                '@id': 'http://url',
-                '@type': ['http://type1', 'http://type2']
-            };
-            expect(normalizeMetadataResource(jsonLd)).toEqual(jsonLd);
-        });
-
-        it('should return value if both value and id are given', () => {
-            expect(Object.values(normalizeMetadataResource({
-                a: [{value: 'a', id: 'b'}]
-            }))).toEqual([
-                ['a']
-            ]);
-        });
-
-        it('should return complete object if no value and id are given', () => {
-            expect(Object.values(normalizeMetadataResource({
-                a: [{url: 'http://google.com'}]
-            }))).toEqual([
-                [{url: 'http://google.com'}]
-            ]);
-        });
-
-        it('should handle zero or false or empty strings as actual values', () => {
-            expect(Object.values(normalizeMetadataResource({
-                a: [{value: 0, id: 'a'}, {value: false, id: 'b'}, {value: '', id: 'c'}],
-            }))).toEqual([
-                [0, false, '']
-            ]);
-        });
     });
 
     describe('getLocalPart', () => {

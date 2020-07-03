@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.services.users.User;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
@@ -9,10 +8,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
@@ -26,16 +24,10 @@ public class TxnLogDatasetGraphTest {
     private static final Statement statement = createStatement(createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
-    @Mock
-    private HttpServletRequest request;
 
     @Before
     public void before() {
-        var user = new User();
-        user.setId("userId");
-        user.setName("fullName");
-        currentRequest.set(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
+        setupRequestContext();
         txn = new BulkTransactions(DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log)));
     }
 
@@ -47,7 +39,7 @@ public class TxnLogDatasetGraphTest {
                 .remove(statement));
 
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userId"), eq("fullName"), anyLong());
+        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onCommit();
@@ -64,7 +56,7 @@ public class TxnLogDatasetGraphTest {
         });
 
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userId"), eq("fullName"), anyLong());
+        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();
@@ -90,7 +82,7 @@ public class TxnLogDatasetGraphTest {
         } catch (Exception ignore) {
         }
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userId"), eq("fullName"), anyLong());
+        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
         verify(log).onAdd(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onDelete(createURI("http://example.com/g1"), statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
         verify(log).onAbort();

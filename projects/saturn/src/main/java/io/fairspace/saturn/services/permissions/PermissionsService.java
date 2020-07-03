@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -7,17 +9,19 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.vocabulary.RDF;
 
 import java.util.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.lang.String.format;
@@ -30,14 +34,18 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 @AllArgsConstructor
 @Slf4j
 public class PermissionsService {
+    public static final Symbol PERMISSIONS_SERVICE = Symbol.create("permissions_service");
+
     public static final String PERMISSIONS_GRAPH = generateMetadataIri("permissions").getURI();
+    private static final String USER_PERMISSIONS_CACHE_ATTRIBUTE = "USER_PERMISSIONS_CACHE";
+    private static final int USER_PERMISSIONS_CACHE_SIZE = 1000;
 
     private final Transactions transactions;
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final String baseCollectionsIri;
 
     public void createResource(Node resource) {
-        createResource(resource, getCurrentUser().getIri());
+        createResource(resource, getUserURI());
     }
 
     public void createResource(Node resource, Node owner) {
@@ -52,13 +60,13 @@ public class PermissionsService {
 
     public void createResources(Collection<Resource> resources) {
         var resourcePermissions = createDefaultModel();
-        var user = resourcePermissions.asRDFNode(getCurrentUser().getIri());
+        var user = resourcePermissions.asRDFNode( getUserURI());
         resources.forEach(resource -> resourcePermissions.add(resource, FS.manage, user));
         transactions.executeWrite(dataset -> dataset.getNamedModel(PERMISSIONS_GRAPH).add(resourcePermissions));
     }
 
     public void setPermission(Node resource, Node user, Access access) {
-        var managingUser = getCurrentUser().getIri();
+        var managingUser =  getUserURI();
 
         var success = transactions.calculateWrite(dataset -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
@@ -82,7 +90,7 @@ public class PermissionsService {
 
         if (success) {
             audit("PERMISSION_UPDATED",
-                    "manager", getCurrentUser().getName(),
+                    "manager", getUserURI(),
                     "target-user", user.getURI(),
                     "resource", resource.getURI(),
                     "access", access.toString());
@@ -93,8 +101,8 @@ public class PermissionsService {
     }
 
     public void ensureAdmin() {
-        if(!getCurrentUser().isAdmin()) {
-            throw new AccessDeniedException(format("User %s has to be an admin.", getCurrentUser().getIri()));
+        if(!isAdmin()) {
+            throw new AccessDeniedException(format("User %s has to be an admin.", getUserURI()));
         }
     }
 
@@ -103,7 +111,7 @@ public class PermissionsService {
             getPermissions(nodes).forEach((node, access) -> {
                 if (access.compareTo(requestedAccess) < 0) {
                     throw new MetadataAccessDeniedException(format("User %s has no %s access to some of the requested resources",
-                            getCurrentUser().getIri(), requestedAccess.name().toLowerCase()), node);
+                            getUserURI(), requestedAccess.name().toLowerCase()), node);
                 }
             });
         }
@@ -113,7 +121,7 @@ public class PermissionsService {
         if (getPermission(resource).compareTo(access) < 0) {
             throw new MetadataAccessDeniedException(
                     format("User %s has no %s access to resource %s",
-                            getCurrentUser().getIri(), access.name().toLowerCase(), resource), resource);
+                            getUserURI(), access.name().toLowerCase(), resource), resource);
         }
     }
 
@@ -176,23 +184,24 @@ public class PermissionsService {
     private Map<Node, Access> getPermissionsForAuthorities(Collection<Node> authorities) {
         return transactions.calculateRead(dataset -> {
             var result = new HashMap<Node, Access>();
-            var userObject = getCurrentUser();
+            var user = getUserURI();
 
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-            var userResource = g.wrapAsResource(userObject.getIri());
+            var userResource = g.wrapAsResource(user);
             authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
 
             return result;
         });
     }
 
+    @SneakyThrows
     private Access getResourceAccess(Resource r, Resource user) {
-        return transactions.calculateRead(dataset -> {
+        return transactions.calculateRead(dataset -> getUserPermissionsCache().get(r, () -> {
             if (isWorkspace(r.asNode())
                     && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
                 return Access.Read;
             }
-            if (getCurrentUser().isAdmin()) {
+            if (isAdmin()) {
                 return Access.Manage;
             }
             if (isCollection(r.asNode()) && isUser(user.asNode())) {
@@ -220,7 +229,21 @@ public class PermissionsService {
             }
 
             return Access.Write;
-        });
+        }));
+    }
+
+    // A short-living (within one transaction) small permissions cache
+    private Cache<Resource, Access> getUserPermissionsCache() {
+        var request = getCurrentRequest();
+
+        var cache = (Cache<Resource, Access>) request.getAttribute(USER_PERMISSIONS_CACHE_ATTRIBUTE);
+        if (cache == null) {
+            cache = CacheBuilder.newBuilder()
+                    .maximumSize(USER_PERMISSIONS_CACHE_SIZE)
+                    .build();
+            request.setAttribute(USER_PERMISSIONS_CACHE_ATTRIBUTE, cache);
+        }
+        return cache;
     }
 
     private boolean isUser(Node resource) {
@@ -261,5 +284,14 @@ public class PermissionsService {
         var result = HashMultimap.<Node, Node>create();
         nodes.forEach(n -> result.put(getAuthority(n), n));
         return result;
+    }
+
+    public List<Node> getVisibleCollections() {
+        return transactions.calculateRead(ds -> ds.getDefaultModel()
+                .listSubjectsWithProperty(RDF.type, FS.Collection)
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .mapWith(Resource::asNode)
+                .filterDrop(n -> getPermission(n) == Access.None)
+                .toList());
     }
 }

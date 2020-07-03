@@ -5,7 +5,7 @@ import org.slf4j.MDC;
 
 import java.util.Objects;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
 
 
 public class Audit {
@@ -20,17 +20,17 @@ public class Audit {
             }
         }
 
-        var user = getCurrentUser();
+        var token = getAccessToken();
 
-        if (user != null) {
-            if (user.getName() != null) {
-                MDC.put("user_name", user.getName());
-            }
-            if (user.getEmail() != null) {
-                MDC.put("user_email", user.getEmail());
-            }
-            MDC.put("user_iri", user.getIri().getURI());
+        if (token.getName() != null) {
+            MDC.put("user_name", token.getName());
         }
+
+        if (token.getEmail() != null) {
+            MDC.put("user_email", token.getEmail());
+        }
+        MDC.put("user_id", token.getSubject());
+
 
         log.info(event);
 

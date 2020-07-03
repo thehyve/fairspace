@@ -11,7 +11,8 @@ import org.elasticsearch.ResourceNotFoundException;
 import java.util.List;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
+import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.time.Instant.now;
@@ -66,15 +67,14 @@ public class WorkspaceService {
                 log.info("Workspace not found {}", patch.getIri());
                 throw new ResourceNotFoundException(patch.getIri().getURI());
             }
-            var user = getCurrentUser();
-            if (!user.isAdmin()) {
+            if (!isAdmin()) {
                 log.info("Not enough permissions to modify the status of a workspace {}", patch.getIri());
                 throw new AccessDeniedException("Insufficient permissions to modify status of a workspace: " + patch.getIri().getURI());
             }
             if (patch.getStatus() != null) {
                 workspace.setStatus(patch.getStatus());
                 workspace.setStatusDateModified(now());
-                workspace.setStatusModifiedBy(user.getIri());
+                workspace.setStatusModifiedBy(getUserURI());
             }
 
             workspace = new DAO(dataset).write(workspace);

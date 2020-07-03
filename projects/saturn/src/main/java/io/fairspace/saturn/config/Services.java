@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServlet;
 import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_SERVICE;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -46,6 +48,7 @@ public class Services {
     private final BlobStore blobStore;
     private final ResourceFactory davFactory;
     private final HttpServlet davServlet;
+    private final FilteredDatasetGraph filteredDatasetGraph;
 
 
     public Services(@NonNull Config config, @NonNull Dataset dataset) {
@@ -57,6 +60,7 @@ public class Services {
         mailService = new MailService(config.mail);
         var permissionNotificationHandler = new PermissionNotificationHandler(transactions, userService, mailService, config.publicUrl);
         permissionsService = new PermissionsService(transactions, permissionNotificationHandler, CONFIG.publicUrl + "/api/v1/webdav/");
+        dataset.getContext().set(PERMISSIONS_SERVICE, permissionsService);
 
         workspaceService = new WorkspaceService(transactions, permissionsService);
 
@@ -90,5 +94,7 @@ public class Services {
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
         davFactory = new DavFactory(CONFIG.publicUrl + "/api/v1/webdav/", dataset.getDefaultModel(), blobStore, permissionsService);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
+
+        filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), permissionsService);
     }
 }

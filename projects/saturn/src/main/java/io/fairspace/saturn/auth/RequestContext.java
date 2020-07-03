@@ -1,19 +1,62 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import org.apache.jena.graph.Node;
+import org.eclipse.jetty.server.*;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
 
-import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+import java.util.Optional;
 
 public class RequestContext {
-    public static final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
+    public static final String ADMIN_ROLE = "organisation-admin";
 
-    public static User getCurrentUser() {
-        var request = currentRequest.get();
-        return request == null ? null : (User) request.getAttribute(User.class.getName());
+    private static final ThreadLocal<Request> currentRequest = new ThreadLocal<>();
+
+    public static Request getCurrentRequest() {
+        return Optional.ofNullable(HttpConnection.getCurrentConnection())
+                .map(HttpConnection::getHttpChannel)
+                .map(HttpChannel::getRequest)
+                .orElseGet(currentRequest::get);
+    }
+
+    public static void setCurrentRequest(Request request) {
+        currentRequest.set(request);
+    }
+
+    private static Optional<UserIdentity> getUserIdentity() {
+        return Optional.ofNullable(getCurrentRequest())
+                .map(Request::getAuthentication)
+                .map(x -> (Authentication.User)x)
+                .map(Authentication.User::getUserIdentity);
+    }
+
+    private static Optional<Principal> getPrincipal() {
+        return getUserIdentity().map(UserIdentity::getUserPrincipal);
+    }
+
+    public static Node getUserURI() {
+        return getPrincipal()
+                .map(Principal::getName)
+                .map(SparqlUtils::generateMetadataIri)
+                .orElse(null);
+    }
+
+    public static AccessToken getAccessToken() {
+        return getPrincipal()
+                .map(x -> (KeycloakPrincipal<?>)x)
+                .map(KeycloakPrincipal::getKeycloakSecurityContext)
+                .map(KeycloakSecurityContext::getToken)
+                .orElse(null);
+    }
+
+    public static boolean isAdmin() {
+        return getUserIdentity().map(u -> u.isUserInRole(ADMIN_ROLE, null)).orElse(false);
     }
 
     public static boolean showDeletedFiles() {
-        var request = currentRequest.get();
-        return (request != null) && "on".equalsIgnoreCase(request.getHeader("Show-Deleted"));
+        return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
     }
 }

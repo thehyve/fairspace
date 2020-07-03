@@ -19,7 +19,7 @@ const Dropdown = ({
     useEffect(() => {
         if (isMounted()) {
             if (loadOptions && touched) {
-                loadOptions(searchText.length < 3 ? '' : searchText)
+                loadOptions(searchText)
                     .then(setOptionsToShow);
             }
         }

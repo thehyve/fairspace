@@ -7,15 +7,12 @@ import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
-import java.time.Instant;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
-import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.webdav.PathUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
@@ -86,6 +83,6 @@ public class DavFactory implements ResourceFactory {
     }
 
     static org.apache.jena.rdf.model.Resource currentUserResource() {
-        return org.apache.jena.rdf.model.ResourceFactory.createResource(getCurrentUser().getIri().getURI());
+        return org.apache.jena.rdf.model.ResourceFactory.createResource(getUserURI().getURI());
     }
 }
