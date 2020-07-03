@@ -83,7 +83,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             return subject.listProperties(FS.createdBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
         }
         if (name.equals(COMMENT_PROPERTY)) {
-            return subject.listProperties(RDFS.comment).nextOptional().map(Statement::getString).orElse("");
+            return subject.listProperties(RDFS.comment).nextOptional().map(Statement::getString).orElse(null);
         }
         if (name.equals(ACCESS_PROPERTY)) {
             return factory.permissions.getPermission(subject.asNode()).toString();
