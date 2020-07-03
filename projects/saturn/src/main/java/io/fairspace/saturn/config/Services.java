@@ -4,7 +4,6 @@ import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.collections.CollectionsService;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
@@ -43,7 +42,6 @@ public class Services {
     private final UserService userService;
     private final MailService mailService;
     private final PermissionsService permissionsService;
-    private final CollectionsService collectionsService;
     private final ChangeableMetadataService metadataService;
     private final ChangeableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
@@ -96,8 +94,6 @@ public class Services {
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
         davFactory = new DavFactory(CONFIG.publicUrl + "/api/v1/webdav/", dataset.getDefaultModel(), blobStore, permissionsService);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
-
-        collectionsService = new CollectionsService(config.publicUrl + "/api/v1/webdav/", transactions, davFactory, permissionsService);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), permissionsService);
     }
