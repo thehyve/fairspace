@@ -44,17 +44,17 @@ public class PermissionsService {
     private final PermissionChangeEventHandler permissionChangeEventHandler;
     private final String baseCollectionsIri;
 
-    public void createResource(Node resource) {
-        createResource(resource, getUserURI());
+    public void assignManagers(Node resource, Collection<Node> managers) {
+        managers.forEach(manager -> assignManager(resource, manager));
     }
 
-    public void createResource(Node resource, Node owner) {
+    public void assignManager(Node resource, Node manager) {
         transactions.executeWrite(dataset -> {
             var model = dataset.getNamedModel(PERMISSIONS_GRAPH);
-            model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(owner));
+            model.add(model.asRDFNode(resource).asResource(), FS.manage, model.asRDFNode(manager));
         });
 
-        audit("RESOURCE_CREATED",
+        audit("MANAGER_ASSIGNED",
                 "resource", resource.getURI());
     }
 

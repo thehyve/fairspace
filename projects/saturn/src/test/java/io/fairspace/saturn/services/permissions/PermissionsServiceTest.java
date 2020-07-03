@@ -59,7 +59,7 @@ public class PermissionsServiceTest {
         setupRequestContext();
 
         service = new PermissionsService(new SimpleTransactions(ds), permissionChangeEventHandler, "http://example.com/collections/");
-        service.createResource(RESOURCE);
+        service.assignManager(RESOURCE, getUserURI());
     }
 
     private void useAnotherUser() {
@@ -125,7 +125,7 @@ public class PermissionsServiceTest {
                 .add(file, RDF.type, FS.File);
 
 
-        service.createResource(collection.asNode());
+        service.assignManager(collection.asNode(), getUserURI());
 
         assertEquals(Access.Manage, service.getPermission(file.asNode()));
     }
@@ -337,8 +337,8 @@ public class PermissionsServiceTest {
                 .add(f1, RDF.type, FS.File)
                 .add(c2, RDF.type, FS.Collection).add(f2, RDF.type, FS.File);
 
-        service.createResource(COLLECTION_1);
-        service.createResource(COLLECTION_2);
+        service.assignManager(COLLECTION_1, getUserURI());
+        service.assignManager(COLLECTION_2, getUserURI());
 
         service.setPermission(COLLECTION_2, USER2, Access.Write);
     }

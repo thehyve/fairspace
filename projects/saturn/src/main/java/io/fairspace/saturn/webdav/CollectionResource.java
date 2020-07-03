@@ -107,7 +107,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             }
 
             subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
-            factory.permissions.createResource(subject.asNode(), ws.asNode());
+            factory.permissions.assignManager(subject.asNode(), ws.asNode());
         }
         super.setProperty(name, value);
     }

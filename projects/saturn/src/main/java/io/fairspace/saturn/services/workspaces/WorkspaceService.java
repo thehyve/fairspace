@@ -46,7 +46,7 @@ public class WorkspaceService {
         var ws = transactions.calculateWrite(dataset -> {
             var workspace = new Workspace(id, id, null, WorkspaceStatus.Active, null, null, Access.Manage);
             new DAO(dataset).write(workspace);
-            permissions.createResource(workspace.getIri());
+            permissions.assignManager(workspace.getIri(), getUserURI());
             return workspace;
         });
         audit("WS_CREATE", "workspace", id);

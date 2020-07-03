@@ -12,9 +12,11 @@ import io.milton.property.PropertySource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
+import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -69,7 +71,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .addProperty(FS.dateModified, timestampLiteral())
                 .addProperty(FS.modifiedBy, currentUserResource());
 
-        factory.permissions.createResource(subj.asNode());
+        List<Node> collectionManagers = new ArrayList<>(List.of(currentUserResource().asNode()));
 
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
@@ -81,8 +83,10 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 throw new NotAuthorizedException();
             }
             subj.addProperty(FS.ownedBy, ws);
-            factory.permissions.createResource(subj.asNode(), ws.asNode());
+            collectionManagers.add(ws.asNode());
         }
+
+        factory.permissions.assignManagers(subj.asNode(), collectionManagers);
 
         return new CollectionResource(factory, subj, Access.Manage);
     }
