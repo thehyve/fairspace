@@ -18,18 +18,23 @@ import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.webdav.DavFactory.childResource;
 import static io.fairspace.saturn.webdav.PathUtils.decodePath;
+import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
     private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
     private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
     private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
+    private static final QName ACCESS_PROPERTY = new QName(FS.NS, "access");
     private static final PropertySource.PropertyMetaData OWNED_BY_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, String.class);
     private static final PropertySource.PropertyMetaData CREATED_BY_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, String.class);
     private static final PropertySource.PropertyMetaData COMMENT_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, String.class);
-    private static final List<QName> COLLECTION_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, OWNED_BY_PROPERTY, CREATED_BY_PROPERTY, COMMENT_PROPERTY);
+    private static final PropertySource.PropertyMetaData ACCESS_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
+    private static final List<QName> COLLECTION_PROPERTIES = List.of(
+            IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, OWNED_BY_PROPERTY, CREATED_BY_PROPERTY,
+            COMMENT_PROPERTY, ACCESS_PROPERTY
+    );
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -78,7 +83,10 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             return subject.listProperties(FS.createdBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
         }
         if (name.equals(COMMENT_PROPERTY)) {
-            return subject.listProperties(RDFS.comment).nextOptional().map(Statement::getString).orElse("");
+            return subject.listProperties(RDFS.comment).nextOptional().map(Statement::getString).orElse(null);
+        }
+        if (name.equals(ACCESS_PROPERTY)) {
+            return factory.permissions.getPermission(subject.asNode()).toString();
         }
         return super.getProperty(name);
     }
@@ -99,7 +107,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             }
 
             subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
-            factory.permissions.createResource(subject.asNode(), ws.asNode());
+            factory.permissions.assignManager(subject.asNode(), ws.asNode());
         }
         super.setProperty(name, value);
     }
@@ -114,6 +122,9 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
         if (name.equals(COMMENT_PROPERTY)) {
             return COMMENT_PROPERTY_META;
+        }
+        if (name.equals(ACCESS_PROPERTY)) {
+            return ACCESS_PROPERTY_META;
         }
         return super.getPropertyMetaData(name);
     }

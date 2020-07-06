@@ -55,8 +55,7 @@ class CollectionAPI {
             return FileAPI.list(rootUrl, showDeleted)
                 .then(collections => Promise.all(collections.map(c => (
                     this.getCollectionProperties(c.basename)
-                        .then(properties => this.getCollectionPermissions(properties.iri, currentUser.iri)
-                            .then(permissions => ({...properties, ...permissions})))))))
+                ))))
                 .catch(handleHttpError("Failure when retrieving a list of collections"));
         }
         return Promise.resolve([]);

@@ -11,11 +11,16 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
     const {users, refresh: refreshUsers} = useContext(UsersContext);
     const [altering, setAltering] = useState(false);
 
-    const extendWithUsernamesAndEmails = rawPermissions => rawPermissions.map(permission => {
-        const user = users.find(u => permission.user === u.iri);
-        return {...permission, name: getDisplayName(user), email: getEmail(user)};
-    });
-
+    const getUsersPermissions = rawPermissions => {
+        const userPermissions = [];
+        rawPermissions.forEach(permission => {
+            const user = users.find(u => permission.user === u.iri);
+            if (user) {
+                userPermissions.push({...permission, name: getDisplayName(user), email: getEmail(user)});
+            }
+        });
+        return userPermissions;
+    };
 
     const {data: permissions = [], loading, error, refresh: refreshPermissions} = useAsync(() => getPermissions(iri), [iri]);
 
@@ -34,7 +39,7 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
     return (
         <PermissionContext.Provider
             value={{
-                permissions: extendWithUsernamesAndEmails(permissions),
+                permissions: getUsersPermissions(permissions),
                 error,
                 loading,
                 alterPermission,
