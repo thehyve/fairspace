@@ -12,8 +12,8 @@ import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
 import io.milton.resource.*;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -21,8 +21,7 @@ import javax.xml.namespace.QName;
 import java.util.Date;
 
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
-import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
-import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childResource;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
@@ -118,11 +117,21 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         subject.listProperties()
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
+                .filterDrop(stmt -> stmt.getPredicate().equals(FS.versions))
                 .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
-        subject.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
-                .forEachRemaining(r -> move(r, newSubject, r.getProperty(RDFS.label).getString()));
+        var versions = getListProperty(subject, FS.versions);
+
+
+        if (versions != null) {
+            var newVersions = subject.getModel().createList(versions.iterator()
+                    .mapWith(RDFNode::asResource)
+                    .mapWith(BaseResource::copyVersion));
+            newSubject.addProperty(FS.versions, newVersions);
+        }
+
+        getResourceProperties(subject, FS.contains)
+                .forEach(r -> move(r, newSubject, getStringProperty(r, RDFS.label)));
 
         subject.getModel().listStatements(null, null, subject)
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
@@ -131,6 +140,12 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
 
         subject.addProperty(FS.movedTo, newSubject);
+    }
+
+    private static Resource copyVersion(Resource ver) {
+        var newVer = ver.getModel().createResource();
+        copyProperties(ver.asResource(), newVer, RDF.type, FS.dateModified, FS.deletedBy, FS.fileSize, FS.blobId, FS.md5);
+        return newVer;
     }
 
     @Override
@@ -165,10 +180,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             newSubject.addLiteral(FS.currentVersion, 1)
                     .addProperty(FS.versions, newSubject.getModel().createList(ver));
         }
-
-        subject.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
-                .forEachRemaining(r -> copy(r, newSubject, r.getProperty(RDFS.label).getString(), user, date));
+        getResourceProperties(subject, FS.contains)
+                .forEach(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
     }
 
     @Override
@@ -179,16 +192,16 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (name.equals(DATE_DELETED_PROPERTY)) {
             return parseDate(subject, FS.dateDeleted);
         }
-        return null;
+        return false;
     }
 
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
         if (name.equals(DATE_DELETED_PROPERTY) && value == null && subject.hasProperty(FS.dateDeleted)) {
-                var date = subject.getProperty(FS.dateDeleted).getLiteral();
-                var user = subject.getProperty(FS.deletedBy).getResource();
+            var date = subject.getProperty(FS.dateDeleted).getLiteral();
+            var user = subject.getProperty(FS.deletedBy).getResource();
 
-                restore(subject, date, user);
+            restore(subject, date, user);
         }
     }
 
