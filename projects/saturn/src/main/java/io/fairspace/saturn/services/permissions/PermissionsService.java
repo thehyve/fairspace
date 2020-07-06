@@ -76,7 +76,7 @@ public class PermissionsService {
 
             validate(isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
             if (isWorkspace(resource)) {
-                validate(!dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
+                validate(dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
                         "Cannot set permissions for an inactive workspace");
             }
 
