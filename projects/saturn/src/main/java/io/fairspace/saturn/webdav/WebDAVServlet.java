@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+import static io.milton.http.ResponseStatus.SC_UNSUPPORTED_MEDIA_TYPE;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
@@ -71,9 +72,16 @@ public class WebDAVServlet extends HttpServlet {
         try {
             setThreadlocals(req, res);
 
-            if (req.getMethod().equalsIgnoreCase("PUT")) {
-                var blob = store.store(req.getInputStream());
-                req.setAttribute(BLOB_ATTRIBUTE, blob);
+            switch (req.getMethod().toUpperCase()) {
+                case "PUT" -> req.setAttribute(BLOB_ATTRIBUTE, store.store(req.getInputStream()));
+                case "MKCOL" -> {
+                    try (var in = req.getInputStream()) {
+                        if (in.read() >= 0) {
+                            res.setStatus(SC_UNSUPPORTED_MEDIA_TYPE); // RFC2518:8.3.1
+                            return;
+                        }
+                    }
+                }
             }
 
             httpManager.process(new ServletRequest(req, req.getServletContext()), new ServletResponse(res));
