@@ -75,11 +75,10 @@ public class PermissionsService {
             validate(!user.equals(managingUser), "A user may not change his own permissions");
 
             validate(isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
-            // TODO: Implement a similar check?
-//            if (isWorkspace(resource)) {
-//                validate(!dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
-//                        "Cannot set permissions for an inactive workspace");
-//            }
+            if (isWorkspace(resource)) {
+                validate(!dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
+                        "Cannot set permissions for an inactive workspace");
+            }
 
             g.removeAll(g.asRDFNode(resource).asResource(), null, g.asRDFNode(user));
 
