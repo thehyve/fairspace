@@ -10,14 +10,12 @@ export const handleCollectionSearchRedirect = (history, value) => {
     history.push(`/collections${searchUrl}`);
 };
 
-export const mapCollectionPermissions: CollectionPermissions = (access) => {
-    return {
-        canManage: compareTo(access, "Manage"),
-        canWrite: compareTo(access, "Write"),
-        canRead: compareTo(access, "Read"),
-        canList: compareTo(access, "List"),
-    };
-};
+export const mapCollectionPermissions: CollectionPermissions = (access) => ({
+    canManage: compareTo(access, "Manage"),
+    canWrite: compareTo(access, "Write"),
+    canRead: compareTo(access, "Read"),
+    canList: compareTo(access, "List"),
+});
 
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({
     [LABEL_URI]: [{value: name}],
@@ -33,5 +31,5 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,
     dateModified: properties.lastmod,
-    ...mapCollectionPermissions(properties.access)
+    ...(properties.access && mapCollectionPermissions(properties.access))
 });
