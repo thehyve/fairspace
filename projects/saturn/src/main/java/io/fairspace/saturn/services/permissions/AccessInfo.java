@@ -6,6 +6,11 @@ public interface AccessInfo {
     Access getAccess();
 
     @JsonProperty
+    default boolean canList() {
+        return getAccess().canList();
+    }
+
+    @JsonProperty
     default boolean canRead() {
         return getAccess().canRead();
     }

@@ -17,8 +17,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import Checkbox from "@material-ui/core/Checkbox";
 import UserSelect from "../permissions/UserSelect";
 import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
 import LoadingOverlay from "../common/components/LoadingOverlay";
@@ -44,7 +43,7 @@ const columns = {
     },
     access: {
         valueExtractor: 'access',
-        label: 'Access'
+        label: 'Can manage?'
     }
 };
 
@@ -60,6 +59,7 @@ const UserList = (props: UserListProps) => {
         permissions: collaborators, alterPermission, altering,
         loading: loadingPermissions, error: errorPermissions
     } = useContext(PermissionContext);
+    const {users} = useContext(UsersContext);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collaborators, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
@@ -86,6 +86,7 @@ const UserList = (props: UserListProps) => {
             <DialogContent>
                 <UserSelect
                     autoFocus
+                    users={users}
                     filter={u => u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
                     onChange={setUserToAdd}
                     placeholder="Please select a user"
@@ -95,7 +96,7 @@ const UserList = (props: UserListProps) => {
                 <Button
                     onClick={() => {
                         setShowAddUserDialog(false);
-                        grantUserAccess(userToAdd.iri, 'Read');
+                        grantUserAccess(userToAdd.iri, 'Write');
                     }}
                     color="primary"
                     disabled={!userToAdd}
@@ -162,16 +163,16 @@ const UserList = (props: UserListProps) => {
                                 {u.email}
                             </TableCell>
                             <TableCell style={{width: 120}}>
-                                <Select
-                                    value={u.access}
+                                <Checkbox
+                                    checked={u.canManage}
+                                    onChange={(event) => (
+                                        event.target.checked
+                                            ? grantUserAccess(u.user, "Manage")
+                                            : grantUserAccess(u.user, "Write")
+                                    )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
-                                    onChange={e => grantUserAccess(u.user, e.target.value)}
-                                    disableUnderline
-                                >
-                                    {['Read', 'Write', 'Manage'].map(permission => (
-                                        <MenuItem value={permission}>{permission}</MenuItem>
-                                    ))}
-                                </Select>
+                                    disableRipple
+                                />
                             </TableCell>
                             <TableCell style={{width: 32}}>
                                 <ConfirmationButton

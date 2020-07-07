@@ -165,25 +165,10 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
         </Card>
     );
 
-    const renderWorkspacePermissionsCard = () => (
-        <PermissionProvider iri={workspace.iri}>
-            <PermissionContext.Consumer>
-                {({permissions}) => (
-                    <PermissionsCard
-                        permissions={permissions}
-                        iri={workspace.iri}
-                        canManage={workspace.canManage}
-                    />
-                )}
-            </PermissionContext.Consumer>
-        </PermissionProvider>
-    );
-
     return (
         <>
             {showStatusUpdateConfirmDialog ? renderStatusUpdateConfirmation() : null}
             {renderWorkspaceSettingsCard()}
-            {renderWorkspacePermissionsCard()}
         </>
     );
 };

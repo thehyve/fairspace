@@ -1,13 +1,10 @@
-import React, {useContext} from "react";
+import React from "react";
 
 import Dropdown from "../metadata/common/values/Dropdown";
 import {getDisplayName} from "../users/userUtils";
-import UsersContext from "../users/UsersContext";
 import {compareBy} from "../common/utils/genericUtils";
 
-const UserSelect = ({filter = () => true, ...otherProps}) => {
-    const {users} = useContext(UsersContext);
-
+const UserSelect = ({filter = () => true, users = [], ...otherProps}) => {
     const options = users
         .filter(filter)
         .sort(compareBy('name'))

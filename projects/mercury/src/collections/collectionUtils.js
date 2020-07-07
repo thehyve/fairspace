@@ -1,5 +1,6 @@
 import {buildSearchUrl} from "../search/searchUtils";
 import {COMMENT_URI, LABEL_URI} from "../constants";
+import {compareTo} from "../permissions/permissionUtils";
 import type {Collection, CollectionPermissions} from "./CollectionAPI";
 
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
@@ -10,24 +11,12 @@ export const handleCollectionSearchRedirect = (history, value) => {
 };
 
 export const mapCollectionPermissions: CollectionPermissions = (access) => {
-    const defaultAccess = {
-        canManage: false,
-        canWrite: false,
-        canRead: false
+    return {
+        canManage: compareTo(access, "Manage"),
+        canWrite: compareTo(access, "Write"),
+        canRead: compareTo(access, "Read"),
+        canList: compareTo(access, "List"),
     };
-    if (access === 'Manage') {
-        defaultAccess.canManage = true;
-        defaultAccess.canWrite = true;
-        defaultAccess.canRead = true;
-    }
-    if (access === 'Write') {
-        defaultAccess.canWrite = true;
-        defaultAccess.canRead = true;
-    }
-    if (access === 'Read') {
-        defaultAccess.canRead = true;
-    }
-    return defaultAccess;
 };
 
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({

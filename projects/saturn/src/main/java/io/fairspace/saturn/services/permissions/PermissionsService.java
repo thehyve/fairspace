@@ -144,7 +144,9 @@ public class PermissionsService {
             g.listStatements(g.asRDFNode(authority).asResource(), null, (RDFNode) null)
                     .forEachRemaining(stmt -> {
                         var user = stmt.getObject().asNode();
-                        if (stmt.getPredicate().equals(FS.read)) {
+                        if (stmt.getPredicate().equals(FS.list)) {
+                            result.put(user, Access.List);
+                        } else if (stmt.getPredicate().equals(FS.read)) {
                             result.put(user, Access.Read);
                         } else if (stmt.getPredicate().equals(FS.write)) {
                             result.put(user, Access.Write);

@@ -41,7 +41,7 @@ export class AlterPermissionDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            accessRight: 'Read',
+            accessRight: 'List',
             selectedUser: null,
             selectedUserLabel: ''
         };
@@ -50,7 +50,7 @@ export class AlterPermissionDialog extends React.Component {
     resetState = () => {
         const {access, user} = this.props;
         this.setState({
-            accessRight: access || 'Read',
+            accessRight: access || 'List',
             selectedUser: {iri: user},
             selectedUserLabel: ''
         });
@@ -129,6 +129,7 @@ export class AlterPermissionDialog extends React.Component {
         // otherwise render select user component
         return (
             <UserSelect
+                users={users}
                 onChange={this.handleSelectedUserChange}
                 filter={u => u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
                 placeholder="Please select a user"

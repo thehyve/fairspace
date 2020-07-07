@@ -20,6 +20,7 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
+    canList: boolean;
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
