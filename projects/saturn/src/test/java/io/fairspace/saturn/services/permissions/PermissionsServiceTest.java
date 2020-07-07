@@ -22,8 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.auth.RequestContext.getUserURI;
+import static io.fairspace.saturn.auth.RequestContext.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -62,9 +61,10 @@ public class PermissionsServiceTest {
         service.assignManager(RESOURCE, getUserURI());
     }
 
-    private void useAnotherUser() {
-        var principal = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity().getUserPrincipal();
-        when(principal.getName()).thenReturn("user2");
+    private void asUserWithAccessToPublicMetadata() {
+        var identity = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity();
+        when(identity.isUserInRole("view-public-metadata", null)).thenReturn(true);
+        when(identity.getUserPrincipal().getName()).thenReturn("user2");
     }
 
     private void setAdminFlag(boolean admin) {
@@ -141,7 +141,10 @@ public class PermissionsServiceTest {
     public void testDefaultPermissionForRegularEntities() {
         var entity = createResource("http://example.com/entity");
         ds.getDefaultModel().add(entity, RDF.type, createResource("http://fairspace.io/ontology#Entity"));
-        assertEquals(Access.Write, service.getPermission(entity.asNode()));
+        assertEquals(Access.None, service.getPermission(entity.asNode()));
+
+        asUserWithAccessToPublicMetadata();
+        assertEquals(Access.Read, service.getPermission(entity.asNode()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -194,7 +197,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToVisibleCollections() {
         setupAccessCheckForMultipleNodes();
 
-        useAnotherUser();
+        asUserWithAccessToPublicMetadata();
 
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
@@ -204,7 +207,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToCollections() {
         setupAccessCheckForMultipleNodes();
 
-        useAnotherUser();
+        asUserWithAccessToPublicMetadata();
 
         service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
     }
@@ -213,7 +216,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToFiles() {
         setupAccessCheckForMultipleNodes();
 
-        useAnotherUser();
+        asUserWithAccessToPublicMetadata();
 
         service.ensureAccess(Set.of(FILE_1), Access.Read);
         service.ensureAccess(Set.of(COLLECTION_2), Access.Read);
@@ -225,7 +228,7 @@ public class PermissionsServiceTest {
     public void testEnsureAccessToNonRestrictedEntities() {
         setupAccessCheckForMultipleNodes();
 
-        useAnotherUser();
+        asUserWithAccessToPublicMetadata();
 
         service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
     }
@@ -286,7 +289,7 @@ public class PermissionsServiceTest {
 
         service.setPermission(w1.asNode(), USER2, Access.Manage);
 
-        useAnotherUser();
+        asUserWithAccessToPublicMetadata();
         setAdminFlag(false);
 
 
@@ -299,7 +302,7 @@ public class PermissionsServiceTest {
     public void testReturnedSubjectInEnsureAccessException() {
         setupAccessCheckForMultipleNodes();
 
-        useAnotherUser();
+        asUserWithAccessToPublicMetadata();
 
         // The exception thrown by ensureAccess should return the failing entity
         try {
