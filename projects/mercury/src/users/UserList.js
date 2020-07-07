@@ -24,7 +24,7 @@ import PermissionContext, {PermissionProvider} from "../permissions/PermissionCo
 import LoadingOverlay from "../common/components/LoadingOverlay";
 import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import type {User} from "./UsersAPI";
+import type {User, UserRoles} from "./UsersAPI";
 import UserContext from "./UserContext";
 import UsersContext from "./UsersContext";
 import useSorting from "../common/hooks/UseSorting";
@@ -49,7 +49,7 @@ const columns = {
 };
 
 type UserListProps = {
-    currentUser: User,
+    currentUser: User & UserRoles,
     workspace: Workspace
 }
 

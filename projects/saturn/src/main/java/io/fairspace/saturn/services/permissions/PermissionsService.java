@@ -29,6 +29,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.StreamSupport.stream;
 import static org.apache.commons.lang3.ObjectUtils.min;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 @AllArgsConstructor
@@ -188,14 +189,17 @@ public class PermissionsService {
 
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             var userResource = g.wrapAsResource(user);
-            authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource)));
+            var defaultAccess = canViewPublicMetadata()
+                    ? Access.Read // TODO: List
+                    : Access.None;
+            authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource, defaultAccess)));
 
             return result;
         });
     }
 
     @SneakyThrows
-    private Access getResourceAccess(Resource r, Resource user) {
+    private Access getResourceAccess(Resource r, Resource user, Access defaultAccess) {
         return transactions.calculateRead(dataset -> getUserPermissionsCache().get(r, () -> {
             if (isWorkspace(r.asNode())
                     && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
@@ -209,7 +213,7 @@ public class PermissionsService {
                         .listSubjectsWithProperty(RDF.type, FS.Workspace)
                         .filterDrop(ws -> ws.hasProperty(FS.dateDeleted))
                         .mapWith(ws -> ws.inModel(dataset.getNamedModel(PERMISSIONS_GRAPH)))
-                        .mapWith(ws -> min(getResourceAccess(ws, user), getResourceAccess(r, ws)));
+                        .mapWith(ws -> min(getResourceAccess(ws, user, Access.None), getResourceAccess(r, ws, Access.None)));
                 return stream(spliteratorUnknownSize(it, 0), false)
                         .max(naturalOrder())
                         .orElse(Access.None);
@@ -228,7 +232,7 @@ public class PermissionsService {
                 return Access.None;
             }
 
-            return Access.Write;
+            return defaultAccess;
         }));
     }
 
@@ -267,7 +271,7 @@ public class PermissionsService {
         if (uri.startsWith(baseCollectionsIri)) {
             var pos = uri.indexOf('/', baseCollectionsIri.length());
             if (pos > 0) {
-                return NodeFactory.createURI(uri.substring(0, pos));
+                return createURI(uri.substring(0, pos));
             }
         }
 

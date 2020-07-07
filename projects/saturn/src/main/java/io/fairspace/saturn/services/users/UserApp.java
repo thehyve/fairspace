@@ -2,8 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static io.fairspace.saturn.auth.RequestContext.getUserURI;
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
+import static io.fairspace.saturn.auth.RequestContext.*;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
@@ -28,6 +27,7 @@ public class UserApp extends BaseApp {
             res.type(APPLICATION_JSON.asString());
             var user = service.getUser(getUserURI());
             user.setAdmin(isAdmin());
+            user.setViewPublicMetadata(canViewPublicMetadata());
             return mapper.writeValueAsString(user);
         });
 
