@@ -236,7 +236,10 @@ public class PermissionsServiceTest {
 
     @Test
     public void testSetPermissionForAWorkspace() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, createResource("http://fairspace.io/ontology#Workspace"));
+        Resource w1 = createResource(RESOURCE.getURI());
+        ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
+        ds.getDefaultModel().add(createResource(w1.getURI()), FS.status, "Active");
+
         assertNull(service.getPermissions(RESOURCE).get(USER2));
         service.setPermission(RESOURCE, USER2, Access.Write);
 
@@ -286,6 +289,7 @@ public class PermissionsServiceTest {
         setAdminFlag(true);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
         ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
+        ds.getDefaultModel().add(createResource(w1.getURI()), FS.status, "Active");
 
         service.setPermission(w1.asNode(), USER2, Access.Manage);
 
