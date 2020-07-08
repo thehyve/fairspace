@@ -144,7 +144,7 @@ public class PermissionsServiceTest {
         assertEquals(Access.None, service.getPermission(entity.asNode()));
 
         asUserWithAccessToPublicMetadata();
-        assertEquals(Access.Read, service.getPermission(entity.asNode()));
+        assertEquals(Access.List, service.getPermission(entity.asNode()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -230,7 +230,7 @@ public class PermissionsServiceTest {
 
         asUserWithAccessToPublicMetadata();
 
-        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
+        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.List);
     }
 
 

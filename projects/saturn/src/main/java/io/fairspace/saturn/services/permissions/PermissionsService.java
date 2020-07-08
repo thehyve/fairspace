@@ -192,7 +192,7 @@ public class PermissionsService {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             var userResource = g.wrapAsResource(user);
             var defaultAccess = canViewPublicMetadata()
-                    ? Access.Read // TODO: List
+                    ? Access.List
                     : Access.None;
             authorities.forEach(a -> result.put(a, getResourceAccess(g.wrapAsResource(a), userResource, defaultAccess)));
 
