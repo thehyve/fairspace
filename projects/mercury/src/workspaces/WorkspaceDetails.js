@@ -3,8 +3,6 @@ import React, {useContext, useState} from 'react';
 import {withRouter} from 'react-router-dom';
 import {Card, CardContent, CardHeader, Grid, IconButton, Menu, MenuItem, withStyles} from "@material-ui/core";
 import {MoreVert, Widgets} from "@material-ui/icons";
-import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
-import PermissionsCard from "../permissions/PermissionsCard";
 import type {Workspace} from "./WorkspacesAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import UserContext from "../users/UserContext";
