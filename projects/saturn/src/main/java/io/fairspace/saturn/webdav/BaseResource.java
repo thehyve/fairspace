@@ -23,7 +23,7 @@ import java.util.Date;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.webdav.DavFactory.childResource;
+import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
@@ -66,7 +66,16 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return (method.isWrite ? access.canWrite() : access.canRead()) || isAdmin();
+        if (isAdmin()) {
+            return true;
+        }
+        if (method == Request.Method.GET) {
+            return access.canRead();
+        }
+        if (method.isWrite) {
+            return access.canWrite();
+        }
+        return true;
     }
 
     @Override
@@ -108,7 +117,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     private void move(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name) {
-        var newSubject = (parent != null) ? childResource(parent, name) : factory.pathToSubject(name);
+        var newSubject = childSubject(parent != null ? parent : factory.rootSubject, name);
         newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
             parent.addProperty(FS.contains, newSubject);
@@ -158,7 +167,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
-        var newSubject = childResource(parent, name);
+        var newSubject = childSubject(parent, name);
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
         newSubject.addProperty(RDFS.label, name)
@@ -230,16 +239,12 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean isCompatible(Request.Method m) {
-        if (m.isWrite) {
-            return access.canWrite() && (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH || m == Request.Method.DELETE);
-        }
-
-        return true;
+        return !m.isWrite || (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH || m == Request.Method.DELETE);
     }
 
     @Override
     public String toString() {
-        return "/" + subject.getURI().substring(factory.baseUri.length());
+        return subject.getURI().substring(factory.rootSubject.getURI().length());
     }
 
     protected org.apache.jena.rdf.model.Resource newVersion() {

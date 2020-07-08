@@ -21,10 +21,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
-import static io.fairspace.saturn.webdav.PathUtils.joinPaths;
 
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
 
@@ -36,15 +36,15 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(null, joinPaths(factory.basePath, childName));
+        return factory.getResource(childSubject(factory.rootSubject, childName));
     }
 
     @Override
     public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
-        return factory.model.listSubjectsWithProperty(RDF.type, FS.Collection)
+        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(s -> {
                     var access = factory.permissions.getPermission(s.asNode());
-                    if (!access.canRead()) {
+                    if (access == Access.None) {
                         return null;
                     }
                     return factory.getResource(s, access);
@@ -55,7 +55,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
-        var subj = factory.pathToSubject(newName);
+        var subj = childSubject(factory.rootSubject, newName);
 
         if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {
             throw new ConflictException();
@@ -93,7 +93,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public String getUniqueId() {
-        return factory.baseUri;
+        return factory.rootSubject.toString();
     }
 
     @Override

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static io.fairspace.saturn.webdav.DavFactory.childResource;
+import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
     private static final List<QName> DIRECTORY_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
@@ -68,7 +68,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             throw new ConflictException(existing);
         }
 
-        var subj = childResource(subject, newName);
+        var subj = childSubject(subject, newName);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         var t = WebDAVServlet.timestampLiteral();
 
@@ -83,7 +83,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(childResource(subject, childName), access);
+        return factory.getResource(childSubject(subject, childName), access);
     }
 
     @Override
