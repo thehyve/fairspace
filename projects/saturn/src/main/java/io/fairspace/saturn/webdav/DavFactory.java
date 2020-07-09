@@ -28,12 +28,12 @@ public class DavFactory implements ResourceFactory {
         this.store = store;
         this.permissions = permissions;
         var uri = URI.create(rootSubject.getURI());
-        this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort()).toString();
+        this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
     }
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
-        return getResource(rootSubject.getModel().createResource(baseUri + encodePath(path)));
+        return getResource(rootSubject.getModel().createResource(baseUri + "/" + encodePath(path)));
     }
 
     Resource getResource(org.apache.jena.rdf.model.Resource subject) throws NotAuthorizedException {
