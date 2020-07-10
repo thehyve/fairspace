@@ -125,7 +125,7 @@ public class PermissionsService {
     }
 
     private void ensureManageAccess(Node resource) {
-        if (getPermission(resource).compareTo(Access.Manage) < 0) {
+        if (!getPermission(resource).canManage()) {
             throw new MetadataAccessDeniedException(
                     format("User %s has no 'Manage' access to resource %s",
                             getUserURI(), resource), resource);
@@ -221,7 +221,7 @@ public class PermissionsService {
         return transactions.calculateRead(dataset -> getUserPermissionsCache().get(r, () -> {
             if (isWorkspace(r.asNode())) {
                 if (dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())
-                        || !isAdmin()) {
+                        || (!isAdmin() && !r.hasProperty(FS.manage, user))) {
                     return Access.Member;
                 }
             }

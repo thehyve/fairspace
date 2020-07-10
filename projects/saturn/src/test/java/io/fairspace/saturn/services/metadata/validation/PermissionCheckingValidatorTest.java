@@ -58,8 +58,8 @@ public class PermissionCheckingValidatorTest {
     public void noChecksShouldBePerformedOnAnEmptyModel() {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
 
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Write);
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
         verifyNoMoreInteractions(violationHandler);
     }
 
@@ -68,7 +68,7 @@ public class PermissionCheckingValidatorTest {
         var model = modelOf(STATEMENT);
         Set<Node> nodes = Set.of(STATEMENT.getSubject().asNode());
 
-        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureMinimalAccess(nodes, Access.Write);
+        doThrow(new MetadataAccessDeniedException("", STATEMENT.getSubject().asNode())).when(permissions).ensureAccess(nodes, Access.Write);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
         verify(violationHandler).onViolation("Cannot modify resource", STATEMENT.getSubject(), null, null);
     }
@@ -81,8 +81,8 @@ public class PermissionCheckingValidatorTest {
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
 
         verifyNoInteractions(violationHandler);
-        verify(permissions).ensureMinimalAccess(nodes, Access.Write);
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(nodes, Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
 
         verifyNoMoreInteractions(permissions);
     }
@@ -96,8 +96,8 @@ public class PermissionCheckingValidatorTest {
 
         verifyNoInteractions(violationHandler);
         nodes.iterator().forEachRemaining(n-> verify(permissions).ensureAdminAccess(n));
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Write);
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
 
         verifyNoMoreInteractions(permissions);
     }
@@ -116,8 +116,8 @@ public class PermissionCheckingValidatorTest {
 
         validator.validate(before, after, toRemove, toAdd, null, violationHandler);
 
-        verify(permissions).ensureMinimalAccess(Set.of(nodeRemoved), Access.Manage);
-        verify(permissions).ensureMinimalAccess(Set.of(nodeAdded), Access.Write);
+        verify(permissions).ensureAccess(Set.of(nodeRemoved), Access.Manage);
+        verify(permissions).ensureAccess(Set.of(nodeAdded), Access.Write);
 
         verifyNoMoreInteractions(permissions);
     }
@@ -139,8 +139,8 @@ public class PermissionCheckingValidatorTest {
         List<Node> values = valueCaptor.getAllValues();
         assertEquals(Arrays.asList(nodeAdded, nodeRemoved), values);
 
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Manage);
-        verify(permissions).ensureMinimalAccess(Collections.emptySet(), Access.Write);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Manage);
+        verify(permissions).ensureAccess(Collections.emptySet(), Access.Write);
 
         verifyNoMoreInteractions(permissions);
     }
