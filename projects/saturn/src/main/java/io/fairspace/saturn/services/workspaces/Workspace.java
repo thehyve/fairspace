@@ -4,7 +4,7 @@ import io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
 import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.AccessInfo;
+import io.fairspace.saturn.services.permissions.dto.WorkspaceAccessInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +21,7 @@ import static io.fairspace.saturn.vocabulary.FS.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @RDFType(WORKSPACE_URI)
-public class Workspace extends LifecycleAwarePersistentEntity implements AccessInfo {
+public class Workspace extends LifecycleAwarePersistentEntity implements WorkspaceAccessInfo {
     @RDFProperty(value = ID_URI, required = true)
     private String id;
 

@@ -6,8 +6,7 @@ import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 const workspacesUrl = "/api/v1/workspaces/";
 
 export type WorkspacePermissions = {|
-    canRead: boolean;
-    canWrite: boolean;
+    isMember: boolean;
     canManage: boolean;
 |};
 

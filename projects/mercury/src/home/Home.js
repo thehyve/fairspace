@@ -55,7 +55,7 @@ export default (props) => {
     if (!workspace) {
         return (<MessageDisplay message="Workspace does not exist." />);
     }
-    if (!workspace.canRead) {
+    if (!workspace.isMember) {
         return (<MessageDisplay message="You don't have sufficient permissions to access the workspace." />);
     }
     if (workspacesError || !workspace.iri) {

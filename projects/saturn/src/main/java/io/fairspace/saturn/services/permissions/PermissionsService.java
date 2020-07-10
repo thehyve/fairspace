@@ -6,13 +6,16 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.permissions.dto.CollectionAccessDto;
+import io.fairspace.saturn.services.permissions.dto.CollectionPermissionDto;
+import io.fairspace.saturn.services.permissions.dto.WorkspaceAccessDto;
+import io.fairspace.saturn.services.permissions.dto.WorkspacePermissionDto;
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.util.Symbol;
@@ -71,13 +74,16 @@ public class PermissionsService {
 
         var success = transactions.calculateWrite(dataset -> {
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
-            ensureAccess(resource, Access.Manage);
+            ensureManageAccess(resource);
             validate(!user.equals(managingUser), "A user may not change his own permissions");
 
             validate(isCollection(resource) || isWorkspace(resource), "Cannot set permissions for a regular entity");
             if (isWorkspace(resource)) {
                 validate(dataset.getDefaultModel().asRDFNode(resource).asResource().hasProperty(FS.status, WorkspaceStatus.Active.name()),
                         "Cannot set permissions for an inactive workspace");
+                validate(Access.WorkspaceAccess.contains(access), "Invalid workspace access type: " + access);
+            } else {
+                validate(Access.CollectionAccess.contains(access), "Invalid collection access type: " + access);
             }
 
             g.removeAll(g.asRDFNode(resource).asResource(), null, g.asRDFNode(user));
@@ -118,11 +124,19 @@ public class PermissionsService {
         }
     }
 
-    private void ensureAccess(Node resource, Access access) {
-        if (getPermission(resource).compareTo(access) < 0) {
+    private void ensureManageAccess(Node resource) {
+        if (getPermission(resource).compareTo(Access.Manage) < 0) {
             throw new MetadataAccessDeniedException(
-                    format("User %s has no %s access to resource %s",
-                            getUserURI(), access.name().toLowerCase(), resource), resource);
+                    format("User %s has no 'Manage' access to resource %s",
+                            getUserURI(), resource), resource);
+        }
+    }
+
+    private void ensureMinimalAccess(Node resource) {
+        if (getPermission(resource) == Access.None) {
+            throw new MetadataAccessDeniedException(
+                    format("User %s has no access to resource %s",
+                            getUserURI(), resource), resource);
         }
     }
 
@@ -137,14 +151,16 @@ public class PermissionsService {
     Map<Node, Access> getPermissions(Node resource) {
         return transactions.calculateRead(dataset -> {
             var authority = getAuthority(resource);
-            ensureAccess(authority, Access.Read);
+            ensureMinimalAccess(authority);
 
             var result = new HashMap<Node, Access>();
             var g = dataset.getNamedModel(PERMISSIONS_GRAPH);
             g.listStatements(g.asRDFNode(authority).asResource(), null, (RDFNode) null)
                     .forEachRemaining(stmt -> {
                         var user = stmt.getObject().asNode();
-                        if (stmt.getPredicate().equals(FS.list)) {
+                        if (stmt.getPredicate().equals(FS.member)) {
+                            result.put(user, Access.Member);
+                        } else if (stmt.getPredicate().equals(FS.list)) {
                             result.put(user, Access.List);
                         } else if (stmt.getPredicate().equals(FS.read)) {
                             result.put(user, Access.Read);
@@ -203,9 +219,11 @@ public class PermissionsService {
     @SneakyThrows
     private Access getResourceAccess(Resource r, Resource user, Access defaultAccess) {
         return transactions.calculateRead(dataset -> getUserPermissionsCache().get(r, () -> {
-            if (isWorkspace(r.asNode())
-                    && dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())) {
-                return Access.Read;
+            if (isWorkspace(r.asNode())) {
+                if (dataset.getDefaultModel().wrapAsResource(r.asNode()).hasProperty(FS.status, WorkspaceStatus.Archived.name())
+                        || !isAdmin()) {
+                    return Access.Member;
+                }
             }
             if (isAdmin()) {
                 return Access.Manage;
@@ -229,6 +247,9 @@ public class PermissionsService {
             }
             if (r.hasProperty(FS.read, user)) {
                 return Access.Read;
+            }
+            if (r.hasProperty(FS.list, user)) {
+                return Access.List;
             }
             if (isCollection(r.asNode()) || isWorkspace(r.asNode())) {
                 return Access.None;
@@ -299,5 +320,26 @@ public class PermissionsService {
                 .mapWith(Resource::asNode)
                 .filterDrop(n -> getPermission(n) == Access.None)
                 .toList());
+    }
+
+    public Object getAccessDto(Node resource) {
+        var access = getPermission(resource);
+        if (isWorkspace(resource)) {
+            return new WorkspaceAccessDto(access);
+        }
+        return new CollectionAccessDto(access);
+    }
+
+    public Object[] getPermissionsDto(Node resource) {
+        return getPermissions(resource)
+                .entrySet()
+                .stream()
+                .map(e -> {
+                    if (isWorkspace(resource)) {
+                        return new WorkspacePermissionDto(e.getKey(), e.getValue());
+                    }
+                    return new CollectionPermissionDto(e.getKey(), e.getValue());
+                })
+                .toArray();
     }
 }

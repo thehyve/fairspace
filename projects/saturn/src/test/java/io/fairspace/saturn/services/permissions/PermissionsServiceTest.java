@@ -188,9 +188,9 @@ public class PermissionsServiceTest {
     public void testEnsureAccessForNodesUser1() {
         setupAccessCheckForMultipleNodes();
 
-        service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_1, FILE_2), Access.Read);
-        service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_1, FILE_2), Access.Write);
-        service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_1, FILE_2), Access.Manage);
+        service.ensureMinimalAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_1, FILE_2), Access.Read);
+        service.ensureMinimalAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_1, FILE_2), Access.Write);
+        service.ensureMinimalAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_1, FILE_2), Access.Manage);
     }
 
     @Test
@@ -199,8 +199,8 @@ public class PermissionsServiceTest {
 
         asUserWithAccessToPublicMetadata();
 
-        service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Read);
-        service.ensureAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
+        service.ensureMinimalAccess(Set.of(COLLECTION_2, FILE_2), Access.Read);
+        service.ensureMinimalAccess(Set.of(COLLECTION_2, FILE_2), Access.Write);
     }
 
     @Test(expected = MetadataAccessDeniedException.class)
@@ -209,7 +209,7 @@ public class PermissionsServiceTest {
 
         asUserWithAccessToPublicMetadata();
 
-        service.ensureAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
+        service.ensureMinimalAccess(Set.of(COLLECTION_1, COLLECTION_2, FILE_2), Access.Read);
     }
 
     @Test(expected = MetadataAccessDeniedException.class)
@@ -218,10 +218,10 @@ public class PermissionsServiceTest {
 
         asUserWithAccessToPublicMetadata();
 
-        service.ensureAccess(Set.of(FILE_1), Access.Read);
-        service.ensureAccess(Set.of(COLLECTION_2), Access.Read);
-        service.ensureAccess(Set.of(FILE_2), Access.Read);
-        service.ensureAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
+        service.ensureMinimalAccess(Set.of(FILE_1), Access.Read);
+        service.ensureMinimalAccess(Set.of(COLLECTION_2), Access.Read);
+        service.ensureMinimalAccess(Set.of(FILE_2), Access.Read);
+        service.ensureMinimalAccess(Set.of(FILE_1, COLLECTION_2, FILE_2), Access.Read);
     }
 
     @Test
@@ -230,7 +230,7 @@ public class PermissionsServiceTest {
 
         asUserWithAccessToPublicMetadata();
 
-        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.List);
+        service.ensureMinimalAccess(Set.of(RESOURCE, RESOURCE2), Access.List);
     }
 
 
@@ -281,7 +281,7 @@ public class PermissionsServiceTest {
     public void testEnsureRemoveWorkspaceMetadataWithNoManagePermission() {
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
         service.setPermission(w1.asNode(), USER2, Access.Write);
-        service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
+        service.ensureMinimalAccess(Set.of(w1.asNode()), Access.Manage);
     }
 
     @Test
@@ -297,7 +297,7 @@ public class PermissionsServiceTest {
         setAdminFlag(false);
 
 
-         service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
+         service.ensureMinimalAccess(Set.of(w1.asNode()), Access.Manage);
     }
 
 
@@ -310,7 +310,7 @@ public class PermissionsServiceTest {
 
         // The exception thrown by ensureAccess should return the failing entity
         try {
-            service.ensureAccess(Set.of(RESOURCE2, RESOURCE), Access.Manage);
+            service.ensureMinimalAccess(Set.of(RESOURCE2, RESOURCE), Access.Manage);
             fail();
         } catch(MetadataAccessDeniedException e) {
             assertEquals(RESOURCE, e.getSubject());
@@ -319,7 +319,7 @@ public class PermissionsServiceTest {
         // The exception thrown by ensureAccess should return the failing entity
         // also when it has been verified by authority
         try {
-            service.ensureAccess(Set.of(FILE_1), Access.Read);
+            service.ensureMinimalAccess(Set.of(FILE_1), Access.Read);
             fail();
         } catch(MetadataAccessDeniedException e) {
             assertEquals(FILE_1, e.getSubject());

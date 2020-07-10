@@ -96,7 +96,7 @@ const UserList = (props: UserListProps) => {
                 <Button
                     onClick={() => {
                         setShowAddUserDialog(false);
-                        grantUserAccess(userToAdd.iri, 'Write');
+                        grantUserAccess(userToAdd.iri, 'Member');
                     }}
                     color="primary"
                     disabled={!userToAdd}
@@ -168,7 +168,7 @@ const UserList = (props: UserListProps) => {
                                     onChange={(event) => (
                                         event.target.checked
                                             ? grantUserAccess(u.user, "Manage")
-                                            : grantUserAccess(u.user, "Write")
+                                            : grantUserAccess(u.user, "Member")
                                     )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     disableRipple
