@@ -1,9 +1,15 @@
-package io.fairspace.saturn.services.permissions;
+package io.fairspace.saturn.services.permissions.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.fairspace.saturn.services.permissions.Access;
 
-public interface AccessInfo {
+public interface CollectionAccessInfo {
     Access getAccess();
+
+    @JsonProperty
+    default boolean canList() {
+        return getAccess().canList();
+    }
 
     @JsonProperty
     default boolean canRead() {

@@ -71,12 +71,13 @@ describe('AlterPermissionDialog', () => {
         // render collacborator selector
         expect(wrapper.find(UserSelect).prop('value')).toBe(null);
 
-        // initial value of the access right is "Read"
-        expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('Read');
-        // populate radio group with 3 access options
-        expect(wrapper.find('[aria-label="Access right"]').childAt(0).prop('value')).toEqual('Read');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(1).prop('value')).toEqual('Write');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Manage');
+        // initial value of the access right is "List"
+        expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('List');
+        // populate radio group with 4 access options
+        expect(wrapper.find('[aria-label="Access right"]').childAt(0).prop('value')).toEqual('List');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(1).prop('value')).toEqual('Read');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Write');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(3).prop('value')).toEqual('Manage');
 
         // render cancel and submit buttons
         expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');

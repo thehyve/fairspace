@@ -15,7 +15,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, updateWorkspaceStatus, 
             && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
     }
 
-    if (!workspace.canRead) {
+    if (!workspace.isMember) {
         return atLeastSingleWorkspaceExists
             && (
                 <EmptyInformationDrawer message="You don't have access to see the metadata of this workspace.

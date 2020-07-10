@@ -144,7 +144,7 @@ public class PermissionsServiceTest {
         assertEquals(Access.None, service.getPermission(entity.asNode()));
 
         asUserWithAccessToPublicMetadata();
-        assertEquals(Access.Read, service.getPermission(entity.asNode()));
+        assertEquals(Access.List, service.getPermission(entity.asNode()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -230,23 +230,40 @@ public class PermissionsServiceTest {
 
         asUserWithAccessToPublicMetadata();
 
-        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.Read);
+        service.ensureAccess(Set.of(RESOURCE, RESOURCE2), Access.List);
     }
-
 
     @Test
     public void testSetPermissionForAWorkspace() {
-        ds.getDefaultModel().add(createResource(RESOURCE.getURI()), RDF.type, createResource("http://fairspace.io/ontology#Workspace"));
-        assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER2, Access.Write);
+        Resource w1 = createResource(RESOURCE.getURI());
+        ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
+        ds.getDefaultModel().add(createResource(w1.getURI()), FS.status, "Active");
 
-        verify(permissionChangeEventHandler).onPermissionChange(getUserURI(), RESOURCE, USER2, Access.Write);
-
-        assertEquals(Access.Write, service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER2, Access.None);
         assertNull(service.getPermissions(RESOURCE).get(USER2));
-        service.setPermission(RESOURCE, USER3, Access.Manage);
-        assertEquals(Access.Manage, service.getPermissions(RESOURCE).get(USER3));
+        service.setPermission(RESOURCE, USER2, Access.Member);
+
+        verify(permissionChangeEventHandler).onPermissionChange(getUserURI(), w1.asNode(), USER2, Access.Member);
+
+        assertEquals(Access.Member, service.getPermissions(w1.asNode()).get(USER2));
+        service.setPermission(w1.asNode(), USER2, Access.None);
+        assertNull(service.getPermissions(w1.asNode()).get(USER2));
+        service.setPermission(w1.asNode(), USER3, Access.Manage);
+        assertEquals(Access.Manage, service.getPermissions(w1.asNode()).get(USER3));
+    }
+
+    @Test
+    public void testSetInvalidPermissionForAWorkspace() {
+        Resource w1 = createResource(RESOURCE.getURI());
+        ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
+        ds.getDefaultModel().add(createResource(w1.getURI()), FS.status, "Active");
+
+        assertNull(service.getPermissions(RESOURCE).get(USER2));
+        try {
+            service.setPermission(RESOURCE, USER2, Access.Write);
+            fail();
+        } catch(IllegalArgumentException e) {
+            assertEquals("Invalid workspace access type: Write", e.getMessage());
+        }
     }
 
     @Test
@@ -286,14 +303,14 @@ public class PermissionsServiceTest {
         setAdminFlag(true);
         Resource w1 = createResource("http://fairspace.io/ontology#Workspace");
         ds.getDefaultModel().add(w1, RDF.type, FS.Workspace);
+        ds.getDefaultModel().add(createResource(w1.getURI()), FS.status, "Active");
 
-        service.setPermission(w1.asNode(), USER2, Access.Manage);
+        service.setPermission(w1.asNode(), USER2, Access.Member);
 
         asUserWithAccessToPublicMetadata();
         setAdminFlag(false);
 
-
-         service.ensureAccess(Set.of(w1.asNode()), Access.Manage);
+        service.ensureAccess(Set.of(w1.asNode()), Access.Member);
     }
 
 

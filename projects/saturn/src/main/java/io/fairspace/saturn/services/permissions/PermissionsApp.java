@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.permissions;
 
 import io.fairspace.saturn.services.BaseApp;
+import io.fairspace.saturn.services.permissions.dto.PermissionDto;
 import org.apache.jena.graph.Node;
 import spark.Request;
 
@@ -24,14 +25,10 @@ public class PermissionsApp extends BaseApp {
         get("/", APPLICATION_JSON.asString(), (req, res) -> {
             res.type(APPLICATION_JSON.asString());
             if (req.queryParams().contains("all")) {
-                return mapper.writeValueAsString(permissionsService.getPermissions(getIri(req))
-                        .entrySet()
-                        .stream()
-                        .map(e -> new PermissionDto(e.getKey(), e.getValue()))
-                        .toArray());
+                return mapper.writeValueAsString(permissionsService.getPermissionDtos(getIri(req)));
             }
 
-            return mapper.writeValueAsString(new AccessDto(permissionsService.getPermission(getIri(req))));
+            return mapper.writeValueAsString(permissionsService.getAccessDto(getIri(req)));
         });
 
         put("/", (req, res) -> {

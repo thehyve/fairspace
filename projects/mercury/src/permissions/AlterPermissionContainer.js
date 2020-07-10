@@ -1,23 +1,40 @@
 import React, {useContext} from "react";
 
 import AlterPermissionDialog from "./AlterPermissionDialog";
-import PermissionContext from "./PermissionContext";
-import UsersContext from "../users/UsersContext";
+import PermissionContext, {PermissionProvider} from "./PermissionContext";
+import CollectionsContext from "../collections/CollectionsContext";
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
 
 const AlterPermissionContainer = props => {
-    const {permissions, loading: loadingPermissions, error: errorPermissions} = useContext(PermissionContext);
-    const {users, loadingUsers, errorUsers} = useContext(UsersContext);
+    const {permissions: collaborators, loading: loadingPermissions, error: errorPermissions} = useContext(PermissionContext);
+    const {collections, loading: loadingCollections, error: errorCollections} = useContext(CollectionsContext);
+
+    if (errorCollections) {
+        return (<MessageDisplay message="An error occurred while fetching collections." />);
+    }
+    if (loadingCollections) {
+        return (<LoadingInlay />);
+    }
+
+    const currentCollection = collections.find(c => c.iri === props.iri);
 
     return (
-        <AlterPermissionDialog
-            {...props}
-            collaborators={permissions}
-            users={users}
-            loading={loadingPermissions || loadingUsers}
-            error={errorPermissions || errorUsers}
-        />
+        <PermissionProvider iri={currentCollection.ownerWorkspace}>
+            <PermissionContext.Consumer>
+                {({permissions}) => (
+                    <AlterPermissionDialog
+                        {...props}
+                        collaborators={collaborators}
+                        users={permissions}
+                        collections={collections}
+                        loading={loadingPermissions}
+                        error={errorPermissions}
+                    />
+                )}
+            </PermissionContext.Consumer>
+        </PermissionProvider>
     );
 };
-
 
 export default AlterPermissionContainer;
