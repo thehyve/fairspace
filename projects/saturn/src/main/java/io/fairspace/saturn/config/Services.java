@@ -92,7 +92,7 @@ public class Services {
         metaVocabularyService = new ReadableMetadataService(transactions, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(CONFIG.publicUrl + "/api/v1/webdav/", dataset.getDefaultModel(), blobStore, permissionsService);
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, permissionsService);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), permissionsService);

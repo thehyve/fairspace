@@ -18,6 +18,7 @@ import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
@@ -62,7 +63,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
-        var newSubject = factory.pathToSubject(name);
+        var newSubject = childSubject(factory.rootSubject, name);
         newSubject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
     }
 

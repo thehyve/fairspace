@@ -30,9 +30,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class DavFactoryTest {
     public static final long FILE_SIZE = 3L;
-    public static final String BASE_PATH = "/api/v1/webdav/";
+    public static final String BASE_PATH = "/api/v1/webdav";
     public static final QName VERSION = new QName(FS.NS, "version");
-    private final String baseUri = "http://example.com/" + BASE_PATH;
+    private final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
     private PermissionsService permissions;
     @Mock
@@ -45,7 +45,7 @@ public class DavFactoryTest {
 
     @Before
     public void before() {
-        factory = new DavFactory(baseUri, createTxnMem().getDefaultModel(), store, permissions);
+        factory = new DavFactory(createTxnMem().getDefaultModel().createResource(baseUri), store, permissions);
 
         setupRequestContext();
         request = getCurrentRequest();

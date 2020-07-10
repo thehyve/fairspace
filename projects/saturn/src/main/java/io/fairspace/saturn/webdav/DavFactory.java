@@ -7,50 +7,43 @@ import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
 
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
-import static io.fairspace.saturn.webdav.PathUtils.*;
+import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
 public class DavFactory implements ResourceFactory {
-    final String baseUri;
-    final Model model;
+    final org.apache.jena.rdf.model.Resource rootSubject;
     final BlobStore store;
     final PermissionsService permissions;
+    private final String baseUri;
     private final Resource root = new RootResource(this);
-    final String basePath;
 
 
-    public DavFactory(String baseUri, Model model, BlobStore store, PermissionsService permissions) {
-        this.baseUri = baseUri;
-        this.model = model;
+    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, PermissionsService permissions) {
+        this.rootSubject = rootSubject;
         this.store = store;
         this.permissions = permissions;
-        this.basePath = normalizePath(URI.create(baseUri).getPath());
+        var uri = URI.create(rootSubject.getURI());
+        this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
     }
 
     @Override
     public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
-        // /api/v1/webdav/relPath -> relPath
-        path = normalizePath(normalizePath(path).substring(basePath.length()));
+        return getResource(rootSubject.getModel().createResource(baseUri + "/" + encodePath(path)));
+    }
 
-        if (path.isEmpty()) {
+    Resource getResource(org.apache.jena.rdf.model.Resource subject) throws NotAuthorizedException {
+        if (subject.equals(rootSubject)) {
             return root;
         }
 
-        var collection = pathToSubject(splitPath(path)[0]);
-        if (!collection.hasProperty(RDF.type, FS.Collection)) {
-            return null;
-        }
+        var access = permissions.getPermission(subject.asNode());
 
-        var subject = pathToSubject(path);
-        var access = permissions.getPermission(collection.asNode());
-
-        if (!access.canRead()) {
+        if (access == Access.None) {
             throw new NotAuthorizedException();
         }
 
@@ -74,11 +67,7 @@ public class DavFactory implements ResourceFactory {
         return null;
     }
 
-    org.apache.jena.rdf.model.Resource pathToSubject(String path) {
-        return model.createResource(baseUri + encodePath(path));
-    }
-
-    static org.apache.jena.rdf.model.Resource childResource(org.apache.jena.rdf.model.Resource subject, String name) {
+    static org.apache.jena.rdf.model.Resource childSubject(org.apache.jena.rdf.model.Resource subject, String name) {
         return subject.getModel().createResource(subject.getURI() + "/" + encodePath(name));
     }
 
