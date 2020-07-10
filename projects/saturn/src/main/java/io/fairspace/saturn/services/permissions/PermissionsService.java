@@ -330,7 +330,7 @@ public class PermissionsService {
         return new CollectionAccessDto(access);
     }
 
-    public Object[] getPermissionsDto(Node resource) {
+    public Object[] getPermissionDtos(Node resource) {
         return getPermissions(resource)
                 .entrySet()
                 .stream()
