@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
+import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 
@@ -55,6 +56,8 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
+        validateCollectionName(newName);
+
         var subj = childSubject(factory.rootSubject, newName);
 
         if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {

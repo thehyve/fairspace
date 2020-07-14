@@ -86,6 +86,36 @@ public class DavFactoryTest {
     }
 
     @Test
+    public void testCreateCollectionWithInvalidName() throws NotAuthorizedException, ConflictException, BadRequestException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        try {
+            root.createCollection("");
+            fail("Empty collection name should be rejected.");
+        } catch (BadRequestException e) {
+            assertEquals("The collection name is empty.", e.getReason());
+        }
+        var tooLongName = "test123_56".repeat(13); // 130 characters
+        try {
+            root.createCollection(tooLongName);
+            fail("Collection name should be rejected as too long.");
+        } catch (BadRequestException e) {
+            assertEquals("The collection name exceeds maximum length 127.", e.getReason());
+        }
+        String[] invalidNames = {".", "..", ".test", "%test%", "!", "\"", "#", "$test", "a test"};
+        for (var invalidName: invalidNames) {
+            try {
+                root.createCollection(invalidName);
+                fail("Collection name should be rejected as invalid: " + invalidName);
+            } catch (BadRequestException e) {
+                assertEquals(
+                        "The collection name should only contain letters a-z and A-Z, " +
+                                "numbers 0-9, and the characters `-` and `_`.",
+                        e.getReason());
+            }
+        }
+    }
+
+    @Test
     public void testNonExistingResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }

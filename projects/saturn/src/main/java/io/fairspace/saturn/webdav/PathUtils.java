@@ -1,16 +1,17 @@
 package io.fairspace.saturn.webdav;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
+import io.milton.http.exceptions.BadRequestException;
 
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.join;
+import java.util.regex.Pattern;
+
 import static org.apache.commons.lang3.StringUtils.strip;
 import static org.apache.http.client.utils.URLEncodedUtils.formatSegments;
-import static org.apache.http.client.utils.URLEncodedUtils.parsePathSegments;
 
 public class PathUtils {
-    private static final String[] INVALID_BASENAMES = {".", ".."};
+    private static final Pattern VALID_COLLECTION_NAMES = Pattern.compile(
+            "[a-z0-9_-]+",
+            Pattern.CASE_INSENSITIVE);
+    private static final int MAX_COLLECTION_NAME_LENGTH = 127;
 
     public static String normalizePath(String path) {
         return strip(path, "/");
@@ -20,22 +21,8 @@ public class PathUtils {
         return normalizePath(formatSegments(splitPath(path)));
     }
 
-    public static String decodePath(String path) {
-        return normalizePath(join(parsePathSegments(path), "/"));
-    }
-
     public static String[] splitPath(String path) {
         return normalizePath(path).split("/");
-    }
-
-    public static String subPath(String path) {
-        return Stream.of(splitPath(path))
-                .skip(1)
-                .collect(joining("/"));
-    }
-
-    public static String joinPaths(String parentPath, String subPath) {
-        return normalizePath(normalizePath(parentPath) + '/' + normalizePath(subPath));
     }
 
     public static String name(String path) {
@@ -43,12 +30,21 @@ public class PathUtils {
         return (parts.length == 0) ? "" :  parts[parts.length - 1];
     }
 
-    public static String parentPath(String path) {
-        var idx = path.lastIndexOf('/');
-        return idx > 0 ? path.substring(0, idx) : null;
-    }
-
-    public static boolean containsInvalidPathName(String path) {
-        return Arrays.asList(INVALID_BASENAMES).contains(name(path));
+    public static void validateCollectionName(String name) throws BadRequestException {
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException(
+                    "The collection name is empty.");
+        }
+        if (name.length() > MAX_COLLECTION_NAME_LENGTH) {
+            throw new BadRequestException(
+                    "The collection name exceeds maximum length " + MAX_COLLECTION_NAME_LENGTH + ".");
+        }
+        if (!VALID_COLLECTION_NAMES.matcher(name).matches()) {
+            throw new BadRequestException(
+                    "The collection name should only contain " +
+                            "letters a-z and A-Z, " +
+                            "numbers 0-9, " +
+                            "and the characters `-` and `_`.");
+        }
     }
 }
