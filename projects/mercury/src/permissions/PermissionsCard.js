@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import PropTypes from "prop-types";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import LockOpen from "@material-ui/icons/LockOpen";
 import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
 import classnames from "classnames";
 
+import {Group} from "@material-ui/icons";
 import PermissionsContainer from "./PermissionsContainer";
 
 const styles = theme => ({
@@ -77,7 +77,7 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
                 titleTypographyProps={{variant: 'h6'}}
                 title="Collaborators"
                 avatar={(
-                    <LockOpen />
+                    <Group />
                 )}
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
