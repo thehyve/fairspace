@@ -246,9 +246,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
                 <SharingProvider iri={collection.iri}>
                     <SharingContext.Consumer>
-                        {({permissions, alterPermission}) => (
+                        {({workspacesWithShare, usersWithShare, alterPermission}) => (
                             <CollectionShareCard
-                                permissions={permissions}
+                                workspacesWithShare={workspacesWithShare}
+                                usersWithShare={usersWithShare}
                                 alterPermission={alterPermission}
                                 workspaces={this.props.workspaces}
                                 collection={this.props.collection}

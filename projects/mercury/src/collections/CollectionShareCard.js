@@ -1,190 +1,186 @@
 // @flow
-import React, {useState} from 'react';
-import {Card, CardContent, CardHeader, IconButton, List, withStyles} from '@material-ui/core';
-import {HighlightOffSharp} from '@material-ui/icons';
+import React, {useContext, useState} from 'react';
+import {Card, CardContent, CardHeader, Collapse, IconButton, Typography, withStyles} from '@material-ui/core';
 import LockOpen from "@material-ui/icons/LockOpen";
-import ListItem from "@material-ui/core/ListItem";
 import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import Checkbox from "@material-ui/core/Checkbox";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import PropTypes from "prop-types";
-import {sortPermissions} from "../permissions/permissionUtils";
-import ErrorDialog from "../common/components/ErrorDialog";
-import ConfirmationButton from "../common/components/ConfirmationButton";
+import classnames from "classnames";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import UsersContext from "../users/UsersContext";
+import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
+import CollectionShareDialog from "./CollectionShareDialog";
+import CollectionShareList from "./CollectionShareList";
 
 
-const styles = () => ({
+const styles = theme => ({
     card: {
         marginTop: 10
+    },
+    expand: {
+        transform: 'rotate(0deg)',
+        marginLeft: 'auto',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    expandOpen: {
+        transform: 'rotate(180deg)',
     }
 });
 
-export const CollectionShareCard = ({classes, permissions, workspaces, collection, alterPermission, setBusy = () => {}}) => {
-    const workspacesToShareWith = workspaces.filter(ws => permissions.every(p => p.user !== ws.iri));
+export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShare, workspaces, collection, alterPermission, setBusy = () => {}}) => {
+    const {users} = useContext(UsersContext);
+    const workspaceShares = workspacesWithShare.filter(p => p.access === 'Read');
+    const userShares = usersWithShare.filter(p => p.access === 'Read');
 
-    const [showAddShareDialog, setShowAddShareDialog] = useState(false);
-    const [workspacesToAdd, setWorkspacesToAdd] = useState([]);
+    const [showAddWorkspaceShareDialog, setShowAddWorkspaceShareDialog] = useState(false);
+    const [showAddUserShareDialog, setShowAddUserShareDialog] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
-    const toggleWorkspaceToAdd = (ws) => {
-        // eslint-disable-next-line react/no-access-state-in-setstate
-        const workspaceList = [...workspacesToAdd];
-        const idx = workspaceList.indexOf(ws);
-        if (idx < 0) {
-            workspaceList.push(ws);
-        } else {
-            workspaceList.splice(idx, 1);
-        }
-        setWorkspacesToAdd(workspaceList);
-    };
-
-    const renderPermissionsList = () => (
-        <List dense disablePadding>
-            {
-                sortPermissions(permissions.filter(p => p.access === 'Read')).map(p => (
-                    <ListItem key={p.user}>
-                        <ListItemText
-                            primary={p.name}
-                            style={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}
-                        />
-                        {collection.canManage && (
-                            <ListItemSecondaryAction>
-                                <ConfirmationButton
-                                    onClick={() => {
-                                        setBusy(true);
-                                        alterPermission(p.user, collection.iri, 'None')
-                                            .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
-                                            .finally(() => setBusy(false));
-                                    }}
-                                    disabled={p.access === 'Manage'}
-                                    message="Are you sure you want to remove this share?"
-                                    agreeButtonText="Ok"
-                                    dangerous
-                                >
-                                    <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
-                                        <HighlightOffSharp />
-                                    </IconButton>
-                                </ConfirmationButton>
-                            </ListItemSecondaryAction>
-                        )}
-                    </ListItem>
-                ))
-            }
-        </List>
+    const getWorkspacesToShareWith = () => workspaces.filter(
+        ws => workspacesWithShare.every(p => p.user !== ws.iri)
+    );
+    const getUsersToShareWith = (workspaceMembers) => users.filter(
+        u => workspaceMembers
+            && workspaceMembers.every(m => m.user !== u.iri)
+            && usersWithShare.every(us => us.user !== u.iri)
     );
 
-    const renderShareCollectionDialog = () => (
-        <Dialog open={showAddShareDialog}>
-            <DialogTitle>Share collection {collection.name} with other workspaces</DialogTitle>
-            <DialogContent>
-                {
-                    workspacesToShareWith.length
-                        ? (
-                            <List>
-                                {
-                                    workspacesToShareWith.map(ws => (
-                                        <ListItem key={ws.iri} onClick={() => toggleWorkspaceToAdd(ws.iri)}>
-                                            <ListItemIcon>
-                                                <Checkbox
-                                                    edge="start"
-                                                    checked={workspacesToAdd.includes(ws.iri)}
-                                                    tabIndex={-1}
-                                                    disableRipple
-                                                />
-                                            </ListItemIcon>
-                                            <ListItemText
-                                                primary={ws.name}
-                                                style={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap'
-                                                }}
-                                            />
-                                        </ListItem>
-                                    ))
-                                }
-                            </List>
-                        )
-                        : 'This collection has been already shared with all workspaces'
-                }
+    const toggleExpand = () => setExpanded(!expanded);
 
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    onClick={
-                        () => {
-                            setBusy(true);
-                            setShowAddShareDialog(false);
+    const cardHeaderAction = (
+        <IconButton
+            className={classnames(classes.expand, {
+                [classes.expandOpen]: expanded,
+            })}
+            onClick={toggleExpand}
+            aria-expanded={expanded}
+            aria-label="Show more"
+            title="Share"
+        >
+            <ExpandMore />
+        </IconButton>
+    );
 
-                            Promise.all(workspacesToAdd.map(ws => alterPermission(ws, collection.iri, 'Read')))
-                                .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
-                                .finally(() => setBusy(false));
-                        }
-                    }
-                    color="default"
-                >
-                    Ok
-                </Button>
-                <Button
-                    onClick={() => setShowAddShareDialog(false)}
-                    color="default"
-                >
-                    Cancel
-                </Button>
-            </DialogActions>
-        </Dialog>
+    const renderSharesList = (shares, title) => (
+        <CollectionShareList
+            shares={shares}
+            title={title}
+            collection={collection}
+            alterPermission={alterPermission}
+            setBusy={setBusy}
+        />
+    );
+
+    const renderNoSharesMessage = () => (
+        <Typography component="p" style={{paddingLeft: 16, paddingTop: 16, color: "gray", fontStyle: "italic"}}>
+            Collection has not been shared yet.
+        </Typography>
+    );
+
+    const renderShares = () => {
+        if (workspaceShares.length === 0 && userShares.length === 0) {
+            return renderNoSharesMessage();
+        }
+        return (
+            <div>
+                {workspaceShares.length > 0 && renderSharesList(workspaceShares, "Shared with workspaces: ")}
+                {userShares.length > 0 && renderSharesList(userShares, "Shared with users: ")}
+            </div>
+        );
+    };
+
+    const renderShareWithUsersDialog = () => (
+        <PermissionProvider iri={collection.ownerWorkspace}>
+            <PermissionContext.Consumer>
+                {({permissions}) => (
+                    <CollectionShareDialog
+                        collection={collection}
+                        alterPermission={alterPermission}
+                        entitiesName="users"
+                        shareCandidates={getUsersToShareWith(permissions)}
+                        setBusy={setBusy}
+                        showDialog={showAddUserShareDialog}
+                        setShowDialog={setShowAddUserShareDialog}
+                    />
+                )}
+            </PermissionContext.Consumer>
+        </PermissionProvider>
+    );
+
+    const renderShareWithWorkspacesDialog = () => (
+        <CollectionShareDialog
+            collection={collection}
+            alterPermission={alterPermission}
+            entitiesName="workspaces"
+            shareCandidates={getWorkspacesToShareWith()}
+            setBusy={setBusy}
+            showDialog={showAddWorkspaceShareDialog}
+            setShowDialog={setShowAddWorkspaceShareDialog}
+        />
     );
 
     return (
         <div>
             <Card classes={{root: classes.card}}>
                 <CardHeader
+                    action={cardHeaderAction}
                     titleTypographyProps={{variant: 'h6'}}
                     title="Share"
                     avatar={(
                         <LockOpen />
                     )}
                 />
-                <CardContent>
-                    {renderPermissionsList()}
-                    {collection.canManage && !collection.dateDeleted && (
-                        <Button
-                            style={{margin: 8}}
-                            color="primary"
-                            variant="text"
-                            aria-label="Add"
-                            title="Add a new share"
-                            onClick={() => {
-                                setShowAddShareDialog(true);
-                                setWorkspacesToAdd([]);
-                            }}
-                        >
-                            Share
-                        </Button>
-                    )}
-                </CardContent>
+                <Collapse in={expanded} timeout="auto" unmountOnExit>
+                    <CardContent style={{paddingTop: 0}}>
+                        <Typography component="p" style={{paddingLeft: 16}}>
+                            Share collection outside the owner workspace.
+                        </Typography>
+                        {renderShares()}
+                        {collection.canManage && !collection.dateDeleted && (
+                            <div>
+                                <Button
+                                    style={{margin: 8}}
+                                    color="primary"
+                                    variant="text"
+                                    aria-label="Add"
+                                    title="Add a new workspace share"
+                                    onClick={() => {
+                                        setShowAddWorkspaceShareDialog(true);
+                                    }}
+                                >
+                                    Share with workspaces
+                                </Button>
+                                <Button
+                                    style={{margin: 8}}
+                                    color="primary"
+                                    variant="text"
+                                    aria-label="Add"
+                                    title="Add a new user share"
+                                    onClick={() => {
+                                        setShowAddUserShareDialog(true);
+                                    }}
+                                >
+                                    Share with users
+                                </Button>
+                            </div>
+                        )}
+                    </CardContent>
+                </Collapse>
             </Card>
-            {renderShareCollectionDialog()}
+            {showAddUserShareDialog && renderShareWithUsersDialog()}
+            {showAddWorkspaceShareDialog && renderShareWithWorkspacesDialog()}
         </div>
     );
 };
 
 CollectionShareCard.propTypes = {
     classes: PropTypes.object,
-    permissions: PropTypes.array,
     workspaces: PropTypes.array,
     collection: PropTypes.object,
     alterPermission: PropTypes.func.isRequired,
     setBusy: PropTypes.func.isRequired,
+    workspacesWithShare: PropTypes.array,
+    usersWithShare: PropTypes.array,
 };
-
 export default withStyles(styles)(CollectionShareCard);
