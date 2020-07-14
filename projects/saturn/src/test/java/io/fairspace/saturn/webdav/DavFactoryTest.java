@@ -75,6 +75,17 @@ public class DavFactoryTest {
     }
 
     @Test
+    public void testCreateCollectionStartingWithDash() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        var coll = root.createCollection("-coll");
+        assertTrue(coll instanceof FolderResource);
+        assertEquals("-coll", coll.getName());
+        assertNotNull(root.child("-coll"));
+        assertNotNull(factory.getResource(null,"/api/v1/webdav/-coll/"));
+        assertEquals(1, root.getChildren().size());
+    }
+
+    @Test
     public void testNonExistingResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }
