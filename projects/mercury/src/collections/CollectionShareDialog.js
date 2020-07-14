@@ -10,12 +10,18 @@ import DialogContent from "@material-ui/core/DialogContent";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 
 export const CollectionShareDialog = ({collection, alterPermission, entitiesName, shareCandidates = [],
     setBusy = () => {}, showDialog, setShowDialog = () => {}}) => {
     const [selectedEntities, setSelectedEntities] = useState([]);
+    const [accessRight, setAccessRight] = useState("Read");
 
     const toggleSelectedEntities = (entities) => {
         const results = [...selectedEntities];
@@ -35,30 +41,46 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
                 {
                     shareCandidates.length
                         ? (
-                            <List>
-                                {
-                                    shareCandidates.map(ws => (
-                                        <ListItem key={ws.iri} onClick={() => toggleSelectedEntities(ws.iri)}>
-                                            <ListItemIcon>
-                                                <Checkbox
-                                                    edge="start"
-                                                    checked={selectedEntities.includes(ws.iri)}
-                                                    tabIndex={-1}
-                                                    disableRipple
+                            <div>
+                                <FormControl>
+                                    <InputLabel id="access-right-label">Access right</InputLabel>
+                                    <Select
+                                        labelId="access-right-selector-label"
+                                        id="access-right-selector"
+                                        value={accessRight}
+                                        onChange={e => setAccessRight(e.target.value)}
+                                    >
+                                        <MenuItem value="List">List</MenuItem>
+                                        <MenuItem value="Read">Read</MenuItem>
+                                    </Select>
+                                    <FormHelperText>Select access right the collection will be shared with</FormHelperText>
+                                </FormControl>
+
+                                <List>
+                                    {
+                                        shareCandidates.map(ws => (
+                                            <ListItem key={ws.iri} onClick={() => toggleSelectedEntities(ws.iri)}>
+                                                <ListItemIcon>
+                                                    <Checkbox
+                                                        edge="start"
+                                                        checked={selectedEntities.includes(ws.iri)}
+                                                        tabIndex={-1}
+                                                        disableRipple
+                                                    />
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary={ws.name}
+                                                    style={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
                                                 />
-                                            </ListItemIcon>
-                                            <ListItemText
-                                                primary={ws.name}
-                                                style={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap'
-                                                }}
-                                            />
-                                        </ListItem>
-                                    ))
-                                }
-                            </List>
+                                            </ListItem>
+                                        ))
+                                    }
+                                </List>
+                            </div>
                         )
                         : `This collection has been already shared with all ${entitiesName}.`
                 }
@@ -70,7 +92,7 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
                             setBusy(true);
                             setShowDialog(false);
 
-                            Promise.all(shareCandidates.map(entity => alterPermission(entity, collection.iri, 'Read')))
+                            Promise.all(shareCandidates.map(entity => alterPermission(entity, collection.iri, accessRight)))
                                 .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
                                 .finally(() => setBusy(false));
                         }
