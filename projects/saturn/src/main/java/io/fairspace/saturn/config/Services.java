@@ -62,7 +62,7 @@ public class Services {
         permissionsService = new PermissionsService(transactions, permissionNotificationHandler, CONFIG.publicUrl + "/api/v1/webdav/");
         dataset.getContext().set(PERMISSIONS_SERVICE, permissionsService);
 
-        workspaceService = new WorkspaceService(transactions, permissionsService);
+        workspaceService = new WorkspaceService(transactions);
 
 
         var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);

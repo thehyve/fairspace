@@ -23,8 +23,8 @@ describe('WorkspacesAPI', () => {
         await workspacesAPI.createWorkspace(workspaceData);
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
-            '/api/v1/workspaces/workspace1',
-            '',
+            '/api/v1/workspaces/',
+            "{\"id\":\"workspace1\"}",
             {headers: {Accept: 'application/json'}}
         );
     });
@@ -50,7 +50,7 @@ describe('WorkspacesAPI', () => {
 
     it('Updates a workspace status', async () => {
         const workspaceData: Workspace = {
-            id: 'workspace1',
+            iri: 'workspace1',
             name: 'w1',
             description: 'Description of workspace1',
             status: 'Active'
@@ -59,12 +59,12 @@ describe('WorkspacesAPI', () => {
             headers: {'content-type': 'application/json'}
         };
         mockAxios.patch.mockImplementationOnce(() => Promise.resolve(patchResponse));
-        await workspacesAPI.updateWorkspaceStatus(workspaceData);
+        await workspacesAPI.updateWorkspace(workspaceData);
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
         expect(mockAxios.patch).toHaveBeenCalledWith(
-            '/api/v1/workspaces/workspace1/status',
+            '/api/v1/workspaces/',
             JSON.stringify({
-                id: 'workspace1',
+                iri: 'workspace1',
                 name: 'w1',
                 description: 'Description of workspace1',
                 status: 'Active'

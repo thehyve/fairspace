@@ -37,7 +37,7 @@ const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
             .then(() => {
                 setCreatingWorkspace(false);
                 setLoadingCreatedWorkspace(false);
-                history.push(`/workspaces/${workspace.id}/`);
+                history.push(`/workspaces/?iri=${encodeURI(workspace.iri)}`);
             })
             .catch(err => {
                 setLoadingCreatedWorkspace(false);

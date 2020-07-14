@@ -6,30 +6,28 @@ import LoadingOverlay from "../common/components/LoadingOverlay";
 const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 
 export default ({onSubmit, onClose, creating, workspaces,
-    workspace: {id = ''} = {}}) => {
+    workspace: {name = ''} = {}}) => {
     const isWorkspaceIdUnique = (workspaceId) => !workspaces.some(workspace => workspace.id === workspaceId);
-    const idControl = useFormField(id, value => !!value && ID_PATTERN.test(value) && isWorkspaceIdUnique(value));
+    const nameControl = useFormField(name, value => !!value && ID_PATTERN.test(value) && isWorkspaceIdUnique(value));
 
-    const allControls = [idControl];
+    const allControls = [nameControl];
 
     const formValid = allControls.every(({valid}) => valid);
 
     const fields = [
         {
-            control: idControl,
+            control: nameControl,
             required: true,
-            id: "id",
-            label: "Id",
-            name: "id",
-            helperText: "Value has to be unique per node. "
-                + "Only lower case letters, numbers, hyphens and should start with a letter."
+            id: "name",
+            label: "Name",
+            name: "name",
+            helperText: "Workspace name"
         }
     ];
 
     const validateAndSubmit = () => formValid && onSubmit(
         {
-            id: idControl.value,
-            label: idControl.value
+            name: nameControl.value,
         }
     );
     return (

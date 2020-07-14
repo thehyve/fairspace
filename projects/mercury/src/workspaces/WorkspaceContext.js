@@ -7,8 +7,8 @@ const WorkspaceContext = React.createContext({});
 
 export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) => {
     const {data: workspaces = [], error: workspacesError, loading: workspacesLoading, refresh: refreshWorkspaces} = useAsync(workspacesAPI.getWorkspaces);
-    const createWorkspace = (workspace: Workspace) => workspacesAPI.createWorkspace(workspace);
-    const updateWorkspaceStatus = (workspace: Workspace) => workspacesAPI.updateWorkspaceStatus(workspace).then(refreshWorkspaces);
+    const createWorkspace = (workspace: Workspace) => workspacesAPI.createWorkspace(workspace).then(refreshWorkspaces);
+    const updateWorkspace = (workspace: Workspace) => workspacesAPI.updateWorkspace(workspace).then(refreshWorkspaces);
 
     return (
         <WorkspaceContext.Provider
@@ -18,7 +18,7 @@ export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) =>
                 workspacesLoading,
                 refreshWorkspaces,
                 createWorkspace,
-                updateWorkspaceStatus
+                updateWorkspaceStatus: updateWorkspace
             }}
         >
             {children}
