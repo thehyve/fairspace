@@ -30,8 +30,8 @@ const styles = theme => ({
 
 export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShare, workspaces, collection, alterPermission, setBusy = () => {}}) => {
     const {users} = useContext(UsersContext);
-    const workspaceShares = workspacesWithShare.filter(p => p.access === 'Read');
-    const userShares = usersWithShare.filter(p => p.access === 'Read');
+    const workspaceShares = workspacesWithShare.filter(p => p.access === 'Read' || p.access === 'List');
+    const userShares = usersWithShare.filter(p => p.access === 'Read' || p.access === 'List');
 
     const [showAddWorkspaceShareDialog, setShowAddWorkspaceShareDialog] = useState(false);
     const [showAddUserShareDialog, setShowAddUserShareDialog] = useState(false);

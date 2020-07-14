@@ -22,6 +22,7 @@ export const CollectionShareList = ({title, shares, collection, alterPermission,
                     <ListItem key={p.user}>
                         <ListItemText
                             primary={p.name}
+                            secondary={p.access}
                             style={{
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
