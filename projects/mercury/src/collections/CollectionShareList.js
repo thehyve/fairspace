@@ -12,14 +12,12 @@ import ConfirmationButton from "../common/components/ConfirmationButton";
 
 
 export const CollectionShareList = ({title, shares, collection, alterPermission, setBusy = () => {}}) => {
-
     const handleRemoveShare = (entity) => {
         setBusy(true);
         alterPermission(entity, collection.iri, 'None')
             .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
             .finally(() => setBusy(false));
     };
-
 
     return (
         <div style={{paddingLeft: 16}}>

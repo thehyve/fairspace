@@ -1,13 +1,11 @@
 // @flow
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {Card, CardContent, CardHeader, Collapse, IconButton, Typography, withStyles} from '@material-ui/core';
 import LockOpen from "@material-ui/icons/LockOpen";
 import Button from "@material-ui/core/Button";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import UsersContext from "../users/UsersContext";
-import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
 import CollectionShareDialog from "./CollectionShareDialog";
 import CollectionShareList from "./CollectionShareList";
 
@@ -34,21 +32,23 @@ const styles = theme => ({
     }
 });
 
-export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShare, workspaces, collection, alterPermission, setBusy = () => {}}) => {
-    const {users} = useContext(UsersContext);
+export const CollectionShareCard = ({classes,
+    workspacesWithShare, usersWithShare,
+    workspaces, collection, users, workspaceUsers,
+    alterPermission, setBusy = () => {}}) => {
     const workspaceShares = workspacesWithShare.filter(p => p.access === 'Read' || p.access === 'List');
-    const userShares = usersWithShare.filter(p => p.access === 'Read' || p.access === 'List');
+    const userShares = usersWithShare.filter(p => (
+        (p.access === 'Read' || p.access === 'List') && workspaceUsers.every(u => u.iri !== p.user)
+    ));
 
     const [showAddWorkspaceShareDialog, setShowAddWorkspaceShareDialog] = useState(false);
     const [showAddUserShareDialog, setShowAddUserShareDialog] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    const getWorkspacesToShareWith = () => workspaces.filter(
-        ws => workspacesWithShare.every(p => p.user !== ws.iri)
-    );
-    const getUsersToShareWith = (workspaceMembers) => users.filter(
-        u => workspaceMembers
-            && workspaceMembers.every(m => m.user !== u.iri)
+    const workspacesToShareWith = workspaces.filter(ws => workspacesWithShare.every(p => p.user !== ws.iri));
+    const usersToShareWith = users.filter(
+        u => workspaceUsers
+            && workspaceUsers.every(m => m.iri !== u.iri)
             && usersWithShare.every(us => us.user !== u.iri)
     );
 
@@ -97,21 +97,15 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
     };
 
     const renderShareWithUsersDialog = () => (
-        <PermissionProvider iri={collection.ownerWorkspace}>
-            <PermissionContext.Consumer>
-                {({permissions}) => (
-                    <CollectionShareDialog
-                        collection={collection}
-                        alterPermission={alterPermission}
-                        entitiesName="users"
-                        shareCandidates={getUsersToShareWith(permissions)}
-                        setBusy={setBusy}
-                        showDialog={showAddUserShareDialog}
-                        setShowDialog={setShowAddUserShareDialog}
-                    />
-                )}
-            </PermissionContext.Consumer>
-        </PermissionProvider>
+        <CollectionShareDialog
+            collection={collection}
+            alterPermission={alterPermission}
+            entitiesName="users"
+            shareCandidates={usersToShareWith}
+            setBusy={setBusy}
+            showDialog={showAddUserShareDialog}
+            setShowDialog={setShowAddUserShareDialog}
+        />
     );
 
     const renderShareWithWorkspacesDialog = () => (
@@ -119,7 +113,7 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
             collection={collection}
             alterPermission={alterPermission}
             entitiesName="workspaces"
-            shareCandidates={getWorkspacesToShareWith()}
+            shareCandidates={workspacesToShareWith}
             setBusy={setBusy}
             showDialog={showAddWorkspaceShareDialog}
             setShowDialog={setShowAddWorkspaceShareDialog}
@@ -177,6 +171,8 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
 CollectionShareCard.propTypes = {
     classes: PropTypes.object,
     workspaces: PropTypes.array,
+    workspaceUsers: PropTypes.array,
+    users: PropTypes.array,
     collection: PropTypes.object,
     alterPermission: PropTypes.func.isRequired,
     setBusy: PropTypes.func.isRequired,

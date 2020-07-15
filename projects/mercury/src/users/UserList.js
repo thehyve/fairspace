@@ -19,20 +19,17 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Checkbox from "@material-ui/core/Checkbox";
 import UserSelect from "../permissions/UserSelect";
-import {PermissionProvider} from "../permissions/PermissionContext";
 import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User, UserRoles} from "./UsersAPI";
-import UserContext from "./UserContext";
 import UsersContext from "./UsersContext";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
-import workspacesAPI from "../workspaces/WorkspacesAPI";
-import useAsync from "../common/hooks/UseAsync";
-import LoadingOverlay from "../common/components/LoadingOverlay";
+import WorkspaceUsersContext, {WorkspaceUsersProvider} from "../workspaces/WorkspaceUsersContext";
+import UserContext from "./UserContext";
 
 const columns = {
     name: {
@@ -51,27 +48,29 @@ const columns = {
 
 type UserListProps = {
     currentUser: User & UserRoles,
-    workspace: Workspace
+    workspace: Workspace,
+    workspaceUsers: Object,
+    workspaceUsersError: boolean,
+    workspaceUsersLoading: boolean,
+    setWorkspaceRole: () => {}
 }
 
 const UserList = (props: UserListProps) => {
-    const {currentUser, workspace} = props;
+    const {currentUser, workspace, workspaceUsers, workspaceUsersError, workspaceUsersLoading, setWorkspaceRole} = props;
     const {canManage} = workspace;
     const {users} = useContext(UsersContext);
-    const {data: collaborators, error: errorCollaborators, loading: loadingCollaborators, refresh} = useAsync(() => workspacesAPI.getWorkspaceUsers(workspace.iri), [workspace.iri]);
-    const collaboratorsEx = collaborators && users && collaborators.map(c => ({...c, ...(users.find(u => u.iri === c.iri) || {})}));
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collaboratorsEx || [], columns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsers, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
 
-    if (errorCollaborators) {
+    if (workspaceUsersError) {
         return (<MessageDisplay message="An error occurred loading permissions" />);
-    } if (loadingCollaborators) {
-        return (<LoadingOverlay loading />);
+    } if (workspaceUsersLoading) {
+        return (<LoadingInlay />);
     }
 
-    const grantUserAccess = (userIri, access) => workspacesAPI.setWorkspaceRole(workspace.iri, userIri, access).then(refresh);
+    const grantUserAccess = (userIri, access) => setWorkspaceRole(workspace.iri, userIri, access).then(refresh);
 
     const renderAddUserDialog = () => (
         <Dialog
@@ -160,8 +159,8 @@ const UserList = (props: UserListProps) => {
                                     checked={u.role === 'Manager'}
                                     onChange={(event) => (
                                         event.target.checked
-                                            ? grantUserAccess(u.iri, "Manager")
-                                            : grantUserAccess(u.iri, "Collaborator")
+                                            ? grantUserAccess(u.user, "Manage")
+                                            : grantUserAccess(u.user, "Member")
                                     )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     disableRipple
@@ -187,7 +186,7 @@ const UserList = (props: UserListProps) => {
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
-                count={collaborators.length}
+                count={workspaceUsers.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={(e, p) => setPage(p)}
@@ -205,7 +204,7 @@ const UserList = (props: UserListProps) => {
     );
 };
 
-const UserListWithPermissionProvider = (props) => {
+const ContextualUserList = (props) => {
     const {workspace} = props;
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {usersLoading, usersError} = useContext(UsersContext);
@@ -217,13 +216,21 @@ const UserListWithPermissionProvider = (props) => {
     }
 
     return (
-        <PermissionProvider iri={workspace.iri}>
-            <UserList
-                currentUser={currentUser}
-                workspace={workspace}
-            />
-        </PermissionProvider>
+        <WorkspaceUsersProvider iri={workspace.iri}>
+            <WorkspaceUsersContext.Consumer>
+                {({workspaceUsers, workspaceUsersError, workspaceUsersLoading, setWorkspaceRole}) => (
+                    <UserList
+                        currentUser={currentUser}
+                        workspace={workspace}
+                        workspaceUsers={workspaceUsers}
+                        workspaceUsersError={workspaceUsersError}
+                        workspaceUsersLoading={workspaceUsersLoading}
+                        setWorkspaceRole={setWorkspaceRole}
+                    />
+                )}
+            </WorkspaceUsersContext.Consumer>
+        </WorkspaceUsersProvider>
     );
 };
 
-export default UserListWithPermissionProvider;
+export default ContextualUserList;
