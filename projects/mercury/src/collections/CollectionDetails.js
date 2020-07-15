@@ -19,6 +19,9 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import PermissionsCard from "../permissions/PermissionsCard";
 import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
 import CollectionShareCard from "./CollectionShareCard";
+import MessageDisplay from "../common/components/MessageDisplay";
+import UsersContext from "../users/UsersContext";
+import WorkspaceUsersContext, {WorkspaceUsersProvider} from "../workspaces/WorkspaceUsersContext";
 
 
 export const ICONS = {
@@ -128,9 +131,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     render() {
-        const {loading, collection, inCollectionsBrowser = false} = this.props;
+        const {loading, error, collection, inCollectionsBrowser = false} = this.props;
         const {anchorEl, editing, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
+
+        if (error) {
+            return (<MessageDisplay message="An error occurred loading collection details." />);
+        }
 
         if (loading) {
             return <LoadingInlay />;
@@ -251,6 +258,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                 workspacesWithShare={workspacesWithShare}
                                 usersWithShare={usersWithShare}
                                 alterPermission={alterPermission}
+                                workspaceUsers={this.props.workspaceUsers}
+                                users={this.props.users}
                                 workspaces={this.props.workspaces}
                                 collection={this.props.collection}
                                 setBusy={this.props.setBusy}
@@ -266,19 +275,29 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {currentUser} = useContext(UserContext);
+    const {users} = useContext(UsersContext);
     const {deleteCollection, undeleteCollection} = useContext(CollectionsContext);
-    const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
+    const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
-        <CollectionDetails
-            {...props}
-            loading={props.loading || workspacesLoading}
-            currentUser={currentUser}
-            workspaces={workspaces}
-            history={history}
-            deleteCollection={deleteCollection}
-            undeleteCollection={undeleteCollection}
-        />
+        <WorkspaceUsersProvider iri={props.collection.ownerWorkspace}>
+            <WorkspaceUsersContext.Consumer>
+                {({workspaceUsers, workspaceUsersError, workspacesUsersLoading}) => (
+                    <CollectionDetails
+                        {...props}
+                        error={props.error || workspacesError || workspaceUsersError}
+                        loading={props.loading || workspacesLoading || workspacesUsersLoading}
+                        currentUser={currentUser}
+                        users={users}
+                        workspaceUsers={workspaceUsers}
+                        workspaces={workspaces}
+                        history={history}
+                        deleteCollection={deleteCollection}
+                        undeleteCollection={undeleteCollection}
+                    />
+                )}
+            </WorkspaceUsersContext.Consumer>
+        </WorkspaceUsersProvider>
     );
 };
 
