@@ -208,21 +208,12 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         // TODO: Remove
         if (name.equals(DATE_DELETED_PROPERTY) && value == null && subject.hasProperty(FS.dateDeleted)) {
             try {
-                restore();
+                undelete();
             } catch (BadRequestException e) {
                 throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, e.getReason());
             } catch (ConflictException e) {
                 throw new PropertySource.PropertySetException(Response.Status.SC_CONFLICT, e.getMessage());
             }
-        }
-    }
-
-    private void restore(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
-        if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
-            resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
-
-            resource.listProperties(FS.contains)
-                    .forEachRemaining(statement -> restore(statement.getResource(), date, user));
         }
     }
 
@@ -282,17 +273,26 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files)  throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
-            case "restore" -> restore();
+            case "undelete" -> undelete();
             default -> throw new BadRequestException(this, "Unrecognized action " + action);
         }
     }
 
-    private void restore() throws BadRequestException, NotAuthorizedException, ConflictException {
+    private void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
         if (!subject.hasProperty(FS.dateDeleted)) {
             throw new ConflictException(this, "Cannot restore");
         }
         var date = subject.getProperty(FS.dateDeleted).getLiteral();
         var user = subject.getProperty(FS.deletedBy).getResource();
-        restore(subject, date, user);
+        undelete(subject, date, user);
+    }
+
+    private void undelete(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
+        if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
+            resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
+
+            resource.listProperties(FS.contains)
+                    .forEachRemaining(statement -> undelete(statement.getResource(), date, user));
+        }
     }
 }

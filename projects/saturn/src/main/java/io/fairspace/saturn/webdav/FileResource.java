@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.ModelUtils;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
@@ -25,8 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
-import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.lang.Integer.parseInt;
@@ -166,7 +164,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
         var newVer = subject.getModel()
                 .createResource();
 
-        ModelUtils.copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
+        copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
         newVer.addProperty(FS.modifiedBy, DavFactory.currentUserResource())
                 .addLiteral(FS.dateModified, WebDAVServlet.timestampLiteral());
 
