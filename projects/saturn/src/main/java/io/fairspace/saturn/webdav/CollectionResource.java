@@ -2,12 +2,14 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
+import io.milton.http.FileItem;
 import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.property.PropertySource;
 import io.milton.resource.DisplayNameResource;
+import io.milton.resource.PostableResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
@@ -15,6 +17,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
 import java.util.List;
+import java.util.Map;
 
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
@@ -23,7 +26,7 @@ import static io.fairspace.saturn.webdav.PathUtils.decodePath;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
-class CollectionResource extends DirectoryResource implements DisplayNameResource {
+class CollectionResource extends DirectoryResource implements DisplayNameResource, PostableResource {
     private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
     private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
     private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
@@ -135,4 +138,39 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return COLLECTION_PROPERTIES;
     }
 
+    @Override
+    public String processForm(Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        var action = parameters.getOrDefault("action", "");
+
+        switch (action) {
+            case "share_with_user" -> shareWithUser(parameters.get("user"), parameters.get("access"));
+            case "share_with_workspace" -> shareWithWorkspace(parameters.get("workspace"));
+            case "unshare_with_workspace" -> unshareWithWorkspace(parameters.get("workspace"));
+            case "publish" -> publish();
+            case "unpublish" -> unpublish();
+            default -> throw new BadRequestException("Unrecognized action " + action);
+        }
+
+        return null;
+    }
+
+    private void shareWithUser(String user, String access) throws BadRequestException, NotAuthorizedException, ConflictException {
+
+    }
+
+    private void shareWithWorkspace(String workspace) throws BadRequestException, NotAuthorizedException, ConflictException {
+
+    }
+
+    private void unshareWithWorkspace(String workspace) throws BadRequestException, NotAuthorizedException, ConflictException {
+
+    }
+
+    private void publish() throws BadRequestException, NotAuthorizedException, ConflictException {
+
+    }
+
+    private void unpublish() throws BadRequestException, NotAuthorizedException, ConflictException {
+
+    }
 }
