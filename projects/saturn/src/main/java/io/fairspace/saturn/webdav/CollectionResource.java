@@ -19,7 +19,7 @@ import java.util.List;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.PathUtils.decodePath;
+import static io.fairspace.saturn.webdav.PathUtils.name;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
@@ -43,7 +43,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Override
     public String getName() {
-        return decodePath(subject.getLocalName());
+        return name(subject.getURI());
     }
 
     @Override
