@@ -25,6 +25,12 @@ const styles = theme => ({
     },
     expandOpen: {
         transform: 'rotate(180deg)',
+    },
+    noSharesMessage: {
+        paddingLeft: 16,
+        paddingTop: 16,
+        color: "gray",
+        fontStyle: "italic"
     }
 });
 
@@ -73,7 +79,7 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
     );
 
     const renderNoSharesMessage = () => (
-        <Typography component="p" style={{paddingLeft: 16, paddingTop: 16, color: "gray", fontStyle: "italic"}}>
+        <Typography component="p" className={classes.noSharesMessage}>
             Collection has not been shared yet.
         </Typography>
     );
@@ -130,12 +136,10 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
                     avatar={(
                         <LockOpen />
                     )}
+                    subheader="Share collection outside the owner workspace."
                 />
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                     <CardContent style={{paddingTop: 0}}>
-                        <Typography component="p" style={{paddingLeft: 16}}>
-                            Share collection outside the owner workspace.
-                        </Typography>
                         {renderShares()}
                         {collection.canManage && !collection.dateDeleted && (
                             <div>
@@ -145,9 +149,7 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
                                     variant="text"
                                     aria-label="Add"
                                     title="Add a new workspace share"
-                                    onClick={() => {
-                                        setShowAddWorkspaceShareDialog(true);
-                                    }}
+                                    onClick={() => setShowAddWorkspaceShareDialog(true)}
                                 >
                                     Share with workspaces
                                 </Button>
@@ -157,9 +159,7 @@ export const CollectionShareCard = ({classes, workspacesWithShare, usersWithShar
                                     variant="text"
                                     aria-label="Add"
                                     title="Add a new user share"
-                                    onClick={() => {
-                                        setShowAddUserShareDialog(true);
-                                    }}
+                                    onClick={() => setShowAddUserShareDialog(true)}
                                 >
                                     Share with users
                                 </Button>

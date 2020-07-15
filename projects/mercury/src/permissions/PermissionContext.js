@@ -16,7 +16,9 @@ export const PermissionProvider = ({iri, children, getPermissions = PermissionAP
         rawPermissions.forEach(permission => {
             const user = users.find(u => permission.user === u.iri);
             if (user) {
-                userPermissions.push({...permission, name: getDisplayName(user), email: getEmail(user)});
+                userPermissions.push(
+                    {...permission, iri: permission.user, name: getDisplayName(user), email: getEmail(user)}
+                );
             }
         });
         return userPermissions;

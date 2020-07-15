@@ -79,6 +79,7 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
                 avatar={(
                     <Group />
                 )}
+                subheader="Add access rights on the collection to owner workspace or individual members."
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>

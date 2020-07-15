@@ -11,49 +11,55 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
 
-export const CollectionShareList = ({title, shares, collection, alterPermission, setBusy = () => {}}) => (
-    <div>
-        <Typography variant="body2">
-            {title}
-        </Typography>
-        <List dense disablePadding>
-            {
-                sortPermissions(shares).map(p => (
-                    <ListItem key={p.user}>
-                        <ListItemText
-                            primary={p.name}
-                            secondary={p.access}
-                            style={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}
-                        />
-                        {collection.canManage && (
-                            <ListItemSecondaryAction>
-                                <ConfirmationButton
-                                    onClick={() => {
-                                        setBusy(true);
-                                        alterPermission(p.user, collection.iri, 'None')
-                                            .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
-                                            .finally(() => setBusy(false));
-                                    }}
-                                    disabled={p.access === 'Manage'}
-                                    message="Are you sure you want to remove this share?"
-                                    agreeButtonText="Ok"
-                                    dangerous
-                                >
-                                    <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
-                                        <HighlightOffSharp />
-                                    </IconButton>
-                                </ConfirmationButton>
-                            </ListItemSecondaryAction>
-                        )}
-                    </ListItem>
-                ))
-            }
-        </List>
-    </div>
-);
+export const CollectionShareList = ({title, shares, collection, alterPermission, setBusy = () => {}}) => {
+
+    const handleRemoveShare = (entity) => {
+        setBusy(true);
+        alterPermission(entity, collection.iri, 'None')
+            .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
+            .finally(() => setBusy(false));
+    };
+
+
+    return (
+        <div style={{paddingLeft: 16}}>
+            <Typography variant="body2">
+                {title}
+            </Typography>
+            <List dense disablePadding>
+                {
+                    sortPermissions(shares).map(p => (
+                        <ListItem key={p.user}>
+                            <ListItemText
+                                primary={p.name}
+                                secondary={p.access}
+                                style={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            />
+                            {collection.canManage && (
+                                <ListItemSecondaryAction>
+                                    <ConfirmationButton
+                                        onClick={() => handleRemoveShare(p.user)}
+                                        disabled={p.access === 'Manage'}
+                                        message="Are you sure you want to remove this share?"
+                                        agreeButtonText="Ok"
+                                        dangerous
+                                    >
+                                        <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
+                                            <HighlightOffSharp />
+                                        </IconButton>
+                                    </ConfirmationButton>
+                                </ListItemSecondaryAction>
+                            )}
+                        </ListItem>
+                    ))
+                }
+            </List>
+        </div>
+    );
+};
 
 export default CollectionShareList;
