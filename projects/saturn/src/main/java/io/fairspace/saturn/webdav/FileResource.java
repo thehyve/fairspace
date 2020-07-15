@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -148,7 +147,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     }
 
     @Override
-    protected void performAction(String action, HashMap<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "revert" -> revert(parameters.get("version"));
             default -> super.performAction(action, parameters, files);
@@ -158,7 +157,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     private void revert(String versionStr) throws BadRequestException, NotAuthorizedException, ConflictException {
         int version;
         try {
-        version =Integer.parseInt(versionStr);
+            version = parseInt(versionStr);
         } catch (Exception e) {
             throw new BadRequestException(this, "No version provided");
         }

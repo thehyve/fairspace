@@ -139,7 +139,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Override
-    protected void performAction(String action, HashMap<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "share_with_user" -> shareWithUser(parameters.get("user"), parameters.get("access"));
             case "share_with_workspace" -> shareWithWorkspace(parameters.get("workspace"));
