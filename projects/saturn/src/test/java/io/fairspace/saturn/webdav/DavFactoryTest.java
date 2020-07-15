@@ -32,7 +32,7 @@ public class DavFactoryTest {
     public static final long FILE_SIZE = 3L;
     public static final String BASE_PATH = "/api/v1/webdav";
     public static final QName VERSION = new QName(FS.NS, "version");
-    private final String baseUri = "http://example.com" + BASE_PATH;
+    private static final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
     private PermissionsService permissions;
     @Mock
@@ -75,14 +75,55 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testNonExistingResource() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testCreateCollectionStartingWithDash() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        var coll = root.createCollection("-coll");
+        assertTrue(coll instanceof FolderResource);
+        assertEquals("-coll", coll.getName());
+        assertNotNull(root.child("-coll"));
+        assertNotNull(factory.getResource(null,"/api/v1/webdav/-coll/"));
+        assertEquals(1, root.getChildren().size());
+    }
+
+    @Test
+    public void testCreateCollectionWithInvalidName() throws NotAuthorizedException, ConflictException, BadRequestException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        try {
+            root.createCollection("");
+            fail("Empty collection name should be rejected.");
+        } catch (BadRequestException e) {
+            assertEquals("The collection name is empty.", e.getReason());
+        }
+        var tooLongName = "test123_56".repeat(13); // 130 characters
+        try {
+            root.createCollection(tooLongName);
+            fail("Collection name should be rejected as too long.");
+        } catch (BadRequestException e) {
+            assertEquals("The collection name exceeds maximum length 127.", e.getReason());
+        }
+        String[] invalidNames = {".", "..", ".test", "%test%", "!", "\"", "#", "$test", "a test"};
+        for (var invalidName: invalidNames) {
+            try {
+                root.createCollection(invalidName);
+                fail("Collection name should be rejected as invalid: " + invalidName);
+            } catch (BadRequestException e) {
+                assertEquals(
+                        "The collection name should only contain letters a-z and A-Z, " +
+                                "numbers 0-9, and the characters `-` and `_`.",
+                        e.getReason());
+            }
+        }
+    }
+
+    @Test
+    public void testNonExistingResource() throws NotAuthorizedException, BadRequestException {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }
 
     @Test(expected = NotAuthorizedException.class)
     public void testInaccessibleResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        var coll = root.createCollection("coll");
+        root.createCollection("coll");
 
         when(permissions.getPermission(any())).thenReturn(Access.None);
 
@@ -94,6 +135,13 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
         root.createCollection("coll");
+    }
+
+    @Test(expected = ConflictException.class)
+    public void testCreateCollectionWithSameNameButDifferentCaseRejected() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll");
+        root.createCollection("COLL");
     }
 
     @Test

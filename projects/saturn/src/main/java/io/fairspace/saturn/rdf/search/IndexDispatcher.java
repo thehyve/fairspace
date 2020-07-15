@@ -28,7 +28,7 @@ public class IndexDispatcher {
             if (pos > 0) {
                 collection = collection.substring(0, pos);
             }
-            return "collection_" + collection;
+            return "collection_" + collection.toLowerCase();
         }
 
         return "shared";

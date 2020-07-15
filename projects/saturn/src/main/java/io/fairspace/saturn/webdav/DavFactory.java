@@ -31,7 +31,7 @@ public class DavFactory implements ResourceFactory {
     }
 
     @Override
-    public Resource getResource(String host, String path) throws NotAuthorizedException, BadRequestException {
+    public Resource getResource(String host, String path) throws NotAuthorizedException {
         return getResource(rootSubject.getModel().createResource(baseUri + "/" + encodePath(path)));
     }
 
