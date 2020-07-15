@@ -21,7 +21,7 @@ export default ({onSubmit, onClose, creating, workspaces,
             id: "name",
             label: "Name",
             name: "name",
-            helperText: "Workspace name"
+            helperText: "Workspace name. Has to be unique."
         }
     ];
 
