@@ -19,7 +19,6 @@ import javax.xml.namespace.QName;
 import java.util.Date;
 import java.util.Map;
 
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
@@ -29,7 +28,7 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
-abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource, PostableResource {
+abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
     protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
@@ -65,11 +64,17 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        if (isAdmin()) {
+        if (access.canManage()) {
             return true;
         }
         if (method == Request.Method.GET) {
             return access.canRead();
+        }
+        if (method == Request.Method.POST) {
+            if ("undelete".equals(request.getParams().get("action"))) {
+                return access.canWrite();
+            }
+            return access.canManage();
         }
         if (method.isWrite) {
             return access.canWrite();
@@ -229,11 +234,6 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             return DATE_DELETED_PROPERTY_META;
         }
         return null;
-    }
-
-    @Override
-    public boolean isCompatible(Request.Method m) {
-        return !m.isWrite || (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH || m == Request.Method.DELETE);
     }
 
     @Override

@@ -22,7 +22,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
-import static io.fairspace.saturn.auth.RequestContext.*;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;

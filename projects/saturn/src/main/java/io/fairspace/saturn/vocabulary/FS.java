@@ -110,6 +110,12 @@ public class FS {
     public static final String MANAGE_URI = NS + "manage";
     public static final Property manage = createProperty(MANAGE_URI);
 
+    public static final String SHARED_WITH_URI = NS + "sharedWith";
+    public static final Property sharedWith = createProperty(SHARED_WITH_URI);
+
+    public static final String ACCESS_MODE_URI = NS + "accessMode";
+    public static final Property accessMode = createProperty(ACCESS_MODE_URI);
+
     public static final String CLASS_SHAPE_META_SHAPE_URI = NS + "ClassShapeMetaShape";
     public static final Resource ClassShapeMetaShape = createResource(CLASS_SHAPE_META_SHAPE_URI);
 

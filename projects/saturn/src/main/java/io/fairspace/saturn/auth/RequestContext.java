@@ -13,6 +13,7 @@ import java.util.Optional;
 public class RequestContext {
     public static final String ADMIN_ROLE = "organisation-admin";
     public static final String VIEW_PUBLIC_METADATA = "view-public-metadata";
+    public static final String VIEW_PUBLIC_DATA = "view-public-data";
 
     private static final ThreadLocal<Request> currentRequest = new ThreadLocal<>();
 
@@ -63,5 +64,9 @@ public class RequestContext {
 
     public static boolean canViewPublicMetadata() {
         return isUserInRole(VIEW_PUBLIC_METADATA);
+    }
+
+    public static boolean canViewPublicData() {
+        return isUserInRole(VIEW_PUBLIC_DATA);
     }
 }
