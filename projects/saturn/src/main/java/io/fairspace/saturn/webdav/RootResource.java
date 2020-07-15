@@ -36,12 +36,12 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     }
 
     @Override
-    public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
+    public Resource child(String childName) throws NotAuthorizedException {
         return factory.getResource(childSubject(factory.rootSubject, childName));
     }
 
     @Override
-    public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
+    public List<? extends Resource> getChildren() {
         return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(s -> {
                     var access = factory.permissions.getPermission(s.asNode());
@@ -54,9 +54,18 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .toList();
     }
 
+    private boolean existsCollectionWithNameIgnoreCase(String name) {
+        return getChildren().stream()
+                .anyMatch(collection -> collection.getName().equalsIgnoreCase(name));
+    }
+
     @Override
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
         validateCollectionName(newName);
+
+        if (existsCollectionWithNameIgnoreCase(newName)) {
+            throw new ConflictException("Collection already exists with that name (modulo case).");
+        }
 
         var subj = childSubject(factory.rootSubject, newName);
 
@@ -125,7 +134,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     }
 
     @Override
-    public String checkRedirect(Request request) throws NotAuthorizedException, BadRequestException {
+    public String checkRedirect(Request request) {
         return null;
     }
 

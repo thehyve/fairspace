@@ -32,7 +32,7 @@ public class DavFactoryTest {
     public static final long FILE_SIZE = 3L;
     public static final String BASE_PATH = "/api/v1/webdav";
     public static final QName VERSION = new QName(FS.NS, "version");
-    private final String baseUri = "http://example.com" + BASE_PATH;
+    private static final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
     private PermissionsService permissions;
     @Mock
@@ -116,14 +116,14 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testNonExistingResource() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testNonExistingResource() throws NotAuthorizedException, BadRequestException {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }
 
     @Test(expected = NotAuthorizedException.class)
     public void testInaccessibleResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        var coll = root.createCollection("coll");
+        root.createCollection("coll");
 
         when(permissions.getPermission(any())).thenReturn(Access.None);
 
@@ -135,6 +135,13 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
         root.createCollection("coll");
+    }
+
+    @Test(expected = ConflictException.class)
+    public void testCreateCollectionWithSameNameButDifferentCaseRejected() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll");
+        root.createCollection("COLL");
     }
 
     @Test
