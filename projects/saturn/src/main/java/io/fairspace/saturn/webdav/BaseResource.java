@@ -2,9 +2,7 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
-import io.milton.http.Auth;
-import io.milton.http.ConditionalCompatibleResource;
-import io.milton.http.Request;
+import io.milton.http.*;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -19,6 +17,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
 import java.util.Date;
+import java.util.Map;
 
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
@@ -30,7 +29,7 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
-abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource {
+abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource, PostableResource {
     protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
     protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
@@ -206,11 +205,15 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
+        // TODO: Remove
         if (name.equals(DATE_DELETED_PROPERTY) && value == null && subject.hasProperty(FS.dateDeleted)) {
-            var date = subject.getProperty(FS.dateDeleted).getLiteral();
-            var user = subject.getProperty(FS.deletedBy).getResource();
-
-            restore(subject, date, user);
+            try {
+                restore();
+            } catch (BadRequestException e) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, e.getReason());
+            } catch (ConflictException e) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_CONFLICT, e.getMessage());
+            }
         }
     }
 
@@ -265,5 +268,31 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             return null;
         }
         return Date.from(parseXSDDateTimeLiteral(s.getProperty(p).getLiteral()));
+    }
+
+    @Override
+    public String processForm(Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        var action = parameters.get("action");
+        if (action == null) {
+            throw new BadRequestException(this, "No action specified");
+        }
+        performAction(action, parameters, files);
+        return null;
+    }
+
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files)  throws BadRequestException, NotAuthorizedException, ConflictException {
+        switch (action) {
+            case "restore" -> restore();
+            default -> throw new BadRequestException(this, "Unrecognized action " + action);
+        }
+    }
+
+    private void restore() throws BadRequestException, NotAuthorizedException, ConflictException {
+        if (!subject.hasProperty(FS.dateDeleted)) {
+            throw new ConflictException(this, "Cannot restore");
+        }
+        var date = subject.getProperty(FS.dateDeleted).getLiteral();
+        var user = subject.getProperty(FS.deletedBy).getResource();
+        restore(subject, date, user);
     }
 }
