@@ -1,11 +1,11 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.ModelUtils;
 import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
+import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -24,8 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
-import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.lang.Integer.parseInt;
@@ -131,26 +130,49 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
+        // TODO: Remove
         if (name.equals(VERSION_PROPERTY)) {
-            var version = parseInt(value.toString());
-
-            var versions = getListProperty(subject, FS.versions);
-            var ver = versions.get(subject.getProperty(FS.currentVersion).getInt() - version).asResource();
-            var newVer = subject.getModel()
-                    .createResource();
-
-            ModelUtils.copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
-            newVer.addProperty(FS.modifiedBy, DavFactory.currentUserResource())
-                    .addLiteral(FS.dateModified, WebDAVServlet.timestampLiteral());
-
-            versions = versions.cons(newVer);
-            var current = subject.getRequiredProperty(FS.currentVersion).getInt() + 1;
-            subject.removeAll(FS.versions)
-                    .removeAll(FS.currentVersion)
-                    .addProperty(FS.versions, versions)
-                    .addLiteral(FS.currentVersion, current);
+            try {
+                revert(value.toString());
+            } catch (BadRequestException e) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, e.getReason());
+            } catch (ConflictException e) {
+                throw new PropertySource.PropertySetException(Response.Status.SC_CONFLICT, e.getMessage());
+            }
         } else {
             super.setProperty(name, value);
         }
+    }
+
+    @Override
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        switch (action) {
+            case "revert" -> revert(parameters.get("version"));
+            default -> super.performAction(action, parameters, files);
+        }
+    }
+
+    private void revert(String versionStr) throws BadRequestException, NotAuthorizedException, ConflictException {
+        int version;
+        try {
+            version = parseInt(versionStr);
+        } catch (Exception e) {
+            throw new BadRequestException(this, "No version provided");
+        }
+        var versions = getListProperty(subject, FS.versions);
+        var ver = versions.get(subject.getProperty(FS.currentVersion).getInt() - version).asResource();
+        var newVer = subject.getModel()
+                .createResource();
+
+        copyProperties(ver, newVer, RDF.type, FS.blobId, FS.fileSize, FS.md5);
+        newVer.addProperty(FS.modifiedBy, DavFactory.currentUserResource())
+                .addLiteral(FS.dateModified, WebDAVServlet.timestampLiteral());
+
+        versions = versions.cons(newVer);
+        var current = subject.getRequiredProperty(FS.currentVersion).getInt() + 1;
+        subject.removeAll(FS.versions)
+                .removeAll(FS.currentVersion)
+                .addProperty(FS.versions, versions)
+                .addLiteral(FS.currentVersion, current);
     }
 }

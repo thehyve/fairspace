@@ -20,7 +20,6 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
-    canList: boolean;
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
@@ -40,7 +39,6 @@ export type CollectionAuditInfo = {|
 |};
 
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;
-
 
 class CollectionAPI {
     getCollectionPermissions(iri: string, userIri: string): Promise<CollectionPermissions> {

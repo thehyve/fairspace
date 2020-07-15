@@ -45,7 +45,7 @@ public class DavFactoryTest {
 
     @Before
     public void before() {
-        factory = new DavFactory(createTxnMem().getDefaultModel().createResource(baseUri), store, permissions);
+        factory = new DavFactory(createTxnMem().getDefaultModel().createResource(baseUri), store);
 
         setupRequestContext();
         request = getCurrentRequest();

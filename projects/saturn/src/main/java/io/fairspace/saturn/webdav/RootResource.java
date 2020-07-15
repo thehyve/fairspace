@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Request;
@@ -9,18 +10,18 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.property.PropertySource;
+import io.milton.resource.CollectionResource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
-import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
@@ -43,13 +44,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     @Override
     public List<? extends Resource> getChildren() {
         return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
-                .mapWith(s -> {
-                    var access = factory.permissions.getPermission(s.asNode());
-                    if (access == Access.None) {
-                        return null;
-                    }
-                    return factory.getResource(s, access);
-                })
+                .mapWith(factory::tryGetResource)
                 .filterDrop(Objects::isNull)
                 .toList();
     }
@@ -83,24 +78,27 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .addProperty(FS.dateModified, timestampLiteral())
                 .addProperty(FS.modifiedBy, currentUserResource());
 
-        List<Node> collectionManagers = new ArrayList<>(List.of(currentUserResource().asNode()));
-
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
             var ws = subj.getModel().createResource(ownerWorkspace);
             if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
                 throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
             }
-            if (!factory.permissions.getPermission(ws.asNode()).canWrite()) {
+
+            if (!ws.hasProperty(FS.status, WorkspaceStatus.Active.name())
+                    && !ws.hasProperty(FS.member, currentUserResource())
+                    && !ws.hasProperty(FS.manage, currentUserResource())
+                    && !isAdmin()) {
                 throw new NotAuthorizedException();
             }
+
             subj.addProperty(FS.ownedBy, ws);
-            collectionManagers.add(ws.asNode());
         }
 
-        factory.permissions.assignManagers(subj.asNode(), collectionManagers);
+        subj.addProperty(FS.manage, currentUserResource())
+                .addProperty(FS.accessMode, AccessMode.Restricted.name());
 
-        return new CollectionResource(factory, subj, Access.Manage);
+        return (CollectionResource) factory.getResource(subj, Access.Manage);
     }
 
     @Override

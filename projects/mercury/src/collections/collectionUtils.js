@@ -14,7 +14,6 @@ export const mapCollectionPermissions: CollectionPermissions = (access) => ({
     canManage: compareTo(access, "Manage"),
     canWrite: compareTo(access, "Write"),
     canRead: compareTo(access, "Read"),
-    canList: compareTo(access, "List"),
 });
 
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({

@@ -39,6 +39,10 @@ class AuditEventListener implements EventListener {
                 case PUT -> audit("FS_WRITE",
                         "path", path,
                         "success", success);
+                case POST -> audit("FS_ACTION",
+                        "path", path,
+                        "parameters", re.getRequest().getParams(),
+                        "success", success);
             }
         }
     }
