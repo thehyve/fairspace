@@ -123,7 +123,7 @@ public class WorkspaceService {
                 var m = ds.getDefaultModel();
                 var r = m.wrapAsResource(iri);
                 validateResource(r, FS.Workspace);
-                getResourceProperties(r, FS.member).forEach(u -> result.put(u.asNode(), WorkspaceRole.Collaborator));
+                getResourceProperties(r, FS.member).forEach(u -> result.put(u.asNode(), WorkspaceRole.Member));
                 getResourceProperties(r, FS.manage).forEach(u -> result.put(u.asNode(), WorkspaceRole.Manager));
         });
         return result;
@@ -143,7 +143,7 @@ public class WorkspaceService {
             m.removeAll(workspaceResource, FS.manage, userResource)
                     .removeAll(workspaceResource, FS.member, userResource);
             switch (role) {
-                case Collaborator -> workspaceResource.addProperty(FS.member, userResource);
+                case Member -> workspaceResource.addProperty(FS.member, userResource);
                 case Manager -> workspaceResource.addProperty(FS.manage, userResource);
             }
         });

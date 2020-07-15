@@ -90,7 +90,7 @@ const UserList = (props: UserListProps) => {
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={() => grantUserAccess(userToAdd.iri, 'Collaborator')}
+                    onClick={() => grantUserAccess(userToAdd.iri, 'Member')}
                     color="primary"
                     disabled={!userToAdd}
                 >
