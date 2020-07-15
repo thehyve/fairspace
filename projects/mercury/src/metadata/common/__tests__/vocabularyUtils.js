@@ -4,42 +4,54 @@ import {
     determineShapeForProperty,
     getChildSubclasses,
     getClassesInCatalog,
-    getDescendants,
-    getLabelForPredicate,
+    getDescendants, getLabelForType,
     getMaxCount,
     getNamespaces,
     getProperties,
     getSystemProperties,
     isGenericIriResource,
     isRdfList,
-    isRelationShape,
+    isRelationShape, typeShapeWithProperties,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from './test.vocabulary.json';
 import * as constants from "../../../constants";
 import {getFirstPredicateId} from "../jsonLdUtils";
+import {SHACL_NAME, SHACL_PROPERTY} from '../../../constants';
 
-describe('getLabelForPredicate', () => {
-    it('returns the label for a known predicate', () => {
-        expect(getLabelForPredicate(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#label')).toEqual('Label');
+describe('getLabelForType', () => {
+    it('returns the label for a known type', () => {
+        expect(getLabelForType(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#label')).toEqual('Label');
     });
 
-    it('returns the uri if no label is known for a predicate', () => {
+    it('returns the uri if no label is known for a type', () => {
         const uri = 'http://fairspace.io/ontology#Unknown';
-        expect(getLabelForPredicate(vocabularyJsonLd, uri)).toEqual(uri);
+        expect(getLabelForType(vocabularyJsonLd, uri)).toEqual(uri);
     });
 
-    it('returns the uri if the predicate itself is unknown', () => {
+    it('returns the uri if the type itself is unknown', () => {
         const uri = 'http://fairspace.io/ontology#NonExisting';
-        expect(getLabelForPredicate(vocabularyJsonLd, uri)).toEqual(uri);
+        expect(getLabelForType(vocabularyJsonLd, uri)).toEqual(uri);
+    });
+});
+
+describe('typeShapeWithProperties', () => {
+    it('collects shape information with properties for a type', () => {
+        const researchProjectShape = typeShapeWithProperties(vocabularyJsonLd, ['http://fairspace.io/ontology#ResearchProject']);
+        expect(researchProjectShape[SHACL_NAME][0]['@value']).toEqual('Research project');
+        expect(researchProjectShape[SHACL_PROPERTY].map(property => property[SHACL_NAME][0]['@value'])).toEqual([
+            'Label',
+            'Project type',
+            'Grant type'
+        ]);
     });
 });
 
 describe('determineShapeForProperty', () => {
     it('returns the correct shape given a url', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#comment')['@id']).toEqual('http://www.w3.org/2000/01/rdf-schema#commentShape');
+        expect(determineShapeForProperty(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#comment')['@id']).toEqual('http://www.w3.org/2000/01/rdf-schema#comment');
     });
     it('returns the correct shape if there is also a blank node pointing to it', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'http://fairspace.io/ontology#list')['@id']).toEqual('http://fairspace.io/ontology#listShape');
+        expect(determineShapeForProperty(vocabularyJsonLd, 'http://fairspace.io/ontology#list')['@id']).toEqual('http://fairspace.io/ontology#list');
     });
 
     it('is undefined if there is only a blank node for a property', () => {
@@ -53,7 +65,6 @@ describe('vocabulary contains', () => {
     it('should return false on empty vocabulary', () => expect(contains([], vocabularyJsonLd[0]['@id'])).toBe(false));
     it('should return false on invalid URI', () => expect(contains(vocabularyJsonLd, 'invalid-uri')).toBe(false));
     it('should return false on invalid parameter', () => expect(contains(vocabularyJsonLd)).toBe(false));
-    it('should return false if URI is only referred to in vocabulary', () => expect(contains(vocabularyJsonLd, 'http://fairspace.io/ontology#Collection')).toBe(false));
 });
 
 describe('isRdfList', () => {
@@ -127,16 +138,16 @@ describe('getClassesInCatalog', () => {
     const shapesIdsInCatalog = getClassesInCatalog(vocabularyJsonLd).map(c => c['@id']);
 
     it('should return classes without machineOnly predicate', () => {
-        expect(shapesIdsInCatalog).toEqual(expect.arrayContaining(['http://fairspace.io/ontology#UserShape']));
+        expect(shapesIdsInCatalog).toEqual(expect.arrayContaining(['http://fairspace.io/ontology#User']));
     });
 
     it('should not return properties', () => {
-        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#commentShape']));
-        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.schema.org/creatorShape']));
+        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#comment']));
+        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.schema.org/creator']));
     });
 
     it('should not return classes with machineOnly predicate', () => {
-        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#CollectionShape']));
+        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://fairspace.io/ontology#Collection']));
     });
 
     it('should not return deleted classes', () => {
@@ -145,16 +156,16 @@ describe('getClassesInCatalog', () => {
 });
 
 describe('Class hierarchy (subclasses and descendants)', () => {
-    const type = 'http://www.w3.org/ns/shacl#PropertyShape';
-    const subClasses = ["http://fairspace.io/ontology#ControlledVocabularyPropertyShape", "http://fairspace.io/ontology#DatatypePropertyShape"];
-    const subcSubClasess = ["http://fairspace.io/ontology#SpecialDatatypePropertyShape", "http://fairspace.io/ontology#AVerySpecialDatatypePropertyShape"];
+    const type = 'http://fairspace.io/ontology#Project';
+    const subClasses = ['http://fairspace.io/ontology#ResearchProject'];
+    const subSubClasess = ['http://fairspace.io/ontology#ExternalResearchProject'];
 
     describe('getChildSubclasses', () => {
         it('should extracts the direct subclasses of the type and avoids deep or indirect subclasses', () => {
             const childClasses = getChildSubclasses(vocabularyJsonLd, type);
 
             expect(childClasses).toEqual(expect.arrayContaining(subClasses));
-            expect(childClasses).not.toEqual(expect.arrayContaining(subcSubClasess));
+            expect(childClasses).not.toEqual(expect.arrayContaining(subSubClasess));
         });
     });
 
@@ -162,7 +173,7 @@ describe('Class hierarchy (subclasses and descendants)', () => {
         it('should extracts the full class hierarchy for the given type', () => {
             const classHierarchy = getDescendants(vocabularyJsonLd, type);
 
-            expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subcSubClasess]));
+            expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subSubClasess]));
             expect(classHierarchy).not.toEqual(expect.arrayContaining(["http://fairspace.io/ontology#File"]));
         });
     });

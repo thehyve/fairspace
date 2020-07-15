@@ -1,18 +1,20 @@
 import React, {useContext} from 'react';
-import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
+import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, withStyles} from '@material-ui/core';
 
+import {Link as RouterLink} from 'react-router-dom';
+import {FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
 import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
-import {getParentPath} from '../file/fileUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
-import {getLabelForPredicate} from '../metadata/common/vocabularyUtils';
+import {getLabelForType, typeShapeWithProperties} from '../metadata/common/vocabularyUtils';
 import useAsync from "../common/hooks/UseAsync";
-import {getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
+import {getSearchQueryFromString, handleSearchError, renderSearchResultProperty} from "../search/searchUtils";
 import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
 import SearchResultHighlights from "../search/SearchResultHighlights";
 import SearchBar from "../search/SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
+import {getParentPath} from '../file/fileUtils';
 
 const styles = {
     tableRoot: {
@@ -33,31 +35,58 @@ const styles = {
 const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
 const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
-    const getPathOfResult = ({type, filePath}) => {
-        switch (type[0]) {
-            case COLLECTION_URI:
-            case DIRECTORY_URI:
-                return filePath[0];
-            case FILE_URI:
-                return getParentPath(filePath[0]);
-            default:
-                return '';
-        }
+    const pathForIri = (iri: string) => {
+        const path = new URL(iri).pathname;
+        return path.replace('/api/v1/webdav/', '');
     };
 
-    // If vocabulary has not been loaded, we can not
-    // retrieve the label. Just return the URI in that (rare) case
-    const generateTypeLabel = (typeUri) => (vocabulary ? getLabelForPredicate(vocabulary, typeUri) : typeUri);
+    const renderType = (item) => {
+        if (!item.type && item.type.length === 0) {
+            return null;
+        }
+        const typeLabel = getLabelForType(vocabulary, item.type[0]);
+        let avatar;
+        switch (typeLabel) {
+            case 'Collection':
+                avatar = <FolderOutlined />;
+                break;
+            case 'Directory':
+                avatar = <FolderOpenOutlined />;
+                break;
+            case 'File':
+                avatar = <InsertDriveFileOutlined />;
+                break;
+            default:
+                avatar = null;
+        }
+        if (avatar) {
+            return (
+                <>
+                    <Tooltip title={typeLabel} arrow>
+                        {avatar}
+                    </Tooltip>
+                    <Typography variant="srOnly">{typeLabel}</Typography>
+                </>
+            );
+        }
+        return <Typography>{typeLabel}</Typography>;
+    };
+
+    const link = (item) => {
+        const path = pathForIri(item.iri);
+        if (item.type && item.type.length > 0 && item.type[0] === FILE_URI) {
+            const parentPath = getParentPath(path);
+            return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
+        }
+        return getCollectionAbsolutePath(path);
+    };
 
     /**
      * Handles a click on a search result.
-     * @param result   The clicked search result. For the format, see the ES api
+     * @param item The clicked search result.
      */
-    const handleResultDoubleClick = (result) => {
-        const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
-        const selectionQueryString = "?selection=" + encodeURIComponent('/' + result.filePath);
-
-        history.push(navigationPath + selectionQueryString);
+    const handleResultDoubleClick = (item) => {
+        history.push(link(item));
     };
 
     if (loading) {
@@ -77,9 +106,9 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Label</TableCell>
-                        <TableCell>Type</TableCell>
-                        <TableCell>Description</TableCell>
+                        <TableCell />
+                        <TableCell />
+                        <TableCell>Path</TableCell>
                         <TableCell>Match</TableCell>
                     </TableRow>
                 </TableHead>
@@ -91,17 +120,30 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                                 key={item.id}
                                 onDoubleClick={() => handleResultDoubleClick(item)}
                             >
-                                <TableCell>
-                                    {item.label}
+                                <TableCell width={30}>
+                                    {renderType(item)}
                                 </TableCell>
                                 <TableCell>
-                                    {generateTypeLabel(item.type)}
+                                    <ListItemText
+                                        primary={renderSearchResultProperty(item, 'label')}
+                                        secondary={renderSearchResultProperty(item, 'comment')}
+                                    />
                                 </TableCell>
                                 <TableCell>
-                                    {item.comment}
+                                    <Link
+                                        to={link(item)}
+                                        component={RouterLink}
+                                        color="inherit"
+                                        underline="hover"
+                                    >
+                                        {pathForIri(item.iri)}
+                                    </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <SearchResultHighlights highlights={item.highlights} />
+                                    <SearchResultHighlights
+                                        highlights={item.highlights}
+                                        typeShape={typeShapeWithProperties(vocabulary, item.type)}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -119,10 +161,8 @@ export const CollectionSearchResultListContainer = ({
 }) => {
     const {data, loading, error} = useAsync(() => searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
         .catch(handleSearchError), [search, query, searchFunction]);
-
     const items = data ? data.items : [];
     const total = data ? data.total : 0;
-
     const handleSearch = (value) => {
         handleCollectionSearchRedirect(history, value);
     };
