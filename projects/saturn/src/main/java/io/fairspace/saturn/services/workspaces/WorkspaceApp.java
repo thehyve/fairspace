@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.workspaces;
 
 import io.fairspace.saturn.services.BaseApp;
 
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -15,22 +16,33 @@ public class WorkspaceApp extends BaseApp {
 
     @Override
     protected void initApp() {
+        put("/", (req, res) -> {
+            var ws = workspaceService.createWorkspace(mapper.readValue(req.body(), Workspace.class));
+            res.type(APPLICATION_JSON.asString());
+            return mapper.writeValueAsString(ws);
+        });
+
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(workspaceService.listWorkspaces());
         });
 
-        put("/:id", (req, res) -> {
-            var ws = workspaceService.createWorkspace(req.params("id"));
+        patch("/", (req, res) -> {
+            var ws = workspaceService.updateWorkspace(mapper.readValue(req.body(), Workspace.class));
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(ws);
         });
 
-        patch("/:id/status", (req, res) -> {
-            var workspace = mapper.readValue(req.body(), Workspace.class);
-            var result = workspaceService.updateStatus(workspace);
+        get("/users/", (req, res) -> {
+            var users = workspaceService.getUsers(createURI(req.queryParams("workspace")));
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(result);
+            return mapper.writeValueAsString(users);
+        });
+
+        patch("/users/", (req, res) -> {
+            var dto = mapper.readValue(req.body(), UserRoleDto.class);
+            workspaceService.setUserRole(dto.getWorkspace(), dto.getUser(), dto.getRole());
+            return "";
         });
     }
 }

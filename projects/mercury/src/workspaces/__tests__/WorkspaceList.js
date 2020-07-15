@@ -19,7 +19,7 @@ describe('WorkspaceList', () => {
             id: 'workspace2', name: 'workspace-2', status: 'Active'
         }];
         const {getByText} = render(<MemoryRouter><WorkspaceList workspaces={workspaces} /></MemoryRouter>);
-        expect(getByText('Id'))
+        expect(getByText('Name'))
             .toBeInTheDocument();
         expect(getByText('workspace-1'))
             .toBeInTheDocument();

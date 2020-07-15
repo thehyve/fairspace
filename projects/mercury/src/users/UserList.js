@@ -19,8 +19,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Checkbox from "@material-ui/core/Checkbox";
 import UserSelect from "../permissions/UserSelect";
-import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
-import LoadingOverlay from "../common/components/LoadingOverlay";
+import {PermissionProvider} from "../permissions/PermissionContext";
 import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User, UserRoles} from "./UsersAPI";
@@ -31,6 +30,9 @@ import usePagination from "../common/hooks/UsePagination";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
+import workspacesAPI from "../workspaces/WorkspacesAPI";
+import useAsync from "../common/hooks/UseAsync";
+import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const columns = {
     name: {
@@ -55,27 +57,21 @@ type UserListProps = {
 const UserList = (props: UserListProps) => {
     const {currentUser, workspace} = props;
     const {canManage} = workspace;
-    const {
-        permissions: collaborators, alterPermission, altering,
-        loading: loadingPermissions, error: errorPermissions
-    } = useContext(PermissionContext);
     const {users} = useContext(UsersContext);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collaborators, columns, 'name');
+    const {data: collaborators, error: errorCollaborators, loading: loadingCollaborators, refresh} = useAsync(() => workspacesAPI.getWorkspaceUsers(workspace.iri), [workspace.iri]);
+    const collaboratorsEx = collaborators && users && collaborators.map(c => ({...c, ...(users.find(u => u.iri === c.iri) || {})}));
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collaboratorsEx || [], columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
 
-    if (errorPermissions) {
+    if (errorCollaborators) {
         return (<MessageDisplay message="An error occurred loading permissions" />);
-    } if (loadingPermissions) {
-        return (<LoadingInlay />);
-    } if (altering) {
+    } if (loadingCollaborators) {
         return (<LoadingOverlay loading />);
     }
 
-    const grantUserAccess = (userIri, access) => (
-        alterPermission(userIri, workspace.iri, access)
-    );
+    const grantUserAccess = (userIri, access) => workspacesAPI.setWorkspaceRole(workspace.iri, userIri, access).then(refresh);
 
     const renderAddUserDialog = () => (
         <Dialog
@@ -94,10 +90,7 @@ const UserList = (props: UserListProps) => {
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={() => {
-                        setShowAddUserDialog(false);
-                        grantUserAccess(userToAdd.iri, 'Member');
-                    }}
+                    onClick={() => grantUserAccess(userToAdd.iri, 'Member')}
                     color="primary"
                     disabled={!userToAdd}
                 >
@@ -164,11 +157,11 @@ const UserList = (props: UserListProps) => {
                             </TableCell>
                             <TableCell style={{width: 120}}>
                                 <Checkbox
-                                    checked={u.canManage}
+                                    checked={u.role === 'Manager'}
                                     onChange={(event) => (
                                         event.target.checked
-                                            ? grantUserAccess(u.user, "Manage")
-                                            : grantUserAccess(u.user, "Member")
+                                            ? grantUserAccess(u.iri, "Manager")
+                                            : grantUserAccess(u.iri, "Collaborator")
                                     )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     disableRipple
@@ -176,7 +169,7 @@ const UserList = (props: UserListProps) => {
                             </TableCell>
                             <TableCell style={{width: 32}}>
                                 <ConfirmationButton
-                                    onClick={() => grantUserAccess(u.user, 'None')}
+                                    onClick={() => grantUserAccess(u.iri, 'None')}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     message="Are you sure you want to remove this user from the workspace?"
                                     agreeButtonText="Remove user"
