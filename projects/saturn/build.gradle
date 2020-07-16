@@ -67,6 +67,8 @@ dependencies {
     implementation 'org.keycloak:keycloak-jetty94-adapter:9.0.0'
     implementation 'org.keycloak:keycloak-admin-client:9.0.0'
 
+    runtime 'org.slf4j:slf4j-jdk14:1.7.30'
+
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
