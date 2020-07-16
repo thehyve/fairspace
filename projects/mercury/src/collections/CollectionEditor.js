@@ -107,6 +107,10 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 }
                 // If the collection location changes, the URI for the current page should change as well
                 history.push(`${getCollectionAbsolutePath(newLocation)}/${path || ''}`);
+            })
+            .catch(err => {
+                const message = err && err.message ? err.message : "An error occurred while renaming a collection";
+                ErrorDialog.showError(err, message);
             });
     };
 
@@ -209,7 +213,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="location"
                         label="Collection identifier"
-                        helperText="This identifier does not allow special characters and has to be unique. It will be used in Jupyterlab as the directory name for files in this collections"
+                        helperText="This identifier does not allow special characters and has to be unique."
                         value={this.state.properties.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}
