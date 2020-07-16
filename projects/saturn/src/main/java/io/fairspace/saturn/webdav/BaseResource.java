@@ -1,8 +1,10 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
-import io.milton.http.*;
+import io.milton.http.Auth;
+import io.milton.http.FileItem;
+import io.milton.http.Request;
+import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;

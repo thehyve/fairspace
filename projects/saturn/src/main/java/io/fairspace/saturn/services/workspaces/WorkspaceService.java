@@ -44,6 +44,20 @@ public class WorkspaceService {
         });
     }
 
+    public Workspace getWorkspace(Node iri) {
+        return tx.calculateRead(ds -> {
+            var ws = new DAO(ds).read(Workspace.class, iri);
+            if (ws == null) {
+                return null;
+            }
+            var res = ds.getDefaultModel().wrapAsResource(ws.getIri());
+            var user = ds.getDefaultModel().wrapAsResource(getUserURI());
+            ws.setCanManage(isAdmin() || res.hasProperty(FS.manage, user));
+            ws.setCanCollaborate(ws.isCanManage() || res.hasProperty(FS.member, user));
+            return ws;
+        });
+    }
+
     public Workspace createWorkspace(Workspace ws) {
         if (!isAdmin()) {
             throw new AccessDeniedException();
@@ -153,5 +167,9 @@ public class WorkspaceService {
     private void validateResource(Resource r, Resource type) {
         validate(r.hasProperty(RDF.type, type), "Invalid resource type");
         validate(!r.hasProperty(FS.dateDeleted), "Resource was deleted");
+    }
+
+    public boolean canList(Resource resource) {
+        return false;
     }
 }

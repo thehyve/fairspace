@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -9,12 +8,8 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.Instant;
-import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
@@ -28,14 +23,8 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
 public class MetadataEntityLifeCycleManagerTest {
-    @Mock
-    private PermissionsService permissionsService;
-
-
     private MetadataEntityLifeCycleManager lifeCycleManager;
     private Dataset ds;
     private Model model;
@@ -57,7 +46,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         setupRequestContext();
 
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, permissionsService);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI);
     }
 
     @Test
@@ -126,8 +115,6 @@ public class MetadataEntityLifeCycleManagerTest {
         delta.add(resource, property, otherResource);
 
         lifeCycleManager.updateLifecycleMetadata(delta);
-
-        verify(permissionsService).createResources(Set.of(resource));
     }
 
     @Test

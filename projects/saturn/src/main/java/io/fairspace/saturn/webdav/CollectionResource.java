@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.FileItem;

@@ -1,7 +1,6 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
@@ -9,6 +8,7 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.*;
+import org.apache.jena.rdf.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,9 +21,9 @@ import java.io.InputStream;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +34,7 @@ public class DavFactoryTest {
     public static final QName VERSION = new QName(FS.NS, "version");
     private static final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
-    private PermissionsService permissions;
+    private MetadataPermissions permissions;
     @Mock
     BlobStore store;
     @Mock
@@ -42,16 +42,15 @@ public class DavFactoryTest {
     private org.eclipse.jetty.server.Request request;
 
     private ResourceFactory factory;
+    private Model model = createTxnMem().getDefaultModel();
 
     @Before
     public void before() {
-        factory = new DavFactory(createTxnMem().getDefaultModel().createResource(baseUri), store);
+        factory = new DavFactory(model.createResource(baseUri), store);
 
         setupRequestContext();
         request = getCurrentRequest();
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 3, "md5"));
-
-        when(permissions.getPermission(any())).thenReturn(Access.Manage);
     }
 
 
@@ -125,7 +124,7 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        when(permissions.getPermission(any())).thenReturn(Access.None);
+        model.createResource(baseUri + "/coll").removeAll(FS.manage);
 
         factory.getResource(null, BASE_PATH + "coll");
     }
@@ -180,7 +179,8 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        when(permissions.getPermission(any())).thenReturn(Access.Read);
+        model.createResource(baseUri + "/coll").removeAll(FS.manage)
+                .addProperty(FS.read, model.wrapAsResource(getUserURI()));
 
         assertFalse(root.child("coll").authorise(null, Request.Method.PUT, null));
     }
