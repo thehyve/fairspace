@@ -68,7 +68,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         txn = new SimpleTransactions(ds);
-        api = new ChangeableMetadataService(txn, createURI(GRAPH), createURI(VOCABULARY), 0, lifeCycleManager, validator);
+        api = new ChangeableMetadataService(txn, createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
 
         setupRequestContext();
     }

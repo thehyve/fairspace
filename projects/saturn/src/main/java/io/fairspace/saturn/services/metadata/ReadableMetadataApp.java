@@ -42,7 +42,6 @@ public class ReadableMetadataApp extends BaseApp {
                 return serializer.serialize(getMetadata(req));
             });
         });
-        exception(TooManyTriplesException.class, exceptionHandler(SC_BAD_REQUEST, "Your query returned too many results"));
     }
 
     protected Model getMetadata(Request req) {

@@ -139,14 +139,6 @@ public class ReadableMetadataServiceTest {
         assertFalse(result.contains(S2, unimportantProperty, S3));
     }
 
-    @Test(expected = TooManyTriplesException.class)
-    public void testTripleLimit() {
-        api = new ReadableMetadataService(txn, createURI(GRAPH), createURI(userVocabularyURI), 1);
-        txn.executeWrite(ds -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
-
-        api.get(null, false);
-    }
-
     private void setupImportantProperties() {
         Resource labelShape = createResource("http://labelShape");
         Resource createdByShape = createResource("http://createdByShape");

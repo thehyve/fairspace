@@ -54,8 +54,6 @@ public class Config {
 
         public File transactionLogPath = new File("data/log");
 
-        public long maxTriplesToReturn = 50000;
-
         public boolean bulkTransactions = true;
 
         public ElasticSearch elasticSearch = new ElasticSearch();

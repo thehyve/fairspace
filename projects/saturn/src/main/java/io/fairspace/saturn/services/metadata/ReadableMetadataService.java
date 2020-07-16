@@ -2,11 +2,9 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.vocabulary.FS;
-import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 
 import static io.fairspace.saturn.vocabulary.Inference.getPropertyShapesForResource;
@@ -14,16 +12,15 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
-@AllArgsConstructor
-public
-class ReadableMetadataService {
+public class ReadableMetadataService {
     protected final Transactions transactions;
     protected final Node graph;
     protected final Node vocabulary;
-    protected final long tripleLimit;
 
     public ReadableMetadataService(Transactions transactions, Node graph, Node vocabulary) {
-        this(transactions, graph, vocabulary, 0);
+        this.transactions = transactions;
+        this.graph = graph;
+        this.vocabulary = vocabulary;
     }
 
     /**
@@ -45,7 +42,7 @@ class ReadableMetadataService {
             dataset.getNamedModel(graph.getURI())
                     .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)
                     .forEachRemaining(stmt -> {
-                        addStmt(model, stmt);
+                        model.add(stmt);
                         if (withObjectProperties && stmt.getObject().isResource()) {
                             getPropertyShapesForResource(stmt.getResource(), voc)
                                     .forEach(shape -> {
@@ -53,7 +50,7 @@ class ReadableMetadataService {
                                             var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
                                             stmt.getResource()
                                                     .listProperties(property)
-                                                    .forEachRemaining(objStmt -> addStmt(model, objStmt));
+                                                    .forEachRemaining(model::add);
                                         }
                                     });
                         }
@@ -61,12 +58,5 @@ class ReadableMetadataService {
         });
 
         return model;
-    }
-
-    private void addStmt(Model model, Statement stmt) {
-        if (tripleLimit != 0 && model.size() == tripleLimit) {
-            throw new TooManyTriplesException();
-        }
-        model.add(stmt);
     }
 }
