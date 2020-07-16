@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.fairspace.saturn.TestUtils.setAdminFlag;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -65,11 +66,6 @@ public class PermissionsServiceTest {
         var identity = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity();
         when(identity.isUserInRole("view-public-metadata", null)).thenReturn(true);
         when(identity.getUserPrincipal().getName()).thenReturn("user2");
-    }
-
-    private void setAdminFlag(boolean admin) {
-        var id = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity();
-        when(id.isUserInRole("organisation-admin", null)).thenReturn(admin);
     }
 
     @Test
