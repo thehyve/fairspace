@@ -11,6 +11,8 @@ import org.keycloak.representations.AccessToken;
 import java.time.Instant;
 import java.util.List;
 
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static java.time.Instant.now;
 import static org.junit.Assert.assertNotNull;
@@ -33,6 +35,11 @@ public class TestUtils {
         return argThat(a -> a.containsAll(m));
     }
 
+    public static void setAdminFlag(boolean admin) {
+        var id = ((Authentication.User) getCurrentRequest().getAuthentication()).getUserIdentity();
+        when(id.isUserInRole("organisation-admin", null)).thenReturn(admin);
+    }
+
     public static void setupRequestContext(String... roles) {
         var request = mock(Request.class);
         setCurrentRequest(request);
@@ -53,6 +60,5 @@ public class TestUtils {
         when(context.getToken()).thenReturn(token);
         when(token.getSubject()).thenReturn("userid");
         when(token.getName()).thenReturn("fullname");
-
     }
 }
