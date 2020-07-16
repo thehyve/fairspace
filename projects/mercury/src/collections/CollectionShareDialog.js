@@ -63,18 +63,18 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
     const renderShareCandidatesList = () => (
         <List>
             {
-                shareCandidates.map(ws => (
-                    <ListItem key={ws.iri} onClick={() => toggleSelectedEntities(ws.iri)}>
+                shareCandidates.map(candidate => (
+                    <ListItem key={candidate.iri} onClick={() => toggleSelectedEntities(candidate.iri)}>
                         <ListItemIcon>
                             <Checkbox
                                 edge="start"
-                                checked={selectedEntities.includes(ws.iri)}
+                                checked={selectedEntities.includes(candidate.iri)}
                                 tabIndex={-1}
                                 disableRipple
                             />
                         </ListItemIcon>
                         <ListItemText
-                            primary={ws.name}
+                            primary={candidate.name}
                             style={{
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',

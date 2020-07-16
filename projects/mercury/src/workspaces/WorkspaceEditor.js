@@ -7,7 +7,7 @@ const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
 
 export default ({onSubmit, onClose, creating, workspaces,
     workspace: {name = ''} = {}}) => {
-    const isWorkspaceIdUnique = (workspaceId) => !workspaces.some(workspace => workspace.id === workspaceId);
+    const isWorkspaceIdUnique = (workspaceId) => !workspaces.some(workspace => workspace.name === workspaceId);
     const nameControl = useFormField(name, value => !!value && ID_PATTERN.test(value) && isWorkspaceIdUnique(value));
 
     const allControls = [nameControl];
