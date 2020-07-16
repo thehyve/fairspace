@@ -152,7 +152,7 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
             <CardHeader
                 action={isAdmin(currentUser) ? statusUpdateMenuAction : null}
                 titleTypographyProps={{variant: 'h6'}}
-                title={workspace.id}
+                title={workspace.name}
                 avatar={(
                     <Widgets />
                 )}
