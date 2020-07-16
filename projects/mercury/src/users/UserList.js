@@ -30,6 +30,8 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import WorkspaceUsersContext, {WorkspaceUsersProvider} from "../workspaces/WorkspaceUsersContext";
 import UserContext from "./UserContext";
+import {getWorkspaceUsersWithRoles} from "./userUtils";
+import ErrorDialog from "../common/components/ErrorDialog";
 
 const columns = {
     name: {
@@ -42,7 +44,7 @@ const columns = {
     },
     access: {
         valueExtractor: 'access',
-        label: 'Can manage?'
+        label: 'Manager'
     }
 };
 
@@ -59,7 +61,8 @@ const UserList = (props: UserListProps) => {
     const {currentUser, workspace, workspaceUsers, workspaceUsersError, workspaceUsersLoading, setWorkspaceRole} = props;
     const {canManage} = workspace;
     const {users} = useContext(UsersContext);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsers, columns, 'name');
+    const workspaceUsersWithRoles = getWorkspaceUsersWithRoles(users, workspaceUsers);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsersWithRoles, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
@@ -70,7 +73,14 @@ const UserList = (props: UserListProps) => {
         return (<LoadingInlay />);
     }
 
-    const grantUserAccess = (userIri, access) => setWorkspaceRole(workspace.iri, userIri, access).then(refresh);
+    const grantUserRole = (userIri, role) => {
+        setWorkspaceRole(userIri, role)
+            .catch(err => {
+                const message = err && err.message ? err.message : "An error occurred while updating a workspace users";
+                ErrorDialog.showError(err, message);
+            })
+            .finally(() => setShowAddUserDialog(false));
+    };
 
     const renderAddUserDialog = () => (
         <Dialog
@@ -82,14 +92,14 @@ const UserList = (props: UserListProps) => {
                 <UserSelect
                     autoFocus
                     users={users}
-                    filter={u => u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
+                    filter={u => u.iri !== currentUser.iri && workspaceUsersWithRoles.find(c => c.iri === u.iri) === undefined}
                     onChange={setUserToAdd}
                     placeholder="Please select a user"
                 />
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={() => grantUserAccess(userToAdd.iri, 'Member')}
+                    onClick={() => grantUserRole(userToAdd.iri, 'Member')}
                     color="primary"
                     disabled={!userToAdd}
                 >
@@ -159,8 +169,8 @@ const UserList = (props: UserListProps) => {
                                     checked={u.role === 'Manager'}
                                     onChange={(event) => (
                                         event.target.checked
-                                            ? grantUserAccess(u.user, "Manage")
-                                            : grantUserAccess(u.user, "Member")
+                                            ? grantUserRole(u.user, "Manager")
+                                            : grantUserRole(u.user, "Member")
                                     )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     disableRipple
@@ -168,7 +178,7 @@ const UserList = (props: UserListProps) => {
                             </TableCell>
                             <TableCell style={{width: 32}}>
                                 <ConfirmationButton
-                                    onClick={() => grantUserAccess(u.iri, 'None')}
+                                    onClick={() => grantUserRole(u.iri, 'None')}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     message="Are you sure you want to remove this user from the workspace?"
                                     agreeButtonText="Remove user"
@@ -186,7 +196,7 @@ const UserList = (props: UserListProps) => {
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
-                count={workspaceUsers.length}
+                count={workspaceUsersWithRoles.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={(e, p) => setPage(p)}
