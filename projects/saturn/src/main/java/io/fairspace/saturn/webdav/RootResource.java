@@ -13,6 +13,8 @@ import io.milton.resource.CollectionResource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
+import lombok.extern.slf4j.*;
+import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -27,6 +29,7 @@ import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 
+@Slf4j
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
 
     private final DavFactory factory;
@@ -48,17 +51,36 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .toList();
     }
 
-    private boolean existsCollectionWithNameIgnoreCase(String name) {
+    public Resource findExistingCollectionWithNameIgnoreCase(String name) {
         return getChildren().stream()
-                .anyMatch(collection -> collection.getName().equalsIgnoreCase(name));
+                .filter(collection -> collection.getName().equalsIgnoreCase(name))
+                .findAny()
+                .orElse(null);
     }
 
+    /**
+     * Creates a new collection resource, sets the owner workspaces and assigns
+     * manage permission on the collection to the current user.
+     * Returns null if a collection with collection already exists with the same name (modulo case),
+     * which is interpreted as a failure by {@link io.milton.http.webdav.MkColHandler},
+     * resulting in a 405 (Method Not Allowed) response.
+     *
+     * @param newName the name (identifier) of the new collection, which needs to be a valid collection name.
+     *
+     * @return the collection resource if it was successfully created; null if
+     *         a collection with the name already exists (ignoring case);
+     * @throws NotAuthorizedException if the user does not have write permission on the owner workspace.
+     * @throws ConflictException if the IRI is already is use by a resource that is not deleted.
+     * @throws BadRequestException if the name is invalid (@see {@link PathUtils#validateCollectionName}).
+     */
     @Override
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
         validateCollectionName(newName);
 
-        if (existsCollectionWithNameIgnoreCase(newName)) {
-            throw new ConflictException("Collection already exists with that name (modulo case).");
+        var existing = findExistingCollectionWithNameIgnoreCase(newName);
+        if (existing != null) {
+            log.warn("Collection already exists with that name (modulo case): {}", existing.getName());
+            return null;
         }
 
         var subj = childSubject(factory.rootSubject, newName);
