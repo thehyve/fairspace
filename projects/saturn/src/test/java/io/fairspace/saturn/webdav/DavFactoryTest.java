@@ -126,7 +126,7 @@ public class DavFactoryTest {
 
         model.createResource(baseUri + "/coll").removeAll(FS.manage);
 
-        factory.getResource(null, BASE_PATH + "coll");
+        factory.getResource(null, BASE_PATH + "/coll");
     }
 
     @Test(expected = ConflictException.class)

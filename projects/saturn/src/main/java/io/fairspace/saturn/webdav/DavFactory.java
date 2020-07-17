@@ -38,7 +38,9 @@ public class DavFactory implements ResourceFactory {
             return root;
         }
 
-        if (!subject.getModel().containsResource(subject) || subject.hasProperty(FS.dateDeleted) && !showDeleted()) {
+        if (!subject.getModel().containsResource(subject)
+                || subject.hasProperty(FS.dateDeleted) && !showDeleted()
+                || subject.hasProperty(FS.movedTo)) {
             return null;
         }
 
@@ -82,6 +84,10 @@ public class DavFactory implements ResourceFactory {
                 return Access.None;
             } else if (ownerWs != null && coll.hasProperty(FS.sharedWith, ownerWs) && ownerWs.hasProperty(FS.member, user)) {
                 return active ? Access.Write : Access.Read;
+            } else if (coll.hasProperty(FS.write, user)) {
+                return Access.Write;
+            } else if (coll.hasProperty(FS.read, user)) {
+                return Access.Read;
             } else if (coll.listProperties(FS.sharedWith)
                     .mapWith(Statement::getResource)
                     .filterDrop(r -> r.hasProperty(FS.dateDeleted))
@@ -90,8 +96,8 @@ public class DavFactory implements ResourceFactory {
                 return Access.Read;
             } else if (coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name()) && canViewPublicData()) {
                 return Access.Read;
-            } else if (coll.hasLiteral(FS.accessMode, AccessMode.MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name())
-                    && canViewPublicMetadata()) {
+            } else if (coll.hasProperty(FS.list, user)
+                    || ((coll.hasLiteral(FS.accessMode, AccessMode.MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name())) && canViewPublicMetadata())) {
                 return Access.List;
             }
         }

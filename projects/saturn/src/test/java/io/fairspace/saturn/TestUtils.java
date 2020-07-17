@@ -9,6 +9,7 @@ import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 
 import java.time.Instant;
+import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static java.time.Instant.now;
@@ -32,12 +33,16 @@ public class TestUtils {
         return argThat(a -> a.containsAll(m));
     }
 
-    public static void setupRequestContext() {
+    public static void setupRequestContext(String... roles) {
         var request = mock(Request.class);
         setCurrentRequest(request);
         var auth = mock(Authentication.User.class);
         when(request.getAuthentication()).thenReturn(auth);
-        var identity = mock(UserIdentity.class);
+        var identity = mock(UserIdentity.class, withSettings().lenient());
+        when(identity.isUserInRole(any(), any())).thenAnswer(invocation -> {
+            var role = invocation.getArgument(0);
+            return List.of(roles).contains(role);
+        });
         when(auth.getUserIdentity()).thenReturn(identity);
         var principal = mock(KeycloakPrincipal.class, withSettings().lenient());
         when(identity.getUserPrincipal()).thenReturn(principal);
@@ -48,5 +53,6 @@ public class TestUtils {
         when(context.getToken()).thenReturn(token);
         when(token.getSubject()).thenReturn("userid");
         when(token.getName()).thenReturn("fullname");
+
     }
 }

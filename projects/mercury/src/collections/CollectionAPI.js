@@ -76,12 +76,12 @@ class CollectionAPI {
     }
 
     deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
-        return FileAPI.delete(collection.name, showDeleted)
+        return FileAPI.delete(collection.location, showDeleted)
             .catch(handleHttpError("Failure while deleting collection"));
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
-        return FileAPI.undelete(collection.name)
+        return FileAPI.undelete(collection.location)
             .catch(handleHttpError("Failure while undeleting collection"));
     }
 
@@ -92,8 +92,24 @@ class CollectionAPI {
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
         const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
-        return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
-            .catch(handleHttpError("Failure while updating a collection"));
+        return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary);
+        // .catch(handleHttpError("Failure while updating a collection"));
+    }
+
+    setAccessMode(collection: Collection, mode) {
+        return FileAPI.post(collection.location, {action: 'set_access_mode', mode});
+    }
+
+    shareWithWorkspace(collection: Collection, workspace) {
+        return FileAPI.post(collection.location, {action: 'share_with_workspace', workspace});
+    }
+
+    unshareWithWorkspace(collection: Collection, workspace) {
+        return FileAPI.post(collection.location, {action: 'unshare_with_workspace', workspace});
+    }
+
+    shareWithUser(collection: Collection, user, access) {
+        return FileAPI.post(collection.location, {action: 'share_with_user', user, access});
     }
 }
 

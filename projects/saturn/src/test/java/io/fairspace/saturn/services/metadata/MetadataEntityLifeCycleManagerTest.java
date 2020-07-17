@@ -13,6 +13,7 @@ import java.time.Instant;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.auth.RequestContext.ADD_SHARED_METADATA;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
@@ -44,7 +45,7 @@ public class MetadataEntityLifeCycleManagerTest {
 
         initVocabularies(ds);
 
-        setupRequestContext();
+        setupRequestContext(ADD_SHARED_METADATA);
 
         lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI);
     }

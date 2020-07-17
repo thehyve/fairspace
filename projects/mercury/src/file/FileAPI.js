@@ -8,14 +8,27 @@ const defaultOptions = {withCredentials: true};
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
+export type Access = "None" | "List" | "Read" | "Write" | "Manage";
+
+export type Permission = {
+    user: string; // iri
+    access: Access;
+}
+
 export type File = {
+    iri: string;
     filename: string;
     basename: string;
     lastmod: string;
-    version: number;
+    version?: number;
     size: number;
     type: string;
+    dateCreated: string;
+    dateModified?: string;
     dateDeleted?: string;
+    access?: Access;
+    sharedWith?: Array<String>;
+    permissions?: Array<Permission>;
 }
 
 class FileAPI {
@@ -375,6 +388,19 @@ class FileAPI {
         return Promise.all(filenames.map(filename => this.undelete(filename)));
     }
 
+    post(path, data) {
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "multipart/form-data"
+            },
+            responseType: "text",
+            data
+        };
+        return this.client().customRequest(path, requestOptions);
+    }
+
     showFileHistory(file, startIndex, endIndex) {
         const versions = [];
         for (let i = file.version - startIndex; i >= file.version - endIndex && i >= 1; i -= 1) {
@@ -384,7 +410,25 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile: File = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
+    mapToFile = (fileObject) => {
+        const flattened = {...fileObject, ...(fileObject.props || {})};
+
+        if (flattened.sharedWith) {
+            if (typeof flattened.sharedWith === 'string') {
+                flattened.sharedWith = flattened.sharedWith.split(',');
+            } else {
+                flattened.sharedWith = [];
+            }
+        }
+
+        if (typeof flattened.permissions === 'string') {
+            flattened.permissions = flattened.permissions
+                .split(',')
+                .map(s => s.split(' '))
+                .map(([user, access]) => ({user, access}));
+        }
+        return flattened;
+    };
 }
 
 export default new FileAPI();

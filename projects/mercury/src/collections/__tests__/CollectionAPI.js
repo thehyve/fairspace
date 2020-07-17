@@ -91,7 +91,8 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to undelete a collection', async () => {
             await CollectionAPI.undeleteCollection({
-                name: 'name1',
+                location: 'name1',
+                name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             }, {});
@@ -107,7 +108,8 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to delete a collection', async () => {
             await CollectionAPI.deleteCollection({
-                name: 'name1',
+                location: 'name1',
+                name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             });
@@ -118,7 +120,8 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to delete a collection permanently', async () => {
             await CollectionAPI.deleteCollection({
-                name: 'name1',
+                location: 'name1',
+                name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             }, true);

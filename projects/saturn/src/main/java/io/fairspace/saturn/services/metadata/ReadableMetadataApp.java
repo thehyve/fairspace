@@ -11,8 +11,6 @@ import spark.Request;
 
 import java.util.List;
 
-import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static org.apache.jena.riot.RDFFormat.TURTLE;
 import static spark.Spark.get;
