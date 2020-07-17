@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {withRouter} from 'react-router-dom';
+import {useHistory, withRouter} from 'react-router-dom';
 import {Card, CardContent, CardHeader, Grid, IconButton, Menu, MenuItem, withStyles} from "@material-ui/core";
 import {MoreVert, Widgets} from "@material-ui/icons";
 import type {Workspace} from "./WorkspacesAPI";
@@ -11,6 +11,9 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
 import UsersContext from "../users/UsersContext";
 import {formatDateTime} from "../common/utils/genericUtils";
+import CollectionsContext from "../collections/CollectionsContext";
+import type {Collection} from "../collections/CollectionAPI";
+import type {User} from "../users/UsersAPI";
 
 
 const styles = {
@@ -35,20 +38,26 @@ type WorkspaceDetailsProps = {
     loading: boolean;
     workspace: Workspace;
     classes: Object;
-    updateWorkspaceStatus: (Workspace) => Promise<void>,
+    updateWorkspaceStatus: (Workspace) => Promise<void>;
+    deleteWorkspace: (Workspace) => Promise<void>;
+    history: History;
+    currentUser: User;
+    users: User[];
+    collections: Collection[];
 };
 
 const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
-    const {loading, workspace, updateWorkspaceStatus, classes} = props;
-    const {currentUser} = useContext(UserContext);
-    const {users} = useContext(UsersContext);
+    const {loading, workspace, updateWorkspaceStatus, deleteWorkspace, classes, history, currentUser, users, collections} = props;
     const [anchorEl, setAnchorEl] = useState(null);
+    const [showDeletionConfirmDialog, setShowDeletionConfirmDialog] = useState(false);
     const [showStatusUpdateConfirmDialog, setShowStatusUpdateConfirmDialog] = useState(false);
     const [newStatus, setNewStatus] = useState(null);
 
     if (loading) {
         return <LoadingInlay />;
     }
+
+    const isNonEmptyWorkspace = collections.some(c => c.ownerWorkspace === workspace.iri);
 
     const handleMenuClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -63,8 +72,27 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
         setShowStatusUpdateConfirmDialog(true);
     };
 
+    const handleDeleteWorkspace = () => {
+        setShowDeletionConfirmDialog(true);
+    };
+
     const handleCloseUpdateStatus = () => {
         setShowStatusUpdateConfirmDialog(false);
+    };
+
+    const handleCloseDeleteWorkspace = () => {
+        setShowDeletionConfirmDialog(false);
+    };
+
+    const deleteCurrentWorkspace = () => {
+        handleCloseDeleteWorkspace();
+        deleteWorkspace(workspace)
+            .then(() => history.push('/workspaces'))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while deleting a workspace",
+                () => handleDeleteWorkspace()
+            ));
     };
 
     const updateStatus = () => {
@@ -81,6 +109,19 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
         const user = users.find(u => u.iri === iri);
         return user ? user.name : '-';
     };
+
+    const renderDeletionConfirmation = () => (
+        <ConfirmationDialog
+            open
+            title="Confirmation"
+            content={`Are you sure you want to delete workspace ${workspace.name}? This operation cannot be reverted.`}
+            dangerous
+            agreeButtonText="Yes"
+            onAgree={deleteCurrentWorkspace}
+            onDisagree={handleCloseDeleteWorkspace}
+            onClose={handleCloseDeleteWorkspace}
+        />
+    );
 
     const renderStatusUpdateConfirmation = () => (
         <ConfirmationDialog
@@ -143,6 +184,13 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
                         Activate workspace
                     </MenuItem>
                 )}
+                <MenuItem
+                    disabled={isNonEmptyWorkspace}
+                    title="Delete empty workspace."
+                    onClick={handleDeleteWorkspace}
+                >
+                    Delete workspace
+                </MenuItem>
             </Menu>
         </>
     );
@@ -165,10 +213,30 @@ const WorkspaceDetails = (props: WorkspaceDetailsProps) => {
 
     return (
         <>
-            {showStatusUpdateConfirmDialog ? renderStatusUpdateConfirmation() : null}
+            {showStatusUpdateConfirmDialog && renderStatusUpdateConfirmation()}
+            {showDeletionConfirmDialog && renderDeletionConfirmation()}
             {renderWorkspaceSettingsCard()}
         </>
     );
 };
 
-export default withRouter(withStyles(styles)(WorkspaceDetails));
+const ContextualWorkspaceDetails = (props) => {
+    const history = useHistory();
+
+    const {currentUser} = useContext(UserContext);
+    const {users} = useContext(UsersContext);
+    const {collections, loading: collectionsLoading} = useContext(CollectionsContext);
+
+    return (
+        <WorkspaceDetails
+            {...props}
+            history={history}
+            currentUser={currentUser}
+            users={users}
+            collections={collections}
+            loading={props.loading || collectionsLoading}
+        />
+    );
+};
+
+export default withRouter(withStyles(styles)(ContextualWorkspaceDetails));

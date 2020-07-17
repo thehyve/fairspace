@@ -9,6 +9,7 @@ export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) =>
     const {data: workspaces = [], error: workspacesError, loading: workspacesLoading, refresh: refreshWorkspaces} = useAsync(workspacesAPI.getWorkspaces);
     const createWorkspace = (workspace: Workspace) => workspacesAPI.createWorkspace(workspace).then(refreshWorkspaces);
     const updateWorkspace = (workspace: Workspace) => workspacesAPI.updateWorkspace(workspace).then(refreshWorkspaces);
+    const deleteWorkspace = (workspace: Workspace) => workspacesAPI.deleteWorkspace(workspace.iri).then(refreshWorkspaces);
 
     return (
         <WorkspaceContext.Provider
@@ -18,7 +19,8 @@ export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) =>
                 workspacesLoading,
                 refreshWorkspaces,
                 createWorkspace,
-                updateWorkspaceStatus: updateWorkspace
+                updateWorkspaceStatus: updateWorkspace,
+                deleteWorkspace
             }}
         >
             {children}

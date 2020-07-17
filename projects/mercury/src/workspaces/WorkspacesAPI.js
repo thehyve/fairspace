@@ -55,6 +55,13 @@ class WorkspacesAPI {
             .catch(handleHttpError("Failure while updating a workspace status"));
     }
 
+    deleteWorkspace(workspaceIri: string): Promise<WorkspaceProperties> {
+        return axios.delete(`${workspacesUrl}?workspace=${encodeURI(workspaceIri)}`, {
+            headers: {Accept: 'application/json'},
+        })
+            .catch(handleHttpError("Failure while deleting a workspace"));
+    }
+
     getWorkspaceUsers(workspaceIri: string): Promise<WorkspaceUser[]> {
         return axios.get(`${workspacesUrl}users/?workspace=${encodeURI(workspaceIri)}`, {
             headers: {Accept: 'application/json'},
