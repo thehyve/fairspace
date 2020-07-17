@@ -19,7 +19,7 @@ export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) =>
                 workspacesLoading,
                 refreshWorkspaces,
                 createWorkspace,
-                updateWorkspaceStatus: updateWorkspace,
+                updateWorkspace,
                 deleteWorkspace
             }}
         >

@@ -37,6 +37,9 @@ export type CollectionAuditInfo = {|
     modifiedBy?: string; // iri
     dateDeleted?: string;
     deletedBy?: string; // iri
+    status?: string;
+    statusDateModified?: string;
+    statusModifiedBy?: string; // iri
 |};
 
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;

@@ -22,13 +22,6 @@ type Accessible = {
     hasAccess: boolean
 }
 
-const styles = () => ({
-    statusColumn: {
-        fontSize: 'small',
-        color: 'gray',
-    }
-});
-
 const columns = {
     canCollaborate: {
         valueExtractor: 'canCollaborate',
@@ -37,10 +30,6 @@ const columns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
-    },
-    status: {
-        valueExtractor: 'status',
-        label: 'Status'
     }
 };
 
@@ -48,7 +37,6 @@ const WorkspaceList = ({
     workspaces = [],
     isSelected = () => false,
     toggleWorkspace = () => {},
-    classes = {}
 }) => {
     const history = useHistory();
 
@@ -107,20 +95,11 @@ const WorkspaceList = ({
                                 onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                                 selected={selected}
                             >
-                                <TableCell style={{maxWidth: 32}} component="th" scope="row" key="canCollaborate">
+                                <TableCell style={{maxWidth: 32, width: 32}} component="th" scope="row" key="canCollaborate">
                                     {!workspace.canCollaborate && (<Lock />)}
                                 </TableCell>
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row" key="name">
                                     {workspace.name}
-                                </TableCell>
-                                <TableCell
-                                    style={{maxWidth: 80}}
-                                    className={`${classes.statusColumn}`}
-                                    component="th"
-                                    scope="row"
-                                    key="status"
-                                >
-                                    {workspace.status ? workspace.status.toLocaleUpperCase() : ''}
                                 </TableCell>
                             </TableRow>
                         );
@@ -140,4 +119,4 @@ const WorkspaceList = ({
     );
 };
 
-export default withStyles(styles)(WorkspaceList);
+export default WorkspaceList;
