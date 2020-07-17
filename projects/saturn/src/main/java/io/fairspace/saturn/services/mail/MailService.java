@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.mail;
 
-import com.google.common.util.concurrent.Futures;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.mail.Message;
@@ -11,6 +10,8 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 
 // TODO: Use me
 @Slf4j
@@ -57,7 +58,7 @@ public class MailService {
             msg.setText(text);
             return send(msg);
         } catch (Exception e) {
-            return Futures.immediateFailedFuture(e);
+            return immediateFailedFuture(e);
         }
     }
 }
