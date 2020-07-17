@@ -130,18 +130,20 @@ public class DavFactoryTest {
         factory.getResource(null, BASE_PATH + "coll");
     }
 
-    @Test(expected = ConflictException.class)
-    public void testCreateCollectionTwice() throws NotAuthorizedException, BadRequestException, ConflictException {
+    @Test
+    public void testCreateCollectionTwiceFails() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        root.createCollection("coll");
-        root.createCollection("coll");
+        assertNotNull(root.createCollection("coll"));
+        assertNull(root.createCollection("coll"));
+        assertEquals(1, root.getChildren().size());
     }
 
-    @Test(expected = ConflictException.class)
-    public void testCreateCollectionWithSameNameButDifferentCaseRejected() throws NotAuthorizedException, BadRequestException, ConflictException {
+    @Test
+    public void testCreateCollectionWithSameNameButDifferentCaseFails() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        root.createCollection("coll");
-        root.createCollection("COLL");
+        assertNotNull(root.createCollection("coll"));
+        assertNull(root.createCollection("COLL"));
+        assertEquals(1, root.getChildren().size());
     }
 
     @Test
@@ -369,6 +371,18 @@ public class DavFactoryTest {
         assertNotNull(factory.getResource(null, BASE_PATH + "/new/dir/file"));
     }
 
+    @Test(expected = ConflictException.class)
+    public void testRenameCollectionToExistingFails() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll1");
+
+        var coll2 = (FolderResource) root.createCollection("coll2");
+        var dir = coll2.createCollection("dir");
+        ((FolderResource) dir).createNew("file", input, FILE_SIZE, "text/abc");
+
+        coll2.moveTo(root, "COLL1");
+    }
+
     @Test
     public void testCopyDirectory() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
@@ -388,4 +402,17 @@ public class DavFactoryTest {
         assertNotNull(factory.getResource(null, BASE_PATH + "/c2/dir2/new"));
         assertNotNull(factory.getResource(null, BASE_PATH + "/c2/dir2/new/file"));
     }
+
+    @Test(expected = ConflictException.class)
+    public void testCopyCollectionToExistingFails() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll1");
+
+        var coll2 = (FolderResource) root.createCollection("coll2");
+        var dir = coll2.createCollection("dir");
+        ((FolderResource) dir).createNew("file", input, FILE_SIZE, "text/abc");
+
+        coll2.copyTo(root, "COLL1");
+    }
+
 }

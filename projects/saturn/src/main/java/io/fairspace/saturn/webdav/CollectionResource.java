@@ -61,6 +61,11 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
+        var existing = ((RootResource) rDest).findExistingCollectionWithNameIgnoreCase(name);
+        if (existing != null) {
+            throw new ConflictException(
+                    existing, "Target already exists (modulo case).");
+        }
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
         var newSubject = childSubject(factory.rootSubject, name);
@@ -71,6 +76,11 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
         if (!(toCollection instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot copy a collection to a non-root folder.");
+        }
+        var existing = ((RootResource) toCollection).findExistingCollectionWithNameIgnoreCase(name);
+        if (existing != null) {
+            throw new ConflictException(
+                    existing, "Target already exists (modulo case).");
         }
         super.copyTo(toCollection, name);
     }
