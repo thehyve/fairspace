@@ -19,9 +19,6 @@ export type WorkspaceProperties = {|
     iri: string;
     name?: string;
     description?: string;
-    status: string;
-    statusDateModified?: string;
-    statusModifiedBy?: string; // iri
 |}
 
 export type Resource = {|
@@ -52,7 +49,7 @@ class WorkspacesAPI {
             headers: {Accept: 'application/json'},
         })
             .then(extractJsonData)
-            .catch(handleHttpError("Failure while updating a workspace status"));
+            .catch(handleHttpError("Failure while updating a workspace"));
     }
 
     deleteWorkspace(workspaceIri: string): Promise<WorkspaceProperties> {
