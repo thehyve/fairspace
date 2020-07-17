@@ -38,6 +38,10 @@ public class DavFactory implements ResourceFactory {
             return root;
         }
 
+        if (!subject.getModel().containsResource(subject) || subject.hasProperty(FS.dateDeleted) && !showDeleted()) {
+            return null;
+        }
+
         var access = getAccess(subject);
 
         if (!access.canList()) {
@@ -63,7 +67,7 @@ public class DavFactory implements ResourceFactory {
 
     public Access getAccess(org.apache.jena.rdf.model.Resource subject) {
         var uri = subject.getURI();
-        var nextSeparatorPos = uri.indexOf('/', baseUri.length() + 1);
+        var nextSeparatorPos = uri.indexOf('/', rootSubject.getURI().length() + 1);
         var coll = nextSeparatorPos < 0 ? subject : subject.getModel().createResource(uri.substring(0, nextSeparatorPos));
         if (coll.hasProperty(RDF.type, FS.Collection)) {
             var user = currentUserResource();
