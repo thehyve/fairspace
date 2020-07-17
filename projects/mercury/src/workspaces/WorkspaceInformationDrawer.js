@@ -9,7 +9,7 @@ import WorkspaceContext from "./WorkspaceContext";
 import WorkspaceDetails from "./WorkspaceDetails";
 
 
-const WorkspaceInformationDrawer = ({workspace, loading, updateWorkspaceStatus, atLeastSingleWorkspaceExists}) => {
+const WorkspaceInformationDrawer = ({workspace, loading, updateWorkspaceStatus, deleteWorkspace, atLeastSingleWorkspaceExists}) => {
     if (!workspace) {
         return atLeastSingleWorkspaceExists
             && <EmptyInformationDrawer message="Select a workspace to display its metadata" />;
@@ -29,6 +29,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, updateWorkspaceStatus, 
             <WorkspaceDetails
                 workspace={workspace}
                 updateWorkspaceStatus={updateWorkspaceStatus}
+                deleteWorkspace={deleteWorkspace}
                 loading={loading}
             />
         </>
@@ -36,7 +37,7 @@ const WorkspaceInformationDrawer = ({workspace, loading, updateWorkspaceStatus, 
 };
 
 const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) => {
-    const {workspacesLoading, updateWorkspaceStatus, workspaces} = useContext(WorkspaceContext);
+    const {workspacesLoading, updateWorkspaceStatus, deleteWorkspace, workspaces} = useContext(WorkspaceContext);
     const workspace = workspaces.find(c => c.iri === selectedWorkspaceIri);
     const atLeastSingleWorkspaceExists = workspaces.length > 0;
     return (
@@ -45,6 +46,7 @@ const ContextualWorkspaceInformationDrawer = ({selectedWorkspaceIri, ...props}) 
             loading={workspacesLoading}
             workspace={workspace}
             updateWorkspaceStatus={updateWorkspaceStatus}
+            deleteWorkspace={deleteWorkspace}
             atLeastSingleWorkspaceExists={atLeastSingleWorkspaceExists}
         />
     );

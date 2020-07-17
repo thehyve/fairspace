@@ -72,4 +72,18 @@ describe('WorkspacesAPI', () => {
             {headers: {Accept: 'application/json'}}
         );
     });
+
+    it('Deletes a new workspace', async () => {
+        const workspaceIri: string = 'workspace1';
+        const deleteResponse: AxiosResponse = {
+            headers: {'content-type': 'application/json'}
+        };
+        mockAxios.delete.mockImplementationOnce(() => Promise.resolve(deleteResponse));
+        await workspacesAPI.deleteWorkspace(workspaceIri);
+        expect(mockAxios.delete).toHaveBeenCalledTimes(1);
+        expect(mockAxios.delete).toHaveBeenCalledWith(
+            '/api/v1/workspaces/?workspace=workspace1',
+            {headers: {Accept: 'application/json'}}
+        );
+    });
 });
