@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -12,6 +11,7 @@ import org.apache.jena.vocabulary.RDF;
 import java.net.URI;
 
 import static io.fairspace.saturn.auth.RequestContext.*;
+import static io.fairspace.saturn.webdav.Access.max;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
@@ -75,30 +75,55 @@ public class DavFactory implements ResourceFactory {
         if (coll.hasProperty(RDF.type, FS.Collection)) {
             var user = currentUserResource();
             var ownerWs = coll.getPropertyResourceValue(FS.ownedBy);
-            var active = (ownerWs != null) && ownerWs.hasLiteral(FS.status, WorkspaceStatus.Active);
-            var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
-            if (coll.hasProperty(FS.manage, user)
-                    || (ownerWs != null) && ownerWs.hasProperty(FS.manage, user)
-                    || isAdmin()) {
+
+            if (isAdmin()) {
                 return Access.Manage;
-            } else if (deleted) {
+            }
+
+            var access = getPermission(coll, user);
+
+            var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
+            if (deleted && access != Access.Manage) {
                 return Access.None;
-            } else if (ownerWs != null && (ownerWs.hasProperty(FS.member, user) || ownerWs.hasProperty(FS.manage, user))) {
-                return active ? Access.Write : Access.Read;
-            } else if (coll.hasProperty(FS.write, user)) {
-                return Access.Write;
-            } else if (coll.hasProperty(FS.read, user)) {
-                return Access.Read;
-            } else if (getWorkspaceShares(coll)
-                    .filterKeep(r -> r.hasProperty(FS.member, user) || r.hasProperty(FS.manage, user))
-                    .hasNext()) {
-                return Access.Read;
-            } else if (coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name()) && canViewPublicData()) {
-                return Access.Read;
+            }
+
+            if (coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name()) && canViewPublicData()) {
+                access = max(access, Access.Read);
             } else if (coll.hasProperty(FS.list, user)
                     || ((coll.hasLiteral(FS.accessMode, AccessMode.MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name())) && canViewPublicMetadata())) {
-                return Access.List;
+                access = max(access, Access.List);
             }
+
+            Iterable<org.apache.jena.rdf.model.Resource> userWorkspaces = () -> subject.getModel()
+                    .listSubjectsWithProperty(RDF.type, FS.Workspace)
+                    .filterKeep(ws -> ws.hasProperty(FS.manage, user) || ws.hasProperty(FS.member, user))
+                    .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
+
+
+            for (var ws : userWorkspaces) {
+                access = max(access, getPermission(coll, ws));
+                if (access == Access.Manage) {
+                    break;
+                }
+            }
+
+            return access;
+        }
+        return Access.None;
+    }
+
+    private Access getPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
+        if (principal.hasProperty(FS.manage, principal)) {
+            return Access.Manage;
+        }
+        if (principal.hasProperty(FS.write, principal)) {
+            return Access.Write;
+        }
+        if (principal.hasProperty(FS.read, principal)) {
+            return Access.Read;
+        }
+        if (principal.hasProperty(FS.list, principal)) {
+            return Access.List;
         }
         return Access.None;
     }

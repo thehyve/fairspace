@@ -1,5 +1,7 @@
 package io.fairspace.saturn.webdav;
 
+import java.util.EnumSet;
+
 public enum Access {
     None,
     List,
@@ -21,5 +23,9 @@ public enum Access {
 
     public boolean canManage() {
         return compareTo(Manage) >= 0;
+    }
+     
+    public static <T extends Enum<T>> T max(T x, T y) {
+        return x.compareTo(y) > 0 ? x : y;
     }
 }
