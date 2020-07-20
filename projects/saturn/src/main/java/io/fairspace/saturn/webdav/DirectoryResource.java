@@ -105,26 +105,26 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
-        var w = new XmlWriter(out);
-        w.open("html");
-        w.open("head");
-        w.close("head");
-        w.open("body");
-        w.begin("h1").open().writeText(this.getName()).close();
-        w.open("table");
-        for (var r : getChildren()) {
-            w.open("tr");
-            w.open("td");
-            w.begin("a").writeAtt("href", r.getName() + (r instanceof FolderResource ? "/" : "")).open().writeText(r.getName()).close();
-            w.close("td");
-            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
-            w.begin("td").open().writeText((r instanceof FileResource) ? ((FileResource) r).getContentLength() + " bytes" : "DIR").close();
-            w.close("tr");
-        }
-        w.close("table");
-        w.close("body");
-        w.close("html");
-        w.flush();
+//        var w = new XmlWriter(out);
+//        w.open("html");
+//        w.open("head");
+//        w.close("head");
+//        w.open("body");
+//        w.begin("h1").open().writeText(this.getName()).close();
+//        w.open("table");
+//        for (var r : getChildren()) {
+//            w.open("tr");
+//            w.open("td");
+//            w.begin("a").writeAtt("href", r.getName() + (r instanceof FolderResource ? "/" : "")).open().writeText(r.getName()).close();
+//            w.close("td");
+//            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
+//            w.begin("td").open().writeText((r instanceof FileResource) ? ((FileResource) r).getContentLength() + " bytes" : "DIR").close();
+//            w.close("tr");
+//        }
+//        w.close("table");
+//        w.close("body");
+//        w.close("html");
+//        w.flush();
     }
 
     @Override

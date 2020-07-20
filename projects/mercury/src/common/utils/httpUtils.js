@@ -6,8 +6,8 @@
  * @param providedMessage   If the backend does not provide an error message, this message will be given in the Error
  * @returns {Function}
  */
-import ErrorDialog from "../components/ErrorDialog";
 import {AxiosError} from 'axios';
+import ErrorDialog from "../components/ErrorDialog";
 
 export const handleAuthError = (status) => {
     switch (status) {

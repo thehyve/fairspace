@@ -34,6 +34,7 @@
     "lodash": "^4.17.15",
     "mdi-material-ui": "^6.16.0",
     "prop-types": "^15.7.2",
+    "qs": "^6.9.4",
     "query-string": "^6.9.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
