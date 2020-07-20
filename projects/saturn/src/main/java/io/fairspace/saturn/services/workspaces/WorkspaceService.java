@@ -159,6 +159,15 @@ public class WorkspaceService {
             switch (role) {
                 case Member -> workspaceResource.addProperty(FS.member, userResource);
                 case Manager -> workspaceResource.addProperty(FS.manage, userResource);
+                case None -> {
+                    var writeableCollections = workspaceResource.getModel().listSubjectsWithProperty(FS.ownedBy, workspaceResource)
+                            .filterKeep(coll -> coll.hasProperty(FS.manage, userResource) || coll.hasProperty(FS.write, userResource))
+                            .toList();
+                    writeableCollections.forEach(c -> c.getModel()
+                            .removeAll(c, FS.manage, userResource)
+                            .removeAll(c, FS.write, userResource)
+                            .add(c, FS.read, userResource));
+                }
             }
         });
         audit("WS_SET_USER_ROLE", "workspace", workspace, "user", user, "role", role);
