@@ -19,7 +19,6 @@ import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
 import UserContext from '../users/UserContext';
-import SharingContext, {SharingProvider} from "../permissions/SharingContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import {getDisplayName, isDataSteward} from "../users/userUtils";
@@ -27,7 +26,6 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import PermissionsCard from "../permissions/PermissionsCard";
-import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
 import CollectionShareCard from "./CollectionShareCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
@@ -246,17 +244,18 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </CardContent>
                 </Card>
 
-                <PermissionProvider iri={collection.iri}>
-                    <PermissionContext.Consumer>
-                        {({permissions}) => (
-                            <PermissionsCard
-                                permissions={permissions}
-                                iri={collection.iri}
-                                canManage={collection.canManage}
-                            />
-                        )}
-                    </PermissionContext.Consumer>
-                </PermissionProvider>
+                <PermissionsCard
+                    permissions={collection.userPermissions}
+                    iri={collection.iri}
+                    canManage={collection.canManage}
+                />
+                <CollectionShareCard
+                    workspaceUsers={this.props.workspaceUsers}
+                    users={this.props.users}
+                    workspaces={this.props.workspaces}
+                    collection={this.props.collection}
+                    setBusy={this.props.setBusy}
+                />
 
                 {editing ? (
                     <CollectionEditor
@@ -304,23 +303,6 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onClose={this.handleCloseDelete}
                     />
                 )}
-
-                <SharingProvider iri={collection.iri}>
-                    <SharingContext.Consumer>
-                        {({workspacesWithShare, usersWithShare, alterPermission}) => (
-                            <CollectionShareCard
-                                workspacesWithShare={workspacesWithShare}
-                                usersWithShare={usersWithShare}
-                                alterPermission={alterPermission}
-                                workspaceUsers={this.props.workspaceUsers}
-                                users={this.props.users}
-                                workspaces={this.props.workspaces}
-                                collection={this.props.collection}
-                                setBusy={this.props.setBusy}
-                            />
-                        )}
-                    </SharingContext.Consumer>
-                </SharingProvider>
             </>
         );
     }

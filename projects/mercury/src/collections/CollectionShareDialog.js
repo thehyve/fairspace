@@ -18,30 +18,30 @@ import FormControl from "@material-ui/core/FormControl";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 
-export const CollectionShareDialog = ({collection, alterPermission, entitiesName, shareCandidates = [],
+export const CollectionShareDialog = ({collection, alterPermission, entitiesName: principalType, shareCandidates = [],
     setBusy = () => {}, showDialog, setShowDialog = () => {}}) => {
-    const [selectedEntities, setSelectedEntities] = useState([]);
+    const [selectedPrincipals, setSelectedPrincipals] = useState([]);
     const [accessRight, setAccessRight] = useState("List");
 
     const handleShareCollection = () => {
         setBusy(true);
         setShowDialog(false);
-        Promise.all(shareCandidates.map(entity => alterPermission(entity, collection.iri, accessRight)))
+        Promise.all(shareCandidates.map(principal => alterPermission(collection.location, principal.iri, accessRight)))
             .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
             .finally(() => setBusy(false));
     };
 
     const handleCancelShareCollection = () => setShowDialog(false);
 
-    const toggleSelectedEntities = (entities) => {
-        const results = [...selectedEntities];
-        const idx = results.indexOf(entities);
+    const toggleSelectedPrincipals = (principals) => {
+        const results = [...selectedPrincipals];
+        const idx = results.indexOf(principals);
         if (idx < 0) {
-            results.push(entities);
+            results.push(principals);
         } else {
             results.splice(idx, 1);
         }
-        setSelectedEntities(results);
+        setSelectedPrincipals(results);
     };
 
     const renderAccessRightSelector = () => (
@@ -64,11 +64,11 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
         <List>
             {
                 shareCandidates.map(candidate => (
-                    <ListItem key={candidate.iri} onClick={() => toggleSelectedEntities(candidate.iri)}>
+                    <ListItem key={candidate.iri} onClick={() => toggleSelectedPrincipals(candidate.iri)}>
                         <ListItemIcon>
                             <Checkbox
                                 edge="start"
-                                checked={selectedEntities.includes(candidate.iri)}
+                                checked={selectedPrincipals.includes(candidate.iri)}
                                 tabIndex={-1}
                                 disableRipple
                             />
@@ -89,7 +89,7 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
 
     return (
         <Dialog open={showDialog}>
-            <DialogTitle>Share collection {collection.name} with other {entitiesName}</DialogTitle>
+            <DialogTitle>Share collection {collection.name} with other {principalType}</DialogTitle>
             <DialogContent>
                 {
                     shareCandidates.length ? (
@@ -97,7 +97,7 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
                             {renderAccessRightSelector()}
                             {renderShareCandidatesList()}
                         </div>
-                    ) : `This collection has been already shared with all ${entitiesName}.`
+                    ) : `This collection has been already shared with all ${principalType}.`
                 }
             </DialogContent>
             <DialogActions>
