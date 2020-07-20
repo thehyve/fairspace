@@ -68,7 +68,7 @@ const UserList = (props: UserListProps) => {
     const [userToAdd, setUserToAdd] = useState(null);
 
     if (workspaceUsersError) {
-        return (<MessageDisplay message="An error occurred loading permissions" />);
+        return (<MessageDisplay message="An error occurred loading workspace users" />);
     } if (workspaceUsersLoading) {
         return (<LoadingInlay />);
     }
@@ -155,7 +155,7 @@ const UserList = (props: UserListProps) => {
                 <TableBody>
                     {pagedItems.map((u) => (
                         <TableRow
-                            key={u.user}
+                            key={u.iri}
                             hover
                         >
                             <TableCell style={{maxWidth: 160}} component="th" scope="row">
@@ -169,8 +169,8 @@ const UserList = (props: UserListProps) => {
                                     checked={u.role === 'Manager'}
                                     onChange={(event) => (
                                         event.target.checked
-                                            ? grantUserRole(u.user, "Manager")
-                                            : grantUserRole(u.user, "Member")
+                                            ? grantUserRole(u.iri, "Manager")
+                                            : grantUserRole(u.iri, "Member")
                                     )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
                                     disableRipple
