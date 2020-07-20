@@ -27,24 +27,22 @@ import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.PathUtils.name;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
-import static java.lang.String.join;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
     private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
     private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
     private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
     private static final QName ACCESS_PROPERTY = new QName(FS.NS, "access");
-    private static final QName SHARED_WITH_PROPERTY = new QName(FS.NS, FS.sharedWith.getLocalName());
-    private static final QName PERMISSIONS_PROPERTY = new QName(FS.NS, "permissions");
+    private static final QName USER_PERMISSIONS_PROPERTY = new QName(FS.NS, "userPermissions");
+    private static final QName WORKSPACE_PERMISSIONS_PROPERTY = new QName(FS.NS, "workspacePermissions");
     private static final PropertyMetaData OWNED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
     private static final PropertyMetaData CREATED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
     private static final PropertyMetaData COMMENT_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
     private static final PropertyMetaData ACCESS_PROPERTY_META = new PropertyMetaData(READ_ONLY, Boolean.class);
-    private static final PropertyMetaData SHARED_WITH_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
     private static final PropertyMetaData PERMISSIONS_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
     private static final List<QName> COLLECTION_PROPERTIES = List.of(
             IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, OWNED_BY_PROPERTY, CREATED_BY_PROPERTY,
-            COMMENT_PROPERTY, ACCESS_PROPERTY, SHARED_WITH_PROPERTY, PERMISSIONS_PROPERTY
+            COMMENT_PROPERTY, ACCESS_PROPERTY, USER_PERMISSIONS_PROPERTY, WORKSPACE_PERMISSIONS_PROPERTY
     );
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
@@ -109,28 +107,30 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (name.equals(ACCESS_PROPERTY)) {
             return access;
         }
-        if (name.equals(SHARED_WITH_PROPERTY)) {
-            return join(",", () -> subject.listProperties(FS.sharedWith)
-                    .mapWith(Statement::getResource)
-                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
-                    .mapWith(Resource::getURI));
+        if (name.equals(USER_PERMISSIONS_PROPERTY)) {
+            return getPermissions(FS.User);
         }
-        if (name.equals(PERMISSIONS_PROPERTY)) {
-            var builder = new StringBuilder();
-
-            dumpPermissions(FS.manage, Access.Manage, builder);
-            dumpPermissions(FS.write, Access.Write, builder);
-            dumpPermissions(FS.read, Access.Read, builder);
-            dumpPermissions(FS.list, Access.List, builder);
-
-            return builder.toString();
+        if (name.equals(WORKSPACE_PERMISSIONS_PROPERTY)) {
+            return getPermissions(FS.Workspace);
         }
         return super.getProperty(name);
     }
 
-    private void dumpPermissions(Property property, Access access, StringBuilder builder) {
+    private String getPermissions(Resource principalType) {
+        var builder = new StringBuilder();
+
+        dumpPermissions(FS.manage, Access.Manage, principalType, builder);
+        dumpPermissions(FS.write, Access.Write, principalType, builder);
+        dumpPermissions(FS.read, Access.Read, principalType, builder);
+        dumpPermissions(FS.list, Access.List, principalType, builder);
+
+        return builder.toString();
+    }
+
+    private void dumpPermissions(Property property, Access access, Resource type, StringBuilder builder) {
         subject.listProperties(property)
                 .mapWith(Statement::getResource)
+                .filterKeep(r -> r.hasProperty(RDF.type, type))
                 .filterDrop(r -> r.hasProperty(FS.dateDeleted))
                 .mapWith(Resource::getURI)
                 .forEachRemaining(uri -> {
@@ -181,10 +181,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (name.equals(ACCESS_PROPERTY)) {
             return ACCESS_PROPERTY_META;
         }
-        if (name.equals(SHARED_WITH_PROPERTY)) {
-            return SHARED_WITH_PROPERTY_META;
-        }
-        if (name.equals(PERMISSIONS_PROPERTY)) {
+        if (name.equals(USER_PERMISSIONS_PROPERTY) || name.equals(WORKSPACE_PERMISSIONS_PROPERTY)) {
             return PERMISSIONS_PROPERTY_META;
         }
         return super.getPropertyMetaData(name);
@@ -199,9 +196,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "set_access_mode" -> setAccessMode(getEnumParameter(parameters, "mode", AccessMode.class));
-            case "share_with_user" -> shareWithUser(getResourceParameter(parameters, "user", FS.User), getEnumParameter(parameters, "access", Access.class));
-            case "share_with_workspace" -> shareWithWorkspace(getResourceParameter(parameters, "workspace", FS.Workspace));
-            case "unshare_with_workspace" -> unshareWithWorkspace(getResourceParameter(parameters, "workspace", FS.Workspace));
+            case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
             default -> super.performAction(action, parameters, files);
         }
     }
@@ -210,27 +205,34 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(FS.accessMode).addProperty(FS.accessMode, mode.name());
     }
 
-    private void shareWithUser(Resource user, Access access) {
+    private void setPermission(Resource principal, Access access) throws BadRequestException {
+        if (principal.hasProperty(RDF.type, FS.User)) {
+            if (access == Access.Write || access == Access.Manage) {
+                var ownerWs = subject.getPropertyResourceValue(FS.ownedBy);
+                if (!principal.hasProperty(FS.member, ownerWs) && !principal.hasProperty(FS.manage, ownerWs)) {
+                    throw new BadRequestException(this);
+                }
+            }
+        } else if (principal.hasProperty(RDF.type, FS.Workspace)) {
+            if ((access == Access.Write || access == Access.Manage) && !subject.hasProperty(FS.ownedBy, principal)) {
+                throw new BadRequestException(this);
+            }
+        } else {
+            throw new BadRequestException(this, "Invalid principal");
+        }
+
         subject.getModel()
-                .removeAll(subject, FS.list, user)
-                .removeAll(subject, FS.read, user)
-                .removeAll(subject, FS.write, user)
-                .removeAll(subject, FS.manage, user);
+                .removeAll(subject, FS.list, principal)
+                .removeAll(subject, FS.read, principal)
+                .removeAll(subject, FS.write, principal)
+                .removeAll(subject, FS.manage, principal);
 
         switch (access) {
-            case List -> subject.addProperty(FS.list, user);
-            case Read -> subject.addProperty(FS.read, user);
-            case Write -> subject.addProperty(FS.write, user);
-            case Manage -> subject.addProperty(FS.manage, user);
+            case List -> subject.addProperty(FS.list, principal);
+            case Read -> subject.addProperty(FS.read, principal);
+            case Write -> subject.addProperty(FS.write, principal);
+            case Manage -> subject.addProperty(FS.manage, principal);
         }
-    }
-
-    private void shareWithWorkspace(Resource workspace) {
-        subject.addProperty(FS.sharedWith,  workspace);
-    }
-
-    private void unshareWithWorkspace(Resource workspace) {
-        subject.getModel().removeAll(subject, FS.sharedWith,  workspace);
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {
@@ -242,7 +244,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
     }
 
-    private Resource getResourceParameter(Map<String, String> parameters, String name, Resource expectedType) throws BadRequestException {
+    private Resource getResourceParameter(Map<String, String> parameters, String name) throws BadRequestException {
         checkParameterPresence(parameters, name);
 
         Resource r = null;
@@ -250,7 +252,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             r = subject.getModel().createResource(parameters.get(name));
         } catch (Exception ignore) {
         }
-        if (r == null || !r.hasProperty(RDF.type, expectedType) || r.hasProperty(FS.dateDeleted)) {
+        if (r == null || r.hasProperty(FS.dateDeleted)) {
             throw new BadRequestException(this, "Invalid \"" + name + "\" parameter");
         }
         return r;

@@ -27,8 +27,8 @@ export type CollectionType = {|
 
 export type CollectionPermissions = {|
     access?: Access;
-    sharedWith: Array<String>;
-    permissions: Array<Permission>;
+    userPermissions: Array<Permission>;
+    workspacePermissions: Array<Permission>;
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
@@ -96,20 +96,12 @@ class CollectionAPI {
         // .catch(handleHttpError("Failure while updating a collection"));
     }
 
-    setAccessMode(collection: Collection, mode) {
-        return FileAPI.post(collection.location, {action: 'set_access_mode', mode});
+    setAccessMode(location: String, mode) {
+        return FileAPI.post(location, {action: 'set_access_mode', mode});
     }
 
-    shareWithWorkspace(collection: Collection, workspace) {
-        return FileAPI.post(collection.location, {action: 'share_with_workspace', workspace});
-    }
-
-    unshareWithWorkspace(collection: Collection, workspace) {
-        return FileAPI.post(collection.location, {action: 'unshare_with_workspace', workspace});
-    }
-
-    shareWithUser(collection: Collection, user, access) {
-        return FileAPI.post(collection.location, {action: 'share_with_user', user, access});
+    setPermission(location, principal, access) {
+        return FileAPI.post(location, {action: 'set_permission', principal, access});
     }
 }
 
