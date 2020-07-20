@@ -30,5 +30,10 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,
     dateModified: properties.lastmod,
-    ...(properties.access && mapCollectionPermissions(properties.access))
+    ...(properties.access && mapCollectionPermissions(properties.access)),
+    sharedWith: (typeof properties.sharedWith === 'string') ? properties.sharedWith.split(',') : [],
+    permissions: properties.permissions
+        .split(',')
+        .map(s => s.split(' '))
+        .map(([user, access]) => ({user, access}))
 });

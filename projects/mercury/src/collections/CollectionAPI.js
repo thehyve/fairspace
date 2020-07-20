@@ -3,10 +3,16 @@ import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import {MetadataAPI} from "../metadata/common/LinkedDataAPI";
 import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
-import PermissionAPI from "../permissions/PermissionAPI";
 import type {User} from "../users/UsersAPI";
 
 const rootUrl = "";
+
+export type Access = "None" | "List" | "Read" | "Write" | "Manage";
+
+export type Permission = {
+    user: string; // iri
+    access: Access;
+}
 
 export type CollectionProperties = {|
     name: string;
@@ -20,6 +26,9 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
+    access?: Access;
+    sharedWith: Array<String>;
+    permissions: Array<Permission>;
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
@@ -41,23 +50,14 @@ export type CollectionAuditInfo = {|
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;
 
 class CollectionAPI {
-    getCollectionPermissions(iri: string, userIri: string): Promise<CollectionPermissions> {
-        return PermissionAPI.getPermissions(iri).then(permissions => permissions.find(p => p.user === userIri));
-    }
-
     getCollectionProperties(name: string): Promise<Collection> {
         return FileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
     getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
-        if (currentUser.iri) {
-            return FileAPI.list(rootUrl, showDeleted)
-                .then(collections => Promise.all(collections.map(c => (
-                    this.getCollectionProperties(c.basename)
-                ))))
-                .catch(handleHttpError("Failure when retrieving a list of collections"));
-        }
-        return Promise.resolve([]);
+        return FileAPI.list(rootUrl, showDeleted)
+            .then(collections => collections.map(mapFilePropertiesToCollection))
+            .catch(handleHttpError("Failure when retrieving a list of collections"));
     }
 
     addCollection(collection: CollectionProperties, vocabulary): Promise<void> {

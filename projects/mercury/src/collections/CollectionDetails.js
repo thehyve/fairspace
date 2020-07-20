@@ -1,25 +1,24 @@
 // @flow
 import React, {useContext} from 'react';
-import {Card, CardContent, CardHeader, IconButton, Menu, MenuItem, Typography} from '@material-ui/core';
+import {Card, CardContent, CardHeader, IconButton, List, Menu, MenuItem, Typography} from '@material-ui/core';
 import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 
+import LockOpen from "@material-ui/icons/LockOpen";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
 import UserContext from '../users/UserContext';
-import SharingContext, {SharingProvider} from "../permissions/SharingContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import {isDataSteward} from "../users/userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import PermissionsCard from "../permissions/PermissionsCard";
-import PermissionContext, {PermissionProvider} from "../permissions/PermissionContext";
-import CollectionShareCard from "./CollectionShareCard";
-
+import {compareBy} from "../common/utils/genericUtils";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -185,17 +184,33 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </CardContent>
                 </Card>
 
-                <PermissionProvider iri={collection.iri}>
-                    <PermissionContext.Consumer>
-                        {({permissions}) => (
-                            <PermissionsCard
-                                permissions={permissions}
-                                iri={collection.iri}
-                                canManage={collection.canManage}
-                            />
+                <Card>
+                    <CardHeader
+                        titleTypographyProps={{variant: 'h6'}}
+                        title="Shared with workspaces"
+                        avatar={(
+                            <LockOpen />
                         )}
-                    </PermissionContext.Consumer>
-                </PermissionProvider>
+                    />
+                    <CardContent>
+                        <List dense disablePadding>
+                            {collection.sharedWith.map(workspaceIri => this.props.workspaces.find(ws => ws.iri === workspaceIri))
+                                .sort(compareBy('name'))
+                                .map(ws => (
+                                    <ListItem key={'share-' + ws.iri}>
+                                        <ListItemText
+                                            primary={ws.name}
+                                            style={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap'
+                                            }}
+                                        />
+                                    </ListItem>
+                                ))}
+                        </List>
+                    </CardContent>
+                </Card>
 
                 {editing ? (
                     <CollectionEditor
@@ -244,19 +259,6 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     />
                 )}
 
-                <SharingProvider iri={collection.iri}>
-                    <SharingContext.Consumer>
-                        {({permissions, alterPermission}) => (
-                            <CollectionShareCard
-                                permissions={permissions}
-                                alterPermission={alterPermission}
-                                workspaces={this.props.workspaces}
-                                collection={this.props.collection}
-                                setBusy={this.props.setBusy}
-                            />
-                        )}
-                    </SharingContext.Consumer>
-                </SharingProvider>
             </>
         );
     }

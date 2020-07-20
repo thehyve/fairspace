@@ -8,13 +8,6 @@ const defaultOptions = {withCredentials: true};
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
-export type Access = "None" | "List" | "Read" | "Write" | "Manage";
-
-export type Permission = {
-    user: string; // iri
-    access: Access;
-}
-
 export type File = {
     iri: string;
     filename: string;
@@ -26,9 +19,6 @@ export type File = {
     dateCreated: string;
     dateModified?: string;
     dateDeleted?: string;
-    access?: Access;
-    sharedWith?: Array<String>;
-    permissions?: Array<Permission>;
 }
 
 class FileAPI {
@@ -66,10 +56,9 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path, showDeleted = false): File[] {
-        const options = {...includeDetails};
+        const options = {...includeDetails, data: '<propfind><allprop /></propfind>'};
         if (showDeleted) {
             options.headers = {"Show-Deleted": "on"};
-            options.data = "<propfind><allprop /></propfind>";
         }
         return this.client().getDirectoryContents(path, options)
             .then(result => result.data
