@@ -6,6 +6,7 @@ import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
@@ -82,15 +83,13 @@ public class DavFactory implements ResourceFactory {
                 return Access.Manage;
             } else if (deleted) {
                 return Access.None;
-            } else if (ownerWs != null && coll.hasProperty(FS.sharedWith, ownerWs) && ownerWs.hasProperty(FS.member, user)) {
+            } else if (ownerWs != null && (ownerWs.hasProperty(FS.member, user) || ownerWs.hasProperty(FS.manage, user))) {
                 return active ? Access.Write : Access.Read;
             } else if (coll.hasProperty(FS.write, user)) {
                 return Access.Write;
             } else if (coll.hasProperty(FS.read, user)) {
                 return Access.Read;
-            } else if (coll.listProperties(FS.sharedWith)
-                    .mapWith(Statement::getResource)
-                    .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+            } else if (getWorkspaceShares(coll)
                     .filterKeep(r -> r.hasProperty(FS.member, user) || r.hasProperty(FS.manage, user))
                     .hasNext()) {
                 return Access.Read;
@@ -102,6 +101,17 @@ public class DavFactory implements ResourceFactory {
             }
         }
         return Access.None;
+    }
+
+    private static ExtendedIterator<org.apache.jena.rdf.model.Resource> getWorkspaceShares(org.apache.jena.rdf.model.Resource coll) {
+        return coll.listProperties()
+                .filterKeep(s -> s.getPredicate().equals(FS.manage)
+                        || s.getPredicate().equals(FS.write)
+                        || s.getPredicate().equals(FS.read)
+                        || s.getPredicate().equals(FS.list))
+                .mapWith(Statement::getResource)
+                .filterKeep(r -> r.hasProperty(RDF.type, FS.Workspace))
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted));
     }
 
     Resource getResource(org.apache.jena.rdf.model.Resource subject, Access access) {
