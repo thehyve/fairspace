@@ -1,8 +1,8 @@
 import {createClient} from "webdav";
+import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
 import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 import {handleHttpError} from "../common/utils/httpUtils";
-import qs from 'qs';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
