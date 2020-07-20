@@ -13,8 +13,7 @@ import io.milton.resource.CollectionResource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
-import lombok.extern.slf4j.*;
-import org.apache.jena.graph.Node;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 

@@ -4,7 +4,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Request;
-import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -28,7 +27,6 @@ import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
-import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
 abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
@@ -36,7 +34,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
     private static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
     protected static final QName DATE_DELETED_PROPERTY = new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName());
-    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Date.class);
+    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Date.class);
 
 
     protected final DavFactory factory;
@@ -212,16 +210,6 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
-        // TODO: Remove
-        if (name.equals(DATE_DELETED_PROPERTY) && value == null && subject.hasProperty(FS.dateDeleted)) {
-            try {
-                undelete();
-            } catch (BadRequestException e) {
-                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, e.getReason());
-            } catch (ConflictException e) {
-                throw new PropertySource.PropertySetException(Response.Status.SC_CONFLICT, e.getMessage());
-            }
-        }
     }
 
     @Override

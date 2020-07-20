@@ -4,7 +4,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
-import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -25,12 +24,12 @@ import java.util.Map;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
-import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
+import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static java.lang.Integer.parseInt;
 
 class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
     private static final QName VERSION_PROPERTY = new QName(FS.NS, "version");
-    private static final PropertySource.PropertyMetaData VERSION_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Integer.class);
+    private static final PropertySource.PropertyMetaData VERSION_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Integer.class);
     private static final List<QName> FILE_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, VERSION_PROPERTY);
 
     private int version;
@@ -120,22 +119,6 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
             return version;
         }
         return super.getProperty(name);
-    }
-
-    @Override
-    public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
-        // TODO: Remove
-        if (name.equals(VERSION_PROPERTY)) {
-            try {
-                revert(value.toString());
-            } catch (BadRequestException e) {
-                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, e.getReason());
-            } catch (ConflictException e) {
-                throw new PropertySource.PropertySetException(Response.Status.SC_CONFLICT, e.getMessage());
-            }
-        } else {
-            super.setProperty(name, value);
-        }
     }
 
     @Override

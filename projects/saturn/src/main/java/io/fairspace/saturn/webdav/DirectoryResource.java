@@ -4,7 +4,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Range;
 import io.milton.http.Request;
-import io.milton.http.XmlWriter;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -71,8 +70,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         var t = WebDAVServlet.timestampLiteral();
 
-        subj
-                .addProperty(RDFS.label, newName)
+        subj.addProperty(RDFS.label, newName)
                 .addProperty(FS.createdBy, DavFactory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 

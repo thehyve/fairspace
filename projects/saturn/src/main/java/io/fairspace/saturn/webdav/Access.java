@@ -1,7 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import java.util.EnumSet;
-
 public enum Access {
     None,
     List,
