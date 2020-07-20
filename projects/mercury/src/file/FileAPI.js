@@ -399,25 +399,7 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile = (fileObject) => {
-        const flattened = {...fileObject, ...(fileObject.props || {})};
-
-        if (flattened.sharedWith) {
-            if (typeof flattened.sharedWith === 'string') {
-                flattened.sharedWith = flattened.sharedWith.split(',');
-            } else {
-                flattened.sharedWith = [];
-            }
-        }
-
-        if (typeof flattened.permissions === 'string') {
-            flattened.permissions = flattened.permissions
-                .split(',')
-                .map(s => s.split(' '))
-                .map(([user, access]) => ({user, access}));
-        }
-        return flattened;
-    };
+    mapToFile = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
 }
 
 export default new FileAPI();
