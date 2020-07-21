@@ -113,16 +113,16 @@ public class DavFactory implements ResourceFactory {
     }
 
     private Access getPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
-        if (principal.hasProperty(FS.manage, principal)) {
+        if (resource.hasProperty(FS.manage, principal)) {
             return Access.Manage;
         }
-        if (principal.hasProperty(FS.write, principal)) {
+        if (resource.hasProperty(FS.write, principal)) {
             return Access.Write;
         }
-        if (principal.hasProperty(FS.read, principal)) {
+        if (resource.hasProperty(FS.read, principal)) {
             return Access.Read;
         }
-        if (principal.hasProperty(FS.list, principal)) {
+        if (resource.hasProperty(FS.list, principal)) {
             return Access.List;
         }
         return Access.None;
