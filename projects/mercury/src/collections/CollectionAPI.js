@@ -92,8 +92,11 @@ class CollectionAPI {
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
         const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
-        return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary);
-        // .catch(handleHttpError("Failure while updating a collection"));
+        return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
+            .catch(e => {
+                console.error(e);
+                throw Error("Failure while updating a collection");
+            });
     }
 
     setAccessMode(location: String, mode) {
