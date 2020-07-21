@@ -160,8 +160,8 @@ public class DavFactory implements ResourceFactory {
         return subject.getModel().createResource(subject.getURI() + "/" + encodePath(name));
     }
 
-    static org.apache.jena.rdf.model.Resource currentUserResource() {
-        return org.apache.jena.rdf.model.ResourceFactory.createResource(getUserURI().getURI());
+    org.apache.jena.rdf.model.Resource currentUserResource() {
+        return rootSubject.getModel().createResource(getUserURI().getURI());
     }
 
     public boolean isFileSystemResource(org.apache.jena.rdf.model.Resource resource) {

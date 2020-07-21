@@ -23,7 +23,6 @@ import java.util.Objects;
 
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
@@ -93,10 +92,10 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         subj.addProperty(RDF.type, FS.Collection)
                 .addProperty(RDFS.label, newName)
                 .addProperty(RDFS.comment, "")
-                .addProperty(FS.createdBy, currentUserResource())
+                .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, timestampLiteral())
                 .addProperty(FS.dateModified, timestampLiteral())
-                .addProperty(FS.modifiedBy, currentUserResource());
+                .addProperty(FS.modifiedBy, factory.currentUserResource());
 
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
@@ -106,8 +105,8 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             }
 
             if (!ws.hasProperty(FS.status, WorkspaceStatus.Active.name())
-                    && !ws.hasProperty(FS.member, currentUserResource())
-                    && !ws.hasProperty(FS.manage, currentUserResource())
+                    && !ws.hasProperty(FS.member, factory.currentUserResource())
+                    && !ws.hasProperty(FS.manage, factory.currentUserResource())
                     && !isAdmin()) {
                 throw new NotAuthorizedException();
             }
@@ -115,7 +114,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             subj.addProperty(FS.ownedBy, ws);
         }
 
-        subj.addProperty(FS.manage, currentUserResource())
+        subj.addProperty(FS.manage, factory.currentUserResource())
                 .addProperty(FS.accessMode, AccessMode.Restricted.name());
 
         return (CollectionResource) factory.getResource(subj, Access.Manage);

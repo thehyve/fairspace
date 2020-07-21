@@ -23,7 +23,6 @@ import java.util.Map;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
@@ -107,7 +106,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
             subject.addProperty(FS.dateDeleted, timestampLiteral())
-                    .addProperty(FS.deletedBy, currentUserResource());
+                    .addProperty(FS.deletedBy, factory.currentUserResource());
         }
     }
 
@@ -167,7 +166,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, currentUserResource(), timestampLiteral());
+        copy(subject, ((DirectoryResource) toCollection).subject, name, factory.currentUserResource(), timestampLiteral());
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
@@ -241,7 +240,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addLiteral(FS.fileSize, blob.size)
                 .addProperty(FS.md5, blob.md5)
                 .addProperty(FS.dateModified, timestampLiteral())
-                .addProperty(FS.modifiedBy, currentUserResource());
+                .addProperty(FS.modifiedBy, factory.currentUserResource());
     }
 
     protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {

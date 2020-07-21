@@ -71,7 +71,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         var t = WebDAVServlet.timestampLiteral();
 
         subj.addProperty(RDFS.label, newName)
-                .addProperty(FS.createdBy, DavFactory.currentUserResource())
+                .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
         subject.addProperty(FS.contains, subj);
