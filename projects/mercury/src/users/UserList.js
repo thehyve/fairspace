@@ -163,7 +163,7 @@ const UserList = (props: UserListProps) => {
                                     checked={u.role === 'Manager'}
                                     onChange={(event) => (
                                         event.target.checked
-                                            ? grantUserAccess(u.iri, "Manage")
+                                            ? grantUserAccess(u.iri, "Manager")
                                             : grantUserAccess(u.iri, "Member")
                                     )}
                                     disabled={!canAlterPermission(canManage, u, currentUser)}
