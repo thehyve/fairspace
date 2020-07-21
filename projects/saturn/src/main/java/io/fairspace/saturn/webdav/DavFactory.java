@@ -4,8 +4,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
@@ -126,17 +124,6 @@ public class DavFactory implements ResourceFactory {
             return Access.List;
         }
         return Access.None;
-    }
-
-    private static ExtendedIterator<org.apache.jena.rdf.model.Resource> getWorkspaceShares(org.apache.jena.rdf.model.Resource coll) {
-        return coll.listProperties()
-                .filterKeep(s -> s.getPredicate().equals(FS.manage)
-                        || s.getPredicate().equals(FS.write)
-                        || s.getPredicate().equals(FS.read)
-                        || s.getPredicate().equals(FS.list))
-                .mapWith(Statement::getResource)
-                .filterKeep(r -> r.hasProperty(RDF.type, FS.Workspace))
-                .filterDrop(r -> r.hasProperty(FS.dateDeleted));
     }
 
     Resource getResource(org.apache.jena.rdf.model.Resource subject, Access access) {
