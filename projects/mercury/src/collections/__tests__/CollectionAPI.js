@@ -22,10 +22,7 @@ describe('CollectionAPI', () => {
             expect(FileAPI.list).toHaveBeenCalledTimes(1);
             expect(FileAPI.list).toHaveBeenCalledWith('', false);
 
-            expect(FileAPI.stat).toHaveBeenCalledTimes(3);
-            expect(FileAPI.stat).toHaveBeenCalledWith('collection1');
-            expect(FileAPI.stat).toHaveBeenCalledWith('collection2');
-            expect(FileAPI.stat).toHaveBeenCalledWith('collection3');
+            expect(FileAPI.stat).toHaveBeenCalledTimes(0);
         });
 
         it('retrieves collections including deleted', async () => {
