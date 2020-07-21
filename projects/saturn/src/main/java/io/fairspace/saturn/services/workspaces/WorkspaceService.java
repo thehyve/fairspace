@@ -149,6 +149,10 @@ public class WorkspaceService {
     }
 
     public void setUserRole(Node workspace, Node user, WorkspaceRole role) {
+        validate(workspace != null, "Workspace is not provided");
+        validate(user != null, "User is not provided");
+        validate(role != null, "Role is not provided");
+
         Runnable postCommitAction = tx.calculateWrite(ds -> {
             var m = ds.getDefaultModel();
             var workspaceResource = m.wrapAsResource(workspace);
