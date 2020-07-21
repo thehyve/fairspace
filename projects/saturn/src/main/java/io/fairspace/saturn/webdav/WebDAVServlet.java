@@ -36,6 +36,7 @@ import static java.util.stream.Collectors.toList;
 public class WebDAVServlet extends HttpServlet {
     private static final String BLOB_ATTRIBUTE = "BLOB";
     private static final String TIMESTAMP_ATTRIBUTE = "TIMESTAMP";
+    public static final String POST_COMMIT_ACTION_ATTRIBUTE = "POST_COMMIT";
 
     private final HttpManager httpManager;
     private final BlobStore store;
@@ -85,6 +86,11 @@ public class WebDAVServlet extends HttpServlet {
             }
 
             httpManager.process(new ServletRequest(req, req.getServletContext()), new ServletResponse(res));
+
+            var postCommitAction = (Runnable) req.getAttribute(POST_COMMIT_ACTION_ATTRIBUTE);
+            if (postCommitAction != null) {
+                postCommitAction.run();
+            }
         } finally {
             clearThreadlocals();
             res.getOutputStream().flush();

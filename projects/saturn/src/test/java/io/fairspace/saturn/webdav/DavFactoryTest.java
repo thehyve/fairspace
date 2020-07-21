@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
@@ -40,6 +41,8 @@ public class DavFactoryTest {
     BlobStore store;
     @Mock
     InputStream input;
+    @Mock
+    MailService mailService;
     private org.eclipse.jetty.server.Request request;
 
     private ResourceFactory factory;
@@ -47,7 +50,7 @@ public class DavFactoryTest {
 
     @Before
     public void before() {
-        factory = new DavFactory(model.createResource(baseUri), store);
+        factory = new DavFactory(model.createResource(baseUri), store, mailService);
 
         setupRequestContext();
         request = getCurrentRequest();

@@ -13,7 +13,6 @@ import java.util.concurrent.Future;
 
 import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 
-// TODO: Use me
 @Slf4j
 public class MailService {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();

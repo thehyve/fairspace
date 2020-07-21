@@ -20,10 +20,12 @@ import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Map;
 
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
+import static io.fairspace.saturn.webdav.WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
@@ -254,6 +256,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case Read -> subject.addProperty(FS.read, principal);
             case Write -> subject.addProperty(FS.write, principal);
             case Manage -> subject.addProperty(FS.manage, principal);
+        }
+
+        if (principal.hasProperty(RDF.type, FS.User) && principal.hasProperty(FS.email)) {
+            var message = access == Access.None
+                    ? "Your access to collection " + getName() + " has been revoked."
+                    : "You've been granted " + access.name().toLowerCase() + " access to collection " +  getName() + "\n" + subject.getURI();
+            var email = principal.getProperty(FS.email).getString();
+            getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
+                    (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
+
         }
     }
 

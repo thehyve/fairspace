@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -16,13 +17,15 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 public class DavFactory implements ResourceFactory {
     final org.apache.jena.rdf.model.Resource rootSubject;
     final BlobStore store;
+    final MailService mailService;
     private final String baseUri;
     public final io.milton.resource.CollectionResource root = new RootResource(this);
 
 
-    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store) {
+    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, MailService mailService) {
         this.rootSubject = rootSubject;
         this.store = store;
+        this.mailService = mailService;
         var uri = URI.create(rootSubject.getURI());
         this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
     }
