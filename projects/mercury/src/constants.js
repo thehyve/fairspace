@@ -95,5 +95,10 @@ export const WORKSPACE_URI = FAIRSPACE_NS + 'Workspace';
 export const WORKSPACE_STATUS_URI = FAIRSPACE_NS + 'status';
 export const LOCATION_URI = FAIRSPACE_NS + 'location';
 export const OWNED_BY_URI = FAIRSPACE_NS + 'ownedBy';
+export const LIST_URI = FAIRSPACE_NS + 'list';
+export const READ_URI = FAIRSPACE_NS + 'read';
+export const WRITE_URI = FAIRSPACE_NS + 'write';
+export const MANAGE_URI = FAIRSPACE_NS + 'manage';
+export const MEMBER_URI = FAIRSPACE_NS + 'member';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

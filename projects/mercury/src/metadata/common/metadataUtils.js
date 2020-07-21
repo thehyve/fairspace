@@ -114,6 +114,11 @@ export const shouldPropertyBeHidden = (key, domain) => {
         case consts.FILE_PATH_URI:
         case consts.DATE_DELETED_URI:
         case consts.DELETED_BY_URI:
+        case consts.LIST_URI:
+        case consts.READ_URI:
+        case consts.WRITE_URI:
+        case consts.MANAGE_URI:
+        case consts.MEMBER_URI:
             return true;
         case consts.LABEL_URI:
             return isManaged;
