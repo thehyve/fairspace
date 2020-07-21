@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
@@ -241,7 +242,7 @@ public class DavFactoryTest {
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", FILE_SIZE + 1, "md5"));
         ((ReplaceableResource) file).replaceContent(input, FILE_SIZE + 1);
 
-        ((MultiNamespaceCustomPropertyResource)coll.child("file")).setProperty(VERSION, 1);
+        ((PostableResource)coll.child("file")).processForm(Map.of("action", "revert", "version", "1"), Map.of());
 
         var ver3 = coll.child("file");
         assertEquals(3, ((MultiNamespaceCustomPropertyResource) ver3).getProperty(VERSION));
@@ -292,9 +293,9 @@ public class DavFactoryTest {
         ((DeletableResource)file).delete();
 
         when(request.getHeader("Show-Deleted")).thenReturn("on");
-        var deleted = (MultiNamespaceCustomPropertyResource) coll.child("file");
+        var deleted = (PostableResource) coll.child("file");
 
-        deleted.setProperty(new QName(FS.NS, "dateDeleted"), null);
+        deleted.processForm(Map.of("action", "undelete"), Map.of());
 
         var restored = (MultiNamespaceCustomPropertyResource) coll.child("file");
         assertNull(restored.getProperty(new QName(FS.NS, "dateDeleted")));
