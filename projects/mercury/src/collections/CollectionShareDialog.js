@@ -18,7 +18,7 @@ import FormControl from "@material-ui/core/FormControl";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 
-export const CollectionShareDialog = ({collection, alterPermission, entitiesName: principalType, shareCandidates = [],
+export const CollectionShareDialog = ({collection, setPermission, principalType, shareCandidates = [],
     setBusy = () => {}, showDialog, setShowDialog = () => {}}) => {
     const [selectedPrincipals, setSelectedPrincipals] = useState([]);
     const [accessRight, setAccessRight] = useState("List");
@@ -26,7 +26,7 @@ export const CollectionShareDialog = ({collection, alterPermission, entitiesName
     const handleShareCollection = () => {
         setBusy(true);
         setShowDialog(false);
-        Promise.all(shareCandidates.map(principal => alterPermission(collection.location, principal.iri, accessRight)))
+        Promise.all(selectedPrincipals.map(principal => setPermission(collection.location, principal, accessRight)))
             .catch(e => ErrorDialog.showError(e, 'Error sharing the collection'))
             .finally(() => setBusy(false));
     };

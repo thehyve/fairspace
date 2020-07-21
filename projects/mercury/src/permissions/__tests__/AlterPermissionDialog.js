@@ -9,7 +9,7 @@ describe('AlterPermissionDialog', () => {
     let shallow;
     let mount;
 
-    const mockAlterPermissionFn = jest.fn();
+    const mockSetPermissionFn = jest.fn();
     const mockUsers = [
 
         {name: 'Mariah Carey', iri: 'http://localhost/iri/user1-id'},
@@ -58,7 +58,7 @@ describe('AlterPermissionDialog', () => {
             collectionId={mockCollectionId}
             collaborators={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
-            alterPermission={mockAlterPermissionFn}
+            setPermission={mockSetPermissionFn}
             users={mockUsers}
         />);
 
@@ -96,7 +96,7 @@ describe('AlterPermissionDialog', () => {
                 collectionId={mockCollectionId}
                 collaborators={mockCollaborators}
                 currentUser={mockCurrentLoggedUser}
-                alterPermission={mockAlterPermissionFn}
+                setPermission={mockSetPermissionFn}
                 users={mockUsers}
             />
         );

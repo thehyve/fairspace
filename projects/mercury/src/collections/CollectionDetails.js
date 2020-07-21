@@ -29,7 +29,7 @@ import PermissionsCard from "../permissions/PermissionsCard";
 import CollectionShareCard from "./CollectionShareCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
-import WorkspaceUsersContext, {WorkspaceUsersProvider} from "../workspaces/WorkspaceUsersContext";
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import {formatDateTime} from "../common/utils/genericUtils";
 
 
@@ -182,7 +182,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     );
 
     render() {
-        const {loading, error, collection, inCollectionsBrowser = false} = this.props;
+        const {loading, error, collection, users, workspaceRoles, workspaces, inCollectionsBrowser = false} = this.props;
         const {anchorEl, editing, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
@@ -193,6 +193,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         if (loading) {
             return <LoadingInlay />;
         }
+        const workspaceUsers = users.filter(u => workspaceRoles.some(r => r.iri === u.iri));
 
         return (
             <>
@@ -245,15 +246,14 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 </Card>
 
                 <PermissionsCard
-                    permissions={collection.userPermissions}
-                    iri={collection.iri}
-                    canManage={collection.canManage}
+                    collection={collection}
+                    workspaceUsers={workspaceUsers}
                 />
                 <CollectionShareCard
-                    workspaceUsers={this.props.workspaceUsers}
-                    users={this.props.users}
-                    workspaces={this.props.workspaces}
-                    collection={this.props.collection}
+                    users={users}
+                    workspaceUsers={workspaceUsers}
+                    workspaces={workspaces}
+                    collection={collection}
                     setBusy={this.props.setBusy}
                 />
 
@@ -316,24 +316,24 @@ const ContextualCollectionDetails = (props) => {
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
-        <WorkspaceUsersProvider iri={props.collection.ownerWorkspace}>
-            <WorkspaceUsersContext.Consumer>
-                {({workspaceUsers, workspaceUsersError, workspacesUsersLoading}) => (
+        <WorkspaceUserRolesProvider iri={props.collection.ownerWorkspace}>
+            <WorkspaceUserRolesContext.Consumer>
+                {({workspaceRoles, workspaceRolesError, workspaceRolesLoading}) => (
                     <CollectionDetails
                         {...props}
-                        error={props.error || workspacesError || workspaceUsersError}
-                        loading={props.loading || workspacesLoading || workspacesUsersLoading}
+                        error={props.error || workspacesError || workspaceRolesError}
+                        loading={props.loading || workspacesLoading || workspaceRolesLoading}
                         currentUser={currentUser}
                         users={users}
-                        workspaceUsers={workspaceUsers}
+                        workspaceRoles={workspaceRoles}
                         workspaces={workspaces}
                         history={history}
                         deleteCollection={deleteCollection}
                         undeleteCollection={undeleteCollection}
                     />
                 )}
-            </WorkspaceUsersContext.Consumer>
-        </WorkspaceUsersProvider>
+            </WorkspaceUserRolesContext.Consumer>
+        </WorkspaceUserRolesProvider>
     );
 };
 

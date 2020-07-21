@@ -28,7 +28,7 @@ import usePagination from "../common/hooks/UsePagination";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
-import WorkspaceUsersContext, {WorkspaceUsersProvider} from "../workspaces/WorkspaceUsersContext";
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import UserContext from "./UserContext";
 import {getWorkspaceUsersWithRoles} from "./userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
@@ -51,25 +51,25 @@ const columns = {
 type UserListProps = {
     currentUser: User & UserRoles,
     workspace: Workspace,
-    workspaceUsers: Object,
-    workspaceUsersError: boolean,
-    workspaceUsersLoading: boolean,
+    workspaceRoles: Object,
+    workspaceRolesError: boolean,
+    workspaceRolesLoading: boolean,
     setWorkspaceRole: () => {}
 }
 
 const UserList = (props: UserListProps) => {
-    const {currentUser, workspace, workspaceUsers, workspaceUsersError, workspaceUsersLoading, setWorkspaceRole} = props;
+    const {currentUser, workspace, workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole} = props;
     const {canManage} = workspace;
     const {users} = useContext(UsersContext);
-    const workspaceUsersWithRoles = getWorkspaceUsersWithRoles(users, workspaceUsers);
+    const workspaceUsersWithRoles = getWorkspaceUsersWithRoles(users, workspaceRoles);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsersWithRoles, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
 
-    if (workspaceUsersError) {
+    if (workspaceRolesError) {
         return (<MessageDisplay message="An error occurred loading workspace users" />);
-    } if (workspaceUsersLoading) {
+    } if (workspaceRolesLoading) {
         return (<LoadingInlay />);
     }
 
@@ -226,20 +226,20 @@ const ContextualUserList = (props) => {
     }
 
     return (
-        <WorkspaceUsersProvider iri={workspace.iri}>
-            <WorkspaceUsersContext.Consumer>
-                {({workspaceUsers, workspaceUsersError, workspaceUsersLoading, setWorkspaceRole}) => (
+        <WorkspaceUserRolesProvider iri={workspace.iri}>
+            <WorkspaceUserRolesContext.Consumer>
+                {({workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole}) => (
                     <UserList
                         currentUser={currentUser}
                         workspace={workspace}
-                        workspaceUsers={workspaceUsers}
-                        workspaceUsersError={workspaceUsersError}
-                        workspaceUsersLoading={workspaceUsersLoading}
+                        workspaceRoles={workspaceRoles}
+                        workspaceRolesError={workspaceRolesError}
+                        workspaceRolesLoading={workspaceRolesLoading}
                         setWorkspaceRole={setWorkspaceRole}
                     />
                 )}
-            </WorkspaceUsersContext.Consumer>
-        </WorkspaceUsersProvider>
+            </WorkspaceUserRolesContext.Consumer>
+        </WorkspaceUserRolesProvider>
     );
 };
 

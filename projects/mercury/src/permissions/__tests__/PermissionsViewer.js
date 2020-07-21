@@ -53,7 +53,7 @@ describe('PermissionsViewer', () => {
     const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
     const mockCreator = 'user4-id';
     const mockFetchPermissionsFn = jest.fn();
-    const mockAlterPermissionFn = jest.fn();
+    const mockSetPermissionFn = jest.fn();
 
     describe('Use Case 1: Current user is creator and can manage collection', () => {
         let wrapper;
@@ -65,7 +65,7 @@ describe('PermissionsViewer', () => {
                     currentUser={mockcurrentUserCreatorCanManage}
                     canManage
                     permissions={mockCollaborators}
-                    alterPermission={mockAlterPermissionFn}
+                    setPermission={mockSetPermissionFn}
                     fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                 />
             );
@@ -99,7 +99,7 @@ describe('PermissionsViewer', () => {
                     canManage={false}
                     currentUser={mockcurrentUserNotCreatorCannotManage}
                     permissions={mockCollaborators}
-                    alterPermission={mockAlterPermissionFn}
+                    setPermission={mockSetPermissionFn}
                     fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                 />
             );
@@ -132,7 +132,7 @@ describe('PermissionsViewer', () => {
                     canManage
                     currentUser={mockcurrentUserNotCreatorCanManage}
                     permissions={mockCollaborators}
-                    alterPermission={mockAlterPermissionFn}
+                    setPermission={mockSetPermissionFn}
                     fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                 />
             );

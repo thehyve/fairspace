@@ -74,9 +74,9 @@ export class AlterPermissionDialog extends React.Component {
 
     handleSubmit = () => {
         const {selectedUser, accessRight} = this.state;
-        const {iri, alterPermission} = this.props;
+        const {collection, setPermission} = this.props;
         if (selectedUser) {
-            alterPermission(selectedUser.iri, iri, accessRight);
+            setPermission(collection.location, selectedUser.iri, accessRight);
             this.handleClose();
         } else {
             this.setState({selectedUserLabel: 'You have to select a user'});
@@ -108,11 +108,11 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     renderUser = () => {
-        const {user, users, collaborators, currentUser} = this.props;
+        const {user, users, usersWithCollectionAccess, currentUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
 
         // only render the label if user is passed into this component
-        if (users && collaborators && user) {
+        if (users && usersWithCollectionAccess && user) {
             return (
                 <div>
                     <Typography
@@ -131,7 +131,7 @@ export class AlterPermissionDialog extends React.Component {
             <UserSelect
                 users={users}
                 onChange={this.handleSelectedUserChange}
-                filter={u => u.iri !== currentUser.iri && collaborators.find(c => c.user === u.iri) === undefined}
+                filter={u => u.iri !== currentUser.iri && !usersWithCollectionAccess.some(c => c.iri === u.iri)}
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
@@ -151,7 +151,7 @@ export class AlterPermissionDialog extends React.Component {
                 onClose={this.handleClose}
                 data-testid="permissions-dialog"
             >
-                <DialogTitle id="scroll-dialog-title">Share with</DialogTitle>
+                <DialogTitle id="scroll-dialog-title">Add collaborator</DialogTitle>
                 <DialogContent>
                     <div className={user ? classes.rootEdit : classes.root}>
                         {this.renderUser()}
@@ -203,7 +203,9 @@ AlterPermissionDialog.propTypes = {
     onClose: PropTypes.func,
     access: PropTypes.string,
     user: PropTypes.string,
-    iri: PropTypes.string,
+    collection: PropTypes.object,
+    users: PropTypes.array,
+    usersWithCollectionAccess: PropTypes.array
 };
 
 export default withStyles(styles)(AlterPermissionDialog);

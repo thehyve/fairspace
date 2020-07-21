@@ -5,34 +5,32 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 
 import AlterPermissionContainer from "./AlterPermissionContainer";
 import {canAlterPermission, sortPermissions} from './permissionUtils';
-import LoadingOverlay from "../common/components/LoadingOverlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 
 const PermissionsViewer = ({
-    permissions, error, loading, altering, iri,
-    alterPermission, canManage, currentUser
+    collection, usersWithCollectionAccess, workspaceUsers, setPermission, error, loading, currentUser
 }) => {
     const [showPermissionDialog, setShowPermissionDialog] = useState(false);
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
-    const [selectedPermission, setSelectedPermission] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleAlterPermission = ({user, access}) => {
+    const handleAlterPermission = ({iri, access}) => {
         setShowPermissionDialog(true);
-        setSelectedPermission({user, access});
+        setSelectedUser({iri, access});
         setAnchorEl(null);
     };
 
     const handleShareWithDialogClose = () => {
         setShowPermissionDialog(false);
-        setSelectedPermission(null);
+        setSelectedUser(null);
     };
 
-    const handleRemoveCollaborator = ({user, access}) => {
+    const handleRemoveCollaborator = ({iri, access}) => {
         setShowConfirmDeleteDialog(true);
-        setSelectedPermission({user, access});
+        setSelectedUser({iri, access});
         setAnchorEl(null);
     };
 
@@ -41,43 +39,43 @@ const PermissionsViewer = ({
     };
 
     const handleDeleteCollaborator = () => {
-        if (selectedPermission) {
-            alterPermission(selectedPermission.user, iri, 'None');
+        if (selectedUser) {
+            setPermission(collection.location, selectedUser.iri, 'None');
             handleCloseConfirmDeleteDialog();
         }
     };
 
-    const handleMenuClick = (event, permission) => {
+    const handleMenuClick = (event, {iri, access}) => {
         setAnchorEl(event.currentTarget);
-        setSelectedPermission(permission);
+        setSelectedUser({iri, access});
     };
 
     const handleMenuClose = () => {
         setAnchorEl(null);
-        setSelectedPermission(null);
+        setSelectedUser(null);
     };
 
     const renderCollaboratorList = () => {
-        const selectedPermissionKey = selectedPermission
-            ? selectedPermission.access + selectedPermission.user
+        const selectedPermissionKey = selectedUser
+            ? selectedUser.access + selectedUser.iri
             : null;
 
-        return sortPermissions(permissions)
-            .map((permission) => {
-                const key = permission.access + permission.user;
+        return sortPermissions(usersWithCollectionAccess)
+            .map((userWithAccess) => {
+                const key = userWithAccess.access + userWithAccess.iri;
                 return (
                     <ListItem
                         key={key}
                     >
                         <ListItemText
-                            primary={permission.name}
-                            secondary={permission.access}
+                            primary={userWithAccess.name}
+                            secondary={userWithAccess.access}
                             data-testid="collaborator"
                         />
                         <ListItemSecondaryAction>
                             <IconButton
-                                onClick={e => handleMenuClick(e, permission)}
-                                disabled={!canAlterPermission(canManage, permission, currentUser)}
+                                onClick={e => handleMenuClick(e, userWithAccess)}
+                                disabled={!canAlterPermission(collection.canManage, userWithAccess, currentUser)}
                             >
                                 <MoreIcon />
                             </IconButton>
@@ -88,12 +86,12 @@ const PermissionsViewer = ({
                                 onClose={handleMenuClose}
                             >
                                 <MenuItem
-                                    onClick={() => handleAlterPermission(permission)}
+                                    onClick={() => handleAlterPermission(userWithAccess)}
                                 >
                                     Change access
                                 </MenuItem>
                                 <MenuItem
-                                    onClick={() => handleRemoveCollaborator(permission)}
+                                    onClick={() => handleRemoveCollaborator(userWithAccess)}
                                 >
                                     Delete
                                 </MenuItem>
@@ -106,15 +104,15 @@ const PermissionsViewer = ({
 
     const renderUserList = () => (
         <List dense disablePadding>
-            {renderCollaboratorList(permissions)}
-            {canManage && (
+            {renderCollaboratorList(usersWithCollectionAccess)}
+            {collection.canManage && (
                 <Button
                     variant="text"
                     title="Add a collaborator"
                     aria-label="Add"
                     color="primary"
                     onClick={() => handleAlterPermission({})}
-                    disabled={!canManage}
+                    disabled={!collection.canManage}
                 >
                     Add
                 </Button>
@@ -125,22 +123,23 @@ const PermissionsViewer = ({
     const renderPermissionDialog = () => (
         <AlterPermissionContainer
             open={showPermissionDialog}
-            alterPermission={alterPermission}
             onClose={handleShareWithDialogClose}
-            user={selectedPermission && selectedPermission.user}
-            access={selectedPermission && selectedPermission.access}
-            iri={iri}
+            user={selectedUser && selectedUser.iri}
+            access={selectedUser && selectedUser.access}
+            collection={collection}
             currentUser={currentUser}
+            usersWithCollectionAccess={usersWithCollectionAccess}
+            workspaceUsers={workspaceUsers}
         />
     );
 
     const renderConfirmationDialog = () => {
-        if (!selectedPermission || !showConfirmDeleteDialog) {
+        if (!selectedUser || !showConfirmDeleteDialog) {
             return null;
         }
 
         // TODO: Refactor variable naming: user vs iri vs id.
-        const user = permissions.find(p => p.user === selectedPermission.user) || {};
+        const user = usersWithCollectionAccess.find(u => u.iri === selectedUser.iri) || {};
         const content = `Are you sure you want to remove "${user.name}" from the collaborator list?`;
 
         return (
@@ -161,9 +160,7 @@ const PermissionsViewer = ({
         return (<MessageDisplay message="An error occurred loading permissions" />);
     } if (loading) {
         return (<LoadingInlay />);
-    } if (altering) {
-        return (<LoadingOverlay loading />);
-    } if (!permissions) {
+    } if (!usersWithCollectionAccess) {
         return (<div>No permission found</div>);
     }
 

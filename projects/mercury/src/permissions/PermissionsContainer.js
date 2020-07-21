@@ -1,26 +1,21 @@
 import React, {useContext} from "react";
-
-import PermissionContext from "./PermissionContext";
 import PermissionsViewer from "./PermissionsViewer";
 import UserContext from "../users/UserContext";
-import UsersContext from "../users/UsersContext";
+import CollectionsContext from "../collections/CollectionsContext";
 
-export default ({iri, canManage}) => {
-    const {permissions, loading: permissionsLoading, error: permissionsError, alterPermission, altering} = useContext(PermissionContext);
+export default ({collection, usersWithCollectionAccess, workspaceUsers}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
-    const {usersLoading, usersError} = useContext(UsersContext);
-
+    const {setPermission, loading, error} = useContext(CollectionsContext);
 
     return (
         <PermissionsViewer
-            loading={permissionsLoading || currentUserLoading || usersLoading}
-            error={permissionsError || currentUserError || usersError}
-            altering={altering}
-            permissions={permissions}
-            alterPermission={alterPermission}
+            loading={currentUserLoading || loading}
+            error={currentUserError || error}
+            setPermission={setPermission}
             currentUser={currentUser}
-            iri={iri}
-            canManage={canManage}
+            workspaceUsers={workspaceUsers}
+            usersWithCollectionAccess={usersWithCollectionAccess}
+            collection={collection}
         />
     );
 };

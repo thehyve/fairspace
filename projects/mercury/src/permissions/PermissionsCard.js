@@ -6,6 +6,7 @@ import classnames from "classnames";
 
 import {Group} from "@material-ui/icons";
 import PermissionsContainer from "./PermissionsContainer";
+import {getUsersWithCollectionAccess} from "../users/userUtils";
 
 const styles = theme => ({
     expand: {
@@ -36,12 +37,14 @@ const styles = theme => ({
     }
 });
 
-export const PermissionsCard = ({classes, permissions, iri, canManage = false, maxCollaboratorIcons = 5}) => {
+export const PermissionsCard = ({classes, collection, workspaceUsers, maxCollaboratorIcons = 5}) => {
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
 
-    const permissionIcons = permissions
+    const usersWithCollectionAccess = getUsersWithCollectionAccess(workspaceUsers, collection.userPermissions);
+
+    const permissionIcons = usersWithCollectionAccess
         .slice(0, maxCollaboratorIcons)
         .map(({user, userName}) => (
             <Avatar
@@ -55,7 +58,11 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
     const cardHeaderAction = (
         <>
             {permissionIcons}
-            {permissions.length > maxCollaboratorIcons ? <div className={classes.additionalCollaborators}>+ {permissions.length - maxCollaboratorIcons}</div> : ''}
+            {usersWithCollectionAccess.length > maxCollaboratorIcons ? (
+                <div className={classes.additionalCollaborators}>
+                    + {usersWithCollectionAccess.length - maxCollaboratorIcons}
+                </div>
+            ) : ''}
             <IconButton
                 className={classnames(classes.expand, {
                     [classes.expandOpen]: expanded,
@@ -84,8 +91,9 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <PermissionsContainer
-                        iri={iri}
-                        canManage={canManage}
+                        workspaceUsers={workspaceUsers}
+                        collection={collection}
+                        usersWithCollectionAccess={usersWithCollectionAccess}
                     />
                 </CardContent>
             </Collapse>
@@ -95,8 +103,8 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
 
 PermissionsCard.propTypes = {
     classes: PropTypes.object,
-    iri: PropTypes.string.isRequired,
-    canManage: PropTypes.bool,
+    collection: PropTypes.object.isRequired,
+    workspaceUsers: PropTypes.array.isRequired,
     maxCollaboratorIcons: PropTypes.number
 };
 

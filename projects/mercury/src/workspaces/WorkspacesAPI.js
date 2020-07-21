@@ -5,7 +5,7 @@ import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 const workspacesUrl = "/api/v1/workspaces/";
 
-export type WorkspaceUser = {
+export type WorkspaceUserRole = {
     iri: string;
     role: string;
 };
@@ -59,7 +59,7 @@ class WorkspacesAPI {
             .catch(handleHttpError("Failure while deleting a workspace"));
     }
 
-    getWorkspaceUsers(workspaceIri: string): Promise<WorkspaceUser[]> {
+    getWorkspaceRoles(workspaceIri: string): Promise<WorkspaceUserRole[]> {
         return axios.get(`${workspacesUrl}users/?workspace=${encodeURI(workspaceIri)}`, {
             headers: {Accept: 'application/json'},
         })

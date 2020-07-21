@@ -11,10 +11,10 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
 
-export const CollectionShareList = ({title, shares, collection, alterPermission, setBusy = () => {}}) => {
-    const handleRemoveShare = (entity) => {
+export const CollectionShareList = ({title, shares, collection, setPermission, setBusy = () => {}}) => {
+    const handleRemoveShare = (principal) => {
         setBusy(true);
-        alterPermission(entity, collection.iri, 'None')
+        setPermission(collection.location, principal, 'None')
             .catch(e => ErrorDialog.showError(e, 'Error unsharing the collection'))
             .finally(() => setBusy(false));
     };
@@ -26,11 +26,11 @@ export const CollectionShareList = ({title, shares, collection, alterPermission,
             </Typography>
             <List dense disablePadding>
                 {
-                    sortPermissions(shares).map(p => (
-                        <ListItem key={p.user}>
+                    sortPermissions(shares).map(s => (
+                        <ListItem key={s.iri}>
                             <ListItemText
-                                primary={p.name}
-                                secondary={p.access}
+                                primary={s.name}
+                                secondary={s.access}
                                 style={{
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -40,13 +40,13 @@ export const CollectionShareList = ({title, shares, collection, alterPermission,
                             {collection.canManage && (
                                 <ListItemSecondaryAction>
                                     <ConfirmationButton
-                                        onClick={() => handleRemoveShare(p.user)}
-                                        disabled={p.access === 'Manage'}
+                                        onClick={() => handleRemoveShare(s.iri)}
+                                        disabled={s.access === 'Manage'}
                                         message="Are you sure you want to remove this share?"
                                         agreeButtonText="Ok"
                                         dangerous
                                     >
-                                        <IconButton disabled={p.access === 'Manage' || !collection.canManage}>
+                                        <IconButton disabled={s.access === 'Manage' || !collection.canManage}>
                                             <HighlightOffSharp />
                                         </IconButton>
                                     </ConfirmationButton>
