@@ -143,27 +143,50 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     @Override
     public void setProperty(QName name, Object value) throws PropertySetException, NotAuthorizedException {
         if (name.equals(OWNED_BY_PROPERTY)) {
-            if (subject.hasProperty(FS.ownedBy) && !isAdmin()) {
-                throw new NotAuthorizedException();
-            }
-
-            var ws = subject.getModel().createResource(value.toString());
-            if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
-                throw new PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
-            }
-
-            // TODO: Use the new WorkspaceService
-            if (!isAdmin() && !ws.hasLiteral(FS.manage, factory.currentUserResource())) {
-                throw new NotAuthorizedException();
-            }
-
-            if (!ws.hasLiteral(FS.status, WorkspaceStatus.Active.name())) {
-                throw new NotAuthorizedException();
-            }
-
-            subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
+            setOwner(subject.getModel().createResource(value.toString()));
         }
         super.setProperty(name, value);
+    }
+
+    private void setOwner(Resource ws) throws NotAuthorizedException {
+        var old = subject.getPropertyResourceValue(FS.ownedBy);
+
+        if (old != null) {
+            if (old.equals(ws)) {
+                return;
+            }
+            if (!isAdmin()) {
+                throw new NotAuthorizedException();
+            }
+        }
+
+        if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
+            throw new PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
+        }
+
+        // TODO: Use the new WorkspaceService
+        if (!isAdmin() && !ws.hasLiteral(FS.manage, factory.currentUserResource())) {
+            throw new NotAuthorizedException();
+        }
+
+        if (!ws.hasLiteral(FS.status, WorkspaceStatus.Active.name())) {
+            throw new NotAuthorizedException();
+        }
+
+        subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
+
+        if (old != null) {
+            old.listProperties(FS.manage)
+                   .andThen(old.listProperties(FS.member))
+                   .mapWith(Statement::getResource)
+                    .filterDrop(user -> ws.hasProperty(FS.member, user) || ws.hasProperty(FS.manage, user))
+                    .filterKeep(user -> subject.hasProperty(FS.manage, user) || subject.hasProperty(FS.write, user))
+                    .toList()
+                    .forEach(user -> user.getModel()
+                            .remove(subject, FS.manage, user)
+                            .remove(subject, FS.write, user)
+                            .add(subject, FS.read, user));
+        }
     }
 
     @Override
