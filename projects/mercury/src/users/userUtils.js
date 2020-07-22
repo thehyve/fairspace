@@ -27,7 +27,7 @@ export const getWorkspaceUsersWithRoles = (users: User[], workspaceRoles: Worksp
 export const getUsersWithCollectionAccess = (users: User[], userPermissions: Permission[]) => {
     const results = [];
     users.forEach(u => {
-        const permission = userPermissions.find(p => p.user === u.iri);
+        const permission = userPermissions.find(p => p.iri === u.iri);
         if (permission) {
             results.push({...u, access: permission.access});
         }

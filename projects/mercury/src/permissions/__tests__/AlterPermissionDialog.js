@@ -20,11 +20,11 @@ describe('AlterPermissionDialog', () => {
     ];
     const mockCollaborators = [
         {
-            user: 'http://localhost/iri/user2-id',
+            iri: 'http://localhost/iri/user2-id',
             access: 'Write'
         },
         {
-            user: 'http://localhost/iri/user4-id',
+            iri: 'http://localhost/iri/user4-id',
             access: 'Manage'
         }
     ];
@@ -35,7 +35,7 @@ describe('AlterPermissionDialog', () => {
     };
     const mockCollectionId = 500;
     const mockPermission = {
-        user: 'http://localhost/iri/user2-id',
+        iri: 'http://localhost/iri/user2-id',
         access: 'Write'
     };
 
@@ -66,7 +66,7 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('[data-testid="permissions-dialog"]').prop('open')).toBeFalsy();
 
         // title =Share with
-        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Share with');
+        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Add collaborator');
 
         // render collacborator selector
         expect(wrapper.find(UserSelect).prop('value')).toBe(null);
@@ -90,7 +90,7 @@ describe('AlterPermissionDialog', () => {
             <AlterPermissionDialog
                 open
                 classes={{}}
-                user={mockPermission.user}
+                user={mockPermission.iri}
                 access={mockPermission.access}
                 iri={mockPermission.iri}
                 collectionId={mockCollectionId}
@@ -101,7 +101,7 @@ describe('AlterPermissionDialog', () => {
             />
         );
 
-        wrapper.setState({selectedUser: mockPermission.user});
+        wrapper.setState({selectedUser: mockPermission.iri});
 
         expect(wrapper.find(UserSelect)).toHaveLength(0);
         expect(wrapper.find('[data-testid="user"]').at(0).text()).toEqual('Michael Jackson');

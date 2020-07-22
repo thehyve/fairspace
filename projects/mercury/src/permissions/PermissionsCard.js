@@ -43,9 +43,9 @@ export const PermissionsCard = ({classes, collection, workspaceUsers, workspaces
     const toggleExpand = () => setExpanded(!expanded);
 
     const usersWithCollectionAccess = getUsersWithCollectionAccess(workspaceUsers, collection.userPermissions);
-    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.user === collection.ownerWorkspace);
-    const workspaceWithCollectionAccess = ownerWorkspaceAccess ? {iri: ownerWorkspaceAccess.user,
-        name: workspaces.find(w => w.iri === ownerWorkspaceAccess.user).name,
+    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace);
+    const workspaceWithCollectionAccess = ownerWorkspaceAccess ? {iri: ownerWorkspaceAccess.iri,
+        name: workspaces.find(w => w.iri === ownerWorkspaceAccess.iri).name,
         access: ownerWorkspaceAccess.access} : undefined;
 
     const permissionIcons = usersWithCollectionAccess

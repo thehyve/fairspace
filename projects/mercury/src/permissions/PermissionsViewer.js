@@ -10,7 +10,7 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 
 const PermissionsViewer = ({
-    collection, usersWithCollectionAccess, workspaceWithCollectionAccess, workspaceUsers, workspaces,
+    collection, usersWithCollectionAccess, workspaceWithCollectionAccess, workspaceUsers, workspaces = [],
     setPermission, error, loading, currentUser
 }) => {
     const [showPermissionDialog, setShowPermissionDialog] = useState(false);
