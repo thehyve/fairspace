@@ -86,8 +86,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     @Override
     public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
         return subject.listProperties(FS.contains)
-                .mapWith(Statement::getObject)
-                .mapWith(RDFNode::asResource)
+                .mapWith(Statement::getResource)
                 .mapWith(r -> factory.getResource(r, access))
                 .filterDrop(Objects::isNull)
                 .toList();

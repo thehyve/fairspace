@@ -23,7 +23,6 @@ import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
@@ -131,8 +130,11 @@ public class DavFactoryTest {
 
         model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"));
 
+        assertTrue(root.getChildren().isEmpty());
+
+        var coll = root.child("coll");
         for (var method: Request.Method.values()) {
-            assertFalse("Shouldn't be able to " + method, factory.getResource(null, BASE_PATH + "/coll").authorise(null, method, null));
+            assertFalse("Shouldn't be able to " + method, coll.authorise(null, method, null));
         }
     }
 

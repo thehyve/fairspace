@@ -11,6 +11,8 @@ import java.net.URI;
 
 import static io.fairspace.saturn.auth.RequestContext.*;
 import static io.fairspace.saturn.webdav.Access.max;
+import static io.fairspace.saturn.webdav.AccessMode.DataPublished;
+import static io.fairspace.saturn.webdav.AccessMode.MetadataPublished;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
@@ -35,7 +37,7 @@ public class DavFactory implements ResourceFactory {
         return getResource(rootSubject.getModel().createResource(baseUri + "/" + encodePath(path)));
     }
 
-    Resource getResource(org.apache.jena.rdf.model.Resource subject) throws NotAuthorizedException {
+    Resource getResource(org.apache.jena.rdf.model.Resource subject) {
         if (subject.equals(rootSubject)) {
             return root;
         }
@@ -49,65 +51,47 @@ public class DavFactory implements ResourceFactory {
         return getResource(subject, getAccess(subject));
     }
 
-    Resource tryGetResource(org.apache.jena.rdf.model.Resource subject) {
-        if (subject.equals(rootSubject)) {
-            return root;
-        }
-
-        var access = getAccess(subject);
-
-        if (!access.canList()) {
-            return null;
-        }
-
-        return getResource(subject, access);
-    }
-
     public Access getAccess(org.apache.jena.rdf.model.Resource subject) {
         var uri = subject.getURI();
         var nextSeparatorPos = uri.indexOf('/', rootSubject.getURI().length() + 1);
         var coll = nextSeparatorPos < 0 ? subject : subject.getModel().createResource(uri.substring(0, nextSeparatorPos));
-        if (coll.hasProperty(RDF.type, FS.Collection)) {
-            var user = currentUserResource();
-            var ownerWs = coll.getPropertyResourceValue(FS.ownedBy);
-
-            if (isAdmin()) {
-                return Access.Manage;
-            }
-
-            var access = getPermission(coll, user);
-
-            var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
-            if (deleted && access != Access.Manage) {
-                return Access.None;
-            }
-
-            if (coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name()) && canViewPublicData()) {
-                access = max(access, Access.Read);
-            } else if (user.hasProperty(FS.canList, coll)
-                    || ((coll.hasLiteral(FS.accessMode, AccessMode.MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name())) && canViewPublicMetadata())) {
-                access = max(access, Access.List);
-            }
-
-            Iterable<org.apache.jena.rdf.model.Resource> userWorkspaces = () -> subject.getModel()
-                    .listSubjectsWithProperty(RDF.type, FS.Workspace)
-                    .filterKeep(ws -> user.hasProperty(FS.isManagerOf, ws) || user.hasProperty(FS.isMemberOf, ws))
-                    .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
-
-
-            for (var ws : userWorkspaces) {
-                access = max(access, getPermission(coll, ws));
-                if (access == Access.Manage) {
-                    break;
-                }
-            }
-
-            return access;
+        if (!coll.hasProperty(RDF.type, FS.Collection)) {
+            return Access.None;
         }
-        return Access.None;
+
+        if (isAdmin()) {
+            return Access.Manage;
+        }
+
+        var user = currentUserResource();
+        var ownerWs = coll.getPropertyResourceValue(FS.ownedBy);
+        var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
+
+        var access = getGrantedPermission(coll, user);
+
+        if (!access.canRead() && coll.hasLiteral(FS.accessMode, DataPublished.name()) && canViewPublicData()) {
+            access = Access.Read;
+        } else if (!access.canList() && canViewPublicMetadata() && (coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
+            access = Access.List;
+        }
+
+        var userWorkspacesIterator = subject.getModel()
+                .listSubjectsWithProperty(RDF.type, FS.Workspace)
+                .filterKeep(ws -> user.hasProperty(FS.isManagerOf, ws) || user.hasProperty(FS.isMemberOf, ws))
+                .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
+
+        while (userWorkspacesIterator.hasNext() && access != Access.Manage) {
+            access = max(access, getGrantedPermission(coll, userWorkspacesIterator.next()));
+        }
+
+        if (deleted && (!showDeleted() || !access.canWrite())) {
+            return Access.None;
+        }
+
+        return access;
     }
 
-    private Access getPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
+    private static Access getGrantedPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
         if (principal.hasProperty(FS.canManage, resource)) {
             return Access.Manage;
         }
@@ -125,6 +109,9 @@ public class DavFactory implements ResourceFactory {
 
     Resource getResource(org.apache.jena.rdf.model.Resource subject, Access access) {
         if (subject.hasProperty(FS.dateDeleted) && !showDeleted()) {
+            return null;
+        }
+        if (subject.hasProperty(FS.movedTo)) {
             return null;
         }
         if (subject.hasProperty(RDF.type, FS.File)) {

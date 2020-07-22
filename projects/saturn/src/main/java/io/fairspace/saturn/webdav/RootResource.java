@@ -44,8 +44,9 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     @Override
     public List<? extends Resource> getChildren() {
         return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
-                .mapWith(factory::tryGetResource)
+                .mapWith(factory::getResource)
                 .filterDrop(Objects::isNull)
+                .filterKeep(r -> ((io.fairspace.saturn.webdav.CollectionResource)r).access.canList())
                 .toList();
     }
 
