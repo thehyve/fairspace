@@ -37,7 +37,7 @@ public class MetadataPermissions {
             return true;
         }
         if (davFactory.isFileSystemResource(resource)) {
-            return davFactory.getAccess(resource).canManage();
+            return davFactory.getAccess(resource).canWrite();
         }
         if (resource.hasProperty(RDF.type, FS.Workspace)) {
             var ws = workspaceService.getWorkspace(resource.asNode());
