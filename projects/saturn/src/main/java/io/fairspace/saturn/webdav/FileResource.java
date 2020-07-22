@@ -4,6 +4,7 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
+import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -60,6 +61,14 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
         contentLength = current.getRequiredProperty(FS.fileSize).getLong();
         modifiedDate = parseDate(current, FS.dateModified);
         singleVersion = versions.size() == 1;
+    }
+
+    @Override
+    public boolean authorise(Request request, Request.Method method, Auth auth) {
+        return switch (method) {
+            case GET -> access.canRead();
+            default -> super.authorise(request, method, auth);
+        };
     }
 
     @Override
@@ -130,6 +139,10 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     }
 
     private void revert(String versionStr) throws BadRequestException, NotAuthorizedException, ConflictException {
+        if (!access.canWrite()) {
+            throw new NotAuthorizedException(this);
+        }
+
         int version;
         try {
             version = parseInt(versionStr);

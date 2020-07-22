@@ -46,13 +46,7 @@ public class DavFactory implements ResourceFactory {
             return null;
         }
 
-        var access = getAccess(subject);
-
-        if (!access.canList()) {
-            throw new NotAuthorizedException();
-        }
-
-        return getResource(subject, access);
+        return getResource(subject, getAccess(subject));
     }
 
     Resource tryGetResource(org.apache.jena.rdf.model.Resource subject) {

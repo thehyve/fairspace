@@ -123,14 +123,18 @@ public class DavFactoryTest {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }
 
-    @Test(expected = NotAuthorizedException.class)
+    @Test
     public void testInaccessibleResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
         model.createResource(baseUri + "/coll").removeAll(FS.manage);
 
-        factory.getResource(null, BASE_PATH + "/coll");
+        for (var method: Request.Method.values()) {
+            assertFalse(factory.getResource(null, BASE_PATH + "/coll").authorise(null, method, null));
+        }
+
+
     }
 
     @Test

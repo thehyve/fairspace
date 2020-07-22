@@ -63,22 +63,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        if (access.canManage()) {
-            return true;
-        }
-        if (method == Request.Method.GET) {
-            return access.canRead();
-        }
-        if (method == Request.Method.POST) {
-            if ("undelete".equals(request.getParams().get("action"))) {
-                return access.canWrite();
-            }
-            return access.canManage();
-        }
-        if (method.isWrite) {
-            return access.canWrite();
-        }
-        return true;
+        // for POST requests performAction *must* implement action-specific checks and throw NotAuthorizedException if necessary
+
+        return (!method.isWrite && access.canList()) || (method.isWrite && access.canWrite());
     }
 
     @Override
@@ -260,14 +247,17 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         return null;
     }
 
-    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files)  throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "undelete" -> undelete();
             default -> throw new BadRequestException(this, "Unrecognized action " + action);
         }
     }
 
-    private void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
+        if (!access.canWrite()) {
+            throw new NotAuthorizedException(this);
+        }
         if (!subject.hasProperty(FS.dateDeleted)) {
             throw new ConflictException(this, "Cannot restore");
         }

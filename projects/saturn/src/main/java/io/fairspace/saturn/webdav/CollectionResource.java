@@ -2,7 +2,9 @@ package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
+import io.milton.http.Auth;
 import io.milton.http.FileItem;
+import io.milton.http.Request;
 import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -25,7 +27,6 @@ import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
-import static io.fairspace.saturn.webdav.WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
@@ -48,6 +49,14 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
+    }
+
+    @Override
+    public boolean authorise(Request request, Request.Method method, Auth auth) {
+        return switch (method) {
+            case DELETE -> access.canManage();
+            default -> super.authorise(request, method, auth);
+        };
     }
 
     @Override
@@ -225,20 +234,26 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
     }
 
-    private void setAccessMode(AccessMode mode) {
+    private void setAccessMode(AccessMode mode) throws NotAuthorizedException {
+        if (!access.canManage()) {
+            throw new NotAuthorizedException(this);
+        }
         subject.removeAll(FS.accessMode).addProperty(FS.accessMode, mode.name());
     }
 
-    private void setPermission(Resource principal, Access access) throws BadRequestException {
+    private void setPermission(Resource principal, Access grantedAccess) throws BadRequestException, NotAuthorizedException {
+        if (!access.canManage()) {
+            throw new NotAuthorizedException(this);
+        }
         if (principal.hasProperty(RDF.type, FS.User)) {
-            if (access == Access.Write || access == Access.Manage) {
+            if (grantedAccess == Access.Write || grantedAccess == Access.Manage) {
                 var ownerWs = subject.getPropertyResourceValue(FS.ownedBy);
                 if (!principal.hasProperty(FS.member, ownerWs) && !principal.hasProperty(FS.manage, ownerWs)) {
                     throw new BadRequestException(this);
                 }
             }
         } else if (principal.hasProperty(RDF.type, FS.Workspace)) {
-            if ((access == Access.Write || access == Access.Manage) && !subject.hasProperty(FS.ownedBy, principal)) {
+            if ((grantedAccess == Access.Write || grantedAccess == Access.Manage) && !subject.hasProperty(FS.ownedBy, principal)) {
                 throw new BadRequestException(this);
             }
         } else {
@@ -251,7 +266,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
                 .removeAll(subject, FS.write, principal)
                 .removeAll(subject, FS.manage, principal);
 
-        switch (access) {
+        switch (grantedAccess) {
             case List -> subject.addProperty(FS.list, principal);
             case Read -> subject.addProperty(FS.read, principal);
             case Write -> subject.addProperty(FS.write, principal);
@@ -259,14 +274,22 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
 
         if (principal.hasProperty(RDF.type, FS.User) && principal.hasProperty(FS.email)) {
-            var message = access == Access.None
+            var message = grantedAccess == Access.None
                     ? "Your access to collection " + getName() + " has been revoked."
-                    : "You've been granted " + access.name().toLowerCase() + " access to collection " +  getName() + "\n" + subject.getURI();
+                    : "You've been granted " + grantedAccess.name().toLowerCase() + " access to collection " +  getName() + "\n" + subject.getURI();
             var email = principal.getProperty(FS.email).getString();
             getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
                     (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
 
         }
+    }
+
+    @Override
+    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
+        if (!access.canManage()) {
+            throw new NotAuthorizedException(this);
+        }
+        super.undelete();
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {
