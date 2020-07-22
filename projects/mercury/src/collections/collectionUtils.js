@@ -25,7 +25,7 @@ const parsePermissions = (value) => ((typeof value !== 'string')
     ? []
     : value.split(',')
         .map(s => s.split(' '))
-        .map(([user, access]) => ({user, access})));
+        .map(([iri, access]) => ({iri, access})));
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,

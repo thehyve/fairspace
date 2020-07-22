@@ -10,7 +10,7 @@ const rootUrl = "";
 export type Access = "None" | "List" | "Read" | "Write" | "Manage";
 
 export type Permission = {
-    user: string; // iri
+    iri: string; // iri
     access: Access;
 }
 
