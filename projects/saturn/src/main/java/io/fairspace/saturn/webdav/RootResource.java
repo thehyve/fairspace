@@ -106,7 +106,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
             if (!ws.hasProperty(FS.status, WorkspaceStatus.Active.name())
                     && !ws.hasProperty(FS.member, factory.currentUserResource())
-                    && !ws.hasProperty(FS.manage, factory.currentUserResource())
+                    && !ws.hasProperty(FS.manager, factory.currentUserResource())
                     && !isAdmin()) {
                 throw new NotAuthorizedException();
             }

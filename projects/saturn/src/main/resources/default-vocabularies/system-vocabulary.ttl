@@ -175,7 +175,7 @@ fs:Workspace a fs:ClassShape ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
   fs:systemProperties
       fs:memberShape,
-      fs:manageShape,
+      fs:managerShape,
       fs:statusShape,
       fs:statusDateModifiedShape,
       fs:statusModifiedByShape ;
@@ -376,6 +376,14 @@ fs:writeShape a fs:RelationShape ;
      fs:machineOnly true ;
      fs:fixedShape true ;
      sh:path fs:member .
+
+ fs:meanagerShape a fs:RelationShape ;
+     sh:name "Managers" ;
+     sh:description "Managers of this workspace." ;
+     sh:class fs:User;
+     fs:machineOnly true ;
+     fs:fixedShape true ;
+     sh:path fs:manager .
 
 fs:createdByShape a fs:RelationShape ;
     sh:name "Created By" ;

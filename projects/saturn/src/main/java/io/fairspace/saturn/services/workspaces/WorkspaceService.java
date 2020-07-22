@@ -43,7 +43,7 @@ public class WorkspaceService {
                     .stream()
                     .peek(ws -> {
                         var res = m.wrapAsResource(ws.getIri());
-                        ws.setCanManage(isAdmin() || res.hasProperty(FS.manage, user));
+                        ws.setCanManage(isAdmin() || res.hasProperty(FS.manager, user));
                         ws.setCanCollaborate(ws.isCanManage() || res.hasProperty(FS.member, user));
                     }).collect(toList());
         });
@@ -57,7 +57,7 @@ public class WorkspaceService {
             }
             var res = ds.getDefaultModel().wrapAsResource(ws.getIri());
             var user = ds.getDefaultModel().wrapAsResource(getUserURI());
-            ws.setCanManage(isAdmin() || res.hasProperty(FS.manage, user));
+            ws.setCanManage(isAdmin() || res.hasProperty(FS.manager, user));
             ws.setCanCollaborate(ws.isCanManage() || res.hasProperty(FS.member, user));
             return ws;
         });
@@ -143,7 +143,7 @@ public class WorkspaceService {
                 var r = m.wrapAsResource(iri);
                 validateResource(r, FS.Workspace);
                 getResourceProperties(r, FS.member).forEach(u -> result.put(u.asNode(), WorkspaceRole.Member));
-                getResourceProperties(r, FS.manage).forEach(u -> result.put(u.asNode(), WorkspaceRole.Manager));
+                getResourceProperties(r, FS.manager).forEach(u -> result.put(u.asNode(), WorkspaceRole.Manager));
         });
         return result;
     }
@@ -172,7 +172,7 @@ public class WorkspaceService {
                     message = "You're now a member of workspace " + workspaceResource.getProperty(RDFS.label).getString() + "\n" + workspaceResource.getURI();
                 }
                 case Manager -> {
-                    workspaceResource.addProperty(FS.manage, userResource);
+                    workspaceResource.addProperty(FS.manager, userResource);
                     message = "You're now a manager of workspace " + workspaceResource.getProperty(RDFS.label).getString() + "\n" + workspaceResource.getURI();
                 }
                 default -> {

@@ -187,10 +187,10 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
 
         if (old != null) {
-            old.listProperties(FS.manage)
+            old.listProperties(FS.manager)
                    .andThen(old.listProperties(FS.member))
                    .mapWith(Statement::getResource)
-                    .filterDrop(user -> ws.hasProperty(FS.member, user) || ws.hasProperty(FS.manage, user))
+                    .filterDrop(user -> ws.hasProperty(FS.member, user) || ws.hasProperty(FS.manager, user))
                     .filterKeep(user -> subject.hasProperty(FS.manage, user) || subject.hasProperty(FS.write, user))
                     .toList()
                     .forEach(user -> user.getModel()
@@ -248,7 +248,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (principal.hasProperty(RDF.type, FS.User)) {
             if (grantedAccess == Access.Write || grantedAccess == Access.Manage) {
                 var ownerWs = subject.getPropertyResourceValue(FS.ownedBy);
-                if (!principal.hasProperty(FS.member, ownerWs) && !principal.hasProperty(FS.manage, ownerWs)) {
+                if (!principal.hasProperty(FS.member, ownerWs) && !principal.hasProperty(FS.manager, ownerWs)) {
                     throw new BadRequestException(this);
                 }
             }

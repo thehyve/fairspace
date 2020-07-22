@@ -98,6 +98,9 @@ public class FS {
     public static final String MEMBER_URI = NS + "member";
     public static final Property member = createProperty(MEMBER_URI);
 
+    public static final String MANAGER_URI = NS + "manager";
+    public static final Property manager = createProperty(MANAGER_URI);
+
     public static final String LIST_URI = NS + "list";
     public static final Property list = createProperty(LIST_URI);
 

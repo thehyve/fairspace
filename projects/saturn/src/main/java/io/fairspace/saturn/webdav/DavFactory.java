@@ -91,7 +91,7 @@ public class DavFactory implements ResourceFactory {
 
             Iterable<org.apache.jena.rdf.model.Resource> userWorkspaces = () -> subject.getModel()
                     .listSubjectsWithProperty(RDF.type, FS.Workspace)
-                    .filterKeep(ws -> ws.hasProperty(FS.manage, user) || ws.hasProperty(FS.member, user))
+                    .filterKeep(ws -> ws.hasProperty(FS.manager, user) || ws.hasProperty(FS.member, user))
                     .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
 
 
