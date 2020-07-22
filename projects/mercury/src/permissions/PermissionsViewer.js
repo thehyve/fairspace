@@ -10,16 +10,29 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 
 const PermissionsViewer = ({
-    collection, usersWithCollectionAccess, workspaceUsers, setPermission, error, loading, currentUser
+    collection, usersWithCollectionAccess, workspaceWithCollectionAccess, workspaceUsers, workspaces,
+    setPermission, error, loading, currentUser
 }) => {
     const [showPermissionDialog, setShowPermissionDialog] = useState(false);
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleAlterPermission = ({iri, access}) => {
+    let sortedCollaboratorsList = sortPermissions(usersWithCollectionAccess);
+    if (workspaceWithCollectionAccess) {
+        sortedCollaboratorsList = [workspaceWithCollectionAccess, ...sortedCollaboratorsList];
+    }
+    const ownerWorkspace = workspaces.find(w => w.iri === collection.ownerWorkspace);
+
+    const handleAlterPermission = (user) => {
         setShowPermissionDialog(true);
-        setSelectedUser({iri, access});
+        setSelectedUser(user);
+        setAnchorEl(null);
+    };
+
+    const handleAlterOwnerWorkspacePermission = () => {
+        setShowPermissionDialog(true);
+        setSelectedUser(ownerWorkspace);
         setAnchorEl(null);
     };
 
@@ -28,9 +41,9 @@ const PermissionsViewer = ({
         setSelectedUser(null);
     };
 
-    const handleRemoveCollaborator = ({iri, access}) => {
+    const handleRemoveCollaborator = (collaborator) => {
         setShowConfirmDeleteDialog(true);
-        setSelectedUser({iri, access});
+        setSelectedUser(collaborator);
         setAnchorEl(null);
     };
 
@@ -60,22 +73,22 @@ const PermissionsViewer = ({
             ? selectedUser.access + selectedUser.iri
             : null;
 
-        return sortPermissions(usersWithCollectionAccess)
-            .map((userWithAccess) => {
-                const key = userWithAccess.access + userWithAccess.iri;
+        return sortedCollaboratorsList
+            .map((collaborator) => {
+                const key = collaborator.access + collaborator.iri;
                 return (
                     <ListItem
                         key={key}
                     >
                         <ListItemText
-                            primary={userWithAccess.name}
-                            secondary={userWithAccess.access}
+                            primary={collaborator.name}
+                            secondary={collaborator.access}
                             data-testid="collaborator"
                         />
                         <ListItemSecondaryAction>
                             <IconButton
-                                onClick={e => handleMenuClick(e, userWithAccess)}
-                                disabled={!canAlterPermission(collection.canManage, userWithAccess, currentUser)}
+                                onClick={e => handleMenuClick(e, collaborator)}
+                                disabled={!canAlterPermission(collection.canManage, collaborator, currentUser)}
                             >
                                 <MoreIcon />
                             </IconButton>
@@ -86,12 +99,12 @@ const PermissionsViewer = ({
                                 onClose={handleMenuClose}
                             >
                                 <MenuItem
-                                    onClick={() => handleAlterPermission(userWithAccess)}
+                                    onClick={() => handleAlterPermission(collaborator)}
                                 >
                                     Change access
                                 </MenuItem>
                                 <MenuItem
-                                    onClick={() => handleRemoveCollaborator(userWithAccess)}
+                                    onClick={() => handleRemoveCollaborator(collaborator)}
                                 >
                                     Delete
                                 </MenuItem>
@@ -106,16 +119,27 @@ const PermissionsViewer = ({
         <List dense disablePadding>
             {renderCollaboratorList(usersWithCollectionAccess)}
             {collection.canManage && (
-                <Button
-                    variant="text"
-                    title="Add a collaborator"
-                    aria-label="Add"
-                    color="primary"
-                    onClick={() => handleAlterPermission({})}
-                    disabled={!collection.canManage}
-                >
-                    Add
-                </Button>
+                <div>
+                    <Button
+                        variant="text"
+                        title="Add single collaborator"
+                        aria-label="Add collaborator"
+                        color="primary"
+                        onClick={() => handleAlterPermission(null)}
+                    >
+                        Add collaborator
+                    </Button>
+                    <Button
+                        variant="text"
+                        title="Add all owner workspace members"
+                        aria-label="Add all members"
+                        color="primary"
+                        onClick={handleAlterOwnerWorkspacePermission}
+                        disabled={workspaceWithCollectionAccess}
+                    >
+                        Add access to all members
+                    </Button>
+                </div>
             )}
         </List>
     );
@@ -124,7 +148,7 @@ const PermissionsViewer = ({
         <AlterPermissionContainer
             open={showPermissionDialog}
             onClose={handleShareWithDialogClose}
-            user={selectedUser && selectedUser.iri}
+            user={selectedUser}
             access={selectedUser && selectedUser.access}
             collection={collection}
             currentUser={currentUser}
@@ -138,9 +162,7 @@ const PermissionsViewer = ({
             return null;
         }
 
-        // TODO: Refactor variable naming: user vs iri vs id.
-        const user = usersWithCollectionAccess.find(u => u.iri === selectedUser.iri) || {};
-        const content = `Are you sure you want to remove "${user.name}" from the collaborator list?`;
+        const content = `Are you sure you want to remove "${selectedUser.name}" from the collaborator list?`;
 
         return (
             <ConfirmationDialog

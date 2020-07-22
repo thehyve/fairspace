@@ -248,6 +248,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 <PermissionsCard
                     collection={collection}
                     workspaceUsers={workspaceUsers}
+                    workspaces={workspaces}
                 />
                 <CollectionShareCard
                     users={users}

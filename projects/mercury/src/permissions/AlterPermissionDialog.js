@@ -51,7 +51,7 @@ export class AlterPermissionDialog extends React.Component {
         const {access, user} = this.props;
         this.setState({
             accessRight: access || 'List',
-            selectedUser: {iri: user},
+            selectedUser: user,
             selectedUserLabel: ''
         });
     };
@@ -102,11 +102,6 @@ export class AlterPermissionDialog extends React.Component {
         return 'No options';
     };
 
-    getName = iri => {
-        const {users} = this.props;
-        return users.find(u => u.iri === iri).name;
-    };
-
     renderUser = () => {
         const {user, users, usersWithCollectionAccess, currentUser} = this.props;
         const {selectedUser, selectedUserLabel} = this.state;
@@ -120,7 +115,7 @@ export class AlterPermissionDialog extends React.Component {
                         gutterBottom
                         data-testid="user"
                     >
-                        {this.getName(user)}
+                        {user.name}
                     </Typography>
                 </div>
             );

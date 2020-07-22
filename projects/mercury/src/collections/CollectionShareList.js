@@ -21,7 +21,7 @@ export const CollectionShareList = ({title, shares, collection, setPermission, s
 
     return (
         <div style={{paddingLeft: 16}}>
-            <Typography variant="body2">
+            <Typography variant="body1">
                 {title}
             </Typography>
             <List dense disablePadding>

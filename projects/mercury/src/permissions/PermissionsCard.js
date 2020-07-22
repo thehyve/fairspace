@@ -37,12 +37,16 @@ const styles = theme => ({
     }
 });
 
-export const PermissionsCard = ({classes, collection, workspaceUsers, maxCollaboratorIcons = 5}) => {
+export const PermissionsCard = ({classes, collection, workspaceUsers, workspaces, maxCollaboratorIcons = 5}) => {
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
 
     const usersWithCollectionAccess = getUsersWithCollectionAccess(workspaceUsers, collection.userPermissions);
+    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.user === collection.ownerWorkspace);
+    const workspaceWithCollectionAccess = ownerWorkspaceAccess ? {iri: ownerWorkspaceAccess.user,
+        name: workspaces.find(w => w.iri === ownerWorkspaceAccess.user).name,
+        access: ownerWorkspaceAccess.access} : undefined;
 
     const permissionIcons = usersWithCollectionAccess
         .slice(0, maxCollaboratorIcons)
@@ -91,9 +95,11 @@ export const PermissionsCard = ({classes, collection, workspaceUsers, maxCollabo
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <PermissionsContainer
+                        workspaces={workspaces}
                         workspaceUsers={workspaceUsers}
                         collection={collection}
                         usersWithCollectionAccess={usersWithCollectionAccess}
+                        workspaceWithCollectionAccess={workspaceWithCollectionAccess}
                     />
                 </CardContent>
             </Collapse>
