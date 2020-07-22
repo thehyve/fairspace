@@ -248,7 +248,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (principal.hasProperty(RDF.type, FS.User)) {
             if (grantedAccess == Access.Write || grantedAccess == Access.Manage) {
                 var ownerWs = subject.getPropertyResourceValue(FS.ownedBy);
-                if (!principal.hasProperty(FS.member, ownerWs) && !principal.hasProperty(FS.manager, ownerWs)) {
+                if (!ownerWs.hasProperty(FS.member, principal) && !ownerWs.hasProperty(FS.manager, principal)) {
                     throw new BadRequestException(this);
                 }
             }
