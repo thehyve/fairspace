@@ -18,7 +18,7 @@ import FormControl from "@material-ui/core/FormControl";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 
-export const CollectionShareDialog = ({collection, setPermission, principalType, shareCandidates = [],
+export const SharesDialog = ({collection, setPermission, principalType, shareCandidates = [],
     setBusy = () => {}, showDialog, setShowDialog = () => {}}) => {
     const [selectedPrincipals, setSelectedPrincipals] = useState([]);
     const [accessRight, setAccessRight] = useState("List");
@@ -118,4 +118,4 @@ export const CollectionShareDialog = ({collection, setPermission, principalType,
     );
 };
 
-export default CollectionShareDialog;
+export default SharesDialog;

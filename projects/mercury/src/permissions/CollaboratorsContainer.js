@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import PermissionsViewer from "./PermissionsViewer";
+import CollaboratorsViewer from "./CollaboratorsViewer";
 import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
 
@@ -8,7 +8,7 @@ export default ({collection, usersWithCollectionAccess, workspaceWithCollectionA
     const {setPermission, loading, error} = useContext(CollectionsContext);
 
     return (
-        <PermissionsViewer
+        <CollaboratorsViewer
             loading={currentUserLoading || loading}
             error={currentUserError || error}
             setPermission={setPermission}

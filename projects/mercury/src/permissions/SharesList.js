@@ -6,12 +6,12 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Typography from "@material-ui/core/Typography";
-import {sortPermissions} from "../permissions/permissionUtils";
+import {sortPermissions} from "./permissionUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
 
-export const CollectionShareList = ({title, shares, collection, setPermission, setBusy = () => {}}) => {
+export const SharesList = ({title, shares, collection, setPermission, setBusy = () => {}}) => {
     const handleRemoveShare = (principal) => {
         setBusy(true);
         setPermission(collection.location, principal, 'None')
@@ -60,4 +60,4 @@ export const CollectionShareList = ({title, shares, collection, setPermission, s
     );
 };
 
-export default CollectionShareList;
+export default SharesList;

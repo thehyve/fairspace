@@ -68,7 +68,7 @@ describe('AlterPermissionDialog', () => {
         // title =Share with
         expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Add collaborator');
 
-        // render collacborator selector
+        // render collaborator selector
         expect(wrapper.find(UserSelect).prop('value')).toBe(null);
 
         // initial value of the access right is "List"

@@ -6,10 +6,13 @@ import Button from "@material-ui/core/Button";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import CollectionShareDialog from "./CollectionShareDialog";
-import CollectionShareList from "./CollectionShareList";
-import CollectionsContext from "./CollectionsContext";
+import {Person, Widgets} from "@material-ui/icons";
+import SharesDialog from "./SharesDialog";
+import CollectionsContext from "../collections/CollectionsContext";
 import {getUsersWithCollectionAccess} from "../users/userUtils";
+import PermissionsList from "./PermissionsList";
+import {sortPermissions} from "./permissionUtils";
+import AlterPermissionContainer from "./AlterPermissionContainer";
 
 const styles = theme => ({
     card: {
@@ -33,7 +36,7 @@ const styles = theme => ({
     }
 });
 
-export const CollectionShareCard = ({classes, collection, users, workspaces, workspaceUsers, setBusy = () => {}}) => {
+export const SharesCard = ({classes, collection, users, workspaces, workspaceUsers, setBusy = () => {}}) => {
     const {setPermission} = useContext(CollectionsContext);
 
     const nonWorkspaceUsers = users.filter(u => !workspaceUsers.some(wu => wu.iri === u.iri));
@@ -46,7 +49,9 @@ export const CollectionShareCard = ({classes, collection, users, workspaces, wor
 
     const [showAddWorkspaceShareDialog, setShowAddWorkspaceShareDialog] = useState(false);
     const [showAddUserShareDialog, setShowAddUserShareDialog] = useState(false);
+    const [showAlterPermissionDialog, setShowAlterPermissionDialog] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const [selectedPrincipal, setSelectedPrincipal] = useState(null);
 
     const toggleExpand = () => setExpanded(!expanded);
 
@@ -64,13 +69,21 @@ export const CollectionShareCard = ({classes, collection, users, workspaces, wor
         </IconButton>
     );
 
-    const renderSharesList = (shares, title) => (
-        <CollectionShareList
-            shares={shares}
-            title={title}
+    const getItemIcon = (principal) => (workspaces.some(w => w.iri === principal.iri) ? (
+        <Widgets />
+    ) : (
+        <Person />
+    ));
+
+    const renderSharesList = (shares) => (
+        <PermissionsList
+            permissions={shares}
             collection={collection}
-            setBusy={setBusy}
             setPermission={setPermission}
+            selectedPrincipal={selectedPrincipal}
+            setSelectedPrincipal={setSelectedPrincipal}
+            setShowPermissionDialog={setShowAlterPermissionDialog}
+            getItemIcon={getItemIcon}
         />
     );
 
@@ -84,16 +97,14 @@ export const CollectionShareCard = ({classes, collection, users, workspaces, wor
         if (workspacesWithCollectionShare.length === 0 && usersWithCollectionShare.length === 0) {
             return renderNoSharesMessage();
         }
-        return (
-            <div>
-                {workspacesWithCollectionShare.length > 0 && renderSharesList(workspacesWithCollectionShare, "Shared with workspaces: ")}
-                {usersWithCollectionShare.length > 0 && renderSharesList(usersWithCollectionShare, "Shared with users: ")}
-            </div>
-        );
+        return renderSharesList([
+            ...sortPermissions(workspacesWithCollectionShare),
+            ...sortPermissions(usersWithCollectionShare)
+        ]);
     };
 
     const renderShareWithUsersDialog = () => (
-        <CollectionShareDialog
+        <SharesDialog
             collection={collection}
             setPermission={setPermission}
             principalType="users"
@@ -105,7 +116,7 @@ export const CollectionShareCard = ({classes, collection, users, workspaces, wor
     );
 
     const renderShareWithWorkspacesDialog = () => (
-        <CollectionShareDialog
+        <SharesDialog
             collection={collection}
             setPermission={setPermission}
             principalType="workspaces"
@@ -113,6 +124,18 @@ export const CollectionShareCard = ({classes, collection, users, workspaces, wor
             setBusy={setBusy}
             showDialog={showAddWorkspaceShareDialog}
             setShowDialog={setShowAddWorkspaceShareDialog}
+        />
+    );
+
+    const renderAlterPermissionDialog = () => (
+        <AlterPermissionContainer
+            open={showAlterPermissionDialog}
+            onClose={() => setShowAlterPermissionDialog(false)}
+            title="Edit share access right"
+            user={selectedPrincipal}
+            access={selectedPrincipal && selectedPrincipal.access}
+            collection={collection}
+            accessRights={['List', 'Read']}
         />
     );
 
@@ -160,11 +183,12 @@ export const CollectionShareCard = ({classes, collection, users, workspaces, wor
             </Card>
             {showAddUserShareDialog && renderShareWithUsersDialog()}
             {showAddWorkspaceShareDialog && renderShareWithWorkspacesDialog()}
+            {showAlterPermissionDialog && renderAlterPermissionDialog()}
         </div>
     );
 };
 
-CollectionShareCard.propTypes = {
+SharesCard.propTypes = {
     classes: PropTypes.object,
     workspaceUsers: PropTypes.array,
     users: PropTypes.array,
@@ -173,4 +197,4 @@ CollectionShareCard.propTypes = {
     setBusy: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(CollectionShareCard);
+export default withStyles(styles)(SharesCard);

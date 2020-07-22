@@ -3,7 +3,7 @@ import React from 'react';
 import {shallow} from "enzyme";
 
 import {Button, IconButton} from "@material-ui/core";
-import PermissionsViewer from "../PermissionsViewer";
+import CollaboratorsViewer from "../CollaboratorsViewer";
 
 const testRenderingCollaborators = (wrapper) => {
     expect(wrapper.find('[data-testid="collaborator"]').length).toBe(4);
@@ -59,7 +59,7 @@ describe('PermissionsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <PermissionsViewer
+                <CollaboratorsViewer
                     creator={mockCreator}
                     iri={500}
                     currentUser={mockcurrentUserCreatorCanManage}
@@ -93,7 +93,7 @@ describe('PermissionsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <PermissionsViewer
+                <CollaboratorsViewer
                     creator={mockCreator}
                     iri={500}
                     canManage={false}
@@ -126,7 +126,7 @@ describe('PermissionsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <PermissionsViewer
+                <CollaboratorsViewer
                     creator={mockCreator}
                     iri={500}
                     canManage

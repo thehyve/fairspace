@@ -107,7 +107,7 @@ export class AlterPermissionDialog extends React.Component {
         const {selectedUser, selectedUserLabel} = this.state;
 
         // only render the label if user is passed into this component
-        if (users && usersWithCollectionAccess && user) {
+        if (user) {
             return (
                 <div>
                     <Typography
@@ -126,7 +126,8 @@ export class AlterPermissionDialog extends React.Component {
             <UserSelect
                 users={users}
                 onChange={this.handleSelectedUserChange}
-                filter={u => u.iri !== currentUser.iri && !usersWithCollectionAccess.some(c => c.iri === u.iri)}
+                filter={u => (!currentUser || u.iri !== currentUser.iri)
+                    && !usersWithCollectionAccess.some(c => c.iri === u.iri)}
                 placeholder="Please select a user"
                 value={selectedUser}
                 label={selectedUserLabel}
@@ -136,8 +137,9 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     render() {
-        const {classes, user, open, loading, error} = this.props;
+        const {classes, user, open, loading, error, title} = this.props;
         const {selectedUser, accessRight} = this.state;
+        const accessRights = this.props.accessRights || AccessRights;
 
         return (
             <Dialog
@@ -146,7 +148,7 @@ export class AlterPermissionDialog extends React.Component {
                 onClose={this.handleClose}
                 data-testid="permissions-dialog"
             >
-                <DialogTitle id="scroll-dialog-title">Add collaborator</DialogTitle>
+                <DialogTitle id="scroll-dialog-title">{title}</DialogTitle>
                 <DialogContent>
                     <div className={user ? classes.rootEdit : classes.root}>
                         {this.renderUser()}
@@ -159,7 +161,7 @@ export class AlterPermissionDialog extends React.Component {
                                 value={accessRight}
                                 onChange={this.handleAccessRightChange}
                             >
-                                {AccessRights.map(access => (
+                                {accessRights.map(access => (
                                     <FormControlLabel
                                         key={access}
                                         value={access}
@@ -196,11 +198,13 @@ AlterPermissionDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     open: PropTypes.bool,
     onClose: PropTypes.func,
+    title: PropTypes.string,
     access: PropTypes.string,
     user: PropTypes.string,
     collection: PropTypes.object,
     users: PropTypes.array,
-    usersWithCollectionAccess: PropTypes.array
+    usersWithCollectionAccess: PropTypes.array,
+    accessRights: PropTypes.array
 };
 
 export default withStyles(styles)(AlterPermissionDialog);

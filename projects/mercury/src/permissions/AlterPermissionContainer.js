@@ -10,7 +10,6 @@ const AlterPermissionContainer = props => {
         <AlterPermissionDialog
             {...props}
             setPermission={setPermission}
-            users={props.workspaceUsers}
             loading={loading}
             error={error}
         />

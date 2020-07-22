@@ -5,7 +5,7 @@ import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles}
 import classnames from "classnames";
 
 import {Group} from "@material-ui/icons";
-import PermissionsContainer from "./PermissionsContainer";
+import PermissionsContainer from "./CollaboratorsContainer";
 import {getUsersWithCollectionAccess} from "../users/userUtils";
 
 const styles = theme => ({
@@ -37,7 +37,7 @@ const styles = theme => ({
     }
 });
 
-export const PermissionsCard = ({classes, collection, workspaceUsers, workspaces, maxCollaboratorIcons = 5}) => {
+export const CollaboratorsCard = ({classes, collection, workspaceUsers, workspaces, maxCollaboratorIcons = 5}) => {
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
@@ -50,10 +50,10 @@ export const PermissionsCard = ({classes, collection, workspaceUsers, workspaces
 
     const permissionIcons = usersWithCollectionAccess
         .slice(0, maxCollaboratorIcons)
-        .map(({user, userName}) => (
+        .map(({iri, name}) => (
             <Avatar
-                key={user}
-                title={userName}
+                key={iri}
+                title={name}
                 src="/public/images/avatar.png"
                 className={classes.avatar}
             />
@@ -93,7 +93,7 @@ export const PermissionsCard = ({classes, collection, workspaceUsers, workspaces
                 subheader="Add access rights on the collection to owner workspace or individual members."
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
+                <CardContent style={{paddingTop: 0}}>
                     <PermissionsContainer
                         workspaces={workspaces}
                         workspaceUsers={workspaceUsers}
@@ -107,11 +107,11 @@ export const PermissionsCard = ({classes, collection, workspaceUsers, workspaces
     );
 };
 
-PermissionsCard.propTypes = {
+CollaboratorsCard.propTypes = {
     classes: PropTypes.object,
     collection: PropTypes.object.isRequired,
     workspaceUsers: PropTypes.array.isRequired,
     maxCollaboratorIcons: PropTypes.number
 };
 
-export default withStyles(styles)(PermissionsCard);
+export default withStyles(styles)(CollaboratorsCard);
