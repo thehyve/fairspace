@@ -89,13 +89,18 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
 
+        var user = factory.currentUserResource();
+
         subj.addProperty(RDF.type, FS.Collection)
                 .addProperty(RDFS.label, newName)
                 .addProperty(RDFS.comment, "")
-                .addProperty(FS.createdBy, factory.currentUserResource())
+                .addProperty(FS.createdBy, user)
                 .addProperty(FS.dateCreated, timestampLiteral())
                 .addProperty(FS.dateModified, timestampLiteral())
-                .addProperty(FS.modifiedBy, factory.currentUserResource());
+                .addProperty(FS.modifiedBy, user)
+                .addProperty(FS.accessMode, AccessMode.Restricted.name());
+
+        user.addProperty(FS.canManage, subj);
 
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
@@ -105,8 +110,8 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             }
 
             if (!ws.hasProperty(FS.status, WorkspaceStatus.Active.name())
-                    && !ws.hasProperty(FS.member, factory.currentUserResource())
-                    && !ws.hasProperty(FS.manager, factory.currentUserResource())
+                    && !factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
+                    && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
                     && !isAdmin()) {
                 throw new NotAuthorizedException();
             }
@@ -114,8 +119,6 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             subj.addProperty(FS.ownedBy, ws);
         }
 
-        subj.addProperty(FS.manage, factory.currentUserResource())
-                .addProperty(FS.accessMode, AccessMode.Restricted.name());
 
         return (CollectionResource) factory.getResource(subj, Access.Manage);
     }

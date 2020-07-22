@@ -25,6 +25,7 @@ import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -128,13 +129,11 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        model.createResource(baseUri + "/coll").removeAll(FS.manage);
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"));
 
         for (var method: Request.Method.values()) {
-            assertFalse(factory.getResource(null, BASE_PATH + "/coll").authorise(null, method, null));
+            assertFalse("Shouldn't be able to " + method, factory.getResource(null, BASE_PATH + "/coll").authorise(null, method, null));
         }
-
-
     }
 
     @Test
@@ -189,8 +188,8 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        model.createResource(baseUri + "/coll").removeAll(FS.manage)
-                .addProperty(FS.read, model.wrapAsResource(getUserURI()));
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"))
+                .add(createResource(baseUri + "/coll"), FS.canRead, model.createResource(baseUri + "/coll"));
 
         assertFalse(root.child("coll").authorise(null, Request.Method.PUT, null));
     }

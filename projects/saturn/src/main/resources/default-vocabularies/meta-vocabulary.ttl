@@ -12,7 +12,7 @@
    rdf:rest ( owl:sameAs sh:ignoredProperties sh:message fs:machineOnly
               fs:fixedShape fs:systemProperties sh:closed fs:createdBy
               fs:dateCreated fs:modifiedBy fs:dateModified
-              fs:deletedBy fs:dateDeleted fs:replaces fs:isReplacedBy sh:order sh:or ) .
+              fs:deletedBy fs:dateDeleted fs:replaces fs:isReplacedBy sh:order ) .
 
 fs:ClassShapeMetaShape a sh:NodeShape ;
     sh:closed true ;
@@ -158,8 +158,8 @@ fs:RelationShapeMetaShape a sh:NodeShape ;
         # options to add new shapes
         sh:nodeKind sh:IRI ;
         sh:path sh:class ;
-#        sh:maxCount 1 ;
-#        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
         sh:name "Class target" ;
         fs:importantProperty true ;
         sh:order 3

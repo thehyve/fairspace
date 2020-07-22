@@ -129,17 +129,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     private String getPermissions(Resource principalType) {
         var builder = new StringBuilder();
 
-        dumpPermissions(FS.manage, Access.Manage, principalType, builder);
-        dumpPermissions(FS.write, Access.Write, principalType, builder);
-        dumpPermissions(FS.read, Access.Read, principalType, builder);
-        dumpPermissions(FS.list, Access.List, principalType, builder);
+        dumpPermissions(FS.canManage, Access.Manage, principalType, builder);
+        dumpPermissions(FS.canWrite, Access.Write, principalType, builder);
+        dumpPermissions(FS.canRead, Access.Read, principalType, builder);
+        dumpPermissions(FS.canList, Access.List, principalType, builder);
 
         return builder.toString();
     }
 
     private void dumpPermissions(Property property, Access access, Resource type, StringBuilder builder) {
-        subject.listProperties(property)
-                .mapWith(Statement::getResource)
+        subject.getModel().listSubjectsWithProperty(property, subject)
                 .filterKeep(r -> r.hasProperty(RDF.type, type))
                 .filterDrop(r -> r.hasProperty(FS.dateDeleted))
                 .mapWith(Resource::getURI)
@@ -176,7 +175,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
 
         // TODO: Use the new WorkspaceService
-        if (!isAdmin() && !ws.hasLiteral(FS.manage, factory.currentUserResource())) {
+        if (!isAdmin() && !factory.currentUserResource().hasLiteral(FS.canManage, ws)) {
             throw new NotAuthorizedException();
         }
 
@@ -187,16 +186,15 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
 
         if (old != null) {
-            old.listProperties(FS.manager)
-                   .andThen(old.listProperties(FS.member))
-                   .mapWith(Statement::getResource)
-                    .filterDrop(user -> ws.hasProperty(FS.member, user) || ws.hasProperty(FS.manager, user))
-                    .filterKeep(user -> subject.hasProperty(FS.manage, user) || subject.hasProperty(FS.write, user))
+            subject.getModel().listResourcesWithProperty(FS.isMemberOf, old)
+                    .andThen(subject.getModel().listResourcesWithProperty(FS.isManagerOf, old))
+                    .filterDrop(user -> user.hasProperty(FS.isMemberOf, ws) || user.hasProperty(FS.isManagerOf, ws))
+                    .filterKeep(user -> user.hasProperty(FS.canManage, subject) || user.hasProperty(FS.canWrite, subject))
                     .toList()
                     .forEach(user -> user.getModel()
-                            .remove(subject, FS.manage, user)
-                            .remove(subject, FS.write, user)
-                            .add(subject, FS.read, user));
+                            .remove(user, FS.canManage, subject)
+                            .remove(user, FS.canWrite, subject)
+                            .add(user, FS.canRead, subject));
         }
     }
 
@@ -248,7 +246,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (principal.hasProperty(RDF.type, FS.User)) {
             if (grantedAccess == Access.Write || grantedAccess == Access.Manage) {
                 var ownerWs = subject.getPropertyResourceValue(FS.ownedBy);
-                if (!ownerWs.hasProperty(FS.member, principal) && !ownerWs.hasProperty(FS.manager, principal)) {
+                if (!principal.hasProperty(FS.isMemberOf, ownerWs) && !principal.hasProperty(FS.isManagerOf, ownerWs)) {
                     throw new BadRequestException(this);
                 }
             }
@@ -261,16 +259,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
 
         subject.getModel()
-                .removeAll(subject, FS.list, principal)
-                .removeAll(subject, FS.read, principal)
-                .removeAll(subject, FS.write, principal)
-                .removeAll(subject, FS.manage, principal);
+                .removeAll(principal, FS.canList, subject)
+                .removeAll(principal, FS.canRead, subject)
+                .removeAll(principal, FS.canWrite, subject)
+                .removeAll(principal, FS.canManage, subject);
 
         switch (grantedAccess) {
-            case List -> subject.addProperty(FS.list, principal);
-            case Read -> subject.addProperty(FS.read, principal);
-            case Write -> subject.addProperty(FS.write, principal);
-            case Manage -> subject.addProperty(FS.manage, principal);
+            case List -> principal.addProperty(FS.canList, subject);
+            case Read -> principal.addProperty(FS.canRead, subject);
+            case Write -> principal.addProperty(FS.canWrite, subject);
+            case Manage -> principal.addProperty(FS.canManage, subject);
         }
 
         if (principal.hasProperty(RDF.type, FS.User) && principal.hasProperty(FS.email)) {

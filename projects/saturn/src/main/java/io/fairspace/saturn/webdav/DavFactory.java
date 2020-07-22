@@ -84,14 +84,14 @@ public class DavFactory implements ResourceFactory {
 
             if (coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name()) && canViewPublicData()) {
                 access = max(access, Access.Read);
-            } else if (coll.hasProperty(FS.list, user)
+            } else if (user.hasProperty(FS.canList, coll)
                     || ((coll.hasLiteral(FS.accessMode, AccessMode.MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, AccessMode.DataPublished.name())) && canViewPublicMetadata())) {
                 access = max(access, Access.List);
             }
 
             Iterable<org.apache.jena.rdf.model.Resource> userWorkspaces = () -> subject.getModel()
                     .listSubjectsWithProperty(RDF.type, FS.Workspace)
-                    .filterKeep(ws -> ws.hasProperty(FS.manager, user) || ws.hasProperty(FS.member, user))
+                    .filterKeep(ws -> user.hasProperty(FS.isManagerOf, ws) || user.hasProperty(FS.isMemberOf, ws))
                     .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
 
 
@@ -108,16 +108,16 @@ public class DavFactory implements ResourceFactory {
     }
 
     private Access getPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
-        if (resource.hasProperty(FS.manage, principal)) {
+        if (principal.hasProperty(FS.canManage, resource)) {
             return Access.Manage;
         }
-        if (resource.hasProperty(FS.write, principal)) {
+        if (principal.hasProperty(FS.canWrite, resource)) {
             return Access.Write;
         }
-        if (resource.hasProperty(FS.read, principal)) {
+        if (principal.hasProperty(FS.canRead, resource)) {
             return Access.Read;
         }
-        if (resource.hasProperty(FS.list, principal)) {
+        if (principal.hasProperty(FS.canList, resource)) {
             return Access.List;
         }
         return Access.None;

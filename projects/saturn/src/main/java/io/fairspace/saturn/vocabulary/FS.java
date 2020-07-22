@@ -95,23 +95,23 @@ public class FS {
     public static final String MACHINE_ONLY_URI = NS + "machineOnly";
     public static final Property machineOnly = createProperty(MACHINE_ONLY_URI);
 
-    public static final String MEMBER_URI = NS + "member";
-    public static final Property member = createProperty(MEMBER_URI);
+    public static final String IS_MEMBER_OF_URI = NS + "isMemberOf";
+    public static final Property isMemberOf = createProperty(IS_MEMBER_OF_URI);
 
-    public static final String MANAGER_URI = NS + "manager";
-    public static final Property manager = createProperty(MANAGER_URI);
+    public static final String IS_MANAGER_OF_URI = NS + "isManagerOf";
+    public static final Property isManagerOf = createProperty(IS_MANAGER_OF_URI);
 
-    public static final String LIST_URI = NS + "list";
-    public static final Property list = createProperty(LIST_URI);
+    public static final String CAN_LIST_URI = NS + "canList";
+    public static final Property canList = createProperty(CAN_LIST_URI);
 
-    public static final String READ_URI = NS + "read";
-    public static final Property read = createProperty(READ_URI);
+    public static final String CAN_READ_URI = NS + "canRead";
+    public static final Property canRead = createProperty(CAN_READ_URI);
 
-    public static final String WRITE_URI = NS + "write";
-    public static final Property write = createProperty(WRITE_URI);
+    public static final String CAN_WRITE_URI = NS + "canWrite";
+    public static final Property canWrite = createProperty(CAN_WRITE_URI);
 
-    public static final String MANAGE_URI = NS + "manage";
-    public static final Property manage = createProperty(MANAGE_URI);
+    public static final String CAN_MANAGE_URI = NS + "canManage";
+    public static final Property canManage = createProperty(CAN_MANAGE_URI);
 
     public static final String ACCESS_MODE_URI = NS + "accessMode";
     public static final Property accessMode = createProperty(ACCESS_MODE_URI);

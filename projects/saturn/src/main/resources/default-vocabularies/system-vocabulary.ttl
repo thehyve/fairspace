@@ -127,10 +127,6 @@ fs:CollectionShape a fs:ClassShape ;
     fs:fixedShape true ;
     fs:systemProperties
         fs:ownedByShape,
-        fs:listShape,
-        fs:readShape,
-        fs:writeShape,
-        fs:manageShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -141,10 +137,6 @@ fs:CollectionShape a fs:ClassShape ;
         fs:commentShape ;
     sh:property
         fs:ownedByShape,
-        fs:listShape,
-        fs:readShape,
-        fs:writeShape,
-        fs:manageShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -154,8 +146,8 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
-fs:UserShape a fs:ClassShape ;
-    sh:description "Description for fs:User" ;
+fs:User a fs:ClassShape ;
+    sh:description "User" ;
     sh:name "User" ;
     sh:targetClass fs:User ;
     fs:machineOnly true ;
@@ -164,7 +156,13 @@ fs:UserShape a fs:ClassShape ;
     sh:property
         fs:labelShape,
         fs:commentShape,
-        fs:userEmailShape .
+        fs:userEmailShape,
+        fs:canListShape,
+        fs:canReadShape,
+        fs:canWriteShape,
+        fs:canManageShape,
+        fs:isMemberOfShape,
+        fs:isManagerOfShape .
 
 fs:Workspace a fs:ClassShape ;
   sh:description "Resource description for the current workspace." ;
@@ -174,15 +172,15 @@ fs:Workspace a fs:ClassShape ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
   fs:systemProperties
-      fs:memberShape,
-      fs:managerShape,
       fs:statusShape,
       fs:statusDateModifiedShape,
       fs:statusModifiedByShape ;
   sh:property
       fs:labelShape,
-      fs:memberShape,
-      fs:manageShape,
+      fs:canListShape,
+      fs:canReadShape,
+      fs:canWriteShape,
+      fs:canManageShape,
       [
         a fs:DatatypePropertyShape ;
         sh:path fs:workspaceDescription ;
@@ -325,65 +323,53 @@ fs:ownedByShape a fs:RelationShape ;
     fs:fixedShape true ;
     sh:path fs:ownedBy .
 
-fs:listShape a fs:RelationShape ;
-    sh:name "Visible to" ;
-    sh:description "Principals which can see this resource." ;
-    sh:or (
-      [ sh:class fs:User; ]
-      [ sh:class fs:Workspace; ]
-    );
+fs:canListShape a fs:RelationShape ;
+    sh:name "Can list" ;
+    sh:description "Visible collections" ;
+    sh:class fs:Collection ;
     fs:machineOnly true ;
     fs:fixedShape true ;
     sh:path fs:list .
 
-fs:readShape a fs:RelationShape ;
-    sh:name "Can be read by" ;
-    sh:description "Principals which can read this resource." ;
-    sh:or (
-      [ sh:class fs:User; ]
-      [ sh:class fs:Workspace; ]
-    );
+fs:canReadShape a fs:RelationShape ;
+    sh:name "Can read" ;
+    sh:description "Can read collections" ;
+    sh:class fs:Collection ;
     fs:machineOnly true ;
     fs:fixedShape true ;
     sh:path fs:read .
 
-fs:writeShape a fs:RelationShape ;
-    sh:name "Can be modified by" ;
-    sh:description "Principals who can modify this resource." ;
-    sh:or (
-      [ sh:class fs:User; ]
-      [ sh:class fs:Workspace; ]
-    );
+fs:canWriteShape a fs:RelationShape ;
+    sh:name "Can write to" ;
+    sh:description "Can write to collections" ;
+    sh:class fs:Collection ;
     fs:machineOnly true ;
     fs:fixedShape true ;
     sh:path fs:write .
 
- fs:manageShape a fs:RelationShape ;
-     sh:name "Can be managed by" ;
-     sh:description "Principals who can manage access to this resource." ;
-     sh:or (
-       [ sh:class fs:User; ]
-       [ sh:class fs:Workspace; ]
-     );
+ fs:canManageShape a fs:RelationShape ;
+     sh:name "Can manage" ;
+     sh:description "Can manage collections" ;
+     sh:class fs:Collection ;
      fs:machineOnly true ;
      fs:fixedShape true ;
      sh:path fs:manage .
 
- fs:memberShape a fs:RelationShape ;
-     sh:name "Members" ;
-     sh:description "Regular members of this workspace." ;
-     sh:class fs:User;
+ fs:isMemberOfShape a fs:RelationShape ;
+     sh:name "Is a member of" ;
+     sh:description "Is a member of workspaces." ;
+     sh:class fs:Workspace;
      fs:machineOnly true ;
      fs:fixedShape true ;
-     sh:path fs:member .
+     sh:path fs:isMemberOf .
 
- fs:meanagerShape a fs:RelationShape ;
-     sh:name "Managers" ;
-     sh:description "Managers of this workspace." ;
-     sh:class fs:User;
+ fs:isManagerOfShape a fs:RelationShape ;
+     sh:name "Is a manager of" ;
+     sh:description "Is a manager of workspaces" ;
+     sh:class fs:Workspace;
      fs:machineOnly true ;
      fs:fixedShape true ;
-     sh:path fs:manager .
+     sh:path fs:isManagerOf .
 
 fs:createdByShape a fs:RelationShape ;
     sh:name "Created By" ;

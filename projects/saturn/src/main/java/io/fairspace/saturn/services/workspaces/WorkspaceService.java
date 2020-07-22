@@ -19,7 +19,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
-import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.time.Instant.now;
@@ -43,8 +42,8 @@ public class WorkspaceService {
                     .stream()
                     .peek(ws -> {
                         var res = m.wrapAsResource(ws.getIri());
-                        ws.setCanManage(isAdmin() || res.hasProperty(FS.manager, user));
-                        ws.setCanCollaborate(ws.isCanManage() || res.hasProperty(FS.member, user));
+                        ws.setCanManage(isAdmin() || user.hasProperty(FS.isManagerOf, res));
+                        ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
                     }).collect(toList());
         });
     }
@@ -57,8 +56,8 @@ public class WorkspaceService {
             }
             var res = ds.getDefaultModel().wrapAsResource(ws.getIri());
             var user = ds.getDefaultModel().wrapAsResource(getUserURI());
-            ws.setCanManage(isAdmin() || res.hasProperty(FS.manager, user));
-            ws.setCanCollaborate(ws.isCanManage() || res.hasProperty(FS.member, user));
+            ws.setCanManage(isAdmin() || user.hasProperty(FS.isManagerOf, res));
+            ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
             return ws;
         });
     }
@@ -80,7 +79,8 @@ public class WorkspaceService {
         var created = tx.calculateWrite(ds -> {
             var workspace = new DAO(ds).write(ws);
             var m = ds.getDefaultModel();
-            m.wrapAsResource(workspace.getIri()).addProperty(FS.manage, m.wrapAsResource(getUserURI()));
+
+            m.wrapAsResource(getUserURI()).addProperty(FS.canManage, m.wrapAsResource(workspace.getIri()));
             workspace.setCanManage(true);
             workspace.setCanCollaborate(true);
             return workspace;
@@ -93,7 +93,7 @@ public class WorkspaceService {
     public Workspace updateWorkspace(Workspace patch) {
         validate(patch.getIri() != null, "No IRI provided");
 
-        var statusUpdated = new boolean[] {false};
+        var statusUpdated = new boolean[]{false};
 
         var updated = tx.calculateWrite(ds -> {
             var dao = new DAO(ds);
@@ -104,7 +104,7 @@ public class WorkspaceService {
 
             var m = ds.getDefaultModel();
             var workspaceResource = m.wrapAsResource(patch.getIri());
-            var canManage = workspaceResource.hasProperty(FS.manage, m.wrapAsResource(getUserURI())) || isAdmin();
+            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
             }
@@ -139,11 +139,15 @@ public class WorkspaceService {
     public Map<Node, WorkspaceRole> getUsers(Node iri) {
         var result = new HashMap<Node, WorkspaceRole>();
         tx.executeRead(ds -> {
-                var m = ds.getDefaultModel();
-                var r = m.wrapAsResource(iri);
-                validateResource(r, FS.Workspace);
-                getResourceProperties(r, FS.member).forEach(u -> result.put(u.asNode(), WorkspaceRole.Member));
-                getResourceProperties(r, FS.manager).forEach(u -> result.put(u.asNode(), WorkspaceRole.Manager));
+            var m = ds.getDefaultModel();
+            var r = m.wrapAsResource(iri);
+            validateResource(r, FS.Workspace);
+            m.listResourcesWithProperty(FS.isMemberOf, r)
+                    .filterDrop(user -> user.hasProperty(FS.dateDeleted))
+                    .forEachRemaining(user -> result.put(user.asNode(), WorkspaceRole.Member));
+            m.listResourcesWithProperty(FS.isManagerOf, r)
+                    .filterDrop(user -> user.hasProperty(FS.dateDeleted))
+                    .forEachRemaining(user -> result.put(user.asNode(), WorkspaceRole.Manager));
         });
         return result;
     }
@@ -159,30 +163,30 @@ public class WorkspaceService {
             var userResource = m.wrapAsResource(user);
             validateResource(workspaceResource, FS.Workspace);
             validateResource(userResource, FS.User);
-            var canManage = workspaceResource.hasProperty(FS.manage, m.wrapAsResource(getUserURI())) || isAdmin();
+            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
             }
-            m.removeAll(workspaceResource, FS.manage, userResource)
-                    .removeAll(workspaceResource, FS.member, userResource);
+            m.removeAll(userResource, FS.canManage, workspaceResource)
+                    .removeAll(userResource, FS.isMemberOf, workspaceResource);
             String message;
             switch (role) {
                 case Member -> {
-                    workspaceResource.addProperty(FS.member, userResource);
+                    userResource.addProperty(FS.isMemberOf, workspaceResource);
                     message = "You're now a member of workspace " + workspaceResource.getProperty(RDFS.label).getString() + "\n" + workspaceResource.getURI();
                 }
                 case Manager -> {
-                    workspaceResource.addProperty(FS.manager, userResource);
+                    userResource.addProperty(FS.isManagerOf, workspaceResource);
                     message = "You're now a manager of workspace " + workspaceResource.getProperty(RDFS.label).getString() + "\n" + workspaceResource.getURI();
                 }
                 default -> {
                     var writeableCollections = workspaceResource.getModel().listSubjectsWithProperty(FS.ownedBy, workspaceResource)
-                            .filterKeep(coll -> coll.hasProperty(FS.manage, userResource) || coll.hasProperty(FS.write, userResource))
+                            .filterKeep(coll -> userResource.hasProperty(FS.canManage, coll) || userResource.hasProperty(FS.canWrite, coll))
                             .toList();
                     writeableCollections.forEach(c -> c.getModel()
-                            .removeAll(c, FS.manage, userResource)
-                            .removeAll(c, FS.write, userResource)
-                            .add(c, FS.read, userResource));
+                            .removeAll(userResource, FS.canManage, c)
+                            .removeAll(userResource, FS.canWrite, c)
+                            .add(userResource, FS.canRead, c));
                     message = "You're no longer a member of workspace " + workspaceResource.getProperty(RDFS.label).getString();
                 }
             }
