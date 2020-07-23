@@ -167,7 +167,7 @@ public class WorkspaceService {
             if (!canManage) {
                 throw new AccessDeniedException();
             }
-            m.removeAll(userResource, FS.canManage, workspaceResource)
+            m.removeAll(userResource, FS.isManagerOf, workspaceResource)
                     .removeAll(userResource, FS.isMemberOf, workspaceResource);
             String message;
             switch (role) {
