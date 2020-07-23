@@ -4,14 +4,14 @@ import Dropdown from "../metadata/common/values/Dropdown";
 import {getDisplayName} from "../users/userUtils";
 import {compareBy} from "../common/utils/genericUtils";
 
-const UserSelect = ({filter = () => true, users = [], ...otherProps}) => {
-    const options = users
+const PermissionCandidateSelect = ({filter = () => true, permissionCandidates = [], ...otherProps}) => {
+    const options = permissionCandidates
         .filter(filter)
         .sort(compareBy('name'))
-        .map(user => (
+        .map(permission => (
             {
-                label: getDisplayName(user),
-                ...user
+                label: getDisplayName(permission),
+                ...permission
             }
         ));
 
@@ -24,4 +24,4 @@ const UserSelect = ({filter = () => true, users = [], ...otherProps}) => {
     );
 };
 
-export default UserSelect;
+export default PermissionCandidateSelect;

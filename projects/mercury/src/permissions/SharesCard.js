@@ -12,7 +12,7 @@ import CollectionsContext from "../collections/CollectionsContext";
 import {getUsersWithCollectionAccess} from "../users/userUtils";
 import PermissionsList from "./PermissionsList";
 import {sortPermissions} from "./permissionUtils";
-import AlterPermissionContainer from "./AlterPermissionContainer";
+import AlterPermissionDialog from "./AlterPermissionDialog";
 
 const styles = theme => ({
     card: {
@@ -128,11 +128,11 @@ export const SharesCard = ({classes, collection, users, workspaces, workspaceUse
     );
 
     const renderAlterPermissionDialog = () => (
-        <AlterPermissionContainer
+        <AlterPermissionDialog
             open={showAlterPermissionDialog}
             onClose={() => setShowAlterPermissionDialog(false)}
             title="Edit share access right"
-            user={selectedPrincipal}
+            principal={selectedPrincipal}
             access={selectedPrincipal && selectedPrincipal.access}
             collection={collection}
             accessRights={['List', 'Read']}

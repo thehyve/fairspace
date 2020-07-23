@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -13,7 +13,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import {AccessRights} from "./permissionUtils";
-import UserSelect from "./UserSelect";
+import PermissionCandidateSelect from "./PermissionCandidateSelect";
+import CollectionsContext from "../collections/CollectionsContext";
 
 export const styles = {
     root: {
@@ -42,17 +43,17 @@ export class AlterPermissionDialog extends React.Component {
         super(props);
         this.state = {
             accessRight: 'List',
-            selectedUser: null,
-            selectedUserLabel: ''
+            selectedPrincipal: null,
+            selectedPrincipalLabel: ''
         };
     }
 
     resetState = () => {
-        const {access, user} = this.props;
+        const {access, principal} = this.props;
         this.setState({
-            accessRight: access || 'List',
-            selectedUser: user,
-            selectedUserLabel: ''
+            accessRight: (access && access !== 'None') ? access : 'List',
+            selectedPrincipal: principal,
+            selectedPrincipalLabel: ''
         });
     };
 
@@ -61,7 +62,7 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSelectedUserChange = (selectedOption) => {
-        this.setState({selectedUser: selectedOption});
+        this.setState({selectedPrincipal: selectedOption});
     };
 
     handleClose = () => {
@@ -73,21 +74,16 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSubmit = () => {
-        const {selectedUser, accessRight} = this.state;
+        const {selectedPrincipal, accessRight} = this.state;
         const {collection, setPermission} = this.props;
-        if (selectedUser) {
-            setPermission(collection.location, selectedUser.iri, accessRight);
+        if (selectedPrincipal) {
+            setPermission(collection.location, selectedPrincipal.iri, accessRight);
             this.handleClose();
         } else {
-            this.setState({selectedUserLabel: 'You have to select a user'});
+            this.setState({selectedPrincipalLabel: 'You have to select one candidate'});
         }
     };
 
-    /**
-     * Get no options message based on users
-     * @param users
-     * @returns {string}
-     */
     getNoOptionMessage = () => {
         const {loading, error} = this.props;
 
@@ -96,49 +92,49 @@ export class AlterPermissionDialog extends React.Component {
         }
 
         if (error) {
-            return 'Error: Cannot fetch users.';
+            return 'Error: Cannot fetch permission candidates.';
         }
 
         return 'No options';
     };
 
-    renderUser = () => {
-        const {user, users, usersWithCollectionAccess, currentUser} = this.props;
-        const {selectedUser, selectedUserLabel} = this.state;
+    renderPermission = () => {
+        const {principal, permissionCandidates, permissions, currentUser} = this.props;
+        const {selectedPrincipal, selectedPrincipalLabel} = this.state;
 
-        // only render the label if user is passed into this component
-        if (user) {
+        // only render the label if principal is passed into this component
+        if (principal) {
             return (
                 <div>
                     <Typography
                         variant="subtitle1"
                         gutterBottom
-                        data-testid="user"
+                        data-testid="principal"
                     >
-                        {user.name}
+                        {principal.name}
                     </Typography>
                 </div>
             );
         }
 
-        // otherwise render select user component
+        // otherwise render select permission candidates component
         return (
-            <UserSelect
-                users={users}
+            <PermissionCandidateSelect
+                permissionCandidates={permissionCandidates}
                 onChange={this.handleSelectedUserChange}
-                filter={u => (!currentUser || u.iri !== currentUser.iri)
-                    && !usersWithCollectionAccess.some(c => c.iri === u.iri)}
-                placeholder="Please select a user"
-                value={selectedUser}
-                label={selectedUserLabel}
+                filter={p => (!currentUser || p.iri !== currentUser.iri)
+                    && !permissions.some(c => c.iri === p.iri)}
+                placeholder="Please select a principal"
+                value={selectedPrincipal}
+                label={selectedPrincipalLabel}
                 autoFocus
             />
         );
     };
 
     render() {
-        const {classes, user, open, loading, error, title} = this.props;
-        const {selectedUser, accessRight} = this.state;
+        const {classes, principal, open, loading, error, title} = this.props;
+        const {selectedPrincipal, accessRight} = this.state;
         const accessRights = this.props.accessRights || AccessRights;
 
         return (
@@ -150,8 +146,8 @@ export class AlterPermissionDialog extends React.Component {
             >
                 <DialogTitle id="scroll-dialog-title">{title}</DialogTitle>
                 <DialogContent>
-                    <div className={user ? classes.rootEdit : classes.root}>
-                        {this.renderUser()}
+                    <div className={principal ? classes.rootEdit : classes.root}>
+                        {this.renderPermission()}
                         <FormControl className={classes.formControl}>
                             <FormLabel component="legend">Access right</FormLabel>
                             <RadioGroup
@@ -177,7 +173,7 @@ export class AlterPermissionDialog extends React.Component {
                     <Button
                         onClick={this.handleSubmit}
                         color="primary"
-                        disabled={Boolean(!selectedUser || loading || error)}
+                        disabled={Boolean(!selectedPrincipal || loading || error)}
                         data-testid="submit"
                     >
                         Save
@@ -200,11 +196,24 @@ AlterPermissionDialog.propTypes = {
     onClose: PropTypes.func,
     title: PropTypes.string,
     access: PropTypes.string,
-    user: PropTypes.object,
+    principal: PropTypes.object,
     collection: PropTypes.object,
-    users: PropTypes.array,
-    usersWithCollectionAccess: PropTypes.array,
+    permissionCandidates: PropTypes.array,
+    permissions: PropTypes.array,
     accessRights: PropTypes.array
 };
 
-export default withStyles(styles)(AlterPermissionDialog);
+const ContextualAlterPermissionDialog = props => {
+    const {setPermission, loading, error} = useContext(CollectionsContext);
+
+    return (
+        <AlterPermissionDialog
+            {...props}
+            setPermission={setPermission}
+            loading={loading}
+            error={error}
+        />
+    );
+};
+
+export default withStyles(styles)(ContextualAlterPermissionDialog);

@@ -3,7 +3,7 @@ import {createMount, createShallow} from '@material-ui/core/test-utils';
 import {Button} from '@material-ui/core';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
-import UserSelect from "../UserSelect";
+import PermissionCandidateSelect from "../PermissionCandidateSelect";
 import {AccessRights} from "../permissionUtils";
 
 describe('AlterPermissionDialog', () => {
@@ -37,7 +37,7 @@ describe('AlterPermissionDialog', () => {
         iri: 'http://localhost/iri/c1',
         location: 'c1'
     };
-    const mockPermission = {
+    const mockPrincipal = {
         iri: 'http://localhost/iri/user2-id',
         access: 'Write',
         name: 'Michael Jackson'
@@ -60,10 +60,10 @@ describe('AlterPermissionDialog', () => {
             classes={{}}
             accessRights={AccessRights}
             collection={mockCollection}
-            usersWithCollectionAccess={mockCollaborators}
+            permissions={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
             setPermission={mockSetPermissionFn}
-            users={mockUsers}
+            permissionCandidates={mockUsers}
             title="Select access right for a collaborator"
         />);
 
@@ -74,7 +74,7 @@ describe('AlterPermissionDialog', () => {
         expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Select access right for a collaborator');
 
         // render collaborator selector
-        expect(wrapper.find(UserSelect).prop('value')).toBe(null);
+        expect(wrapper.find(PermissionCandidateSelect).prop('value')).toBe(null);
 
         // initial value of the access right is "List"
         expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('List');
@@ -95,8 +95,8 @@ describe('AlterPermissionDialog', () => {
             <AlterPermissionDialog
                 open
                 classes={{}}
-                user={mockPermission}
-                access={mockPermission.access}
+                principal={mockPrincipal}
+                access={mockPrincipal.access}
                 accessRights={AccessRights}
                 collection={mockCollection}
                 currentUser={mockCurrentLoggedUser}
@@ -105,10 +105,10 @@ describe('AlterPermissionDialog', () => {
             />
         );
 
-        wrapper.setState({selectedUser: mockPermission.iri});
+        wrapper.setState({selectedUser: mockPrincipal.iri});
 
-        expect(wrapper.find(UserSelect)).toHaveLength(0);
-        expect(wrapper.find('[data-testid="user"]').at(0).text()).toEqual('Michael Jackson');
+        expect(wrapper.find(PermissionCandidateSelect)).toHaveLength(0);
+        expect(wrapper.find('[data-testid="principal"]').at(0).text()).toEqual('Michael Jackson');
         expect(wrapper.find('[data-testid="submit"]').at(0).prop('disabled')).toBeFalsy(); // submit button enabled
     });
 });

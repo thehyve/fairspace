@@ -18,7 +18,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Checkbox from "@material-ui/core/Checkbox";
-import UserSelect from "../permissions/UserSelect";
+import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
 import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User, UserRoles} from "./UsersAPI";
@@ -89,7 +89,7 @@ const UserList = (props: UserListProps) => {
         >
             <DialogTitle id="scroll-dialog-title">Add user to the workspace</DialogTitle>
             <DialogContent>
-                <UserSelect
+                <PermissionCandidateSelect
                     autoFocus
                     users={users}
                     filter={u => u.iri !== currentUser.iri && workspaceUsersWithRoles.find(c => c.iri === u.iri) === undefined}

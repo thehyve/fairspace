@@ -5,8 +5,8 @@ import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles}
 import classnames from "classnames";
 
 import {Group} from "@material-ui/icons";
-import CollaboratorsContainer from "./CollaboratorsContainer";
 import {getUsersWithCollectionAccess} from "../users/userUtils";
+import CollaboratorsViewer from "./CollaboratorsViewer";
 
 const styles = theme => ({
     expand: {
@@ -42,13 +42,15 @@ export const CollaboratorsCard = ({classes, collection, workspaceUsers, workspac
 
     const toggleExpand = () => setExpanded(!expanded);
 
-    const usersWithCollectionAccess = getUsersWithCollectionAccess(workspaceUsers, collection.userPermissions);
-    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace);
-    const workspaceWithCollectionAccess = ownerWorkspaceAccess ? {iri: ownerWorkspaceAccess.iri,
-        name: workspaces.find(w => w.iri === ownerWorkspaceAccess.iri).name,
-        access: ownerWorkspaceAccess.access} : undefined;
+    const collaborators = getUsersWithCollectionAccess(workspaceUsers, collection.userPermissions);
+    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace) || {access: 'None'};
+    const ownerWorkspace = {
+        iri: collection.ownerWorkspace,
+        name: workspaces.find(w => w.iri === collection.ownerWorkspace).name,
+        access: ownerWorkspaceAccess.access
+    };
 
-    const permissionIcons = usersWithCollectionAccess
+    const permissionIcons = collaborators
         .slice(0, maxCollaboratorIcons)
         .map(({iri, name}) => (
             <Avatar
@@ -62,9 +64,9 @@ export const CollaboratorsCard = ({classes, collection, workspaceUsers, workspac
     const cardHeaderAction = (
         <>
             {permissionIcons}
-            {usersWithCollectionAccess.length > maxCollaboratorIcons ? (
+            {collaborators.length > maxCollaboratorIcons ? (
                 <div className={classes.additionalCollaborators}>
-                    + {usersWithCollectionAccess.length - maxCollaboratorIcons}
+                    + {collaborators.length - maxCollaboratorIcons}
                 </div>
             ) : ''}
             <IconButton
@@ -94,12 +96,11 @@ export const CollaboratorsCard = ({classes, collection, workspaceUsers, workspac
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    <CollaboratorsContainer
-                        workspaces={workspaces}
-                        workspaceUsers={workspaceUsers}
+                    <CollaboratorsViewer
+                        collaboratorCandidates={workspaceUsers}
                         collection={collection}
-                        usersWithCollectionAccess={usersWithCollectionAccess}
-                        workspaceWithCollectionAccess={workspaceWithCollectionAccess}
+                        collaborators={collaborators}
+                        ownerWorkspace={ownerWorkspace}
                     />
                 </CardContent>
             </Collapse>

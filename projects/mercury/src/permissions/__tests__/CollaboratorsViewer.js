@@ -3,7 +3,7 @@ import React from 'react';
 import {shallow} from "enzyme";
 
 import {Button} from "@material-ui/core";
-import CollaboratorsViewer from "../CollaboratorsViewer";
+import {CollaboratorsViewer} from "../CollaboratorsViewer";
 import PermissionsList from "../PermissionsList";
 
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
@@ -58,20 +58,16 @@ describe('CollaboratorsViewer', () => {
         ],
         workspacePermissions: []
     };
-    const mockWorkspaces = [
-        {iri: 'http://localhost/iri/w1'},
-        {iri: 'http://localhost/iri/w2'}
-    ];
     const mockWorkspaceUsers = [
         mockUsers[3],
         mockUsers[1],
         mockUsers[0]
     ];
-    const mockUsersWithCollectionAccess = [
+    const mockCollaborators = [
         mockUsers[1],
         mockUsers[3]
     ];
-    const mockWorkspaceWithCollectionAccess = null;
+    const mockOwnerWorkspace = {iri: 'http://localhost/iri/w1'};
 
     describe('Use Case 1: Current user can manage collection', () => {
         let wrapper;
@@ -80,10 +76,9 @@ describe('CollaboratorsViewer', () => {
                 <CollaboratorsViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
-                    usersWithCollectionAccess={mockUsersWithCollectionAccess}
-                    workspaceWithCollectionAccess={mockWorkspaceWithCollectionAccess}
+                    collaborators={mockCollaborators}
+                    ownerWorkspace={mockOwnerWorkspace}
                     workspaceUsers={mockWorkspaceUsers}
-                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
                 />
             );
@@ -109,10 +104,9 @@ describe('CollaboratorsViewer', () => {
                 <CollaboratorsViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    usersWithCollectionAccess={mockUsersWithCollectionAccess}
-                    workspaceWithCollectionAccess={mockWorkspaceWithCollectionAccess}
+                    collaborators={mockCollaborators}
+                    ownerWorkspace={mockOwnerWorkspace}
                     workspaceUsers={mockWorkspaceUsers}
-                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
                 />
             );
@@ -138,10 +132,9 @@ describe('CollaboratorsViewer', () => {
                 <CollaboratorsViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
-                    usersWithCollectionAccess={[...mockUsersWithCollectionAccess, mockUsers[0]]}
-                    workspaceWithCollectionAccess={mockWorkspaceWithCollectionAccess}
+                    collaborators={[...mockCollaborators, mockUsers[0]]}
+                    ownerWorkspace={mockOwnerWorkspace}
                     workspaceUsers={mockWorkspaceUsers}
-                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
                 />
             );
@@ -159,10 +152,9 @@ describe('CollaboratorsViewer', () => {
                 <CollaboratorsViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    usersWithCollectionAccess={mockUsersWithCollectionAccess}
-                    workspaceWithCollectionAccess={mockWorkspaces[0]}
+                    collaborators={mockCollaborators}
+                    ownerWorkspace={{...mockOwnerWorkspace, access: 'Write'}}
                     workspaceUsers={mockWorkspaceUsers}
-                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
                 />
             );

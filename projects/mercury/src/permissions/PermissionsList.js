@@ -1,6 +1,6 @@
 // @flow
 import React, {useState} from 'react';
-import {IconButton, List, Menu} from '@material-ui/core';
+import {IconButton, List, Menu, Typography} from '@material-ui/core';
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
@@ -12,11 +12,18 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
 
-export const PermissionsList = ({permissions, collection, setPermission, currentUser,
-    selectedPrincipal, setSelectedPrincipal, setShowPermissionDialog,
-    getItemIcon}) => {
+export const PermissionsList = ({permissions, setPermission, collection, currentUser,
+    selectedPrincipal, setSelectedPrincipal, setShowPermissionDialog, getItemIcon}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+
+    if (!permissions || permissions.length === 0) {
+        return (
+            <Typography variant="body2">
+                No collaborator found.
+            </Typography>
+        );
+    }
 
     const handleDeletePermission = (principal) => {
         setShowConfirmDeleteDialog(true);
@@ -71,7 +78,7 @@ export const PermissionsList = ({permissions, collection, setPermission, current
         setSelectedPrincipal(null);
     };
 
-    const selectedPermissionKey = selectedPrincipal ? selectedPrincipal.access + selectedPrincipal.iri : null;
+    const selectedPrincipalKey = selectedPrincipal ? selectedPrincipal.access + selectedPrincipal.iri : null;
 
     return (
         <div style={{paddingLeft: 16}}>
@@ -105,7 +112,7 @@ export const PermissionsList = ({permissions, collection, setPermission, current
                                         <Menu
                                             id="more-menu"
                                             anchorEl={anchorEl}
-                                            open={Boolean(anchorEl) && key === selectedPermissionKey}
+                                            open={Boolean(anchorEl) && key === selectedPrincipalKey}
                                             onClose={handleMenuClose}
                                         >
                                             <MenuItem
