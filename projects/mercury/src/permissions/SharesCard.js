@@ -161,7 +161,7 @@ export const SharesCard = ({classes, collection, users, workspaces, workspaceUse
                                     color="primary"
                                     variant="text"
                                     aria-label="Add"
-                                    title="Add a new workspace share"
+                                    title="Share with workspace"
                                     onClick={() => setShowAddWorkspaceShareDialog(true)}
                                 >
                                     Share with workspaces
@@ -171,7 +171,7 @@ export const SharesCard = ({classes, collection, users, workspaces, workspaceUse
                                     color="primary"
                                     variant="text"
                                     aria-label="Add"
-                                    title="Add a new user share"
+                                    title="Share with user"
                                     onClick={() => setShowAddUserShareDialog(true)}
                                 >
                                     Share with users

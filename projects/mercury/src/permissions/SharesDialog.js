@@ -56,7 +56,7 @@ export const SharesDialog = ({collection, setPermission, principalType, shareCan
                 <MenuItem value="List">List</MenuItem>
                 <MenuItem value="Read">Read</MenuItem>
             </Select>
-            <FormHelperText>Select access right the collection will be shared with</FormHelperText>
+            <FormHelperText>Select access level</FormHelperText>
         </FormControl>
     );
 

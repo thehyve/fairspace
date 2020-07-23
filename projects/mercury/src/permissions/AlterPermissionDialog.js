@@ -80,7 +80,7 @@ export class AlterPermissionDialog extends React.Component {
             setPermission(collection.location, selectedPrincipal.iri, accessRight);
             this.handleClose();
         } else {
-            this.setState({selectedPrincipalLabel: 'You have to select one candidate'});
+            this.setState({selectedPrincipalLabel: 'You have to select one option'});
         }
     };
 
@@ -92,7 +92,7 @@ export class AlterPermissionDialog extends React.Component {
         }
 
         if (error) {
-            return 'Error: Cannot fetch permission candidates.';
+            return 'Error accessing the server. Try again later.';
         }
 
         return 'No options';
@@ -124,7 +124,7 @@ export class AlterPermissionDialog extends React.Component {
                 onChange={this.handleSelectedUserChange}
                 filter={p => (!currentUser || p.iri !== currentUser.iri)
                     && !permissions.some(c => c.iri === p.iri)}
-                placeholder="Please select a principal"
+                placeholder="Please select one option"
                 value={selectedPrincipal}
                 label={selectedPrincipalLabel}
                 autoFocus
