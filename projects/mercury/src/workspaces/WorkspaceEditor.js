@@ -3,12 +3,10 @@ import WorkspaceDialog from "./WorkspaceDialog";
 import {useFormField} from "../common/hooks/UseFormField";
 import LoadingOverlay from "../common/components/LoadingOverlay";
 
-const ID_PATTERN = /^[a-z][-a-z_0-9]*$/;
-
 export default ({onSubmit, onClose, creating, workspaces,
     workspace: {name = ''} = {}}) => {
     const isWorkspaceNameUnique = (workspaceName) => !workspaces.some(workspace => workspace.name === workspaceName);
-    const nameControl = useFormField(name, value => !!value && ID_PATTERN.test(value) && isWorkspaceNameUnique(value));
+    const nameControl = useFormField(name, value => !!value && isWorkspaceNameUnique(value));
 
     const allControls = [nameControl];
 
