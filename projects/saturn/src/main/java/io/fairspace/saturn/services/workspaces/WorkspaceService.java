@@ -80,7 +80,7 @@ public class WorkspaceService {
             var workspace = new DAO(ds).write(ws);
             var m = ds.getDefaultModel();
 
-            m.wrapAsResource(getUserURI()).addProperty(FS.canManage, m.wrapAsResource(workspace.getIri()));
+            m.wrapAsResource(getUserURI()).addProperty(FS.isManagerOf, m.wrapAsResource(workspace.getIri()));
             workspace.setCanManage(true);
             workspace.setCanCollaborate(true);
             return workspace;
