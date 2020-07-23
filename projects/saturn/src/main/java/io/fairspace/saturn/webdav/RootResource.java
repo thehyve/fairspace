@@ -1,6 +1,6 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
+import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Request;
@@ -9,21 +9,20 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.property.PropertySource;
+import io.milton.resource.CollectionResource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
-import lombok.extern.slf4j.*;
-import org.apache.jena.graph.Node;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
@@ -45,14 +44,9 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     @Override
     public List<? extends Resource> getChildren() {
         return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
-                .mapWith(s -> {
-                    var access = factory.permissions.getPermission(s.asNode());
-                    if (access == Access.None) {
-                        return null;
-                    }
-                    return factory.getResource(s, access);
-                })
+                .mapWith(factory::getResource)
                 .filterDrop(Objects::isNull)
+                .filterKeep(r -> ((io.fairspace.saturn.webdav.CollectionResource)r).access.canList())
                 .toList();
     }
 
@@ -96,15 +90,18 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
 
+        var user = factory.currentUserResource();
+
         subj.addProperty(RDF.type, FS.Collection)
                 .addProperty(RDFS.label, newName)
                 .addProperty(RDFS.comment, "")
-                .addProperty(FS.createdBy, currentUserResource())
+                .addProperty(FS.createdBy, user)
                 .addProperty(FS.dateCreated, timestampLiteral())
                 .addProperty(FS.dateModified, timestampLiteral())
-                .addProperty(FS.modifiedBy, currentUserResource());
+                .addProperty(FS.modifiedBy, user)
+                .addProperty(FS.accessMode, AccessMode.Restricted.name());
 
-        List<Node> collectionManagers = new ArrayList<>(List.of(currentUserResource().asNode()));
+        user.addProperty(FS.canManage, subj);
 
         var ownerWorkspace = owner();
         if (ownerWorkspace != null) {
@@ -112,16 +109,19 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
                 throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
             }
-            if (!factory.permissions.getPermission(ws.asNode()).canWrite()) {
+
+            if (!ws.hasProperty(FS.status, WorkspaceStatus.Active.name())
+                    && !factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
+                    && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
+                    && !isAdmin()) {
                 throw new NotAuthorizedException();
             }
+
             subj.addProperty(FS.ownedBy, ws);
-            collectionManagers.add(ws.asNode());
         }
 
-        factory.permissions.assignManagers(subj.asNode(), collectionManagers);
 
-        return new CollectionResource(factory, subj, Access.Manage);
+        return (CollectionResource) factory.getResource(subj, Access.Manage);
     }
 
     @Override

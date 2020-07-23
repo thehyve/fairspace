@@ -1,9 +1,8 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
-import io.milton.http.ConditionalCompatibleResource;
+import io.milton.http.FileItem;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -19,24 +18,22 @@ import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
 import java.util.Date;
+import java.util.Map;
 
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
-import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 
-abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource {
+abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
     private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
     protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
     private static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
     protected static final QName DATE_DELETED_PROPERTY = new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName());
-    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Date.class);
+    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Date.class);
 
 
     protected final DavFactory factory;
@@ -66,16 +63,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        if (isAdmin()) {
-            return true;
-        }
-        if (method == Request.Method.GET) {
-            return access.canRead();
-        }
-        if (method.isWrite) {
-            return access.canWrite();
-        }
-        return true;
+        // for POST requests performAction *must* implement action-specific checks and throw NotAuthorizedException if necessary
+
+        return (!method.isWrite && access.canList()) || (method.isWrite && access.canWrite());
     }
 
     @Override
@@ -103,7 +93,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
             subject.addProperty(FS.dateDeleted, timestampLiteral())
-                    .addProperty(FS.deletedBy, currentUserResource());
+                    .addProperty(FS.deletedBy, factory.currentUserResource());
         }
     }
 
@@ -163,7 +153,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, currentUserResource(), timestampLiteral());
+        copy(subject, ((DirectoryResource) toCollection).subject, name, factory.currentUserResource(), timestampLiteral());
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
@@ -206,21 +196,6 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
-        if (name.equals(DATE_DELETED_PROPERTY) && value == null && subject.hasProperty(FS.dateDeleted)) {
-            var date = subject.getProperty(FS.dateDeleted).getLiteral();
-            var user = subject.getProperty(FS.deletedBy).getResource();
-
-            restore(subject, date, user);
-        }
-    }
-
-    private void restore(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
-        if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
-            resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
-
-            resource.listProperties(FS.contains)
-                    .forEachRemaining(statement -> restore(statement.getResource(), date, user));
-        }
     }
 
     @Override
@@ -238,11 +213,6 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     @Override
-    public boolean isCompatible(Request.Method m) {
-        return !m.isWrite || (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH || m == Request.Method.DELETE);
-    }
-
-    @Override
     public String toString() {
         return subject.getURI().substring(factory.rootSubject.getURI().length());
     }
@@ -257,7 +227,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addLiteral(FS.fileSize, blob.size)
                 .addProperty(FS.md5, blob.md5)
                 .addProperty(FS.dateModified, timestampLiteral())
-                .addProperty(FS.modifiedBy, currentUserResource());
+                .addProperty(FS.modifiedBy, factory.currentUserResource());
     }
 
     protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {
@@ -265,5 +235,43 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             return null;
         }
         return Date.from(parseXSDDateTimeLiteral(s.getProperty(p).getLiteral()));
+    }
+
+    @Override
+    public String processForm(Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        var action = parameters.get("action");
+        if (action == null) {
+            throw new BadRequestException(this, "No action specified");
+        }
+        performAction(action, parameters, files);
+        return null;
+    }
+
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        switch (action) {
+            case "undelete" -> undelete();
+            default -> throw new BadRequestException(this, "Unrecognized action " + action);
+        }
+    }
+
+    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
+        if (!access.canWrite()) {
+            throw new NotAuthorizedException(this);
+        }
+        if (!subject.hasProperty(FS.dateDeleted)) {
+            throw new ConflictException(this, "Cannot restore");
+        }
+        var date = subject.getProperty(FS.dateDeleted).getLiteral();
+        var user = subject.getProperty(FS.deletedBy).getResource();
+        undelete(subject, date, user);
+    }
+
+    private void undelete(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
+        if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
+            resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
+
+            resource.listProperties(FS.contains)
+                    .forEachRemaining(statement -> undelete(statement.getResource(), date, user));
+        }
     }
 }

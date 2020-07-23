@@ -7,27 +7,25 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
 import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.ReadableMetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
-import io.fairspace.saturn.services.permissions.PermissionNotificationHandler;
-import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.LocalBlobStore;
 import io.fairspace.saturn.webdav.WebDAVServlet;
-import io.milton.http.ResourceFactory;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.util.Symbol;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.services.permissions.PermissionsService.PERMISSIONS_SERVICE;
 import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -35,18 +33,20 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 @Slf4j
 @Getter
 public class Services {
+    public static final Symbol FS_ROOT = Symbol.create("file_system_root");
+
     private final Config config;
     private final Transactions transactions;
 
     private final WorkspaceService workspaceService;
     private final UserService userService;
     private final MailService mailService;
-    private final PermissionsService permissionsService;
+    private final MetadataPermissions metadataPermissions;
     private final ChangeableMetadataService metadataService;
     private final ChangeableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
     private final BlobStore blobStore;
-    private final ResourceFactory davFactory;
+    private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final FilteredDatasetGraph filteredDatasetGraph;
 
@@ -58,19 +58,21 @@ public class Services {
         userService = new UserService(config.auth, transactions);
 
         mailService = new MailService(config.mail);
-        var permissionNotificationHandler = new PermissionNotificationHandler(transactions, userService, mailService, config.publicUrl);
-        permissionsService = new PermissionsService(transactions, permissionNotificationHandler, CONFIG.publicUrl + "/api/v1/webdav/");
-        dataset.getContext().set(PERMISSIONS_SERVICE, permissionsService);
+        blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, mailService);
+        dataset.getContext().set(FS_ROOT, davFactory.root);
+        davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        workspaceService = new WorkspaceService(transactions, permissionsService);
+        workspaceService = new WorkspaceService(transactions, mailService);
 
+        metadataPermissions = new MetadataPermissions(workspaceService, davFactory);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI, permissionsService);
+        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
                 new ProtectMachineOnlyPredicatesValidator(),
-                new PermissionCheckingValidator(permissionsService),
+                new PermissionCheckingValidator(metadataPermissions),
                 new DeletionValidator(),
                 new WorkspaceStatusValidator(),
                 new ShaclValidator());
@@ -86,15 +88,11 @@ public class Services {
                 new InverseForUsedPropertiesValidator(dataset)
         );
 
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, permissionsService);
+        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         userVocabularyService = new ChangeableMetadataService(transactions, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
         metaVocabularyService = new ReadableMetadataService(transactions, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
-        blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, permissionsService);
-        davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
-
-        filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), permissionsService);
+        filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
     }
 }

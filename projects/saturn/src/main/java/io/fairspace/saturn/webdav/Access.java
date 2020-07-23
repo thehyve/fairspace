@@ -1,21 +1,11 @@
-package io.fairspace.saturn.services.permissions;
-
-import java.util.EnumSet;
+package io.fairspace.saturn.webdav;
 
 public enum Access {
     None,
-    Member,
     List,
     Read,
     Write,
     Manage;
-
-    public static EnumSet<Access> WorkspaceAccess = EnumSet.of(None, Member, Manage);
-    public static EnumSet<Access> CollectionAccess = EnumSet.of(None, List, Read, Write, Manage);
-
-    public boolean isMember() {
-        return compareTo(Member) >= 0;
-    }
 
     public boolean canList() {
         return compareTo(List) >= 0;
@@ -31,5 +21,9 @@ public enum Access {
 
     public boolean canManage() {
         return compareTo(Manage) >= 0;
+    }
+     
+    public static <T extends Enum<T>> T max(T x, T y) {
+        return x.compareTo(y) > 0 ? x : y;
     }
 }

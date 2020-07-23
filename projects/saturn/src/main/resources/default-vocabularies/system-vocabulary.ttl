@@ -126,7 +126,7 @@ fs:CollectionShape a fs:ClassShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:fixedShape true ;
     fs:systemProperties
-        fs:connectionString,
+        fs:ownedByShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -136,7 +136,7 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape ;
     sh:property
-        fs:connectionString,
+        fs:ownedByShape,
         fs:createdByShape,
         fs:dateCreatedShape,
         fs:modifiedByShape,
@@ -146,8 +146,8 @@ fs:CollectionShape a fs:ClassShape ;
         fs:labelShape,
         fs:commentShape .
 
-fs:UserShape a fs:ClassShape ;
-    sh:description "Description for fs:User" ;
+fs:User a fs:ClassShape ;
+    sh:description "User" ;
     sh:name "User" ;
     sh:targetClass fs:User ;
     fs:machineOnly true ;
@@ -156,7 +156,13 @@ fs:UserShape a fs:ClassShape ;
     sh:property
         fs:labelShape,
         fs:commentShape,
-        fs:userEmailShape .
+        fs:userEmailShape,
+        fs:canListShape,
+        fs:canReadShape,
+        fs:canWriteShape,
+        fs:canManageShape,
+        fs:isMemberOfShape,
+        fs:isManagerOfShape .
 
 fs:Workspace a fs:ClassShape ;
   sh:description "Resource description for the current workspace." ;
@@ -171,6 +177,10 @@ fs:Workspace a fs:ClassShape ;
       fs:statusModifiedByShape ;
   sh:property
       fs:labelShape,
+      fs:canListShape,
+      fs:canReadShape,
+      fs:canWriteShape,
+      fs:canManageShape,
       [
         a fs:DatatypePropertyShape ;
         sh:path fs:workspaceDescription ;
@@ -254,15 +264,6 @@ fs:dateDeletedShape a fs:DatatypePropertyShape ;
     fs:fixedShape true ;
     sh:path fs:dateDeleted .
 
-fs:connectionString a fs:DatatypePropertyShape ;
-    sh:maxCount 1 ;
-    sh:name "Connection string" ;
-    sh:datatype xsd:string ;
-    sh:description "Connection string" ;
-    fs:machineOnly true ;
-    fs:fixedShape true ;
-    sh:path fs:connectionString .
-
 fs:fileSizeShape a fs:DatatypePropertyShape ;
     sh:name "File size" ;
     sh:description "File size in bytes" ;
@@ -312,6 +313,63 @@ fs:statusDateModifiedShape a fs:DatatypePropertyShape ;
     sh:path fs:statusDateModified .
 
 ## Relation Shapes
+
+fs:ownedByShape a fs:RelationShape ;
+    sh:name "Owned By" ;
+    sh:description "Owner workspace" ;
+    sh:class fs:Workspace ;
+    sh:maxCount 1 ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:ownedBy .
+
+fs:canListShape a fs:RelationShape ;
+    sh:name "Can list" ;
+    sh:description "Visible collections" ;
+    sh:class fs:Collection ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:list .
+
+fs:canReadShape a fs:RelationShape ;
+    sh:name "Can read" ;
+    sh:description "Can read collections" ;
+    sh:class fs:Collection ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:read .
+
+fs:canWriteShape a fs:RelationShape ;
+    sh:name "Can write to" ;
+    sh:description "Can write to collections" ;
+    sh:class fs:Collection ;
+    fs:machineOnly true ;
+    fs:fixedShape true ;
+    sh:path fs:write .
+
+ fs:canManageShape a fs:RelationShape ;
+     sh:name "Can manage" ;
+     sh:description "Can manage collections" ;
+     sh:class fs:Collection ;
+     fs:machineOnly true ;
+     fs:fixedShape true ;
+     sh:path fs:manage .
+
+ fs:isMemberOfShape a fs:RelationShape ;
+     sh:name "Is a member of" ;
+     sh:description "Is a member of workspaces." ;
+     sh:class fs:Workspace;
+     fs:machineOnly true ;
+     fs:fixedShape true ;
+     sh:path fs:isMemberOf .
+
+ fs:isManagerOfShape a fs:RelationShape ;
+     sh:name "Is a manager of" ;
+     sh:description "Is a manager of workspaces" ;
+     sh:class fs:Workspace;
+     fs:machineOnly true ;
+     fs:fixedShape true ;
+     sh:path fs:isManagerOf .
 
 fs:createdByShape a fs:RelationShape ;
     sh:name "Created By" ;

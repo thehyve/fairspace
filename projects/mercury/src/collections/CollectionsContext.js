@@ -14,7 +14,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
 
 
     const {data: collections = [], error, loading, refresh} = useAsync(
-        () => collectionApi.getCollections(currentUser, showDeleted),
+        () => collectionApi.getCollections(showDeleted),
         [currentUser, showDeleted]
     );
 

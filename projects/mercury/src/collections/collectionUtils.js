@@ -14,13 +14,18 @@ export const mapCollectionPermissions: CollectionPermissions = (access) => ({
     canManage: compareTo(access, "Manage"),
     canWrite: compareTo(access, "Write"),
     canRead: compareTo(access, "Read"),
-    canList: compareTo(access, "List"),
 });
 
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({
     [LABEL_URI]: [{value: name}],
     [COMMENT_URI]: [{value: description}]
 });
+
+const parsePermissions = (value) => ((typeof value !== 'string')
+    ? []
+    : value.split(',')
+        .map(s => s.split(' '))
+        .map(([iri, access]) => ({iri, access})));
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,
@@ -31,5 +36,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,
     dateModified: properties.lastmod,
-    ...(properties.access && mapCollectionPermissions(properties.access))
+    ...(properties.access && mapCollectionPermissions(properties.access)),
+    userPermissions: parsePermissions(properties.userPermissions),
+    workspacePermissions: parsePermissions(properties.workspacePermissions)
 });

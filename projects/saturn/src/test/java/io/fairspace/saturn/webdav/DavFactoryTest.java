@@ -1,7 +1,7 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.PermissionsService;
+import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
@@ -9,6 +9,7 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.*;
+import org.apache.jena.rdf.model.Model;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,12 +19,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -34,24 +36,25 @@ public class DavFactoryTest {
     public static final QName VERSION = new QName(FS.NS, "version");
     private static final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
-    private PermissionsService permissions;
+    private MetadataPermissions permissions;
     @Mock
     BlobStore store;
     @Mock
     InputStream input;
+    @Mock
+    MailService mailService;
     private org.eclipse.jetty.server.Request request;
 
     private ResourceFactory factory;
+    private Model model = createTxnMem().getDefaultModel();
 
     @Before
     public void before() {
-        factory = new DavFactory(createTxnMem().getDefaultModel().createResource(baseUri), store, permissions);
+        factory = new DavFactory(model.createResource(baseUri), store, mailService);
 
         setupRequestContext();
         request = getCurrentRequest();
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 3, "md5"));
-
-        when(permissions.getPermission(any())).thenReturn(Access.Manage);
     }
 
 
@@ -120,14 +123,19 @@ public class DavFactoryTest {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }
 
-    @Test(expected = NotAuthorizedException.class)
+    @Test
     public void testInaccessibleResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        when(permissions.getPermission(any())).thenReturn(Access.None);
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"));
 
-        factory.getResource(null, BASE_PATH + "coll");
+        assertTrue(root.getChildren().isEmpty());
+
+        var coll = root.child("coll");
+        for (var method: Request.Method.values()) {
+            assertFalse("Shouldn't be able to " + method, coll.authorise(null, method, null));
+        }
     }
 
     @Test
@@ -182,7 +190,8 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        when(permissions.getPermission(any())).thenReturn(Access.Read);
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"))
+                .add(createResource(baseUri + "/coll"), FS.canRead, model.createResource(baseUri + "/coll"));
 
         assertFalse(root.child("coll").authorise(null, Request.Method.PUT, null));
     }
@@ -241,7 +250,7 @@ public class DavFactoryTest {
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", FILE_SIZE + 1, "md5"));
         ((ReplaceableResource) file).replaceContent(input, FILE_SIZE + 1);
 
-        ((MultiNamespaceCustomPropertyResource)coll.child("file")).setProperty(VERSION, 1);
+        ((PostableResource)coll.child("file")).processForm(Map.of("action", "revert", "version", "1"), Map.of());
 
         var ver3 = coll.child("file");
         assertEquals(3, ((MultiNamespaceCustomPropertyResource) ver3).getProperty(VERSION));
@@ -292,9 +301,9 @@ public class DavFactoryTest {
         ((DeletableResource)file).delete();
 
         when(request.getHeader("Show-Deleted")).thenReturn("on");
-        var deleted = (MultiNamespaceCustomPropertyResource) coll.child("file");
+        var deleted = (PostableResource) coll.child("file");
 
-        deleted.setProperty(new QName(FS.NS, "dateDeleted"), null);
+        deleted.processForm(Map.of("action", "undelete"), Map.of());
 
         var restored = (MultiNamespaceCustomPropertyResource) coll.child("file");
         assertNull(restored.getProperty(new QName(FS.NS, "dateDeleted")));

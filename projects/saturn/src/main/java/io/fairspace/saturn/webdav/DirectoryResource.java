@@ -1,11 +1,9 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Range;
 import io.milton.http.Request;
-import io.milton.http.XmlWriter;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -72,9 +70,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         var t = WebDAVServlet.timestampLiteral();
 
-        subj
-                .addProperty(RDFS.label, newName)
-                .addProperty(FS.createdBy, DavFactory.currentUserResource())
+        subj.addProperty(RDFS.label, newName)
+                .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
         subject.addProperty(FS.contains, subj);
@@ -89,8 +86,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     @Override
     public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
         return subject.listProperties(FS.contains)
-                .mapWith(Statement::getObject)
-                .mapWith(RDFNode::asResource)
+                .mapWith(Statement::getResource)
                 .mapWith(r -> factory.getResource(r, access))
                 .filterDrop(Objects::isNull)
                 .toList();
@@ -106,26 +102,26 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
-        var w = new XmlWriter(out);
-        w.open("html");
-        w.open("head");
-        w.close("head");
-        w.open("body");
-        w.begin("h1").open().writeText(this.getName()).close();
-        w.open("table");
-        for (var r : getChildren()) {
-            w.open("tr");
-            w.open("td");
-            w.begin("a").writeAtt("href", r.getName() + (r instanceof FolderResource ? "/" : "")).open().writeText(r.getName()).close();
-            w.close("td");
-            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
-            w.begin("td").open().writeText((r instanceof FileResource) ? ((FileResource) r).getContentLength() + " bytes" : "DIR").close();
-            w.close("tr");
-        }
-        w.close("table");
-        w.close("body");
-        w.close("html");
-        w.flush();
+//        var w = new XmlWriter(out);
+//        w.open("html");
+//        w.open("head");
+//        w.close("head");
+//        w.open("body");
+//        w.begin("h1").open().writeText(this.getName()).close();
+//        w.open("table");
+//        for (var r : getChildren()) {
+//            w.open("tr");
+//            w.open("td");
+//            w.begin("a").writeAtt("href", r.getName() + (r instanceof FolderResource ? "/" : "")).open().writeText(r.getName()).close();
+//            w.close("td");
+//            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
+//            w.begin("td").open().writeText((r instanceof FileResource) ? ((FileResource) r).getContentLength() + " bytes" : "DIR").close();
+//            w.close("tr");
+//        }
+//        w.close("table");
+//        w.close("body");
+//        w.close("html");
+//        w.flush();
     }
 
     @Override

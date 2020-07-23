@@ -46,7 +46,7 @@ public class ServicesTest {
 
     @Test
     public void getPermissionsService() {
-        assertNotNull(svc.getPermissionsService());
+        assertNotNull(svc.getMetadataPermissions());
     }
 
     @Test

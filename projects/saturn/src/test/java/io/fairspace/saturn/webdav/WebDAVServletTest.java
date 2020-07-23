@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Vector;
 
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -55,6 +56,8 @@ public class WebDAVServletTest {
         when(factory.getResource(any(), any())).thenReturn(resource);
         when(resource.authorise(any(), any(), any())).thenReturn(true);
         when(resource.createNew(any(), any(), any(), any())).thenReturn(resource);
+
+        setupRequestContext();
 
         doAnswer(invocation -> {
             ThrowingConsumer job = invocation.getArgument(0);

@@ -3,10 +3,16 @@ import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import {MetadataAPI} from "../metadata/common/LinkedDataAPI";
 import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
-import PermissionAPI from "../permissions/PermissionAPI";
 import type {User} from "../users/UsersAPI";
 
 const rootUrl = "";
+
+export type Access = "None" | "List" | "Read" | "Write" | "Manage";
+
+export type Permission = {
+    iri: string; // iri
+    access: Access;
+}
 
 export type CollectionProperties = {|
     name: string;
@@ -20,7 +26,9 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
-    canList: boolean;
+    access?: Access;
+    userPermissions: Array<Permission>;
+    workspacePermissions: Array<Permission>;
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
@@ -41,25 +49,15 @@ export type CollectionAuditInfo = {|
 
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;
 
-
 class CollectionAPI {
-    getCollectionPermissions(iri: string, userIri: string): Promise<CollectionPermissions> {
-        return PermissionAPI.getPermissions(iri).then(permissions => permissions.find(p => p.user === userIri));
-    }
-
     getCollectionProperties(name: string): Promise<Collection> {
         return FileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
     getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
-        if (currentUser.iri) {
-            return FileAPI.list(rootUrl, showDeleted)
-                .then(collections => Promise.all(collections.map(c => (
-                    this.getCollectionProperties(c.basename)
-                ))))
-                .catch(handleHttpError("Failure when retrieving a list of collections"));
-        }
-        return Promise.resolve([]);
+        return FileAPI.list(rootUrl, showDeleted)
+            .then(collections => collections.map(mapFilePropertiesToCollection))
+            .catch(handleHttpError("Failure when retrieving a list of collections"));
     }
 
     addCollection(collection: CollectionProperties, vocabulary): Promise<void> {
@@ -78,12 +76,12 @@ class CollectionAPI {
     }
 
     deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
-        return FileAPI.delete(collection.name, showDeleted)
+        return FileAPI.delete(collection.location, showDeleted)
             .catch(handleHttpError("Failure while deleting collection"));
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
-        return FileAPI.undelete(collection.name)
+        return FileAPI.undelete(collection.location)
             .catch(handleHttpError("Failure while undeleting collection"));
     }
 
@@ -95,7 +93,18 @@ class CollectionAPI {
     updateCollection(collection: Collection, vocabulary): Promise<void> {
         const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
         return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
-            .catch(handleHttpError("Failure while updating a collection"));
+            .catch(e => {
+                console.error(e);
+                throw Error("Failure while updating a collection");
+            });
+    }
+
+    setAccessMode(location: String, mode) {
+        return FileAPI.post(location, {action: 'set_access_mode', mode});
+    }
+
+    setPermission(location, principal, access) {
+        return FileAPI.post(location, {action: 'set_permission', principal, access});
     }
 }
 

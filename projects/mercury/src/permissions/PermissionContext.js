@@ -5,6 +5,7 @@ import {getDisplayName, getEmail} from "../users/userUtils";
 import useAsync from "../common/hooks/UseAsync";
 import UsersContext from "../users/UsersContext";
 
+// Deprecated and broken
 const PermissionContext = React.createContext({});
 
 export const PermissionProvider = ({iri, children, getPermissions = PermissionAPI.getPermissions}) => {

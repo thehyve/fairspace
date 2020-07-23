@@ -1,6 +1,8 @@
 import {createClient} from "webdav";
+import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
 import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
+import {handleHttpError} from "../common/utils/httpUtils";
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -9,12 +11,15 @@ const defaultOptions = {withCredentials: true};
 const includeDetails = {...defaultOptions, details: true};
 
 export type File = {
+    iri: string;
     filename: string;
     basename: string;
     lastmod: string;
-    version: number;
+    version?: number;
     size: number;
     type: string;
+    dateCreated: string;
+    dateModified?: string;
     dateDeleted?: string;
 }
 
@@ -53,10 +58,9 @@ class FileAPI {
      * @returns {Promise<T>}
      */
     list(path, showDeleted = false): File[] {
-        const options = {...includeDetails};
+        const options = {...includeDetails, data: '<propfind><allprop /></propfind>'};
         if (showDeleted) {
             options.headers = {"Show-Deleted": "on"};
-            options.data = "<propfind><allprop /></propfind>";
         }
         return this.client().getDirectoryContents(path, options)
             .then(result => result.data
@@ -165,66 +169,20 @@ class FileAPI {
      * @returns Promise<any>
      */
     undelete(path) {
-        if (!path) return Promise.reject(Error("No path specified for undeleting"));
-        const removeDateDeletedPropRequest = ""
-            + "<?xml version=\"1.0\"?>"
-            + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
-            + "<d:remove>"
-            + "<d:prop>"
-            + "<fs:dateDeleted/>"
-            + "</d:prop>"
-            + "</d:remove>"
-            + "</d:propertyupdate>";
-
-        const requestOptions = {
-            method: "PROPPATCH",
-            headers: {
-                "Accept": "text/plain",
-                "Content-Type": "text/xml",
-                "Show-Deleted": "on"
-            },
-            responseType: "text",
-            data: removeDateDeletedPropRequest
-        };
-
-        return this.client().customRequest(path, requestOptions)
+        if (!path) return Promise.reject(new Error("No path specified for undeleting"));
+        return this.post(path, {action: 'undelete'}, true)
             .catch(e => {
-                if (e && e.response) {
-                    throw new Error("Could not undelete file or directory.");
-                }
-
-                return Promise.reject(e);
+                console.error("Could not undelete file or directory.", e);
+                throw new Error("Could not undelete file or directory.");
             });
     }
 
     revertToVersion(path, version) {
         if (!path) return Promise.reject(Error("No path specified for version reverting"));
-        const revertToVersionRequest = ""
-            + "<?xml version=\"1.0\"?>"
-            + "<d:propertyupdate xmlns:d=\"DAV:\" xmlns:fs=\"http://fairspace.io/ontology#\">"
-            + "<d:set>"
-            + "<d:prop>"
-            + `<fs:version>${version}</fs:version>`
-            + "</d:prop>"
-            + "</d:set>"
-            + "</d:propertyupdate>";
 
-        const requestOptions = {
-            method: "PROPPATCH",
-            headers: {
-                "Accept": "text/plain",
-                "Content-Type": "text/xml"
-            },
-            responseType: "text",
-            data: revertToVersionRequest
-        };
-
-        return this.client().customRequest(path, requestOptions)
-            .catch(e => {
-                if (e && e.response) {
-                    throw new Error(`Could not revert file or directory to version ${version}.`);
-                }
-                return Promise.reject(e);
+        return this.post(path, {action: 'restore', version})
+            .catch(() => {
+                throw new Error("Could not revert a file to a previous version.");
             });
     }
 
@@ -375,6 +333,22 @@ class FileAPI {
         return Promise.all(filenames.map(filename => this.undelete(filename)));
     }
 
+    post(path, data, showDeleted = false) {
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Show-Deleted": showDeleted ? "on" : "off"
+            },
+            responseType: "text",
+            data: qs.stringify(data)
+        };
+        return this.client()
+            .customRequest(path, requestOptions)
+            .catch(handleHttpError("Error performing POST request"));
+    }
+
     showFileHistory(file, startIndex, endIndex) {
         const versions = [];
         for (let i = file.version - startIndex; i >= file.version - endIndex && i >= 1; i -= 1) {
@@ -384,7 +358,7 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile: File = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
+    mapToFile = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
 }
 
 export default new FileAPI();

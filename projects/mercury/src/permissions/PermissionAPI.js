@@ -4,6 +4,7 @@ import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 const permissionsUrl = '/api/v1/permissions/';
 
+// Deprecated and broken
 class PermissionAPI {
     /**
      * Retrieves a list of permissions for a specific collection.

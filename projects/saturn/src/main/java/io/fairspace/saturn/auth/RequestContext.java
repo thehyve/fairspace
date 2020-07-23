@@ -13,6 +13,8 @@ import java.util.Optional;
 public class RequestContext {
     public static final String ADMIN_ROLE = "organisation-admin";
     public static final String VIEW_PUBLIC_METADATA = "view-public-metadata";
+    public static final String VIEW_PUBLIC_DATA = "view-public-data";
+    public static final String ADD_SHARED_METADATA = "add-shared-metadata";
 
     private static final ThreadLocal<Request> currentRequest = new ThreadLocal<>();
 
@@ -62,6 +64,14 @@ public class RequestContext {
     }
 
     public static boolean canViewPublicMetadata() {
-        return isUserInRole(VIEW_PUBLIC_METADATA);
+        return isUserInRole(VIEW_PUBLIC_METADATA) || canViewPublicData();
+    }
+
+    public static boolean canViewPublicData() {
+        return isUserInRole(VIEW_PUBLIC_DATA) || isAdmin();
+    }
+
+    public static boolean canAddSharedMetadata() {
+        return isUserInRole(ADD_SHARED_METADATA) || isAdmin();
     }
 }

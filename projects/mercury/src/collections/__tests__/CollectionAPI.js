@@ -22,10 +22,7 @@ describe('CollectionAPI', () => {
             expect(FileAPI.list).toHaveBeenCalledTimes(1);
             expect(FileAPI.list).toHaveBeenCalledWith('', false);
 
-            expect(FileAPI.stat).toHaveBeenCalledTimes(3);
-            expect(FileAPI.stat).toHaveBeenCalledWith('collection1');
-            expect(FileAPI.stat).toHaveBeenCalledWith('collection2');
-            expect(FileAPI.stat).toHaveBeenCalledWith('collection3');
+            expect(FileAPI.stat).toHaveBeenCalledTimes(0);
         });
 
         it('retrieves collections including deleted', async () => {
@@ -91,7 +88,8 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to undelete a collection', async () => {
             await CollectionAPI.undeleteCollection({
-                name: 'name1',
+                location: 'name1',
+                name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             }, {});
@@ -107,7 +105,8 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to delete a collection', async () => {
             await CollectionAPI.deleteCollection({
-                name: 'name1',
+                location: 'name1',
+                name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             });
@@ -118,7 +117,8 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to delete a collection permanently', async () => {
             await CollectionAPI.deleteCollection({
-                name: 'name1',
+                location: 'name1',
+                name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             }, true);

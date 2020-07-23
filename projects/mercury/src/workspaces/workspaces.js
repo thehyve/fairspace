@@ -1,6 +1,3 @@
-export const currentWorkspace = () => {
-    const segments = window.location.pathname.split('/');
-    return ((segments.length > 2 && segments[0] === '' && segments[1] === 'workspaces') && segments[2]) || '';
-};
+export const currentWorkspace = () => new URLSearchParams(window.location.search).get('iri');
 
-export const workspacePrefix = (workspace: string = currentWorkspace()) => (workspace ? `/workspaces/${workspace}` : '');
+export const workspacePrefix = (workspace: string = currentWorkspace()) => (workspace ? `/workspace?iri=${encodeURI(workspace)}` : '');

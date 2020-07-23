@@ -3,8 +3,6 @@ package io.fairspace.saturn.services.workspaces;
 import io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
-import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.dto.WorkspaceAccessInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,10 +19,7 @@ import static io.fairspace.saturn.vocabulary.FS.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @RDFType(WORKSPACE_URI)
-public class Workspace extends LifecycleAwarePersistentEntity implements WorkspaceAccessInfo {
-    @RDFProperty(value = ID_URI, required = true)
-    private String id;
-
+public class Workspace extends LifecycleAwarePersistentEntity {
     @RDFProperty(value = RDFS.uri + "label")
     private String name;
 
@@ -40,5 +35,6 @@ public class Workspace extends LifecycleAwarePersistentEntity implements Workspa
     @RDFProperty(value = STATUS_MODIFIED_BY_URI)
     private Node statusModifiedBy;
 
-    private Access access;
+    private boolean canCollaborate;
+    private boolean canManage;
 }
