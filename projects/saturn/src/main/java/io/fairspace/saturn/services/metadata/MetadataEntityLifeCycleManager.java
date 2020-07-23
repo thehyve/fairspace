@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
@@ -15,14 +14,12 @@ import org.apache.jena.vocabulary.RDF;
 import java.time.Instant;
 import java.util.Set;
 
-import static io.fairspace.saturn.auth.RequestContext.canAddSharedMetadata;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 @AllArgsConstructor
 public
@@ -62,9 +59,7 @@ class MetadataEntityLifeCycleManager {
     }
 
     boolean softDelete(Resource resource) {
-        if (!canAddSharedMetadata()) {
-            throw new AccessDeniedException("Insufficient permissions to delete entity " + resource.asNode());
-        }
+        // TODO: Check permissions
         var model = dataset.getNamedModel(graph.getURI());
         resource = resource.inModel(model);
         if (isMachineOnly(resource)) {
@@ -72,7 +67,7 @@ class MetadataEntityLifeCycleManager {
         }
         if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
             resource.addLiteral(FS.dateDeleted, toXSDDateTimeLiteral(Instant.now()));
-            resource.addProperty(FS.deletedBy, createResource(getUserURI().getURI()));
+            resource.addProperty(FS.deletedBy, model.wrapAsResource(getUserURI()));
             return true;
         }
         return false;
