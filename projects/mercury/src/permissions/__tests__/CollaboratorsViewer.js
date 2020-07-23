@@ -2,156 +2,174 @@
 import React from 'react';
 import {shallow} from "enzyme";
 
-import {Button, IconButton} from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import CollaboratorsViewer from "../CollaboratorsViewer";
+import PermissionsList from "../PermissionsList";
 
-const testRenderingCollaborators = (wrapper) => {
-    expect(wrapper.find('[data-testid="collaborator"]').length).toBe(4);
+const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
+    const permissionsListProps = wrapper.find(PermissionsList).first().props();
+    expect(permissionsListProps.permissions.length).toBe(numberOfCollaborators);
+    expect(permissionsListProps.selectedPrincipal).toBe(null);
 };
 
 const testOrderingOfCollaborators = (wrapper) => {
-    const collaborators = wrapper.find('[data-testid="collaborator"]');
-
-    expect(collaborators.at(0).props().primary).toEqual('Kurt Cobain');
-    expect(collaborators.at(0).props().secondary).toEqual('Manage');
-
-    expect(collaborators.at(1).props().primary).toEqual('Mariah Carey');
-    expect(collaborators.at(1).props().secondary).toEqual('Manage');
-
-    expect(collaborators.at(2).props().primary).toEqual('Michael Jackson');
-    expect(collaborators.at(2).props().secondary).toEqual('Write');
-
-    expect(collaborators.at(3).props().primary).toEqual('Bruno Mars');
-    expect(collaborators.at(3).props().secondary).toEqual('Read');
+    const permissionsListProps = wrapper.find(PermissionsList).first().props();
+    expect(permissionsListProps.permissions.map(p => p.iri)).toEqual(
+        ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id']
+    );
 };
 
-describe('PermissionsViewer', () => {
-    const mockCollaborators = [
+describe('CollaboratorsViewer', () => {
+    const mockUsers = [
         {
-            user: 'http://localhost/iri/user2-id',
-            access: 'Write',
+            iri: 'http://localhost/iri/user2-id',
+            access: 'Read',
             name: 'Michael Jackson'
         },
         {
-            user: 'http://localhost/iri/user3-id',
+            iri: 'http://localhost/iri/user3-id',
             access: 'Read',
             name: 'Bruno Mars'
         },
         {
-            user: 'http://localhost/iri/user1-id',
+            iri: 'http://localhost/iri/user1-id',
             access: 'Manage',
             name: 'Mariah Carey'
         },
         {
-            user: 'http://localhost/iri/user4-id',
+            iri: 'http://localhost/iri/user4-id',
             access: 'Manage',
             name: 'Kurt Cobain'
         }
     ];
-    const mockcurrentUserCreatorCanManage = {id: 'user4-id'};
-    const mockcurrentUserNotCreatorCanManage = {id: 'user1-id'};
-    const mockcurrentUserNotCreatorCannotManage = {id: 'user3-id'};
-    const mockCreator = 'user4-id';
-    const mockFetchPermissionsFn = jest.fn();
+    const mockCurrentUserCanManage = mockUsers[3];
+    const mockCurrentUserCannotManage = mockUsers[1];
     const mockSetPermissionFn = jest.fn();
+    const mockCollection = {
+        iri: 'http://localhost/iri/c1',
+        ownerWorkspace: 'http://localhost/iri/w1',
+        access: 'Manage',
+        canManage: true,
+        userPermissions: [
+            mockUsers[3],
+            mockUsers[2],
+            mockUsers[1],
+            mockUsers[0]
+        ],
+        workspacePermissions: []
+    };
+    const mockWorkspaces = [
+        {iri: 'http://localhost/iri/w1'},
+        {iri: 'http://localhost/iri/w2'}
+    ];
+    const mockWorkspaceUsers = [
+        mockUsers[3],
+        mockUsers[1],
+        mockUsers[0]
+    ];
+    const mockUsersWithCollectionAccess = [
+        mockUsers[1],
+        mockUsers[3]
+    ];
+    const mockWorkspaceWithCollectionAccess = null;
 
-    describe('Use Case 1: Current user is creator and can manage collection', () => {
+    describe('Use Case 1: Current user can manage collection', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
                 <CollaboratorsViewer
-                    creator={mockCreator}
-                    iri={500}
-                    currentUser={mockcurrentUserCreatorCanManage}
-                    canManage
-                    permissions={mockCollaborators}
+                    currentUser={mockCurrentUserCanManage}
+                    collection={mockCollection}
+                    usersWithCollectionAccess={mockUsersWithCollectionAccess}
+                    workspaceWithCollectionAccess={mockWorkspaceWithCollectionAccess}
+                    workspaceUsers={mockWorkspaceUsers}
+                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
-                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                 />
             );
         });
 
         it('should render all collaborators', () => {
-            testRenderingCollaborators(wrapper);
+            testRenderingCollaborators(wrapper, 2);
         });
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             testOrderingOfCollaborators(wrapper);
         });
 
-        // user can see all 4 permissions (one is disabled not hidden)
-        it('should enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find(IconButton).length).toEqual(4);
-        });
-
-        it('should render add button', () => {
-            expect(wrapper.find(Button).length).toEqual(1);
+        it('should render add buttons', () => {
+            expect(wrapper.find(Button).length).toEqual(2);
         });
     });
 
-    describe('Use Case 2: Current user is NOT creator and can NOT manage collection', () => {
+    describe('Use Case 2: Current user cannot manage collection', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
                 <CollaboratorsViewer
-                    creator={mockCreator}
-                    iri={500}
-                    canManage={false}
-                    currentUser={mockcurrentUserNotCreatorCannotManage}
-                    permissions={mockCollaborators}
+                    currentUser={mockCurrentUserCannotManage}
+                    collection={mockCollection}
+                    usersWithCollectionAccess={mockUsersWithCollectionAccess}
+                    workspaceWithCollectionAccess={mockWorkspaceWithCollectionAccess}
+                    workspaceUsers={mockWorkspaceUsers}
+                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
-                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                 />
             );
         });
 
         it('should render all collaborators', () => {
-            testRenderingCollaborators(wrapper);
+            testRenderingCollaborators(wrapper, 2);
         });
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             testOrderingOfCollaborators(wrapper);
         });
 
-        it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find('MoreActions').length).toEqual(0);
-        });
-
-        it('should NOT render add button', () => {
+        it('should NOT render add buttons', () => {
             expect(wrapper.find('[aria-label="Add"]').length).toEqual(0);
         });
     });
 
-    describe('Use Case 3: Current user is NOT creator and can manage collection', () => {
+    describe('Access to a collection is added to a new user', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
                 <CollaboratorsViewer
-                    creator={mockCreator}
-                    iri={500}
-                    canManage
-                    currentUser={mockcurrentUserNotCreatorCanManage}
-                    permissions={mockCollaborators}
+                    currentUser={mockCurrentUserCanManage}
+                    collection={mockCollection}
+                    usersWithCollectionAccess={[...mockUsersWithCollectionAccess, mockUsers[0]]}
+                    workspaceWithCollectionAccess={mockWorkspaceWithCollectionAccess}
+                    workspaceUsers={mockWorkspaceUsers}
+                    workspaces={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
-                    fetchPermissionsIfNeeded={mockFetchPermissionsFn}
                 />
             );
         });
 
         it('should render all collaborators', () => {
-            testRenderingCollaborators(wrapper);
+            testRenderingCollaborators(wrapper, 3);
+        });
+    });
+
+    describe('Access to a collection is added to an owner workspace', () => {
+        let wrapper;
+        beforeAll(() => {
+            wrapper = shallow(
+                <CollaboratorsViewer
+                    currentUser={mockCurrentUserCannotManage}
+                    collection={mockCollection}
+                    usersWithCollectionAccess={mockUsersWithCollectionAccess}
+                    workspaceWithCollectionAccess={mockWorkspaces[0]}
+                    workspaceUsers={mockWorkspaceUsers}
+                    workspaces={mockWorkspaces}
+                    setPermission={mockSetPermissionFn}
+                />
+            );
         });
 
-        it('should order permissions by the access rank (Manage-Write-Read)', () => {
-            testOrderingOfCollaborators(wrapper);
-        });
-
-        it('should NOT enable current user to alter all collaborator\'s permissions', () => {
-            expect(wrapper.find(IconButton).some('[disabled]')).toBeTruthy();
-        });
-
-        it('should render add button', () => {
-            expect(wrapper.find(Button).length).toEqual(1);
+        it('should render all collaborators', () => {
+            testRenderingCollaborators(wrapper, 3);
         });
     });
 });

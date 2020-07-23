@@ -9,7 +9,7 @@ export const sortPermissions = (permissions) => {
         return [];
     }
 
-    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('name')));
+    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('iri')));
 };
 
 export const compareTo: boolean = (currentAccess, baseAccess) => (

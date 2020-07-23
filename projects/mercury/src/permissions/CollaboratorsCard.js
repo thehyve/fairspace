@@ -5,7 +5,7 @@ import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles}
 import classnames from "classnames";
 
 import {Group} from "@material-ui/icons";
-import PermissionsContainer from "./CollaboratorsContainer";
+import CollaboratorsContainer from "./CollaboratorsContainer";
 import {getUsersWithCollectionAccess} from "../users/userUtils";
 
 const styles = theme => ({
@@ -94,7 +94,7 @@ export const CollaboratorsCard = ({classes, collection, workspaceUsers, workspac
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    <PermissionsContainer
+                    <CollaboratorsContainer
                         workspaces={workspaces}
                         workspaceUsers={workspaceUsers}
                         collection={collection}

@@ -4,6 +4,7 @@ import {Button} from '@material-ui/core';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
 import UserSelect from "../UserSelect";
+import {AccessRights} from "../permissionUtils";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
@@ -11,7 +12,6 @@ describe('AlterPermissionDialog', () => {
 
     const mockSetPermissionFn = jest.fn();
     const mockUsers = [
-
         {name: 'Mariah Carey', iri: 'http://localhost/iri/user1-id'},
         {name: 'Michael Jackson', iri: 'http://localhost/iri/user2-id'},
         {name: 'Bruno Mars', iri: 'http://localhost/iri/user3-id'},
@@ -33,10 +33,14 @@ describe('AlterPermissionDialog', () => {
         id: 'user1-id',
         iri: 'http://localhost/iri/user1-id'
     };
-    const mockCollectionId = 500;
+    const mockCollection = {
+        iri: 'http://localhost/iri/c1',
+        location: 'c1'
+    };
     const mockPermission = {
         iri: 'http://localhost/iri/user2-id',
-        access: 'Write'
+        access: 'Write',
+        name: 'Michael Jackson'
     };
 
     let wrapper;
@@ -54,19 +58,20 @@ describe('AlterPermissionDialog', () => {
         wrapper = shallow(<AlterPermissionDialog
             open={false}
             classes={{}}
-            permission={null}
-            collectionId={mockCollectionId}
-            collaborators={mockCollaborators}
+            accessRights={AccessRights}
+            collection={mockCollection}
+            usersWithCollectionAccess={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
             setPermission={mockSetPermissionFn}
             users={mockUsers}
+            title="Select access right for a collaborator"
         />);
 
         // initial state if it's open or not
         expect(wrapper.find('[data-testid="permissions-dialog"]').prop('open')).toBeFalsy();
 
         // title =Share with
-        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Add collaborator');
+        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Select access right for a collaborator');
 
         // render collaborator selector
         expect(wrapper.find(UserSelect).prop('value')).toBe(null);
@@ -90,14 +95,13 @@ describe('AlterPermissionDialog', () => {
             <AlterPermissionDialog
                 open
                 classes={{}}
-                user={mockPermission.iri}
+                user={mockPermission}
                 access={mockPermission.access}
-                iri={mockPermission.iri}
-                collectionId={mockCollectionId}
-                collaborators={mockCollaborators}
+                accessRights={AccessRights}
+                collection={mockCollection}
                 currentUser={mockCurrentLoggedUser}
                 setPermission={mockSetPermissionFn}
-                users={mockUsers}
+                title="Select access right for a collaborator"
             />
         );
 

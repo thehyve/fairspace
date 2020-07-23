@@ -25,7 +25,7 @@ import {getDisplayName, isDataSteward} from "../users/userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import PermissionsCard from "../permissions/CollaboratorsCard";
+import CollaboratorsCard from "../permissions/CollaboratorsCard";
 import CollectionShareCard from "../permissions/SharesCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
@@ -245,7 +245,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </CardContent>
                 </Card>
 
-                <PermissionsCard
+                <CollaboratorsCard
                     collection={collection}
                     workspaceUsers={workspaceUsers}
                     workspaces={workspaces}

@@ -7,8 +7,8 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import PermissionsList from "./PermissionsList";
 
-const CollaboratorsViewer = ({collection, usersWithCollectionAccess, workspaceWithCollectionAccess, workspaceUsers, workspaces = [],
-    setPermission, error, loading, currentUser}) => {
+const CollaboratorsViewer = ({collection, usersWithCollectionAccess, workspaceWithCollectionAccess,
+    workspaceUsers, workspaces = [], currentUser, setPermission, error, loading}) => {
     const [showPermissionDialog, setShowPermissionDialog] = useState(false);
     const [selectedPrincipal, setSelectedPrincipal] = useState(null);
 

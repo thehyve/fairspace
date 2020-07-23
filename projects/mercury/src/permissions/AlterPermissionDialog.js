@@ -200,7 +200,7 @@ AlterPermissionDialog.propTypes = {
     onClose: PropTypes.func,
     title: PropTypes.string,
     access: PropTypes.string,
-    user: PropTypes.string,
+    user: PropTypes.object,
     collection: PropTypes.object,
     users: PropTypes.array,
     usersWithCollectionAccess: PropTypes.array,

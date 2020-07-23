@@ -92,6 +92,7 @@ export const PermissionsList = ({permissions, collection, setPermission, current
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap'
                                     }}
+                                    data-testid="permission"
                                 />
                                 {collection.canManage && (
                                     <ListItemSecondaryAction>
