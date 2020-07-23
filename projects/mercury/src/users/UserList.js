@@ -91,7 +91,7 @@ const UserList = (props: UserListProps) => {
             <DialogContent>
                 <PermissionCandidateSelect
                     autoFocus
-                    users={users}
+                    permissionCandidates={users}
                     filter={u => u.iri !== currentUser.iri && workspaceUsersWithRoles.find(c => c.iri === u.iri) === undefined}
                     onChange={setUserToAdd}
                     placeholder="Please select a user"
