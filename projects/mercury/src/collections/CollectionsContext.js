@@ -23,6 +23,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const deleteCollection = (collection: CollectionProperties) => collectionApi.deleteCollection(collection, showDeleted).then(refresh);
     const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh);
     const relocateCollection = (oldLocation: string, newLocation: string) => collectionApi.relocateCollection(oldLocation, newLocation).then(refresh);
+    const setPermission = (location: string, principal: string, access: string) => collectionApi.setPermission(location, principal, access).then(refresh);
 
     return (
         <CollectionsContext.Provider
@@ -36,6 +37,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 undeleteCollection,
                 updateCollection,
                 relocateCollection,
+                setPermission,
                 showDeleted,
                 setShowDeleted
             }}

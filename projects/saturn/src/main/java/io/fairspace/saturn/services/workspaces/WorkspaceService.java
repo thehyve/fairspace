@@ -136,6 +136,22 @@ public class WorkspaceService {
         return updated;
     }
 
+    public void deleteWorkspace(Node iri) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException();
+        }
+        validate(iri != null, "No IRI provided");
+        tx.executeWrite(ds -> {
+            var m = ds.getDefaultModel();
+            var r = m.wrapAsResource(iri);
+            validateResource(r, FS.Workspace);
+            validate(!m.contains(null, FS.ownedBy, r), "Workspace is not empty");
+
+            m.removeAll(r, null, null).removeAll(null, null, r);
+        });
+        audit("WS_DELETE", "workspace", iri);
+    }
+
     public Map<Node, WorkspaceRole> getUsers(Node iri) {
         var result = new HashMap<Node, WorkspaceRole>();
         tx.executeRead(ds -> {

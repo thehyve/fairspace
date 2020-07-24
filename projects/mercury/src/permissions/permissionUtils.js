@@ -9,7 +9,7 @@ export const sortPermissions = (permissions) => {
         return [];
     }
 
-    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('name')));
+    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('iri')));
 };
 
 export const compareTo: boolean = (currentAccess, baseAccess) => (
@@ -21,7 +21,7 @@ export const compareTo: boolean = (currentAccess, baseAccess) => (
  * - has manage access to a resource
  * - permission is not his/hers
  */
-export const canAlterPermission = (userCanManage, permission, currentLoggedUser) => {
-    const isSomeoneElsePermission = currentLoggedUser.iri !== permission.user;
-    return userCanManage && isSomeoneElsePermission;
+export const canAlterPermission = (canManage, user, currentLoggedUser) => {
+    const isSomeoneElsePermission = currentLoggedUser.iri !== user.iri;
+    return canManage && isSomeoneElsePermission;
 };

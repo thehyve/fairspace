@@ -45,6 +45,9 @@ export type CollectionAuditInfo = {|
     modifiedBy?: string; // iri
     dateDeleted?: string;
     deletedBy?: string; // iri
+    status?: string; // TODO use enum instead of any string
+    statusDateModified?: string;
+    statusModifiedBy?: string; // iri
 |};
 
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;

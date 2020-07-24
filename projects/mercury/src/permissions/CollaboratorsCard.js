@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
 import PropTypes from "prop-types";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import LockOpen from "@material-ui/icons/LockOpen";
 import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
 import classnames from "classnames";
 
-import PermissionsContainer from "./PermissionsContainer";
+import {Group} from "@material-ui/icons";
+import {getUsersWithCollectionAccess} from "../users/userUtils";
+import CollaboratorsViewer from "./CollaboratorsViewer";
 
 const styles = theme => ({
     expand: {
@@ -36,17 +37,25 @@ const styles = theme => ({
     }
 });
 
-export const PermissionsCard = ({classes, permissions, iri, canManage = false, maxCollaboratorIcons = 5}) => {
+export const CollaboratorsCard = ({classes, collection, workspaceUsers, workspaces, maxCollaboratorIcons = 5}) => {
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
 
-    const permissionIcons = permissions
+    const collaborators = getUsersWithCollectionAccess(workspaceUsers, collection.userPermissions);
+    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace) || {access: 'None'};
+    const ownerWorkspace = {
+        iri: collection.ownerWorkspace,
+        name: workspaces.find(w => w.iri === collection.ownerWorkspace).name,
+        access: ownerWorkspaceAccess.access
+    };
+
+    const permissionIcons = collaborators
         .slice(0, maxCollaboratorIcons)
-        .map(({user, userName}) => (
+        .map(({iri, name}) => (
             <Avatar
-                key={user}
-                title={userName}
+                key={iri}
+                title={name}
                 src="/public/images/avatar.png"
                 className={classes.avatar}
             />
@@ -55,7 +64,11 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
     const cardHeaderAction = (
         <>
             {permissionIcons}
-            {permissions.length > maxCollaboratorIcons ? <div className={classes.additionalCollaborators}>+ {permissions.length - maxCollaboratorIcons}</div> : ''}
+            {collaborators.length > maxCollaboratorIcons ? (
+                <div className={classes.additionalCollaborators}>
+                    + {collaborators.length - maxCollaboratorIcons}
+                </div>
+            ) : ''}
             <IconButton
                 className={classnames(classes.expand, {
                     [classes.expandOpen]: expanded,
@@ -77,14 +90,17 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
                 titleTypographyProps={{variant: 'h6'}}
                 title="Collaborators"
                 avatar={(
-                    <LockOpen />
+                    <Group />
                 )}
+                subheader="Add access rights on the collection to owner workspace or individual members."
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <PermissionsContainer
-                        iri={iri}
-                        canManage={canManage}
+                <CardContent style={{paddingTop: 0}}>
+                    <CollaboratorsViewer
+                        collaboratorCandidates={workspaceUsers}
+                        collection={collection}
+                        collaborators={collaborators}
+                        ownerWorkspace={ownerWorkspace}
                     />
                 </CardContent>
             </Collapse>
@@ -92,11 +108,11 @@ export const PermissionsCard = ({classes, permissions, iri, canManage = false, m
     );
 };
 
-PermissionsCard.propTypes = {
+CollaboratorsCard.propTypes = {
     classes: PropTypes.object,
-    iri: PropTypes.string.isRequired,
-    canManage: PropTypes.bool,
+    collection: PropTypes.object.isRequired,
+    workspaceUsers: PropTypes.array.isRequired,
     maxCollaboratorIcons: PropTypes.number
 };
 
-export default withStyles(styles)(PermissionsCard);
+export default withStyles(styles)(CollaboratorsCard);

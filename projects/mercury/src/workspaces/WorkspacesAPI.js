@@ -5,6 +5,11 @@ import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 const workspacesUrl = "/api/v1/workspaces/";
 
+export type WorkspaceUserRole = {
+    iri: string;
+    role: string;
+};
+
 export type WorkspacePermissions = {|
     canCollaborate: boolean;
     canManage: boolean;
@@ -14,9 +19,6 @@ export type WorkspaceProperties = {|
     iri: string;
     name?: string;
     description?: string;
-    status: string;
-    statusDateModified?: string;
-    statusModifiedBy?: string; // iri
 |}
 
 export type Resource = {|
@@ -47,11 +49,18 @@ class WorkspacesAPI {
             headers: {Accept: 'application/json'},
         })
             .then(extractJsonData)
-            .catch(handleHttpError("Failure while updating a workspace status"));
+            .catch(handleHttpError("Failure while updating a workspace"));
     }
 
-    getWorkspaceUsers(iri: string): Promise<void> {
-        return axios.get(`${workspacesUrl}/users/?workspace=${encodeURI(iri)}`, {
+    deleteWorkspace(workspaceIri: string): Promise<WorkspaceProperties> {
+        return axios.delete(`${workspacesUrl}?workspace=${encodeURI(workspaceIri)}`, {
+            headers: {Accept: 'application/json'},
+        })
+            .catch(handleHttpError("Failure while deleting a workspace"));
+    }
+
+    getWorkspaceRoles(workspaceIri: string): Promise<WorkspaceUserRole[]> {
+        return axios.get(`${workspacesUrl}users/?workspace=${encodeURI(workspaceIri)}`, {
             headers: {Accept: 'application/json'},
         })
             .then(extractJsonData)
@@ -60,7 +69,9 @@ class WorkspacesAPI {
     }
 
     setWorkspaceRole(workspace: string, user: string, role: string): Promise<void> {
-        return axios.patch(`${workspacesUrl}/users/`, JSON.stringify({workspace, user, role}), {})
+        return axios.patch(`${workspacesUrl}users/`, JSON.stringify({workspace, user, role}), {
+            headers: {'Content-type': 'application/json', 'Accept': 'application/json'}
+        })
             .catch(handleHttpError("Failure while updating a workspace role"));
     }
 }
