@@ -29,10 +29,6 @@ import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static java.lang.Integer.parseInt;
 
 class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
-    private static final QName VERSION_PROPERTY = new QName(FS.NS, "version");
-    private static final PropertySource.PropertyMetaData VERSION_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Integer.class);
-    private static final List<QName> FILE_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, VERSION_PROPERTY);
-
     private int version;
     private String blobId;
     private long contentLength;
@@ -109,25 +105,10 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
         return modifiedDate;
     }
 
-    @Override
-    public List<QName> getAllPropertyNames() {
-        return FILE_PROPERTIES;
-    }
 
-    @Override
-    public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
-        if (name.equals(VERSION_PROPERTY)) {
-            return VERSION_PROPERTY_META;
-        }
-        return super.getPropertyMetaData(name);
-    }
-
-    @Override
-    public Object getProperty(QName name) {
-        if (name.equals(VERSION_PROPERTY)) {
-            return version;
-        }
-        return super.getProperty(name);
+    @Property
+    public int getVersion() {
+        return version;
     }
 
     @Override
