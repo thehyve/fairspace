@@ -270,7 +270,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!access.canManage()) {
             throw new NotAuthorizedException(this);
         }
-        if (getAvailableStatusesSet().contains(status)) {
+        if (!getAvailableStatusesSet().contains(status)) {
             throw new ConflictException(this);
         }
         subject.removeAll(FS.status).addProperty(FS.status, status.name());
