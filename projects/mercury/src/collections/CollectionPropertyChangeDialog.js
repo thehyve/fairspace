@@ -1,5 +1,5 @@
 // @flow
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -10,7 +10,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {withStyles} from "@material-ui/core/styles";
-import CollectionsContext from "./CollectionsContext";
+import {typeNameToValue} from "../common/utils/genericUtils";
 
 export const styles = {
     root: {
@@ -34,22 +34,19 @@ export const styles = {
     },
 };
 
-export const AccessModes = ["Restricted", "MetadataPublished", "DataPublished"];
-
-export const CollectionAccessModeDialog = ({collection, changeAccessMode, onClose = () => {},
-    classes, loading, error}) => {
-    const [selectedAccessMode, setSelectedAccessMode] = useState();
+export const CollectionPropertyChangeDialog = ({collection, title, currentValue, availableValues, setValue, onClose,
+    classes}) => {
+    const [selectedValue, setSelectedValue] = useState(currentValue);
     const [openDialog, setOpenDialog] = useState(true);
-    const accessModeCandidates = AccessModes;
 
-    const handleAccessModeChange = (event) => {
-        setSelectedAccessMode(event.target.value);
+    const handleValueChange = (event) => {
+        setSelectedValue(event.target.value);
     };
 
     const handleSubmit = () => {
-        if (selectedAccessMode) {
+        if (selectedValue) {
             setOpenDialog(false);
-            changeAccessMode(collection.location, selectedAccessMode);
+            setValue(collection.location, selectedValue);
             onClose();
         }
     };
@@ -62,27 +59,25 @@ export const CollectionAccessModeDialog = ({collection, changeAccessMode, onClos
     return (
         <Dialog
             open={openDialog}
-            // onEnter={this.handleOnEnter}
-            // onClose={this.handleClose}
-            data-testid="permissions-dialog"
+            data-testid="property-change-dialog"
         >
-            <DialogTitle id="scroll-dialog-title">Select collection access mode</DialogTitle>
+            <DialogTitle id="property-change-dialog-title">{title}</DialogTitle>
             <DialogContent>
                 <div>
                     <FormControl className={classes.formControl}>
                         <RadioGroup
-                            aria-label="Access mode"
-                            name="access-mode"
+                            aria-label="Available values"
+                            name="collection-property-value"
                             className={classes.group}
-                            value={selectedAccessMode}
-                            onChange={handleAccessModeChange}
+                            value={selectedValue}
+                            onChange={handleValueChange}
                         >
-                            {accessModeCandidates.map(mode => (
+                            {availableValues.map(mode => (
                                 <FormControlLabel
                                     key={mode}
                                     value={mode}
                                     control={<Radio />}
-                                    label={mode}
+                                    label={typeNameToValue(mode)}
                                 />
                             ))}
                         </RadioGroup>
@@ -93,7 +88,7 @@ export const CollectionAccessModeDialog = ({collection, changeAccessMode, onClos
                 <Button
                     onClick={handleSubmit}
                     color="primary"
-                    disabled={Boolean(!selectedAccessMode || loading || error)}
+                    disabled={Boolean(!selectedValue)}
                     data-testid="submit"
                 >
                     Save
@@ -109,17 +104,4 @@ export const CollectionAccessModeDialog = ({collection, changeAccessMode, onClos
     );
 };
 
-const ContextualAccessModeDialog = props => {
-    const {setAccessMode, loading, error} = useContext(CollectionsContext);
-
-    return (
-        <CollectionAccessModeDialog
-            {...props}
-            changeAccessMode={setAccessMode}
-            loading={loading}
-            error={error}
-        />
-    );
-};
-
-export default withStyles(styles)(ContextualAccessModeDialog);
+export default withStyles(styles)(CollectionPropertyChangeDialog);

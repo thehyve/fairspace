@@ -21,14 +21,10 @@ export const mapCollectionNameAndDescriptionToMetadata = (name, description) => 
     [COMMENT_URI]: [{value: description}]
 });
 
-const parseCommaSeparatedString = value => (
-    value.split(',').map(s => s.split(' ')));
-
 const parsePermissions = (value) => ((typeof value !== 'string')
-    ? [] : parseCommaSeparatedString(value).map(([iri, access]) => ({iri, access})));
+    ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
 
-const parseToArray = value => ((typeof value !== 'string')
-    ? [] : parseCommaSeparatedString(value));
+const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(','));
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,

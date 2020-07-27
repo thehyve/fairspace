@@ -108,6 +108,10 @@ class CollectionAPI {
         return FileAPI.post(location, {action: 'set_access_mode', mode});
     }
 
+    setStatus(location: String, status) {
+        return FileAPI.post(location, {action: 'set_status', status});
+    }
+
     setPermission(location, principal, access) {
         return FileAPI.post(location, {action: 'set_permission', principal, access});
     }

@@ -123,4 +123,6 @@ export const formatDateTime = (value) => {
  * @param typeName
  * @returns {string} whitespace separated string
  */
-export const typeNameToValue = typeName => typeName.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+export const typeNameToValue = typeName => (
+    (typeof typeName !== 'string') ? '' : typeName.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+);
