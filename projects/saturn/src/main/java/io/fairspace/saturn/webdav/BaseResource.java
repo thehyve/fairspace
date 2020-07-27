@@ -7,8 +7,9 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
+import io.milton.property.PropertySource.PropertyMetaData;
+import io.milton.property.PropertySource.PropertySetException;
 import io.milton.resource.*;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
@@ -17,25 +18,23 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
-import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
+import static io.milton.property.PropertySource.PropertyAccessibility.*;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor;
+import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
 
 abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
-    protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
-    private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
-    protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
-    private static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
-    protected static final QName DATE_DELETED_PROPERTY = new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName());
-    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Date.class);
-
-
     protected final DavFactory factory;
     protected final org.apache.jena.rdf.model.Resource subject;
     protected final Access access;
@@ -184,32 +183,63 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     @Override
-    public Object getProperty(QName name) {
-        if (name.equals(IRI_PROPERTY)) {
-            return subject.getURI();
-        }
-        if (name.equals(DATE_DELETED_PROPERTY)) {
-            return parseDate(subject, FS.dateDeleted);
-        }
-        return false;
+    public List<QName> getAllPropertyNames() {
+        return Stream.of(getPropertyDescriptors(getClass()))
+                .filter(p -> p.getReadMethod().isAnnotationPresent(Property.class))
+                .map(p -> new QName(FS.NS, p.getName()))
+                .collect(toList());
     }
 
     @Override
-    public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
+    public Object getProperty(QName name) {
+        try {
+            return getPropertyDescriptor(this, name.getLocalPart())
+                    .getReadMethod()
+                    .invoke(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void setProperty(QName name, Object value) throws PropertySetException, NotAuthorizedException {
+        try {
+            getPropertyDescriptor(this, name.getLocalPart())
+                    .getWriteMethod()
+                    .invoke(this, value);
+        } catch (IllegalAccessException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            if (e.getTargetException() instanceof PropertySetException) {
+                throw (PropertySetException) e.getTargetException();
+            }
+            if (e.getTargetException() instanceof NotAuthorizedException) {
+                throw (NotAuthorizedException) e.getTargetException();
+            }
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
-        if (name.equals(IRI_PROPERTY)) {
-            return IRI_PROPERTY_META;
-        }
-        if (name.equals(IS_READONLY_PROPERTY)) {
-            return IS_READONLY_PROPERTY_META;
-        }
-        if (name.equals(DATE_DELETED_PROPERTY)) {
-            return DATE_DELETED_PROPERTY_META;
+        try {
+            var pd = getPropertyDescriptor(this, name.getLocalPart());
+            if (pd != null) {
+                return new PropertyMetaData(pd.getWriteMethod() != null ? WRITABLE : READ_ONLY, pd.getPropertyType());
+            }
+        } catch (Exception ignore) {
         }
         return null;
+    }
+
+    @Property
+    public String getIri() {
+        return subject.getURI();
+    }
+
+    @Property
+    public Date getDateDeleted() {
+        return parseDate(subject, FS.dateDeleted);
     }
 
     @Override

@@ -28,8 +28,6 @@ import java.util.Objects;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
-    private static final List<QName> DIRECTORY_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
-
     public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
         super(factory, subject, access);
     }
@@ -137,11 +135,6 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     @Override
     public Long getContentLength() {
         return null;
-    }
-
-    @Override
-    public List<QName> getAllPropertyNames() {
-        return DIRECTORY_PROPERTIES;
     }
 
     @Override

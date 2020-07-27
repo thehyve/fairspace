@@ -99,7 +99,8 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .addProperty(FS.dateCreated, timestampLiteral())
                 .addProperty(FS.dateModified, timestampLiteral())
                 .addProperty(FS.modifiedBy, user)
-                .addProperty(FS.accessMode, AccessMode.Restricted.name());
+                .addProperty(FS.accessMode, AccessMode.Restricted.name())
+                .addProperty(FS.status, Status.Active.name());
 
         user.addProperty(FS.canManage, subj);
 

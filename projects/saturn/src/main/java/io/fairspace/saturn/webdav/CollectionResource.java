@@ -12,15 +12,16 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.property.PropertySource.PropertySetException;
 import io.milton.resource.DisplayNameResource;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
-import java.util.List;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
@@ -29,23 +30,25 @@ import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
     private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
     private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
     private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
     private static final QName ACCESS_PROPERTY = new QName(FS.NS, "access");
+    private static final QName ACCESS_MODE_PROPERTY = new QName(FS.accessMode.getNameSpace(), FS.accessMode.getLocalName());
+    private static final QName AVAILABLE_ACCESS_MODES_PROPERTY = new QName(FS.NS, "availableAccessModes");
     private static final QName USER_PERMISSIONS_PROPERTY = new QName(FS.NS, "userPermissions");
     private static final QName WORKSPACE_PERMISSIONS_PROPERTY = new QName(FS.NS, "workspacePermissions");
     private static final PropertyMetaData OWNED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
     private static final PropertyMetaData CREATED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
     private static final PropertyMetaData COMMENT_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData ACCESS_PROPERTY_META = new PropertyMetaData(READ_ONLY, Boolean.class);
+    private static final PropertyMetaData ACCESS_PROPERTY_META = new PropertyMetaData(READ_ONLY, Access.class);
+    private static final PropertyMetaData ACCESS_MODE_PROPERTY_META = new PropertyMetaData(READ_ONLY, AccessMode.class);
     private static final PropertyMetaData PERMISSIONS_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
-    private static final List<QName> COLLECTION_PROPERTIES = List.of(
-            IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY, OWNED_BY_PROPERTY, CREATED_BY_PROPERTY,
-            COMMENT_PROPERTY, ACCESS_PROPERTY, USER_PERMISSIONS_PROPERTY, WORKSPACE_PERMISSIONS_PROPERTY
-    );
+    private static final PropertyMetaData AVAILABLE_ACCESS_MODES_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -79,11 +82,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
-        var existing = ((RootResource) rDest).findExistingCollectionWithNameIgnoreCase(name);
-        if (existing != null) {
-            throw new ConflictException(
-                    existing, "Target already exists (modulo case).");
-        }
+        ensureNameIsAvailable(name);
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
         var newSubject = childSubject(factory.rootSubject, name);
@@ -95,70 +94,24 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(toCollection instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot copy a collection to a non-root folder.");
         }
-        var existing = ((RootResource) toCollection).findExistingCollectionWithNameIgnoreCase(name);
-        if (existing != null) {
-            throw new ConflictException(
-                    existing, "Target already exists (modulo case).");
-        }
+        ensureNameIsAvailable(name);
         super.copyTo(toCollection, name);
     }
 
-    @Override
-    public Object getProperty(QName name) {
-        if (name.equals(OWNED_BY_PROPERTY)) {
-            return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
+    private void ensureNameIsAvailable(String name) throws ConflictException {
+        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
+        if (existing != null) {
+            throw new ConflictException(existing, "Target already exists (modulo case).");
         }
-        if (name.equals(CREATED_BY_PROPERTY)) {
-            return subject.listProperties(FS.createdBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
-        }
-        if (name.equals(COMMENT_PROPERTY)) {
-            return subject.listProperties(RDFS.comment).nextOptional().map(Statement::getString).orElse(null);
-        }
-        if (name.equals(ACCESS_PROPERTY)) {
-            return access;
-        }
-        if (name.equals(USER_PERMISSIONS_PROPERTY)) {
-            return getPermissions(FS.User);
-        }
-        if (name.equals(WORKSPACE_PERMISSIONS_PROPERTY)) {
-            return getPermissions(FS.Workspace);
-        }
-        return super.getProperty(name);
     }
 
-    private String getPermissions(Resource principalType) {
-        var builder = new StringBuilder();
-
-        dumpPermissions(FS.canManage, Access.Manage, principalType, builder);
-        dumpPermissions(FS.canWrite, Access.Write, principalType, builder);
-        dumpPermissions(FS.canRead, Access.Read, principalType, builder);
-        dumpPermissions(FS.canList, Access.List, principalType, builder);
-
-        return builder.toString();
+    @Property
+    public String getOwnedBy() {
+        return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
     }
 
-    private void dumpPermissions(Property property, Access access, Resource type, StringBuilder builder) {
-        subject.getModel().listSubjectsWithProperty(property, subject)
-                .filterKeep(r -> r.hasProperty(RDF.type, type))
-                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
-                .mapWith(Resource::getURI)
-                .forEachRemaining(uri -> {
-                    if (builder.length() > 0) {
-                        builder.append(',');
-                    }
-                    builder.append(uri).append(' ').append(access);
-                });
-    }
-
-    @Override
-    public void setProperty(QName name, Object value) throws PropertySetException, NotAuthorizedException {
-        if (name.equals(OWNED_BY_PROPERTY)) {
-            setOwner(subject.getModel().createResource(value.toString()));
-        }
-        super.setProperty(name, value);
-    }
-
-    private void setOwner(Resource ws) throws NotAuthorizedException {
+    public void setOwnedBy(String iri) throws NotAuthorizedException {
+        var ws = subject.getModel().createResource(iri);
         var old = subject.getPropertyResourceValue(FS.ownedBy);
 
         if (old != null) {
@@ -198,43 +151,137 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
     }
 
-    @Override
-    public PropertyMetaData getPropertyMetaData(QName name) {
-        if (name.equals(OWNED_BY_PROPERTY)) {
-            return OWNED_BY_PROPERTY_META;
-        }
-        if (name.equals(CREATED_BY_PROPERTY)) {
-            return CREATED_BY_PROPERTY_META;
-        }
-        if (name.equals(COMMENT_PROPERTY)) {
-            return COMMENT_PROPERTY_META;
-        }
-        if (name.equals(ACCESS_PROPERTY)) {
-            return ACCESS_PROPERTY_META;
-        }
-        if (name.equals(USER_PERMISSIONS_PROPERTY) || name.equals(WORKSPACE_PERMISSIONS_PROPERTY)) {
-            return PERMISSIONS_PROPERTY_META;
-        }
-        return super.getPropertyMetaData(name);
+    @Property
+    public Access getAccess() {
+        return access;
     }
 
-    @Override
-    public List<QName> getAllPropertyNames() {
-        return COLLECTION_PROPERTIES;
+    @Property
+    public AccessMode getAccessMode() {
+        return AccessMode.valueOf(subject.getProperty(FS.accessMode).getString());
     }
+
+    @Property
+    public String getAvailableAccessModes() {
+        return getAvailableAccessModesSet()
+                .stream()
+                .map(Enum::name)
+                .collect(joining(","));
+    }
+
+    public Set<AccessMode> getAvailableAccessModesSet() {
+        if (!access.canManage()) {
+            return EnumSet.of(getAccessMode());
+        }
+
+        if (getStatus() == Status.Closed) {
+            return EnumSet.of(AccessMode.Restricted);
+        }
+
+        return Stream.of(AccessMode.values())
+                .filter(mode -> isAdmin() || mode.compareTo(getAccessMode()) >= 0)
+                .collect(toSet());
+    }
+
+    @Property
+    public String getUserPermissions() {
+        return getPermissions(FS.User);
+    }
+
+    @Property
+    public String getWorkspacePermissions() {
+        return getPermissions(FS.Workspace);
+    }
+
+    @Property
+    public String getComment() {
+        return getStringProperty(subject, RDFS.comment);
+    }
+
+    @Property
+    public String getCreatedBy() {
+        return subject.listProperties(FS.createdBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
+
+    }
+
+    @Property
+    public Status getStatus() {
+        return Status.valueOf(subject.getProperty(FS.status).getString());
+    }
+
+    @Property
+    public String getAvailableStatuses() {
+        return getAvailableStatusesSet()
+                .stream()
+                .map(Enum::name)
+                .collect(joining(","));
+    }
+
+    public Set<Status> getAvailableStatusesSet() {
+        if (!access.canManage()) {
+            return EnumSet.of(getStatus());
+        }
+
+        return switch (getStatus()) {
+            case Closed -> EnumSet.of(Status.Active, Status.Closed);
+            default -> (getAccessMode() == AccessMode.Restricted)
+                    ? EnumSet.allOf(Status.class)
+                    : EnumSet.of(Status.Active, Status.Archived);
+        };
+    }
+
+
+    private String getPermissions(Resource principalType) {
+        var builder = new StringBuilder();
+
+        dumpPermissions(FS.canManage, Access.Manage, principalType, builder);
+        dumpPermissions(FS.canWrite, Access.Write, principalType, builder);
+        dumpPermissions(FS.canRead, Access.Read, principalType, builder);
+        dumpPermissions(FS.canList, Access.List, principalType, builder);
+
+        return builder.toString();
+    }
+
+    private void dumpPermissions(org.apache.jena.rdf.model.Property property, Access access, Resource type, StringBuilder builder) {
+        subject.getModel().listSubjectsWithProperty(property, subject)
+                .filterKeep(r -> r.hasProperty(RDF.type, type))
+                .filterDrop(r -> r.hasProperty(FS.dateDeleted))
+                .mapWith(Resource::getURI)
+                .forEachRemaining(uri -> {
+                    if (builder.length() > 0) {
+                        builder.append(',');
+                    }
+                    builder.append(uri).append(' ').append(access);
+                });
+    }
+
 
     @Override
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "set_access_mode" -> setAccessMode(getEnumParameter(parameters, "mode", AccessMode.class));
+            case "set_status" -> setStatus(getEnumParameter(parameters, "status", Status.class));
             case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
             default -> super.performAction(action, parameters, files);
         }
     }
 
-    private void setAccessMode(AccessMode mode) throws NotAuthorizedException {
+    private void setStatus(Status status) throws NotAuthorizedException, ConflictException {
         if (!access.canManage()) {
             throw new NotAuthorizedException(this);
+        }
+        if (!getAvailableStatusesSet().contains(status)) {
+            throw new ConflictException(this);
+        }
+        subject.removeAll(FS.status).addProperty(FS.status, status.name());
+    }
+
+    private void setAccessMode(AccessMode mode) throws NotAuthorizedException, ConflictException {
+        if (!access.canManage()) {
+            throw new NotAuthorizedException(this);
+        }
+        if (!getAvailableAccessModesSet().contains(mode)) {
+            throw new ConflictException(this);
         }
         subject.removeAll(FS.accessMode).addProperty(FS.accessMode, mode.name());
     }
@@ -274,11 +321,19 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (principal.hasProperty(RDF.type, FS.User) && principal.hasProperty(FS.email)) {
             var message = grantedAccess == Access.None
                     ? "Your access to collection " + getName() + " has been revoked."
-                    : "You've been granted " + grantedAccess.name().toLowerCase() + " access to collection " +  getName() + "\n" + subject.getURI();
+                    : "You've been granted " + grantedAccess.name().toLowerCase() + " access to collection " + getName() + "\n" + subject.getURI();
             var email = principal.getProperty(FS.email).getString();
             getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
                     (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
 
+        }
+    }
+
+    @Override
+    public void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
+        switch (getAccessMode()) {
+            case MetadataPublished, DataPublished -> throw new ConflictException(this);
+            default -> super.delete(purge);
         }
     }
 

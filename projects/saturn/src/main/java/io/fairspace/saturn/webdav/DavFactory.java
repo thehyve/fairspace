@@ -10,7 +10,8 @@ import org.apache.jena.vocabulary.RDF;
 import java.net.URI;
 
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.webdav.Access.max;
+import static io.fairspace.saturn.vocabulary.EnumUtils.max;
+import static io.fairspace.saturn.vocabulary.EnumUtils.min;
 import static io.fairspace.saturn.webdav.AccessMode.DataPublished;
 import static io.fairspace.saturn.webdav.AccessMode.MetadataPublished;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
@@ -21,7 +22,7 @@ public class DavFactory implements ResourceFactory {
     final BlobStore store;
     final MailService mailService;
     private final String baseUri;
-    public final io.milton.resource.CollectionResource root = new RootResource(this);
+    public final RootResource root = new RootResource(this);
 
 
     public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, MailService mailService) {
@@ -86,6 +87,10 @@ public class DavFactory implements ResourceFactory {
 
         if (deleted && (!showDeleted() || !access.canWrite())) {
             return Access.None;
+        } else if (subject.hasProperty(FS.status, Status.Archived.name())) {
+            access = min(access, Access.Read);
+        } else if (subject.hasProperty(FS.status, Status.Closed.name())) {
+            access = min(access, Access.List);
         }
 
         return access;
