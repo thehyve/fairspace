@@ -49,6 +49,8 @@ export type CollectionAuditInfo = {|
     deletedBy?: string; // iri
     accessMode: AccessMode;
     status?: Status;
+    availableAccessModes: Array<AccessMode>;
+    availableStatuses: Array<Status>;
     statusDateModified?: string;
     statusModifiedBy?: string; // iri
 |};
