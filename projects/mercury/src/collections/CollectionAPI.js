@@ -8,6 +8,7 @@ import type {User} from "../users/UsersAPI";
 const rootUrl = "";
 
 export type Access = "None" | "List" | "Read" | "Write" | "Manage";
+export type AccessMode = "Restricted" | "MetadataPublished" | "DataPublished";
 
 export type Permission = {
     iri: string; // iri
@@ -45,6 +46,7 @@ export type CollectionAuditInfo = {|
     modifiedBy?: string; // iri
     dateDeleted?: string;
     deletedBy?: string; // iri
+    accessMode: AccessMode;
     status?: string; // TODO use enum instead of any string
     statusDateModified?: string;
     statusModifiedBy?: string; // iri

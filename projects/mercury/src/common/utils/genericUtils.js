@@ -116,3 +116,11 @@ export const formatDateTime = (value) => {
     const isToday = (today.toDateString() === date.toDateString());
     return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
+
+/**
+ * Splits type name (camel case string) into whitespace separated string
+ *
+ * @param typeName
+ * @returns {string} whitespace separated string
+ */
+export const typeNameToValue = typeName => typeName.replace(/([a-z0-9])([A-Z])/g, '$1 $2');

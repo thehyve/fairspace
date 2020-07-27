@@ -30,7 +30,8 @@ import CollectionShareCard from "../permissions/SharesCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import {formatDateTime} from "../common/utils/genericUtils";
+import {formatDateTime, typeNameToValue} from "../common/utils/genericUtils";
+import CollectionAccessModeDialog from "./CollectionAccessModeDialog";
 
 
 export const ICONS = {
@@ -43,20 +44,17 @@ export const ICONS = {
 const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
 const styles = {
-    statusLabel: {
+    propertyLabel: {
         color: 'gray'
     },
-    statusText: {
+    propertyText: {
         fontSize: 'small',
         marginTop: 2,
         marginBottom: 0,
         marginInlineStart: 4
     },
-    statusDetails: {
+    propertyDetails: {
         marginLeft: 8
-    },
-    statusCard: {
-        paddingTop: 0
     }
 };
 
@@ -75,6 +73,7 @@ type CollectionDetailsProps = {
 
 type CollectionDetailsState = {
     editing: boolean;
+    changingAccessMode: boolean,
     deleting: boolean;
     undeleting: boolean;
     anchorEl: any;
@@ -83,11 +82,13 @@ type CollectionDetailsState = {
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
         inCollectionsBrowser: false,
-        setBusy: () => {}
+        setBusy: () => {
+        }
     };
 
     state = {
         editing: false,
+        changingAccessMode: false,
         anchorEl: null,
         deleting: false,
         undeleting: false
@@ -96,6 +97,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     handleEdit = () => {
         if (this.props.collection.canWrite) {
             this.setState({editing: true});
+            this.handleMenuClose();
+        }
+    };
+
+    handleChangeAccessMode = () => {
+        if (this.props.collection.canWrite) {
+            this.setState({changingAccessMode: true});
             this.handleMenuClose();
         }
     };
@@ -158,32 +166,38 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             .finally(() => setBusy(false));
     };
 
-    renderCollectionStatus = () => (
+    renderCollectionProperty = (property: string, value: string) => (
         <Grid container direction="row">
-            <Grid item xs={11}>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <legend className={this.props.classes.statusLabel}>Status</legend>
-                        <div className={this.props.classes.statusDetails}>
-                            <p className={this.props.classes.statusText}>
-                                {this.props.collection.status}
-                            </p>
-                            <p className={`${this.props.classes.statusLabel} ${this.props.classes.statusText}`}>
-                                Modified by: {getDisplayName(this.props.collection.statusModifiedBy)}
-                            </p>
-                            <p className={`${this.props.classes.statusLabel} ${this.props.classes.statusText}`}>
-                                Modification date: {formatDateTime(this.props.collection.statusDateModified) || '-'}
-                            </p>
-                        </div>
-                    </Grid>
-                </Grid>
+            <Grid item xs={2}>
+                <p className={`${this.props.classes.propertyLabel} ${this.props.classes.propertyText}`}>
+                    {property}:
+                </p>
+            </Grid>
+            <Grid item xs>
+                <p className={this.props.classes.propertyText}>
+                    {typeNameToValue(value)}
+                </p>
             </Grid>
         </Grid>
     );
 
+    renderCollectionDescription = () => (
+        <Typography component="p" className={this.props.classes.propertyText}>
+            {this.props.collection.description}
+        </Typography>
+    );
+
+    renderCollectionAccessMode = () => (
+        this.props.collection.accessMode && this.renderCollectionProperty('Access mode', this.props.collection.accessMode)
+    );
+
+    renderCollectionStatus = () => (
+        this.props.collection.status && this.renderCollectionProperty('Status', this.props.collection.status)
+    );
+
     render() {
         const {loading, error, collection, users, workspaceRoles, workspaces, inCollectionsBrowser = false} = this.props;
-        const {anchorEl, editing, deleting, undeleting} = this.state;
+        const {anchorEl, editing, changingAccessMode, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (error) {
@@ -216,9 +230,14 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                     onClose={this.handleMenuClose}
                                 >
                                     {!collection.dateDeleted && (
-                                        <MenuItem onClick={this.handleEdit}>
-                                            Edit
-                                        </MenuItem>
+                                        <div>
+                                            <MenuItem onClick={this.handleEdit}>
+                                                Edit
+                                            </MenuItem>
+                                            <MenuItem onClick={this.handleChangeAccessMode}>
+                                                Change access mode
+                                            </MenuItem>
+                                        </div>
                                     )}
                                     {isDataSteward(this.props.currentUser) && (
                                         <MenuItem onClick={this.handleDelete}>
@@ -238,10 +257,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         avatar={ICONS[iconName]}
                     />
                     <CardContent style={{paddingTop: 0}}>
-                        <Typography component="p">
-                            {collection.description}
-                        </Typography>
-                        {this.props.collection.status && this.renderCollectionStatus()}
+                        {this.renderCollectionDescription()}
+                        {this.renderCollectionStatus()}
+                        {this.renderCollectionAccessMode()}
                     </CardContent>
                 </Card>
 
@@ -267,6 +285,12 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onClose={() => this.setState({editing: false})}
                     />
                 ) : null}
+                {changingAccessMode ? (
+                    <CollectionAccessModeDialog
+                        collection={collection}
+                        onClose={() => this.setState({changingAccessMode: false})}
+                    />
+                ) : null}
                 {undeleting ? (
                     <ConfirmationDialog
                         open
@@ -284,7 +308,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         open
                         title="Confirmation"
                         content={`Collection ${collection.name} is already marked as deleted.`
-                         + " Are you sure you want to delete it permanently?"}
+                        + " Are you sure you want to delete it permanently?"}
                         dangerous
                         agreeButtonText="Delete permanently"
                         onAgree={() => this.handleCollectionDelete(this.props.collection)}
@@ -308,6 +332,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         );
     }
 }
+
 
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();

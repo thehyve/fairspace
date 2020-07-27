@@ -21,11 +21,14 @@ export const mapCollectionNameAndDescriptionToMetadata = (name, description) => 
     [COMMENT_URI]: [{value: description}]
 });
 
+const parseCommaSeparatedString = value => (
+    value.split(',').map(s => s.split(' ')));
+
 const parsePermissions = (value) => ((typeof value !== 'string')
-    ? []
-    : value.split(',')
-        .map(s => s.split(' '))
-        .map(([iri, access]) => ({iri, access})));
+    ? [] : parseCommaSeparatedString(value).map(([iri, access]) => ({iri, access})));
+
+const parseToArray = value => ((typeof value !== 'string')
+    ? [] : parseCommaSeparatedString(value));
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,
@@ -36,6 +39,11 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,
     dateModified: properties.lastmod,
+    accessMode: properties.accessMode,
+    status: properties.status,
+    accessModes: properties.accessModes,
+    availableAccessModes: parseToArray(properties.availableAccessModes),
+    availableStatuses: parseToArray(properties.availableStatuses),
     ...(properties.access && mapCollectionPermissions(properties.access)),
     userPermissions: parsePermissions(properties.userPermissions),
     workspacePermissions: parsePermissions(properties.workspacePermissions)
