@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort,
+    joinWithSeparator, stableSort, typeNameToValue,
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -140,5 +140,20 @@ describe('stableSort', () => {
         const a = ["c", "a", "b"];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
+    });
+});
+
+describe('typeNameToValue', () => {
+    it('should return unchanged string', () => {
+        expect(typeNameToValue('Test')).toEqual('Test');
+    });
+    it('should return whotespace separated string', () => {
+        expect(typeNameToValue('TestWithCamelCase')).toEqual('Test With Camel Case');
+    });
+    it('should return empty string for null', () => {
+        expect(typeNameToValue(null)).toEqual('');
+    });
+    it('should return empty string for non-string value', () => {
+        expect(typeNameToValue(['test'])).toEqual('');
     });
 });
