@@ -10,7 +10,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {withStyles} from "@material-ui/core/styles";
-import {typeNameToValue} from "../common/utils/genericUtils";
+import {camelCaseToWords} from "../common/utils/genericUtils";
 
 export const styles = {
     root: {
@@ -77,7 +77,7 @@ export const CollectionPropertyChangeDialog = ({collection, title, currentValue,
                                     key={mode}
                                     value={mode}
                                     control={<Radio />}
-                                    label={typeNameToValue(mode)}
+                                    label={camelCaseToWords(mode)}
                                 />
                             ))}
                         </RadioGroup>

@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, typeNameToValue,
+    joinWithSeparator, stableSort, camelCaseToWords,
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -143,17 +143,23 @@ describe('stableSort', () => {
     });
 });
 
-describe('typeNameToValue', () => {
+describe('camelCaseToWords', () => {
     it('should return unchanged string', () => {
-        expect(typeNameToValue('Test')).toEqual('Test');
+        expect(camelCaseToWords('Test')).toEqual('Test');
     });
-    it('should return whotespace separated string', () => {
-        expect(typeNameToValue('TestWithCamelCase')).toEqual('Test With Camel Case');
+    it('should return whitespace separated string', () => {
+        expect(camelCaseToWords('TestWithCamelCase')).toEqual('Test with camel case');
+    });
+    it('should return unchanged for single letter', () => {
+        expect(camelCaseToWords('x')).toEqual('x');
     });
     it('should return empty string for null', () => {
-        expect(typeNameToValue(null)).toEqual('');
+        expect(camelCaseToWords(null)).toEqual('');
+    });
+    it('should return empty string for empty', () => {
+        expect(camelCaseToWords(null)).toEqual('');
     });
     it('should return empty string for non-string value', () => {
-        expect(typeNameToValue(['test'])).toEqual('');
+        expect(camelCaseToWords(['test'])).toEqual('');
     });
 });

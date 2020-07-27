@@ -30,7 +30,7 @@ import CollectionShareCard from "../permissions/SharesCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import {typeNameToValue} from "../common/utils/genericUtils";
+import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionPropertyChangeDialog from "./CollectionPropertyChangeDialog";
 
 
@@ -85,8 +85,7 @@ type CollectionDetailsState = {
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
         inCollectionsBrowser: false,
-        setBusy: () => {
-        }
+        setBusy: () => {}
     };
 
     state = {
@@ -186,7 +185,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             </Grid>
             <Grid item xs>
                 <p className={this.props.classes.propertyText}>
-                    {typeNameToValue(value)}
+                    {camelCaseToWords(value)}
                 </p>
             </Grid>
         </Grid>

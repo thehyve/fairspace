@@ -118,11 +118,12 @@ export const formatDateTime = (value) => {
 };
 
 /**
- * Splits type name (camel case string) into whitespace separated string
+ * Splits camel case string into whitespace separated string
  *
- * @param typeName
+ * @param value
  * @returns {string} whitespace separated string
  */
-export const typeNameToValue = typeName => (
-    (typeof typeName !== 'string') ? '' : typeName.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+export const camelCaseToWords = value => ((typeof value !== 'string')
+    ? '' : value.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/.*/, (v) => v.charAt(0) + v.slice(1).toLowerCase())
 );
