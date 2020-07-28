@@ -11,9 +11,9 @@ export const handleCollectionSearchRedirect = (history, value) => {
 };
 
 export const mapCollectionPermissions: CollectionPermissions = (access) => ({
-    canManage: compareTo(access, "Manage"),
-    canWrite: compareTo(access, "Write"),
-    canRead: compareTo(access, "Read"),
+    canManage: compareTo({access}, {access: "Manage"}),
+    canWrite: compareTo({access}, {access: "Write"}),
+    canRead: compareTo({access}, {access: "Read"}),
 });
 
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({

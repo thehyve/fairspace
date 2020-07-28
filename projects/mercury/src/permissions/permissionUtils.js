@@ -2,7 +2,7 @@ import {comparing, compareBy} from "../common/utils/genericUtils";
 
 export const AccessRights = ['List', 'Read', 'Write', 'Manage'];
 
-const permissionLevel = access => AccessRights.indexOf(access);
+const permissionLevel = p => AccessRights.indexOf(p.access);
 
 export const sortPermissions = (permissions) => {
     if (!permissions) {
