@@ -8,6 +8,8 @@ import type {User} from "../users/UsersAPI";
 const rootUrl = "";
 
 export type Access = "None" | "List" | "Read" | "Write" | "Manage";
+export type AccessMode = "Restricted" | "MetadataPublished" | "DataPublished";
+export type Status = "Active" | "Archived" | "Closed";
 
 export type Permission = {
     iri: string; // iri
@@ -45,7 +47,10 @@ export type CollectionAuditInfo = {|
     modifiedBy?: string; // iri
     dateDeleted?: string;
     deletedBy?: string; // iri
-    status?: string; // TODO use enum instead of any string
+    accessMode: AccessMode;
+    status?: Status;
+    availableAccessModes: Array<AccessMode>;
+    availableStatuses: Array<Status>;
     statusDateModified?: string;
     statusModifiedBy?: string; // iri
 |};
@@ -102,8 +107,12 @@ class CollectionAPI {
             });
     }
 
-    setAccessMode(location: String, mode) {
+    setAccessMode(location: String, mode: AccessMode) {
         return FileAPI.post(location, {action: 'set_access_mode', mode});
+    }
+
+    setStatus(location: String, status: Status) {
+        return FileAPI.post(location, {action: 'set_status', status});
     }
 
     setPermission(location, principal, access) {
