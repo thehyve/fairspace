@@ -21,7 +21,7 @@ import type {History} from '../types';
 import UserContext from '../users/UserContext';
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import {isDataSteward} from "../users/userUtils";
+import {isAdmin} from "../users/userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -223,7 +223,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={collection.canWrite && (
+                        action={collection.canManage && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -252,10 +252,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             </MenuItem>
                                         </div>
                                     )}
-                                    {isDataSteward(this.props.currentUser) && (
-                                        <MenuItem onClick={this.handleDelete}>
-                                            {collection && collection.dateDeleted ? 'Delete permanently' : 'Delete'}
-                                        </MenuItem>
+                                    {collection && collection.dateDeleted && isAdmin(this.props.currentUser) ? (
+                                        <MenuItem onClick={this.handleDelete}>Delete permanently</MenuItem>
+                                    ) : (
+                                        <MenuItem onClick={this.handleDelete}>Delete</MenuItem>
                                     )}
                                     {collection.dateDeleted && (
                                         <MenuItem onClick={this.handleUndelete}>

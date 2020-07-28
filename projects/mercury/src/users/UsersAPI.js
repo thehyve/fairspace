@@ -14,6 +14,7 @@ export type User = {
 export type UserRoles = {
     admin: boolean;
     viewPublicMetadata: boolean;
+    addPublicMetadata: boolean;
 }
 
 const requestOptions = {

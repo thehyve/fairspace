@@ -4,7 +4,7 @@ import Delete from "@material-ui/icons/Delete";
 import useIsMounted from "react-is-mounted-hook";
 import LinkedDataContext from "../LinkedDataContext";
 import UserContext from "../../users/UserContext";
-import {isDataSteward} from "../../users/userUtils";
+import {isAdmin} from "../../users/userUtils";
 import ErrorDialog from "../../common/components/ErrorDialog";
 import ProgressButton from "../../common/components/ProgressButton";
 import ConfirmationButton from "../../common/components/ConfirmationButton";
@@ -25,7 +25,7 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
             .then(() => isMounted() && setDeleting(false));
     };
 
-    if (!isDataSteward(currentUser)) {
+    if (!isAdmin(currentUser)) {
         return <div />;
     }
 

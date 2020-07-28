@@ -9,7 +9,7 @@ import GenericTooltip from "../../common/components/GenericTooltip";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
 import UserContext from "../../users/UserContext";
-import {isDataSteward} from "../../users/userUtils";
+import {canAddPublicMetadata} from "../../users/userUtils";
 
 const LinkedDataProperty = (
     {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete, checkValueAddedNotSubmitted}
@@ -42,7 +42,7 @@ const LinkedDataProperty = (
         machineOnly
         || property.isGenericIriResource
         || property.allowedValues
-        || (!isDataSteward(currentUser) && isSingleValuePropertyWithExistingValue)
+        || (!canAddPublicMetadata(currentUser) && isSingleValuePropertyWithExistingValue)
     );
 
     // The edit component should not actually allow editing the value if editable is set to false

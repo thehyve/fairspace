@@ -10,8 +10,8 @@ export function getEmail(user) {
     return (user && user.email) || '';
 }
 
-export const isAdmin = (user) => user && user.admin;
-export const isDataSteward = (user) => isAdmin(user);
+export const isAdmin = user => user && user.admin;
+export const canAddPublicMetadata = user => user && (user.addPublicMetadata || user.admin);
 
 export const getWorkspaceUsersWithRoles = (users: User[], workspaceRoles: WorkspaceUserRole[]) => {
     const members = [];

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Grid, IconButton} from "@material-ui/core";
 import Add from '@material-ui/icons/Add';
@@ -6,11 +6,14 @@ import Add from '@material-ui/icons/Add';
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/components/LoadingInlay";
 import MessageDisplay from "../../../common/components/MessageDisplay";
+import {canAddPublicMetadata} from "../../../users/userUtils";
+import UserContext from "../../../users/UserContext";
 
 const InputWithAddition = ({
     children, onChange,
     pending, error, shape, requireIdentifier = true
 }) => {
+    const {currentUser} = useContext(UserContext);
     const [adding, setAdding] = useState(false);
 
     const handleCloseDialog = () => setAdding(false);
@@ -56,7 +59,7 @@ const InputWithAddition = ({
                 {children}
             </Grid>
             <Grid item xs={2}>
-                {renderAddFunctionality()}
+                {canAddPublicMetadata(currentUser) && renderAddFunctionality()}
             </Grid>
         </Grid>
     );

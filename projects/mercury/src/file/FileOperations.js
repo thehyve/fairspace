@@ -12,7 +12,7 @@ import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
 import ConfirmationButton from "../common/components/ConfirmationButton";
-import {isDataSteward} from "../users/userUtils";
+import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import CreateDirectoryButton from "./buttons/CreateDirectoryButton";
 import ProgressButton from "../common/components/ProgressButton";
@@ -186,7 +186,7 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
-                {isDataSteward(currentUser) && (
+                {isAdmin(currentUser) && (
                     <>
                         <ProgressButton active={activeOperation === Operations.RENAME}>
                             <RenameButton
@@ -252,7 +252,7 @@ export const FileOperations = ({
                 >
                     <ContentCopy />
                 </IconButton>
-                {isDataSteward(currentUser) && (
+                {isAdmin(currentUser) && (
                     <IconButton
                         aria-label="Cut"
                         title="Cut"

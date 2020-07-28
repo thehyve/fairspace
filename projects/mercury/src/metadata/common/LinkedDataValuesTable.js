@@ -5,7 +5,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 
 import {canDelete} from "./metadataUtils";
 import {STRING_URI} from '../../constants';
-import {isDataSteward} from "../../users/userUtils";
+import {isAdmin} from "../../users/userUtils";
 import UserContext from "../../users/UserContext";
 
 const styles = {
@@ -41,7 +41,7 @@ export const LinkedDataValuesTable = (
     // - user has a right to perform delete operations or given entry was just added and not submitted yet
     const isDeleteButtonEnabled = (entry) => (
         canDelete(property, entry)
-        && (isDataSteward(currentUser) || checkValueAddedNotSubmitted(property, entry))
+        && (isAdmin(currentUser) || checkValueAddedNotSubmitted(property, entry))
     );
 
     return (
