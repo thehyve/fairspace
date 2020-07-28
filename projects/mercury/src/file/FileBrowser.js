@@ -34,6 +34,8 @@ export const DisconnectedFileBrowser = ({
     const [currentTab, setCurrentTab] = useState(TAB_FILES);
 
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
+    const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
+
     const existingFilenames = files ? files.map(file => file.basename) : [];
     const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
 
@@ -69,7 +71,7 @@ export const DisconnectedFileBrowser = ({
              *      It requires react-router-dom version>=6 to be released.
              */
             history.push(`/collections${encodeURI(encodePath(path.filename))}`);
-        } else {
+        } else if (isReadingEnabled) {
             FileAPI.open(path.filename);
         }
     };
@@ -111,7 +113,7 @@ export const DisconnectedFileBrowser = ({
     const renderTabFiles = () => (
         <div data-testid="files-view">
             <FileList
-                selectionEnabled
+                selectionEnabled={openedCollection.canRead}
                 files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
                 onPathCheckboxClick={path => selection.toggle(path.filename)}
                 onPathHighlight={handlePathHighlight}
@@ -119,7 +121,7 @@ export const DisconnectedFileBrowser = ({
                 onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
                 showDeleted={showDeleted}
             />
-            {renderFileOperations()}
+            {openedCollection.canRead && renderFileOperations()}
         </div>
     );
 
