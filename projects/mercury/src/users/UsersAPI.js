@@ -8,23 +8,27 @@ export type User = {
     id: string;
     name: string;
     email?: string;
-    admin: boolean;
     access: string;
+}
+
+export type UserRoles = {
+    admin: boolean;
+    viewPublicMetadata: boolean;
 }
 
 const requestOptions = {
     headers: {Accept: 'application/json'}
 };
 
-export const getUser = () => axios.get('/api/v1/users/current')
+export const getUser = (): User & UserRoles => axios.get('/api/v1/users/current')
     .catch(handleHttpError("Failure when retrieving user's information"))
     .then(extractJsonData)
     .then(user => ({...user, iri: createMetadataIri(user.id)}));
 
-export const logoutUser = () => axios.post('/api/v1/users/current/logout', {}, {headers: {'Content-Type': 'application/json'}})
+export const logoutUser = () => axios.post('/api/v1/users/current/logout')
     .catch(handleHttpError("Failure when logging out user"));
 
-export const getUsers = () => axios.get('/api/v1/users/', requestOptions)
+export const getUsers = (): Array<User> => axios.get('/api/v1/users/', requestOptions)
     .catch(handleHttpError('Error while loading users'))
     .then(extractJsonData)
     .then(users => users.map(user => ({iri: createMetadataIri(user.id), ...user})));

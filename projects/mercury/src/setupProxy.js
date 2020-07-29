@@ -34,7 +34,7 @@ module.exports = (app) => {
     app.use(keycloak.middleware({logout: '/logout'}));
     app.use('/dev', keycloak.protect());
 
-    const addToken = (proxyReq, req) => proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
+    const addToken = (proxyReq, req) => req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
     app.use(proxy('/api/v1', {
         target: 'http://localhost:8080/',

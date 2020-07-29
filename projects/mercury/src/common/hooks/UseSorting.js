@@ -18,7 +18,7 @@ const useSorting = (items, columns, initialOrderBy) => {
     const [orderAscending, setOrderAscending] = useState(true);
     const [orderBy, setOrderBy] = useState(initialOrderBy);
 
-    const orderedItems = stableSort(items, compareBy(columns[orderBy].valueExtractor, orderAscending), orderAscending);
+    const orderedItems = stableSort(items, compareBy(columns[orderBy].valueExtractor), orderAscending);
     const toggleSort = column => {
         if (orderBy === column) {
             setOrderAscending(!orderAscending);

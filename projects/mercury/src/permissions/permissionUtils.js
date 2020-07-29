@@ -1,6 +1,6 @@
 import {comparing, compareBy} from "../common/utils/genericUtils";
 
-export const AccessRights = ['Read', 'Write', 'Manage'];
+export const AccessRights = ['List', 'Read', 'Write', 'Manage'];
 
 const permissionLevel = p => AccessRights.indexOf(p.access);
 
@@ -9,15 +9,19 @@ export const sortPermissions = (permissions) => {
         return [];
     }
 
-    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('name')));
+    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('iri')));
 };
+
+export const compareTo: boolean = (currentAccess, baseAccess) => (
+    permissionLevel(currentAccess) >= permissionLevel(baseAccess)
+);
 
 /**
  * Check if collaborator can alter permission. User can alter permission if:
  * - has manage access to a resource
  * - permission is not his/hers
  */
-export const canAlterPermission = (userCanManage, permission, currentLoggedUser) => {
-    const isSomeoneElsePermission = currentLoggedUser.iri !== permission.user;
-    return userCanManage && isSomeoneElsePermission;
+export const canAlterPermission = (canManage, user, currentLoggedUser) => {
+    const isSomeoneElsePermission = currentLoggedUser.iri !== user.iri;
+    return canManage && isSomeoneElsePermission;
 };

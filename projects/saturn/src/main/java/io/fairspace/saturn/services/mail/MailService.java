@@ -2,12 +2,16 @@ package io.fairspace.saturn.services.mail;
 
 import lombok.extern.slf4j.Slf4j;
 
+import javax.mail.Message;
 import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.google.common.util.concurrent.Futures.immediateFailedFuture;
 
 @Slf4j
 public class MailService {
@@ -43,5 +47,17 @@ public class MailService {
                 return false;
             }
         });
+    }
+
+    public Future<Boolean> send(String email, String subject, String text) {
+        try {
+            var msg = newMessage();
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            msg.setSubject(subject);
+            msg.setText(text);
+            return send(msg);
+        } catch (Exception e) {
+            return immediateFailedFuture(e);
+        }
     }
 }

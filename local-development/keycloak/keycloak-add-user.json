@@ -10,7 +10,7 @@
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
     } ],
-    "realmRoles" : [ "organisation-admin" ]
+    "realmRoles" : [ "organisation-admin", "view-public-metadata" ]
   }, {
     "username" : "datasteward",
     "enabled" : true,
@@ -20,7 +20,8 @@
       "salt" : "KU8BscCubkHEYPOn22JmKA==",
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
-    } ]
+    } ],
+    "realmRoles" : [ "view-public-metadata" ]
   }, {
     "username" : "coordinator",
     "enabled" : true,
@@ -30,7 +31,8 @@
       "salt" : "knVkWfbSl1S0eX4g6EpW1A==",
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
-    } ]
+    } ],
+    "realmRoles" : [ "view-public-metadata" ]
   }, {
     "username" : "coordinator2",
     "enabled" : true,
@@ -40,7 +42,8 @@
       "salt" : "k+vzGc9X5zfVN5uvsAFgHw==",
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
-    } ]
+    } ],
+    "realmRoles" : [ "view-public-metadata" ]
   }, {
     "username" : "user",
     "enabled" : true,
@@ -50,7 +53,8 @@
       "salt" : "62iHKU0CRl5iD1xv5xzPJw==",
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
-    } ]
+    } ],
+    "realmRoles" : [ "view-public-metadata" ]
   }, {
     "username" : "user2",
     "enabled" : true,
@@ -60,9 +64,10 @@
       "salt" : "idhZxv/6LbvEaGoHxmrbPQ==",
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
-    } ]
+    } ],
+    "realmRoles" : [ "view-public-metadata" ]
   }, {
-    "username" : "user3",
+    "username" : "external-user",
     "enabled" : true,
     "credentials" : [ {
       "type" : "password",
@@ -70,7 +75,8 @@
       "salt" : "vuoNifbptaxRB7OgqNFEPA==",
       "hashIterations" : 100000,
       "algorithm" : "pbkdf2-sha256"
-    } ]
+    } ],
+    "realmRoles" : []
   } ]
 }, {
   "realm" : "master",

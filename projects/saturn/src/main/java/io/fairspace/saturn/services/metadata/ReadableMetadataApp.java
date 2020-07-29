@@ -11,8 +11,6 @@ import spark.Request;
 
 import java.util.List;
 
-import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.jena.riot.RDFFormat.JSONLD;
 import static org.apache.jena.riot.RDFFormat.TURTLE;
 import static spark.Spark.get;
@@ -42,7 +40,6 @@ public class ReadableMetadataApp extends BaseApp {
                 return serializer.serialize(getMetadata(req));
             });
         });
-        exception(TooManyTriplesException.class, exceptionHandler(SC_BAD_REQUEST, "Your query returned too many results"));
     }
 
     protected Model getMetadata(Request req) {

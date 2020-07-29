@@ -93,5 +93,13 @@ export const USABLE_IN_VOCABULARY_URI = FAIRSPACE_NS + 'usableInVocabulary';
 export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
 export const WORKSPACE_URI = FAIRSPACE_NS + 'Workspace';
 export const WORKSPACE_STATUS_URI = FAIRSPACE_NS + 'status';
+export const LOCATION_URI = FAIRSPACE_NS + 'location';
+export const OWNED_BY_URI = FAIRSPACE_NS + 'ownedBy';
+export const CAN_LIST_URI = FAIRSPACE_NS + 'canList';
+export const CAN_READ_URI = FAIRSPACE_NS + 'canRead';
+export const CAN_WRITE_URI = FAIRSPACE_NS + 'canWrite';
+export const CAN_MANAGE_URI = FAIRSPACE_NS + 'canManage';
+export const IS_MEMBER_OF_URI = FAIRSPACE_NS + 'isMemberOf';
+export const IS_MANAGER_OF_URI = FAIRSPACE_NS + 'isManagerOf';
 
 export const NIL_URI = FAIRSPACE_NS + 'nil';

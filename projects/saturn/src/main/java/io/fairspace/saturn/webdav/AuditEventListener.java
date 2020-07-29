@@ -11,7 +11,8 @@ class AuditEventListener implements EventListener {
     public void onEvent(Event e) {
         if (e instanceof ResponseEvent) {
             var re = (ResponseEvent) e;
-            var success = re.getResponse().getStatus().code < 300;
+            var status = re.getResponse().getStatus();
+            var success = status != null && status.code < 300;
             var path = resourcePath(re.getRequest().getAbsolutePath());
 
             switch (re.getRequest().getMethod()) {
@@ -38,6 +39,10 @@ class AuditEventListener implements EventListener {
                         "success", success);
                 case PUT -> audit("FS_WRITE",
                         "path", path,
+                        "success", success);
+                case POST -> audit("FS_ACTION",
+                        "path", path,
+                        "parameters", re.getRequest().getParams(),
                         "success", success);
             }
         }

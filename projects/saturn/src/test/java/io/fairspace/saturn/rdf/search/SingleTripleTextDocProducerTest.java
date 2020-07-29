@@ -29,8 +29,7 @@ public class SingleTripleTextDocProducerTest {
     public void setup() {
 
         when(indexer.getDocDef()).thenReturn(new AutoEntityDefinition());
-        producer = new SingleTripleTextDocProducer(indexer, false);
-
+        producer = new SingleTripleTextDocProducer(indexer);
     }
 
     @Test

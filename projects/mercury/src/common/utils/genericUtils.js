@@ -116,3 +116,14 @@ export const formatDateTime = (value) => {
     const isToday = (today.toDateString() === date.toDateString());
     return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
+
+/**
+ * Splits camel case string into whitespace separated string
+ *
+ * @param value
+ * @returns {string} whitespace separated string
+ */
+export const camelCaseToWords = value => ((typeof value !== 'string')
+    ? '' : value.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/.*/, (v) => v.charAt(0) + v.slice(1).toLowerCase())
+);

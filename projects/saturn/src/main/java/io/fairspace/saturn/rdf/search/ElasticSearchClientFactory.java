@@ -3,7 +3,6 @@ package io.fairspace.saturn.rdf.search;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.text.es.ESSettings;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -11,7 +10,6 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -34,8 +32,8 @@ public class ElasticSearchClientFactory {
         settingsBuilder.put("cluster.name", esSettings.getClusterName());
         var settings = settingsBuilder.build();
 
-        List<TransportAddress> addresses = new ArrayList<>();
-        for (String host : esSettings.getHostToPortMapping().keySet()) {
+        var addresses = new ArrayList<TransportAddress>();
+        for (var host : esSettings.getHostToPortMapping().keySet()) {
             try {
                 addresses.add(new TransportAddress(InetAddress.getByName(host), esSettings.getHostToPortMapping().get(host)));
             } catch (UnknownHostException e) {
@@ -43,8 +41,8 @@ public class ElasticSearchClientFactory {
             }
         }
 
-        TransportAddress socketAddresses[] = new TransportAddress[addresses.size()];
-        TransportClient tc = new PreBuiltTransportClient(settings);
+        var socketAddresses = new TransportAddress[addresses.size()];
+        var tc = new PreBuiltTransportClient(settings);
         tc.addTransportAddresses(addresses.toArray(socketAddresses));
         log.debug("Successfully initialized the client");
 

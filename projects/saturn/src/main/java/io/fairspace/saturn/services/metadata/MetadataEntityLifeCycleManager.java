@@ -1,8 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.permissions.MetadataAccessDeniedException;
-import io.fairspace.saturn.services.permissions.PermissionsService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.AllArgsConstructor;
 import org.apache.jena.graph.Node;
@@ -17,13 +14,12 @@ import org.apache.jena.vocabulary.RDF;
 import java.time.Instant;
 import java.util.Set;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 @AllArgsConstructor
 public
@@ -31,7 +27,6 @@ class MetadataEntityLifeCycleManager {
     private final Dataset dataset;
     private final Node graph;
     private final Node vocabulary;
-    private final PermissionsService permissionsService;
 
     /**
      * Stores statements regarding the lifecycle of the entities in this model
@@ -40,7 +35,7 @@ class MetadataEntityLifeCycleManager {
      * - a triple for the creator of an entity (see {@value io.fairspace.saturn.vocabulary.FS#CREATED_BY_URI})
      * - a triple for the date this entity was created (see {@value io.fairspace.saturn.vocabulary.FS#DATE_CREATED_URI})
      * <p>
-     * In addition, the current user will get manage permissions on this entity as well, through the {@link PermissionsService}
+     * In addition, the current user will get manage permissions on this entity as well, through the {@link MetadataPermissions}
      * <p>
      * Please note that this method will check the database for existence of the entities. For that reason, this method must be called
      * before actually inserting new triples.
@@ -60,16 +55,11 @@ class MetadataEntityLifeCycleManager {
         // as well as permissions
         if (!newEntities.isEmpty()) {
             dataset.getNamedModel(graph.getURI()).add(generateCreationInformation(newEntities));
-            permissionsService.createResources(newEntities);
         }
     }
 
     boolean softDelete(Resource resource) {
-        try {
-            permissionsService.ensureAdmin();
-        } catch (AccessDeniedException e) {
-            throw new MetadataAccessDeniedException("Insufficient permissions to delete entities.", resource.asNode());
-        }
+        // TODO: Check permissions
         var model = dataset.getNamedModel(graph.getURI());
         resource = resource.inModel(model);
         if (isMachineOnly(resource)) {
@@ -77,7 +67,7 @@ class MetadataEntityLifeCycleManager {
         }
         if (model.containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
             resource.addLiteral(FS.dateDeleted, toXSDDateTimeLiteral(Instant.now()));
-            resource.addProperty(FS.deletedBy, createResource(getCurrentUser().getIri().getURI()));
+            resource.addProperty(FS.deletedBy, model.wrapAsResource(getUserURI()));
             return true;
         }
         return false;
@@ -101,7 +91,7 @@ class MetadataEntityLifeCycleManager {
      */
     private Model generateCreationInformation(Set<Resource> entities) {
         var model = createDefaultModel();
-        var user = model.asRDFNode(getCurrentUser().getIri());
+        var user = model.asRDFNode(getUserURI());
         var now = toXSDDateTimeLiteral(Instant.now());
 
         entities.forEach(resource -> model.add(resource, createdBy, user).add(resource, dateCreated, now));

@@ -11,7 +11,7 @@ describe('WorkspaceEditor', () => {
     const node = {id: 'http://localhost:8080'};
 
     const enterValue = (label, value) => fireEvent.change(utils.getByTestId(label), {target: {value}});
-    const enterId = (value) => enterValue('Id', value);
+    const enterName = (value) => enterValue('Name', value);
 
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
 
@@ -36,19 +36,18 @@ describe('WorkspaceEditor', () => {
     afterEach(cleanup);
 
     it('should send all entered parameters to the creation method', () => {
-        enterId('a');
+        enterName('a');
         submit();
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(onSubmit)
             .toHaveBeenCalledWith({
-                id: 'a',
-                label: 'a'
+                name: 'a'
             });
     });
 
     it('should enable and disable submit button at proper times', () => {
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
-        enterId('a');
+        enterName('a');
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled', false);
     });
 
@@ -58,7 +57,7 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should require unique workspace id', () => {
-        enterId('a1');
+        enterName('a1');
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
     });
 });

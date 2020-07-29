@@ -3,30 +3,16 @@ import {PropTypes} from 'prop-types';
 
 import {valuesContainsValueOrId} from "./metadataUtils";
 import Dropdown from './values/Dropdown';
-import {SEARCH_DROPDOWN_DEFAULT_SIZE} from "../../constants";
 import LinkedDataContext from "../LinkedDataContext";
 import {getDescendants} from './vocabularyUtils';
-import {handleSearchError} from "../../search/searchUtils";
-import SearchAPI, {SORT_ALPHABETICALLY} from "../../search/SearchAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import LoadingInlay from "../../common/components/LoadingInlay";
+import {lookup} from "../../search/lookup";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);
 
-    const search = query => fetchItems({types, size: SEARCH_DROPDOWN_DEFAULT_SIZE, query})
-        .then(
-            ({items}) => items.map(metadataItem => {
-                const {id, label, name} = metadataItem;
-                const displayLabel = (label && label[0]) || (name && name[0]) || id;
-
-                return {
-                    label: displayLabel,
-                    id,
-                    otherEntry: metadataItem
-                };
-            })
-        );
+    const search = query => fetchItems({types, query});
 
     const debouncedSearch = (query) => {
         if (fetchRequest.current) {
@@ -64,9 +50,7 @@ LinkedDataDropdown.propTypes = {
 };
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({types, size, query}) => SearchAPI
-        .searchLinkedData({types, size, query, sort: SORT_ALPHABETICALLY})
-        .catch(handleSearchError),
+    fetchItems: ({types, query}) => lookup(query, types),
     debounce: 300
 };
 

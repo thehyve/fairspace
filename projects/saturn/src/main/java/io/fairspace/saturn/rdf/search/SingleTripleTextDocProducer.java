@@ -22,13 +22,11 @@ import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
 public class SingleTripleTextDocProducer extends AbstractDatasetChanges implements TextDocProducer {
     private final EntityDefinition defn;
     private final TextIndex indexer;
-    private final boolean swallowExceptions;
 
 
-    public SingleTripleTextDocProducer(TextIndex indexer, boolean swallowExceptions) {
+    public SingleTripleTextDocProducer(TextIndex indexer) {
         this.defn = indexer.getDocDef();
         this.indexer = indexer;
-        this.swallowExceptions = swallowExceptions;
     }
 
     @Override
@@ -45,19 +43,11 @@ public class SingleTripleTextDocProducer extends AbstractDatasetChanges implemen
 
         var entity = createEntity(g, s, p, o);
         if (entity != null) {
-            try {
                 if (qaction == QuadAction.ADD) {
                     indexer.addEntity(entity);
                 } else {
                     indexer.deleteEntity(entity);
                 }
-            } catch (Throwable t) {
-                if (swallowExceptions) {
-                    log.warn("Error indexing in ElasticSearch", t);
-                } else {
-                    throw t;
-                }
-            }
         }
     }
 

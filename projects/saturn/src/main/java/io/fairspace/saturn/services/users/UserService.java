@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.System.getenv;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -66,9 +67,9 @@ public class UserService {
         }
     }
 
-    public void logoutCurrent(HttpServletRequest request) {
+    public void logoutCurrent() {
         try {
-            request.logout();
+            getCurrentRequest().logout();
         } catch (ServletException e) {
             throw new RuntimeException(e);
         }

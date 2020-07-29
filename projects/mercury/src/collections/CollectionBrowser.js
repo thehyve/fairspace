@@ -93,7 +93,7 @@ const ContextualCollectionBrowser = (props) => {
     const {workspacesLoading, workspacesError, workspaces} = useContext(WorkspaceContext);
     const workspace = props.workspaceIri ? workspaces.find(w => w.iri === props.workspaceIri) : {};
 
-    const canAdd = window.location.pathname.startsWith('/workspaces/') && workspace.canWrite;
+    const canAdd = window.location.pathname === '/workspace' && workspace.canCollaborate;
 
     const filteredCollections = props.workspaceIri
         ? collections.filter(c => c.ownerWorkspace === props.workspaceIri)

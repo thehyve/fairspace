@@ -4,7 +4,6 @@ import {Grid, IconButton} from "@material-ui/core";
 import Add from '@material-ui/icons/Add';
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
-import {normalizeMetadataResource, simplifyUriPredicates} from "../metadataUtils";
 import LoadingInlay from "../../../common/components/LoadingInlay";
 import MessageDisplay from "../../../common/components/MessageDisplay";
 
@@ -16,10 +15,9 @@ const InputWithAddition = ({
 
     const handleCloseDialog = () => setAdding(false);
 
-    const onCreate = ({subject, values}) => {
-        const otherEntry = simplifyUriPredicates(normalizeMetadataResource(values));
+    const onCreate = ({subject}) => {
         handleCloseDialog();
-        onChange({id: subject, otherEntry});
+        onChange({id: subject});
     };
 
     const renderAddFunctionality = () => {

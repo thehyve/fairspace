@@ -1,45 +1,40 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
-import io.milton.http.ConditionalCompatibleResource;
+import io.milton.http.FileItem;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.http.webdav.WebDavProtocol;
 import io.milton.property.PropertySource;
+import io.milton.property.PropertySource.PropertyMetaData;
+import io.milton.property.PropertySource.PropertySetException;
 import io.milton.resource.*;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
-import static io.fairspace.saturn.rdf.ModelUtils.copyProperties;
-import static io.fairspace.saturn.rdf.ModelUtils.getListProperty;
+import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
-import static io.fairspace.saturn.webdav.DavFactory.*;
-import static io.fairspace.saturn.webdav.DavFactory.currentUserResource;
+import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
-import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
-import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
+import static io.milton.property.PropertySource.PropertyAccessibility.*;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor;
+import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
 
-abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, ConditionalCompatibleResource {
-    protected static final QName IRI_PROPERTY = new QName(FS.NS, "iri");
-    private static final PropertySource.PropertyMetaData IRI_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, String.class);
-    protected static final QName IS_READONLY_PROPERTY = new QName(WebDavProtocol.DAV_URI, "isreadonly");
-    private static final PropertySource.PropertyMetaData IS_READONLY_PROPERTY_META = new PropertySource.PropertyMetaData(READ_ONLY, Boolean.class);
-    protected static final QName DATE_DELETED_PROPERTY = new QName(FS.dateDeleted.getNameSpace(), FS.dateDeleted.getLocalName());
-    private static final PropertySource.PropertyMetaData DATE_DELETED_PROPERTY_META = new PropertySource.PropertyMetaData(WRITABLE, Date.class);
-
-
+abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected final DavFactory factory;
     protected final org.apache.jena.rdf.model.Resource subject;
     protected final Access access;
@@ -67,7 +62,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return (method.isWrite ? access.canWrite() : access.canRead()) || getCurrentUser().isAdmin();
+        // for POST requests performAction *must* implement action-specific checks and throw NotAuthorizedException if necessary
+
+        return (!method.isWrite && access.canList()) || (method.isWrite && access.canWrite());
     }
 
     @Override
@@ -95,7 +92,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
             subject.addProperty(FS.dateDeleted, timestampLiteral())
-                    .addProperty(FS.deletedBy, currentUserResource());
+                    .addProperty(FS.deletedBy, factory.currentUserResource());
         }
     }
 
@@ -109,7 +106,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     private void move(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name) {
-        var newSubject = (parent != null) ? childResource(parent, name) : factory.pathToSubject(name);
+        var newSubject = childSubject(parent != null ? parent : factory.rootSubject, name);
         newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
             parent.addProperty(FS.contains, newSubject);
@@ -118,11 +115,21 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         subject.listProperties()
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
+                .filterDrop(stmt -> stmt.getPredicate().equals(FS.versions))
                 .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
-        subject.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
-                .forEachRemaining(r -> move(r, newSubject, r.getProperty(RDFS.label).getString()));
+        var versions = getListProperty(subject, FS.versions);
+
+
+        if (versions != null) {
+            var newVersions = subject.getModel().createList(versions.iterator()
+                    .mapWith(RDFNode::asResource)
+                    .mapWith(BaseResource::copyVersion));
+            newSubject.addProperty(FS.versions, newVersions);
+        }
+
+        getResourceProperties(subject, FS.contains)
+                .forEach(r -> move(r, newSubject, getStringProperty(r, RDFS.label)));
 
         subject.getModel().listStatements(null, null, subject)
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
@@ -133,17 +140,23 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         subject.addProperty(FS.movedTo, newSubject);
     }
 
+    private static Resource copyVersion(Resource ver) {
+        var newVer = ver.getModel().createResource();
+        copyProperties(ver.asResource(), newVer, RDF.type, FS.dateModified, FS.deletedBy, FS.fileSize, FS.blobId, FS.md5);
+        return newVer;
+    }
+
     @Override
     public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
         var existing = toCollection.child(name);
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, currentUserResource(), timestampLiteral());
+        copy(subject, ((DirectoryResource) toCollection).subject, name, factory.currentUserResource(), timestampLiteral());
     }
 
     private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
-        var newSubject = childResource(parent, name);
+        var newSubject = childSubject(parent, name);
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
         newSubject.addProperty(RDFS.label, name)
@@ -165,68 +178,73 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             newSubject.addLiteral(FS.currentVersion, 1)
                     .addProperty(FS.versions, newSubject.getModel().createList(ver));
         }
+        getResourceProperties(subject, FS.contains)
+                .forEach(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
+    }
 
-        subject.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
-                .forEachRemaining(r -> copy(r, newSubject, r.getProperty(RDFS.label).getString(), user, date));
+    @Override
+    public List<QName> getAllPropertyNames() {
+        return Stream.of(getPropertyDescriptors(getClass()))
+                .filter(p -> p.getReadMethod().isAnnotationPresent(Property.class))
+                .map(p -> new QName(FS.NS, p.getName()))
+                .collect(toList());
     }
 
     @Override
     public Object getProperty(QName name) {
-        if (name.equals(IRI_PROPERTY)) {
-            return subject.getURI();
+        try {
+            return getPropertyDescriptor(this, name.getLocalPart())
+                    .getReadMethod()
+                    .invoke(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        if (name.equals(DATE_DELETED_PROPERTY)) {
-            return parseDate(subject, FS.dateDeleted);
-        }
-        return null;
     }
 
     @Override
-    public void setProperty(QName name, Object value) throws PropertySource.PropertySetException, NotAuthorizedException {
-        if (name.equals(DATE_DELETED_PROPERTY) && value == null && subject.hasProperty(FS.dateDeleted)) {
-                var date = subject.getProperty(FS.dateDeleted).getLiteral();
-                var user = subject.getProperty(FS.deletedBy).getResource();
-
-                restore(subject, date, user);
-        }
-    }
-
-    private void restore(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
-        if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
-            resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
-
-            resource.listProperties(FS.contains)
-                    .forEachRemaining(statement -> restore(statement.getResource(), date, user));
+    public void setProperty(QName name, Object value) throws PropertySetException, NotAuthorizedException {
+        try {
+            getPropertyDescriptor(this, name.getLocalPart())
+                    .getWriteMethod()
+                    .invoke(this, value);
+        } catch (IllegalAccessException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            if (e.getTargetException() instanceof PropertySetException) {
+                throw (PropertySetException) e.getTargetException();
+            }
+            if (e.getTargetException() instanceof NotAuthorizedException) {
+                throw (NotAuthorizedException) e.getTargetException();
+            }
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public PropertySource.PropertyMetaData getPropertyMetaData(QName name) {
-        if (name.equals(IRI_PROPERTY)) {
-            return IRI_PROPERTY_META;
-        }
-        if (name.equals(IS_READONLY_PROPERTY)) {
-            return IS_READONLY_PROPERTY_META;
-        }
-        if (name.equals(DATE_DELETED_PROPERTY)) {
-            return DATE_DELETED_PROPERTY_META;
+        try {
+            var pd = getPropertyDescriptor(this, name.getLocalPart());
+            if (pd != null) {
+                return new PropertyMetaData(pd.getWriteMethod() != null ? WRITABLE : READ_ONLY, pd.getPropertyType());
+            }
+        } catch (Exception ignore) {
         }
         return null;
     }
 
-    @Override
-    public boolean isCompatible(Request.Method m) {
-        if (m.isWrite) {
-            return access.canWrite() && (!subject.hasProperty(FS.dateDeleted) || m == Request.Method.PROPPATCH || m == Request.Method.DELETE);
-        }
+    @Property
+    public String getIri() {
+        return subject.getURI();
+    }
 
-        return true;
+    @Property
+    public Date getDateDeleted() {
+        return parseDate(subject, FS.dateDeleted);
     }
 
     @Override
     public String toString() {
-        return "/" + subject.getURI().substring(factory.baseUri.length());
+        return subject.getURI().substring(factory.rootSubject.getURI().length());
     }
 
     protected org.apache.jena.rdf.model.Resource newVersion() {
@@ -239,7 +257,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addLiteral(FS.fileSize, blob.size)
                 .addProperty(FS.md5, blob.md5)
                 .addProperty(FS.dateModified, timestampLiteral())
-                .addProperty(FS.modifiedBy, currentUserResource());
+                .addProperty(FS.modifiedBy, factory.currentUserResource());
     }
 
     protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {
@@ -247,5 +265,43 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             return null;
         }
         return Date.from(parseXSDDateTimeLiteral(s.getProperty(p).getLiteral()));
+    }
+
+    @Override
+    public String processForm(Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        var action = parameters.get("action");
+        if (action == null) {
+            throw new BadRequestException(this, "No action specified");
+        }
+        performAction(action, parameters, files);
+        return null;
+    }
+
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+        switch (action) {
+            case "undelete" -> undelete();
+            default -> throw new BadRequestException(this, "Unrecognized action " + action);
+        }
+    }
+
+    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
+        if (!access.canWrite()) {
+            throw new NotAuthorizedException(this);
+        }
+        if (!subject.hasProperty(FS.dateDeleted)) {
+            throw new ConflictException(this, "Cannot restore");
+        }
+        var date = subject.getProperty(FS.dateDeleted).getLiteral();
+        var user = subject.getProperty(FS.deletedBy).getResource();
+        undelete(subject, date, user);
+    }
+
+    private void undelete(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
+        if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
+            resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
+
+            resource.listProperties(FS.contains)
+                    .forEachRemaining(statement -> undelete(statement.getResource(), date, user));
+        }
     }
 }

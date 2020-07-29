@@ -47,7 +47,7 @@ export default (props) => {
     const [value, setValue] = React.useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
-    const workspace = workspaces.find(w => w.id === currentWorkspace());
+    const workspace = workspaces.find(w => w.iri === currentWorkspace());
 
     if (workspacesLoading) {
         return (<LoadingInlay />);
@@ -55,7 +55,7 @@ export default (props) => {
     if (!workspace) {
         return (<MessageDisplay message="Workspace does not exist." />);
     }
-    if (!workspace.canRead) {
+    if (!workspace.canCollaborate) {
         return (<MessageDisplay message="You don't have sufficient permissions to access the workspace." />);
     }
     if (workspacesError || !workspace.iri) {

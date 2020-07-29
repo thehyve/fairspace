@@ -214,7 +214,6 @@ saturn:
       provisioner:
       allowVolumeExpansion: true
       reclaimPolicy: Delete
-  maxTriplesToReturn: 50000
   bulkTransactions: true
   # See Apache Jena TDB2 documentation
   storeParams:

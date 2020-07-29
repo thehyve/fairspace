@@ -58,7 +58,7 @@ export class SearchAPI {
 
         // Send the query to the backend and transform the results
         return this.client.search({
-            index: 'fairspace',
+            index: '_all',
             body: {
                 size,
                 from,

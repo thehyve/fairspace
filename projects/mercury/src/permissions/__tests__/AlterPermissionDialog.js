@@ -3,15 +3,15 @@ import {createMount, createShallow} from '@material-ui/core/test-utils';
 import {Button} from '@material-ui/core';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
-import UserSelect from "../UserSelect";
+import PermissionCandidateSelect from "../PermissionCandidateSelect";
+import {AccessRights} from "../permissionUtils";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
     let mount;
 
-    const mockAlterPermissionFn = jest.fn();
+    const mockSetPermissionFn = jest.fn();
     const mockUsers = [
-
         {name: 'Mariah Carey', iri: 'http://localhost/iri/user1-id'},
         {name: 'Michael Jackson', iri: 'http://localhost/iri/user2-id'},
         {name: 'Bruno Mars', iri: 'http://localhost/iri/user3-id'},
@@ -20,11 +20,11 @@ describe('AlterPermissionDialog', () => {
     ];
     const mockCollaborators = [
         {
-            user: 'http://localhost/iri/user2-id',
+            iri: 'http://localhost/iri/user2-id',
             access: 'Write'
         },
         {
-            user: 'http://localhost/iri/user4-id',
+            iri: 'http://localhost/iri/user4-id',
             access: 'Manage'
         }
     ];
@@ -33,10 +33,14 @@ describe('AlterPermissionDialog', () => {
         id: 'user1-id',
         iri: 'http://localhost/iri/user1-id'
     };
-    const mockCollectionId = 500;
-    const mockPermission = {
-        user: 'http://localhost/iri/user2-id',
-        access: 'Write'
+    const mockCollection = {
+        iri: 'http://localhost/iri/c1',
+        location: 'c1'
+    };
+    const mockPrincipal = {
+        iri: 'http://localhost/iri/user2-id',
+        access: 'Write',
+        name: 'Michael Jackson'
     };
 
     let wrapper;
@@ -54,29 +58,31 @@ describe('AlterPermissionDialog', () => {
         wrapper = shallow(<AlterPermissionDialog
             open={false}
             classes={{}}
-            permission={null}
-            collectionId={mockCollectionId}
-            collaborators={mockCollaborators}
+            accessRights={AccessRights}
+            collection={mockCollection}
+            permissions={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
-            alterPermission={mockAlterPermissionFn}
-            users={mockUsers}
+            setPermission={mockSetPermissionFn}
+            permissionCandidates={mockUsers}
+            title="Select access right for a collaborator"
         />);
 
         // initial state if it's open or not
         expect(wrapper.find('[data-testid="permissions-dialog"]').prop('open')).toBeFalsy();
 
         // title =Share with
-        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Share with');
+        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Select access right for a collaborator');
 
-        // render collacborator selector
-        expect(wrapper.find(UserSelect).prop('value')).toBe(null);
+        // render collaborator selector
+        expect(wrapper.find(PermissionCandidateSelect).prop('value')).toBe(null);
 
-        // initial value of the access right is "Read"
-        expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('Read');
-        // populate radio group with 3 access options
-        expect(wrapper.find('[aria-label="Access right"]').childAt(0).prop('value')).toEqual('Read');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(1).prop('value')).toEqual('Write');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Manage');
+        // initial value of the access right is "List"
+        expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('List');
+        // populate radio group with 4 access options
+        expect(wrapper.find('[aria-label="Access right"]').childAt(0).prop('value')).toEqual('List');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(1).prop('value')).toEqual('Read');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Write');
+        expect(wrapper.find('[aria-label="Access right"]').childAt(3).prop('value')).toEqual('Manage');
 
         // render cancel and submit buttons
         expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');
@@ -89,21 +95,20 @@ describe('AlterPermissionDialog', () => {
             <AlterPermissionDialog
                 open
                 classes={{}}
-                user={mockPermission.user}
-                access={mockPermission.access}
-                iri={mockPermission.iri}
-                collectionId={mockCollectionId}
-                collaborators={mockCollaborators}
+                principal={mockPrincipal}
+                access={mockPrincipal.access}
+                accessRights={AccessRights}
+                collection={mockCollection}
                 currentUser={mockCurrentLoggedUser}
-                alterPermission={mockAlterPermissionFn}
-                users={mockUsers}
+                setPermission={mockSetPermissionFn}
+                title="Select access right for a collaborator"
             />
         );
 
-        wrapper.setState({selectedUser: mockPermission.user});
+        wrapper.setState({selectedUser: mockPrincipal.iri});
 
-        expect(wrapper.find(UserSelect)).toHaveLength(0);
-        expect(wrapper.find('[data-testid="user"]').at(0).text()).toEqual('Michael Jackson');
+        expect(wrapper.find(PermissionCandidateSelect)).toHaveLength(0);
+        expect(wrapper.find('[data-testid="principal"]').at(0).text()).toEqual('Michael Jackson');
         expect(wrapper.find('[data-testid="submit"]').at(0).prop('disabled')).toBeFalsy(); // submit button enabled
     });
 });

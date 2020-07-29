@@ -1,15 +1,24 @@
 // @flow
-import axios from 'axios';
-import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
+import {handleHttpError} from '../common/utils/httpUtils';
+import FileAPI from "../file/FileAPI";
+import {MetadataAPI} from "../metadata/common/LinkedDataAPI";
+import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
+import type {User} from "../users/UsersAPI";
 
+const rootUrl = "";
 
-const collectionsUrl = "/api/v1/collections/";
-const headers = {'Content-Type': 'application/json'};
+export type Access = "None" | "List" | "Read" | "Write" | "Manage";
+export type AccessMode = "Restricted" | "MetadataPublished" | "DataPublished";
+export type Status = "Active" | "Archived" | "Closed";
+
+export type Permission = {
+    iri: string; // iri
+    access: Access;
+}
 
 export type CollectionProperties = {|
     name: string;
     description: string;
-    connectionString: string;
     location: string;
     ownerWorkspace: string;
 |};
@@ -19,6 +28,9 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
+    access?: Access;
+    userPermissions: Array<Permission>;
+    workspacePermissions: Array<Permission>;
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
@@ -35,60 +47,76 @@ export type CollectionAuditInfo = {|
     modifiedBy?: string; // iri
     dateDeleted?: string;
     deletedBy?: string; // iri
+    accessMode: AccessMode;
+    status?: Status;
+    availableAccessModes: Array<AccessMode>;
+    availableStatuses: Array<Status>;
+    statusDateModified?: string;
+    statusModifiedBy?: string; // iri
 |};
 
 export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;
 
-
 class CollectionAPI {
-    getCollections(showDeleted = false): Promise<Collection[]> {
-        const getCollectionsHeader = {Accept: 'application/json'};
-        if (showDeleted) {
-            getCollectionsHeader['Show-Deleted'] = 'on';
-        }
-        return axios.get(collectionsUrl, {headers: getCollectionsHeader})
-            .catch(handleHttpError("Failure when retrieving a list of collections"))
-            .then(extractJsonData);
+    getCollectionProperties(name: string): Promise<Collection> {
+        return FileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
-    addCollection(collection: CollectionProperties): Promise<void> {
-        return axios.put(
-            collectionsUrl,
-            JSON.stringify(collection),
-            {headers}
-        ).catch(handleHttpError("Failure while saving a collection"));
+    getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
+        return FileAPI.list(rootUrl, showDeleted)
+            .then(collections => collections.map(mapFilePropertiesToCollection))
+            .catch(handleHttpError("Failure when retrieving a list of collections"));
     }
 
-    updateCollection(collection: Collection): Promise<void> {
-        return axios.patch(
-            collectionsUrl,
-            JSON.stringify(collection),
-            {headers}
-        ).catch(handleHttpError("Failure while updating a collection"));
-    }
-
-    deleteCollection(collection: Resource, showDeleted = false): Promise<void> {
-        const deleteCollectionsHeader = {...headers};
-        if (showDeleted) {
-            deleteCollectionsHeader['Show-Deleted'] = 'on';
-        }
-        return axios.delete(
-            `${collectionsUrl}?iri=${encodeURIComponent(collection.iri)}`,
-            {headers: deleteCollectionsHeader}
-        ).catch(handleHttpError("Failure while deleting collection"));
-    }
-
-    undeleteCollection(collection: Resource): Promise<void> {
-        collection.dateDeleted = null;
-        const undeleteCollectionHeader = {
-            ...headers,
-            'Show-Deleted': 'on'
+    addCollection(collection: CollectionProperties, vocabulary): Promise<void> {
+        const options = {
+            headers: {
+                Owner: collection.ownerWorkspace
+            },
+            withCredentials: true
         };
-        return axios.patch(
-            collectionsUrl,
-            JSON.stringify(collection),
-            {headers: undeleteCollectionHeader}
-        ).catch(handleHttpError("Failure while undeleting collection"));
+        return FileAPI.createDirectory(collection.location, options)
+            .then(() => this.getCollectionProperties(collection.location))
+            .then((properties) => {
+                collection.iri = properties.iri;
+                return this.updateCollection(collection, vocabulary);
+            });
+    }
+
+    deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
+        return FileAPI.delete(collection.location, showDeleted)
+            .catch(handleHttpError("Failure while deleting collection"));
+    }
+
+    undeleteCollection(collection: CollectionProperties): Promise<void> {
+        return FileAPI.undelete(collection.location)
+            .catch(handleHttpError("Failure while undeleting collection"));
+    }
+
+    relocateCollection(oldLocation: string, newLocation: string): Promise<void> {
+        return FileAPI.move(oldLocation, newLocation)
+            .catch(handleHttpError("Failure while relocating collection"));
+    }
+
+    updateCollection(collection: Collection, vocabulary): Promise<void> {
+        const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
+        return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
+            .catch(e => {
+                console.error(e);
+                throw Error("Failure while updating a collection");
+            });
+    }
+
+    setAccessMode(location: String, mode: AccessMode) {
+        return FileAPI.post(location, {action: 'set_access_mode', mode});
+    }
+
+    setStatus(location: String, status: Status) {
+        return FileAPI.post(location, {action: 'set_status', status});
+    }
+
+    setPermission(location, principal, access) {
+        return FileAPI.post(location, {action: 'set_permission', principal, access});
     }
 }
 

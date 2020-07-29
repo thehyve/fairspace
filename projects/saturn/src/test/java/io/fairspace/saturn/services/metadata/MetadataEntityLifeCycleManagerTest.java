@@ -1,7 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
@@ -10,16 +8,12 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
-import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.auth.RequestContext.ADD_SHARED_METADATA;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
@@ -30,27 +24,15 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class MetadataEntityLifeCycleManagerTest {
-    @Mock
-    private User user;
-    @Mock
-    private HttpServletRequest request;
-    @Mock
-    private PermissionsService permissionsService;
-
-
     private MetadataEntityLifeCycleManager lifeCycleManager;
     private Dataset ds;
     private Model model;
 
     private Node graph = createURI("http://graph");
-    private final Node userIri = createURI("http://user");
-    private Resource userResource = createResource("http://user");
+    private final Node userIri = createURI("http://localhost/iri/userid");
+    private Resource userResource = createResource("http://localhost/iri/userid");
 
     private Resource resource = createResource("http://resource");
     private Property property = ResourceFactory.createProperty("http://property");
@@ -63,11 +45,9 @@ public class MetadataEntityLifeCycleManagerTest {
 
         initVocabularies(ds);
 
-        currentRequest.set(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
-        when(user.getIri()).thenReturn(userIri);
+        setupRequestContext(ADD_SHARED_METADATA);
 
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI, permissionsService);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI);
     }
 
     @Test
@@ -136,8 +116,6 @@ public class MetadataEntityLifeCycleManagerTest {
         delta.add(resource, property, otherResource);
 
         lifeCycleManager.updateLifecycleMetadata(delta);
-
-        verify(permissionsService).createResources(Set.of(resource));
     }
 
     @Test

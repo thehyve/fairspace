@@ -1,11 +1,9 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.permissions.Access;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Range;
 import io.milton.http.Request;
-import io.milton.http.XmlWriter;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -27,11 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static io.fairspace.saturn.webdav.DavFactory.childResource;
+import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
-    private static final List<QName> DIRECTORY_PROPERTIES = List.of(IRI_PROPERTY, IS_READONLY_PROPERTY, DATE_DELETED_PROPERTY);
-
     public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
         super(factory, subject, access);
     }
@@ -68,13 +64,12 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             throw new ConflictException(existing);
         }
 
-        var subj = childResource(subject, newName);
+        var subj = childSubject(subject, newName);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         var t = WebDAVServlet.timestampLiteral();
 
-        subj
-                .addProperty(RDFS.label, newName)
-                .addProperty(FS.createdBy, DavFactory.currentUserResource())
+        subj.addProperty(RDFS.label, newName)
+                .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
         subject.addProperty(FS.contains, subj);
@@ -83,14 +78,13 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public Resource child(String childName) throws NotAuthorizedException, BadRequestException {
-        return factory.getResource(childResource(subject, childName), access);
+        return factory.getResource(childSubject(subject, childName), access);
     }
 
     @Override
     public List<? extends Resource> getChildren() throws NotAuthorizedException, BadRequestException {
         return subject.listProperties(FS.contains)
-                .mapWith(Statement::getObject)
-                .mapWith(RDFNode::asResource)
+                .mapWith(Statement::getResource)
                 .mapWith(r -> factory.getResource(r, access))
                 .filterDrop(Objects::isNull)
                 .toList();
@@ -106,26 +100,26 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
-        var w = new XmlWriter(out);
-        w.open("html");
-        w.open("head");
-        w.close("head");
-        w.open("body");
-        w.begin("h1").open().writeText(this.getName()).close();
-        w.open("table");
-        for (var r : getChildren()) {
-            w.open("tr");
-            w.open("td");
-            w.begin("a").writeAtt("href", r.getName() + (r instanceof FolderResource ? "/" : "")).open().writeText(r.getName()).close();
-            w.close("td");
-            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
-            w.begin("td").open().writeText((r instanceof FileResource) ? ((FileResource) r).getContentLength() + " bytes" : "DIR").close();
-            w.close("tr");
-        }
-        w.close("table");
-        w.close("body");
-        w.close("html");
-        w.flush();
+//        var w = new XmlWriter(out);
+//        w.open("html");
+//        w.open("head");
+//        w.close("head");
+//        w.open("body");
+//        w.begin("h1").open().writeText(this.getName()).close();
+//        w.open("table");
+//        for (var r : getChildren()) {
+//            w.open("tr");
+//            w.open("td");
+//            w.begin("a").writeAtt("href", r.getName() + (r instanceof FolderResource ? "/" : "")).open().writeText(r.getName()).close();
+//            w.close("td");
+//            w.begin("td").open().writeText(r.getModifiedDate() + "").close();
+//            w.begin("td").open().writeText((r instanceof FileResource) ? ((FileResource) r).getContentLength() + " bytes" : "DIR").close();
+//            w.close("tr");
+//        }
+//        w.close("table");
+//        w.close("body");
+//        w.close("html");
+//        w.flush();
     }
 
     @Override
@@ -141,11 +135,6 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     @Override
     public Long getContentLength() {
         return null;
-    }
-
-    @Override
-    public List<QName> getAllPropertyNames() {
-        return DIRECTORY_PROPERTIES;
     }
 
     @Override

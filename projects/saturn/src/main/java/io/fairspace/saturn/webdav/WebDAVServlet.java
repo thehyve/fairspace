@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
 
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+import static io.milton.http.ResponseStatus.SC_UNSUPPORTED_MEDIA_TYPE;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
@@ -35,6 +36,7 @@ import static java.util.stream.Collectors.toList;
 public class WebDAVServlet extends HttpServlet {
     private static final String BLOB_ATTRIBUTE = "BLOB";
     private static final String TIMESTAMP_ATTRIBUTE = "TIMESTAMP";
+    public static final String POST_COMMIT_ACTION_ATTRIBUTE = "POST_COMMIT";
 
     private final HttpManager httpManager;
     private final BlobStore store;
@@ -71,12 +73,24 @@ public class WebDAVServlet extends HttpServlet {
         try {
             setThreadlocals(req, res);
 
-            if (req.getMethod().equalsIgnoreCase("PUT")) {
-                var blob = store.store(req.getInputStream());
-                req.setAttribute(BLOB_ATTRIBUTE, blob);
+            switch (req.getMethod().toUpperCase()) {
+                case "PUT" -> req.setAttribute(BLOB_ATTRIBUTE, store.store(req.getInputStream()));
+                case "MKCOL" -> {
+                    try (var in = req.getInputStream()) {
+                        if (in.read() >= 0) {
+                            res.setStatus(SC_UNSUPPORTED_MEDIA_TYPE); // RFC2518:8.3.1
+                            return;
+                        }
+                    }
+                }
             }
 
             httpManager.process(new ServletRequest(req, req.getServletContext()), new ServletResponse(res));
+
+            var postCommitAction = (Runnable) req.getAttribute(POST_COMMIT_ACTION_ATTRIBUTE);
+            if (postCommitAction != null) {
+                postCommitAction.run();
+            }
         } finally {
             clearThreadlocals();
             res.getOutputStream().flush();
@@ -86,22 +100,28 @@ public class WebDAVServlet extends HttpServlet {
 
 
     static Integer fileVersion() {
-        return Optional.ofNullable(currentRequest.get())
+        return Optional.ofNullable(getCurrentRequest())
                 .map(r -> r.getHeader("Version"))
                 .map(Integer::parseInt)
                 .orElse(null);
     }
 
+    static String owner() {
+        return Optional.ofNullable(getCurrentRequest())
+                .map(r -> r.getHeader("Owner"))
+                .orElse(null);
+    }
+
     static boolean showDeleted() {
-        return "on".equalsIgnoreCase(currentRequest.get().getHeader("Show-Deleted"));
+        return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
     }
 
     static BlobInfo getBlob() {
-        return (BlobInfo) currentRequest.get().getAttribute(BLOB_ATTRIBUTE);
+        return (BlobInfo) getCurrentRequest().getAttribute(BLOB_ATTRIBUTE);
     }
 
     static Literal timestampLiteral() {
-        var r = currentRequest.get();
+        var r = getCurrentRequest();
         var t = (Literal) r.getAttribute(TIMESTAMP_ATTRIBUTE);
         if (t == null) {
             t = toXSDDateTimeLiteral(Instant.now());

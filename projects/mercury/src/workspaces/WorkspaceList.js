@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {useHistory} from 'react-router-dom';
 import {
     Paper,
@@ -9,13 +9,10 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    withStyles,
 } from "@material-ui/core";
 import {Lock} from "@material-ui/icons";
 
 import type {Workspace} from './WorkspacesAPI';
-import {isAdmin} from "../users/userUtils";
-import UserContext from "../users/UserContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
@@ -24,29 +21,14 @@ type Accessible = {
     hasAccess: boolean
 }
 
-const styles = () => ({
-    statusColumn: {
-        fontSize: 'small',
-        color: 'gray',
-    }
-});
-
 const columns = {
-    hasAccess: {
-        valueExtractor: 'hasAccess',
+    canCollaborate: {
+        valueExtractor: 'canCollaborate',
         label: ' '
-    },
-    id: {
-        valueExtractor: 'id',
-        label: 'Id'
     },
     name: {
         valueExtractor: 'name',
         label: 'Name'
-    },
-    status: {
-        valueExtractor: 'status',
-        label: 'Status'
     }
 };
 
@@ -54,22 +36,18 @@ const WorkspaceList = ({
     workspaces = [],
     isSelected = () => false,
     toggleWorkspace = () => {},
-    classes = {}
 }) => {
-    const {currentUser = {authorizations: []}} = useContext(UserContext);
     const history = useHistory();
 
     const onWorkspaceDoubleClick = (workspace: Workspace & Accessible) => {
-        if (workspace.hasAccess) {
-            history.push(`/workspaces/${workspace.id}/`);
+        if (workspace.canCollaborate) {
+            history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
         }
     };
-    const onWorkspaceClick = (workspace: Workspace & Accessible) => {
+    const onWorkspaceClick = (workspace: Workspace) => {
         toggleWorkspace(workspace);
     };
-
-    const workspacesWithAccess = workspaces.map(ws => ({...ws, hasAccess: isAdmin(currentUser) || ws.canRead}));
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'id');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!workspaces || workspaces.length === 0) {
@@ -83,7 +61,6 @@ const WorkspaceList = ({
             />
         );
     }
-
 
     return (
         <Paper>
@@ -111,29 +88,17 @@ const WorkspaceList = ({
 
                         return (
                             <TableRow
-                                key={workspace.id}
+                                key={workspace.iri}
                                 hover
                                 onClick={() => onWorkspaceClick(workspace)}
                                 onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                                 selected={selected}
                             >
-                                <TableCell style={{maxWidth: 32}} component="th" scope="row" key="hasAccess">
-                                    {!workspace.hasAccess && (<Lock />)}
-                                </TableCell>
-                                <TableCell style={{maxWidth: 160}} component="th" scope="row" key="id">
-                                    {workspace.id}
+                                <TableCell style={{maxWidth: 32, width: 32}} component="th" scope="row" key="canCollaborate">
+                                    {!workspace.canCollaborate && (<Lock />)}
                                 </TableCell>
                                 <TableCell style={{maxWidth: 160}} component="th" scope="row" key="name">
                                     {workspace.name}
-                                </TableCell>
-                                <TableCell
-                                    style={{maxWidth: 80}}
-                                    className={`${classes.statusColumn}`}
-                                    component="th"
-                                    scope="row"
-                                    key="label"
-                                >
-                                    {workspace.status ? workspace.status.toLocaleUpperCase() : ''}
                                 </TableCell>
                             </TableRow>
                         );
@@ -153,4 +118,4 @@ const WorkspaceList = ({
     );
 };
 
-export default withStyles(styles)(WorkspaceList);
+export default WorkspaceList;

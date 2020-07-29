@@ -54,8 +54,6 @@ public class Config {
 
         public File transactionLogPath = new File("data/log");
 
-        public long maxTriplesToReturn = 50000;
-
         public boolean bulkTransactions = true;
 
         public ElasticSearch elasticSearch = new ElasticSearch();
@@ -66,6 +64,7 @@ public class Config {
             public ESSettings settings = new ESSettings.Builder()
                     .clusterName("fairspace")
                     .hostAndPort("127.0.0.1", 9300)
+                    .indexName("fairspace")
                     .build();
             public Map<String, String> advancedSettings = new HashMap<>();
         }

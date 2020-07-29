@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort,
+    joinWithSeparator, stableSort, camelCaseToWords,
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -140,5 +140,26 @@ describe('stableSort', () => {
         const a = ["c", "a", "b"];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
+    });
+});
+
+describe('camelCaseToWords', () => {
+    it('should return unchanged string', () => {
+        expect(camelCaseToWords('Test')).toEqual('Test');
+    });
+    it('should return whitespace separated string', () => {
+        expect(camelCaseToWords('TestWithCamelCase')).toEqual('Test with camel case');
+    });
+    it('should return unchanged for single letter', () => {
+        expect(camelCaseToWords('x')).toEqual('x');
+    });
+    it('should return empty string for null', () => {
+        expect(camelCaseToWords(null)).toEqual('');
+    });
+    it('should return empty string for empty', () => {
+        expect(camelCaseToWords(null)).toEqual('');
+    });
+    it('should return empty string for non-string value', () => {
+        expect(camelCaseToWords(['test'])).toEqual('');
     });
 });

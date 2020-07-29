@@ -1,9 +1,7 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.auth.RequestContext;
-import io.fairspace.saturn.services.permissions.Access;
-import io.fairspace.saturn.services.permissions.PermissionsService;
-import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
@@ -12,52 +10,51 @@ import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.*;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DavFactoryTest {
     public static final long FILE_SIZE = 3L;
-    public static final String BASE_PATH = "/api/v1/webdav/";
+    public static final String BASE_PATH = "/api/v1/webdav";
     public static final QName VERSION = new QName(FS.NS, "version");
-    private final String baseUri = "http://example.com/" + BASE_PATH;
+    private static final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
-    private PermissionsService permissions;
-    @Mock
-    HttpServletRequest request;
+    private MetadataPermissions permissions;
     @Mock
     BlobStore store;
     @Mock
     InputStream input;
-    private User user = new User();
-    private final Model model = createTxnMem().getDefaultModel();
+    @Mock
+    MailService mailService;
+    private org.eclipse.jetty.server.Request request;
+
     private ResourceFactory factory;
+    private Model model = createTxnMem().getDefaultModel();
 
     @Before
     public void before() {
-        factory = new DavFactory(baseUri, createTxnMem().getDefaultModel(), store, permissions);
-        RequestContext.currentRequest.set(request);
-        user.setIri(createURI("http://ex.com/user"));
-        when(request.getAttribute(User.class.getName())).thenReturn(user);
-        model.wrapAsResource(user.getIri()).addProperty(RDF.type, FS.User);
+        factory = new DavFactory(model.createResource(baseUri), store, mailService);
+
+        setupRequestContext();
+        request = getCurrentRequest();
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 3, "md5"));
-        when(permissions.getPermission(any())).thenReturn(Access.Manage);
     }
 
 
@@ -81,25 +78,80 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testNonExistingResource() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testCreateCollectionStartingWithDash() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        var coll = root.createCollection("-coll");
+        assertTrue(coll instanceof FolderResource);
+        assertEquals("-coll", coll.getName());
+        assertNotNull(root.child("-coll"));
+        assertNotNull(factory.getResource(null,"/api/v1/webdav/-coll/"));
+        assertEquals(1, root.getChildren().size());
+    }
+
+    @Test
+    public void testCreateCollectionWithInvalidName() throws NotAuthorizedException, ConflictException, BadRequestException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        try {
+            root.createCollection("");
+            fail("Empty collection name should be rejected.");
+        } catch (BadRequestException e) {
+            assertEquals("The collection name is empty.", e.getReason());
+        }
+        var tooLongName = "test123_56".repeat(13); // 130 characters
+        try {
+            root.createCollection(tooLongName);
+            fail("Collection name should be rejected as too long.");
+        } catch (BadRequestException e) {
+            assertEquals("The collection name exceeds maximum length 127.", e.getReason());
+        }
+        String[] invalidNames = {".", "..", ".test", "%test%", "!", "\"", "#", "$test", "a test"};
+        for (var invalidName: invalidNames) {
+            try {
+                root.createCollection(invalidName);
+                fail("Collection name should be rejected as invalid: " + invalidName);
+            } catch (BadRequestException e) {
+                assertEquals(
+                        "The collection name should only contain letters a-z and A-Z, " +
+                                "numbers 0-9, and the characters `-` and `_`.",
+                        e.getReason());
+            }
+        }
+    }
+
+    @Test
+    public void testNonExistingResource() throws NotAuthorizedException, BadRequestException {
         assertNull(factory.getResource(null, BASE_PATH + "coll/dir/file"));
     }
 
-    @Test(expected = NotAuthorizedException.class)
+    @Test
     public void testInaccessibleResource() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        var coll = root.createCollection("coll");
+        root.createCollection("coll");
 
-        when(permissions.getPermission(any())).thenReturn(Access.None);
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"));
 
-        factory.getResource(null, BASE_PATH + "coll");
+        assertTrue(root.getChildren().isEmpty());
+
+        var coll = root.child("coll");
+        for (var method: Request.Method.values()) {
+            assertFalse("Shouldn't be able to " + method, coll.authorise(null, method, null));
+        }
     }
 
-    @Test(expected = ConflictException.class)
-    public void testCreateCollectionTwice() throws NotAuthorizedException, BadRequestException, ConflictException {
+    @Test
+    public void testCreateCollectionTwiceFails() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        root.createCollection("coll");
-        root.createCollection("coll");
+        assertNotNull(root.createCollection("coll"));
+        assertNull(root.createCollection("coll"));
+        assertEquals(1, root.getChildren().size());
+    }
+
+    @Test
+    public void testCreateCollectionWithSameNameButDifferentCaseFails() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        assertNotNull(root.createCollection("coll"));
+        assertNull(root.createCollection("COLL"));
+        assertEquals(1, root.getChildren().size());
     }
 
     @Test
@@ -138,7 +190,8 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        when(permissions.getPermission(any())).thenReturn(Access.Read);
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"))
+                .add(createResource(baseUri + "/coll"), FS.canRead, model.createResource(baseUri + "/coll"));
 
         assertFalse(root.child("coll").authorise(null, Request.Method.PUT, null));
     }
@@ -197,7 +250,7 @@ public class DavFactoryTest {
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", FILE_SIZE + 1, "md5"));
         ((ReplaceableResource) file).replaceContent(input, FILE_SIZE + 1);
 
-        ((MultiNamespaceCustomPropertyResource)coll.child("file")).setProperty(VERSION, 1);
+        ((PostableResource)coll.child("file")).processForm(Map.of("action", "revert", "version", "1"), Map.of());
 
         var ver3 = coll.child("file");
         assertEquals(3, ((MultiNamespaceCustomPropertyResource) ver3).getProperty(VERSION));
@@ -248,9 +301,9 @@ public class DavFactoryTest {
         ((DeletableResource)file).delete();
 
         when(request.getHeader("Show-Deleted")).thenReturn("on");
-        var deleted = (MultiNamespaceCustomPropertyResource) coll.child("file");
+        var deleted = (PostableResource) coll.child("file");
 
-        deleted.setProperty(new QName(FS.NS, "dateDeleted"), null);
+        deleted.processForm(Map.of("action", "undelete"), Map.of());
 
         var restored = (MultiNamespaceCustomPropertyResource) coll.child("file");
         assertNull(restored.getProperty(new QName(FS.NS, "dateDeleted")));
@@ -327,6 +380,18 @@ public class DavFactoryTest {
         assertNotNull(factory.getResource(null, BASE_PATH + "/new/dir/file"));
     }
 
+    @Test(expected = ConflictException.class)
+    public void testRenameCollectionToExistingFails() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll1");
+
+        var coll2 = (FolderResource) root.createCollection("coll2");
+        var dir = coll2.createCollection("dir");
+        ((FolderResource) dir).createNew("file", input, FILE_SIZE, "text/abc");
+
+        coll2.moveTo(root, "COLL1");
+    }
+
     @Test
     public void testCopyDirectory() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
@@ -346,4 +411,17 @@ public class DavFactoryTest {
         assertNotNull(factory.getResource(null, BASE_PATH + "/c2/dir2/new"));
         assertNotNull(factory.getResource(null, BASE_PATH + "/c2/dir2/new/file"));
     }
+
+    @Test(expected = ConflictException.class)
+    public void testCopyCollectionToExistingFails() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll1");
+
+        var coll2 = (FolderResource) root.createCollection("coll2");
+        var dir = coll2.createCollection("dir");
+        ((FolderResource) dir).createNew("file", input, FILE_SIZE, "text/abc");
+
+        coll2.copyTo(root, "COLL1");
+    }
+
 }

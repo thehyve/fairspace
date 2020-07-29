@@ -2,15 +2,15 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
-import io.fairspace.saturn.services.users.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
+import org.keycloak.representations.AccessToken;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
 import static java.lang.System.currentTimeMillis;
 
 @Slf4j
@@ -19,7 +19,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";
 
     private final TransactionLog transactionLog;
-    private volatile User user;
+    private volatile AccessToken user;
 
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
@@ -33,10 +33,10 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
         critical(() -> {
-            var currentUser = getCurrentUser();
+            var currentUser = getAccessToken();
             if (currentUser != user) {
                 user = currentUser;
-                transactionLog.onMetadata(user.getId(), user.getName(), currentTimeMillis());
+                transactionLog.onMetadata(user.getSubject(), user.getName(), currentTimeMillis());
             }
             switch (action) {
                 case ADD -> transactionLog.onAdd(graph, subject, predicate, object);

@@ -53,7 +53,6 @@ const LinkedDataProperty = (
     const addInputComponent = valueComponentFactory.addComponent(property);
 
     const labelTooltip = <><Iri iri={path} /><div style={{marginTop: 4}}>{description}</div></>;
-
     return (
         <FormControl
             required={formEditable && minValuesCount > 0}

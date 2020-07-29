@@ -6,6 +6,7 @@
  * @param providedMessage   If the backend does not provide an error message, this message will be given in the Error
  * @returns {Function}
  */
+import {AxiosError} from 'axios';
 import ErrorDialog from "../components/ErrorDialog";
 
 export const handleAuthError = (status) => {
@@ -25,8 +26,11 @@ export const handleAuthError = (status) => {
 };
 
 export function handleHttpError(providedMessage) {
-    return ({response}) => {
-        const {status, data} = response;
+    return (e: Error | AxiosError) => {
+        if (!e || !e.response) {
+            throw e;
+        }
+        const {response: {status, data, message}} = e;
 
         switch (status) {
             case 401:
@@ -40,7 +44,7 @@ export function handleHttpError(providedMessage) {
                 }
 
                 // If a message was provided by the backend, provide it to the calling party
-                const defaultMessage = `${providedMessage} ${response.message || ''}`.trim();
+                const defaultMessage = `${providedMessage} ${message || ''}`.trim();
                 throw Error((data && data.message) || defaultMessage);
             }
         }

@@ -1,21 +1,17 @@
 package io.fairspace.saturn.config;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ServicesTest {
-    @Mock
-    private Dataset dataset;
+    private Dataset dataset = DatasetFactory.create();
     private Config config = new Config();
     private Services svc;
 
@@ -50,12 +46,7 @@ public class ServicesTest {
 
     @Test
     public void getPermissionsService() {
-        assertNotNull(svc.getPermissionsService());
-    }
-
-    @Test
-    public void getCollectionsService() {
-        assertNotNull(svc.getCollectionsService());
+        assertNotNull(svc.getMetadataPermissions());
     }
 
     @Test

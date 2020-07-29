@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.dao;
 
-import io.fairspace.saturn.services.users.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
@@ -8,11 +7,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
-import static io.fairspace.saturn.auth.RequestContext.currentRequest;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -28,18 +23,13 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class DAOTest {
     private Dataset dataset;
     private DAO dao;
     private Entity entity;
     private EntityWithInheritedProperties entityWithInheritedProperties;
     private LifecycleAwareEntity basicEntity;
-    @Mock
-    private HttpServletRequest request;
 
     @Before
     public void before() {
@@ -48,10 +38,7 @@ public class DAOTest {
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
-        var user = new User();
-        user.setIri(createURI("http://ex.com/user"));
-        currentRequest.set(request);
-        when(request.getAttribute(eq(User.class.getName()))).thenReturn(user);
+        setupRequestContext();
     }
 
     @Test
@@ -246,7 +233,7 @@ public class DAOTest {
         dao.write(entity1);
         var entity2 = dao.read(basicEntity.getClass(), basicEntity.getIri());
         assertEquals(t1, entity2.getDateCreated());
-        assertTrue(entity2.getDateModified().isAfter(t1));
+        assertFalse(t1.isAfter(entity2.getDateModified()));
         ensureRecentInstant(entity2.getDateModified());
         assertNotNull(entity2.getModifiedBy());
         assertEquals(entity2.getCreatedBy(), entity2.getModifiedBy());

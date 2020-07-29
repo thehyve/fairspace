@@ -22,7 +22,7 @@ const WorkspaceRoutes = () => (
     <Switch>
         <Route path="/workspaces" exact component={WorkspacePage} />
 
-        <Route path="/workspaces/:workspace" exact render={props => (<WorkspaceOverview {...props} />)} />
+        <Route path="/workspace" exact render={props => (<WorkspaceOverview {...props} />)} />
 
         <Route
             path="/collections"

@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.*;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
@@ -25,11 +25,14 @@ public class UserApp extends BaseApp {
 
         get("/current", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(getCurrentUser());
+            var user = service.getUser(getUserURI());
+            user.setAdmin(isAdmin());
+            user.setViewPublicMetadata(canViewPublicMetadata());
+            return mapper.writeValueAsString(user);
         });
 
         post("/current/logout", (req, res) -> {
-            service.logoutCurrent(req.raw());
+            service.logoutCurrent();
             res.status(SC_NO_CONTENT);
             return "";
         });

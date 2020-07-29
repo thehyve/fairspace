@@ -28,7 +28,7 @@ beforeEach(() => {
 
     Object.defineProperty(window, 'location', {
         value: {
-            pathname: '/workspaces/ws1/'
+            pathname: '/workspace'
         }
     });
 });

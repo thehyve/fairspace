@@ -22,7 +22,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentUser;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.String.format;
 import static java.time.Instant.now;
@@ -91,7 +91,7 @@ public class DAO {
 
             if (entity instanceof LifecycleAwarePersistentEntity) {
                 var basicEntity = (LifecycleAwarePersistentEntity) entity;
-                var user = getUserIRI();
+                var user = getUserURI();
                 basicEntity.setDateModified(now());
                 basicEntity.setModifiedBy(user);
 
@@ -126,10 +126,6 @@ public class DAO {
 
             return entity;
         });
-    }
-
-    private static Node getUserIRI() {
-        return ofNullable(getCurrentUser()).map(PersistentEntity::getIri).orElse(null);
     }
 
     /**
@@ -189,7 +185,7 @@ public class DAO {
         var existing = (T) read(entity.getClass(), entity.getIri());
         if (existing != null) {
             existing.setDateDeleted(now());
-            existing.setDeletedBy(getUserIRI());
+            existing.setDeletedBy(getUserURI());
             return write(existing);
         }
         return null;

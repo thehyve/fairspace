@@ -14,7 +14,7 @@ describe('FileAPI', () => {
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith(
                 '/src',
-                {details: true, withCredentials: true}
+                {details: true, withCredentials: true, data: '<propfind><allprop /></propfind>'}
             );
         });
 
