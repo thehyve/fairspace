@@ -13,6 +13,8 @@ import org.keycloak.adapters.spi.AuthChallenge;
 import org.keycloak.adapters.spi.HttpFacade;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
+import javax.servlet.ServletRequest;
+
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
@@ -53,5 +55,10 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
                 completeOAuthAuthentication(principal);
             }
         };
+    }
+
+    @Override
+    public void logout(ServletRequest request) {
+        logoutCurrent((Request) request);
     }
 }

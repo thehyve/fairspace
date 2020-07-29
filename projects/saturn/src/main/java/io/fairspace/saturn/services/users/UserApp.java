@@ -32,7 +32,7 @@ public class UserApp extends BaseApp {
         });
 
         post("/current/logout", (req, res) -> {
-            service.logoutCurrent(req.raw());
+            service.logoutCurrent();
             res.status(SC_NO_CONTENT);
             return "";
         });
