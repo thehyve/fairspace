@@ -1,6 +1,6 @@
 import React, {useCallback, useContext} from 'react';
 // Utils
-import {canAddPublicMetadata} from "../../users/userUtils";
+import {canAddSharedMetadata} from "../../users/userUtils";
 import {
     extendPropertiesWithVocabularyEditingInfo,
     getNamespaces,
@@ -27,7 +27,7 @@ const LinkedDataVocabularyProvider = ({children, authorizations, ...otherProps})
 
     const {currentUser} = useContext(UserContext);
 
-    const canEdit = canAddPublicMetadata(currentUser);
+    const canEdit = canAddSharedMetadata(currentUser);
 
     const createLinkedDataEntity = (subject, values, type) => createVocabularyEntity(subject, values, metaVocabulary, type);
 

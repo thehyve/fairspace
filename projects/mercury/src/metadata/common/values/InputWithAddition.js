@@ -6,7 +6,7 @@ import Add from '@material-ui/icons/Add';
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/components/LoadingInlay";
 import MessageDisplay from "../../../common/components/MessageDisplay";
-import {canAddPublicMetadata} from "../../../users/userUtils";
+import {canAddSharedMetadata} from "../../../users/userUtils";
 import UserContext from "../../../users/UserContext";
 
 const InputWithAddition = ({
@@ -59,7 +59,7 @@ const InputWithAddition = ({
                 {children}
             </Grid>
             <Grid item xs={2}>
-                {canAddPublicMetadata(currentUser) && renderAddFunctionality()}
+                {canAddSharedMetadata(currentUser) && renderAddFunctionality()}
             </Grid>
         </Grid>
     );
