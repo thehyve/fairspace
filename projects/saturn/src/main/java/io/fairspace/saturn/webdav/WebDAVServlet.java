@@ -27,6 +27,7 @@ import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 /**
  * Ensures that all operations are handled in one transaction.
@@ -101,7 +102,10 @@ public class WebDAVServlet extends HttpServlet {
 
     static Integer fileVersion() {
         return Optional.ofNullable(getCurrentRequest())
-                .map(r -> r.getHeader("Version"))
+                .map(r -> (isEmpty(r.getParameter("Version"))
+                        ? r.getHeader("Version")
+                        : r.getParameter("Version")
+                ))
                 .map(Integer::parseInt)
                 .orElse(null);
     }

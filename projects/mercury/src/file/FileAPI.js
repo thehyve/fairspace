@@ -126,8 +126,11 @@ class FileAPI {
      * It will calls the browser API to open the file if it's 'openable' otherwise the browser will show download dialog
      * @param path
      */
-    open(path) {
-        const link = this.getDownloadLink(path);
+    open(path, version = null) {
+        let link = this.getDownloadLink(path);
+        if (version !== null) {
+            link += `?Version=${version}`;
+        }
         window.open(link);
     }
 
@@ -180,7 +183,7 @@ class FileAPI {
     revertToVersion(path, version) {
         if (!path) return Promise.reject(Error("No path specified for version reverting"));
 
-        return this.post(path, {action: 'restore', version})
+        return this.post(path, {action: 'revert', version})
             .catch(() => {
                 throw new Error("Could not revert a file to a previous version.");
             });
