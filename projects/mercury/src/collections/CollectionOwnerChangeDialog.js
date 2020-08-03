@@ -7,6 +7,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import {compareBy} from "../common/utils/genericUtils";
 import Dropdown from "../metadata/common/values/Dropdown";
+import ConfirmationButton from "../common/components/ConfirmationButton";
 
 
 export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy, onClose}) => {
@@ -61,14 +62,22 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy,
                 </div>
             </DialogContent>
             <DialogActions>
-                <Button
+                <ConfirmationButton
                     onClick={handleSubmit}
-                    color="primary"
                     disabled={Boolean(!selectedValue)}
-                    data-testid="submit"
+                    message={`Are you sure you want to transfer the ownership 
+                    on collection ${collection.name} to workspace ${selectedValue && selectedValue.label}?`}
+                    agreeButtonText="Yes"
+                    dangerous
                 >
-                    Save
-                </Button>
+                    <Button
+                        color="primary"
+                        disabled={Boolean(!selectedValue)}
+                        data-testid="submit"
+                    >
+                        Save
+                    </Button>
+                </ConfirmationButton>
                 <Button
                     onClick={handleCancel}
                     color="default"

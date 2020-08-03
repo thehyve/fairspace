@@ -316,6 +316,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CollectionPropertyChangeDialog
                         collection={collection}
                         title="Select collection access mode"
+                        confirmationMessage={`Are you sure you want to change the access mode of collection ${collection.name}`}
                         currentValue={collection.accessMode}
                         availableValues={collection.availableAccessModes}
                         setValue={this.props.setAccessMode}
@@ -326,6 +327,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CollectionPropertyChangeDialog
                         collection={collection}
                         title="Select collection status"
+                        confirmationMessage={`Are you sure you want to change the status of collection ${collection.name}`}
                         currentValue={collection.status}
                         availableValues={collection.availableStatuses}
                         setValue={this.props.setStatus}
