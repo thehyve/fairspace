@@ -138,7 +138,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     );
 
     function getDownloadLink(version) {
-        return FileAPI.getDownloadLink(selectedFile.filename) + `?Version=${version}`;
+        return FileAPI.getDownloadLink(selectedFile.filename) + `?version=${version}`;
     }
 
     const renderDownloadActionCell = (rowIndex) => (

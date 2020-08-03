@@ -102,9 +102,9 @@ public class WebDAVServlet extends HttpServlet {
 
     static Integer fileVersion() {
         return Optional.ofNullable(getCurrentRequest())
-                .map(r -> (isEmpty(r.getParameter("Version"))
+                .map(r -> (isEmpty(r.getParameter("version"))
                         ? r.getHeader("Version")
-                        : r.getParameter("Version")
+                        : r.getParameter("version")
                 ))
                 .map(Integer::parseInt)
                 .orElse(null);

@@ -129,7 +129,7 @@ class FileAPI {
     open(path, version = null) {
         let link = this.getDownloadLink(path);
         if (version !== null) {
-            link += `?Version=${version}`;
+            link += `?version=${version}`;
         }
         window.open(link);
     }
