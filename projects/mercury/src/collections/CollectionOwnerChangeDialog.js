@@ -47,12 +47,13 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy,
     return (
         <Dialog
             open={openDialog}
-            data-testid="property-change-dialog"
+            data-testid="owner-workspace-change-dialog"
         >
             <DialogTitle id="property-change-dialog-title">Transfer the collection ownership to another workspace</DialogTitle>
             <DialogContent>
                 <div>
                     <Dropdown
+                        data-testid="owner-workspace-change-dropdown"
                         options={options}
                         clearTextOnSelection={false}
                         isOptionDisabled={option => option.iri === collection.ownerWorkspace}
