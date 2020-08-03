@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.fairspace.saturn.webdav.DavFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -41,7 +40,7 @@ public class MetadataPermissions {
         }
         if (resource.hasProperty(RDF.type, FS.Workspace)) {
             var ws = workspaceService.getWorkspace(resource.asNode());
-            return ws.isCanManage() && ws.getStatus() == WorkspaceStatus.Active;
+            return ws.isCanManage();
         }
         return canAddSharedMetadata();
     }

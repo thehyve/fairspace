@@ -21,7 +21,6 @@ import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
-import static java.time.Instant.now;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -72,10 +71,6 @@ public class WorkspaceService {
             ws.setDescription("");
         }
 
-        ws.setStatus(WorkspaceStatus.Active);
-        ws.setStatusDateModified(now());
-        ws.setStatusModifiedBy(getUserURI());
-
         var created = tx.calculateWrite(ds -> {
             var workspace = new DAO(ds).write(ws);
             var m = ds.getDefaultModel();
@@ -93,8 +88,6 @@ public class WorkspaceService {
     public Workspace updateWorkspace(Workspace patch) {
         validate(patch.getIri() != null, "No IRI provided");
 
-        var statusUpdated = new boolean[]{false};
-
         var updated = tx.calculateWrite(ds -> {
             var dao = new DAO(ds);
             var workspace = dao.read(Workspace.class, patch.getIri());
@@ -107,13 +100,6 @@ public class WorkspaceService {
             var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
-            }
-
-            if (patch.getStatus() != null && patch.getStatus() != workspace.getStatus()) {
-                workspace.setStatus(patch.getStatus());
-                workspace.setStatusModifiedBy(getUserURI());
-                workspace.setStatusDateModified(now());
-                statusUpdated[0] = true;
             }
 
             if (patch.getName() != null && !patch.getName().equals(workspace.getName())) {
@@ -130,9 +116,6 @@ public class WorkspaceService {
         updated.setCanManage(true);
         updated.setCanCollaborate(true);
 
-        if (statusUpdated[0]) {
-            audit("WS_UPDATE", "workspace", updated.getIri(), "status", updated.getStatus());
-        }
         return updated;
     }
 

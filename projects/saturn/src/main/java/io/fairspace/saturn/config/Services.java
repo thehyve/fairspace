@@ -74,7 +74,6 @@ public class Services {
                 new ProtectMachineOnlyPredicatesValidator(),
                 new PermissionCheckingValidator(metadataPermissions),
                 new DeletionValidator(),
-                new WorkspaceStatusValidator(),
                 new ShaclValidator());
 
         metadataService = new ChangeableMetadataService(transactions, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
