@@ -32,6 +32,7 @@ import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionPropertyChangeDialog from "./CollectionPropertyChangeDialog";
+import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 
 
 export const ICONS = {
@@ -68,6 +69,7 @@ type CollectionDetailsProps = {
     undeleteCollection: (Resource) => Promise<void>;
     setAccessMode: (Resource) => Promise<void>;
     setStatus: (Resource) => Promise<void>;
+    setOwnedBy: (Resource) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
     classes: any;
@@ -77,6 +79,7 @@ type CollectionDetailsState = {
     editing: boolean;
     changingAccessMode: boolean,
     changingStatus: boolean,
+    changingOwner: boolean,
     deleting: boolean;
     undeleting: boolean;
     anchorEl: any;
@@ -92,6 +95,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         editing: false,
         changingAccessMode: false,
         changingStatus: false,
+        changingOwner: false,
         anchorEl: null,
         deleting: false,
         undeleting: false
@@ -105,21 +109,28 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleChangeAccessMode = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({changingAccessMode: true});
             this.handleMenuClose();
         }
     };
 
     handleChangeStatus = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({changingStatus: true});
             this.handleMenuClose();
         }
     };
 
+    handleChangeOwner = () => {
+        if (this.props.collection.canManage) {
+            this.setState({changingOwner: true});
+            this.handleMenuClose();
+        }
+    };
+
     handleDelete = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({deleting: true});
             this.handleMenuClose();
         }
@@ -207,7 +218,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     render() {
         const {loading, error, collection, users, workspaceRoles, workspaces, inCollectionsBrowser = false} = this.props;
-        const {anchorEl, editing, changingAccessMode, changingStatus, deleting, undeleting} = this.state;
+        const {anchorEl, editing, changingAccessMode, changingStatus, changingOwner, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (error) {
@@ -249,6 +260,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             </MenuItem>
                                             <MenuItem onClick={this.handleChangeStatus}>
                                                 Change status
+                                            </MenuItem>
+                                            <MenuItem onClick={this.handleChangeOwner}>
+                                                Transfer ownership
                                             </MenuItem>
                                         </div>
                                     )}
@@ -318,6 +332,14 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onClose={() => this.setState({changingStatus: false})}
                     />
                 ) : null}
+                {changingOwner ? (
+                    <CollectionOwnerChangeDialog
+                        collection={collection}
+                        workspaces={workspaces}
+                        setOwnedBy={this.props.setOwnedBy}
+                        onClose={() => this.setState({changingOwner: false})}
+                    />
+                ) : null}
                 {undeleting ? (
                     <ConfirmationDialog
                         open
@@ -365,7 +387,7 @@ const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {currentUser} = useContext(UserContext);
     const {users} = useContext(UsersContext);
-    const {deleteCollection, undeleteCollection, setAccessMode, setStatus} = useContext(CollectionsContext);
+    const {deleteCollection, undeleteCollection, setAccessMode, setStatus, setOwnedBy} = useContext(CollectionsContext);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
@@ -385,6 +407,7 @@ const ContextualCollectionDetails = (props) => {
                         undeleteCollection={undeleteCollection}
                         setAccessMode={setAccessMode}
                         setStatus={setStatus}
+                        setOwnedBy={setOwnedBy}
                     />
                 )}
             </WorkspaceUserRolesContext.Consumer>
