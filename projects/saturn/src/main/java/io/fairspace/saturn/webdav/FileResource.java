@@ -9,23 +9,19 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
-import io.milton.property.PropertySource;
 import io.milton.resource.ReplaceableResource;
 import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
-import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static java.lang.Integer.parseInt;
 
 class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
