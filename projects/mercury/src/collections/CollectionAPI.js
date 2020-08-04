@@ -1,7 +1,7 @@
 // @flow
 import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
-import {MetadataAPI} from "../metadata/common/LinkedDataAPI";
+import MetadataAPI from "../metadata/common/MetadataAPI";
 import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
 import type {User} from "../users/UsersAPI";
 

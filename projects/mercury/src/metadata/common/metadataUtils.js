@@ -26,7 +26,7 @@ export const getLocalPart = uri => (
  */
 export function linkLabel(uri, shortenExternalUris = false) {
     try {
-        const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
+        const supportedLocalInfixes = ['/iri/', '/collections/'];
         const url = new URL(uri);
 
         // Local uris are treated separately, as we know its

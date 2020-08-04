@@ -1,6 +1,6 @@
 import CollectionAPI from "../CollectionAPI";
 import FileAPI from "../../file/FileAPI";
-import {MetadataAPI} from "../../metadata/common/LinkedDataAPI";
+import MetadataAPI from "../../metadata/common/MetadataAPI";
 import {RDFS_NS} from "../../constants";
 
 afterEach(() => {
@@ -98,7 +98,6 @@ describe('CollectionAPI', () => {
             expect(FileAPI.undelete).toHaveBeenCalledWith('name1');
         });
     });
-
 
     describe('Deleting', () => {
         FileAPI.delete = jest.fn(() => Promise.resolve());

@@ -14,7 +14,7 @@ import {isDataSteward} from "../../users/userUtils";
 const LinkedDataProperty = (
     {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete, checkValueAddedNotSubmitted}
 ) => {
-    const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
+    const {valueComponentFactory} = useContext(LinkedDataContext);
     const {currentUser} = useContext(UserContext);
 
     const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
@@ -78,7 +78,6 @@ const LinkedDataProperty = (
                             onAdd={onAdd}
                             onDelete={onDelete}
                             addComponent={addInputComponent}
-                            editorPath={editorPath}
                             checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                         />
                     ) : (

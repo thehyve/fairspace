@@ -30,7 +30,6 @@ const LinkedDataList = ({
     hasHighlights,
     onOpen,
     classes,
-    typeRender,
 
     error,
     pending,
@@ -71,7 +70,7 @@ const LinkedDataList = ({
                         <ListItemText primary={primaryText} secondary={secondaryText} />
                     </TableCell>
                     <TableCell style={{minWidth: 140}}>
-                        {typeRender(entry)}
+                        {entry.typeLabel}
                     </TableCell>
                     {hasHighlights && (
                         <TableCell style={{minWidth: 200}}>

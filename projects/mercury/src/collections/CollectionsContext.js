@@ -12,7 +12,6 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const {vocabulary} = useContext(VocabularyContext);
     const {currentUser} = useContext(UserContext);
 
-
     const {data: collections = [], error, loading, refresh} = useAsync(
         () => collectionApi.getCollections(showDeleted),
         [currentUser, showDeleted]

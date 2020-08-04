@@ -102,7 +102,6 @@ describe('FileBrowser', () => {
         expect(getByText(/collection does not exist/i)).toBeInTheDocument();
     });
 
-
     it('show error when when an error messsage is given', () => {
         const {getByText} = renderWithProviders(
             <DisconnectedFileBrowser

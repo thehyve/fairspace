@@ -11,7 +11,6 @@ import {canAlterPermission} from "./permissionUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
-
 export const PermissionsList = ({permissions, setPermission, collection, currentUser,
     selectedPrincipal, setSelectedPrincipal, setShowPermissionDialog, getItemIcon}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);

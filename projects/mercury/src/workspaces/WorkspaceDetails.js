@@ -14,7 +14,6 @@ import CollectionsContext from "../collections/CollectionsContext";
 import type {Collection} from "../collections/CollectionAPI";
 import type {User} from "../users/UsersAPI";
 
-
 type WorkspaceDetailsProps = {
     loading: boolean;
     workspace: Workspace;

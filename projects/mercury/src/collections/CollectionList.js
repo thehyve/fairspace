@@ -83,7 +83,6 @@ const CollectionList = ({
 
     const pagedCollections = pagedItems.map(c => ({...c, workspaceName: workspaces.find(ws => ws.iri === c.ownerWorkspace).name}));
 
-
     return (
         <Paper className={classes.root}>
             <Table>

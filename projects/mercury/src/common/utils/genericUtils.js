@@ -34,7 +34,6 @@ export const joinWithSeparator = (items = [], separator) => items.reduce((prev, 
  */
 export const first = array => ((array && array.length) ? array[0] : undefined);
 
-
 //* *********************************
 //* COMPARISION
 //* *********************************

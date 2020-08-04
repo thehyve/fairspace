@@ -20,7 +20,6 @@ describe('<CopyButton />', () => {
         expect(getByTitle(/Copy full IRI/i)).toBeInTheDocument();
         expect(uncopiedIcon).toBeInTheDocument();
 
-
         fireEvent.click(getByTestId('tooltip'));
 
         const copiedIcon = getByTestId('copied');

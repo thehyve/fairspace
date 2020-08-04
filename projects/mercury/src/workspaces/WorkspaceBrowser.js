@@ -13,7 +13,6 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 
-
 type WorkspaceBrowserProps = {
     loading: boolean,
     error: boolean,

@@ -17,7 +17,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import ErrorDialog from "../common/components/ErrorDialog";
 
-
 export const SharesDialog = ({collection, setPermission, principalType, shareCandidates = [],
     setBusy = () => {}, showDialog, setShowDialog = () => {}}) => {
     const [selectedPrincipals, setSelectedPrincipals] = useState([]);

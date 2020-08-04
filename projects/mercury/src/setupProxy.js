@@ -14,7 +14,6 @@ module.exports = (app) => {
         store
     }));
 
-
     const keycloak = new Keycloak(
         {
             store
@@ -26,7 +25,6 @@ module.exports = (app) => {
             secret: '**********'
         }
     );
-
 
     // Return 401 Unauthorized for API requests
     keycloak.redirectToLogin = (request) => !request.baseUrl.startsWith('/api/');

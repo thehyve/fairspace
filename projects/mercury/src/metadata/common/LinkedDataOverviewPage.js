@@ -1,8 +1,6 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
-import {Grid, Switch} from "@material-ui/core";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 
 import LinkedDataCreator from "./LinkedDataCreator";
@@ -10,15 +8,15 @@ import LinkedDataContext from '../LinkedDataContext';
 import LinkedDataOverviewHeader from "./LinkedDataOverviewHeader";
 import useLinkedDataSearchParams from "./UseLinkedDataSearchParams";
 import {getFirstPredicateId} from "./jsonLdUtils";
-import {SHACL_TARGET_CLASS} from "../../constants";
+import {METADATA_PATH, SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "./metadataUtils";
 import {getClassesInCatalog} from './vocabularyUtils';
 import BreadCrumbs from "../../common/components/BreadCrumbs";
 
-const getEntityRelativeUrl = (editorPath, id) => `${editorPath}?iri=${encodeURIComponent(id)}`;
+const getEntityRelativeUrl = (id) => `${METADATA_PATH}?iri=${encodeURIComponent(id)}`;
 
-const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent, showGraphSelection = false}) => {
-    const {requireIdentifier, editorPath, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
+const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent}) => {
+    const {requireIdentifier, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
 
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
@@ -68,44 +66,19 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
             shapesLoading={shapesLoading}
             shapesError={shapesError}
 
-            onOpen={(id) => history.push(getEntityRelativeUrl(editorPath, id))}
+            onOpen={(id) => history.push(getEntityRelativeUrl(id))}
         />
     );
 
     return (
         <>
             <BreadCrumbs />
-            {showGraphSelection ? (
-                <Grid container justify="space-between" alignItems="center">
-                    <Grid item xs={9}>
-                        <LinkedDataOverviewHeader
-                            setQuery={setQuery}
-                            selectedTypes={selectedTypes}
-                            setSelectedTypes={setSelectedTypes}
-                            availableTypes={availableTypes}
-                        />
-                    </Grid>
-                    <Grid item xs={2}>
-                        <FormControlLabel
-                            control={(
-                                <Switch
-                                    color="primary"
-                                    checked={showGraph}
-                                    onChange={() => setShowGraph(!showGraph)}
-                                />
-                            )}
-                            label="Show graph"
-                        />
-                    </Grid>
-                </Grid>
-            ) : (
-                <LinkedDataOverviewHeader
-                    setQuery={setQuery}
-                    selectedTypes={selectedTypes}
-                    setSelectedTypes={setSelectedTypes}
-                    availableTypes={availableTypes}
-                />
-            )}
+            <LinkedDataOverviewHeader
+                setQuery={setQuery}
+                selectedTypes={selectedTypes}
+                setSelectedTypes={setSelectedTypes}
+                availableTypes={availableTypes}
+            />
             {
                 hasEditRight ? (
                     <LinkedDataCreator
@@ -113,7 +86,7 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                         shapesError={shapesError}
                         shapes={getClassesInCatalogToDisplay()}
                         requireIdentifier={requireIdentifier}
-                        onCreate={({subject}) => history.push(getEntityRelativeUrl(editorPath, subject))}
+                        onCreate={({subject}) => history.push(getEntityRelativeUrl(subject))}
                     >
                         {renderResults()}
                     </LinkedDataCreator>

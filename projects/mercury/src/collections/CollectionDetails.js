@@ -33,7 +33,6 @@ import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspac
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionPropertyChangeDialog from "./CollectionPropertyChangeDialog";
 
-
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
     AZURE_BLOB_STORAGE: <CloudDownload />,
@@ -359,7 +358,6 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         );
     }
 }
-
 
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();

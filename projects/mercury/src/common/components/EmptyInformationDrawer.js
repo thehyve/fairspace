@@ -3,7 +3,6 @@ import {Grid} from '@material-ui/core';
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
 import MessageDisplay from './MessageDisplay';
 
-
 const EmptyInformationDrawer = (props) => {
     const {message} = props;
     return (

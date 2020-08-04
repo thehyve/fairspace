@@ -58,7 +58,6 @@ describe('generateUniqueFileName', () => {
     });
 });
 
-
 describe('getParentPath', () => {
     it('determines the parent path', () => {
         expect(getParentPath('/aaa/bbb/ccc.ext')).toEqual('/aaa/bbb');

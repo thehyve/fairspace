@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import ReactMarkdown from "react-markdown";
 import Switch from "@material-ui/core/Switch";
 import {formatDateTime} from '../../../common/utils/genericUtils';
@@ -6,9 +6,8 @@ import {formatDateTime} from '../../../common/utils/genericUtils';
 import LinkedDataLink from "../LinkedDataLink";
 import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from "../../../constants";
 import Iri from "../../../common/components/Iri";
-import LinkedDataContext from "../../LinkedDataContext";
 
-export const ReferringValue = ({property, entry, editorPath}) => {
+export const ReferringValue = ({property, entry}) => {
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
@@ -26,11 +25,11 @@ export const ReferringValue = ({property, entry, editorPath}) => {
 
     if (entry.id) {
         // External links should be represented by a direct link to the URI itself
-        // Other iri entities should be opened in the metadata/vocabulary editor
+        // Other iri entities should be opened in the metadata editor
         return property.isExternalLink
             ? <a href={entry.id}>{entry.id}</a>
             : (
-                <LinkedDataLink editorPath={editorPath} uri={entry.id}>
+                <LinkedDataLink uri={entry.id}>
                     {displayValue}
                 </LinkedDataLink>
             );
@@ -39,10 +38,4 @@ export const ReferringValue = ({property, entry, editorPath}) => {
     return displayValue;
 };
 
-const ContextualReferringValue = props => {
-    const {editorPath} = useContext(LinkedDataContext);
-
-    return <ReferringValue {...props} editorPath={editorPath} />;
-};
-
-export default ContextualReferringValue;
+export default ReferringValue;
