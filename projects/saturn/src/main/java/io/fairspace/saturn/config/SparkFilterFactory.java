@@ -15,7 +15,7 @@ public class SparkFilterFactory {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new ChangeableMetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService(), config.jena.metadataBaseIRI),
-                new ChangeableMetadataApp(apiPathPrefix + "/vocabulary", svc.getUserVocabularyService(), config.jena.vocabularyBaseIRI),
+                new ReadableMetadataApp(apiPathPrefix + "/vocabulary", svc.getUserVocabularyService()),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),
                 new HealthApp(apiPathPrefix + "/health"),

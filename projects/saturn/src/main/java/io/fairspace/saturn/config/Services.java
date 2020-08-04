@@ -43,7 +43,7 @@ public class Services {
     private final MailService mailService;
     private final MetadataPermissions metadataPermissions;
     private final ChangeableMetadataService metadataService;
-    private final ChangeableMetadataService userVocabularyService;
+    private final ReadableMetadataService userVocabularyService;
     private final ReadableMetadataService metaVocabularyService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
@@ -79,18 +79,7 @@ public class Services {
 
         metadataService = new ChangeableMetadataService(transactions, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
 
-        var vocabularyValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(),
-                new DeletionValidator(),
-                new ShaclValidator(),
-                new SystemVocabularyProtectingValidator(),
-                new MetadataAndVocabularyConsistencyValidator(dataset),
-                new InverseForUsedPropertiesValidator(dataset)
-        );
-
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
-
-        userVocabularyService = new ChangeableMetadataService(transactions, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
+        userVocabularyService = new ReadableMetadataService(transactions, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
         metaVocabularyService = new ReadableMetadataService(transactions, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
