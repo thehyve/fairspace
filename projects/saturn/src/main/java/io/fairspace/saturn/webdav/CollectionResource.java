@@ -115,7 +115,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             throw new BadRequestException(this, "Invalid owner");
         }
 
-        var old = subject.getProperty(FS.ownedBy);
+        var old = subject.getPropertyResourceValue(FS.ownedBy);
 
         subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, owner);
 
@@ -129,6 +129,12 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
                             .remove(user, FS.canManage, subject)
                             .remove(user, FS.canWrite, subject)
                             .add(user, FS.canRead, subject));
+            subject.getModel()
+                    .removeAll(old, FS.canManage, subject)
+                    .removeAll(old, FS.canWrite, subject)
+                    .removeAll(old, FS.canRead, subject)
+                    .removeAll(old, FS.canManage, subject);
+
         }
     }
 
