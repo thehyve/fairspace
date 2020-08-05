@@ -1,9 +1,7 @@
 package io.fairspace.saturn.vocabulary;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 
@@ -11,32 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
-import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 
 public class Inference {
-    public static Model applyInference(Model vocabulary, Model model) {
-        return model.add(getInferredStatements(vocabulary, model, model));
-    }
-
-    public static Model applyInference(Model vocabulary, Model base, Model changes) {
-        return changes.add(getInferredStatements(vocabulary, base, changes));
-    }
-
-    public static Model getInferredStatements(Model vocabulary, Model base, Model changes) {
-        var inferred = createDefaultModel();
-
-         changes.listStatements()
-                .filterKeep(stmt -> stmt.getObject().isResource())
-                 .mapWith(stmt -> base.createStatement(stmt.getSubject(), stmt.getPredicate(), stmt.getObject()))
-                .forEachRemaining(stmt -> getInversePropertyForStatement(stmt, vocabulary)
-                        .map(inverseProperty -> stmt.getModel().createStatement(stmt.getObject().asResource(), inverseProperty, stmt.getSubject()))
-                        .ifPresent(inferred::add)
-                );
-
-        return inferred;
-    }
-
     public static Optional<Resource> getClassShapeForResource(Resource resource, Model vocabulary) {
         return ofNullable(resource.getPropertyResourceValue(RDF.type))
                 .flatMap(type -> getClassShapeForClass(type, vocabulary));
@@ -52,23 +26,5 @@ public class Inference {
                         .mapWith(stmt -> stmt.getObject().asResource())
                         .toList())
                 .orElse(List.of());
-    }
-
-    public static Optional<Resource> getPropertyShapeForStatement(Statement statement, Model vocabulary) {
-        return getPropertyShapesForResource(statement.getSubject(), vocabulary)
-                .stream()
-                .filter(ps -> ps.hasProperty(SHACLM.path, statement.getPredicate()))
-                .findFirst();
-    }
-
-    public static Optional<Resource> getInversePropertyShapeForStatement(Statement statement, Model vocabulary) {
-        return getPropertyShapeForStatement(statement, vocabulary)
-                .map(shape -> shape.getPropertyResourceValue(FS.inverseRelation));
-    }
-
-    public static Optional<Property> getInversePropertyForStatement(Statement statement, Model vocabulary) {
-        return getInversePropertyShapeForStatement(statement, vocabulary)
-                .map(shape -> shape.getPropertyResourceValue(SHACLM.path))
-                .map(resource -> createProperty(resource.getURI()));
     }
 }

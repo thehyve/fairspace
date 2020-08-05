@@ -16,7 +16,6 @@ import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
-import static io.fairspace.saturn.vocabulary.Inference.applyInference;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
@@ -101,10 +100,6 @@ public class ChangeableMetadataService extends ReadableMetadataService {
         return transactions.calculateWrite(dataset -> {
             var before = dataset.getNamedModel(graph.getURI());
             var vocabularyModel = dataset.getNamedModel(vocabulary.getURI());
-
-            applyInference(vocabularyModel, before, modelToRemove);
-            applyInference(vocabularyModel, unionView(before, modelToAdd), modelToAdd);
-
             var after = updatedView(before, modelToRemove, modelToAdd);
 
             validate(before, after, modelToRemove, modelToAdd, vocabularyModel);

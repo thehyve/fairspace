@@ -129,7 +129,6 @@ public class ChangeableMetadataServiceTest {
     public void patchWithNil() {
         txn.executeWrite(ds -> ds.getDefaultModel().add(S1, P1, S2).add(S1, P1, S3));
 
-
         api.patch(createDefaultModel().add(S1, P1, NIL));
 
         assertFalse(txn.calculateRead(ds -> ds.getDefaultModel().contains(S1, P1)));
@@ -142,29 +141,4 @@ public class ChangeableMetadataServiceTest {
         verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
     }
 
-    @Test
-    public void testInference() {
-        txn.executeWrite(Vocabularies::initVocabularies);
-        txn.executeWrite(ds ->
-                ds.getDefaultModel()
-                        .add(S1, RDF.type, FOAF.Person)
-                        .add(S2, RDF.type, createResource(generateVocabularyIri("PersonConsent").getURI())));
-
-        var gaveConsent = createProperty(generateVocabularyIri("gaveConsent").getURI());
-        var isConsentOf = createProperty(generateVocabularyIri("isConsentOf").getURI());
-
-        api.put(modelOf(S1, gaveConsent, S2));
-
-        txn.executeRead(ds -> {
-            assertTrue(ds.getDefaultModel().contains(S1, gaveConsent, S2));
-            assertTrue(ds.getDefaultModel().contains(S2, isConsentOf, S1));
-        });
-
-        api.delete(modelOf(S2, isConsentOf, S1));
-
-        txn.executeRead(ds -> {
-            assertFalse(ds.getDefaultModel().contains(S1, gaveConsent, S2));
-            assertFalse(ds.getDefaultModel().contains(S2, isConsentOf, S1));
-        });
-    }
 }

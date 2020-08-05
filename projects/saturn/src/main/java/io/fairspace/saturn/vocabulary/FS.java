@@ -134,9 +134,6 @@ public class FS {
     public static final String RELATION_SHAPE_URI = NS + "RelationShape";
     public static final Resource RelationShape = createResource(RELATION_SHAPE_URI);
 
-    public static final String INVERSE_RELATION_URI = NS + "inverseRelation";
-    public static final Property inverseRelation = createProperty(INVERSE_RELATION_URI);
-
     public static final String IMPORTANT_PROPERTY_URI = NS + "importantProperty";
     public static final Property importantProperty = createProperty(IMPORTANT_PROPERTY_URI);
 

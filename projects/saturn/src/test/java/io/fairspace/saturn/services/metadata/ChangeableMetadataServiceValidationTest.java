@@ -49,10 +49,6 @@ public class ChangeableMetadataServiceValidationTest {
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
     private static final Property property1 = createProperty("http://fairspace.io/ontology/P1");
     private static final Property property2 = createProperty("http://fairspace.io/ontology/P2");
-    private static final Resource classShape1 = createResource("http://localhost/iri/ClassShape1");
-    private static final Resource classShape2 = createResource("http://localhost/iri/ClassShape2");
-    private static final Resource propertyShape1 = createResource("http://localhost/iri/PropertyShape1");
-    private static final Resource propertyShape2 = createResource("http://localhost/iri/PropertyShape2");
     private static final Property class1 = createProperty("http://fairspace.io/ontology/C1");
     private static final Property class2 = createProperty("http://fairspace.io/ontology/C2");
 
@@ -183,50 +179,6 @@ public class ChangeableMetadataServiceValidationTest {
                         resource1, property1, resource2)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                isomorphic(ds.getNamedModel(VOCABULARY)),
-                any());
-    }
-
-
-    @Test
-    public void validatedModelsContainInferredStatements() {
-        ds.replaceNamedModel(GRAPH, modelOf(
-                resource1, RDF.type, class1,
-                resource2, RDF.type, class2));
-
-        ds.replaceNamedModel(VOCABULARY, modelOf(
-                classShape1, SHACLM.targetClass, class1,
-                classShape2, SHACLM.targetClass, class2,
-                classShape1, SHACLM.property, propertyShape1,
-                classShape2, SHACLM.property, propertyShape2,
-                propertyShape1, SHACLM.path, property1,
-                propertyShape1, FS.domainIncludes, classShape1,
-                propertyShape1, FS.inverseRelation, propertyShape2,
-                propertyShape2, SHACLM.path, property2,
-                propertyShape1, FS.domainIncludes, classShape2,
-                propertyShape2, FS.inverseRelation, propertyShape1
-        ));
-
-        var toAdd = modelOf(resource1, property1, resource2);
-
-        txn.executeWrite(ds -> {
-            api.put(toAdd);
-            ds.abort();
-        });
-
-        verify(validator).validate(
-                isomorphic(modelOf(
-                        resource1, RDF.type, class1,
-                        resource2, RDF.type, class2)),
-                isomorphic(modelOf(
-                        resource1, RDF.type, class1,
-                        resource2, RDF.type, class2,
-                        resource1, property1, resource2,
-                        resource2, property2, resource1)),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(modelOf(
-                        resource1, property1, resource2,
-                        resource2, property2, resource1)),
                 isomorphic(ds.getNamedModel(VOCABULARY)),
                 any());
     }
