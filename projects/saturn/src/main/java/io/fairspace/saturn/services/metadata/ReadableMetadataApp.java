@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.metadata;
 
 
 import io.fairspace.saturn.services.BaseApp;
-import io.fairspace.saturn.services.metadata.serialization.GraphVizSerializer;
 import io.fairspace.saturn.services.metadata.serialization.RDFSerializer;
 import io.fairspace.saturn.services.metadata.serialization.Serializer;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,7 @@ public class ReadableMetadataApp extends BaseApp {
     private final ReadableMetadataService api;
     private static final List<Serializer> serializers = List.of(
             new RDFSerializer(JSONLD),
-            new RDFSerializer(TURTLE),
-            new GraphVizSerializer()
+            new RDFSerializer(TURTLE)
     );
 
     public ReadableMetadataApp(String basePath, ReadableMetadataService api) {
