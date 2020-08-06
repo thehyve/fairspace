@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServlet;
 import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
@@ -44,7 +43,6 @@ public class Services {
     private final MetadataPermissions metadataPermissions;
     private final ChangeableMetadataService metadataService;
     private final ReadableMetadataService userVocabularyService;
-    private final ReadableMetadataService metaVocabularyService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
@@ -79,8 +77,7 @@ public class Services {
 
         metadataService = new ChangeableMetadataService(transactions, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
 
-        userVocabularyService = new ReadableMetadataService(transactions, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
-        metaVocabularyService = new ReadableMetadataService(transactions, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
+        userVocabularyService = new ReadableMetadataService(transactions, VOCABULARY_GRAPH_URI, VOCABULARY_GRAPH_URI);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
     }

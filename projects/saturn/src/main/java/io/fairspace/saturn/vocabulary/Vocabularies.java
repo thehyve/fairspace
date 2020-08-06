@@ -7,19 +7,14 @@ import org.apache.jena.util.FileManager;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
-import static org.apache.jena.graph.NodeFactory.createURI;
 
 public class Vocabularies {
-    public static final Model META_VOCABULARY = FileManager.get().loadModel("default-vocabularies/meta-vocabulary.ttl");
     public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel("default-vocabularies/system-vocabulary.ttl");
-    public static final Node META_VOCABULARY_GRAPH_URI = createURI(FS.NS + "meta-vocabulary");
     public static final Node VOCABULARY_GRAPH_URI = generateVocabularyIri("");
 
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
     public static void initVocabularies(Dataset ds) {
-            ds.replaceNamedModel(META_VOCABULARY_GRAPH_URI.getURI(), META_VOCABULARY);
-
             var oldSystemVocabulary = ds.getNamedModel(SYSTEM_VOCABULARY_GRAPH_BACKUP);
 
             if (!SYSTEM_VOCABULARY.isIsomorphicWith(oldSystemVocabulary)) {

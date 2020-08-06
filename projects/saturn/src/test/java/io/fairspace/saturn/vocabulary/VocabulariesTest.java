@@ -27,13 +27,8 @@ public class VocabulariesTest {
     }
 
     @Test
-    public void validateMetaVocabulary() {
-        validate(META_VOCABULARY, SHACL_FOR_SHACL);
-    }
-
-    @Test
     public void validateVocabulary() {
-        validate(ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()), META_VOCABULARY.union(SHACL_FOR_SHACL));
+        validate(ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI()), SYSTEM_VOCABULARY.union(SHACL_FOR_SHACL));
     }
 
     private void validate(Model dataModel, Model shapesModel) {

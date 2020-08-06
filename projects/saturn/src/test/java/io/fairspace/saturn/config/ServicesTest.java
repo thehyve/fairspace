@@ -58,9 +58,4 @@ public class ServicesTest {
     public void getUserVocabularyService() {
         assertNotNull(svc.getUserVocabularyService());
     }
-
-    @Test
-    public void getMetaVocabularyService() {
-        assertNotNull(svc.getUserVocabularyService());
-    }
 }

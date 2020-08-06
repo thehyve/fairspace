@@ -7,7 +7,7 @@ import {getTypeInfo} from './metadataUtils';
 
 /**
  * This custom hook is a helper for many Linked Data functions, such as fetching, searching and transforming/parsing metadata.
- * It is agnostic about the difference between metadata, vocabular and metavocabulary.
+ * It is agnostic about the difference between metadata and vocabulary.
  * The contextual logic is being provided by {@link LinkedDataContext}
  *
  * @param {string} subject
