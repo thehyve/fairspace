@@ -7,7 +7,7 @@ import {USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './vocabulary/VocabularyContext';
 import {getNamespaces} from './common/vocabularyUtils';
-import MetadataAPI from "./common/LinkedDataAPI";
+import MetadataAPI from "./common/MetadataAPI";
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
