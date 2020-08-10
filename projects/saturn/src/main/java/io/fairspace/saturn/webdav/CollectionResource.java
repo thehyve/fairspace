@@ -178,6 +178,10 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             return EnumSet.of(AccessMode.Restricted);
         }
 
+        if (getStatus() == Status.Active) {
+            return EnumSet.of(AccessMode.Restricted, AccessMode.MetadataPublished);
+        }
+
         return Stream.of(AccessMode.values())
                 .filter(mode -> isAdmin() || mode.compareTo(getAccessMode()) >= 0)
                 .collect(toSet());
