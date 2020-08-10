@@ -73,7 +73,8 @@ public class DavFactory implements ResourceFactory {
         if (coll.hasLiteral(FS.accessMode, DataPublished.name()) && (canViewPublicData() || access.canRead())) {
             return Access.Read;
         }
-        if ((coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name())) && canViewPublicMetadata()) {
+        if (!access.canList() && canViewPublicMetadata()
+                && (coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
             access = Access.List;
         }
 
