@@ -6,25 +6,23 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
-import FormControl from '@material-ui/core/FormControl';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
 import Typography from '@material-ui/core/Typography';
 import {AccessRights} from "./permissionUtils";
 import PermissionCandidateSelect from "./PermissionCandidateSelect";
 import CollectionsContext from "../collections/CollectionsContext";
+import Dropdown from "../metadata/common/values/Dropdown";
+import type {Access} from "../collections/CollectionAPI";
 
 export const styles = {
     root: {
         width: 400,
-        height: 350,
+        height: 150,
         display: 'block',
     },
     rootEdit: {
         width: 400,
         display: 'block',
+        paddingBottom: 40
     },
     container: {
         display: 'flex',
@@ -42,27 +40,26 @@ export class AlterPermissionDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            accessRight: 'List',
-            selectedPrincipal: null,
-            selectedPrincipalLabel: ''
+            selectedAccessRight: null,
+            selectedPrincipal: null
         };
     }
 
     resetState = () => {
         const {access, principal} = this.props;
         this.setState({
-            accessRight: (access && access !== 'None') ? access : 'List',
-            selectedPrincipal: principal,
-            selectedPrincipalLabel: ''
+            selectedAccessRight: (access && access !== 'None') ? access : null,
+            selectedPrincipal: principal
         });
     };
 
-    handleAccessRightChange = (event) => {
-        this.setState({accessRight: event.target.value});
+    handleAccessRightChange = (selectedOption) => {
+        this.setState({selectedAccessRight: selectedOption ? selectedOption.label : null});
     };
 
-    handleSelectedUserChange = (selectedOption) => {
+    handleSelectedPrincipalChange = (selectedOption) => {
         this.setState({selectedPrincipal: selectedOption});
+        this.handleAccessRightChange(null);
     };
 
     handleClose = () => {
@@ -74,13 +71,11 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSubmit = () => {
-        const {selectedPrincipal, accessRight} = this.state;
+        const {selectedPrincipal, selectedAccessRight} = this.state;
         const {collection, setPermission} = this.props;
-        if (selectedPrincipal) {
-            setPermission(collection.location, selectedPrincipal.iri, accessRight);
+        if (selectedPrincipal && selectedAccessRight) {
+            setPermission(collection.location, selectedPrincipal.iri, selectedAccessRight);
             this.handleClose();
-        } else {
-            this.setState({selectedPrincipalLabel: 'You have to select one option'});
         }
     };
 
@@ -98,9 +93,37 @@ export class AlterPermissionDialog extends React.Component {
         return 'No options';
     };
 
-    renderPermission = () => {
+    getAccessRightsForPrincipal: Access[] = () => {
+        const {selectedPrincipal} = this.state;
+        const {collection, workspaceUsers} = this.props;
+        if (!selectedPrincipal
+            || (selectedPrincipal.type === 'User' && workspaceUsers.some(wu => wu.iri === selectedPrincipal.iri))
+            || (selectedPrincipal.type === 'Workspace' && selectedPrincipal.iri === collection.ownerWorkspace)) {
+            return AccessRights;
+        }
+        return ['Read'];
+    };
+
+    renderAccessRightControl = () => {
+        const {classes} = this.props;
+        const accessRights = this.getAccessRightsForPrincipal();
+        const options = accessRights.map(access => ({label: access}));
+
+        return (
+            <Dropdown
+                data-testid="access-right-change-dropdown"
+                options={options}
+                clearTextOnSelection={false}
+                onChange={this.handleAccessRightChange}
+                label="Select access right"
+                className={classes.formControl}
+            />
+        );
+    };
+
+    renderPermissionControl = () => {
         const {principal, permissionCandidates, permissions, currentUser} = this.props;
-        const {selectedPrincipal, selectedPrincipalLabel} = this.state;
+        const {selectedPrincipal} = this.state;
 
         // only render the label if principal is passed into this component
         if (principal) {
@@ -121,12 +144,11 @@ export class AlterPermissionDialog extends React.Component {
         return (
             <PermissionCandidateSelect
                 permissionCandidates={permissionCandidates}
-                onChange={this.handleSelectedUserChange}
+                onChange={this.handleSelectedPrincipalChange}
                 filter={p => (!currentUser || p.iri !== currentUser.iri)
                     && !permissions.some(c => c.iri === p.iri)}
-                placeholder="Please select one option"
                 value={selectedPrincipal}
-                label={selectedPrincipalLabel}
+                label="Select user or workspace"
                 autoFocus
             />
         );
@@ -134,8 +156,7 @@ export class AlterPermissionDialog extends React.Component {
 
     render() {
         const {classes, principal, open, loading, error, title} = this.props;
-        const {selectedPrincipal, accessRight} = this.state;
-        const accessRights = this.props.accessRights || AccessRights;
+        const {selectedPrincipal, selectedAccessRight} = this.state;
 
         return (
             <Dialog
@@ -147,33 +168,15 @@ export class AlterPermissionDialog extends React.Component {
                 <DialogTitle id="scroll-dialog-title">{title}</DialogTitle>
                 <DialogContent>
                     <div className={principal ? classes.rootEdit : classes.root}>
-                        {this.renderPermission()}
-                        <FormControl className={classes.formControl}>
-                            <FormLabel component="legend">Access right</FormLabel>
-                            <RadioGroup
-                                aria-label="Access right"
-                                name="access-right"
-                                className={classes.group}
-                                value={accessRight}
-                                onChange={this.handleAccessRightChange}
-                            >
-                                {accessRights.map(access => (
-                                    <FormControlLabel
-                                        key={access}
-                                        value={access}
-                                        control={<Radio />}
-                                        label={access}
-                                    />
-                                ))}
-                            </RadioGroup>
-                        </FormControl>
+                        {this.renderPermissionControl()}
+                        {this.renderAccessRightControl()}
                     </div>
                 </DialogContent>
                 <DialogActions>
                     <Button
                         onClick={this.handleSubmit}
                         color="primary"
-                        disabled={Boolean(!selectedPrincipal || loading || error)}
+                        disabled={Boolean(!selectedPrincipal || !selectedAccessRight || loading || error)}
                         data-testid="submit"
                     >
                         Save
@@ -200,7 +203,7 @@ AlterPermissionDialog.propTypes = {
     collection: PropTypes.object,
     permissionCandidates: PropTypes.array,
     permissions: PropTypes.array,
-    accessRights: PropTypes.array
+    workspaceUsers: PropTypes.array
 };
 
 const ContextualAlterPermissionDialog = props => {

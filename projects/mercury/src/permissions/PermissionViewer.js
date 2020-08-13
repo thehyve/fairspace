@@ -2,15 +2,14 @@ import React, {useContext, useState} from 'react';
 import {Button, List} from "@material-ui/core";
 import {Person, Widgets} from "@material-ui/icons";
 import AlterPermissionDialog from "./AlterPermissionDialog";
-import {sortPermissions} from './permissionUtils';
+import {mapPrincipalPermission, sortPermissions} from './permissionUtils';
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import PermissionsList from "./PermissionsList";
 import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
 
-export const CollaboratorsViewer = ({collection, collaborators, collaboratorCandidates, ownerWorkspace, currentUser,
-    setPermission, error, loading}) => {
+export const PermissionViewer = ({collection, users, workspaces, workspaceUsers, collaborators, currentUser, setPermission, error, loading}) => {
     const [showPermissionDialog, setShowPermissionDialog] = useState(false);
     const [selectedPrincipal, setSelectedPrincipal] = useState(null);
 
@@ -21,23 +20,17 @@ export const CollaboratorsViewer = ({collection, collaborators, collaboratorCand
         return (<LoadingInlay />);
     }
 
-    let sortedCollaboratorsList = sortPermissions(collaborators);
+    const sortedCollaborators = sortPermissions(collaborators);
+    const collaborationCandidates = [
+        ...workspaces.map(w => mapPrincipalPermission(w, 'Workspace')),
+        ...users.map(w => mapPrincipalPermission(w, 'User'))]
+        .filter(p => !sortedCollaborators.some(c => c.iri === p.iri));
 
-    const hasOwnerWorkspaceAccess: boolean = ownerWorkspace && ownerWorkspace.access && ownerWorkspace.access !== 'None';
-    if (hasOwnerWorkspaceAccess) {
-        sortedCollaboratorsList = [ownerWorkspace, ...sortedCollaboratorsList];
-    }
+    const getItemIcon = (principal) => ((principal.type === 'Workspace') ? <Widgets /> : <Person />);
 
-    const getItemIcon = (principal) => ((principal.iri === ownerWorkspace.iri) ? <Widgets /> : <Person />);
-
-    const handleAlterPermission = (user) => {
+    const handleAlterPermission = (principal) => {
         setShowPermissionDialog(true);
-        setSelectedPrincipal(user);
-    };
-
-    const handleAlterOwnerWorkspacePermission = () => {
-        setShowPermissionDialog(true);
-        setSelectedPrincipal(ownerWorkspace);
+        setSelectedPrincipal(principal);
     };
 
     const handleAlterPermissionDialogClose = () => {
@@ -47,7 +40,7 @@ export const CollaboratorsViewer = ({collection, collaborators, collaboratorCand
 
     const renderPermissionList = () => (
         <PermissionsList
-            permissions={sortedCollaboratorsList}
+            permissions={sortedCollaborators}
             collection={collection}
             setPermission={setPermission}
             currentUser={currentUser}
@@ -60,27 +53,17 @@ export const CollaboratorsViewer = ({collection, collaborators, collaboratorCand
 
     const renderCollaboratorsList = () => (
         <List dense disablePadding>
-            {renderPermissionList(collaborators)}
+            {renderPermissionList()}
             {collection.canManage && (
                 <div>
                     <Button
                         variant="text"
-                        title="Add single collaborator"
-                        aria-label="Add collaborator"
+                        title="Share"
+                        aria-label="Share"
                         color="primary"
                         onClick={() => handleAlterPermission(null)}
                     >
-                        Add collaborator
-                    </Button>
-                    <Button
-                        variant="text"
-                        title="Add all owner workspace members"
-                        aria-label="Add all members"
-                        color="primary"
-                        onClick={handleAlterOwnerWorkspacePermission}
-                        disabled={hasOwnerWorkspaceAccess}
-                    >
-                        Add access to all members
+                        Share
                     </Button>
                 </div>
             )}
@@ -91,13 +74,14 @@ export const CollaboratorsViewer = ({collection, collaborators, collaboratorCand
         <AlterPermissionDialog
             open={showPermissionDialog}
             onClose={handleAlterPermissionDialogClose}
-            title="Select access right for a collaborator"
+            title="Alter permission"
             principal={selectedPrincipal}
             access={selectedPrincipal && selectedPrincipal.access}
             collection={collection}
             currentUser={currentUser}
-            permissions={collaborators}
-            permissionCandidates={collaboratorCandidates}
+            permissions={sortedCollaborators}
+            permissionCandidates={collaborationCandidates}
+            workspaceUsers={workspaceUsers}
         />
     );
 
@@ -109,27 +93,25 @@ export const CollaboratorsViewer = ({collection, collaborators, collaboratorCand
     );
 };
 
-CollaboratorsViewer.defaultProps = {
-    renderPermissionsDialog: () => {
-    }
-};
+PermissionViewer.defaultProps = {};
 
-const ContextualCollaboratorsViewer = ({collection, collaborators, ownerWorkspace, collaboratorCandidates}) => {
+const ContextualPermissionViewer = ({collection, users, workspaces, workspaceUsers, collaborators}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {setPermission, loading, error} = useContext(CollectionsContext);
 
     return (
-        <CollaboratorsViewer
+        <PermissionViewer
             loading={currentUserLoading || loading}
             error={currentUserError || error}
             setPermission={setPermission}
             currentUser={currentUser}
-            collaboratorCandidates={collaboratorCandidates}
             collaborators={collaborators}
-            ownerWorkspace={ownerWorkspace}
             collection={collection}
+            users={users}
+            workspaces={workspaces}
+            workspaceUsers={workspaceUsers}
         />
     );
 };
 
-export default ContextualCollaboratorsViewer;
+export default ContextualPermissionViewer;

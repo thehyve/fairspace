@@ -3,7 +3,7 @@ import React from 'react';
 import {shallow} from "enzyme";
 
 import {Button} from "@material-ui/core";
-import {CollaboratorsViewer} from "../CollaboratorsViewer";
+import {PermissionViewer} from "../PermissionViewer";
 import PermissionsList from "../PermissionsList";
 
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
@@ -19,7 +19,7 @@ const testOrderingOfCollaborators = (wrapper) => {
     );
 };
 
-describe('CollaboratorsViewer', () => {
+describe('PermissionViewer', () => {
     const mockUsers = [
         {
             iri: 'http://localhost/iri/user2-id',
@@ -73,12 +73,13 @@ describe('CollaboratorsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
                     collaborators={mockCollaborators}
-                    ownerWorkspace={mockOwnerWorkspace}
+                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
+                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
                 />
             );
@@ -92,8 +93,8 @@ describe('CollaboratorsViewer', () => {
             testOrderingOfCollaborators(wrapper);
         });
 
-        it('should render add buttons', () => {
-            expect(wrapper.find(Button).length).toEqual(2);
+        it('should render add button', () => {
+            expect(wrapper.find(Button).length).toEqual(1);
         });
     });
 
@@ -101,12 +102,13 @@ describe('CollaboratorsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
                     collaborators={mockCollaborators}
-                    ownerWorkspace={mockOwnerWorkspace}
+                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
+                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
                 />
             );
@@ -129,12 +131,13 @@ describe('CollaboratorsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
                     collaborators={[...mockCollaborators, mockUsers[0]]}
-                    ownerWorkspace={mockOwnerWorkspace}
+                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
+                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
                 />
             );
@@ -149,12 +152,13 @@ describe('CollaboratorsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    collaborators={mockCollaborators}
-                    ownerWorkspace={{...mockOwnerWorkspace, access: 'Write'}}
+                    collaborators={[...mockCollaborators, mockOwnerWorkspace]}
+                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
+                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
                 />
             );

@@ -25,8 +25,7 @@ import {isAdmin} from "../users/userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import CollaboratorsCard from "../permissions/CollaboratorsCard";
-import CollectionShareCard from "../permissions/SharesCard";
+import PermissionCard from "../permissions/PermissionCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
@@ -291,17 +290,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </CardContent>
                 </Card>
 
-                <CollaboratorsCard
+                <PermissionCard
                     collection={collection}
-                    workspaceUsers={workspaceUsers}
-                    workspaces={workspaces}
-                />
-                <CollectionShareCard
                     users={users}
                     workspaceUsers={workspaceUsers}
                     workspaces={workspaces}
-                    collection={collection}
-                    setBusy={this.props.setBusy}
                 />
 
                 {editing ? (

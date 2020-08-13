@@ -5,6 +5,7 @@ import {Button} from '@material-ui/core';
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
 import PermissionCandidateSelect from "../PermissionCandidateSelect";
 import {AccessRights} from "../permissionUtils";
+import Dropdown from "../../metadata/common/values/Dropdown";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
@@ -76,13 +77,8 @@ describe('AlterPermissionDialog', () => {
         // render collaborator selector
         expect(wrapper.find(PermissionCandidateSelect).prop('value')).toBe(null);
 
-        // initial value of the access right is "List"
-        expect(wrapper.find('[aria-label="Access right"]').prop('value')).toEqual('List');
-        // populate radio group with 4 access options
-        expect(wrapper.find('[aria-label="Access right"]').childAt(0).prop('value')).toEqual('List');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(1).prop('value')).toEqual('Read');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(2).prop('value')).toEqual('Write');
-        expect(wrapper.find('[aria-label="Access right"]').childAt(3).prop('value')).toEqual('Manage');
+        // initial value of the access right is "null"
+        expect(wrapper.find(Dropdown).prop('label')).toBe("Select access right");
 
         // render cancel and submit buttons
         expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');
