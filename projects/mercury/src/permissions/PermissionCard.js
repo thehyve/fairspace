@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import {Avatar, Card, CardContent, CardHeader, Collapse, Grid, IconButton, withStyles} from "@material-ui/core";
+import {Avatar, Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
 import classnames from "classnames";
 
 import LockOpen from "@material-ui/icons/LockOpen";
@@ -9,8 +9,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import InputLabel from "@material-ui/core/InputLabel";
 import PermissionViewer from "./PermissionViewer";
-import {getPrincipalsWithCollectionAccess, getAccessModeDescription} from "./permissionUtils";
+import {getAccessModeDescription, getPrincipalsWithCollectionAccess} from "./permissionUtils";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -43,14 +44,20 @@ const styles = theme => ({
         verticalAlign: 'middle',
         margin: '0 4px'
     },
+    propertyLabel: {
+        margin: 'auto',
+        width: '50%'
+    },
     propertyText: {
         marginTop: 2,
         marginBottom: 0,
-        marginInlineStart: 4
+        marginInlineStart: 4,
+        width: '100%'
     },
     propertyDiv: {
-        paddingLeft: 32,
-        paddingBottom: 16
+        marginLeft: 32,
+        marginRight: 32,
+        marginBottom: 16
     }
 });
 
@@ -135,30 +142,24 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     );
 
     const renderAccessMode = () => (
-        <Grid container direction="row" className={classes.propertyDiv}>
-            <Grid item xs={2}>
-                <p className={classes.propertyText}>
-                    Access mode:
-                </p>
-            </Grid>
-            <Grid item xs>
-                <FormControl className={classes.propertyText}>
-                    <Select
-                        value={collection.accessMode}
-                        onChange={mode => handleSetAccessMode(mode)}
-                        inputProps={{'aria-label': 'Access mode'}}
-                        disabled={!collection.canManage}
-                    >
-                        {collection.availableAccessModes.map(mode => (
-                            <MenuItem key={mode} value={mode}>
-                                {camelCaseToWords(mode)}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <FormHelperText>{getAccessModeDescription(collection.accessMode)}</FormHelperText>
-                </FormControl>
-            </Grid>
-        </Grid>
+        <div className={classes.propertyDiv}>
+            <FormControl className={classes.propertyText}>
+                <InputLabel id="demo-simple-select-helper-label">Access mode</InputLabel>
+                <Select
+                    value={collection.accessMode}
+                    onChange={mode => handleSetAccessMode(mode)}
+                    inputProps={{'aria-label': 'Access mode'}}
+                    disabled={!collection.canManage}
+                >
+                    {collection.availableAccessModes.map(mode => (
+                        <MenuItem key={mode} value={mode}>
+                            {camelCaseToWords(mode)}
+                        </MenuItem>
+                    ))}
+                </Select>
+                <FormHelperText>{getAccessModeDescription(collection.accessMode)}</FormHelperText>
+            </FormControl>
+        </div>
     );
 
     return (

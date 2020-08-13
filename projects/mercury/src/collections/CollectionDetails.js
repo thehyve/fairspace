@@ -49,7 +49,6 @@ const styles = {
         color: 'gray'
     },
     propertyText: {
-        fontSize: 'small',
         marginTop: 2,
         marginBottom: 0,
         marginInlineStart: 4
@@ -184,7 +183,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     {property}:
                 </p>
             </Grid>
-            <Grid item xs>
+            <Grid item xs={10}>
                 <p className={this.props.classes.propertyText}>
                     {camelCaseToWords(value)}
                 </p>
