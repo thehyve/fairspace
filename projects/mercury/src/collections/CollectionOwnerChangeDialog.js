@@ -9,7 +9,6 @@ import {compareBy} from "../common/utils/genericUtils";
 import Dropdown from "../metadata/common/values/Dropdown";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
-
 export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy, onClose}) => {
     const [selectedValue, setSelectedValue] = useState();
     const [openDialog, setOpenDialog] = useState(true);
