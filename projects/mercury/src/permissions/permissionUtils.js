@@ -1,5 +1,5 @@
 import {compareBy, comparing} from "../common/utils/genericUtils";
-import type {Access, Permission} from "../collections/CollectionAPI";
+import type {Access, AccessMode, Permission} from "../collections/CollectionAPI";
 
 export type PrincipalType = "User" | "Workspace";
 
@@ -55,4 +55,17 @@ export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principal
         }
     });
     return results;
+};
+
+export const getAccessModeDescription = (accessMode: AccessMode) => {
+    switch (accessMode) {
+        case "Restricted":
+            return "Collection data limited to users with explicitly granted access.";
+        case "MetadataPublished":
+            return "All users can see collection metadata";
+        case "DataPublished":
+            return "All users can see collection data";
+        default:
+            return "Unrecognized access mode";
+    }
 };
