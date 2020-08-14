@@ -155,7 +155,7 @@ const FileList = ({
                                     ) : null
                                 }
 
-                                <TableCell padding="5" align="left">
+                                <TableCell style={{padding: 5}} align="left">
                                     {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                 </TableCell>
                                 <TableCell>

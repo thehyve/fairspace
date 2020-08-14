@@ -26,7 +26,7 @@ const LinkedDataEntityFormContainer = ({
         validateAll, validationErrors, isValid
     } = useFormData(values, properties);
 
-    setHasUpdates(hasFormUpdates);
+    useEffect(() => setHasUpdates(hasFormUpdates), [hasFormUpdates, setHasUpdates]);
 
     useEffect(() => {
         setEditingEnabled(hasEditRight && !showEditButtons && !isDeleted);

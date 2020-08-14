@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import CollectionEditor from './CollectionEditor';
@@ -92,6 +92,7 @@ const ContextualCollectionBrowser = (props) => {
     const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} = useContext(CollectionsContext);
     const {workspacesLoading, workspacesError, workspaces} = useContext(WorkspaceContext);
     const workspace = props.workspaceIri ? workspaces.find(w => w.iri === props.workspaceIri) : {};
+    const {showDeletedCollections} = props;
 
     const canAdd = window.location.pathname === '/workspace' && workspace.canCollaborate;
 
@@ -99,7 +100,7 @@ const ContextualCollectionBrowser = (props) => {
         ? collections.filter(c => c.ownerWorkspace === props.workspaceIri)
         : collections;
 
-    setShowDeleted(props.showDeletedCollections);
+    useEffect(() => setShowDeleted(showDeletedCollections), [setShowDeleted, showDeletedCollections]);
 
     return (
         <CollectionBrowser

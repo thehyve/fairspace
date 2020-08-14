@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext} from 'react';
-import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography, withStyles} from '@material-ui/core';
+import {Accordion, AccordionDetails, AccordionSummary, Typography, withStyles} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from 'react-router-dom';
 
@@ -60,25 +60,25 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                 loading={loading}
                 setBusy={props.setBusy}
             />
-            <ExpansionPanel defaultExpanded>
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Accordion defaultExpanded>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>Metadata for {collection.name}</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
+                </AccordionSummary>
+                <AccordionDetails>
                     <LinkedDataEntityFormWithLinkedData
                         subject={collection.iri}
                         hasEditRight={hasEditRight}
                         setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
                     />
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
+                </AccordionDetails>
+            </Accordion>
             {
                 paths.map(metadataPath => (
-                    <ExpansionPanel
+                    <Accordion
                         key={metadataPath}
                         defaultExpanded
                     >
-                        <ExpansionPanelSummary
+                        <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
                         >
                             <Typography
@@ -86,16 +86,16 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                             >
                                 Metadata for {relativePath(metadataPath)}
                             </Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
+                        </AccordionSummary>
+                        <AccordionDetails>
                             <PathMetadata
                                 path={metadataPath}
                                 showDeleted={showDeleted}
                                 isMetaDataEditable={collection.canWrite && metadataPath === paths[paths.length - 1]}
                                 style={{width: '100%'}}
                             />
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
+                        </AccordionDetails>
+                    </Accordion>
                 ))
             }
         </>
