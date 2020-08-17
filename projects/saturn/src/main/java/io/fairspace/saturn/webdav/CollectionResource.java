@@ -170,20 +170,18 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     public Set<AccessMode> getAvailableAccessModesSet() {
+        var availableModes = EnumSet.of(getAccessMode());
+
         if (!access.canManage()) {
-            return EnumSet.of(getAccessMode());
+            return availableModes;
         }
 
-        if (getStatus() == Status.Closed) {
-            return EnumSet.of(AccessMode.Restricted);
-        }
-
-        if (getStatus() == Status.Active) {
-            return EnumSet.of(AccessMode.Restricted, AccessMode.MetadataPublished);
+        if (getStatus() == Status.Active || getStatus() == Status.Closed) {
+            availableModes.addAll(EnumSet.of(AccessMode.Restricted, AccessMode.MetadataPublished));
         }
 
         return Stream.of(AccessMode.values())
-                .filter(mode -> isAdmin() || mode.compareTo(getAccessMode()) >= 0)
+                .filter(mode -> isAdmin() || (mode.compareTo(getAccessMode()) >= 0 && availableModes.contains(mode)))
                 .collect(toSet());
     }
 
