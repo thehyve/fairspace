@@ -21,7 +21,7 @@ const LinkedDataEntityFormContainer = ({
     const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
 
     const {
-        addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates, checkValueAddedNotSubmitted,
+        addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid
     } = useFormData(values, properties);
 
@@ -97,7 +97,6 @@ const LinkedDataEntityFormContainer = ({
                             loading={linkedDataLoading}
                             properties={extendedProperties}
                             values={valuesWithUpdates}
-                            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                             validationErrors={validationErrors}
                             onAdd={addValue}
                             onChange={updateValue}
