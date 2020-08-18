@@ -22,7 +22,6 @@ const defaultProperty = {
 
 const defaultValues = [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}];
 
-
 describe('LinkedDataProperty elements', () => {
     it('shows a table with relations for relationShapes', () => {
         const wrapper = shallow(<LinkedDataProperty property={defaultProperty} values={defaultValues} />);
@@ -59,10 +58,6 @@ describe('LinkedDataProperty elements', () => {
         it('should not allow adding new entities if property is machineOnly', () => verifyCanEdit({
             ...defaultProperty,
             machineOnly: true
-        }, false));
-        it('should not allow adding new entities if the max number of values is reached', () => verifyCanEdit({
-            ...defaultProperty,
-            maxValuesCount: 3
         }, false));
     });
 

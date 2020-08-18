@@ -67,4 +67,11 @@ describe('LinkedDataValuesTable elements', () => {
         expect(wrapper.find(TableFooter).find(TableCell).length).toEqual(2);
         expect(wrapper.find(TableFooter).find(TableCell).first().find(StringValue).length).toEqual(1);
     });
+
+    it('should not show an add input field when maxValueCount reached', () => {
+        const property = {...defaultProperty, maxValuesCount: 3};
+        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} canAdd addComponent={StringValue} />);
+        expect(wrapper.find(TableFooter).find(TableCell).length).toEqual(0);
+        expect(wrapper.find(TableFooter).find(TableCell).first().find(StringValue).length).toEqual(0);
+    });
 });
