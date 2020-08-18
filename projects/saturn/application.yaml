@@ -7,8 +7,6 @@ jena:
   metadataBaseIRI: "http://localhost/iri/"
   # Base IRI for all vocabulary entities
   vocabularyBaseIRI: "http://localhost/vocabulary/"
-  systemVocabularyConfig: "src/main/resources/default-vocabularies/system-vocabulary.ttl"
-  userVocabularyConfig: "src/main/resources/default-vocabularies/user-vocabulary.ttl"
   # Jena's TDB2 database path
   datasetPath: "data/db"
   storeParams:

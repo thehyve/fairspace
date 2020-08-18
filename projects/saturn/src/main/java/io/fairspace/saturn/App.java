@@ -4,9 +4,7 @@ import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.system.Txn;
 import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.server.session.SessionHandler;
 
@@ -14,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
-import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 
 @Slf4j
 public class App {
@@ -43,12 +39,6 @@ public class App {
                 .build();
 
         server.getJettyServer().insertHandler(new SessionHandler());
-
-        Txn.executeWrite(ds, () -> {
-            TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
-            initVocabularies(ds);
-        });
-
 
         server.start();
 

@@ -55,7 +55,15 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog);
 
-        return DatasetFactory.wrap(dsg);
+        var ds = DatasetFactory.wrap(dsg);
+
+        Txn.executeWrite(ds, () -> {
+            TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
+
+            initVocabularies(ds);
+        });
+
+        return ds;
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {

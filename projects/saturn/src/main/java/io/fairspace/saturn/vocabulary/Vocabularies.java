@@ -9,7 +9,7 @@ import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
 
 public class Vocabularies {
-    public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel(CONFIG.jena.systemVocabularyConfig);
+    public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel("default-vocabularies/system-vocabulary.ttl");
     public static final Node VOCABULARY_GRAPH_URI = generateVocabularyIri("");
 
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
@@ -21,7 +21,7 @@ public class Vocabularies {
                 var oldVocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
 
                 var userVocabulary = oldVocabulary.isEmpty()
-                        ? FileManager.get().loadModel(CONFIG.jena.userVocabularyConfig, CONFIG.jena.vocabularyBaseIRI, null)
+                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", CONFIG.jena.vocabularyBaseIRI, null)
                         : oldVocabulary.difference(oldSystemVocabulary);
 
                 ds.replaceNamedModel(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));
