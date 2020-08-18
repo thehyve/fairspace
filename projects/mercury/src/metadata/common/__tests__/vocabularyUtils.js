@@ -142,8 +142,7 @@ describe('extendPropertiesWithVocabularyEditingInfo', () => {
 
 describe('isRelationShape', () => {
     it('should return true for relation shapes', () => {
-        expect(isRelationShape({'@type': [constants.RELATION_SHAPE_URI]})).toBe(true);
-        expect(isRelationShape({'@type': ['http://someShape', constants.RELATION_SHAPE_URI]})).toBe(true);
+        expect(isRelationShape({[constants.SHACL_CLASS]: [{'@value': 'SomeClass'}]})).toBe(true);
     });
     it('should return false for other types of shapes', () => {
         expect(isRelationShape({'@type': ['http://other-type']})).toBe(false);

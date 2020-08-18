@@ -27,7 +27,7 @@ export const isGenericIriResource = (propertyShape) => getFirstPredicateId(prope
  * @param propertyShape
  * @returns {boolean}
  */
-export const isRelationShape = propertyShape => Array.isArray(propertyShape['@type']) && propertyShape['@type'].includes(constants.RELATION_SHAPE_URI);
+export const isRelationShape = propertyShape => getFirstPredicateValue(propertyShape, constants.SHACL_CLASS) != null;
 
 /**
  * Returns the maxCount value for the given shape
