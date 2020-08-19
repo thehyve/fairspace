@@ -9,7 +9,6 @@ import {
     DIRECTORY_URI,
     FILE_PATH_URI,
     FILE_URI,
-    FIXED_SHAPE_URI
 } from "../../constants";
 import DeleteEntityButton from "./DeleteEntityButton";
 import CopyButton from "../../common/components/CopyButton";
