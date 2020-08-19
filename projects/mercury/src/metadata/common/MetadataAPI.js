@@ -3,7 +3,7 @@ import LinkedDataAPI from "./LinkedDataAPI";
 import {toJsonLd} from "./jsonLdConverter";
 import {handleHttpError} from "../../common/utils/httpUtils";
 
-class LinkedDataMetadataAPI extends LinkedDataAPI {
+class MetadataAPI extends LinkedDataAPI {
     constructor() {
         super('metadata');
     }
@@ -57,4 +57,4 @@ class LinkedDataMetadataAPI extends LinkedDataAPI {
     }
 }
 
-export default new LinkedDataMetadataAPI();
+export default new MetadataAPI();

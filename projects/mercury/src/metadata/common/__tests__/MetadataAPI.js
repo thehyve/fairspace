@@ -7,7 +7,7 @@ beforeEach(() => {
     mockAxios.patch.mockClear();
 });
 
-describe('LinkedDataApi', () => {
+describe('MetadataAPI', () => {
     it('fetches metadata with provided parameters', () => {
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
             data: [],
