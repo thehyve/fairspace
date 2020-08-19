@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 
-import static io.fairspace.saturn.vocabulary.Inference.getPropertyShapesForResource;
+import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;

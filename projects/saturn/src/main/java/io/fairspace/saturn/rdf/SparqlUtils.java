@@ -81,7 +81,6 @@ public class SparqlUtils {
     @SneakyThrows(IOException.class)
     private static String load(String name) {
         return "PREFIX ws: " + str(createURI(CONFIG.jena.metadataBaseIRI)) + '\n' +
-                "PREFIX vocabulary: " + str(createURI(CONFIG.jena.vocabularyBaseIRI)) + '\n' +
                 IOUtils.toString(SparqlUtils.class.getResourceAsStream("/sparql/" + name + ".sparql"), StandardCharsets.UTF_8);
     }
 
@@ -95,14 +94,6 @@ public class SparqlUtils {
 
     public static String extractIdFromIri(@NonNull Node iri) {
         return iri.getURI().replace(CONFIG.jena.metadataBaseIRI, "");
-    }
-
-    public static Node generateVocabularyIri() {
-        return generateVocabularyIri(randomUUID().toString());
-    }
-
-    public static Node generateVocabularyIri(String id) {
-        return createURI(CONFIG.jena.vocabularyBaseIRI + id);
     }
 
     public static Instant parseXSDDateTimeLiteral(Literal literal) {

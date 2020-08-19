@@ -13,7 +13,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UsersResource;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

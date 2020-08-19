@@ -15,7 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.rdf.ModelUtils.*;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.updatedView;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 

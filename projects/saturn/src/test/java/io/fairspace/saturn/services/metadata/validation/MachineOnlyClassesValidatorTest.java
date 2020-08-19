@@ -19,14 +19,12 @@ import static org.mockito.Mockito.*;
 public class MachineOnlyClassesValidatorTest {
     private static final Resource machineOnlyClass = createResource("http://example.com/MachineOnly");
     private static final Resource regularClass = createResource("http://example.com/Regular");
-    private static final Resource machineOnlyClassShape = createResource("http://example.com/MachineOnlyShape");
-    private static final Resource regularClassShape = createResource("http://example.com/RegularShape");
     private static final Resource machineOnlyInstance = createResource("http://example.com/123");
     private static final Resource regularInstance = createResource("http://example.com/345");
     private static final Model vocabulary = modelOf(
-            regularClassShape, SHACLM.targetClass, regularClass,
-            machineOnlyClassShape, SHACLM.targetClass, machineOnlyClass,
-            machineOnlyClassShape, FS.machineOnly, createTypedLiteral(true));
+            regularClass, RDF.type, SHACLM.NodeShape,
+            machineOnlyClass, RDF.type, SHACLM.NodeShape,
+            machineOnlyClass, FS.machineOnly, createTypedLiteral(true));
 
     private MachineOnlyClassesValidator validator = new MachineOnlyClassesValidator();
 

@@ -11,7 +11,6 @@ import {
     DELETED_BY_URI,
     DIRECTORY_URI,
     FILE_URI,
-    FIXED_SHAPE_URI
 } from "../../../constants";
 import VocabularyContext from '../../vocabulary/VocabularyContext';
 
@@ -44,13 +43,6 @@ describe('LinkedDataEntityHeader', () => {
                 '@type': [{id: 'http://random-type'}],
                 [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}]
             }, true);
-        });
-
-        it('should show a disabled button for fixed shapes', () => {
-            testDeleteButtonDeletableState({
-                [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}],
-                [FIXED_SHAPE_URI]: [{value: true}]
-            }, false);
         });
 
         it('should show a disabled delete button for deleted entities', () => {

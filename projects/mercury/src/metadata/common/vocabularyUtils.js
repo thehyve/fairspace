@@ -1,5 +1,6 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
+import {SHACL_CLASS} from "../../constants";
 
 const TYPE_PROPERTY = {
     key: '@type',
@@ -49,47 +50,9 @@ export const getMaxCount = propertyShape => (isRdfList(propertyShape) ? 0 : getF
 const isExternalLink = propertyShape => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
 
 /**
- * Checks whether the given list of properties represents a fixed shape, as defined by FS:fixedShape
- */
-export const isFixedShape = classShape => getFirstPredicateValue(classShape, constants.FIXED_SHAPE_URI, false);
-
-/**
  * Returns a list of system properties defined for the given shape
  */
 export const getSystemProperties = classShape => (classShape && classShape[constants.SYSTEM_PROPERTIES_URI] && classShape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
-
-/**
- * Extends the list of properties with information for vocabulary editing
- *
- * The logic that is applied is based on the functionality of the fs:fixedShape flag. This flag
- * indicates that a user is not allowed to change anything from a shape, except for adding
- * new properties. The user is also allowed to delete properties that have been added before
- * (i.e. not systemProperties)
- *
- * The following keys are added to the properties:
- * - editable           is set based on the given editable flag combined with the isFixed flag
- * - systemProperties   is set for the field SHACL_PROPERTY
- *
- * @param properties
- * @param editable
- * @param isFixed
- * @param systemProperties
- * @returns {*}
- */
-export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditable = true, isFixed = false, systemProperties = []}) => properties
-    .map(p => {
-        // For fixed shapes, return the list of system properties for the SHACL_PROPERTY definition
-        if (isFixed && p.key === constants.SHACL_PROPERTY) {
-            // Add systemProperties for determining which entry can be deleted
-            return {...p, isEditable: isEditable && !p.machineOnly, systemProperties};
-        }
-
-        // In all other cases, if the shape is fixed, the property must not be editable
-        return {
-            ...p,
-            isEditable: !isFixed && isEditable
-        };
-    });
 
 /**
  * Returns a list of classes marked as fairspace entities.

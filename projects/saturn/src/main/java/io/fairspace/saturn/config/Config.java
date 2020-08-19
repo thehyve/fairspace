@@ -46,7 +46,6 @@ public class Config {
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
-        public String vocabularyBaseIRI = "http://localhost/vocabulary/";
 
         public File datasetPath = new File("data/db");
 

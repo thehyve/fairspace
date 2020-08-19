@@ -3,14 +3,13 @@ package io.fairspace.saturn.vocabulary;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.util.FileManager;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateVocabularyIri;
+import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.riot.RDFDataMgr.loadModel;
 
 public class Vocabularies {
-    public static final Model SYSTEM_VOCABULARY = FileManager.get().loadModel("default-vocabularies/system-vocabulary.ttl");
-    public static final Node VOCABULARY_GRAPH_URI = generateVocabularyIri("");
+    public static final Model SYSTEM_VOCABULARY = loadModel("default-vocabularies/system-vocabulary.ttl");
+    public static final Node VOCABULARY_GRAPH_URI = createURI( "https://fairspace.io/vocabulary/");
 
     private static final String SYSTEM_VOCABULARY_GRAPH_BACKUP = "saturn:system-vocabulary-backup";
 
@@ -21,7 +20,7 @@ public class Vocabularies {
                 var oldVocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
 
                 var userVocabulary = oldVocabulary.isEmpty()
-                        ? FileManager.get().loadModel("default-vocabularies/user-vocabulary.ttl", CONFIG.jena.vocabularyBaseIRI, null)
+                        ? loadModel("default-vocabularies/user-vocabulary.ttl")
                         : oldVocabulary.difference(oldSystemVocabulary);
 
                 ds.replaceNamedModel(VOCABULARY_GRAPH_URI.getURI(), SYSTEM_VOCABULARY.union(userVocabulary));

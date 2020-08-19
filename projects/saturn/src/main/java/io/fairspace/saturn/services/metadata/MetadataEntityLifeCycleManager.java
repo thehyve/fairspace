@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 
 import java.time.Instant;
@@ -18,6 +17,7 @@ import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
+import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
@@ -74,12 +74,9 @@ class MetadataEntityLifeCycleManager {
     }
 
     private boolean isMachineOnly(Resource resource) {
-        var voc = dataset.getNamedModel(vocabulary.getURI());
         return resource.listProperties(RDF.type)
                 .mapWith(Statement::getObject)
-                .filterKeep(cl -> voc.listSubjectsWithProperty(SHACLM.targetClass, cl)
-                        .filterKeep(shape -> shape.hasLiteral(FS.machineOnly, true))
-                        .hasNext())
+                .filterKeep(SYSTEM_VOCABULARY::containsResource)
                 .hasNext();
     }
 

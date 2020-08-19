@@ -81,7 +81,6 @@ export const DATE_MODIFIED_URI = FAIRSPACE_NS + 'dateModified';
 export const MODIFIED_BY_URI = FAIRSPACE_NS + 'modifiedBy';
 export const DATE_DELETED_URI = FAIRSPACE_NS + 'dateDeleted';
 export const DELETED_BY_URI = FAIRSPACE_NS + 'deletedBy';
-export const FIXED_SHAPE_URI = FAIRSPACE_NS + 'fixedShape';
 export const EXTERNAL_LINK_URI = FAIRSPACE_NS + 'externalLink';
 export const SYSTEM_PROPERTIES_URI = FAIRSPACE_NS + 'systemProperties';
 export const IMPORTANT_PROPERTY_URI = FAIRSPACE_NS + 'importantProperty';

@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static java.time.Instant.now;
 import static org.junit.Assert.assertNotNull;

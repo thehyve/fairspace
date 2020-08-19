@@ -30,10 +30,9 @@ public class SparqlUtilsTest {
     }
 
     @Test
-    public void vocabularyAndWorkspacePrefixesAreAdded() {
+    public void workspacePrefixIsAdded() {
         assertEquals(
                 "PREFIX ws: <http://localhost/iri/>\n" +
-                        "PREFIX vocabulary: <http://localhost/vocabulary/>\n" +
                         "\"\"",
                 storedQuery("test_formatting", "")
         );

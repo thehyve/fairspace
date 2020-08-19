@@ -44,7 +44,6 @@ const LinkedDataEntityHeader = ({
     typeInfo = {},
     updateLinkedData
 }) => {
-    const isFixedShape = values[FIXED_SHAPE_URI];
     const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
     const namespacedIri = UseNamespacedIri(subject);
     const isDeleted = values[DATE_DELETED_URI];
@@ -64,7 +63,7 @@ const LinkedDataEntityHeader = ({
                 <Grid item style={{display: "flex", alignItems: "center"}}>
                     <DeleteEntityButton
                         subject={subject}
-                        isDeletable={!isDeleted && !isFixedShape && !isProtectedEntity}
+                        isDeletable={!isDeleted && !isProtectedEntity}
                         updateLinkedData={updateLinkedData}
                     />
 
