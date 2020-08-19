@@ -10,8 +10,8 @@ import org.apache.jena.vocabulary.RDF;
 import java.net.URI;
 
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.vocabulary.EnumUtils.max;
-import static io.fairspace.saturn.vocabulary.EnumUtils.min;
+import static io.fairspace.saturn.util.EnumUtils.max;
+import static io.fairspace.saturn.util.EnumUtils.min;
 import static io.fairspace.saturn.webdav.AccessMode.DataPublished;
 import static io.fairspace.saturn.webdav.AccessMode.MetadataPublished;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
