@@ -1,6 +1,5 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
-import {SHACL_CLASS} from "../../constants";
 
 const TYPE_PROPERTY = {
     key: '@type',
