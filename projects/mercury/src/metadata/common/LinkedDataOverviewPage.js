@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext} from 'react';
 import PropTypes from "prop-types";
 import {withRouter} from 'react-router-dom';
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
@@ -23,26 +23,11 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
         size, setSize, page, setPage
     } = useLinkedDataSearchParams();
 
-    const [showGraph, setShowGraph] = useState(true);
-
-    useEffect(() => {
-        if (query || (selectedTypes && selectedTypes.length > 0)) {
-            setShowGraph(false);
-        }
-    }, [query, selectedTypes]);
-
-    useEffect(() => {
-        if (showGraph) {
-            setSelectedTypes([]);
-            setQuery(null);
-        }
-    }, [setQuery, setSelectedTypes, showGraph]);
-
     const getClassesInCatalogToDisplay = useCallback(() => getClassesInCatalog(shapes), [shapes]);
 
     const getAvailableTypes = useCallback(() => getClassesInCatalogToDisplay()
         .map(type => {
-            const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS);
+            const targetClass = getFirstPredicateId(type, SHACL_TARGET_CLASS) || type['@id'];
             const label = getLabel(type);
             return {targetClass, label};
         }), [getClassesInCatalogToDisplay]);
@@ -53,7 +38,6 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
 
     const renderResults = () => (
         <ResultsComponent
-            showGraph={showGraph}
             selectedTypes={selectedTypes}
             availableTypes={availableTypes}
 

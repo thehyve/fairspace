@@ -60,7 +60,7 @@ export const getSystemProperties = classShape => (classShape && classShape[const
  * Deleted entries are excluded from the list
  */
 export const getClassesInCatalog = (vocabulary) => vocabulary
-    .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))
+    .filter(entry => getFirstPredicateValue(constants.SHACL_TARGET_CLASS) || (entry['@type'] && entry['@type'].includes('http://www.w3.org/2000/01/rdf-schema#Class') && entry['@type'].includes('http://www.w3.org/ns/shacl#NodeShape')))
     .filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI))
     .filter(entry => !getFirstPredicateValue(entry, constants.DATE_DELETED_URI));
 
@@ -98,7 +98,7 @@ export const getShape = (vocabulary, id) => vocabulary.find(el => el['@id'] === 
  * Determines the SHACL shape to be applied to the given types
  * @param typeUris
  */
-export const determineShapeForTypes = (vocabulary, typeUris) => vocabulary.find(entry => typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
+export const determineShapeForTypes = (vocabulary, typeUris) => vocabulary.find(entry => typeUris.includes(entry['@id']) || typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
 
 /**
  * Determines the SHACL shape to be applied to the given type.
@@ -160,7 +160,7 @@ const isFairspaceClass = (vocabulary, className) => {
     }
 
     return getClassesInCatalog(vocabulary)
-        .some(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
+        .some(entry => entry['@id'] === className || getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
 };
 
 /**
