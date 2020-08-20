@@ -10,7 +10,7 @@
   {
     "@id": "http://fairspace.io/ontology#DeletedClass",
     "@type": [
-      "http://fairspace.io/ontology#ClassShape"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://www.w3.org/ns/shacl#name": [
       {
@@ -41,7 +41,7 @@
   {
     "@id": "http://fairspace.io/ontology#CollectionShape",
     "@type": [
-      "http://fairspace.io/ontology#ClassShape"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://www.w3.org/ns/shacl#closed": [
       {
@@ -89,7 +89,7 @@
   {
     "@id": "http://fairspace.io/ontology#UserShape",
     "@type": [
-      "http://fairspace.io/ontology#ClassShape"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
     "http://www.w3.org/ns/shacl#closed": [
       {
