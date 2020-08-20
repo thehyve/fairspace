@@ -6,7 +6,6 @@ import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.UserService;
@@ -26,7 +25,6 @@ import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
-import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
 
 @Slf4j
 @Getter
@@ -63,8 +61,6 @@ public class Services {
 
         metadataPermissions = new MetadataPermissions(workspaceService, davFactory);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset.getDefaultModel());
-
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -73,7 +69,7 @@ public class Services {
                 new WorkspaceStatusValidator(),
                 new ShaclValidator());
 
-        metadataService = new MetadataService(transactions, VOCABULARY, metadataLifeCycleManager, metadataValidator);
+        metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
     }

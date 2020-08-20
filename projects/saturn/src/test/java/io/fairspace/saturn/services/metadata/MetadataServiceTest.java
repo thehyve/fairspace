@@ -3,11 +3,15 @@ package io.fairspace.saturn.services.metadata;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.vocabulary.FS;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,17 +41,15 @@ public class MetadataServiceTest {
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
 
+    private Dataset ds = createTxnMem();
 
-    private Transactions txn = new SimpleTransactions(createTxnMem());
+    private Transactions txn = new SimpleTransactions(ds);
     private MetadataService api;
-
-    @Mock
-    private MetadataEntityLifeCycleManager lifeCycleManager;
 
     @Before
     public void setUp() {
         setupRequestContext();
-        api = new MetadataService(txn, VOCABULARY, lifeCycleManager, new ComposedValidator());
+        api = new MetadataService(txn, VOCABULARY, new ComposedValidator());
     }
 
     @Test
@@ -61,10 +63,13 @@ public class MetadataServiceTest {
     }
 
     @Test
-    public void testPutHandlesLifecycleForEntitities() {
-        var delta = modelOf(STMT1, STMT2);
+    public void testPutHandlesLifecycleForEntities() {
+        var delta = modelOf(STMT1);
         api.put(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.createdBy));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateCreated));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.modifiedBy));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateModified));
     }
 
 
@@ -132,9 +137,11 @@ public class MetadataServiceTest {
 
     @Test
     public void testPatchHandlesLifecycleForEntities() {
-        var delta = modelOf(STMT1, STMT2);
+        var delta = modelOf(STMT1);
         api.patch(delta);
-        verify(lifeCycleManager).updateLifecycleMetadata(isomorphic(delta));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.modifiedBy));
+        assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateModified));
     }
+
 
 }

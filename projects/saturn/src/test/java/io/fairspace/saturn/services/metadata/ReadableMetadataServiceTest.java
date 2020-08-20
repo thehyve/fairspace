@@ -39,7 +39,7 @@ public class ReadableMetadataServiceTest {
 
     @Before
     public void setUp() {
-        api = new MetadataService(txn, vocabulary, null, null);
+        api = new MetadataService(txn, vocabulary, null);
     }
 
     @Test

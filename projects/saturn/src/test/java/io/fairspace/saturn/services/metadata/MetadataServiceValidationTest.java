@@ -39,10 +39,6 @@ public class MetadataServiceValidationTest {
     @Mock
     MetadataRequestValidator validator;
 
-    @Mock
-    private MetadataEntityLifeCycleManager lifeCycleManager;
-
-
     private static final Resource resource1 = createResource("http://localhost/iri/S1");
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
     private static final Property property1 = createProperty("http://fairspace.io/ontology/P1");
@@ -62,7 +58,7 @@ public class MetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         txn = new SimpleTransactions(ds);
-        api = new MetadataService(txn, VOCABULARY, lifeCycleManager, validator);
+        api = new MetadataService(txn, VOCABULARY, validator);
 
         setupRequestContext();
     }

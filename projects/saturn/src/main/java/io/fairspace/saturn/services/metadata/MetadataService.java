@@ -9,16 +9,22 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
+import org.apache.jena.vocabulary.RDF;
 
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.updatedView;
+import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
+import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -28,13 +34,11 @@ public class MetadataService {
 
     private final Transactions transactions;
     private final Model vocabulary;
-    private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
 
-    public MetadataService(Transactions transactions, Model vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+    public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator) {
         this.transactions = transactions;
         this.vocabulary = vocabulary;
-        this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
     }
 
@@ -89,10 +93,29 @@ public class MetadataService {
     /**
      * Marks an entity as deleted
      *
-     * @param subject   Subject URI to mark as deleted
+     * @param subject Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        if (lifeCycleManager.softDelete(subject)) {
+        var success = transactions.calculateWrite(ds -> {
+            var resource = subject.inModel(ds.getDefaultModel());
+
+            var machineOnly = resource.listProperties(RDF.type)
+                    .mapWith(Statement::getObject)
+                    .filterKeep(SYSTEM_VOCABULARY::containsResource)
+                    .hasNext();
+
+            if (machineOnly) {
+                throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
+            }
+            if (resource.getModel().containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
+                resource.addLiteral(FS.dateDeleted, toXSDDateTimeLiteral(Instant.now()));
+                resource.addProperty(FS.deletedBy, ds.getDefaultModel().wrapAsResource(getUserURI()));
+                return true;
+            }
+            return false;
+        });
+
+        if (success) {
             audit("METADATA_MARKED_AS_DELETED", "iri", subject.getURI());
             return true;
         } else {
@@ -169,10 +192,24 @@ public class MetadataService {
 
     private void persist(Model modelToRemove, Model modelToAdd) {
         transactions.executeWrite(dataset -> {
-            // Store information on the lifecycle of the entities
-            lifeCycleManager.updateLifecycleMetadata(modelToAdd);
+            var model = dataset.getDefaultModel();
 
-            dataset.getDefaultModel().remove(modelToRemove).add(modelToAdd);
+            var created = modelToAdd.listSubjects()
+                    .filterKeep(RDFNode::isURIResource)
+                    .filterDrop(s -> model.listStatements(s, null, (RDFNode) null).hasNext())
+                    .toSet();
+
+            model.remove(modelToRemove).add(modelToAdd);
+
+            var user = model.wrapAsResource(getUserURI());
+            var now = toXSDDateTimeLiteral(Instant.now());
+
+            created.forEach(s -> model.add(s, FS.createdBy, user).add(s, FS.dateCreated, now));
+
+            modelToAdd.listSubjects().andThen(modelToRemove.listSubjects())
+                    .filterKeep(RDFNode::isURIResource)
+                    .filterKeep(s -> model.listStatements(s, null, (RDFNode) null).hasNext())
+                    .forEachRemaining(s -> model.add(s, FS.modifiedBy, user).add(s, FS.dateModified, now));
         });
     }
 }
