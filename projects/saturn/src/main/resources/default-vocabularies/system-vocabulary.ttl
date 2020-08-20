@@ -171,16 +171,8 @@ fs:Workspace a fs:ClassShape ;
   fs:machineOnly true ;
   fs:fixedShape true ;
   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-  fs:systemProperties
-      fs:statusShape,
-      fs:statusDateModifiedShape,
-      fs:statusModifiedByShape ;
   sh:property
       fs:labelShape,
-      fs:canListShape,
-      fs:canReadShape,
-      fs:canWriteShape,
-      fs:canManageShape,
       [
         a fs:DatatypePropertyShape ;
         sh:path fs:workspaceDescription ;
@@ -457,7 +449,7 @@ xsd:dateTime rdfs:label "Date and time" ;
     rdfs:comment "Reference to xsd:datetime." .
 
 fs:File a fs:Class .
-fs:Collection a fs:Class.
+fs:Collection a fs:Class .
 fs:User a fs:Class .
 fs:Directory a fs:Class ;
     rdfs:subClassOf fs:File .

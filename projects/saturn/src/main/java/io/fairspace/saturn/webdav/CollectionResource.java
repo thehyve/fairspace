@@ -1,16 +1,13 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Request;
-import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.property.PropertySource.PropertyMetaData;
-import io.milton.property.PropertySource.PropertySetException;
 import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -110,44 +107,34 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
     }
 
-    public void setOwnedBy(String iri) throws NotAuthorizedException {
-        var ws = subject.getModel().createResource(iri);
+    public void setOwnedBy(Resource owner) throws NotAuthorizedException, BadRequestException {
+        if (!access.canManage()) {
+            throw new NotAuthorizedException(this);
+        }
+        if (!owner.hasProperty(RDF.type, FS.Workspace)) {
+            throw new BadRequestException(this, "Invalid owner");
+        }
+
         var old = subject.getPropertyResourceValue(FS.ownedBy);
 
-        if (old != null) {
-            if (old.equals(ws)) {
-                return;
-            }
-            if (!isAdmin()) {
-                throw new NotAuthorizedException();
-            }
-        }
-
-        if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
-            throw new PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
-        }
-
-        // TODO: Use the new WorkspaceService
-        if (!isAdmin() && !factory.currentUserResource().hasLiteral(FS.canManage, ws)) {
-            throw new NotAuthorizedException();
-        }
-
-        if (!ws.hasLiteral(FS.status, WorkspaceStatus.Active.name())) {
-            throw new NotAuthorizedException();
-        }
-
-        subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, ws);
+        subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, owner);
 
         if (old != null) {
             subject.getModel().listResourcesWithProperty(FS.isMemberOf, old)
                     .andThen(subject.getModel().listResourcesWithProperty(FS.isManagerOf, old))
-                    .filterDrop(user -> user.hasProperty(FS.isMemberOf, ws) || user.hasProperty(FS.isManagerOf, ws))
+                    .filterDrop(user -> user.hasProperty(FS.isMemberOf, owner) || user.hasProperty(FS.isManagerOf, owner))
                     .filterKeep(user -> user.hasProperty(FS.canManage, subject) || user.hasProperty(FS.canWrite, subject))
                     .toList()
                     .forEach(user -> user.getModel()
                             .remove(user, FS.canManage, subject)
                             .remove(user, FS.canWrite, subject)
                             .add(user, FS.canRead, subject));
+            subject.getModel()
+                    .removeAll(old, FS.canManage, subject)
+                    .removeAll(old, FS.canWrite, subject)
+                    .removeAll(old, FS.canRead, subject)
+                    .removeAll(old, FS.canManage, subject);
+
         }
     }
 
@@ -264,6 +251,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case "set_access_mode" -> setAccessMode(getEnumParameter(parameters, "mode", AccessMode.class));
             case "set_status" -> setStatus(getEnumParameter(parameters, "status", Status.class));
             case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
+            case "set_owned_by" -> setOwnedBy(getResourceParameter(parameters, "owner"));
             default -> super.performAction(action, parameters, files);
         }
     }
