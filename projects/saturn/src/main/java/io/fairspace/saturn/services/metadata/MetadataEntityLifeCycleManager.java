@@ -24,9 +24,7 @@ import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 @AllArgsConstructor
 public
 class MetadataEntityLifeCycleManager {
-    private final Dataset dataset;
-    private final Node graph;
-    private final Node vocabulary;
+    private final Model model;
 
     /**
      * Stores statements regarding the lifecycle of the entities in this model
@@ -40,27 +38,26 @@ class MetadataEntityLifeCycleManager {
      * Please note that this method will check the database for existence of the entities. For that reason, this method must be called
      * before actually inserting new triples.
      *
-     * @param model
+     * @param delta
      */
-    void updateLifecycleMetadata(Model model) {
-        if (model == null || model.isEmpty()) {
+    void updateLifecycleMetadata(Model delta) {
+        if (delta == null || delta.isEmpty()) {
             return;
         }
 
         // Determine whether the model to add contains new entities
         // for which new information should be stored
-        var newEntities = determineNewEntities(model);
+        var newEntities = determineNewEntities(delta);
 
         // If there are new entities, updateLifecycleMetadata creation information for them
         // as well as permissions
         if (!newEntities.isEmpty()) {
-            dataset.getNamedModel(graph.getURI()).add(generateCreationInformation(newEntities));
+            model.add(generateCreationInformation(newEntities));
         }
     }
 
     boolean softDelete(Resource resource) {
         // TODO: Check permissions
-        var model = dataset.getNamedModel(graph.getURI());
         resource = resource.inModel(model);
         if (isMachineOnly(resource)) {
             throw new IllegalArgumentException("Cannot mark as deleted machine-only entity " + resource);
@@ -120,6 +117,6 @@ class MetadataEntityLifeCycleManager {
      * @return
      */
     private boolean exists(Resource resource) {
-        return dataset.getNamedModel(graph.getURI()).contains(resource, null);
+        return model.contains(resource, null);
     }
 }

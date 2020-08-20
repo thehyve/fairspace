@@ -53,9 +53,4 @@ public class ServicesTest {
     public void getMetadataService() {
         assertNotNull(svc.getMetadataService());
     }
-
-    @Test
-    public void getUserVocabularyService() {
-        assertNotNull(svc.getUserVocabularyService());
-    }
 }

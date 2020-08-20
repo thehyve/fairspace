@@ -22,6 +22,7 @@ import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -29,19 +30,18 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ChangeableMetadataServiceValidationTest {
+public class MetadataServiceValidationTest {
     @Mock
     MetadataRequestValidator validator;
 
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
 
-    private static final String GRAPH = "http://localhost/iri/graph";
-    private static final String VOCABULARY = "http://localhost/iri/vocabulary";
 
     private static final Resource resource1 = createResource("http://localhost/iri/S1");
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
@@ -56,13 +56,13 @@ public class ChangeableMetadataServiceValidationTest {
 
     private Dataset ds;
     private Transactions txn;
-    private ChangeableMetadataService api;
+    private MetadataService api;
 
     @Before
     public void setUp() {
         ds = createTxnMem();
         txn = new SimpleTransactions(ds);
-        api = new ChangeableMetadataService(txn, createURI(GRAPH), createURI(VOCABULARY), lifeCycleManager, validator);
+        api = new MetadataService(txn, VOCABULARY, lifeCycleManager, validator);
 
         setupRequestContext();
     }
@@ -71,7 +71,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void testPutShouldSucceedOnValidationSuccess() {
         api.put(modelOf(LBL_STMT1));
 
-        Model model = ds.getNamedModel(GRAPH);
+        Model model = ds.getDefaultModel();
         assertTrue(model.contains(LBL_STMT1));
     }
 
@@ -95,7 +95,7 @@ public class ChangeableMetadataServiceValidationTest {
     public void testPatchShouldSucceedOnValidationSuccess() {
         api.patch(modelOf(LBL_STMT1));
 
-        Model model = ds.getNamedModel(GRAPH);
+        Model model = ds.getDefaultModel();
         assertTrue(model.contains(LBL_STMT1));
     }
 
@@ -107,11 +107,11 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testSoftDeleteShouldSucceedOnValidationSuccess() {
-        txn.executeWrite(ds -> ds.getNamedModel(GRAPH).add(STMT1));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1));
 
         api.softDelete(resource1);
 
-        Model model = ds.getNamedModel(GRAPH);
+        Model model = ds.getDefaultModel();
         assertFalse(model.contains(LBL_STMT1));
     }
 
@@ -123,11 +123,11 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
-        txn.executeWrite(ds -> ds.getNamedModel(GRAPH).add(STMT1));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1));
 
         api.delete(modelOf(LBL_STMT1));
 
-        Model model = ds.getNamedModel(GRAPH);
+        Model model = ds.getDefaultModel();
         assertFalse(model.contains(LBL_STMT1));
     }
 
@@ -139,7 +139,7 @@ public class ChangeableMetadataServiceValidationTest {
 
     @Test
     public void validatedModelsContainSubjectTypes() {
-        ds.replaceNamedModel(GRAPH, modelOf(resource1, RDF.type, class1));
+        ds.setDefaultModel(modelOf(resource1, RDF.type, class1));
 
         var toAdd = modelOf(resource1, property1, createTypedLiteral(1));
 
@@ -155,13 +155,13 @@ public class ChangeableMetadataServiceValidationTest {
                         resource1, property1, createTypedLiteral(1))),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                isomorphic(ds.getNamedModel(VOCABULARY)),
+                eq(VOCABULARY),
                 any());
     }
 
     @Test
     public void validatedModelsContainObjectTypes() {
-        ds.replaceNamedModel(GRAPH, modelOf(resource2, RDF.type, class2));
+        ds.setDefaultModel(modelOf(resource2, RDF.type, class2));
 
         var toAdd = modelOf(resource1, property1, resource2);
 
@@ -177,7 +177,7 @@ public class ChangeableMetadataServiceValidationTest {
                         resource1, property1, resource2)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                isomorphic(ds.getNamedModel(VOCABULARY)),
+                eq(VOCABULARY),
                 any());
     }
 
@@ -197,7 +197,7 @@ public class ChangeableMetadataServiceValidationTest {
                 node3, RDF.rest, RDF.nil,
                 resource2, RDF.type, class2);
 
-        ds.replaceNamedModel(GRAPH, modelWithList);
+        ds.setDefaultModel(modelWithList);
 
         var toAdd = modelOf(resource1, property2, resource2);
 
@@ -211,7 +211,7 @@ public class ChangeableMetadataServiceValidationTest {
                 isomorphic(modelWithList.union(toAdd)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                isomorphic(ds.getNamedModel(VOCABULARY)),
+                eq(VOCABULARY),
                 any());
     }
 }

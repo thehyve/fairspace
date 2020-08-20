@@ -17,7 +17,6 @@ import java.io.File;
 
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
 @Slf4j
@@ -55,15 +54,9 @@ public class SaturnDatasetFactory {
         // Add transaction log
         dsg = new TxnLogDatasetGraph(dsg, txnLog);
 
-        var ds = DatasetFactory.wrap(dsg);
+        TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
 
-        Txn.executeWrite(ds, () -> {
-            TypeMapper.getInstance().registerDatatype(MARKDOWN_DATA_TYPE);
-
-            initVocabularies(ds);
-        });
-
-        return ds;
+        return DatasetFactory.wrap(dsg);
     }
 
     protected static boolean isRestoreNeeded(File datasetPath) {

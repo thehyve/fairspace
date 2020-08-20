@@ -116,29 +116,8 @@ public class FS {
     public static final String ACCESS_MODE_URI = NS + "accessMode";
     public static final Property accessMode = createProperty(ACCESS_MODE_URI);
 
-    public static final String CLASS_SHAPE_META_SHAPE_URI = NS + "ClassShapeMetaShape";
-    public static final Resource ClassShapeMetaShape = createResource(CLASS_SHAPE_META_SHAPE_URI);
-
-    public static final String PROPERTY_SHAPE_META_SHAPE_URI = NS + "PropertyShapeMetaShape";
-    public static final Resource PropertyShapeMetaShape = createResource(PROPERTY_SHAPE_META_SHAPE_URI);
-
-    public static final String RELATION_SHAPE_META_SHAPE_URI = NS + "RelationShapeMetaShape";
-    public static final Resource RelationShapeMetaShape = createResource(RELATION_SHAPE_META_SHAPE_URI);
-
-    public static final String CLASS_SHAPE_URI = NS + "ClassShape";
-    public static final Resource ClassShape = createResource(CLASS_SHAPE_URI);
-
-    public static final String PROPERTY_SHAPE_URI = NS + "PropertyShape";
-    public static final Resource PropertyShape = createResource(PROPERTY_SHAPE_URI);
-
-    public static final String RELATION_SHAPE_URI = NS + "RelationShape";
-    public static final Resource RelationShape = createResource(RELATION_SHAPE_URI);
-
     public static final String IMPORTANT_PROPERTY_URI = NS + "importantProperty";
     public static final Property importantProperty = createProperty(IMPORTANT_PROPERTY_URI);
-
-    public static final String DOMAIN_INCLUDES_URI = NS + "domainIncludes";
-    public static final Property domainIncludes = createProperty(DOMAIN_INCLUDES_URI);
 
     public static final String ERROR_URI = NS + "error";
     public static final String ERROR_STATUS_URI = NS + "errorStatus";

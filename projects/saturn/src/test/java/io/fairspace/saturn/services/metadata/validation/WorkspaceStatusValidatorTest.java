@@ -2,8 +2,6 @@ package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -16,7 +14,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.mockito.Mockito.*;
@@ -27,8 +24,7 @@ public class WorkspaceStatusValidatorTest {
     @Mock
     private ViolationHandler violationHandler;
 
-    private WorkspaceStatusValidator validator;
-    private Dataset ds = DatasetFactory.create();
+    private WorkspaceStatusValidator validator;;
     private Model vocabulary;
     Model before;
     Resource resource;
@@ -36,7 +32,7 @@ public class WorkspaceStatusValidatorTest {
     @Before
     public void setUp() {
         validator = new WorkspaceStatusValidator();
-        vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
+        vocabulary = createDefaultModel();
         before = createDefaultModel();
         resource = before.createResource("http://example.com/w123");
         resource.addProperty(RDF.type, FS.Workspace);

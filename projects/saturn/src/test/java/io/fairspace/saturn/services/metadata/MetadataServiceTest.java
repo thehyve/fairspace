@@ -17,8 +17,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.services.metadata.ChangeableMetadataService.NIL;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
+import static io.fairspace.saturn.services.metadata.MetadataService.NIL;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ChangeableMetadataServiceTest {
+public class MetadataServiceTest {
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
@@ -39,7 +39,7 @@ public class ChangeableMetadataServiceTest {
 
 
     private Transactions txn = new SimpleTransactions(createTxnMem());
-    private ChangeableMetadataService api;
+    private MetadataService api;
 
     @Mock
     private MetadataEntityLifeCycleManager lifeCycleManager;
@@ -47,7 +47,7 @@ public class ChangeableMetadataServiceTest {
     @Before
     public void setUp() {
         setupRequestContext();
-        api = new ChangeableMetadataService(txn, Quad.defaultGraphIRI, VOCABULARY_GRAPH_URI, lifeCycleManager, new ComposedValidator());
+        api = new MetadataService(txn, VOCABULARY, lifeCycleManager, new ComposedValidator());
     }
 
     @Test

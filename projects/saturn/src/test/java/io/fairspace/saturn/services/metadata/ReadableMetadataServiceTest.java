@@ -13,15 +13,15 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 
+import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 
 public class ReadableMetadataServiceTest {
-    private static final String userVocabularyURI = "http://localhost/iri/user-vocabulary";
-    private static final String GRAPH = "http://localhost/iri/graph";
-
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
@@ -34,18 +34,19 @@ public class ReadableMetadataServiceTest {
     private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
     private Transactions txn = new SimpleTransactions(createTxnMem());
-    private ReadableMetadataService api;
+    private MetadataService api;
+    private Model vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel());
 
     @Before
     public void setUp() {
-        api = new ReadableMetadataService(txn, createURI(GRAPH), createURI(userVocabularyURI));
+        api = new MetadataService(txn, vocabulary, null, null);
     }
 
     @Test
     public void get() {
         assertEquals(0, api.get(null, false).size());
 
-        txn.executeWrite(ds -> ds.getNamedModel(GRAPH).add(STMT1).add(STMT2));
+        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1).add(STMT2));
 
         Model m1 = api.get(null, false);
         assertEquals(2, m1.size());
@@ -70,7 +71,7 @@ public class ReadableMetadataServiceTest {
         assertEquals(0, api.get(null, true).size());
 
         txn.executeWrite(ds -> {
-            ds.getNamedModel(GRAPH)
+            ds.getDefaultModel()
                     .add(STMT1).add(STMT2)
                     .add(LBL_STMT1).add(LBL_STMT2);
             setupImportantProperties();
@@ -87,7 +88,7 @@ public class ReadableMetadataServiceTest {
 
     @Test
     public void getWithImportantPropertiesWorksWithoutImportantProperties() {
-        txn.executeWrite(ds -> ds.getNamedModel(GRAPH)
+        txn.executeWrite(ds -> ds.getDefaultModel()
                 .add(STMT1).add(STMT2)
                 .add(LBL_STMT1).add(LBL_STMT2));
 
@@ -115,7 +116,7 @@ public class ReadableMetadataServiceTest {
         txn.executeWrite(ds -> {
             setupImportantProperties();
 
-            ds.getNamedModel(userVocabularyURI)
+            vocabulary
                     .add(clazzShape, SHACLM.targetClass, clazz)
                     .add(clazzShape, SHACLM.property, importantPropertyShape)
                     .add(importantPropertyShape, SHACLM.path, importantProperty)
@@ -123,7 +124,7 @@ public class ReadableMetadataServiceTest {
                     .add(clazzShape, SHACLM.property, unimportantPropertyShape)
                     .add(unimportantPropertyShape, SHACLM.path, unimportantProperty);
 
-            ds.getNamedModel(GRAPH)
+            ds.getDefaultModel()
                     .add(S1, someProperty, S2)
                     .add(S2, RDF.type, clazz)
                     .add(S2, unimportantProperty, S3)
@@ -144,13 +145,11 @@ public class ReadableMetadataServiceTest {
         Resource createdByShape = createResource("http://createdByShape");
         Resource md5Shape = createResource("http://md5Shape");
 
-        txn.executeWrite(ds -> {
-            ds.getNamedModel(userVocabularyURI).add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
-            ds.getNamedModel(userVocabularyURI).add(labelShape, SHACLM.path, RDFS.label);
-            ds.getNamedModel(userVocabularyURI).add(createdByShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE));
-            ds.getNamedModel(userVocabularyURI).add(createdByShape, SHACLM.path, FS.createdBy);
-            ds.getNamedModel(userVocabularyURI).add(md5Shape, FS.importantProperty, createTypedLiteral(Boolean.FALSE));
-            ds.getNamedModel(userVocabularyURI).add(md5Shape, SHACLM.path, FS.md5);
-        });
+        vocabulary.add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE))
+                .add(labelShape, SHACLM.path, RDFS.label)
+                .add(createdByShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE))
+                .add(createdByShape, SHACLM.path, FS.createdBy)
+                .add(md5Shape, FS.importantProperty, createTypedLiteral(Boolean.FALSE))
+                .add(md5Shape, SHACLM.path, FS.md5);
     }
 }

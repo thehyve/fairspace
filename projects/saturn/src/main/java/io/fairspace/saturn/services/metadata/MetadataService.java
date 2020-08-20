@@ -4,11 +4,12 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -17,19 +18,60 @@ import java.util.Set;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.updatedView;
+import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
-public class ChangeableMetadataService extends ReadableMetadataService {
+public class MetadataService {
     static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
 
+    private final Transactions transactions;
+    private final Model vocabulary;
     private final MetadataEntityLifeCycleManager lifeCycleManager;
     private final MetadataRequestValidator validator;
 
-    public ChangeableMetadataService(Transactions transactions, Node graph, Node vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
-        super(transactions, graph, vocabulary);
+    public MetadataService(Transactions transactions, Model vocabulary, MetadataEntityLifeCycleManager lifeCycleManager, MetadataRequestValidator validator) {
+        this.transactions = transactions;
+        this.vocabulary = vocabulary;
         this.lifeCycleManager = lifeCycleManager;
         this.validator = validator;
+    }
+
+    /**
+     * Returns a model with statements from the metadata database, based on the given selection criteria
+     * <p>
+     * If any of the fields is null, that field is not included to filter statements. For example, if only
+     * subject is given and predicate and object are null, then all statements with the given subject will be returned.
+     *
+     * @param subject              Subject URI for which you want to return statements
+     * @param withObjectProperties If set to true, the returned model will also include statements specifying values for
+     *                             certain properties marked as fs:importantProperty in the vocabulary
+     * @return
+     */
+    Model get(String subject, boolean withObjectProperties) {
+        var model = createDefaultModel();
+
+        transactions.executeRead(dataset -> {
+            dataset.getDefaultModel()
+                    .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)
+                    .forEachRemaining(stmt -> {
+                        model.add(stmt);
+                        if (withObjectProperties && stmt.getObject().isResource()) {
+                            getPropertyShapesForResource(stmt.getResource(), vocabulary)
+                                    .forEach(shape -> {
+                                        if (shape.hasLiteral(FS.importantProperty, true)) {
+                                            var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
+                                            stmt.getResource()
+                                                    .listProperties(property)
+                                                    .forEachRemaining(model::add);
+                                        }
+                                    });
+                        }
+                    });
+        });
+
+        return model;
     }
 
     /**
@@ -85,7 +127,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
      */
     void patch(Model model) {
         logUpdates(transactions.calculateWrite(dataset -> {
-            var before = dataset.getNamedModel(graph.getURI());
+            var before = dataset.getDefaultModel();
             var existing = createDefaultModel();
             model.listStatements()
                     .filterKeep(stmt -> stmt.getSubject().isURIResource())
@@ -99,11 +141,10 @@ public class ChangeableMetadataService extends ReadableMetadataService {
 
     private Set<Resource> update(Model modelToRemove, Model modelToAdd) {
         return transactions.calculateWrite(dataset -> {
-            var before = dataset.getNamedModel(graph.getURI());
-            var vocabularyModel = dataset.getNamedModel(vocabulary.getURI());
+            var before = dataset.getDefaultModel();
             var after = updatedView(before, modelToRemove, modelToAdd);
 
-            validate(before, after, modelToRemove, modelToAdd, vocabularyModel);
+            validate(before, after, modelToRemove, modelToAdd, vocabulary);
 
             persist(modelToRemove, modelToAdd);
 
@@ -131,7 +172,7 @@ public class ChangeableMetadataService extends ReadableMetadataService {
             // Store information on the lifecycle of the entities
             lifeCycleManager.updateLifecycleMetadata(modelToAdd);
 
-            dataset.getNamedModel(graph.getURI()).remove(modelToRemove).add(modelToAdd);
+            dataset.getDefaultModel().remove(modelToRemove).add(modelToAdd);
         });
     }
 }

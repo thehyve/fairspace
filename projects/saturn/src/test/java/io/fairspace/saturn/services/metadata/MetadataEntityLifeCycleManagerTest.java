@@ -16,8 +16,6 @@ import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.ADD_SHARED_METADATA;
 import static io.fairspace.saturn.vocabulary.FS.createdBy;
 import static io.fairspace.saturn.vocabulary.FS.dateCreated;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -30,7 +28,6 @@ public class MetadataEntityLifeCycleManagerTest {
     private Dataset ds;
     private Model model;
 
-    private Node graph = createURI("http://graph");
     private final Node userIri = createURI("http://localhost/iri/userid");
     private Resource userResource = createResource("http://localhost/iri/userid");
 
@@ -41,13 +38,11 @@ public class MetadataEntityLifeCycleManagerTest {
     @Before
     public void setUp() {
         ds = createTxnMem();
-        model = ds.getNamedModel(graph.getURI());
-
-        initVocabularies(ds);
+        model = ds.getDefaultModel();
 
         setupRequestContext(ADD_SHARED_METADATA);
 
-        lifeCycleManager = new MetadataEntityLifeCycleManager(ds, graph, VOCABULARY_GRAPH_URI);
+        lifeCycleManager = new MetadataEntityLifeCycleManager(model);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata.validation;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.vocabulary.Vocabularies;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -18,8 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.initVocabularies;
+import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
@@ -32,7 +32,6 @@ public class ShaclValidatorTest {
     private static final Resource closedClass = createResource("http://example.com/ClosedClass");
     private static final Resource closedClassShape = createResource("http://example.com/ClosedClassShape");
 
-    private Dataset ds = DatasetFactory.create();
     private ShaclValidator validator;
     private Model vocabulary;
 
@@ -42,13 +41,10 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        initVocabularies(ds);
-        vocabulary = ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI());
-
-        ds.getNamedModel(VOCABULARY_GRAPH_URI.getURI())
-                .add(closedClassShape, RDF.type, FS.ClassShape)
+        vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel()
+                .add(closedClassShape, RDF.type, SHACLM.NodeShape)
                 .add(closedClassShape, SHACLM.targetClass, closedClass)
-                .add(closedClassShape, SHACLM.closed, createTypedLiteral(true));
+                .add(closedClassShape, SHACLM.closed, createTypedLiteral(true)));
 
         validator = new ShaclValidator();
     }
@@ -99,8 +95,8 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceMissingRequiredProperty() {
         var model = modelOf(resource1, RDF.type, FS.Workspace);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model,
-                vocabulary, violationHandler);
+
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
 
         expect(resource1, FS.workspaceDescription, null);
 
