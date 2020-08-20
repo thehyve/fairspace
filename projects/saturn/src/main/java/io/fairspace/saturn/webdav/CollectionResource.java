@@ -14,7 +14,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import javax.xml.namespace.QName;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,27 +24,10 @@ import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
-import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
-import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
-    private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
-    private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
-    private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
-    private static final QName ACCESS_PROPERTY = new QName(FS.NS, "access");
-    private static final QName ACCESS_MODE_PROPERTY = new QName(FS.accessMode.getNameSpace(), FS.accessMode.getLocalName());
-    private static final QName AVAILABLE_ACCESS_MODES_PROPERTY = new QName(FS.NS, "availableAccessModes");
-    private static final QName USER_PERMISSIONS_PROPERTY = new QName(FS.NS, "userPermissions");
-    private static final QName WORKSPACE_PERMISSIONS_PROPERTY = new QName(FS.NS, "workspacePermissions");
-    private static final PropertyMetaData OWNED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData CREATED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData COMMENT_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData ACCESS_PROPERTY_META = new PropertyMetaData(READ_ONLY, Access.class);
-    private static final PropertyMetaData ACCESS_MODE_PROPERTY_META = new PropertyMetaData(READ_ONLY, AccessMode.class);
-    private static final PropertyMetaData PERMISSIONS_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
-    private static final PropertyMetaData AVAILABLE_ACCESS_MODES_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
