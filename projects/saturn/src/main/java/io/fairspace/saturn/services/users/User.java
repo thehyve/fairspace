@@ -24,16 +24,5 @@ public class User extends PersistentEntity {
     @RDFProperty(EMAIL_URI)
     private String email;
 
-    // Only for the current user
-    private Boolean admin;
-
-    // Only for the current user
-    private Boolean viewPublicMetadata;
-
-    // Only for the current user
-    private Boolean viewPublicData;
-
-    // Only for the current user
-    private Boolean addSharedMetadata;
-
+    private UserRoles roles;
 }

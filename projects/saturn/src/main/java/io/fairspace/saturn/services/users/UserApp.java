@@ -26,10 +26,12 @@ public class UserApp extends BaseApp {
         get("/current", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
             var user = service.getUser(getUserURI());
-            user.setAdmin(isAdmin());
-            user.setViewPublicMetadata(canViewPublicMetadata());
-            user.setViewPublicData(canViewPublicData());
-            user.setAddSharedMetadata(canAddSharedMetadata());
+            user.setRoles(UserRoles.builder()
+                    .admin(isAdmin())
+                    .viewPublicMetadata(canViewPublicMetadata())
+                    .viewPublicData(canViewPublicData())
+                    .addSharedMetadata(canAddSharedMetadata())
+                    .build());
             return mapper.writeValueAsString(user);
         });
 
