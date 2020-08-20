@@ -15,7 +15,7 @@ import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 
 import CollectionEditor from "./CollectionEditor";
-import type {Collection, Resource} from './CollectionAPI';
+import type {AccessMode, Collection, Resource, Status} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
 import UserContext from '../users/UserContext';
@@ -33,6 +33,8 @@ import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspac
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionPropertyChangeDialog from "./CollectionPropertyChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
+
+import {accessModes, statuses} from './CollectionAPI';
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
@@ -66,9 +68,9 @@ type CollectionDetailsProps = {
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
-    setAccessMode: (Resource) => Promise<void>;
-    setStatus: (Resource) => Promise<void>;
-    setOwnedBy: (Resource) => Promise<void>;
+    setAccessMode: (location: string, mode: AccessMode) => Promise<void>;
+    setStatus: (location: string, status: Status) => Promise<void>;
+    setOwnedBy: (location: string, owner: string) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
     classes: any;
@@ -317,7 +319,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         title="Select collection access mode"
                         confirmationMessage={`Are you sure you want to change the access mode of collection ${collection.name}`}
                         currentValue={collection.accessMode}
-                        availableValues={collection.availableAccessModes}
+                        availableValues={accessModes.filter(mode => collection.availableAccessModes.includes(mode))}
                         setValue={this.props.setAccessMode}
                         onClose={() => this.setState({changingAccessMode: false})}
                     />
@@ -328,7 +330,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         title="Select collection status"
                         confirmationMessage={`Are you sure you want to change the status of collection ${collection.name}`}
                         currentValue={collection.status}
-                        availableValues={collection.availableStatuses}
+                        availableValues={statuses.filter(status => collection.availableStatuses.includes(status))}
                         setValue={this.props.setStatus}
                         onClose={() => this.setState({changingStatus: false})}
                     />

@@ -7,7 +7,6 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -17,15 +16,12 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
 
@@ -132,26 +128,45 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Property
     public String getAvailableAccessModes() {
-        return getAvailableAccessModesSet()
+        return availableAccessModes()
                 .stream()
                 .map(Enum::name)
                 .collect(joining(","));
     }
 
-    public Set<AccessMode> getAvailableAccessModesSet() {
-        var availableModes = EnumSet.of(getAccessMode());
-
+    /**
+     * Compute available access modes for the collection, given its current status
+     * and the user's permissions.
+     *
+     * Returns only the current access mode when:
+     * - the current user does not have manage permission; or
+     * - the status is {@link Status#Closed} (which forbids changing its access mode); or
+     * - the access mode is {@link AccessMode#DataPublished}, which is terminal;
+     * returns all access modes except that {@link AccessMode#DataPublished} is only
+     * included when in status {@link Status#Archived} and {@link AccessMode#Restricted} is
+     * excluded when in status {@link Status#Archived}.
+     */
+    public Set<AccessMode> availableAccessModes() {
         if (!access.canManage()) {
-            return availableModes;
+            return EnumSet.of(getAccessMode());
         }
 
-        if (getStatus() == Status.Active || getStatus() == Status.Closed) {
-            availableModes.addAll(EnumSet.of(AccessMode.Restricted, AccessMode.MetadataPublished));
+        if (getStatus() == Status.Closed) {
+            return EnumSet.of(getAccessMode());
         }
 
-        return Stream.of(AccessMode.values())
-                .filter(mode -> isAdmin() || (mode.compareTo(getAccessMode()) >= 0 && availableModes.contains(mode)))
-                .collect(toSet());
+        if (getAccessMode() == AccessMode.DataPublished) {
+            return EnumSet.of(getAccessMode());
+        }
+
+        var accessModes = EnumSet.of(AccessMode.MetadataPublished);
+
+        if (getStatus() == Status.Archived) {
+            accessModes.add(AccessMode.DataPublished);
+        } else {
+            accessModes.add(AccessMode.Restricted);
+        }
+        return accessModes;
     }
 
     @Property
@@ -182,13 +197,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Property
     public String getAvailableStatuses() {
-        return getAvailableStatusesSet()
+        return availableStatuses()
                 .stream()
                 .map(Enum::name)
                 .collect(joining(","));
     }
 
-    public Set<Status> getAvailableStatusesSet() {
+    public Set<Status> availableStatuses() {
         if (!access.canManage()) {
             return EnumSet.of(getStatus());
         }
@@ -226,7 +241,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
                 });
     }
 
-
     @Override
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
@@ -242,7 +256,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!access.canManage()) {
             throw new NotAuthorizedException(this);
         }
-        if (!getAvailableStatusesSet().contains(status)) {
+        if (!availableStatuses().contains(status)) {
             throw new ConflictException(this);
         }
         subject.removeAll(FS.status).addProperty(FS.status, status.name());
@@ -252,7 +266,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!access.canManage()) {
             throw new NotAuthorizedException(this);
         }
-        if (!getAvailableAccessModesSet().contains(mode)) {
+        if (!availableAccessModes().contains(mode)) {
             throw new ConflictException(this);
         }
         subject.removeAll(FS.accessMode).addProperty(FS.accessMode, mode.name());

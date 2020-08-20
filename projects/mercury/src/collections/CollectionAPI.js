@@ -5,15 +5,18 @@ import MetadataAPI from "../metadata/common/MetadataAPI";
 import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
 import type {User} from "../users/UsersAPI";
 
-const rootUrl = "";
+const rootUrl = '';
 
-export type Access = "None" | "List" | "Read" | "Write" | "Manage";
-export type AccessMode = "Restricted" | "MetadataPublished" | "DataPublished";
-export type Status = "Active" | "Archived" | "Closed";
+export type AccessLevel = 'None' | 'List' | 'Read' | 'Write' | 'Manage';
+export const accessLevels: AccessLevel[] = ['None', 'List', 'Read', 'Write', 'Manage'];
+export type AccessMode = 'Restricted' | 'MetadataPublished' | 'DataPublished';
+export const accessModes: AccessMode[] = ['Restricted', 'MetadataPublished', 'DataPublished'];
+export type Status = 'Active' | 'Archived' | 'Closed';
+export const statuses: Status[] = ['Active', 'Archived', 'Closed'];
 
 export type Permission = {
     iri: string; // iri
-    access: Access;
+    access: AccessLevel;
 }
 
 export type CollectionProperties = {|
@@ -28,9 +31,9 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
-    access?: Access;
-    userPermissions: Array<Permission>;
-    workspacePermissions: Array<Permission>;
+    access?: AccessLevel;
+    userPermissions: Permission[];
+    workspacePermissions: Permission[];
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
@@ -49,8 +52,8 @@ export type CollectionAuditInfo = {|
     deletedBy?: string; // iri
     accessMode: AccessMode;
     status?: Status;
-    availableAccessModes: Array<AccessMode>;
-    availableStatuses: Array<Status>;
+    availableAccessModes: AccessMode[];
+    availableStatuses: Status[];
     statusDateModified?: string;
     statusModifiedBy?: string; // iri
 |};
@@ -107,19 +110,19 @@ class CollectionAPI {
             });
     }
 
-    setAccessMode(location: String, mode: AccessMode) {
+    setAccessMode(location: string, mode: AccessMode) {
         return FileAPI.post(location, {action: 'set_access_mode', mode});
     }
 
-    setStatus(location: String, status: Status) {
+    setStatus(location: string, status: Status) {
         return FileAPI.post(location, {action: 'set_status', status});
     }
 
-    setPermission(location, principal, access) {
+    setPermission(location: string, principal: string, access: AccessLevel) {
         return FileAPI.post(location, {action: 'set_permission', principal, access});
     }
 
-    setOwnedBy(location, owner) {
+    setOwnedBy(location: string, owner: string) {
         return FileAPI.post(location, {action: 'set_owned_by', owner});
     }
 }
