@@ -41,4 +41,6 @@ data:
       {{ if ( and .Values.services .Values.services.cbioportal  ) }}"cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
+  vocabulary.ttl: |
+   {{ .Values.saturn.vocabulary | indent 4 }}
 
