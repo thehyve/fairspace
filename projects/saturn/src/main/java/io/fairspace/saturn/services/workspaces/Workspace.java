@@ -7,12 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.apache.jena.graph.Node;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.time.Instant;
-
-import static io.fairspace.saturn.vocabulary.FS.*;
+import static io.fairspace.saturn.vocabulary.FS.WORKSPACE_URI;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)

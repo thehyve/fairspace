@@ -11,7 +11,6 @@ import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.system.Txn;
 
 import java.io.File;
 

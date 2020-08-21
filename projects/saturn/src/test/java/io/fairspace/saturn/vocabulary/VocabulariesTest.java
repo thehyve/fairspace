@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.vocabulary.Vocabularies.*;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.riot.RDFDataMgr.loadModel;
 import static org.junit.Assert.assertTrue;
 
