@@ -262,7 +262,7 @@ saturn:
     @prefix foaf: <http://xmlns.com/foaf/0.1/> .
     @prefix fhir: <http://hl7.org/fhir/STU3/> .
     @prefix dash: <http://datashapes.org/dash#> .
-    @prefix curie: <https://curie.org/dontology#> .
+    @prefix curie: <https://institut-curie.org/dontology#> .
 
     ########################
     ###   User Shapes    ###
@@ -614,12 +614,6 @@ saturn:
       sh:datatype xsd:integer ;
       sh:maxCount 1 ;
       sh:path curie:numberOfBreakPoints
-      ],
-      [
-      sh:name "Analysis files" ;
-      sh:description "The analysis linked to the files" ;
-      sh:class fs:File ;
-      sh:path curie:associatedFiles
       ],
       [
       sh:name "Label" ;
