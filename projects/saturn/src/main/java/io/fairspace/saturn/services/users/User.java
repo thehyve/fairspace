@@ -29,4 +29,11 @@ public class User extends PersistentEntity {
 
     // Only for the current user
     private Boolean viewPublicMetadata;
+
+    // Only for the current user
+    private Boolean viewPublicData;
+
+    // Only for the current user
+    private Boolean addSharedMetadata;
+
 }

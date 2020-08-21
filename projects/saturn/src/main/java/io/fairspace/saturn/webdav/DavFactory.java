@@ -70,9 +70,11 @@ public class DavFactory implements ResourceFactory {
 
         var access = getGrantedPermission(coll, user);
 
-        if (!access.canRead() && coll.hasLiteral(FS.accessMode, DataPublished.name()) && canViewPublicData()) {
-            access = Access.Read;
-        } else if (!access.canList() && canViewPublicMetadata() && (coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
+        if (coll.hasLiteral(FS.accessMode, DataPublished.name()) && (canViewPublicData() || access.canRead())) {
+            return Access.Read;
+        }
+        if (!access.canList() && canViewPublicMetadata()
+                && (coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
             access = Access.List;
         }
 

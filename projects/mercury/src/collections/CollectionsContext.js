@@ -26,6 +26,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const setPermission = (location: string, principal: string, access: string) => collectionApi.setPermission(location, principal, access).then(refresh);
     const setAccessMode = (location: string, mode: string) => collectionApi.setAccessMode(location, mode).then(refresh);
     const setStatus = (location: string, status: string) => collectionApi.setStatus(location, status).then(refresh);
+    const setOwnedBy = (location: string, owner: string) => collectionApi.setOwnedBy(location, owner).then(refresh);
 
     return (
         <CollectionsContext.Provider
@@ -42,6 +43,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 setPermission,
                 setAccessMode,
                 setStatus,
+                setOwnedBy,
                 showDeleted,
                 setShowDeleted
             }}

@@ -12,8 +12,6 @@ import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
 import ConfirmationButton from "../common/components/ConfirmationButton";
-import {isDataSteward} from "../users/userUtils";
-import UserContext from "../users/UserContext";
 import CreateDirectoryButton from "./buttons/CreateDirectoryButton";
 import ProgressButton from "../common/components/ProgressButton";
 import RenameButton from "./buttons/RenameButton";
@@ -31,7 +29,6 @@ Object.freeze(Operations);
 
 export const FileOperations = ({
     isWritingEnabled,
-    currentUser,
     showDeleted,
     openedPath,
     selectedPaths,
@@ -186,7 +183,7 @@ export const FileOperations = ({
                 >
                     <Download />
                 </IconButton>
-                {isDataSteward(currentUser) && (
+                {isWritingEnabled && (
                     <>
                         <ProgressButton active={activeOperation === Operations.RENAME}>
                             <RenameButton
@@ -220,7 +217,7 @@ export const FileOperations = ({
                                 </IconButton>
                             </ConfirmationButton>
                         </ProgressButton>
-                        {isWritingEnabled && showDeleted && (
+                        {showDeleted && (
                             <ProgressButton active={activeOperation === Operations.UNDELETE}>
                                 <ConfirmationButton
                                     message={`Are you sure you want to undelete ${selectedPaths.length} item(s)?`}
@@ -252,26 +249,28 @@ export const FileOperations = ({
                 >
                     <ContentCopy />
                 </IconButton>
-                {isDataSteward(currentUser) && (
-                    <IconButton
-                        aria-label="Cut"
-                        title="Cut"
-                        onClick={e => handleCut(e)}
-                        disabled={noPathSelected || isDeletedItemSelected || busy}
-                    >
-                        <ContentCut />
-                    </IconButton>
+                {isWritingEnabled && (
+                    <>
+                        <IconButton
+                            aria-label="Cut"
+                            title="Cut"
+                            onClick={e => handleCut(e)}
+                            disabled={noPathSelected || isDeletedItemSelected || busy}
+                        >
+                            <ContentCut />
+                        </IconButton>
+                        <ProgressButton active={activeOperation === Operations.PASTE}>
+                            <IconButton
+                                aria-label="Paste"
+                                title="Paste"
+                                onClick={e => handlePaste(e)}
+                                disabled={isPasteDisabled || isDeletedItemSelected || busy}
+                            >
+                                {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
+                            </IconButton>
+                        </ProgressButton>
+                    </>
                 )}
-                <ProgressButton active={activeOperation === Operations.PASTE}>
-                    <IconButton
-                        aria-label="Paste"
-                        title="Paste"
-                        onClick={e => handlePaste(e)}
-                        disabled={isPasteDisabled || isDeletedItemSelected || busy}
-                    >
-                        {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
-                    </IconButton>
-                </ProgressButton>
             </FileOperationsGroup>
             <FileOperationsGroup>
                 <ProgressButton active={activeOperation === Operations.REVERT}>
@@ -296,9 +295,8 @@ export const FileOperations = ({
 
 const ContextualFileOperations = props => {
     const clipboard = useContext(ClipboardContext);
-    const {currentUser} = useContext(UserContext);
 
-    return <FileOperations clipboard={clipboard} currentUser={currentUser} {...props} />;
+    return <FileOperations clipboard={clipboard} {...props} />;
 };
 
 export default ContextualFileOperations;

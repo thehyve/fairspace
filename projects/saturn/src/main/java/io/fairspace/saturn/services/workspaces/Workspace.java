@@ -26,15 +26,6 @@ public class Workspace extends LifecycleAwarePersistentEntity {
     @RDFProperty(value = RDFS.uri + "comment")
     private String description;
 
-    @RDFProperty(value = STATUS_URI)
-    private WorkspaceStatus status;
-
-    @RDFProperty(value = STATUS_DATE_MODIFIED_URI)
-    private Instant statusDateModified;
-
-    @RDFProperty(value = STATUS_MODIFIED_BY_URI)
-    private Node statusModifiedBy;
-
     private boolean canCollaborate;
     private boolean canManage;
 }

@@ -21,7 +21,7 @@ import type {History} from '../types';
 import UserContext from '../users/UserContext';
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import {isDataSteward} from "../users/userUtils";
+import {isAdmin} from "../users/userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -32,6 +32,7 @@ import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionPropertyChangeDialog from "./CollectionPropertyChangeDialog";
+import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 
 
 export const ICONS = {
@@ -68,6 +69,7 @@ type CollectionDetailsProps = {
     undeleteCollection: (Resource) => Promise<void>;
     setAccessMode: (Resource) => Promise<void>;
     setStatus: (Resource) => Promise<void>;
+    setOwnedBy: (Resource) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
     classes: any;
@@ -77,6 +79,7 @@ type CollectionDetailsState = {
     editing: boolean;
     changingAccessMode: boolean,
     changingStatus: boolean,
+    changingOwner: boolean,
     deleting: boolean;
     undeleting: boolean;
     anchorEl: any;
@@ -92,6 +95,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         editing: false,
         changingAccessMode: false,
         changingStatus: false,
+        changingOwner: false,
         anchorEl: null,
         deleting: false,
         undeleting: false
@@ -105,21 +109,28 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleChangeAccessMode = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({changingAccessMode: true});
             this.handleMenuClose();
         }
     };
 
     handleChangeStatus = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({changingStatus: true});
             this.handleMenuClose();
         }
     };
 
+    handleChangeOwner = () => {
+        if (this.props.collection.canManage) {
+            this.setState({changingOwner: true});
+            this.handleMenuClose();
+        }
+    };
+
     handleDelete = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({deleting: true});
             this.handleMenuClose();
         }
@@ -207,7 +218,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     render() {
         const {loading, error, collection, users, workspaceRoles, workspaces, inCollectionsBrowser = false} = this.props;
-        const {anchorEl, editing, changingAccessMode, changingStatus, deleting, undeleting} = this.state;
+        const {anchorEl, editing, changingAccessMode, changingStatus, changingOwner, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (error) {
@@ -223,7 +234,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={collection.canWrite && (
+                        action={collection.canManage && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -250,12 +261,15 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             <MenuItem onClick={this.handleChangeStatus}>
                                                 Change status
                                             </MenuItem>
+                                            <MenuItem onClick={this.handleChangeOwner}>
+                                                Transfer ownership
+                                            </MenuItem>
                                         </div>
                                     )}
-                                    {isDataSteward(this.props.currentUser) && (
-                                        <MenuItem onClick={this.handleDelete}>
-                                            {collection && collection.dateDeleted ? 'Delete permanently' : 'Delete'}
-                                        </MenuItem>
+                                    {collection && collection.dateDeleted && isAdmin(this.props.currentUser) ? (
+                                        <MenuItem onClick={this.handleDelete}>Delete permanently</MenuItem>
+                                    ) : (
+                                        <MenuItem onClick={this.handleDelete}>Delete</MenuItem>
                                     )}
                                     {collection.dateDeleted && (
                                         <MenuItem onClick={this.handleUndelete}>
@@ -302,6 +316,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CollectionPropertyChangeDialog
                         collection={collection}
                         title="Select collection access mode"
+                        confirmationMessage={`Are you sure you want to change the access mode of collection ${collection.name}`}
                         currentValue={collection.accessMode}
                         availableValues={collection.availableAccessModes}
                         setValue={this.props.setAccessMode}
@@ -312,10 +327,19 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CollectionPropertyChangeDialog
                         collection={collection}
                         title="Select collection status"
+                        confirmationMessage={`Are you sure you want to change the status of collection ${collection.name}`}
                         currentValue={collection.status}
                         availableValues={collection.availableStatuses}
                         setValue={this.props.setStatus}
                         onClose={() => this.setState({changingStatus: false})}
+                    />
+                ) : null}
+                {changingOwner ? (
+                    <CollectionOwnerChangeDialog
+                        collection={collection}
+                        workspaces={workspaces}
+                        setOwnedBy={this.props.setOwnedBy}
+                        onClose={() => this.setState({changingOwner: false})}
                     />
                 ) : null}
                 {undeleting ? (
@@ -365,7 +389,7 @@ const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {currentUser} = useContext(UserContext);
     const {users} = useContext(UsersContext);
-    const {deleteCollection, undeleteCollection, setAccessMode, setStatus} = useContext(CollectionsContext);
+    const {deleteCollection, undeleteCollection, setAccessMode, setStatus, setOwnedBy} = useContext(CollectionsContext);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
@@ -385,6 +409,7 @@ const ContextualCollectionDetails = (props) => {
                         undeleteCollection={undeleteCollection}
                         setAccessMode={setAccessMode}
                         setStatus={setStatus}
+                        setOwnedBy={setOwnedBy}
                     />
                 )}
             </WorkspaceUserRolesContext.Consumer>

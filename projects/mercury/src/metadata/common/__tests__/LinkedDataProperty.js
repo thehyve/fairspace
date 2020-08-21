@@ -22,7 +22,6 @@ const defaultProperty = {
 
 const defaultValues = [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}];
 
-
 describe('LinkedDataProperty elements', () => {
     it('shows a table with relations for relationShapes', () => {
         const wrapper = shallow(<LinkedDataProperty property={defaultProperty} values={defaultValues} />);
@@ -43,26 +42,22 @@ describe('LinkedDataProperty elements', () => {
         expect(table.prop("property")).toEqual(property);
     });
 
-    describe('canAdd', () => {
-        const verifyCanAdd = (property, expectedCanAdd) => {
+    describe('canEdit', () => {
+        const verifyCanEdit = (property, expectedCanEdit) => {
             const wrapper = shallow(<LinkedDataProperty property={property} values={defaultValues} />);
             const table = wrapper.find(LinkedDataRelationTable);
             expect(table.length).toEqual(1);
-            expect(table.prop("canAdd")).toBe(expectedCanAdd);
+            expect(table.prop("canEdit")).toBe(expectedCanEdit);
         };
 
-        it('should allow adding new entities', () => verifyCanAdd(defaultProperty, true));
-        it('should not allow adding new entities if property is not editable', () => verifyCanAdd({
+        it('should allow adding new entities', () => verifyCanEdit(defaultProperty, true));
+        it('should not allow adding new entities if property is not editable', () => verifyCanEdit({
             ...defaultProperty,
             isEditable: false
         }, false));
-        it('should not allow adding new entities if property is machineOnly', () => verifyCanAdd({
+        it('should not allow adding new entities if property is machineOnly', () => verifyCanEdit({
             ...defaultProperty,
             machineOnly: true
-        }, false));
-        it('should not allow adding new entities if the max number of values is reached', () => verifyCanAdd({
-            ...defaultProperty,
-            maxValuesCount: 3
         }, false));
     });
 

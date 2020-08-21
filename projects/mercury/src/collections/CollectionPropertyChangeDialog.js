@@ -11,6 +11,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {withStyles} from "@material-ui/core/styles";
 import {camelCaseToWords} from "../common/utils/genericUtils";
+import ConfirmationButton from "../common/components/ConfirmationButton";
 
 export const styles = {
     root: {
@@ -35,7 +36,7 @@ export const styles = {
 };
 
 export const CollectionPropertyChangeDialog = ({collection, title, currentValue, availableValues, setValue, onClose,
-    classes}) => {
+    confirmationMessage = 'Are you sure you want to change this property?', classes}) => {
     const [selectedValue, setSelectedValue] = useState(currentValue);
     const [openDialog, setOpenDialog] = useState(true);
 
@@ -85,14 +86,21 @@ export const CollectionPropertyChangeDialog = ({collection, title, currentValue,
                 </div>
             </DialogContent>
             <DialogActions>
-                <Button
+                <ConfirmationButton
                     onClick={handleSubmit}
-                    color="primary"
                     disabled={Boolean(!selectedValue)}
-                    data-testid="submit"
+                    message={confirmationMessage}
+                    agreeButtonText="Yes"
+                    dangerous
                 >
-                    Save
-                </Button>
+                    <Button
+                        color="primary"
+                        disabled={Boolean(!selectedValue)}
+                        data-testid="submit"
+                    >
+                        Save
+                    </Button>
+                </ConfirmationButton>
                 <Button
                     onClick={handleCancel}
                     color="default"

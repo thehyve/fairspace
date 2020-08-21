@@ -39,7 +39,6 @@ describe('FileOperations', () => {
         fileActions={fileActions}
         openedPath={openedPath}
         isWritingEnabled
-        currentUser={{admin: true}}
     />);
 
     beforeEach(() => {
@@ -165,7 +164,6 @@ describe('FileOperations', () => {
                 fileActions={fileActions}
                 openedPath={{}}
                 isWritingEnabled
-                currentUser={{admin: true}}
                 clipboard={emptyClipboard}
                 showDeleted={false}
             />);
@@ -186,7 +184,6 @@ describe('FileOperations', () => {
                 fileActions={fileActions}
                 openedPath={{}}
                 isWritingEnabled
-                currentUser={{admin: true}}
                 clipboard={emptyClipboard}
                 showDeleted
             />);
@@ -207,7 +204,6 @@ describe('FileOperations', () => {
                 fileActions={fileActions}
                 openedPath={{}}
                 isWritingEnabled
-                currentUser={{admin: true}}
                 clipboard={emptyClipboard}
                 showDeleted
             />);
@@ -228,7 +224,6 @@ describe('FileOperations', () => {
                 fileActions={fileActions}
                 openedPath={{}}
                 isWritingEnabled
-                currentUser={{admin: true}}
                 clipboard={emptyClipboard}
                 showDeleted
             />);
@@ -258,7 +253,6 @@ describe('FileOperations', () => {
                 fileActions={fileActions}
                 openedPath={{}}
                 isWritingEnabled
-                currentUser={{admin: true}}
                 clipboard={emptyClipboard}
             />);
 
@@ -278,7 +272,6 @@ describe('FileOperations', () => {
                 fileActions={fileActions}
                 openedPath={{}}
                 isWritingEnabled
-                currentUser={{admin: true}}
                 clipboard={emptyClipboard}
             />);
 

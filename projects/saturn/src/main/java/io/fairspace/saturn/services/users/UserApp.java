@@ -28,6 +28,8 @@ public class UserApp extends BaseApp {
             var user = service.getUser(getUserURI());
             user.setAdmin(isAdmin());
             user.setViewPublicMetadata(canViewPublicMetadata());
+            user.setViewPublicData(canViewPublicData());
+            user.setAddSharedMetadata(canAddSharedMetadata());
             return mapper.writeValueAsString(user);
         });
 

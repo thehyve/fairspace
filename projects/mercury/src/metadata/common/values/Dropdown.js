@@ -8,7 +8,7 @@ import {compareBy} from "../../../common/utils/genericUtils";
 const Dropdown = ({
     options = null, clearTextOnSelection = true, placeholder,
     loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value,
-    autoFocus = false, ...otherProps
+    autoFocus = false, label, ...otherProps
 }) => {
     const [optionsToShow, setOptionsToShow] = useState(options);
     const [searchText, setSearchText] = useState('');
@@ -59,6 +59,7 @@ const Dropdown = ({
                     {...params}
                     inputProps={clearTextOnSelection ? inputProps(params) : params.inputProps}
                     inputRef={inputRef}
+                    label={label}
                 />
             )}
         />

@@ -37,7 +37,6 @@ export const LinkedDataEntityForm = ({
     onAdd = () => {},
     onDelete = () => {},
     editable = true,
-    checkValueAddedNotSubmitted = () => {}
 }) => {
     if (loading) {
         return <LoadingInlay />;
@@ -88,7 +87,6 @@ export const LinkedDataEntityForm = ({
                                     onAdd={editable ? (value) => onAdd(p, value) : () => {}}
                                     onChange={editable ? (value, index) => onChange(p, value, index) : () => {}}
                                     onDelete={editable ? (index) => onDelete(p, index) : () => {}}
-                                    checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                                 />
                             </ListItem>
                         ))
@@ -102,7 +100,6 @@ LinkedDataEntityForm.propTypes = {
     onAdd: PropTypes.func,
     onChange: PropTypes.func,
     onDelete: PropTypes.func,
-    checkValueAddedNotSubmitted: PropTypes.func,
 
     errorMessage: PropTypes.string,
 

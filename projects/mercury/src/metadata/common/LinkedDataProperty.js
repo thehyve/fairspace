@@ -8,41 +8,29 @@ import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import GenericTooltip from "../../common/components/GenericTooltip";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
-import UserContext from "../../users/UserContext";
-import {isDataSteward} from "../../users/userUtils";
 
 const LinkedDataProperty = (
-    {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete, checkValueAddedNotSubmitted}
+    {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete}
 ) => {
     const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
-    const {currentUser} = useContext(UserContext);
 
-    const {key, maxValuesCount, machineOnly, minValuesCount, label, description, path} = property;
+    const {key, machineOnly, minValuesCount, label, description, path} = property;
     const hasErrors = validationErrors && validationErrors.length > 0;
 
     // Do not show an add component if no multiples are allowed
     // and there is already a value
-    const maxValuesReached = (maxValuesCount && (values.length >= maxValuesCount)) || false;
-    const canAdd = formEditable && property.isEditable && !machineOnly && !maxValuesReached;
+    const canEdit = formEditable && property.isEditable && !machineOnly;
     const labelId = `label-${key}`;
-
-    const isSingleValuePropertyWithExistingValue = (
-        maxValuesCount === 1
-            && values.length === 1 && values[0].value !== ""
-            && !checkValueAddedNotSubmitted(property, values[0])
-    );
 
     // Checks whether the configuration of this property disallow editing of existing values
     // This is the case if:
     // - the property is machineOnly
     // - the field refers to a url (marked as RESOURCE_URI)
     // - the value is taken from a set of allowed values
-    // - single-value property already has a value and the current user does not have permission to modify existing values
     const disallowEditingOfExistingValues = (
         machineOnly
         || property.isGenericIriResource
         || property.allowedValues
-        || (!isDataSteward(currentUser) && isSingleValuePropertyWithExistingValue)
     );
 
     // The edit component should not actually allow editing the value if editable is set to false
@@ -74,26 +62,24 @@ const LinkedDataProperty = (
                         <LinkedDataRelationTable
                             property={property}
                             values={values}
-                            canAdd={canAdd}
+                            canEdit={canEdit}
                             onAdd={onAdd}
                             onDelete={onDelete}
                             addComponent={addInputComponent}
                             editorPath={editorPath}
-                            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                         />
                     ) : (
                         <LinkedDataInputFieldsTable
                             property={property}
                             values={values}
                             validationErrors={validationErrors}
-                            canAdd={canAdd}
+                            canEdit={canEdit}
                             onAdd={onAdd}
                             onChange={onChange}
                             onDelete={onDelete}
                             labelId={labelId}
                             editComponent={editInputComponent}
                             addComponent={addInputComponent}
-                            checkValueAddedNotSubmitted={checkValueAddedNotSubmitted}
                         />
                     )
                 }
