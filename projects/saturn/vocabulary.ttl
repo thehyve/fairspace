@@ -363,12 +363,6 @@ curie:Analysis a rdfs:Class, sh:NodeShape ;
         sh:path curie:numberOfBreakPoints
     ],
     [
-        sh:name "Analysis files" ;
-        sh:description "The analysis linked to the files" ;
-        sh:class fs:File ;
-        sh:path curie:associatedFiles
-    ],
-    [
         sh:name "Label" ;
         sh:description "Human readable label for this resource." ;
         sh:datatype xsd:string ;
