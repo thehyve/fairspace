@@ -210,8 +210,8 @@ public class MetadataService {
                     .filterKeep(RDFNode::isURIResource)
                     .filterKeep(s -> model.listStatements(s, null, (RDFNode) null).hasNext())
                     .forEachRemaining(s -> model
-                            .remove(s, FS.modifiedBy, null)
-                            .remove(s, FS.dateModified, null)
+                            .removeAll(s, FS.modifiedBy, null)
+                            .removeAll(s, FS.dateModified, null)
                             .add(s, FS.modifiedBy, user)
                             .add(s, FS.dateModified, now));
         });
