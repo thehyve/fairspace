@@ -16,18 +16,18 @@
 
 ## Augmented system class shapes
 fs:File sh:property
-        [
-            sh:name "Is about person" ;
-            sh:description "Persons that are featured in this collection." ;
-            sh:class foaf:Person ;
-            sh:path curie:aboutPerson
-        ],
-        [
-            sh:name "Is about biological sample." ;
-            sh:description "Materials that are featured in this collection." ;
-            sh:class curie:BiologicalSample ;
-            sh:path curie:aboutMaterial
-        ],
+    [
+        sh:name "Is about person" ;
+        sh:description "Persons that are featured in this collection." ;
+        sh:class foaf:Person ;
+        sh:path curie:aboutPerson
+    ],
+    [
+        sh:name "Is about biological sample." ;
+        sh:description "Materials that are featured in this collection." ;
+        sh:class curie:BiologicalSample ;
+        sh:path curie:aboutMaterial
+    ],
     [
         sh:name "Analysed by" ;
         sh:description "The files associated to the analysis" ;
