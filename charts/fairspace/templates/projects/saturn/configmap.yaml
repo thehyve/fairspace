@@ -42,5 +42,10 @@ data:
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
   vocabulary.ttl: |
-   {{ .Values.saturn.vocabulary | indent 4 }}
+{{ if .Values.saturn.vocabularyx }}
+{{ .Values.saturn.vocabulary | indent 4 }}
+{{ else }}
+{{ .Files.Get "vocabulary.ttl" | indent 4  }}
+{{ end }}
+   
 
