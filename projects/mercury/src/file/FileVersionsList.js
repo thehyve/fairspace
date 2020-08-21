@@ -6,6 +6,7 @@ import {SettingsBackupRestore} from "@material-ui/icons";
 import TableCell from "@material-ui/core/TableCell";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import filesize from "filesize";
+import Download from "mdi-material-ui/Download";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
 import MessageDisplay from "../common/components/MessageDisplay";
@@ -14,20 +15,22 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
 const styles = (theme) => ({
     fileVersionDialog: {
-        height: 300,
-        width: 500
-    },
-    flexContainer: {
-        display: 'flex',
-        boxSizing: 'border-box',
-    },
-    table: {
-        // temporary right-to-left patch, waiting for
-        // https://github.com/bvaughn/react-virtualized/issues/454
+        'height': 300,
+        'width': 500,
         '& .ReactVirtualized__Table__headerRow': {
             flip: false,
             paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined,
         },
+        '& .ReactVirtualized__Table__row': {
+            outline: 0
+        },
+        '& .ReactVirtualized__Table__Grid': {
+            outline: 0
+        },
+    },
+    flexContainer: {
+        display: 'flex',
+        boxSizing: 'border-box',
     },
     tableRow: {
         cursor: 'pointer',
@@ -41,6 +44,10 @@ const styles = (theme) => ({
         flex: 1,
         borderBottom: 'none',
     },
+    tableActionCell: {
+        margin: 0,
+        padding: 0
+    },
     tableHeaderRow: {
         'text-transform': 'none'
     }
@@ -53,7 +60,7 @@ const columns = [
         dataKey: 'version',
     },
     {
-        width: 250,
+        width: 300,
         label: 'Modified',
         dataKey: 'lastmod'
     },
@@ -70,7 +77,6 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     );
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
-
     const [loadedData, setLoadedData] = useState([{}]);
 
     if (error) {
@@ -84,6 +90,10 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     if (!selectedFileVersion || selectedFileVersion === 1) {
         return (<div>No previous version found.</div>);
     }
+
+    const handleOpenVersion = (version) => {
+        FileAPI.open(selectedFile.filename, version);
+    };
 
     const handleRevertToVersion = (version) => {
         setSelectedVersion(version);
@@ -121,14 +131,31 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
             component="div"
             variant="body"
             className={classes.tableCell}
-            onDoubleClick={() => handleRevertToVersion(loadedData[rowIndex].version)}
         >
             {formatCellData(cellData, dataKey)}
         </TableCell>
     );
 
-    const renderActionCell = (rowIndex) => (
-        <TableCell align="right" className={classes.tableCell} variant="body" component="div">
+    function getDownloadLink(version) {
+        return FileAPI.getDownloadLink(selectedFile.filename) + `?version=${version}`;
+    }
+
+    const renderDownloadActionCell = (rowIndex) => (
+        <TableCell align="right" className={`${classes.tableCell} ${classes.tableActionCell}`} variant="body" component="div">
+            <IconButton
+                title="Download this version"
+                aria-label="Download this version"
+                component="a"
+                href={getDownloadLink(loadedData[rowIndex].version)}
+                download
+            >
+                <Download />
+            </IconButton>
+        </TableCell>
+    );
+
+    const renderRevertActionCell = (rowIndex) => (
+        <TableCell align="right" className={`${classes.tableCell} ${classes.tableActionCell}`} variant="body" component="div">
             <IconButton
                 aria-label="Revert to this version"
                 title="Revert to this version"
@@ -186,7 +213,6 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                         {({onRowsRendered, registerChild}) => (
                             <Table
                                 ref={registerChild}
-                                className={classes.table}
                                 rowHeight={50}
                                 rowCount={loadedData.length}
                                 width={width}
@@ -195,7 +221,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                 rowGetter={({index}) => loadedData[index]}
                                 onRowsRendered={onRowsRendered}
                                 rowClassName={getRowClassName}
-                                onRowDoubleClick={({index}) => handleRevertToVersion(loadedData[index].version)}
+                                onRowDoubleClick={({index}) => handleOpenVersion(loadedData[index].version)}
                             >
                                 {columns.map((col) => (
                                     <Column
@@ -206,17 +232,25 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                         className={classes.flexContainer}
                                         cellRenderer={({cellData, rowIndex}) => renderCell(cellData, rowIndex, col.dataKey)}
                                         width={col.width}
-                                        padding={col.padding}
                                         align="left"
                                     />
                                 ))}
+                                <Column
+                                    key="download"
+                                    label=""
+                                    dataKey="download"
+                                    headerRenderer={renderHeader}
+                                    className={classes.flexContainer}
+                                    cellRenderer={({rowIndex}) => renderDownloadActionCell(rowIndex)}
+                                    width={80}
+                                />
                                 <Column
                                     key="revert"
                                     label=""
                                     dataKey="revert"
                                     headerRenderer={renderHeader}
                                     className={classes.flexContainer}
-                                    cellRenderer={({rowIndex}) => renderActionCell(rowIndex)}
+                                    cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
                                     width={80}
                                 />
                             </Table>

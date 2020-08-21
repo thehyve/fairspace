@@ -118,6 +118,10 @@ class CollectionAPI {
     setPermission(location, principal, access) {
         return FileAPI.post(location, {action: 'set_permission', principal, access});
     }
+
+    setOwnedBy(location, owner) {
+        return FileAPI.post(location, {action: 'set_owned_by', owner});
+    }
 }
 
 export default new CollectionAPI();

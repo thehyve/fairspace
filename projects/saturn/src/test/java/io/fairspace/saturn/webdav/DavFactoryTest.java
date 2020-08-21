@@ -1,7 +1,6 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
@@ -35,8 +34,6 @@ public class DavFactoryTest {
     public static final String BASE_PATH = "/api/v1/webdav";
     public static final QName VERSION = new QName(FS.NS, "version");
     private static final String baseUri = "http://example.com" + BASE_PATH;
-    @Mock
-    private MetadataPermissions permissions;
     @Mock
     BlobStore store;
     @Mock

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.workspaces.WorkspaceStatus;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.Request;
@@ -111,8 +110,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
             }
 
-            if (!ws.hasProperty(FS.status, WorkspaceStatus.Active.name())
-                    && !factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
+            if (!factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
                     && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
                     && !isAdmin()) {
                 throw new NotAuthorizedException();

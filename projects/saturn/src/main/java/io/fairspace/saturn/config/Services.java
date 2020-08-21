@@ -66,7 +66,6 @@ public class Services {
                 new ProtectMachineOnlyPredicatesValidator(),
                 new PermissionCheckingValidator(metadataPermissions),
                 new DeletionValidator(),
-                new WorkspaceStatusValidator(),
                 new ShaclValidator());
 
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
