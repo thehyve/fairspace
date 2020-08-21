@@ -4,11 +4,9 @@ import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import spark.Request;
-import spark.Response;
 
-import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,16 +21,17 @@ public class Serialization {
             .map(f -> f.getLang().getHeaderString())
             .collect(Collectors.toList());
 
-    public static Model read(Request request) {
-                var model = createDefaultModel();
-                RDFDataMgr.read(model, new StringReader(request.body()), null, getFormat(request.contentType()).getLang());
-                return model;
+    public static Model deserialize(String body, String contentType) {
+        var model = createDefaultModel();
+        RDFDataMgr.read(model, new StringReader(body), null, getFormat(contentType).getLang());
+        return model;
     }
 
-    public static void write(Model model, Response response, String acceptHeader) throws IOException {
-        var format = getFormat(acceptHeader);
-        response.type(format.getLang().getHeaderString());
-        RDFDataMgr.write(response.raw().getOutputStream(), model, format);
+    public static String serialize(Model model, String contentType) {
+        var format = getFormat(contentType);
+        var writer = new StringWriter();
+        RDFDataMgr.write(writer, model, format);
+        return writer.toString();
     }
 
     private static RDFFormat getFormat(String headerString) {

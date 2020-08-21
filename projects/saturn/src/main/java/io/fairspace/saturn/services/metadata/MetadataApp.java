@@ -10,7 +10,8 @@ import spark.Request;
 
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.saturn.services.metadata.Serialization.read;
+import static io.fairspace.saturn.services.metadata.Serialization.deserialize;
+import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -32,12 +33,12 @@ public class MetadataApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             var model = getMetadata(req);
-            Serialization.write(model, res, req.headers("Accept"));
-            return null;
+            res.type(req.headers("Accept"));
+            return serialize(model, req.headers("Accept"));
         });
 
         put("/", (req, res) -> {
-            Model model = read(req);
+            var model = deserialize(req.body(), req.contentType());
 
             api.put(model);
 
@@ -45,7 +46,7 @@ public class MetadataApp extends BaseApp {
             return "";
         });
         patch("/", (req, res) -> {
-            Model model = read(req);
+            var model = deserialize(req.body(), req.contentType());
 
             api.patch(model);
 
@@ -62,7 +63,7 @@ public class MetadataApp extends BaseApp {
                     return null;
                 }
             } else {
-                Model model = read(req);
+                var model = deserialize(req.body(), req.contentType());
                 api.delete(model);
             }
 
