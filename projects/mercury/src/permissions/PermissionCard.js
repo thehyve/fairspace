@@ -132,7 +132,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         <ConfirmationDialog
             open
             title="Confirmation"
-            content={`Are you sure you want to change the access mode of ${collection.name} to ${selectedAccessMode}?`}
+            content={`Are you sure you want to change the view mode of ${collection.name} to ${selectedAccessMode}?`}
             dangerous
             agreeButtonText="Confirm"
             onAgree={handleConfirmSetAccessMode}
@@ -144,20 +144,20 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     const renderAccessMode = () => (
         <div className={classes.propertyDiv}>
             <FormControl className={classes.propertyText}>
-                <InputLabel id="demo-simple-select-helper-label">Access mode</InputLabel>
+                <InputLabel id="demo-simple-select-helper-label">View mode:</InputLabel>
                 <Select
                     value={collection.accessMode}
                     onChange={mode => handleSetAccessMode(mode)}
-                    inputProps={{'aria-label': 'Access mode'}}
+                    inputProps={{'aria-label': 'View mode'}}
                     disabled={!collection.canManage}
                 >
                     {collection.availableAccessModes.map(mode => (
                         <MenuItem key={mode} value={mode}>
                             {camelCaseToWords(mode)}
+                            <FormHelperText variant="filled">{getAccessModeDescription(mode)}</FormHelperText>
                         </MenuItem>
                     ))}
                 </Select>
-                <FormHelperText>{getAccessModeDescription(collection.accessMode)}</FormHelperText>
             </FormControl>
         </div>
     );

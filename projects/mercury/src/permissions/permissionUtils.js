@@ -66,6 +66,6 @@ export const getAccessModeDescription = (accessMode: AccessMode) => {
         case "DataPublished":
             return "All users can see collection data";
         default:
-            return "Unrecognized access mode";
+            return "Unrecognized view mode";
     }
 };
