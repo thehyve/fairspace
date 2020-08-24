@@ -8,26 +8,26 @@ import type {Workspace} from './WorkspacesAPI';
 import WorkspaceEditor from './WorkspaceEditor';
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
-import UsersContext from "../users/UsersContext";
 import ErrorDialog from "../common/components/ErrorDialog";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 
-type WorkspaceBrowserProps = {
-    loading: boolean,
-    error: boolean,
-    workspaces: Workspace[],
-    createWorkspace: (Workspace) => Promise<Workspace>,
-    toggleWorkspace: () => {}
-}
+const WorkspaceBrowser = () => {
+    const history = useHistory();
+    const {currentUser, currentUserError, currentUserLoading} = useContext(UserContext);
+    const {workspaces,
+        workspacesLoading,
+        workspacesError,
+        createWorkspace,
+        refreshWorkspaces} = useContext(WorkspaceContext);
 
-const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
-    const {loading, error, workspaces, history, createWorkspace, refreshWorkspaces, toggleWorkspace, isSelected} = props;
+    const loading = currentUserLoading || workspacesLoading;
+    const error = currentUserError || workspacesError;
+
     const [creatingWorkspace, setCreatingWorkspace] = useState(false);
     const [loadingCreatedWorkspace, setLoadingCreatedWorkspace] = useState(false);
-    const {currentUser} = useContext(UserContext);
 
-    const handleCreateWorkspaceClick = () => setCreatingWorkspace(true);
+    const openCreateWorkspaceDialog = () => setCreatingWorkspace(true);
 
     const handleSaveWorkspace = async (workspace: Workspace) => {
         setLoadingCreatedWorkspace(true);
@@ -45,7 +45,7 @@ const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
             });
     };
 
-    const handleCancelCreateWorkspace = () => setCreatingWorkspace(false);
+    const closeCreateWorkspaceDialog = () => setCreatingWorkspace(false);
 
     const renderWorkspaceList = () => (
     // workspaces.forEach((workspace: Workspace) => {
@@ -54,14 +54,12 @@ const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
         <>
             <WorkspaceList
                 workspaces={workspaces}
-                toggleWorkspace={toggleWorkspace}
-                isSelected={isSelected}
             />
             {creatingWorkspace ? (
                 <WorkspaceEditor
                     title="Create workspace"
                     onSubmit={handleSaveWorkspace}
-                    onClose={handleCancelCreateWorkspace}
+                    onClose={closeCreateWorkspaceDialog}
                     creating={loadingCreatedWorkspace}
                     workspaces={workspaces}
                 />
@@ -76,7 +74,7 @@ const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
             variant="contained"
             aria-label="Add"
             title="Create a new workspace"
-            onClick={handleCreateWorkspaceClick}
+            onClick={openCreateWorkspaceDialog}
         >
             New
         </Button>
@@ -94,29 +92,4 @@ const WorkspaceBrowser = (props: WorkspaceBrowserProps) => {
     );
 };
 
-WorkspaceBrowser.defaultProps = {
-    loading: false,
-    error: false
-};
-
-const ContextualWorkspaceBrowser = (props) => {
-    const history = useHistory();
-    const {currentUserError, currentUserLoading} = useContext(UserContext);
-    const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {workspaces, workspacesLoading, workspacesError, createWorkspace, refreshWorkspaces} = useContext(WorkspaceContext);
-
-    return (
-        <WorkspaceBrowser
-            {...props}
-            history={history}
-            workspaces={workspaces}
-            createWorkspace={createWorkspace}
-            refreshWorkspaces={refreshWorkspaces}
-            users={users}
-            loading={workspacesLoading || currentUserLoading || usersLoading}
-            error={workspacesError || currentUserError || usersError}
-        />
-    );
-};
-
-export default withRouter(ContextualWorkspaceBrowser);
+export default withRouter(WorkspaceBrowser);

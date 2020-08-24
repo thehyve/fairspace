@@ -12,9 +12,9 @@ import {
 } from '@material-ui/core';
 import {Error} from '@material-ui/icons';
 
-function Transition(props) {
-    return <Slide direction="up" {...props} />;
-}
+const Transition = React.forwardRef(
+    (props, ref) => <Slide ref={ref} direction="up" {...props} />
+);
 
 const DEFAULT_ERROR_TITLE = 'An error has occurred';
 const DEFAULT_MAX_WIDTH = 'sm';

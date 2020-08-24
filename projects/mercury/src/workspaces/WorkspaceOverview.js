@@ -5,15 +5,17 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import {Widgets} from '@material-ui/icons';
 import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import {currentWorkspace} from "../workspaces/workspaces";
+import WorkspaceContext from "./WorkspaceContext";
+import {currentWorkspace, workspacePrefix} from "./workspaces";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import Collections from "../collections/CollectionsPage";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import BreadCrumbs from "../common/components/BreadCrumbs";
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 
 export const TabPanel = (props) => {
     const {children, value, index, ...other} = props;
@@ -43,7 +45,7 @@ const a11yProps = (index) => ({
     'aria-controls': `workspace-tabpanel-${index}`,
 });
 
-export default (props) => {
+const WorkspaceOverview = (props) => {
     const [value, setValue] = React.useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
@@ -67,7 +69,19 @@ export default (props) => {
     };
 
     return (
-        <>
+        <BreadcrumbsContext.Provider value={{segments: [
+            {
+                label: 'Workspaces',
+                icon: <Widgets />,
+                href: '/workspaces'
+            },
+            {
+                label: workspace.name,
+                href: workspacePrefix()
+            }
+        ]}}
+        >
+            <BreadCrumbs />
             <Tabs
                 value={value}
                 onChange={handleChange}
@@ -80,7 +94,6 @@ export default (props) => {
                 <Tab label="Collections" {...a11yProps(2)} />
             </Tabs>
             <TabPanel value={value} index={0}>
-                <BreadCrumbs />
                 <WorkspaceInfo workspace={workspace} />
             </TabPanel>
             <TabPanel value={value} index={1}>
@@ -91,6 +104,8 @@ export default (props) => {
                     <Collections history={props.history} workspaceIri={workspace.iri} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
-        </>
+        </BreadcrumbsContext.Provider>
     );
 };
+
+export default WorkspaceOverview;
