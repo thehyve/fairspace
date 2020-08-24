@@ -14,7 +14,6 @@ data:
     elasticsearchUrl: {{ template "elasticsearch.baseurl" . }}
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
-      vocabularyBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/vocabulary/
       datasetPath: "/data/saturn/db"
       storeParams:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}
