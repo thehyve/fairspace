@@ -1,7 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingFunction;
-import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.vocabulary.RDFS;
@@ -52,25 +52,23 @@ public class BulkTransactionsTest {
     @Test
     public void onlySuccessfulTasksShouldBeCommitted() {
         batch(
-                ds -> {
-                    ds.getDefaultModel().add(RESOURCE, RDFS.label, "success");
-                    txn.calculateWrite(ds2 -> ds.getDefaultModel().add(RESOURCE, RDFS.label, "nested"));
+                m -> {
+                    m.add(RESOURCE, RDFS.label, "success");
+                    txn.calculateWrite(ds2 -> m.add(RESOURCE, RDFS.label, "nested"));
                     return null;
                 },
-                ds -> {
-                    ds.getDefaultModel().add(RESOURCE, RDFS.label, "failed");
+                m -> {
+                    m.add(RESOURCE, RDFS.label, "failed");
                     throw new RuntimeException();
                 },
-                ds -> {
-                    ds.getDefaultModel().add(RESOURCE, RDFS.label, "aborted");
-                    ds.getDefaultModel().abort();
-                    return null;
+                m -> {
+                    m.add(RESOURCE, RDFS.label, "aborted");
+                    throw new RuntimeException();
                 },
-                ds -> ds.getDefaultModel().add(RESOURCE, RDFS.label, "another success")
+                m -> m.add(RESOURCE, RDFS.label, "another success")
         );
 
-        txn.executeRead(ds -> {
-            var model = ds.getDefaultModel();
+        txn.executeRead(model -> {
             assertTrue(model.contains(RESOURCE, RDFS.label, "success"));
             assertTrue(model.contains(RESOURCE, RDFS.label, "nested"));
             assertFalse(model.contains(RESOURCE, RDFS.label, "failed"));
@@ -81,7 +79,7 @@ public class BulkTransactionsTest {
     }
 
     // executes actions in one batch
-    private void batch(ThrowingFunction<Dataset, ?, ?>... jobs) {
+    private void batch(ThrowingFunction<Model, ?, ?>... jobs) {
         try {
             // First submit a long-running task to get other tasks batched
             var latch1 = new CountDownLatch(1);

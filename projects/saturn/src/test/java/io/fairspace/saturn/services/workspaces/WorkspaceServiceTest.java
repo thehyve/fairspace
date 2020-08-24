@@ -46,7 +46,7 @@ public class WorkspaceServiceTest {
         setupRequestContext();
         service = new WorkspaceService(txn, mailService);
 
-        txn.executeWrite(ds -> ds.getDefaultModel()
+        txn.executeWrite(model -> model
                 .add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(EMPTY_WORKSPACE, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
@@ -61,9 +61,9 @@ public class WorkspaceServiceTest {
         setAdminFlag(true);
         service.deleteWorkspace(createURI(EMPTY_WORKSPACE.getURI()));
 
-        txn.executeRead(ds -> {
-            assertFalse(ds.getDefaultModel().contains(EMPTY_WORKSPACE, PROPERTY_2, RESOURCE_2));
-            assertFalse(ds.getDefaultModel().containsResource(EMPTY_WORKSPACE));
+        txn.executeRead(model -> {
+            assertFalse(model.contains(EMPTY_WORKSPACE, PROPERTY_2, RESOURCE_2));
+            assertFalse(model.containsResource(EMPTY_WORKSPACE));
         });
     }
 

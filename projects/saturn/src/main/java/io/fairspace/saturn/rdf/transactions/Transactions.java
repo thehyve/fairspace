@@ -2,24 +2,24 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
-import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 
 
 public interface Transactions extends AutoCloseable {
-    <R, E extends Exception> R calculateWrite(ThrowingFunction<? super Dataset, R, E> job) throws E;
+    <R, E extends Exception> R calculateWrite(ThrowingFunction<? super Model, R, E> job) throws E;
 
-    default <E extends Exception> void executeWrite(ThrowingConsumer<? super Dataset, E> job) throws E {
-        calculateWrite(ds -> {
-            job.accept(ds);
+    default <E extends Exception> void executeWrite(ThrowingConsumer<? super Model, E> job) throws E {
+        calculateWrite(model -> {
+            job.accept(model);
             return null;
         });
     }
 
-    <R, E extends Exception> R calculateRead(ThrowingFunction<? super Dataset, R, E> job) throws E;
+    <R, E extends Exception> R calculateRead(ThrowingFunction<? super Model, R, E> job) throws E;
 
-    default <E extends Exception> void executeRead(ThrowingConsumer<? super Dataset, E> job) throws E {
-        calculateRead(ds -> {
-            job.accept(ds);
+    default <E extends Exception> void executeRead(ThrowingConsumer<? super Model, E> job) throws E {
+        calculateRead(model -> {
+            job.accept(model);
             return null;
         });
     }

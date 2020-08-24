@@ -34,10 +34,9 @@ public class WorkspaceService {
     }
 
     public List<Workspace> listWorkspaces() {
-        return tx.calculateRead(ds -> {
-            var m = ds.getDefaultModel();
+        return tx.calculateRead(m -> {
             var user = m.wrapAsResource(getUserURI());
-            return new DAO(ds).list(Workspace.class)
+            return new DAO(m).list(Workspace.class)
                     .stream()
                     .peek(ws -> {
                         var res = m.wrapAsResource(ws.getIri());
@@ -48,13 +47,13 @@ public class WorkspaceService {
     }
 
     public Workspace getWorkspace(Node iri) {
-        return tx.calculateRead(ds -> {
-            var ws = new DAO(ds).read(Workspace.class, iri);
+        return tx.calculateRead(model -> {
+            var ws = new DAO(model).read(Workspace.class, iri);
             if (ws == null) {
                 return null;
             }
-            var res = ds.getDefaultModel().wrapAsResource(ws.getIri());
-            var user = ds.getDefaultModel().wrapAsResource(getUserURI());
+            var res = model.wrapAsResource(ws.getIri());
+            var user = model.wrapAsResource(getUserURI());
             ws.setCanManage(isAdmin() || user.hasProperty(FS.isManagerOf, res));
             ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
             return ws;
@@ -71,9 +70,8 @@ public class WorkspaceService {
             ws.setDescription("");
         }
 
-        var created = tx.calculateWrite(ds -> {
-            var workspace = new DAO(ds).write(ws);
-            var m = ds.getDefaultModel();
+        var created = tx.calculateWrite(m -> {
+            var workspace = new DAO(m).write(ws);
 
             m.wrapAsResource(getUserURI()).addProperty(FS.isManagerOf, m.wrapAsResource(workspace.getIri()));
             workspace.setCanManage(true);
@@ -88,14 +86,13 @@ public class WorkspaceService {
     public Workspace updateWorkspace(Workspace patch) {
         validate(patch.getIri() != null, "No IRI provided");
 
-        var updated = tx.calculateWrite(ds -> {
-            var dao = new DAO(ds);
+        var updated = tx.calculateWrite(m -> {
+            var dao = new DAO(m);
             var workspace = dao.read(Workspace.class, patch.getIri());
             if (workspace == null) {
                 throw new AccessDeniedException();
             }
 
-            var m = ds.getDefaultModel();
             var workspaceResource = m.wrapAsResource(patch.getIri());
             var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || isAdmin();
             if (!canManage) {
@@ -124,8 +121,7 @@ public class WorkspaceService {
             throw new AccessDeniedException();
         }
         validate(iri != null, "No IRI provided");
-        tx.executeWrite(ds -> {
-            var m = ds.getDefaultModel();
+        tx.executeWrite(m -> {
             var r = m.wrapAsResource(iri);
             validateResource(r, FS.Workspace);
             validate(!m.contains(null, FS.ownedBy, r), "Workspace is not empty");
@@ -137,8 +133,7 @@ public class WorkspaceService {
 
     public Map<Node, WorkspaceRole> getUsers(Node iri) {
         var result = new HashMap<Node, WorkspaceRole>();
-        tx.executeRead(ds -> {
-            var m = ds.getDefaultModel();
+        tx.executeRead(m -> {
             var r = m.wrapAsResource(iri);
             validateResource(r, FS.Workspace);
             m.listResourcesWithProperty(FS.isMemberOf, r)
@@ -156,8 +151,7 @@ public class WorkspaceService {
         validate(user != null, "User is not provided");
         validate(role != null, "Role is not provided");
 
-        Runnable postCommitAction = tx.calculateWrite(ds -> {
-            var m = ds.getDefaultModel();
+        Runnable postCommitAction = tx.calculateWrite(m -> {
             var workspaceResource = m.wrapAsResource(workspace);
             var userResource = m.wrapAsResource(user);
             validateResource(workspaceResource, FS.Workspace);

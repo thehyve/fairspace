@@ -102,7 +102,7 @@ public class MetadataServiceValidationTest {
 
     @Test
     public void testSoftDeleteShouldSucceedOnValidationSuccess() {
-        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1));
+        txn.executeWrite(m -> m.add(STMT1));
 
         api.softDelete(resource1);
 
@@ -118,7 +118,7 @@ public class MetadataServiceValidationTest {
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
-        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1));
+        txn.executeWrite(m -> m.add(STMT1));
 
         api.delete(modelOf(LBL_STMT1));
 

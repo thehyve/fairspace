@@ -7,7 +7,7 @@ import lombok.SneakyThrows;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -68,10 +68,10 @@ public class DAO {
     private static final String WRONG_ENTITY_TYPE_ERROR = "Entity %s is not of type %s";
 
     @Getter
-    private final Dataset dataset;
+    private final Model model;
 
-    public DAO(Dataset dataset) {
-        this.dataset = dataset;
+    public DAO(Model model) {
+        this.model = model;
     }
 
     /**
@@ -87,7 +87,7 @@ public class DAO {
         return safely(() -> {
             var type = getRdfType(entity.getClass());
 
-            var graph = dataset.getDefaultModel().getGraph();
+            var graph = model.getGraph();
 
             if (entity instanceof LifecycleAwarePersistentEntity) {
                 var basicEntity = (LifecycleAwarePersistentEntity) entity;
@@ -150,9 +150,8 @@ public class DAO {
      * @return The found entity or null if no entity was found or it was marked as deleted and showDeleted is set to false
      */
     public <T extends PersistentEntity> T read(Class<T> type, Node iri, boolean showDeleted) {
-        var m = dataset.getDefaultModel();
-        var resource = m.wrapAsResource(iri);
-        return (m.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
+        var resource = model.wrapAsResource(iri);
+        return (model.containsResource(resource) && (showDeleted || !resource.hasProperty(FS.dateDeleted)))
                 ? entityFromResource(type, resource)
                 : null;
     }
@@ -172,7 +171,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-        dataset.getDefaultModel().removeAll(dataset.getDefaultModel().asRDFNode(iri).asResource(), null, null);
+       model.removeAll(model.asRDFNode(iri).asResource(), null, null);
     }
 
     /**
@@ -229,7 +228,7 @@ public class DAO {
      * @return
      */
     public <T extends PersistentEntity> List<T> list(Class<T> type, boolean includeDeleted) {
-        return dataset.getDefaultModel().listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
+        return model.listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
                 .filterKeep(r -> includeDeleted || !r.hasProperty(FS.dateDeleted))
                 .mapWith(r -> entityFromResource(type, r))
                 .toList();

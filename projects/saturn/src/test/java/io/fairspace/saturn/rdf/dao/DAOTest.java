@@ -34,7 +34,7 @@ public class DAOTest {
     @Before
     public void before() {
         dataset = createTxnMem();
-        dao = new DAO(dataset);
+        dao = new DAO(dataset.getDefaultModel());
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();

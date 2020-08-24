@@ -44,17 +44,17 @@ public class RestoreTest {
     public void restoreWorksAsExpected() throws Exception {
         try (var txn1 = newDataset()) {
 
-            txn1.executeWrite(ds -> ds.getDefaultModel().add(stmt1));
-            txn1.executeWrite(ds -> ds.getDefaultModel().add(stmt2));
+            txn1.executeWrite(m -> m.add(stmt1));
+            txn1.executeWrite(m -> m.add(stmt2));
         }
 
         deleteDirectory(config.datasetPath);
         assertFalse(config.datasetPath.exists());
 
         try (var txn2 = newDataset()) {
-            txn2.executeRead(ds -> {
-                assertTrue(ds.getDefaultModel().contains(stmt1));
-                assertTrue(ds.getDefaultModel().contains(stmt2));
+            txn2.executeRead(m -> {
+                assertTrue(m.contains(stmt1));
+                assertTrue(m.contains(stmt2));
             });
         }
     }
@@ -62,18 +62,18 @@ public class RestoreTest {
     @Test
     public void restoreListsWorksAsExpected() throws Exception {
         var txn1 = newDataset();
-        txn1.executeWrite(ds -> ds.getDefaultModel()
-                .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), ds.getDefaultModel().createList(createTypedLiteral(1), createTypedLiteral(2)))
-                .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), ds.getDefaultModel().createList(createTypedLiteral("a"), createTypedLiteral("b"))));
+        txn1.executeWrite(m -> m
+                .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)))
+                .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b"))));
 
-        var before = txn1.calculateRead(ds -> ds.getDefaultModel().listStatements().toSet());
+        var before = txn1.calculateRead(m -> m.listStatements().toSet());
 
         txn1.close();
 
         deleteDirectory(config.datasetPath);
 
         try (var txn2 = newDataset()) {
-            txn2.executeRead(ds -> assertEquals(before, ds.getDefaultModel().listStatements().toSet()));
+            txn2.executeRead(m -> assertEquals(before, m.listStatements().toSet()));
         }
     }
 

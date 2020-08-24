@@ -3,6 +3,7 @@ package io.fairspace.saturn.rdf.transactions;
 import com.pivovarit.function.ThrowingFunction;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.system.Txn;
 import org.eclipse.jetty.server.Request;
@@ -43,11 +44,11 @@ public class BulkTransactions extends BaseTransactions {
     }
 
     @Override
-    public <R, E extends Exception> R calculateWrite(ThrowingFunction<? super Dataset, R, E> job) throws E {
+    public <R, E extends Exception> R calculateWrite(ThrowingFunction<? super Model, R, E> job) throws E {
         try {
             if (ds.isInTransaction()) {
                 if (ds.transactionMode() == ReadWrite.WRITE) {
-                    return job.apply(ds);
+                    return job.apply(ds.getDefaultModel());
                 }
                 throw new JenaTransactionException("Can't promote to a write transaction");
             }
@@ -69,7 +70,7 @@ public class BulkTransactions extends BaseTransactions {
         return Txn.calculateWrite(ds, () -> {
             for (var it = tasks.iterator(); it.hasNext(); ) {
                 var task = it.next();
-                if (!task.perform(ds)) {
+                if (!task.perform(ds.getDefaultModel())) {
                     ds.abort();
                 }
                 if (!ds.isInTransaction()) {
@@ -99,20 +100,20 @@ public class BulkTransactions extends BaseTransactions {
     private static class Task<R, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
         private final Request request;
-        private final ThrowingFunction<? super Dataset, R, E> job;
+        private final ThrowingFunction<? super Model, R, E> job;
         private R result;
         private Throwable error;
 
-        Task(Request request, ThrowingFunction<? super Dataset, R, E> job) {
+        Task(Request request, ThrowingFunction<? super Model, R, E> job) {
             this.request = request;
             this.job = job;
         }
 
-        boolean perform(Dataset ds) {
+        boolean perform(Model model) {
             try {
                 setCurrentRequest(request);
 
-                result = job.apply(ds);
+                result = job.apply(model);
                 error = null;
                 return true;
             } catch (Exception e) {

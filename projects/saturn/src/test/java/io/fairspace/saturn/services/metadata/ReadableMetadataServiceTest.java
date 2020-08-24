@@ -44,7 +44,7 @@ public class ReadableMetadataServiceTest {
     public void get() {
         assertEquals(0, api.get(null, false).size());
 
-        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        txn.executeWrite(m -> m.add(STMT1).add(STMT2));
 
         Model m1 = api.get(null, false);
         assertEquals(2, m1.size());
@@ -68,8 +68,8 @@ public class ReadableMetadataServiceTest {
     public void getWithImportantPropertiesReturnsFullModel() {
         assertEquals(0, api.get(null, true).size());
 
-        txn.executeWrite(ds -> {
-            ds.getDefaultModel()
+        txn.executeWrite(m -> {
+            m
                     .add(STMT1).add(STMT2)
                     .add(LBL_STMT1).add(LBL_STMT2);
             setupImportantProperties();
@@ -86,7 +86,7 @@ public class ReadableMetadataServiceTest {
 
     @Test
     public void getWithImportantPropertiesWorksWithoutImportantProperties() {
-        txn.executeWrite(ds -> ds.getDefaultModel()
+        txn.executeWrite(m -> m
                 .add(STMT1).add(STMT2)
                 .add(LBL_STMT1).add(LBL_STMT2));
 
@@ -111,7 +111,7 @@ public class ReadableMetadataServiceTest {
         var importantPropertyShape = createResource("http://ex.com/importantShape");
         var unimportantPropertyShape = createResource("http://ex.com/unimportantShape");;
 
-        txn.executeWrite(ds -> {
+        txn.executeWrite(m -> {
             setupImportantProperties();
 
             vocabulary
@@ -122,7 +122,7 @@ public class ReadableMetadataServiceTest {
                     .add(clazzShape, SHACLM.property, unimportantPropertyShape)
                     .add(unimportantPropertyShape, SHACLM.path, unimportantProperty);
 
-            ds.getDefaultModel()
+            m
                     .add(S1, someProperty, S2)
                     .add(S2, RDF.type, clazz)
                     .add(S2, unimportantProperty, S3)

@@ -56,24 +56,22 @@ public class MetadataService {
     Model get(String subject, boolean withObjectProperties) {
         var model = createDefaultModel();
 
-        transactions.executeRead(dataset -> {
-            dataset.getDefaultModel()
-                    .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)
-                    .forEachRemaining(stmt -> {
-                        model.add(stmt);
-                        if (withObjectProperties && stmt.getObject().isResource()) {
-                            getPropertyShapesForResource(stmt.getResource(), vocabulary)
-                                    .forEach(shape -> {
-                                        if (shape.hasLiteral(FS.importantProperty, true)) {
-                                            var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
-                                            stmt.getResource()
-                                                    .listProperties(property)
-                                                    .forEachRemaining(model::add);
-                                        }
-                                    });
-                        }
-                    });
-        });
+        transactions.executeRead(m -> m
+                .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)
+                .forEachRemaining(stmt -> {
+                    model.add(stmt);
+                    if (withObjectProperties && stmt.getObject().isResource()) {
+                        getPropertyShapesForResource(stmt.getResource(), vocabulary)
+                                .forEach(shape -> {
+                                    if (shape.hasLiteral(FS.importantProperty, true)) {
+                                        var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
+                                        stmt.getResource()
+                                                .listProperties(property)
+                                                .forEachRemaining(model::add);
+                                    }
+                                });
+                    }
+                }));
 
         return model;
     }
@@ -96,8 +94,8 @@ public class MetadataService {
      * @param subject Subject URI to mark as deleted
      */
     boolean softDelete(Resource subject) {
-        var success = transactions.calculateWrite(ds -> {
-            var resource = subject.inModel(ds.getDefaultModel());
+        var success = transactions.calculateWrite(model -> {
+            var resource = subject.inModel(model);
 
             var machineOnly = resource.listProperties(RDF.type)
                     .mapWith(Statement::getObject)
@@ -109,7 +107,7 @@ public class MetadataService {
             }
             if (resource.getModel().containsResource(resource) && !resource.hasProperty(FS.dateDeleted)) {
                 resource.addLiteral(FS.dateDeleted, toXSDDateTimeLiteral(Instant.now()));
-                resource.addProperty(FS.deletedBy, ds.getDefaultModel().wrapAsResource(getUserURI()));
+                resource.addProperty(FS.deletedBy, model.wrapAsResource(getUserURI()));
                 return true;
             }
             return false;
@@ -149,8 +147,7 @@ public class MetadataService {
      * @param model
      */
     void patch(Model model) {
-        logUpdates(transactions.calculateWrite(dataset -> {
-            var before = dataset.getDefaultModel();
+        logUpdates(transactions.calculateWrite(before -> {
             var existing = createDefaultModel();
             model.listStatements()
                     .filterKeep(stmt -> stmt.getSubject().isURIResource())
@@ -163,8 +160,7 @@ public class MetadataService {
     }
 
     private Set<Resource> update(Model modelToRemove, Model modelToAdd) {
-        return transactions.calculateWrite(dataset -> {
-            var before = dataset.getDefaultModel();
+        return transactions.calculateWrite(before -> {
             var after = updatedView(before, modelToRemove, modelToAdd);
 
             validate(before, after, modelToRemove, modelToAdd, vocabulary);
@@ -191,9 +187,7 @@ public class MetadataService {
     }
 
     private void persist(Model modelToRemove, Model modelToAdd) {
-        transactions.executeWrite(dataset -> {
-            var model = dataset.getDefaultModel();
-
+        transactions.executeWrite(model -> {
             var created = modelToAdd.listSubjects()
                     .filterKeep(RDFNode::isURIResource)
                     .filterDrop(s -> model.listStatements(s, null, (RDFNode) null).hasNext())

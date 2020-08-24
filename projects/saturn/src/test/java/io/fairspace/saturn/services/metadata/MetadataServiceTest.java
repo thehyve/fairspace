@@ -72,7 +72,7 @@ public class MetadataServiceTest {
         // Prepopulate the model
         final Statement EXISTING1 = createStatement(S1, P1, S3);
         final Statement EXISTING2 = createStatement(S2, P2, createPlainLiteral("test"));
-        txn.executeWrite(ds -> ds.getDefaultModel().add(EXISTING1).add(EXISTING2));
+        txn.executeWrite(m -> m.add(EXISTING1).add(EXISTING2));
 
         // Put new statements
         var delta = modelOf(STMT1, STMT2);
@@ -80,8 +80,7 @@ public class MetadataServiceTest {
 
         // Now ensure that the existing triples are still there
         // and the new ones are added
-        txn.executeRead(ds -> {
-            Model model = ds.getDefaultModel();
+        txn.executeRead(model -> { ;
             assertTrue(model.contains(EXISTING1));
             assertTrue(model.contains(EXISTING2));
             assertTrue(model.contains(STMT1));
@@ -91,19 +90,19 @@ public class MetadataServiceTest {
 
     @Test
     public void deleteModel() {
-        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        txn.executeWrite(m -> m.add(STMT1).add(STMT2));
 
         api.delete(modelOf(STMT1));
 
-        txn.executeRead(ds -> {
-            assertFalse(ds.getDefaultModel().contains(STMT1));
-            assertTrue(ds.getDefaultModel().contains(STMT2));
+        txn.executeRead(m -> {
+            assertFalse(m.contains(STMT1));
+            assertTrue(m.contains(STMT2));
         });
     }
 
     @Test
     public void patch() {
-        txn.executeWrite(ds -> ds.getDefaultModel().add(STMT1).add(STMT2));
+        txn.executeWrite(m -> m.add(STMT1).add(STMT2));
 
         Statement newStmt1 = createStatement(S1, P1, S3);
         Statement newStmt2 = createStatement(S2, P1, S1);
@@ -111,22 +110,22 @@ public class MetadataServiceTest {
 
         api.patch(modelOf(newStmt1, newStmt2, newStmt3));
 
-        txn.executeRead(ds -> {
-            assertTrue(ds.getDefaultModel().contains(newStmt1));
-            assertTrue(ds.getDefaultModel().contains(newStmt2));
-            assertTrue(ds.getDefaultModel().contains(newStmt3));
-            assertFalse(ds.getDefaultModel().contains(STMT1));
-            assertFalse(ds.getDefaultModel().contains(STMT2));
+        txn.executeRead(m -> {
+            assertTrue(m.contains(newStmt1));
+            assertTrue(m.contains(newStmt2));
+            assertTrue(m.contains(newStmt3));
+            assertFalse(m.contains(STMT1));
+            assertFalse(m.contains(STMT2));
         });
     }
 
     @Test
     public void patchWithNil() {
-        txn.executeWrite(ds -> ds.getDefaultModel().add(S1, P1, S2).add(S1, P1, S3));
+        txn.executeWrite(m -> m.add(S1, P1, S2).add(S1, P1, S3));
 
         api.patch(createDefaultModel().add(S1, P1, NIL));
 
-        assertFalse(txn.calculateRead(ds -> ds.getDefaultModel().contains(S1, P1)));
+        assertFalse(txn.calculateRead(m -> m.contains(S1, P1)));
     }
 
     @Test
