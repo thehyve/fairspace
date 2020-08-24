@@ -153,8 +153,8 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                 >
                     {collection.availableAccessModes.map(mode => (
                         <MenuItem key={mode} value={mode}>
-                            {camelCaseToWords(mode)}
-                            <FormHelperText variant="filled">{getAccessModeDescription(mode)}</FormHelperText>
+                            <span style={{marginRight: 10}}>{camelCaseToWords(mode)}</span>
+                            <FormHelperText>{getAccessModeDescription(mode)}</FormHelperText>
                         </MenuItem>
                     ))}
                 </Select>
