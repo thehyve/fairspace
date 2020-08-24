@@ -264,6 +264,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         titleTypographyProps={{variant: 'h6'}}
                         title={collection.name}
                         avatar={ICONS[iconName]}
+                        style={{wordBreak: 'break-word'}}
                     />
                     <CardContent style={{paddingTop: 0}}>
                         {this.renderCollectionDescription()}
