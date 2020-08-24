@@ -13,7 +13,6 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
-
 const styles = (theme) => ({
     fileVersionDialog: {
         'height': 300,

@@ -9,7 +9,6 @@ import org.apache.jena.query.text.TextDocProducer;
 import org.apache.jena.query.text.TextIndex;
 import org.apache.jena.sparql.core.QuadAction;
 
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
 import static org.apache.jena.query.text.TextQueryFuncs.graphNodeToString;
 import static org.apache.jena.query.text.TextQueryFuncs.subjectToString;
 import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
@@ -37,7 +36,7 @@ public class SingleTripleTextDocProducer extends AbstractDatasetChanges implemen
         if (g.equals(defaultGraphNodeGenerated)) {
             g = defaultGraphIRI;
         }
-        if (!g.equals(defaultGraphIRI) && !g.equals(VOCABULARY_GRAPH_URI)) {
+        if (!g.equals(defaultGraphIRI)) {
             return;
         }
 

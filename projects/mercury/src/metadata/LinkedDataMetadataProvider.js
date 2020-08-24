@@ -3,11 +3,11 @@ import React, {useCallback, useContext} from 'react';
 import {getFirstPredicateValue} from "./common/jsonLdUtils";
 // Other
 import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
-import {METADATA_PATH, USABLE_IN_METADATA_URI} from "../constants";
+import {USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './vocabulary/VocabularyContext';
 import {getNamespaces} from './common/vocabularyUtils';
-import {MetadataAPI} from './common/LinkedDataAPI';
+import MetadataAPI from "./common/MetadataAPI";
 
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
@@ -57,7 +57,6 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 // Fixed properties
                 hasEditRight: true,
                 requireIdentifier: true,
-                editorPath: METADATA_PATH,
                 namespaces,
 
                 // Generic methods without reference to shapes

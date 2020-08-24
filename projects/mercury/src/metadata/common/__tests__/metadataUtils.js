@@ -21,7 +21,7 @@ describe('Metadata Utils', () => {
     describe('linkLabel', () => {
         it('handles local IRIs', () => {
             expect(linkLabel('http://localhost/iri/1234')).toEqual('1234');
-            expect(linkLabel('http://localhost/vocabulary/1234')).toEqual('1234');
+            expect(linkLabel('http://localhost/collections/1234')).toEqual('1234');
         });
 
         it('handles local IRIs with query and hash', () => {
@@ -165,7 +165,6 @@ describe('Metadata Utils', () => {
         });
     });
 
-
     describe('propertiesToShow', () => {
         it('should hide the type of an entity', () => {
             const properties = [{
@@ -212,7 +211,6 @@ describe('Metadata Utils', () => {
             expect(url2iri('some-invalid-uri')).toEqual('some-invalid-uri');
         });
     });
-
 
     // TODO: Could'nt fix this test!
     describe('getTypeInfo', () => {

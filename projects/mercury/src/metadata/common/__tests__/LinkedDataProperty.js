@@ -69,7 +69,7 @@ describe('LinkedDataProperty elements', () => {
         };
 
         const renderTable = property => {
-            const wrapper = mount(<LinkedDataContext.Provider value={{editorPath: '/metadata', valueComponentFactory}}><LinkedDataProperty property={property} /></LinkedDataContext.Provider>);
+            const wrapper = mount(<LinkedDataContext.Provider value={{valueComponentFactory}}><LinkedDataProperty property={property} /></LinkedDataContext.Provider>);
             const table = wrapper.find(LinkedDataInputFieldsTable);
             expect(table.length).toEqual(1);
             return table;

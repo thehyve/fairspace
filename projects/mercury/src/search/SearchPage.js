@@ -1,6 +1,5 @@
 import React from 'react';
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles} from '@material-ui/core';
-import {Link} from "react-router-dom";
 import {workspacePrefix} from "../workspaces/workspaces";
 import crossWorkspacesSearchAPI from "./CrossWorkspacesSearchAPI";
 import {METADATA_PATH, WORKSPACE_URI} from "../constants";
@@ -74,14 +73,7 @@ export const SearchPage = ({classes, items = [], loading, error, history}) => {
                                     {item.label}
                                 </TableCell>
                                 <TableCell>
-                                    <Link
-                                        to={{
-                                            pathname: '/vocabulary',
-                                            search: "?iri=" + encodeURIComponent(item.type)
-                                        }}
-                                    >
-                                        {item.type}
-                                    </Link>;
+                                    {item.type}
                                 </TableCell>
                             </TableRow>
                         ))}

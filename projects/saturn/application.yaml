@@ -5,8 +5,6 @@ elasticsearchUrl: http://localhost:9200
 jena:
   # Base IRI for all metadata entities
   metadataBaseIRI: "http://localhost/iri/"
-  # Base IRI for all vocabulary entities
-  vocabularyBaseIRI: "http://localhost/vocabulary/"
   # Jena's TDB2 database path
   datasetPath: "data/db"
   storeParams:

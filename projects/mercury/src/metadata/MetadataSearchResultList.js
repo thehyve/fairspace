@@ -4,8 +4,6 @@ import Iri from "../common/components/Iri";
 import LinkedDataContext from "./LinkedDataContext";
 import {getLabel} from "./common/metadataUtils";
 import LinkedDataList from "./common/LinkedDataList";
-import LinkedDataLink from "./common/LinkedDataLink";
-import {VOCABULARY_PATH} from "../constants";
 import {determineShapeForTypes} from "./common/vocabularyUtils";
 
 export default ({items, ...otherProps}) => {
@@ -26,7 +24,5 @@ export default ({items, ...otherProps}) => {
         };
     });
 
-    const typeRender = (entry) => <LinkedDataLink editorPath={VOCABULARY_PATH} uri={entry.shapeUrl}>{entry.typeLabel}</LinkedDataLink>;
-
-    return <LinkedDataList entities={entities} typeRender={typeRender} {...otherProps} />;
+    return <LinkedDataList entities={entities} {...otherProps} />;
 };

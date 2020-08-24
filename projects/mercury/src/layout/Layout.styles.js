@@ -1,4 +1,3 @@
-
 const styles = theme => ({
     main: {
         backgroundColor: theme.palette.background.default,

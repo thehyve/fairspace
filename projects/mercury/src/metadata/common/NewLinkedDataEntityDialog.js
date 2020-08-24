@@ -43,7 +43,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
     const properties = getPropertiesForNodeShape(shapes, shape);
-    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS);
+    const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'];
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});

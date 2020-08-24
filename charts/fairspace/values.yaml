@@ -251,6 +251,7 @@ saturn:
     mail.smtp.host: host
     mail.smtp.port: 587
     mail.smtp.starttls.enable: true
+  vocabulary:
 
 # Settings for the documentation container
 docs:

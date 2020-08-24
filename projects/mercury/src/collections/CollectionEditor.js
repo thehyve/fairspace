@@ -14,7 +14,6 @@ import {getCollectionAbsolutePath} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from "../common/components/ErrorDialog";
 
-
 const fields = ['name', 'description', 'location', 'ownerWorkspace'];
 
 const copyProperties = (properties: CollectionProperties): CollectionProperties => ((fields
@@ -47,7 +46,6 @@ export const convertToSafeDirectoryName = (name: string) => {
  */
 export const isInputValid = (properties: CollectionProperties) => !!properties.name && !!properties.location && !properties.location.match(NON_SAFE_CHARACTERS_REGEX);
 
-
 type PathParam = {
     path: string;
 }
@@ -77,7 +75,6 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         updateExisting: false,
         inCollectionsBrowser: false
     };
-
 
     state = {
         editing: true,

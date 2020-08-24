@@ -140,7 +140,6 @@ LinkedDataEntityFormContainer.propTypes = {
     editable: PropTypes.bool,
 };
 
-
 export const LinkedDataEntityFormWithLinkedData = (
     {subject, hasEditRight, setHasCollectionMetadataUpdates}
 ) => {

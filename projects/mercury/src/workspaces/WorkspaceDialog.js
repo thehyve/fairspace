@@ -3,7 +3,6 @@ import React from "react";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@material-ui/core";
 import ControlledTextField from "../common/components/ControlledTextField";
 
-
 const ControlledTextFieldWrapper = ({
     control, type, autoFocus = false, required = false, id, label, name, disabled,
     multiline = false, select = false, selectOptions = [], helperText, inputProps

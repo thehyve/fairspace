@@ -27,7 +27,7 @@ export const isGenericIriResource = (propertyShape) => getFirstPredicateId(prope
  * @param propertyShape
  * @returns {boolean}
  */
-export const isRelationShape = propertyShape => Array.isArray(propertyShape['@type']) && propertyShape['@type'].includes(constants.RELATION_SHAPE_URI);
+export const isRelationShape = propertyShape => getFirstPredicateValue(propertyShape, constants.SHACL_CLASS) != null;
 
 /**
  * Returns the maxCount value for the given shape
@@ -49,47 +49,9 @@ export const getMaxCount = propertyShape => (isRdfList(propertyShape) ? 0 : getF
 const isExternalLink = propertyShape => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
 
 /**
- * Checks whether the given list of properties represents a fixed shape, as defined by FS:fixedShape
- */
-export const isFixedShape = classShape => getFirstPredicateValue(classShape, constants.FIXED_SHAPE_URI, false);
-
-/**
  * Returns a list of system properties defined for the given shape
  */
 export const getSystemProperties = classShape => (classShape && classShape[constants.SYSTEM_PROPERTIES_URI] && classShape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
-
-/**
- * Extends the list of properties with information for vocabulary editing
- *
- * The logic that is applied is based on the functionality of the fs:fixedShape flag. This flag
- * indicates that a user is not allowed to change anything from a shape, except for adding
- * new properties. The user is also allowed to delete properties that have been added before
- * (i.e. not systemProperties)
- *
- * The following keys are added to the properties:
- * - editable           is set based on the given editable flag combined with the isFixed flag
- * - systemProperties   is set for the field SHACL_PROPERTY
- *
- * @param properties
- * @param editable
- * @param isFixed
- * @param systemProperties
- * @returns {*}
- */
-export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditable = true, isFixed = false, systemProperties = []}) => properties
-    .map(p => {
-        // For fixed shapes, return the list of system properties for the SHACL_PROPERTY definition
-        if (isFixed && p.key === constants.SHACL_PROPERTY) {
-            // Add systemProperties for determining which entry can be deleted
-            return {...p, isEditable: isEditable && !p.machineOnly, systemProperties};
-        }
-
-        // In all other cases, if the shape is fixed, the property must not be editable
-        return {
-            ...p,
-            isEditable: !isFixed && isEditable
-        };
-    });
 
 /**
  * Returns a list of classes marked as fairspace entities.
@@ -98,7 +60,7 @@ export const extendPropertiesWithVocabularyEditingInfo = ({properties, isEditabl
  * Deleted entries are excluded from the list
  */
 export const getClassesInCatalog = (vocabulary) => vocabulary
-    .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))
+    .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) || (entry['@type'] && entry['@type'].includes(constants.RDFS_CLASS) && entry['@type'].includes(constants.SHACL_NODE_SHAPE)))
     .filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI))
     .filter(entry => !getFirstPredicateValue(entry, constants.DATE_DELETED_URI));
 
@@ -136,7 +98,7 @@ export const getShape = (vocabulary, id) => vocabulary.find(el => el['@id'] === 
  * Determines the SHACL shape to be applied to the given types
  * @param typeUris
  */
-export const determineShapeForTypes = (vocabulary, typeUris) => vocabulary.find(entry => typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
+export const determineShapeForTypes = (vocabulary, typeUris) => vocabulary.find(entry => typeUris.includes(entry['@id']) || typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
 
 /**
  * Determines the SHACL shape to be applied to the given type.
@@ -198,7 +160,7 @@ const isFairspaceClass = (vocabulary, className) => {
     }
 
     return getClassesInCatalog(vocabulary)
-        .some(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
+        .some(entry => entry['@id'] === className || getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
 };
 
 /**

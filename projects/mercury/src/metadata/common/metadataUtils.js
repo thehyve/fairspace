@@ -26,7 +26,7 @@ export const getLocalPart = uri => (
  */
 export function linkLabel(uri, shortenExternalUris = false) {
     try {
-        const supportedLocalInfixes = ['/iri/', '/vocabulary/', '/collections/'];
+        const supportedLocalInfixes = ['/iri/', '/collections/'];
         const url = new URL(uri);
 
         // Local uris are treated separately, as we know its
@@ -156,7 +156,7 @@ export const getTypeInfo = (linkedDataItem, vocabulary) => {
     const shape = determineShapeForTypes(vocabulary, types);
 
     return {
-        typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS),
+        typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'],
         label: getFirstPredicateValue(shape, consts.SHACL_NAME),
         description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION)
     };

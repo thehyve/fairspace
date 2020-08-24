@@ -12396,11 +12396,6 @@ vfile@^2.0.0:
     unist-util-stringify-position "^1.0.0"
     vfile-message "^1.0.0"
 
-vis-network@^6.4.4:
-  version "6.5.2"
-  resolved "https://registry.yarnpkg.com/vis-network/-/vis-network-6.5.2.tgz#a63719c029b952c99bab20d11dacb90534d9e289"
-  integrity sha512-Dj5oEtZMUWuhq7D7dwdmxmtJgrK3kwfV4Ov/ePSrhPZgNdJlXzpeDZU/Eq0pKGyOAPLClemgVImc0bZpZ4Yafw==
-
 vm-browserify@^1.0.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"

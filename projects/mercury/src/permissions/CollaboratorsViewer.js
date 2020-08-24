@@ -132,5 +132,4 @@ const ContextualCollaboratorsViewer = ({collection, collaborators, ownerWorkspac
     );
 };
 
-
 export default ContextualCollaboratorsViewer;

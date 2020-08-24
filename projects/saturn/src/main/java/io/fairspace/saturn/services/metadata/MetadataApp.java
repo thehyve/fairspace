@@ -1,60 +1,44 @@
 package io.fairspace.saturn.services.metadata;
 
 
+import io.fairspace.saturn.services.BaseApp;
 import io.fairspace.saturn.services.PayloadParsingException;
-import io.fairspace.saturn.services.metadata.serialization.RDFSerializer;
-import io.fairspace.saturn.services.metadata.serialization.Serializer;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.rdf.model.Model;
 import spark.Request;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.saturn.util.ValidationUtils.*;
+import static io.fairspace.saturn.services.metadata.Serialization.deserialize;
+import static io.fairspace.saturn.services.metadata.Serialization.serialize;
+import static io.fairspace.saturn.util.ValidationUtils.validate;
+import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.riot.RDFFormat.JSONLD;
-import static org.apache.jena.riot.RDFFormat.TURTLE;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 @Slf4j
-public class ChangeableMetadataApp extends ReadableMetadataApp {
-    protected final ChangeableMetadataService api;
-    private final String baseURI;
+public class MetadataApp extends BaseApp {
+    protected final MetadataService api;
 
-    private static final List<Serializer> deserializers = List.of(
-            new RDFSerializer(JSONLD),
-            new RDFSerializer(TURTLE)
-    );
-
-    private static final List<String> supportedMimetypes = deserializers
-            .stream()
-            .map(Serializer::getMimeType)
-            .collect(Collectors.toList());
-
-    public ChangeableMetadataApp(String basePath, ChangeableMetadataService api, String baseURI) {
-        super(basePath, api);
+    public MetadataApp(String basePath, MetadataService api) {
+        super(basePath);
         this.api = api;
-        this.baseURI = baseURI;
     }
 
     @Override
     protected void initApp() {
-        super.initApp();
+        get("/", (req, res) -> {
+            var model = getMetadata(req);
+            res.type(req.headers("Accept"));
+            return serialize(model, req.headers("Accept"));
+        });
 
         put("/", (req, res) -> {
-            Model model = getModelFromRequest(req);
-
-            if(model == null) {
-                throw new UnsupportedMediaTypeException(supportedMimetypes);
-            }
+            var model = deserialize(req.body(), req.contentType());
 
             api.put(model);
 
@@ -62,11 +46,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             return "";
         });
         patch("/", (req, res) -> {
-            Model model = getModelFromRequest(req);
-
-            if(model == null) {
-                throw new UnsupportedMediaTypeException(supportedMimetypes);
-            }
+            var model = deserialize(req.body(), req.contentType());
 
             api.patch(model);
 
@@ -74,11 +54,7 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
             return "";
         });
         delete("/", (req, res) -> {
-            Model model = getModelFromRequest(req);
-
-            if(model != null) {
-                api.delete(model);
-            } else {
+            if (req.queryParams("subject") != null) {
                 var subject = req.queryParams("subject");
                 validate(subject != null, "Parameter \"subject\" is required");
                 validateIRI(subject);
@@ -86,6 +62,9 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
                     // Subject could not be deleted. Return a 404 error response
                     return null;
                 }
+            } else {
+                var model = deserialize(req.body(), req.contentType());
+                api.delete(model);
             }
 
             res.status(SC_NO_CONTENT);
@@ -102,15 +81,9 @@ public class ChangeableMetadataApp extends ReadableMetadataApp {
         });
     }
 
-    private Model getModelFromRequest(Request req) {
-        for(Serializer deserializer: deserializers) {
-            if(hasContentType(req, deserializer.getMimeType())) {
-                return deserializer.deserialize(req.body(), baseURI);
-            }
-        }
-
-        return null;
+    private Model getMetadata(Request req) {
+        return api.get(
+                req.queryParams("subject"),
+                req.queryParams().contains("includeObjectProperties"));
     }
-
-
 }

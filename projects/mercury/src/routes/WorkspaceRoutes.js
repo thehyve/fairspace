@@ -1,16 +1,14 @@
 import React from 'react';
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 
 import * as queryString from 'query-string';
 import WorkspaceOverview from "../home/Home";
 import Collections from "../collections/CollectionsPage";
 import FilesPage from "../file/FilesPage";
 import SearchPage from '../search/SearchPage';
-import {createVocabularyIri} from "../metadata/common/metadataUtils";
-import {MetadataWrapper, VocabularyWrapper} from '../metadata/LinkedDataWrapper';
+import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
-import VocabularyOverviewPage from "../metadata/vocabulary/VocabularyOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
 import WorkspacePage from "../workspaces/WorkspacePage";
@@ -61,30 +59,11 @@ const WorkspaceRoutes = () => (
 
                 return (
                     <MetadataWrapper>
-                        {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} /> : <MetadataOverviewPage />}
+                        {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
+                            : <MetadataOverviewPage />}
                     </MetadataWrapper>
                 );
             }}
-        />
-
-        <Route
-            path="/vocabulary"
-            exact
-            render={() => {
-                const subject = getSubject();
-
-                return (
-                    <VocabularyWrapper>
-                        {subject ? <LinkedDataEntityPage title="Vocabulary" subject={subject} /> : <VocabularyOverviewPage />}
-                    </VocabularyWrapper>
-                );
-            }}
-        />
-
-        <Route
-            /* This route redirects a metadata iri which is entered directly to the metadata editor */
-            path="/vocabulary/**"
-            render={({match}) => (<Redirect to={"/vocabulary?iri=" + encodeURIComponent(createVocabularyIri(match.params[0]))} />)}
         />
 
         <Route

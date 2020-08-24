@@ -8,7 +8,6 @@ import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer"
 import WorkspaceContext from "./WorkspaceContext";
 import WorkspaceDetails from "./WorkspaceDetails";
 
-
 const WorkspaceInformationDrawer = ({workspace, loading, deleteWorkspace, atLeastSingleWorkspaceExists}) => {
     if (!workspace) {
         return atLeastSingleWorkspaceExists

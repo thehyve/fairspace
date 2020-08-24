@@ -2,7 +2,6 @@ import {
     contains,
     determinePropertyShapesForTypes,
     determineShapeForProperty,
-    extendPropertiesWithVocabularyEditingInfo,
     getChildSubclasses,
     getClassesInCatalog,
     getDescendants,
@@ -114,40 +113,12 @@ describe('getSystemProperties', () => {
     it('should return a list with iris if no system properties are present', () => expect(getSystemProperties(systemPropertiesList)).toEqual(['http://a', 'http://b']));
 });
 
-describe('extendPropertiesWithVocabularyEditingInfo', () => {
-    const properties = [
-        {id: 'a'},
-        {id: 'b', key: 'http://uri'},
-        {id: 'property', key: constants.SHACL_PROPERTY, values: [{id: 'http://custom'}, {id: 'http://fixed'}]}
-    ];
-    const systemProperties = ['http://a', 'http://b', 'http://fixed'];
-
-    it('should set editable for all properties', () => {
-        const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties});
-        expect(extendedProperties[0].isEditable).toBe(true);
-        expect(extendedProperties[1].isEditable).toBe(true);
-        expect(extendedProperties[2].isEditable).toBe(true);
-    });
-    it('should include isFixed to determine editability', () => {
-        const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true});
-        expect(extendedProperties[0].isEditable).toBe(false);
-        expect(extendedProperties[1].isEditable).toBe(false);
-        expect(extendedProperties[2].isEditable).toBe(true);
-    });
-    it('should include given systemProperties for SHACL_PROPERTY', () => {
-        const extendedProperties = extendPropertiesWithVocabularyEditingInfo({properties, isFixed: true, systemProperties});
-        expect(extendedProperties[2].systemProperties).toEqual(systemProperties);
-    });
-});
-
 describe('isRelationShape', () => {
     it('should return true for relation shapes', () => {
-        expect(isRelationShape({'@type': [constants.RELATION_SHAPE_URI]})).toBe(true);
-        expect(isRelationShape({'@type': ['http://someShape', constants.RELATION_SHAPE_URI]})).toBe(true);
+        expect(isRelationShape({[constants.SHACL_CLASS]: [{'@value': 'SomeClass'}]})).toBe(true);
     });
     it('should return false for other types of shapes', () => {
-        expect(isRelationShape({'@type': ['http://other-type']})).toBe(false);
-        expect(isRelationShape({'@type': []})).toBe(false);
+        expect(isRelationShape({[constants.SHACL_DATATYPE]: ['http://ex.com/type']})).toBe(false);
         expect(isRelationShape({})).toBe(false);
     });
 });

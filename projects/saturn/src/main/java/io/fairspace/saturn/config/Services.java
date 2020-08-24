@@ -5,10 +5,8 @@ import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.metadata.ChangeableMetadataService;
-import io.fairspace.saturn.services.metadata.MetadataEntityLifeCycleManager;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
-import io.fairspace.saturn.services.metadata.ReadableMetadataService;
+import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
@@ -26,9 +24,7 @@ import javax.servlet.http.HttpServlet;
 import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.vocabulary.Vocabularies.META_VOCABULARY_GRAPH_URI;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY_GRAPH_URI;
-import static org.apache.jena.sparql.core.Quad.defaultGraphIRI;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @Slf4j
 @Getter
@@ -42,9 +38,7 @@ public class Services {
     private final UserService userService;
     private final MailService mailService;
     private final MetadataPermissions metadataPermissions;
-    private final ChangeableMetadataService metadataService;
-    private final ChangeableMetadataService userVocabularyService;
-    private final ReadableMetadataService metaVocabularyService;
+    private final MetadataService metadataService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
@@ -67,8 +61,6 @@ public class Services {
 
         metadataPermissions = new MetadataPermissions(workspaceService, davFactory);
 
-        var metadataLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, defaultGraphIRI, VOCABULARY_GRAPH_URI);
-
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),
                 new ProtectMachineOnlyPredicatesValidator(),
@@ -76,21 +68,7 @@ public class Services {
                 new DeletionValidator(),
                 new ShaclValidator());
 
-        metadataService = new ChangeableMetadataService(transactions, defaultGraphIRI, VOCABULARY_GRAPH_URI, metadataLifeCycleManager, metadataValidator);
-
-        var vocabularyValidator = new ComposedValidator(
-                new ProtectMachineOnlyPredicatesValidator(),
-                new DeletionValidator(),
-                new ShaclValidator(),
-                new SystemVocabularyProtectingValidator(),
-                new MetadataAndVocabularyConsistencyValidator(dataset),
-                new InverseForUsedPropertiesValidator(dataset)
-        );
-
-        var vocabularyLifeCycleManager = new MetadataEntityLifeCycleManager(dataset, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
-
-        userVocabularyService = new ChangeableMetadataService(transactions, VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI, vocabularyLifeCycleManager, vocabularyValidator);
-        metaVocabularyService = new ReadableMetadataService(transactions, META_VOCABULARY_GRAPH_URI, META_VOCABULARY_GRAPH_URI);
+        metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
     }

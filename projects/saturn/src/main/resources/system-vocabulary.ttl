@@ -1,0 +1,538 @@
+@prefix fs: <http://fairspace.io/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <http://www.schema.org/> .
+@prefix dash: <http://datashapes.org/dash#> .
+
+
+########################
+###   Fixed Shapes   ###
+########################
+
+## Class Shapes
+
+fs:File a rdfs:Class, sh:NodeShape ;
+    sh:description "A single file." ;
+    sh:name "File" ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:movedTo fs:versions fs:currentVersion) ;
+    fs:systemProperties
+    [
+        sh:name "Created By" ;
+        sh:description "User that created this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:createdBy
+    ],
+    [
+        sh:name "Created" ;
+        sh:description "Date created" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateCreated
+    ],
+    [
+        sh:name "Deleted By" ;
+        sh:description "User that deleted this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:deletedBy
+    ],
+    [
+        sh:name "Deleted" ;
+        sh:description "Date deleted" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateDeleted
+    ],
+    [
+        sh:name "Label" ;
+        sh:description "Human readable label for this resource." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
+    [
+        sh:name "Description" ;
+        sh:description "Human friendly description." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path rdfs:comment
+    ],
+    [
+        sh:name "Replaces" ;
+        sh:description "Old version of this file." ;
+        sh:class fs:File ;
+        sh:maxCount 1 ;
+        sh:path fs:replaces
+    ],
+    [
+        a fs:RelationShape ;
+        sh:name "Is Replaced By" ;
+        sh:description "New version of this file." ;
+        sh:class fs:File ;
+        sh:maxCount 1 ;
+        sh:path fs:isReplacedBy
+    ] ;
+    sh:property
+    [
+        sh:name "Created By" ;
+        sh:description "User that created this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:createdBy
+    ],
+    [
+        sh:name "Created" ;
+        sh:description "Date created" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        fs:fixedShape true ;
+        sh:path fs:dateCreated
+    ],
+    [
+        sh:name "Deleted By" ;
+        sh:description "User that deleted this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:deletedBy
+    ],
+    [
+        sh:name "Deleted" ;
+        sh:description "Date deleted" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateDeleted
+    ],
+    [
+        sh:name "Label" ;
+        sh:description "Human readable label for this resource." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ; ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
+    [
+        sh:name "Description" ;
+        sh:description "Human friendly description." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path rdfs:comment
+    ],
+    [
+         sh:name "Replaces" ;
+         sh:description "Old version of this file." ;
+         sh:class fs:File ;
+         sh:maxCount 1 ;
+         sh:path fs:replaces
+    ],
+    [
+         sh:name "Is Replaced By" ;
+         sh:description "New version of this file." ;
+         sh:class fs:File ;
+         sh:maxCount 1 ;
+         sh:path fs:isReplacedBy
+] .
+
+fs:Directory a rdfs:Class, sh:NodeShape ;
+    sh:description "A directory containing multiple files." ;
+    sh:name "Directory" ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:contains fs:movedTo) ;
+    fs:systemProperties
+        fs:containsShape, #TBR?
+        [
+            sh:name "Created By" ;
+            sh:description "User that created this resource." ;
+            sh:class fs:User ;
+            sh:maxCount 1 ;
+            fs:machineOnly true ;
+            sh:path fs:createdBy
+        ],
+        [
+            sh:name "Created" ;
+            sh:description "Date created" ;
+            sh:datatype xsd:dateTime ;
+            sh:maxCount 1 ;
+            fs:machineOnly true ;
+            sh:path fs:dateCreated
+        ],
+        [
+            sh:name "Last Modified By" ;
+            sh:description "User that last modified this resource." ;
+            sh:class fs:User ;
+            sh:maxCount 1 ;
+            fs:machineOnly true ;
+            sh:path fs:modifiedBy
+        ],
+        [
+            sh:name "Modified" ;
+            sh:description "Date modified" ;
+            sh:datatype xsd:dateTime ;
+            sh:maxCount 1 ;
+            fs:machineOnly true ; ;
+            sh:path fs:dateModified
+        ],
+        [
+             sh:name "Deleted By" ;
+             sh:description "User that deleted this resource." ;
+             sh:class fs:User ;
+             sh:maxCount 1 ;
+             fs:machineOnly true ;
+             sh:path fs:deletedBy
+        ],
+        [
+            sh:name "Deleted" ;
+            sh:description "Date deleted" ;
+            sh:datatype xsd:dateTime ;
+            sh:maxCount 1 ;
+            fs:machineOnly true ;
+            sh:path fs:dateDeleted
+        ],
+        [
+             sh:name "Label" ;
+             sh:description "Human readable label for this resource." ;
+             sh:datatype xsd:string ;
+             sh:maxCount 1 ;
+             dash:singleLine true ;
+             fs:importantProperty true ;
+             sh:path rdfs:label;
+             sh:order 0
+        ],
+        [
+             sh:name "Description" ;
+             sh:description "Human friendly description." ;
+             sh:datatype xsd:string ;
+             sh:maxCount 1 ;
+             sh:path rdfs:comment
+        ] ;
+    sh:property
+    [
+        sh:name "Created By" ;
+        sh:description "User that created this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:createdBy
+    ],
+    [
+        sh:name "Created" ;
+        sh:description "Date created" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateCreated
+    ],
+    [
+        sh:name "Last Modified By" ;
+        sh:description "User that last modified this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:modifiedBy
+    ],
+    [
+        sh:name "Modified" ;
+        sh:description "Date modified" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateModified
+    ],
+    [
+        sh:name "Deleted By" ;
+        sh:description "User that deleted this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:deletedBy
+    ],
+    [
+        sh:name "Deleted" ;
+        sh:description "Date deleted" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateDeleted
+    ],
+    [
+        sh:name "Label" ;
+        sh:description "Human readable label for this resource." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
+    [
+        sh:name "Description" ;
+        sh:description "Human friendly description." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path rdfs:comment
+] .
+
+fs:Collection a rdfs:Class, sh:NodeShape ;
+    sh:description "Collection of files with associated metadata and access rules." ;
+    sh:name "Collection" ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    fs:systemProperties
+    [
+        sh:name "Owned By" ;
+        sh:description "Owner workspace" ;
+        sh:class fs:Workspace ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:ownedBy
+    ],
+    [
+        sh:name "Created By" ;
+        sh:description "User that created this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:createdBy
+    ],
+    [
+        sh:name "Created" ;
+        sh:description "Date created" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateCreated
+    ],
+    [
+        sh:name "Last Modified By" ;
+        sh:description "User that last modified this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:modifiedBy
+    ],
+    [
+        sh:name "Modified" ;
+        sh:description "Date modified" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateModified
+    ],
+    [
+        sh:name "Deleted By" ;
+        sh:description "User that deleted this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:deletedBy
+    ],
+    [
+        sh:name "Deleted" ;
+        sh:description "Date deleted" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateDeleted
+    ],
+    [
+        sh:name "Label" ;
+        sh:description "Human readable label for this resource." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
+    [
+        sh:name "Description" ;
+        sh:description "Human friendly description." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path rdfs:comment
+    ] ;
+    sh:property
+    [
+        sh:name "Created By" ;
+        sh:description "User that created this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:createdBy
+    ],
+    [
+        sh:name "Created" ;
+        sh:description "Date created" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateCreated
+    ],
+    [
+        sh:name "Last Modified By" ;
+        sh:description "User that last modified this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:modifiedBy
+    ],
+    [
+        sh:name "Modified" ;
+        sh:description "Date modified" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateModified
+    ],
+    [
+        sh:name "Deleted By" ;
+        sh:description "User that deleted this resource." ;
+        sh:class fs:User ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:deletedBy
+    ],
+    [
+        sh:name "Deleted" ;
+        sh:description "Date deleted" ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:dateDeleted
+    ],
+    [
+        sh:name "Label" ;
+        sh:description "Human readable label for this resource." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
+    [
+        sh:name "Description" ;
+        sh:description "Human friendly description." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path rdfs:comment
+] .
+
+fs:User a rdfs:Class, sh:NodeShape ;
+    sh:description "User" ;
+    sh:name "User" ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+         sh:name "Label" ;
+         sh:description "Human readable label for this resource." ;
+         sh:datatype xsd:string ;
+         sh:maxCount 1 ;
+         dash:singleLine true ;
+         fs:importantProperty true ;
+         sh:path rdfs:label;
+         sh:order 0
+    ],
+    [
+         sh:name "Description" ;
+         sh:description "Human friendly description." ;
+         sh:datatype xsd:string ;
+         sh:maxCount 1 ;
+         sh:path rdfs:comment
+    ],
+    [
+         sh:name "Email" ;
+         sh:description "Email address" ;
+         sh:datatype xsd:string ;
+         sh:maxCount 1 ;
+         fs:machineOnly true ;
+         sh:path fs:email
+    ],
+    [
+         sh:name "Can list" ;
+         sh:description "Visible collections" ;
+         sh:class fs:Collection ;
+         fs:machineOnly true ;
+         sh:path fs:list
+    ],
+    [
+         sh:name "Can read" ;
+         sh:description "Can read collections" ;
+         sh:class fs:Collection ;
+         fs:machineOnly true ;
+         sh:path fs:read
+    ],
+    [
+         sh:name "Can write to" ;
+         sh:description "Can write to collections" ;
+         sh:class fs:Collection ;
+         fs:machineOnly true ;
+         sh:path fs:write
+    ],
+    [
+        sh:name "Can manage" ;
+        sh:description "Can manage collections" ;
+        sh:class fs:Collection ;
+        fs:machineOnly true ;
+        sh:path fs:manage
+    ],
+    [
+         sh:name "Is a member of" ;
+         sh:description "Is a member of workspaces." ;
+         sh:class fs:Workspace;
+         fs:machineOnly true ;
+         sh:path fs:isMemberOf
+    ],
+    [
+        sh:name "Is a manager of" ;
+        sh:description "Is a manager of workspaces" ;
+        sh:class fs:Workspace;
+        fs:machineOnly true ;
+        sh:path fs:isManagerOf
+] .
+
+fs:Workspace a rdfs:Class, sh:NodeShape ;
+    sh:description "Resource description for the current workspace." ;
+    sh:name "Workspace" ;
+    fs:machineOnly true ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Human readable label for this resource." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
+    [
+        sh:path fs:workspaceDescription ;
+        sh:name "Workspace description" ;
+        sh:description "A markdown formatted description for the workspace homepage." ;
+        sh:datatype fs:markdown ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:order 2
+] .
+

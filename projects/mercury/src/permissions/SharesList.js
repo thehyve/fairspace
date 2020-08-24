@@ -10,7 +10,6 @@ import {sortPermissions} from "./permissionUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
-
 export const SharesList = ({title, shares, collection, setPermission, setBusy = () => {}}) => {
     const handleRemoveShare = (principal) => {
         setBusy(true);

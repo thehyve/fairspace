@@ -26,7 +26,6 @@ const SearchResultHighlights = ({highlights}) => highlights && (
     </List>
 );
 
-
 SearchResultHighlights.propTypes = {
     highlights: PropTypes.array
 };

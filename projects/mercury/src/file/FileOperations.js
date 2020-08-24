@@ -134,7 +134,6 @@ export const FileOperations = ({
             ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
         });
 
-
     const getDeletionConfirmationMessage = () => {
         if (isDeletedItemSelected) {
             if (selectedDeletedItems.length === 1 && selectedItems.length === 1) {

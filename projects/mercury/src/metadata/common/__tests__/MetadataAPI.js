@@ -1,13 +1,13 @@
 import mockAxios from 'axios';
 
-import {MetadataAPI} from "../LinkedDataAPI";
+import MetadataAPI from "../MetadataAPI";
 
 beforeEach(() => {
     mockAxios.get.mockClear();
     mockAxios.patch.mockClear();
 });
 
-describe('LinkedDataApi', () => {
+describe('MetadataAPI', () => {
     it('fetches metadata with provided parameters', () => {
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
             data: [],

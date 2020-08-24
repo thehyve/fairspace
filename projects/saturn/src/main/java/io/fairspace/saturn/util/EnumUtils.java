@@ -1,4 +1,4 @@
-package io.fairspace.saturn.vocabulary;
+package io.fairspace.saturn.util;
 
 import java.util.stream.Stream;
 

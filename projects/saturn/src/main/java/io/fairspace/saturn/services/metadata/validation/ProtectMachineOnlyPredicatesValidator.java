@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getBooleanProperty;
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
-import static io.fairspace.saturn.vocabulary.Inference.getClassShapeForClass;
+import static io.fairspace.saturn.vocabulary.ShapeUtils.getClassShapeForClass;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 

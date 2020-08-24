@@ -1,4 +1,3 @@
-
 const mockClipboard = {
     writeText: jest.fn(),
 };
