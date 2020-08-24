@@ -1,7 +1,7 @@
 import {buildSearchUrl} from "../search/searchUtils";
 import {COMMENT_URI, LABEL_URI} from "../constants";
 import {compareTo} from "../permissions/permissionUtils";
-import type {Collection, CollectionPermissions} from "./CollectionAPI";
+import type {Collection, CollectionPermissions, Status} from "./CollectionAPI";
 
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 
@@ -45,3 +45,16 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     userPermissions: parsePermissions(properties.userPermissions),
     workspacePermissions: parsePermissions(properties.workspacePermissions)
 });
+
+export const getStatusDescription = (status: Status) => {
+    switch (status) {
+        case "Active":
+            return "Editing data and metadata enabled.";
+        case "Archived":
+            return "Data immutable, read-only.";
+        case "Closed":
+            return "Data not available for reading.";
+        default:
+            return "Unrecognized status";
+    }
+};

@@ -30,8 +30,10 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import {camelCaseToWords} from "../common/utils/genericUtils";
-import CollectionPropertyChangeDialog from "./CollectionPropertyChangeDialog";
+import CollectionPropertyChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
+import {getStatusDescription} from "./collectionUtils";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 import {statuses} from './CollectionAPI';
 
@@ -176,7 +178,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             .finally(() => setBusy(false));
     };
 
-    renderCollectionProperty = (property: string, value: string) => (
+    renderCollectionProperty = (property: string, value: string, helperValue: string = null) => (
         <Grid container direction="row">
             <Grid item xs={2}>
                 <p className={`${this.props.classes.propertyLabel} ${this.props.classes.propertyText}`}>
@@ -187,6 +189,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 <p className={this.props.classes.propertyText}>
                     {camelCaseToWords(value)}
                 </p>
+                {helperValue && (
+                    <FormHelperText>{helperValue}</FormHelperText>
+                )}
             </Grid>
         </Grid>
     );
@@ -198,7 +203,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     );
 
     renderCollectionStatus = () => (
-        this.props.collection.status && this.renderCollectionProperty('Status', this.props.collection.status)
+        this.props.collection.status
+        && this.renderCollectionProperty('Status', this.props.collection.status, getStatusDescription(this.props.collection.status))
     );
 
     render() {
@@ -292,10 +298,6 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 {changingStatus ? (
                     <CollectionPropertyChangeDialog
                         collection={collection}
-                        title="Select collection status"
-                        confirmationMessage={`Are you sure you want to change the status of collection ${collection.name}`}
-                        currentValue={collection.status}
-                        availableValues={statuses.filter(status => collection.availableStatuses.includes(status))}
                         setValue={this.props.setStatus}
                         onClose={() => this.setState({changingStatus: false})}
                     />

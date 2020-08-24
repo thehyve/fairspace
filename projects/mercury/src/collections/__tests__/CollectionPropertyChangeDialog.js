@@ -1,7 +1,7 @@
 import React from 'react';
 import {createMount, createShallow} from '@material-ui/core/test-utils';
 import {Button} from '@material-ui/core';
-import CollectionPropertyChangeDialog from "../CollectionPropertyChangeDialog";
+import CollectionPropertyChangeDialog from "../CollectionStatusChangeDialog";
 
 describe('CollectionPropertyChangeDialog', () => {
     let shallow;

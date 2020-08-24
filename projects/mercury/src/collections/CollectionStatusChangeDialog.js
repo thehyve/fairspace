@@ -10,34 +10,26 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {withStyles} from "@material-ui/core/styles";
+import FormHelperText from "@material-ui/core/FormHelperText";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import ConfirmationButton from "../common/components/ConfirmationButton";
+import {getStatusDescription} from "./collectionUtils";
 
 export const styles = {
-    root: {
-        width: 400,
-        height: 350,
-        display: 'block',
+    group: {
+        width: 350
     },
-    rootEdit: {
-        width: 400,
-        display: 'block',
+    groupItem: {
+        marginBottom: 10
     },
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
-    formControl: {
-        marginTop: 20,
-    },
-    autocomplete: {
-        width: '100%'
-    },
+    helperText: {
+        marginLeft: 32,
+        marginTop: 0
+    }
 };
 
-export const CollectionPropertyChangeDialog = ({collection, title, currentValue, availableValues, setValue, onClose,
-    confirmationMessage = 'Are you sure you want to change this property?', classes}) => {
-    const [selectedValue, setSelectedValue] = useState(currentValue);
+export const CollectionStatusChangeDialog = ({collection, setValue, onClose, classes}) => {
+    const [selectedValue, setSelectedValue] = useState(collection.status);
     const [openDialog, setOpenDialog] = useState(true);
 
     const handleValueChange = (event) => {
@@ -62,10 +54,10 @@ export const CollectionPropertyChangeDialog = ({collection, title, currentValue,
             open={openDialog}
             data-testid="property-change-dialog"
         >
-            <DialogTitle id="property-change-dialog-title">{title}</DialogTitle>
+            <DialogTitle id="property-change-dialog-title">Select collection status</DialogTitle>
             <DialogContent>
                 <div>
-                    <FormControl className={classes.formControl}>
+                    <FormControl>
                         <RadioGroup
                             aria-label="Available values"
                             name="collection-property-value"
@@ -73,13 +65,16 @@ export const CollectionPropertyChangeDialog = ({collection, title, currentValue,
                             value={selectedValue}
                             onChange={handleValueChange}
                         >
-                            {availableValues.map(mode => (
-                                <FormControlLabel
-                                    key={mode}
-                                    value={mode}
-                                    control={<Radio />}
-                                    label={camelCaseToWords(mode)}
-                                />
+                            {collection.availableStatuses.map(status => (
+                                <span className={classes.groupItem}>
+                                    <FormControlLabel
+                                        key={status}
+                                        value={status}
+                                        control={<Radio />}
+                                        label={camelCaseToWords(status)}
+                                    />
+                                    <FormHelperText className={classes.helperText}>{getStatusDescription(status)}</FormHelperText>
+                                </span>
                             ))}
                         </RadioGroup>
                     </FormControl>
@@ -89,7 +84,7 @@ export const CollectionPropertyChangeDialog = ({collection, title, currentValue,
                 <ConfirmationButton
                     onClick={handleSubmit}
                     disabled={Boolean(!selectedValue)}
-                    message={confirmationMessage}
+                    message={`Are you sure you want to change the status of collection ${collection.name}`}
                     agreeButtonText="Yes"
                     dangerous
                 >
@@ -112,4 +107,4 @@ export const CollectionPropertyChangeDialog = ({collection, title, currentValue,
     );
 };
 
-export default withStyles(styles)(CollectionPropertyChangeDialog);
+export default withStyles(styles)(CollectionStatusChangeDialog);
