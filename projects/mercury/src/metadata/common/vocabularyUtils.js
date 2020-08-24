@@ -60,7 +60,7 @@ export const getSystemProperties = classShape => (classShape && classShape[const
  * Deleted entries are excluded from the list
  */
 export const getClassesInCatalog = (vocabulary) => vocabulary
-    .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) || (entry['@type'] && entry['@type'].includes('http://www.w3.org/2000/01/rdf-schema#Class') && entry['@type'].includes('http://www.w3.org/ns/shacl#NodeShape')))
+    .filter(entry => getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) || (entry['@type'] && entry['@type'].includes(constants.RDFS_CLASS) && entry['@type'].includes(constants.SHACL_NODE_SHAPE)))
     .filter(entry => !getFirstPredicateValue(entry, constants.MACHINE_ONLY_URI))
     .filter(entry => !getFirstPredicateValue(entry, constants.DATE_DELETED_URI));
 

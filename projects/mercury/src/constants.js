@@ -36,6 +36,8 @@ export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
 export const SUBCLASS_URI = RDFS_NS + 'subClassOf';
 
+export const RDFS_CLASS = RDFS_NS + 'Class';
+
 export const SHACL_NAME = SHACL_NS + 'name';
 export const SHACL_DESCRIPTION = SHACL_NS + 'description';
 export const SHACL_PATH = SHACL_NS + 'path';
@@ -54,6 +56,7 @@ export const SHACL_ORDER = SHACL_NS + 'order';
 export const SHACL_PREFIX = SHACL_NS + 'prefix';
 export const SHACL_NAMESPACE = SHACL_NS + 'namespace';
 export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
+export const SHACL_NODE_SHAPE = SHACL_NS + 'NodeShape';
 
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 export const DASH_SINGLE_LINE = DASH_NS + 'singleLine';
