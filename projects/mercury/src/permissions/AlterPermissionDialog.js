@@ -7,11 +7,11 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import {AccessRights} from "./permissionUtils";
 import PermissionCandidateSelect from "./PermissionCandidateSelect";
 import CollectionsContext from "../collections/CollectionsContext";
 import Dropdown from "../metadata/common/values/Dropdown";
-import type {Access} from "../collections/CollectionAPI";
+import type {AccessLevel} from "../collections/CollectionAPI";
+import {accessLevels} from "../collections/CollectionAPI";
 
 export const styles = {
     root: {
@@ -40,7 +40,7 @@ export class AlterPermissionDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedAccessRight: null,
+            selectedAccessLevel: null,
             selectedPrincipal: null
         };
     }
@@ -48,18 +48,18 @@ export class AlterPermissionDialog extends React.Component {
     resetState = () => {
         const {access, principal} = this.props;
         this.setState({
-            selectedAccessRight: (access && access !== 'None') ? access : null,
+            selectedAccessLevel: (access && access !== 'None') ? access : null,
             selectedPrincipal: principal
         });
     };
 
-    handleAccessRightChange = (selectedOption) => {
-        this.setState({selectedAccessRight: selectedOption ? selectedOption.label : null});
+    handleAccessLevelChange = (selectedOption) => {
+        this.setState({selectedAccessLevel: selectedOption ? selectedOption.label : null});
     };
 
     handleSelectedPrincipalChange = (selectedOption) => {
         this.setState({selectedPrincipal: selectedOption});
-        this.handleAccessRightChange(null);
+        this.handleAccessLevelChange(null);
     };
 
     handleClose = () => {
@@ -71,10 +71,10 @@ export class AlterPermissionDialog extends React.Component {
     };
 
     handleSubmit = () => {
-        const {selectedPrincipal, selectedAccessRight} = this.state;
+        const {selectedPrincipal, selectedAccessLevel} = this.state;
         const {collection, setPermission} = this.props;
-        if (selectedPrincipal && selectedAccessRight) {
-            setPermission(collection.location, selectedPrincipal.iri, selectedAccessRight);
+        if (selectedPrincipal && selectedAccessLevel) {
+            setPermission(collection.location, selectedPrincipal.iri, selectedAccessLevel);
             this.handleClose();
         }
     };
@@ -93,36 +93,36 @@ export class AlterPermissionDialog extends React.Component {
         return 'No options';
     };
 
-    getAccessRightsForPrincipal: Access[] = () => {
+    getAccessLevelsForPrincipal: AccessLevel[] = () => {
         const {selectedPrincipal} = this.state;
         const {collection, workspaceUsers} = this.props;
         if (!selectedPrincipal
             || (selectedPrincipal.type === 'User' && workspaceUsers.some(wu => wu.iri === selectedPrincipal.iri))
             || (selectedPrincipal.type === 'Workspace' && selectedPrincipal.iri === collection.ownerWorkspace)) {
-            return AccessRights;
+            return accessLevels;
         }
         return ['Read'];
     };
 
-    renderAccessRightControl = () => {
+    renderAccessLevelControl = () => {
         const {classes} = this.props;
-        const accessRights = this.getAccessRightsForPrincipal();
-        const options = accessRights.map(access => ({label: access}));
+        const accessLevelOptions = this.getAccessLevelsForPrincipal();
+        const options = accessLevelOptions.map(access => ({label: access}));
 
         return (
             <Dropdown
-                data-testid="access-right-change-dropdown"
+                data-testid="access-level-change-dropdown"
                 options={options}
                 clearTextOnSelection={false}
-                onChange={this.handleAccessRightChange}
-                label="Select access right"
+                onChange={this.handleAccessLevelChange}
+                label="Select access level"
                 className={classes.formControl}
             />
         );
     };
 
     renderPermissionControl = () => {
-        const {principal, permissionCandidates, permissions, currentUser} = this.props;
+        const {principal, permissionCandidates, currentUser} = this.props;
         const {selectedPrincipal} = this.state;
 
         // only render the label if principal is passed into this component
@@ -145,8 +145,7 @@ export class AlterPermissionDialog extends React.Component {
             <PermissionCandidateSelect
                 permissionCandidates={permissionCandidates}
                 onChange={this.handleSelectedPrincipalChange}
-                filter={p => (!currentUser || p.iri !== currentUser.iri)
-                    && !permissions.some(c => c.iri === p.iri)}
+                filter={p => (!currentUser || p.iri !== currentUser.iri)}
                 value={selectedPrincipal}
                 label="Select user or workspace"
                 autoFocus
@@ -156,7 +155,7 @@ export class AlterPermissionDialog extends React.Component {
 
     render() {
         const {classes, principal, open, loading, error, title} = this.props;
-        const {selectedPrincipal, selectedAccessRight} = this.state;
+        const {selectedPrincipal, selectedAccessLevel} = this.state;
 
         return (
             <Dialog
@@ -169,14 +168,14 @@ export class AlterPermissionDialog extends React.Component {
                 <DialogContent>
                     <div className={principal ? classes.rootEdit : classes.root}>
                         {this.renderPermissionControl()}
-                        {this.renderAccessRightControl()}
+                        {this.renderAccessLevelControl()}
                     </div>
                 </DialogContent>
                 <DialogActions>
                     <Button
                         onClick={this.handleSubmit}
                         color="primary"
-                        disabled={Boolean(!selectedPrincipal || !selectedAccessRight || loading || error)}
+                        disabled={Boolean(!selectedPrincipal || !selectedAccessLevel || loading || error)}
                         data-testid="submit"
                     >
                         Save
@@ -202,7 +201,6 @@ AlterPermissionDialog.propTypes = {
     principal: PropTypes.object,
     collection: PropTypes.object,
     permissionCandidates: PropTypes.array,
-    permissions: PropTypes.array,
     workspaceUsers: PropTypes.array
 };
 

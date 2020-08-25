@@ -4,8 +4,8 @@ import {Button} from '@material-ui/core';
 
 import {AlterPermissionDialog} from "../AlterPermissionDialog";
 import PermissionCandidateSelect from "../PermissionCandidateSelect";
-import {AccessRights} from "../permissionUtils";
 import Dropdown from "../../metadata/common/values/Dropdown";
+import {accessLevels} from "../../collections/CollectionAPI";
 
 describe('AlterPermissionDialog', () => {
     let shallow;
@@ -59,26 +59,26 @@ describe('AlterPermissionDialog', () => {
         wrapper = shallow(<AlterPermissionDialog
             open={false}
             classes={{}}
-            accessRights={AccessRights}
+            accessLevels={accessLevels}
             collection={mockCollection}
             permissions={mockCollaborators}
             currentUser={mockCurrentLoggedUser}
             setPermission={mockSetPermissionFn}
             permissionCandidates={mockUsers}
-            title="Select access right for a collaborator"
+            title="Select access level for a collaborator"
         />);
 
         // initial state if it's open or not
         expect(wrapper.find('[data-testid="permissions-dialog"]').prop('open')).toBeFalsy();
 
         // title =Share with
-        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Select access right for a collaborator');
+        expect(wrapper.find('#scroll-dialog-title').childAt(0).text()).toEqual('Select access level for a collaborator');
 
         // render collaborator selector
         expect(wrapper.find(PermissionCandidateSelect).prop('value')).toBe(null);
 
-        // initial value of the access right is "null"
-        expect(wrapper.find(Dropdown).prop('label')).toBe("Select access right");
+        // initial value of the access level is "null"
+        expect(wrapper.find(Dropdown).prop('label')).toBe("Select access level");
 
         // render cancel and submit buttons
         expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');
@@ -93,11 +93,11 @@ describe('AlterPermissionDialog', () => {
                 classes={{}}
                 principal={mockPrincipal}
                 access={mockPrincipal.access}
-                accessRights={AccessRights}
+                accessLevels={accessLevels}
                 collection={mockCollection}
                 currentUser={mockCurrentLoggedUser}
                 setPermission={mockSetPermissionFn}
-                title="Select access right for a collaborator"
+                title="Select access level for a collaborator"
             />
         );
 

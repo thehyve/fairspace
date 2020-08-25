@@ -11,11 +11,12 @@ import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import PermissionViewer from "./PermissionViewer";
-import {getAccessModeDescription, getPrincipalsWithCollectionAccess} from "./permissionUtils";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
+import {accessLevels} from "../collections/CollectionAPI";
+import {getAccessModeDescription, getPrincipalsWithCollectionAccess} from "../collections/collectionUtils";
 
 const styles = theme => ({
     expand: {
@@ -44,9 +45,8 @@ const styles = theme => ({
         verticalAlign: 'middle',
         margin: '0 4px'
     },
-    propertyLabel: {
-        margin: 'auto',
-        width: '50%'
+    label: {
+        fontWeight: 'bold'
     },
     propertyText: {
         marginTop: 2,
@@ -55,8 +55,8 @@ const styles = theme => ({
         width: '100%'
     },
     propertyDiv: {
-        marginLeft: 32,
-        marginRight: 32,
+        marginLeft: 16,
+        marginRight: 16,
         marginBottom: 16
     }
 });
@@ -65,12 +65,18 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     const [expanded, setExpanded] = useState(false);
     const [changingAccessMode, setChangingAccessMode] = useState(false);
     const [selectedAccessMode, setSelectedAccessMode] = useState(collection.accessMode);
-    const {setAccessMode} = useContext(CollectionsContext);
+
+    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace)
+        ? collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace).access : "None";
+    const [changingOwnerWorkspaceAccess, setChangingOwnerWorkspaceAccess] = useState(false);
+    const [selectedOwnerWorkspaceAccess, setSelectedOwnerWorkspaceAccess] = useState(ownerWorkspaceAccess);
+    const {setAccessMode, setPermission} = useContext(CollectionsContext);
 
     const toggleExpand = () => setExpanded(!expanded);
-    const collaboratingUsers = getPrincipalsWithCollectionAccess(users, collection.userPermissions, 'User');
-    const collaboratingWorkspaces = getPrincipalsWithCollectionAccess(workspaces, collection.workspacePermissions, 'Workspace');
-    const allCollaborators = [...collaboratingWorkspaces, ...collaboratingUsers];
+    const collaboratingUsers = getPrincipalsWithCollectionAccess(users, collection.userPermissions);
+    const collaboratingWorkspaces = getPrincipalsWithCollectionAccess(workspaces, collection.workspacePermissions);
+
+    const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== "List");
 
     const handleSetAccessMode = (event) => {
         if (collection.canManage) {
@@ -89,13 +95,36 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
             .then(handleCancelSetAccessMode)
             .catch(err => ErrorDialog.showError(
                 err,
-                "An error occurred while deleting a collection",
+                "An error occurred while setting an access mode",
                 () => handleConfirmSetAccessMode()
             ))
             .finally(setBusy(false));
     };
 
-    const permissionIcons = allCollaborators
+    const handleSetOwnerWorkspaceAccess = (event) => {
+        if (collection.canManage) {
+            setSelectedOwnerWorkspaceAccess(event.target.value);
+            setChangingOwnerWorkspaceAccess(true);
+        }
+    };
+
+    const handleCancelSetOwnerWorkspaceAccess = () => {
+        setChangingOwnerWorkspaceAccess(false);
+    };
+
+    const handleConfirmSetOwnerWorkspaceAccess = () => {
+        setBusy(true);
+        setPermission(collection.location, collection.ownerWorkspace, selectedOwnerWorkspaceAccess)
+            .then(handleCancelSetOwnerWorkspaceAccess)
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while setting an access level",
+                () => handleConfirmSetOwnerWorkspaceAccess()
+            ))
+            .finally(setBusy(false));
+    };
+
+    const permissionIcons = collaboratingUsers
         .slice(0, maxCollaboratorIcons)
         .map(({iri, name}) => (
             <Avatar
@@ -109,9 +138,9 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     const cardHeaderAction = (
         <>
             {permissionIcons}
-            {allCollaborators.length > maxCollaboratorIcons ? (
+            {collaboratingUsers.length > maxCollaboratorIcons ? (
                 <div className={classes.additionalCollaborators}>
-                    + {allCollaborators.length - maxCollaboratorIcons}
+                    + {collaboratingUsers.length - maxCollaboratorIcons}
                 </div>
             ) : ''}
             <IconButton
@@ -144,7 +173,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     const renderAccessMode = () => (
         <div className={classes.propertyDiv}>
             <FormControl className={classes.propertyText}>
-                <InputLabel id="demo-simple-select-helper-label">View mode:</InputLabel>
+                <InputLabel className={classes.label}>View mode:</InputLabel>
                 <Select
                     value={collection.accessMode}
                     onChange={mode => handleSetAccessMode(mode)}
@@ -155,6 +184,39 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                         <MenuItem key={mode} value={mode}>
                             <span style={{marginRight: 10}}>{camelCaseToWords(mode)}</span>
                             <FormHelperText>{getAccessModeDescription(mode)}</FormHelperText>
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+        </div>
+    );
+
+    const renderOwnerWorkspaceAccessChangeConfirmation = () => (
+        <ConfirmationDialog
+            open
+            title="Confirmation"
+            content={`Are you sure you want to change all workspace members access to ${selectedOwnerWorkspaceAccess} for ${collection.name} collection?`}
+            dangerous
+            agreeButtonText="Confirm"
+            onAgree={handleConfirmSetOwnerWorkspaceAccess}
+            onDisagree={handleCancelSetOwnerWorkspaceAccess}
+            onClose={handleCancelSetOwnerWorkspaceAccess}
+        />
+    );
+
+    const renderOwnerWorkspaceAccess = () => (
+        <div className={classes.propertyDiv}>
+            <FormControl className={classes.propertyText}>
+                <InputLabel className={classes.label}>Default access for all workspace members:</InputLabel>
+                <Select
+                    value={ownerWorkspaceAccess}
+                    onChange={access => handleSetOwnerWorkspaceAccess(access)}
+                    inputProps={{'aria-label': 'Owner workspace access'}}
+                    disabled={!collection.canManage}
+                >
+                    {availableWorkspaceMembersAccessLevels.map(access => (
+                        <MenuItem key={access} value={access}>
+                            <span style={{marginRight: 10}}>{access}</span>
                         </MenuItem>
                     ))}
                 </Select>
@@ -176,15 +238,16 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
                     {renderAccessMode()}
+                    {renderOwnerWorkspaceAccess()}
                     <PermissionViewer
                         collection={collection}
-                        users={users}
-                        collaborators={allCollaborators}
-                        workspaces={workspaces}
+                        collaboratingUsers={collaboratingUsers}
+                        collaboratingWorkspaces={collaboratingWorkspaces}
                         workspaceUsers={workspaceUsers}
                     />
                 </CardContent>
                 {changingAccessMode && renderAccessModeChangeConfirmation()}
+                {changingOwnerWorkspaceAccess && renderOwnerWorkspaceAccessChangeConfirmation()}
             </Collapse>
         </Card>
     );

@@ -1,13 +1,73 @@
 import {buildSearchUrl} from "../search/searchUtils";
 import {COMMENT_URI, LABEL_URI} from "../constants";
-import {compareTo} from "../permissions/permissionUtils";
-import type {Collection, CollectionPermissions, Status} from "./CollectionAPI";
+import type {
+    AccessLevel,
+    AccessMode,
+    Collection,
+    CollectionPermissions,
+    Permission,
+    PrincipalPermission,
+    Status
+} from "./CollectionAPI";
+// eslint-disable-next-line import/no-cycle
+import {accessLevels} from "./CollectionAPI";
+import {compareBy, comparing} from "../common/utils/genericUtils";
 
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 
 export const handleCollectionSearchRedirect = (history, value) => {
     const searchUrl = value ? buildSearchUrl(value) : '';
     history.push(`/collections${searchUrl}`);
+};
+
+const permissionLevel = p => accessLevels.indexOf(p.access);
+export const sortPermissions = (permissions) => {
+    if (!permissions) {
+        return [];
+    }
+    return permissions.sort(comparing(
+        compareBy(permissionLevel, false),
+        compareBy('name')
+    ));
+};
+export const compareTo: boolean = (currentAccess, baseAccess) => (
+    permissionLevel(currentAccess) >= permissionLevel(baseAccess)
+);
+/**
+ * Check if collaborator can alter permission. User can alter permission if:
+ * - has manage access to a resource
+ * - permission is not his/hers
+ */
+export const canAlterPermission = (canManage, user, currentLoggedUser) => {
+    const isSomeoneElsePermission = currentLoggedUser.iri !== user.iri;
+    return canManage && isSomeoneElsePermission;
+};
+export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
+    iri: principalProperties.iri,
+    name: principalProperties.name,
+    access
+});
+export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principals, permissions: Permission[]) => {
+    const results = [];
+    principals.forEach(u => {
+        const permission = permissions.find(p => p.iri === u.iri);
+        if (permission) {
+            results.push(mapPrincipalPermission(u, permission.access));
+        }
+    });
+    return results;
+};
+export const getAccessModeDescription = (accessMode: AccessMode) => {
+    switch (accessMode) {
+        case "Restricted":
+            return "Collection data limited to users with explicitly granted access.";
+        case "MetadataPublished":
+            return "All users can see collection metadata";
+        case "DataPublished":
+            return "All users can see collection data";
+        default:
+            return "Unrecognized view mode";
+    }
 };
 
 export const mapCollectionPermissions: CollectionPermissions = (access) => ({
@@ -38,7 +98,6 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateDeleted: properties.dateDeleted,
     accessMode: properties.accessMode,
     status: properties.status,
-    accessModes: properties.accessModes,
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),
     ...(properties.access && mapCollectionPermissions(properties.access)),

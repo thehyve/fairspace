@@ -14,6 +14,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 import {getStatusDescription} from "./collectionUtils";
+import {statuses} from './CollectionAPI';
 
 export const styles = {
     group: {
@@ -65,17 +66,20 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                             value={selectedValue}
                             onChange={handleValueChange}
                         >
-                            {collection.availableStatuses.map(status => (
-                                <span className={classes.groupItem}>
-                                    <FormControlLabel
-                                        key={status}
-                                        value={status}
-                                        control={<Radio />}
-                                        label={camelCaseToWords(status)}
-                                    />
-                                    <FormHelperText className={classes.helperText}>{getStatusDescription(status)}</FormHelperText>
-                                </span>
-                            ))}
+                            {statuses.filter(status => collection.availableStatuses.includes(status))
+                                .map(status => (
+                                    <span className={classes.groupItem}>
+                                        <FormControlLabel
+                                            key={status}
+                                            value={status}
+                                            control={<Radio />}
+                                            label={camelCaseToWords(status)}
+                                        />
+                                        <FormHelperText className={classes.helperText}>
+                                            {getStatusDescription(status)}
+                                        </FormHelperText>
+                                    </span>
+                                ))}
                         </RadioGroup>
                     </FormControl>
                 </div>

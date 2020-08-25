@@ -4,16 +4,16 @@ import {shallow} from "enzyme";
 
 import {Button} from "@material-ui/core";
 import {PermissionViewer} from "../PermissionViewer";
-import PermissionsList from "../PermissionsList";
+import UserPermissionsList from "../UserPermissionsList";
 
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
-    const permissionsListProps = wrapper.find(PermissionsList).first().props();
+    const permissionsListProps = wrapper.find(UserPermissionsList).first().props();
     expect(permissionsListProps.permissions.length).toBe(numberOfCollaborators);
     expect(permissionsListProps.selectedPrincipal).toBe(null);
 };
 
 const testOrderingOfCollaborators = (wrapper) => {
-    const permissionsListProps = wrapper.find(PermissionsList).first().props();
+    const permissionsListProps = wrapper.find(UserPermissionsList).first().props();
     expect(permissionsListProps.permissions.map(p => p.iri)).toEqual(
         ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id']
     );

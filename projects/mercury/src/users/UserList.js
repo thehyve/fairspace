@@ -19,7 +19,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Checkbox from "@material-ui/core/Checkbox";
 import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
-import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User} from "./UsersAPI";
 import UsersContext from "./UsersContext";
@@ -32,6 +31,7 @@ import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspac
 import UserContext from "./UserContext";
 import {getWorkspaceUsersWithRoles} from "./userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
+import {canAlterPermission} from "../collections/collectionUtils";
 
 const columns = {
     name: {

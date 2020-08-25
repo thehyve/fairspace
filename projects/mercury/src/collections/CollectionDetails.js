@@ -14,6 +14,7 @@ import {
 import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 
+import FormHelperText from "@material-ui/core/FormHelperText";
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource, Status} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
@@ -33,9 +34,6 @@ import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionPropertyChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 import {getStatusDescription} from "./collectionUtils";
-import FormHelperText from "@material-ui/core/FormHelperText";
-
-import {statuses} from './CollectionAPI';
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,

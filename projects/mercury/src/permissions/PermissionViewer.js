@@ -1,18 +1,14 @@
-import React, {useContext, useState} from 'react';
-import {Button, List} from "@material-ui/core";
-import {Person, Widgets} from "@material-ui/icons";
-import AlterPermissionDialog from "./AlterPermissionDialog";
-import {mapPrincipalPermission, sortPermissions} from './permissionUtils';
+import React, {useContext} from 'react';
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
-import PermissionsList from "./PermissionsList";
+import UserPermissionsList from "./UserPermissionsList";
 import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
+import WorkspacePermissionsList from "./WorkspacePermissionsList";
+import {sortPermissions} from "../collections/collectionUtils";
 
-export const PermissionViewer = ({collection, users, workspaces, workspaceUsers, collaborators, currentUser, setPermission, error, loading}) => {
-    const [showPermissionDialog, setShowPermissionDialog] = useState(false);
-    const [selectedPrincipal, setSelectedPrincipal] = useState(null);
-
+export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorkspaces,
+    collaboratingUsers, currentUser, setPermission, error, loading}) => {
     if (error) {
         return (<MessageDisplay message="An error occurred loading permissions" />);
     }
@@ -20,82 +16,35 @@ export const PermissionViewer = ({collection, users, workspaces, workspaceUsers,
         return (<LoadingInlay />);
     }
 
-    const sortedCollaborators = sortPermissions(collaborators);
-    const collaborationCandidates = [
-        ...workspaces.map(w => mapPrincipalPermission(w, 'Workspace')),
-        ...users.map(w => mapPrincipalPermission(w, 'User'))]
-        .filter(p => !sortedCollaborators.some(c => c.iri === p.iri));
-
-    const getItemIcon = (principal) => ((principal.type === 'Workspace') ? <Widgets /> : <Person />);
-
-    const handleAlterPermission = (principal) => {
-        setShowPermissionDialog(true);
-        setSelectedPrincipal(principal);
-    };
-
-    const handleAlterPermissionDialogClose = () => {
-        setShowPermissionDialog(false);
-        setSelectedPrincipal(null);
-    };
-
-    const renderPermissionList = () => (
-        <PermissionsList
-            permissions={sortedCollaborators}
+    const renderUserPermissionList = () => (
+        <UserPermissionsList
+            permissions={sortPermissions(collaboratingUsers)}
             collection={collection}
             setPermission={setPermission}
             currentUser={currentUser}
-            selectedPrincipal={selectedPrincipal}
-            setSelectedPrincipal={setSelectedPrincipal}
-            setShowPermissionDialog={setShowPermissionDialog}
-            getItemIcon={getItemIcon}
-        />
-    );
-
-    const renderCollaboratorsList = () => (
-        <List dense disablePadding>
-            {renderPermissionList()}
-            {collection.canManage && (
-                <div>
-                    <Button
-                        variant="text"
-                        title="Share"
-                        aria-label="Share"
-                        color="primary"
-                        onClick={() => handleAlterPermission(null)}
-                    >
-                        Share
-                    </Button>
-                </div>
-            )}
-        </List>
-    );
-
-    const renderPermissionDialog = () => (
-        <AlterPermissionDialog
-            open={showPermissionDialog}
-            onClose={handleAlterPermissionDialogClose}
-            title="Alter permission"
-            principal={selectedPrincipal}
-            access={selectedPrincipal && selectedPrincipal.access}
-            collection={collection}
-            currentUser={currentUser}
-            permissions={sortedCollaborators}
-            permissionCandidates={collaborationCandidates}
             workspaceUsers={workspaceUsers}
         />
     );
 
+    const renderWorkspacePermissionList = () => (
+        <WorkspacePermissionsList
+            permissions={sortPermissions(collaboratingWorkspaces)}
+            setPermission={setPermission}
+            collection={collection}
+        />
+    );
+
     return (
-        <>
-            {renderPermissionDialog()}
-            {renderCollaboratorsList()}
-        </>
+        <div>
+            {renderUserPermissionList()}
+            {renderWorkspacePermissionList()}
+        </div>
     );
 };
 
 PermissionViewer.defaultProps = {};
 
-const ContextualPermissionViewer = ({collection, users, workspaces, workspaceUsers, collaborators}) => {
+const ContextualPermissionViewer = ({collection, workspaceUsers, collaboratingUsers, collaboratingWorkspaces}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {setPermission, loading, error} = useContext(CollectionsContext);
 
@@ -105,10 +54,9 @@ const ContextualPermissionViewer = ({collection, users, workspaces, workspaceUse
             error={currentUserError || error}
             setPermission={setPermission}
             currentUser={currentUser}
-            collaborators={collaborators}
+            collaboratingUsers={collaboratingUsers}
+            collaboratingWorkspaces={collaboratingWorkspaces}
             collection={collection}
-            users={users}
-            workspaces={workspaces}
             workspaceUsers={workspaceUsers}
         />
     );
