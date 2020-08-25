@@ -30,6 +30,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 @Getter
 public class Services {
     public static final Symbol FS_ROOT = Symbol.create("file_system_root");
+    public static final Symbol USER_SERVICE = Symbol.create("user_service");
 
     private final Config config;
     private final Transactions transactions;
@@ -50,6 +51,7 @@ public class Services {
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions);
+        dataset.getContext().set(USER_SERVICE, userService);
 
         mailService = new MailService(config.mail);
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));

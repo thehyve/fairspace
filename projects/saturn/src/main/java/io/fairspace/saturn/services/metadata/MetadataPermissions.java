@@ -7,8 +7,6 @@ import io.fairspace.saturn.webdav.DavFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import static io.fairspace.saturn.auth.RequestContext.*;
-
 public class MetadataPermissions {
     private final WorkspaceService workspaceService;
     private final DavFactory davFactory;
@@ -21,7 +19,7 @@ public class MetadataPermissions {
     }
 
     public boolean canReadMetadata(Resource resource) {
-        if (isSuperAdmin()) {
+        if (userService.currentUser().isAdmin()) {
             return true;
         }
         if (davFactory.isFileSystemResource(resource)) {
@@ -31,11 +29,11 @@ public class MetadataPermissions {
             var ws = workspaceService.getWorkspace(resource.asNode());
             return ws.isCanCollaborate();
         }
-        return userService.currentUser().getSuperadmin();
+        return false;
     }
 
     public boolean canWriteMetadata(Resource resource) {
-        if (isSuperAdmin()) {
+        if (userService.currentUser().isAdmin()) {
             return true;
         }
         if (davFactory.isFileSystemResource(resource)) {
