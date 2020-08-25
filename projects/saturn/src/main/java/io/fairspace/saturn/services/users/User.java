@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.fairspace.saturn.rdf.dao.PersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.vocabulary.RDFS;
@@ -24,16 +25,18 @@ public class User extends PersistentEntity {
     @RDFProperty(EMAIL_URI)
     private String email;
 
-    // Only for the current user
-    private Boolean admin;
+    @RDFProperty(FS.IS_ADMIN_URI)
+    private boolean admin;
 
-    // Only for the current user
-    private Boolean viewPublicMetadata;
+    @RDFProperty(FS.CAN_VIEW_PUBLIC_METADATA_URI)
+    private boolean viewPublicMetadata;
 
-    // Only for the current user
-    private Boolean viewPublicData;
+    @RDFProperty(FS.CAN_VIEW_PUBLIC_DATA_URI)
+    private boolean viewPublicData;
 
-    // Only for the current user
-    private Boolean addSharedMetadata;
+    @RDFProperty(FS.CAN_ADD_SHARED_METADATA_URI)
+    private boolean addSharedMetadata;
 
+    // Can only manage other users' organisation roles
+    private boolean superadmin;
 }

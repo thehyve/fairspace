@@ -4,6 +4,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -18,7 +19,6 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.stream.Collectors.toList;
@@ -26,10 +26,12 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class WorkspaceService {
     private final Transactions tx;
+    private final UserService userService;
     private final MailService mailService;
 
-    public WorkspaceService(Transactions tx, MailService mailService) {
+    public WorkspaceService(Transactions tx, UserService userService, MailService mailService) {
         this.tx = tx;
+        this.userService = userService;
         this.mailService = mailService;
     }
 
@@ -40,7 +42,7 @@ public class WorkspaceService {
                     .stream()
                     .peek(ws -> {
                         var res = m.wrapAsResource(ws.getIri());
-                        ws.setCanManage(isAdmin() || user.hasProperty(FS.isManagerOf, res));
+                        ws.setCanManage(userService.currentUser().isAdmin() || user.hasProperty(FS.isManagerOf, res));
                         ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
                     }).collect(toList());
         });
@@ -54,14 +56,14 @@ public class WorkspaceService {
             }
             var res = model.wrapAsResource(ws.getIri());
             var user = model.wrapAsResource(getUserURI());
-            ws.setCanManage(isAdmin() || user.hasProperty(FS.isManagerOf, res));
+            ws.setCanManage(userService.currentUser().isAdmin() || user.hasProperty(FS.isManagerOf, res));
             ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
             return ws;
         });
     }
 
     public Workspace createWorkspace(Workspace ws) {
-        if (!isAdmin()) {
+        if (!userService.currentUser().isAdmin()) {
             throw new AccessDeniedException();
         }
         validate(ws.getIri() == null, "IRI must be empty");
@@ -94,7 +96,7 @@ public class WorkspaceService {
             }
 
             var workspaceResource = m.wrapAsResource(patch.getIri());
-            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || isAdmin();
+            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || userService.currentUser().isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
             }
@@ -117,7 +119,7 @@ public class WorkspaceService {
     }
 
     public void deleteWorkspace(Node iri) {
-        if (!isAdmin()) {
+        if (!userService.currentUser().isAdmin()) {
             throw new AccessDeniedException();
         }
         validate(iri != null, "No IRI provided");
@@ -156,7 +158,7 @@ public class WorkspaceService {
             var userResource = m.wrapAsResource(user);
             validateResource(workspaceResource, FS.Workspace);
             validateResource(userResource, FS.User);
-            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || isAdmin();
+            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || userService.currentUser().isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
             }

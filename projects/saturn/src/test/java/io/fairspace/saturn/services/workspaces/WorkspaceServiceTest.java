@@ -44,7 +44,7 @@ public class WorkspaceServiceTest {
     @Before
     public void setUp() {
         setupRequestContext();
-        service = new WorkspaceService(txn, mailService);
+        service = new WorkspaceService(txn, userService, mailService);
 
         txn.executeWrite(model -> model
                 .add(WORKSPACE_1, RDF.type, FS.Workspace)

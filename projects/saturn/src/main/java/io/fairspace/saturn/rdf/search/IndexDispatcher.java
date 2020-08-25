@@ -5,7 +5,7 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
 import org.apache.jena.sparql.util.Context;
 
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
+import static io.fairspace.saturn.auth.RequestContext.isSuperAdmin;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.Services.FS_ROOT;
 
@@ -40,7 +40,7 @@ public class IndexDispatcher {
     }
 
     public String[] getAvailableIndexes() {
-        if (isAdmin()) {
+        if (isSuperAdmin()) {
             return ALL_INDEXES;
         }
 

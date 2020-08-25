@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
+import static io.fairspace.saturn.auth.RequestContext.isSuperAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
@@ -168,7 +168,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
 
         return Stream.of(AccessMode.values())
-                .filter(mode -> isAdmin() || (mode.compareTo(getAccessMode()) >= 0 && availableModes.contains(mode)))
+                .filter(mode -> isSuperAdmin() || (mode.compareTo(getAccessMode()) >= 0 && availableModes.contains(mode)))
                 .collect(toSet());
     }
 

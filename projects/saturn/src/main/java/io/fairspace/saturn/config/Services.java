@@ -53,13 +53,13 @@ public class Services {
 
         mailService = new MailService(config.mail);
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, mailService);
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, mailService);
         dataset.getContext().set(FS_ROOT, davFactory.root);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        workspaceService = new WorkspaceService(transactions, mailService);
+        workspaceService = new WorkspaceService(transactions, userService, mailService);
 
-        metadataPermissions = new MetadataPermissions(workspaceService, davFactory);
+        metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),

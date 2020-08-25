@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -37,6 +38,8 @@ public class CollectionResourceTest {
     @Mock
     BlobStore store;
     @Mock
+    UserService userService;
+    @Mock
     MailService mailService;
 
     @SneakyThrows
@@ -47,7 +50,7 @@ public class CollectionResourceTest {
                 .add(COLLECTION_1, RDF.type, FS.Collection)
                 .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1);
 
-        DavFactory factory = new DavFactory(model.createResource(baseUri), store, mailService);
+        DavFactory factory = new DavFactory(model.createResource(baseUri), store, userService, mailService);
         resource = new CollectionResource(factory, COLLECTION_1, Access.Manage);
     }
 

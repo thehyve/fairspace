@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
@@ -112,7 +111,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
             if (!factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
                     && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
-                    && !isAdmin()) {
+                    && !factory.userService.currentUser().isAdmin()) {
                 throw new NotAuthorizedException();
             }
 

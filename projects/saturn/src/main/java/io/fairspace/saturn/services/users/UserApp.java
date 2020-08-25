@@ -2,11 +2,9 @@ package io.fairspace.saturn.services.users;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static io.fairspace.saturn.auth.RequestContext.*;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.get;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class UserApp extends BaseApp {
     private final UserService service;
@@ -23,13 +21,15 @@ public class UserApp extends BaseApp {
             return mapper.writeValueAsString(service.getUsers());
         });
 
+        patch("/",  (req, res) -> {
+            service.update(mapper.readValue(req.body(), UserRolesUpdate.class));
+            res.status(SC_NO_CONTENT);
+            return "";
+        });
+
         get("/current", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            var user = service.getUser(getUserURI());
-            user.setAdmin(isAdmin());
-            user.setViewPublicMetadata(canViewPublicMetadata());
-            user.setViewPublicData(canViewPublicData());
-            user.setAddSharedMetadata(canAddSharedMetadata());
+            var user = service.currentUser();
             return mapper.writeValueAsString(user);
         });
 
