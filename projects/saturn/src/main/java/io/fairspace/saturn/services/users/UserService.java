@@ -85,6 +85,14 @@ public class UserService {
                         user.setIri(iri);
                         user.setId(ku.getId());
 
+                        if (config.superAdminUser.equals(ku.getUsername())) {
+                            user.setSuperadmin(true);
+                            user.setAdmin(true);
+                            user.setCanViewPublicMetadata(true);
+                            user.setCanViewPublicData(true);
+                            user.setCanAddSharedMetadata(true);
+                        }
+
                         updated.add(user);
                     }
 
@@ -97,8 +105,6 @@ public class UserService {
                         user.setName(name);
                         updated.add(user);
                     }
-
-                    user.setSuperadmin(config.superAdminUser.equals(ku.getUsername()));
 
                     return user;
                 }).collect(toList());
@@ -135,18 +141,34 @@ public class UserService {
             if (user == null) {
                 throw new NotFoundException();
             }
+            if (user.isSuperadmin()) {
+                throw new IllegalArgumentException("Cannot modify superadmin's roles");
+            }
             if (roles.getAdmin() != null) {
                 user.setAdmin(roles.getAdmin());
+                if (user.isAdmin()) {
+                    user.setCanViewPublicData(true);
+                    user.setCanViewPublicMetadata(true);
+                }
             }
-            if (roles.getViewPublicMetadata() != null) {
-                user.setViewPublicMetadata(roles.getViewPublicMetadata());
+            if (roles.getCanViewPublicData() != null) {
+                user.setCanViewPublicData(roles.getCanViewPublicData());
+                if (user.isCanViewPublicData()) {
+                    user.setCanViewPublicMetadata(true);
+                }
             }
-            if (roles.getViewPublicData() != null) {
-                user.setViewPublicData(roles.getViewPublicData());
+            if (roles.getCanViewPublicMetadata() != null) {
+                user.setCanViewPublicMetadata(roles.getCanViewPublicMetadata());
             }
-            if (roles.getAddSharedMetadata() != null) {
-                user.setAddSharedMetadata(roles.getAddSharedMetadata());
+            if (roles.getCanAddSharedMetadata() != null) {
+                user.setCanAddSharedMetadata(roles.getCanAddSharedMetadata());
             }
+
+            if (user.isAdmin() && !user.isCanViewPublicData()
+            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()) {
+                throw new IllegalArgumentException("Inconsistent organisation-level roles");
+            }
+
             dao.write(user);
         });
     }

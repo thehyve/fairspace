@@ -43,6 +43,6 @@ public class MetadataPermissions {
             var ws = workspaceService.getWorkspace(resource.asNode());
             return ws.isCanManage();
         }
-        return userService.currentUser().isViewPublicMetadata();
+        return userService.currentUser().isCanViewPublicMetadata();
     }
 }

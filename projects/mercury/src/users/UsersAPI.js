@@ -16,7 +16,11 @@ export type User = {
     name: string;
     email?: string;
     access: string;
-    roles: UserRoles;
+    isSuperadmin: boolean;
+    isAdmin: boolean;
+    canViewPublicMetadata: boolean;
+    canViewPublicData: boolean;
+    canAddSharedMetadata: boolean;
 }
 
 const requestOptions = {

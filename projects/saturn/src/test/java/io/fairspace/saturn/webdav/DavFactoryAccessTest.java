@@ -81,8 +81,8 @@ public class DavFactoryAccessTest {
     @Before
     public void before() {
         setupRequestContext();
-        user.setViewPublicData(true);
-        user.setViewPublicMetadata(true);
+        user.setCanViewPublicData(true);
+        user.setCanViewPublicMetadata(true);
         when(userService.currentUser()).thenReturn(user);
         factory = new DavFactory(model.createResource(baseUri), store, userService, mailService);
     }

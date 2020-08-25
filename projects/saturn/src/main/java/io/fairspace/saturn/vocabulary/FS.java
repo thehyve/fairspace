@@ -144,5 +144,6 @@ public class FS {
     public static final String CAN_VIEW_PUBLIC_METADATA_URI = NS + "canViewPublicMetadata";
     public static final String CAN_VIEW_PUBLIC_DATA_URI = NS + "canViewPublicData";
     public static final String CAN_ADD_SHARED_METADATA_URI = NS + "canAddSharedMetadata";
+    public static final String IS_SUPERADMIN_URI = NS + "isSuperadmin";
 }
 
