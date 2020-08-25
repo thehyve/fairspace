@@ -523,8 +523,19 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         dash:singleLine true ;
         fs:importantProperty true ;
-        sh:path rdfs:label;
+        fs:machineOnly true ;
+        sh:path rdfs:label ;
         sh:order 0
+    ],
+    [
+        sh:name "Short description";
+        sh:description "Short public description of the workspace." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:comment ;
+        sh:order 1
     ],
     [
         sh:path fs:workspaceDescription ;
@@ -534,5 +545,5 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:order 2
-] .
+    ] .
 

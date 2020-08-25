@@ -7,13 +7,11 @@ import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.fairspace.saturn.audit.Audit.audit;
@@ -42,6 +40,18 @@ public class WorkspaceService {
                         var res = m.wrapAsResource(ws.getIri());
                         ws.setCanManage(isAdmin() || user.hasProperty(FS.isManagerOf, res));
                         ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
+                        var collectionCount = m
+                                .listSubjectsWithProperty(RDF.type, FS.Collection)
+                                .filterKeep(collection -> collection.hasProperty(FS.ownedBy, res))
+                                .toList().size();
+                        var memberCount = m
+                                .listSubjectsWithProperty(RDF.type, FS.User)
+                                .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
+                                .toList().size();
+                        ws.setSummary(WorkspaceSummary.builder()
+                                .collectionCount(collectionCount)
+                                .memberCount(memberCount)
+                                .build());
                     }).collect(toList());
         });
     }
@@ -60,6 +70,16 @@ public class WorkspaceService {
         });
     }
 
+    private Optional<Workspace> findExistingWorkspace(Model model, String name) {
+        return new DAO(model).list(Workspace.class)
+                .stream()
+                .filter(ws -> {
+                    var res = model.wrapAsResource(ws.getIri());
+                    return res.hasLiteral(model.createProperty(RDFS.uri, "label"), name);
+                })
+                .findAny();
+    }
+
     public Workspace createWorkspace(Workspace ws) {
         if (!isAdmin()) {
             throw new AccessDeniedException();
@@ -71,6 +91,11 @@ public class WorkspaceService {
         }
 
         var created = tx.calculateWrite(m -> {
+            var conflictingWorkspace = findExistingWorkspace(m, ws.getName());
+            if (conflictingWorkspace.isPresent()) {
+                throw new IllegalArgumentException("Workspace already exists with the same name.");
+            }
+
             var workspace = new DAO(m).write(ws);
 
             m.wrapAsResource(getUserURI()).addProperty(FS.isManagerOf, m.wrapAsResource(workspace.getIri()));
@@ -100,7 +125,15 @@ public class WorkspaceService {
             }
 
             if (patch.getName() != null && !patch.getName().equals(workspace.getName())) {
+                var conflictingWorkspace = findExistingWorkspace(m, patch.getName());
+                if (conflictingWorkspace.isPresent()) {
+                    throw new IllegalArgumentException("Workspace already exists with the same name.");
+                }
                 workspace.setName(patch.getName());
+            }
+
+            if (patch.getComment() != null && !patch.getComment().equals(workspace.getComment())) {
+                workspace.setComment(patch.getComment());
             }
 
             if (patch.getDescription() != null && !patch.getDescription().equals(workspace.getDescription())) {
