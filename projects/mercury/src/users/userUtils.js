@@ -2,16 +2,16 @@ import type {User} from "./UsersAPI";
 import type {WorkspaceUserRole} from "../workspaces/WorkspacesAPI";
 import type {Permission} from "../collections/CollectionAPI";
 
-export function getDisplayName(user) {
+export function getDisplayName(user: User) {
     return (user && user.name) || '';
 }
 
-export function getEmail(user) {
+export function getEmail(user: User) {
     return (user && user.email) || '';
 }
 
-export const isAdmin = user => user && user.admin;
-export const canAddSharedMetadata = user => user && (user.addSharedMetadata || user.admin);
+export const isAdmin = (user: User) => user && user.roles && user.roles.admin;
+export const canAddSharedMetadata = (user: User) => user && user.roles && (user.roles.addSharedMetadata || user.roles.admin);
 
 export const getWorkspaceUsersWithRoles = (users: User[], workspaceRoles: WorkspaceUserRole[]) => {
     const members = [];

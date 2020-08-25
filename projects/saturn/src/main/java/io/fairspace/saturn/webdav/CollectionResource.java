@@ -7,45 +7,23 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import javax.xml.namespace.QName;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.name;
-import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
-import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
-    private static final QName OWNED_BY_PROPERTY = new QName(FS.ownedBy.getNameSpace(), FS.ownedBy.getLocalName());
-    private static final QName CREATED_BY_PROPERTY = new QName(FS.createdBy.getNameSpace(), FS.createdBy.getLocalName());
-    private static final QName COMMENT_PROPERTY = new QName(RDFS.comment.getNameSpace(), RDFS.comment.getLocalName());
-    private static final QName ACCESS_PROPERTY = new QName(FS.NS, "access");
-    private static final QName ACCESS_MODE_PROPERTY = new QName(FS.accessMode.getNameSpace(), FS.accessMode.getLocalName());
-    private static final QName AVAILABLE_ACCESS_MODES_PROPERTY = new QName(FS.NS, "availableAccessModes");
-    private static final QName USER_PERMISSIONS_PROPERTY = new QName(FS.NS, "userPermissions");
-    private static final QName WORKSPACE_PERMISSIONS_PROPERTY = new QName(FS.NS, "workspacePermissions");
-    private static final PropertyMetaData OWNED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData CREATED_BY_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData COMMENT_PROPERTY_META = new PropertyMetaData(WRITABLE, String.class);
-    private static final PropertyMetaData ACCESS_PROPERTY_META = new PropertyMetaData(READ_ONLY, Access.class);
-    private static final PropertyMetaData ACCESS_MODE_PROPERTY_META = new PropertyMetaData(READ_ONLY, AccessMode.class);
-    private static final PropertyMetaData PERMISSIONS_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
-    private static final PropertyMetaData AVAILABLE_ACCESS_MODES_PROPERTY_META = new PropertyMetaData(READ_ONLY, String.class);
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -150,26 +128,45 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Property
     public String getAvailableAccessModes() {
-        return getAvailableAccessModesSet()
+        return availableAccessModes()
                 .stream()
                 .map(Enum::name)
                 .collect(joining(","));
     }
 
-    public Set<AccessMode> getAvailableAccessModesSet() {
-        var availableModes = EnumSet.of(getAccessMode());
-
+    /**
+     * Compute available access modes for the collection, given its current status
+     * and the user's permissions.
+     *
+     * Returns only the current access mode when:
+     * - the current user does not have manage permission; or
+     * - the status is {@link Status#Closed} (which forbids changing its access mode); or
+     * - the access mode is {@link AccessMode#DataPublished}, which is terminal;
+     * returns all access modes except that {@link AccessMode#DataPublished} is only
+     * included when in status {@link Status#Archived} and {@link AccessMode#Restricted} is
+     * excluded when in status {@link Status#Archived}.
+     */
+    public Set<AccessMode> availableAccessModes() {
         if (!access.canManage()) {
-            return availableModes;
+            return EnumSet.of(getAccessMode());
         }
 
-        if (getStatus() == Status.Active || getStatus() == Status.Closed) {
-            availableModes.addAll(EnumSet.of(AccessMode.Restricted, AccessMode.MetadataPublished));
+        if (getStatus() == Status.Closed) {
+            return EnumSet.of(getAccessMode());
         }
 
-        return Stream.of(AccessMode.values())
-                .filter(mode -> isAdmin() || (mode.compareTo(getAccessMode()) >= 0 && availableModes.contains(mode)))
-                .collect(toSet());
+        if (getAccessMode() == AccessMode.DataPublished) {
+            return EnumSet.of(getAccessMode());
+        }
+
+        var accessModes = EnumSet.of(AccessMode.MetadataPublished);
+
+        if (getStatus() == Status.Archived) {
+            accessModes.add(AccessMode.DataPublished);
+        } else {
+            accessModes.add(AccessMode.Restricted);
+        }
+        return accessModes;
     }
 
     @Property
@@ -200,13 +197,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Property
     public String getAvailableStatuses() {
-        return getAvailableStatusesSet()
+        return availableStatuses()
                 .stream()
                 .map(Enum::name)
                 .collect(joining(","));
     }
 
-    public Set<Status> getAvailableStatusesSet() {
+    public Set<Status> availableStatuses() {
         if (!access.canManage()) {
             return EnumSet.of(getStatus());
         }
@@ -244,7 +241,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
                 });
     }
 
-
     @Override
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
@@ -260,7 +256,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!access.canManage()) {
             throw new NotAuthorizedException(this);
         }
-        if (!getAvailableStatusesSet().contains(status)) {
+        if (!availableStatuses().contains(status)) {
             throw new ConflictException(this);
         }
         subject.removeAll(FS.status).addProperty(FS.status, status.name());
@@ -270,7 +266,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!access.canManage()) {
             throw new NotAuthorizedException(this);
         }
-        if (!getAvailableAccessModesSet().contains(mode)) {
+        if (!availableAccessModes().contains(mode)) {
             throw new ConflictException(this);
         }
         subject.removeAll(FS.accessMode).addProperty(FS.accessMode, mode.name());
