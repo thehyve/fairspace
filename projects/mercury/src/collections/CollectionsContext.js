@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import type {Collection, CollectionProperties} from './CollectionAPI';
+import type {AccessLevel, AccessMode, Collection, CollectionProperties, Status} from './CollectionAPI';
 import CollectionAPI from "./CollectionAPI";
 import useAsync from "../common/hooks/UseAsync";
 import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
@@ -22,9 +22,9 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const deleteCollection = (collection: CollectionProperties) => collectionApi.deleteCollection(collection, showDeleted).then(refresh);
     const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh);
     const relocateCollection = (oldLocation: string, newLocation: string) => collectionApi.relocateCollection(oldLocation, newLocation).then(refresh);
-    const setPermission = (location: string, principal: string, access: string) => collectionApi.setPermission(location, principal, access).then(refresh);
-    const setAccessMode = (location: string, mode: string) => collectionApi.setAccessMode(location, mode).then(refresh);
-    const setStatus = (location: string, status: string) => collectionApi.setStatus(location, status).then(refresh);
+    const setPermission = (location: string, principal: string, access: AccessLevel) => collectionApi.setPermission(location, principal, access).then(refresh);
+    const setAccessMode = (location: string, mode: AccessMode) => collectionApi.setAccessMode(location, mode).then(refresh);
+    const setStatus = (location: string, status: Status) => collectionApi.setStatus(location, status).then(refresh);
     const setOwnedBy = (location: string, owner: string) => collectionApi.setOwnedBy(location, owner).then(refresh);
 
     return (
