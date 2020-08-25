@@ -7,16 +7,16 @@ import type {Workspace} from '../WorkspacesAPI';
 
 describe('WorkspaceList', () => {
     it('shows message when no workspaces are available', () => {
-        const {getByText} = render(<MemoryRouter><WorkspaceList /></MemoryRouter>);
+        const {getByText} = render(<MemoryRouter><WorkspaceList workspaces={[]} /></MemoryRouter>);
         expect(getByText(/Please create a workspace/i))
             .toBeInTheDocument();
     });
 
     it('displays the list of workspaces', () => {
         const workspaces: Workspace[] = [{
-            id: 'workspace1', name: 'workspace-1', status: 'Active'
+            id: 'workspace1', name: 'workspace-1', comment: 'First workspace'
         }, {
-            id: 'workspace2', name: 'workspace-2', status: 'Active'
+            id: 'workspace2', name: 'workspace-2', comment: 'Second workspace'
         }];
         const {getByText} = render(<MemoryRouter><WorkspaceList workspaces={workspaces} /></MemoryRouter>);
         expect(getByText('Name'))
