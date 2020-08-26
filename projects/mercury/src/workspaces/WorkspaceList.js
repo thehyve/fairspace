@@ -2,6 +2,7 @@
 import React, {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {
+    Chip,
     Paper,
     Table,
     TableBody,
@@ -38,19 +39,31 @@ const columns = {
         valueExtractor: 'comment',
         label: 'Short description'
     },
-    collections: {
+    collectionCount: {
         valueExtractor: 'summary.collectionCount',
         label: 'Collections',
         align: 'right'
     },
-    members: {
+    memberCount: {
         valueExtractor: 'summary.memberCount',
         label: 'Members',
         align: 'right'
     },
+    managers: {
+        valueExtractor: 'managers',
+        label: 'Managers'
+    },
     menu: {
         label: ' '
     }
+};
+
+const EmailChip = ({email, label}) => {
+    const chip = <Chip style={{cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
+    if (email) {
+        return <a title={email} href={`mailto:${email}`}>{chip}</a>;
+    }
+    return chip;
 };
 
 const WorkspaceList = (props: WorkspaceListProps) => {
@@ -115,11 +128,16 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                 <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="comment">
                                     {workspace.comment}
                                 </TableCell>
-                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="summary.collectionCount">
+                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
                                     {workspace.summary ? workspace.summary.collectionCount : ''}
                                 </TableCell>
-                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="summary.memberCount">
+                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
                                     {workspace.summary ? workspace.summary.memberCount : ''}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
+                                    {workspace.managers ? workspace.managers.map(m => (
+                                        <EmailChip key={m.iri} email={m.email} label={m.name} />
+                                    )) : ''}
                                 </TableCell>
                                 <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
                                     { isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} /> }

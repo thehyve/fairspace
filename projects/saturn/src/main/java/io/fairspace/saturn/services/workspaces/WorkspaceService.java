@@ -4,6 +4,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -48,10 +49,14 @@ public class WorkspaceService {
                                 .listSubjectsWithProperty(RDF.type, FS.User)
                                 .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
                                 .toList().size();
+                        var managers = new DAO(m).list(User.class).stream()
+                                .filter(u -> m.wrapAsResource(u.getIri()).hasProperty(FS.isManagerOf, res))
+                                .collect(toList());
                         ws.setSummary(WorkspaceSummary.builder()
                                 .collectionCount(collectionCount)
-                                .memberCount(memberCount)
+                                .memberCount(memberCount + managers.size())
                                 .build());
+                        ws.setManagers(managers);
                     }).collect(toList());
         });
     }

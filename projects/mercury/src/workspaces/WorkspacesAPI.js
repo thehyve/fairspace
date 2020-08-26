@@ -2,6 +2,7 @@
 import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
+import type {User} from '../users/UsersAPI';
 
 const workspacesUrl = "/api/v1/workspaces/";
 
@@ -25,6 +26,7 @@ export type WorkspaceProperties = {|
     comment?: string;
     description?: string;
     summary ?: WorkspaceSummary;
+    managers?: User[];
 |}
 
 export type Resource = {|
