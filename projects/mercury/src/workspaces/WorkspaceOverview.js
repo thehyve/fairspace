@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import PropTypes from 'prop-types';
 import Tabs from '@material-ui/core/Tabs';
@@ -46,10 +46,10 @@ const a11yProps = (index) => ({
 });
 
 const WorkspaceOverview = (props) => {
-    const [value, setValue] = React.useState(0);
+    const [selectedTab, setSelectedTab] = useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
-    const workspace = workspaces.find(w => w.iri === currentWorkspace());
+    const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
 
     if (workspacesLoading) {
         return (<LoadingInlay />);
@@ -61,11 +61,20 @@ const WorkspaceOverview = (props) => {
         return (<MessageDisplay message="You don't have sufficient permissions to access the workspace." />);
     }
     if (workspacesError || !workspace.iri) {
-        return (<MessageDisplay message="Error loading workspaces" />);
+        return (<MessageDisplay message="Error loading workspace." />);
     }
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        const updated = workspaces.find(w => w.iri === currentWorkspace());
+        if (updated && workspace !== updated) {
+            setWorkspace(updated);
+        }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [workspaces]);
+
+    const changeTab = (event, tabIndex) => {
+        setSelectedTab(tabIndex);
     };
 
     return (
@@ -74,17 +83,17 @@ const WorkspaceOverview = (props) => {
                 label: 'Workspaces',
                 icon: <Widgets />,
                 href: '/workspaces'
-            },
-            {
-                label: workspace.name,
-                href: workspacePrefix()
             }
         ]}}
         >
-            <BreadCrumbs />
+            <BreadCrumbs additionalSegments={[{
+                label: workspace.name,
+                href: workspacePrefix()
+            }]}
+            />
             <Tabs
-                value={value}
-                onChange={handleChange}
+                value={selectedTab}
+                onChange={changeTab}
                 indicatorColor="primary"
                 textColor="primary"
                 aria-label="workspace tabs"
@@ -93,13 +102,13 @@ const WorkspaceOverview = (props) => {
                 <Tab label="Users" {...a11yProps(1)} />
                 <Tab label="Collections" {...a11yProps(2)} />
             </Tabs>
-            <TabPanel value={value} index={0}>
+            <TabPanel value={selectedTab} index={0}>
                 <WorkspaceInfo workspace={workspace} />
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={selectedTab} index={1}>
                 <UserList workspace={workspace} />
             </TabPanel>
-            <TabPanel value={value} index={2}>
+            <TabPanel value={selectedTab} index={2}>
                 <LinkedDataMetadataProvider>
                     <Collections history={props.history} workspaceIri={workspace.iri} />
                 </LinkedDataMetadataProvider>

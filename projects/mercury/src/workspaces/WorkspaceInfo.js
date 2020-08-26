@@ -7,8 +7,8 @@ import useLinkedData from '../metadata/common/UseLinkedData';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import WorkspaceActionMenu from './WorkspaceActionMenu';
 import {isAdmin} from '../users/userUtils';
-import CollectionsContext from '../collections/CollectionsContext';
 import UserContext from '../users/UserContext';
+import type {Workspace} from './WorkspacesAPI';
 
 const WorkspaceInfoWithProvider = (props) => (
     <LinkedDataMetadataProvider>
@@ -16,16 +16,17 @@ const WorkspaceInfoWithProvider = (props) => (
     </LinkedDataMetadataProvider>
 );
 
-const WorkspaceInfo = (props) => {
+type WorkspaceInfoProps = {
+    workspace: Workspace;
+}
+
+const WorkspaceInfo = (props: WorkspaceInfoProps) => {
     const {workspace} = props;
     const {iri} = workspace;
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
     const {currentUser} = useContext(UserContext);
-    const {collections} = useContext(CollectionsContext);
 
-    const isWorkspaceEmpty = !collections.some(c => c.ownerWorkspace === iri);
-    const contextMenu = isAdmin(currentUser) && isWorkspaceEmpty
-        ? <WorkspaceActionMenu workspace={workspace} /> : null;
+    const contextMenu = isAdmin(currentUser) ? <WorkspaceActionMenu workspace={workspace} onUpdate={updateLinkedData} /> : null;
 
     return (
         <>

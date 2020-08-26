@@ -3,21 +3,27 @@ import React, {useContext, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import {IconButton, Menu, MenuItem} from '@material-ui/core';
 import {MoreVert} from '@material-ui/icons';
-import type {Workspace} from './WorkspacesAPI';
+import type {Workspace, WorkspaceProperties} from './WorkspacesAPI';
 import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import ErrorDialog from '../common/components/ErrorDialog';
 import WorkspaceContext from './WorkspaceContext';
 import {currentWorkspace} from './workspaces';
+import WorkspaceEditor from './WorkspaceEditor';
+import CollectionsContext from '../collections/CollectionsContext';
 
 type WorkspaceActionMenuProps = {
     workspace: Workspace;
     small: boolean;
+    onUpdate?: () => void;
 }
 
 const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
-    const {workspace, small} = props;
+    const {workspace, small, onUpdate} = props;
     const history = useHistory();
-    const {deleteWorkspace} = useContext(WorkspaceContext);
+    const {workspaces, updateWorkspace, deleteWorkspace} = useContext(WorkspaceContext);
+    const {collections} = useContext(CollectionsContext);
+
+    const isWorkspaceEmpty = !collections.some(c => c.ownerWorkspace === workspace.iri);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [showDeletionConfirmDialog, setShowDeletionConfirmDialog] = useState(false);
@@ -32,6 +38,7 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
 
     const openDeleteWorkspaceDialog = () => {
         setShowDeletionConfirmDialog(true);
+        setAnchorEl(null);
     };
 
     const closeDeleteWorkspaceDialog = () => {
@@ -67,6 +74,32 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
         />
     );
 
+    const [renamingWorkspace, setRenamingWorkspace] = useState(false);
+
+    const openRenameWorkspaceDialog = () => {
+        setRenamingWorkspace(true);
+        setAnchorEl(null);
+    };
+
+    const closeRenameWorkspaceDialog = () => {
+        setRenamingWorkspace(false);
+        setAnchorEl(null);
+    };
+
+    const handleRenameWorkspace = (ws: WorkspaceProperties) => {
+        updateWorkspace({iri: workspace.iri, name: ws.name})
+            .then(() => {
+                closeRenameWorkspaceDialog();
+                if (onUpdate) {
+                    onUpdate();
+                }
+            })
+            .catch(err => {
+                const message = err && err.message ? err.message : "An error occurred while renaming the workspace";
+                ErrorDialog.showError(err, message);
+            });
+    };
+
     return (
         <>
             <IconButton
@@ -85,13 +118,30 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
                 onClose={handleMenuClose}
             >
                 <MenuItem
-                    title="Delete empty workspace."
-                    onClick={openDeleteWorkspaceDialog}
+                    title="Rename workspace."
+                    onClick={openRenameWorkspaceDialog}
                 >
-                    Delete workspace &hellip;
+                    Rename workspace &hellip;
                 </MenuItem>
+                { isWorkspaceEmpty && (
+                    <MenuItem
+                        title="Delete empty workspace."
+                        onClick={openDeleteWorkspaceDialog}
+                    >
+                        Delete workspace &hellip;
+                    </MenuItem>
+                )}
             </Menu>
             { showDeletionConfirmDialog && renderDeletionConfirmation() }
+            { renamingWorkspace && (
+                <WorkspaceEditor
+                    title={`Rename workspace ${workspace.name}`}
+                    onSubmit={handleRenameWorkspace}
+                    onClose={closeRenameWorkspaceDialog}
+                    workspace={{name: workspace.name}}
+                    workspaces={workspaces}
+                />
+            ) }
         </>
     );
 };
