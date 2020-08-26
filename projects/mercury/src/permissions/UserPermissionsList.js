@@ -12,6 +12,7 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import AlterPermissionDialog from "./AlterPermissionDialog";
 import UsersContext from "../users/UsersContext";
 import {canAlterPermission, sortPermissions} from "../collections/collectionUtils";
+import UserPermissionsDialog from "./UserPermissionsDialog";
 
 const styles = {
     tableWrapper: {
@@ -67,6 +68,7 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [showPermissionDialog, setShowPermissionDialog] = useState(false);
+    const [showUserPermissionsDialog, setShowUserPermissionsDialog] = useState(false);
     const [selectedPrincipal, setSelectedPrincipal] = useState(null);
 
     const isWorkspaceMember = (principal) => principal && workspaceUsers.some(u => u.iri === principal.iri);
@@ -76,6 +78,8 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         ...sortedPermissions.filter(p => !isWorkspaceMember(p))
     ];
     const permissionCandidates = users.filter(p => !sortedPermissions.some(c => c.iri === p.iri));
+
+    const selectedPrincipalKey = selectedPrincipal ? selectedPrincipal.access + selectedPrincipal.iri : null;
 
     const handleAlterPermissionDialogClose = () => {
         setShowPermissionDialog(false);
@@ -92,16 +96,18 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         setShowConfirmDeleteDialog(false);
     };
 
-    const removePermission = (principal) => {
-        setPermission(collection.location, principal.iri, 'None')
-            .catch(e => ErrorDialog.showError(e, 'Error removing permission.'))
-            .finally(handleCloseConfirmDeleteDialog);
-    };
-
     const handleAlterPermission = (principal) => {
         setShowPermissionDialog(true);
         setSelectedPrincipal(principal);
         setAnchorEl(null);
+    };
+
+    const handleUserPermissionsDialog = () => {
+        setShowUserPermissionsDialog(true);
+    };
+
+    const handleUserPermissionsDialogClose = () => {
+        setShowUserPermissionsDialog(false);
     };
 
     const handleMenuClick = (event, principal) => {
@@ -114,7 +120,11 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         setSelectedPrincipal(null);
     };
 
-    const selectedPrincipalKey = selectedPrincipal ? selectedPrincipal.access + selectedPrincipal.iri : null;
+    const removePermission = (principal) => {
+        setPermission(collection.location, principal.iri, 'None')
+            .catch(e => ErrorDialog.showError(e, 'Error removing permission.'))
+            .finally(handleCloseConfirmDeleteDialog);
+    };
 
     const renderHeader = () => (
         <Toolbar className={classes.header}>
@@ -127,7 +137,7 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
                         color="primary"
                         aria-label="add user permission"
                         className={classes.addButton}
-                        onClick={() => handleAlterPermission(null)}
+                        onClick={() => handleUserPermissionsDialog()}
                     >
                         <Add />
                     </IconButton>
@@ -216,7 +226,7 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         );
     };
 
-    const renderPermissionDialog = () => (
+    const renderAlterPermissionDialog = () => (
         <AlterPermissionDialog
             open={showPermissionDialog}
             onClose={handleAlterPermissionDialogClose}
@@ -230,6 +240,19 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         />
     );
 
+    const renderUserPermissionsDialog = () => (
+        <UserPermissionsDialog
+            open={showUserPermissionsDialog}
+            onClose={handleUserPermissionsDialogClose}
+            collection={collection}
+            currentUser={currentUser}
+            permissionCandidates={permissionCandidates}
+            workspaceUsers={workspaceUsers}
+            setPermission={setPermission}
+            isWorkspaceMember={isWorkspaceMember}
+        />
+    );
+
     return (
         <div className={classes.tableWrapper}>
             {renderHeader()}
@@ -238,7 +261,8 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
                     Collection is not shared with any user.
                 </Typography>
             )}
-            {renderPermissionDialog()}
+            {renderAlterPermissionDialog()}
+            {renderUserPermissionsDialog()}
             {renderDeletionConfirmationDialog()}
         </div>
     );
