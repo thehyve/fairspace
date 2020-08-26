@@ -555,7 +555,6 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         dash:singleLine true ;
         fs:importantProperty true ;
-        fs:machineOnly true ;
         sh:path rdfs:label ;
         sh:order 0
     ],
