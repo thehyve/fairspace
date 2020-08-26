@@ -1,6 +1,8 @@
-import React from 'react';
+// @flow
+import React, {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {
+    Chip,
     Paper,
     Table,
     TableBody,
@@ -16,10 +18,13 @@ import type {Workspace} from './WorkspacesAPI';
 import MessageDisplay from "../common/components/MessageDisplay";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
+import {isAdmin} from '../users/userUtils';
+import UserContext from '../users/UserContext';
+import WorkspaceActionMenu from './WorkspaceActionMenu';
 
-type Accessible = {
-    hasAccess: boolean
-}
+type WorkspaceListProps = {
+    workspaces: Workspace[];
+};
 
 const columns = {
     canCollaborate: {
@@ -29,28 +34,52 @@ const columns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
+    },
+    comment: {
+        valueExtractor: 'comment',
+        label: 'Short description'
+    },
+    collectionCount: {
+        valueExtractor: 'summary.collectionCount',
+        label: 'Collections',
+        align: 'right'
+    },
+    memberCount: {
+        valueExtractor: 'summary.memberCount',
+        label: 'Members',
+        align: 'right'
+    },
+    managers: {
+        valueExtractor: 'managers',
+        label: 'Managers'
+    },
+    menu: {
+        label: ' '
     }
 };
 
-const WorkspaceList = ({
-    workspaces = [],
-    isSelected = () => false,
-    toggleWorkspace = () => {},
-}) => {
-    const history = useHistory();
+const EmailChip = ({email, label}) => {
+    const chip = <Chip style={{cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
+    if (email) {
+        return <a title={email} href={`mailto:${email}`}>{chip}</a>;
+    }
+    return chip;
+};
 
-    const onWorkspaceDoubleClick = (workspace: Workspace & Accessible) => {
+const WorkspaceList = (props: WorkspaceListProps) => {
+    const {workspaces} = props;
+    const history = useHistory();
+    const {currentUser} = useContext(UserContext);
+
+    const onWorkspaceDoubleClick = (workspace: Workspace) => {
         if (workspace.canCollaborate) {
             history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
         }
     };
-    const onWorkspaceClick = (workspace: Workspace) => {
-        toggleWorkspace(workspace);
-    };
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
-    if (!workspaces || workspaces.length === 0) {
+    if (!props.workspaces || props.workspaces.length === 0) {
         return (
             <MessageDisplay
                 message="Please create a workspace."
@@ -63,58 +92,71 @@ const WorkspaceList = ({
     }
 
     return (
-        <Paper>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {
-                            Object.entries(columns).map(([key, column]) => (
-                                <TableCell key={key}>
-                                    <TableSortLabel
-                                        active={orderBy === key}
-                                        direction={orderAscending ? 'asc' : 'desc'}
-                                        onClick={() => toggleSort(key)}
-                                    >
-                                        {column.label}
-                                    </TableSortLabel>
-                                </TableCell>
-                            ))
-                        }
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {pagedItems.map((workspace: Workspace & Accessible) => {
-                        const selected = isSelected(workspace);
-
-                        return (
+        <>
+            <Paper>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {
+                                Object.entries(columns).map(([key, column]) => (
+                                    <TableCell key={key} align={column.align ? column.align : 'inherit'}>
+                                        <TableSortLabel
+                                            active={orderBy === key}
+                                            direction={orderAscending ? 'asc' : 'desc'}
+                                            onClick={() => toggleSort(key)}
+                                        >
+                                            {column.label}
+                                        </TableSortLabel>
+                                    </TableCell>
+                                ))
+                            }
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {pagedItems.map((workspace: Workspace) => (
                             <TableRow
                                 key={workspace.iri}
                                 hover
-                                onClick={() => onWorkspaceClick(workspace)}
                                 onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
-                                selected={selected}
                             >
-                                <TableCell style={{maxWidth: 32, width: 32}} component="th" scope="row" key="canCollaborate">
+                                <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
                                     {!workspace.canCollaborate && (<Lock />)}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 160}} component="th" scope="row" key="name">
+                                <TableCell variant="head" style={{minWidth: 150, maxWidth: 150}} scope="row" key="name">
                                     {workspace.name}
                                 </TableCell>
+                                <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="comment">
+                                    {workspace.comment}
+                                </TableCell>
+                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
+                                    {workspace.summary ? workspace.summary.collectionCount : ''}
+                                </TableCell>
+                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
+                                    {workspace.summary ? workspace.summary.memberCount : ''}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
+                                    {workspace.managers ? workspace.managers.map(m => (
+                                        <EmailChip key={m.iri} email={m.email} label={m.name} />
+                                    )) : ''}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
+                                    { isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} /> }
+                                </TableCell>
                             </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={workspaces.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={(e, p) => setPage(p)}
-                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-            />
-        </Paper>
+                        ))}
+                    </TableBody>
+                </Table>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={props.workspaces.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={(e, p) => setPage(p)}
+                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                />
+            </Paper>
+        </>
     );
 };
 

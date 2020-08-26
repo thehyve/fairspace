@@ -1,19 +1,21 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import PropTypes from 'prop-types';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import {Widgets} from '@material-ui/icons';
 import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import {currentWorkspace} from "../workspaces/workspaces";
+import WorkspaceContext from "./WorkspaceContext";
+import {currentWorkspace, workspacePrefix} from "./workspaces";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
 import Collections from "../collections/CollectionsPage";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import BreadCrumbs from "../common/components/BreadCrumbs";
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 
 export const TabPanel = (props) => {
     const {children, value, index, ...other} = props;
@@ -43,11 +45,11 @@ const a11yProps = (index) => ({
     'aria-controls': `workspace-tabpanel-${index}`,
 });
 
-export default (props) => {
-    const [value, setValue] = React.useState(0);
+const WorkspaceOverview = (props) => {
+    const [selectedTab, setSelectedTab] = useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
-    const workspace = workspaces.find(w => w.iri === currentWorkspace());
+    const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
 
     if (workspacesLoading) {
         return (<LoadingInlay />);
@@ -59,18 +61,39 @@ export default (props) => {
         return (<MessageDisplay message="You don't have sufficient permissions to access the workspace." />);
     }
     if (workspacesError || !workspace.iri) {
-        return (<MessageDisplay message="Error loading workspaces" />);
+        return (<MessageDisplay message="Error loading workspace." />);
     }
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        const updated = workspaces.find(w => w.iri === currentWorkspace());
+        if (updated && workspace !== updated) {
+            setWorkspace(updated);
+        }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [workspaces]);
+
+    const changeTab = (event, tabIndex) => {
+        setSelectedTab(tabIndex);
     };
 
     return (
-        <>
+        <BreadcrumbsContext.Provider value={{segments: [
+            {
+                label: 'Workspaces',
+                icon: <Widgets />,
+                href: '/workspaces'
+            }
+        ]}}
+        >
+            <BreadCrumbs additionalSegments={[{
+                label: workspace.name,
+                href: workspacePrefix()
+            }]}
+            />
             <Tabs
-                value={value}
-                onChange={handleChange}
+                value={selectedTab}
+                onChange={changeTab}
                 indicatorColor="primary"
                 textColor="primary"
                 aria-label="workspace tabs"
@@ -79,18 +102,19 @@ export default (props) => {
                 <Tab label="Users" {...a11yProps(1)} />
                 <Tab label="Collections" {...a11yProps(2)} />
             </Tabs>
-            <TabPanel value={value} index={0}>
-                <BreadCrumbs />
+            <TabPanel value={selectedTab} index={0}>
                 <WorkspaceInfo workspace={workspace} />
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={selectedTab} index={1}>
                 <UserList workspace={workspace} />
             </TabPanel>
-            <TabPanel value={value} index={2}>
+            <TabPanel value={selectedTab} index={2}>
                 <LinkedDataMetadataProvider>
                     <Collections history={props.history} workspaceIri={workspace.iri} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
-        </>
+        </BreadcrumbsContext.Provider>
     );
 };
+
+export default WorkspaceOverview;

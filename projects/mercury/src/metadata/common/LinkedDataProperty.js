@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {FormControl, FormGroup, FormHelperText, FormLabel} from '@material-ui/core';
 import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
 import LinkedDataRelationTable from "./LinkedDataRelationTable";
-import {TOOLTIP_ENTER_DELAY} from "../../constants";
+import {LABEL_URI, TOOLTIP_ENTER_DELAY} from "../../constants";
 import GenericTooltip from "../../common/components/GenericTooltip";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
@@ -51,11 +51,16 @@ const LinkedDataProperty = (
                 margin: 4,
             }}
         >
-            <GenericTooltip interactive leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
-                <FormLabel component="legend">
-                    {label}
-                </FormLabel>
-            </GenericTooltip>
+            {
+                canEdit || key !== LABEL_URI
+                    ? (
+                        <GenericTooltip interactive leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
+                            <FormLabel component="legend">
+                                {label}
+                            </FormLabel>
+                        </GenericTooltip>
+                    ) : null
+            }
             <FormGroup>
                 {
                     property.isRelationShape ? (

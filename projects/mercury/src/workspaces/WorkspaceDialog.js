@@ -31,7 +31,7 @@ const ControlledTextFieldWrapper = ({
     />
 );
 
-export default ({onSubmit, onClose, submitDisabled, fields}) => (
+export default ({onSubmit, onClose, submitDisabled, fields, title = 'New workspace'}) => (
     <Dialog
         open
         onClose={onClose}
@@ -41,7 +41,7 @@ export default ({onSubmit, onClose, submitDisabled, fields}) => (
     >
         <DialogTitle id="form-dialog-title">
             <div>
-                <Typography variant="h5" component="h2">New workspace</Typography>
+                <Typography variant="h5" component="h2">{title}</Typography>
             </div>
         </DialogTitle>
         <DialogContent style={{overflowX: 'hidden'}}>

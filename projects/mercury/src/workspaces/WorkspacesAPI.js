@@ -2,6 +2,7 @@
 import axios from 'axios';
 
 import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
+import type {User} from '../users/UsersAPI';
 
 const workspacesUrl = "/api/v1/workspaces/";
 
@@ -15,10 +16,17 @@ export type WorkspacePermissions = {|
     canManage: boolean;
 |};
 
+export type WorkspaceSummary = {|
+    collectionCount: number;
+    memberCount: number;
+|};
 export type WorkspaceProperties = {|
     iri: string;
     name?: string;
+    comment?: string;
     description?: string;
+    summary ?: WorkspaceSummary;
+    managers?: User[];
 |}
 
 export type Resource = {|
@@ -44,7 +52,7 @@ class WorkspacesAPI {
             .catch(handleHttpError("Failure while creating a workspace"));
     }
 
-    updateWorkspace(workspace: Workspace): Promise<void> {
+    updateWorkspace(workspace: WorkspaceProperties): Promise<void> {
         return axios.patch(workspacesUrl, JSON.stringify(workspace), {
             headers: {Accept: 'application/json'},
         })

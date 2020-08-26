@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import PropTypes from "prop-types";
-import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, withStyles} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, Typography, withStyles} from '@material-ui/core';
+import {Clear} from '@material-ui/icons';
 
 import {canDelete} from "./metadataUtils";
-import {STRING_URI} from '../../constants';
+import {LABEL_URI, STRING_URI} from '../../constants';
 
 const styles = {
     buttonColumn: {
@@ -63,7 +63,11 @@ export const LinkedDataValuesTable = (
                     >
                         {columnDefinitions.map(columnDef => (
                             <TableCell className={classes.valueColumn} key={columnDef.id}>
-                                {columnDef.getValue(entry, idx)}
+                                {
+                                    columnDef.id === LABEL_URI
+                                        ? <Typography variant="h4">{columnDef.getValue(entry, idx)}</Typography>
+                                        : columnDef.getValue(entry, idx)
+                                }
                             </TableCell>
                         ))}
                         {
@@ -82,7 +86,7 @@ export const LinkedDataValuesTable = (
                                             style={{opacity: hoveredIndex === idx ? 1 : 0}}
                                             aria-label="Delete"
                                         >
-                                            <ClearIcon />
+                                            <Clear />
                                         </IconButton>
                                     )
                                 }

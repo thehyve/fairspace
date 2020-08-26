@@ -12,13 +12,13 @@ export const noNamespace = {
     value: ''
 };
 
-export const IriValue = ({
+export const IriValue = React.forwardRef(({
     namespace,
     namespaces = [],
     localPart = '',
     onNamespaceChange = () => {},
     onLocalPartChange = () => {}
-}) => {
+}, ref) => {
     const namespaceOptions = [
         noNamespace,
         ...namespaces.map(n => ({
@@ -46,7 +46,7 @@ export const IriValue = ({
                     }}
                     getOptionDisabled={option => option.disabled}
                     getOptionLabel={option => option.label}
-                    renderInput={(props) => <TextField fullWidth {...props} />}
+                    renderInput={(props) => <TextField ref={ref} fullWidth {...props} />}
                 />
             </Grid>
             <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
@@ -59,7 +59,7 @@ export const IriValue = ({
             </Grid>
         </Grid>
     );
-};
+});
 
 IriValue.propTypes = {
     localPart: PropTypes.string,
@@ -75,7 +75,7 @@ IriValue.propTypes = {
     )
 };
 
-export default props => {
+export default React.forwardRef((props, ref) => {
     const {namespaces} = useContext(LinkedDataContext);
-    return <IriValue namespaces={namespaces} {...props} />;
-};
+    return <IriValue ref={ref} namespaces={namespaces} {...props} />;
+});

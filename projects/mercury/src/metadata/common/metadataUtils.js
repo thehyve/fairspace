@@ -158,7 +158,8 @@ export const getTypeInfo = (linkedDataItem, vocabulary) => {
     return {
         typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'],
         label: getFirstPredicateValue(shape, consts.SHACL_NAME),
-        description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION)
+        description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION),
+        comment: getFirstPredicateValue(shape, consts.COMMENT_URI)
     };
 };
 
