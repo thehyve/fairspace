@@ -39,7 +39,6 @@ const WorkspaceLayout = () => (
     <WorkspacesProvider>
         <WorkspaceLayoutInner />
     </WorkspacesProvider>
-
 );
 
 export default WorkspaceLayout;

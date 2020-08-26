@@ -14,6 +14,7 @@ import ConfirmationDialog from "../../common/components/ConfirmationDialog";
 
 const LinkedDataEntityFormContainer = ({
     subject, hasEditRight = true, showEditButtons = false, fullpage = false,
+    contextMenu = null,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
@@ -118,19 +119,18 @@ const LinkedDataEntityFormContainer = ({
                     />
                 )}
             </Grid>
-            {showEditButtons ? (
-                <Grid item xs={1}>
-                    {!editingEnabled && (
-                        <IconButton
-                            aria-label="Edit"
-                            onClick={() => {
-                                setEditingEnabled(true);
-                            }}
-                        ><Edit />
-                        </IconButton>
-                    )}
-                </Grid>
-            ) : null}
+            <Grid item xs={1} align="right">
+                {showEditButtons && !editingEnabled && (
+                    <IconButton
+                        aria-label="Edit"
+                        onClick={() => {
+                            setEditingEnabled(true);
+                        }}
+                    ><Edit />
+                    </IconButton>
+                )}
+                {!editingEnabled && contextMenu}
+            </Grid>
         </Grid>
     );
 };

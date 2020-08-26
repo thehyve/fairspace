@@ -14,7 +14,7 @@ export default () => {
                     component={NavLink}
                     to="/workspaces"
                     button
-                    selected={pathname === '/workspaces'}
+                    selected={pathname.startsWith('/workspace')}
                 >
                     <ListItemIcon>
                         <Widgets />

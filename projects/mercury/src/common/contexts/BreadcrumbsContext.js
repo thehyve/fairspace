@@ -1,14 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {Home} from '@material-ui/icons';
-import {workspacePrefix} from "../../workspaces/workspaces";
 
 const BreadcrumbsContext = React.createContext({
-    segments: [{
-        label: 'Workspace overview',
-        href: workspacePrefix(),
-        icon: <Home />
-    }]
+    segments: []
 });
 
 BreadcrumbsContext.Provider.propTypes = {
