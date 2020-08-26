@@ -9,7 +9,6 @@ import UserPermissionsList from "../UserPermissionsList";
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
     const permissionsListProps = wrapper.find(UserPermissionsList).first().props();
     expect(permissionsListProps.permissions.length).toBe(numberOfCollaborators);
-    expect(permissionsListProps.selectedPrincipal).toBe(null);
 };
 
 const testOrderingOfCollaborators = (wrapper) => {
@@ -68,6 +67,7 @@ describe('PermissionViewer', () => {
         mockUsers[3]
     ];
     const mockOwnerWorkspace = {iri: 'http://localhost/iri/w1'};
+    const mockWorkspaces = [mockOwnerWorkspace, {iri: 'http://localhost/iri/w2'}];
 
     describe('Use Case 1: Current user can manage collection', () => {
         let wrapper;
@@ -76,9 +76,10 @@ describe('PermissionViewer', () => {
                 <PermissionViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
-                    collaborators={mockCollaborators}
+                    collaboratingUsers={mockCollaborators}
+                    collaboratingWorkspaces={[]}
                     workspaces={[mockOwnerWorkspace]}
-                    workspaceUsers={mockWorkspaceUsers}
+                    workspaceUsers={mockWorkspaces}
                     users={mockUsers}
                     setPermission={mockSetPermissionFn}
                 />
@@ -91,10 +92,6 @@ describe('PermissionViewer', () => {
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             testOrderingOfCollaborators(wrapper);
-        });
-
-        it('should render add button', () => {
-            expect(wrapper.find(Button).length).toEqual(1);
         });
     });
 
@@ -105,7 +102,8 @@ describe('PermissionViewer', () => {
                 <PermissionViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    collaborators={mockCollaborators}
+                    collaboratingUsers={mockCollaborators}
+                    collaboratingWorkspaces={[]}
                     workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
                     users={mockUsers}
@@ -121,10 +119,6 @@ describe('PermissionViewer', () => {
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             testOrderingOfCollaborators(wrapper);
         });
-
-        it('should NOT render add buttons', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(0);
-        });
     });
 
     describe('Access to a collection is added to a new user', () => {
@@ -134,7 +128,8 @@ describe('PermissionViewer', () => {
                 <PermissionViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
-                    collaborators={[...mockCollaborators, mockUsers[0]]}
+                    collaboratingUsers={[...mockCollaborators, mockUsers[0]]}
+                    collaboratingWorkspaces={[]}
                     workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
                     users={mockUsers}
@@ -148,14 +143,15 @@ describe('PermissionViewer', () => {
         });
     });
 
-    describe('Access to a collection is added to an owner workspace', () => {
+    describe('Access to a collection is added to a workspace', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
                 <PermissionViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    collaborators={[...mockCollaborators, mockOwnerWorkspace]}
+                    collaboratingUsers={[...mockCollaborators, mockOwnerWorkspace]}
+                    collaboratingWorkspaces={[{iri: 'http://localhost/iri/w2'}]}
                     workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
                     users={mockUsers}

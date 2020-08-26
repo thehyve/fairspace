@@ -32,18 +32,6 @@ describe('Collection Utils', () => {
                 {access: 'Read', name: 's3'}
             ]);
         });
-
-        it('should sort first by type then by access and name', () => {
-            expect(sortPermissions([
-                {access: 'Read', name: 's1', type: 'User'},
-                {access: 'Write', name: 's2', type: 'Workspace'},
-                {access: 'Manage', name: 's3', type: 'User'}
-            ])).toEqual([
-                {access: 'Write', name: 's2', type: 'Workspace'},
-                {access: 'Manage', name: 's3', type: 'User'},
-                {access: 'Read', name: 's1', type: 'User'}
-            ]);
-        });
     });
 
     describe('canAlterPermission', () => {

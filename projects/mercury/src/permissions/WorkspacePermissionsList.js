@@ -8,6 +8,7 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {sortPermissions} from "../collections/collectionUtils";
+import AlterWorkspacePermissionsDialog from "./AlterWorkspacePermissionsDialog";
 
 const styles = {
     tableWrapper: {
@@ -60,10 +61,11 @@ const styles = {
 export const WorkspacePermissionsList = ({permissions, setPermission, collection, workspaces, classes}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [selectedWorkspace, setSelectedWorkspace] = useState(false);
+    const [showWorkspacePermissionsDialog, setShowWorkspacePermissionsDialog] = useState(false);
 
-    const sortedPermissions = sortPermissions(permissions);
+    const sortedPermissions = sortPermissions(permissions.filter(p => p.iri !== collection.ownerWorkspace));
     const permissionCandidates = workspaces.filter(
-        w => !sortedPermissions.some(p => p.iri === w.iri) && w.iri !== collection.ownerWorkspace
+        w => !sortedPermissions.some(p => p.iri === w.iri)
     );
 
     const handleDeletePermission = (workspace) => {
@@ -81,9 +83,12 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
             .finally(handleCloseConfirmDeleteDialog);
     };
 
-    const handleAlterPermission = (principal) => {
-        // setShowPermissionDialog(true);
-        // setSelectedPrincipal(principal);
+    const handleAlterWorkspacePermissionsDialogShow = () => {
+        setShowWorkspacePermissionsDialog(true);
+    };
+
+    const handleWorkspacePermissionsDialogClose = () => {
+        setShowWorkspacePermissionsDialog(false);
     };
 
     const renderHeader = () => (
@@ -97,7 +102,7 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
                         color="primary"
                         aria-label="add workspace"
                         className={classes.addButton}
-                        onClick={() => handleAlterPermission(null)}
+                        onClick={() => handleAlterWorkspacePermissionsDialogShow()}
                     >
                         <Add />
                     </IconButton>
@@ -110,7 +115,7 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
         <Table size="small" className={classes.table}>
             <TableBody className={classes.tableBody}>
                 {
-                    permissions.map(p => (
+                    sortedPermissions.map(p => (
                         <TableRow key={p.iri} className={classes.tableRow}>
                             <TableCell style={{width: 30}}>
                                 <Widgets />
@@ -139,7 +144,7 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
             return null;
         }
 
-        const content = `Are you sure you want to remove permission for "${selectedWorkspace.name}"?`;
+        const content = `Are you sure you do not want to share collection "${collection.name}" with workspace "${selectedWorkspace.name}" anymore?`;
 
         return (
             <ConfirmationDialog
@@ -155,14 +160,25 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
         );
     };
 
+    const renderAlterWorkspacePermissionsDialog = () => (
+        <AlterWorkspacePermissionsDialog
+            open={showWorkspacePermissionsDialog}
+            onClose={handleWorkspacePermissionsDialogClose}
+            collection={collection}
+            permissionCandidates={permissionCandidates}
+            setPermission={setPermission}
+        />
+    );
+
     return (
         <div className={classes.tableWrapper}>
             {renderHeader()}
-            {permissions && permissions.length > 0 ? renderPermissionTable() : (
+            {sortedPermissions && sortedPermissions.length > 0 ? renderPermissionTable() : (
                 <Typography variant="body2" className={classes.emptyPermissions}>
                     Collection is not shared with other workspaces.
                 </Typography>
             )}
+            {renderAlterWorkspacePermissionsDialog()}
             {renderDeletionConfirmationDialog()}
         </div>
     );

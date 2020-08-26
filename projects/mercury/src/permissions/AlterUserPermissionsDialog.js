@@ -63,7 +63,7 @@ export const styles = {
     }
 };
 
-export const UserPermissionsDialog = ({collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
+export const AlterUserPermissionsDialog = ({collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
     open = false, onClose, isWorkspaceMember, classes}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
@@ -171,6 +171,7 @@ export const UserPermissionsDialog = ({collection, permissionCandidates, workspa
 
     const renderUserSelector = () => (
         <PermissionCandidateSelect
+            disableClearable
             clearTextOnSelection
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
@@ -189,7 +190,7 @@ export const UserPermissionsDialog = ({collection, permissionCandidates, workspa
             className={classes.root}
             fullWidth
         >
-            <DialogTitle id="scroll-dialog-title">Add access for selected users</DialogTitle>
+            <DialogTitle id="scroll-dialog-title">Share collections with users</DialogTitle>
             <DialogContent>
                 <div>
                     {renderUserSelector()}
@@ -217,7 +218,7 @@ export const UserPermissionsDialog = ({collection, permissionCandidates, workspa
     );
 };
 
-UserPermissionsDialog.propTypes = {
+AlterUserPermissionsDialog.propTypes = {
     classes: PropTypes.object.isRequired,
     open: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
@@ -229,4 +230,4 @@ UserPermissionsDialog.propTypes = {
     currentUser: PropTypes.object
 };
 
-export default withStyles(styles)(UserPermissionsDialog);
+export default withStyles(styles)(AlterUserPermissionsDialog);

@@ -12,7 +12,7 @@ import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import AlterPermissionDialog from "./AlterPermissionDialog";
 import UsersContext from "../users/UsersContext";
 import {canAlterPermission, sortPermissions} from "../collections/collectionUtils";
-import UserPermissionsDialog from "./UserPermissionsDialog";
+import AlterUserPermissionsDialog from "./AlterUserPermissionsDialog";
 
 const styles = {
     tableWrapper: {
@@ -102,7 +102,7 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         setAnchorEl(null);
     };
 
-    const handleUserPermissionsDialog = () => {
+    const handleAlterUserPermissionsDialogShow = () => {
         setShowUserPermissionsDialog(true);
     };
 
@@ -137,7 +137,7 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
                         color="primary"
                         aria-label="add user permission"
                         className={classes.addButton}
-                        onClick={() => handleUserPermissionsDialog()}
+                        onClick={() => handleAlterUserPermissionsDialogShow()}
                     >
                         <Add />
                     </IconButton>
@@ -240,8 +240,8 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
         />
     );
 
-    const renderUserPermissionsDialog = () => (
-        <UserPermissionsDialog
+    const renderAlterUserPermissionsDialog = () => (
+        <AlterUserPermissionsDialog
             open={showUserPermissionsDialog}
             onClose={handleUserPermissionsDialogClose}
             collection={collection}
@@ -262,7 +262,7 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
                 </Typography>
             )}
             {renderAlterPermissionDialog()}
-            {renderUserPermissionsDialog()}
+            {renderAlterUserPermissionsDialog()}
             {renderDeletionConfirmationDialog()}
         </div>
     );
