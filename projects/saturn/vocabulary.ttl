@@ -11,8 +11,12 @@
 @prefix curie: <https://institut-curie.org/ontology#> .
 
 ########################
-###   User Shapes    ###
+###   User shapes    ###
 ########################
+
+curie:aboutPerson a rdf:Property .
+curie:aboutMaterial a rdf:Property .
+curie:associatedAnalysis a rdf:Property .
 
 ## Augmented system class shapes
 fs:File sh:property
@@ -23,7 +27,7 @@ fs:File sh:property
         sh:path curie:aboutPerson
     ],
     [
-        sh:name "Is about biological sample." ;
+        sh:name "Is about biological sample" ;
         sh:description "Materials that are featured in this collection." ;
         sh:class curie:BiologicalSample ;
         sh:path curie:aboutMaterial
@@ -39,6 +43,10 @@ fs:File sh:property
 
 ## User class Shapes
 
+curie:ageOfDeath a rdf:Property .
+curie:patientIdentifier a rdf:Property .
+curie:hasEvent a rdf:Property .
+
 curie:Person a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
     sh:description "A person that is subject of research." ;
@@ -47,7 +55,7 @@ curie:Person a rdfs:Class, sh:NodeShape ;
     sh:property
     [
         sh:name "Gender" ;
-        sh:description "The gender of the patient" ;
+        sh:description "The gender of the patient." ;
         sh:in (
                   "Male"
                   "Female"
@@ -59,14 +67,14 @@ curie:Person a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Age of death" ;
-        sh:description "The age at which this person has died" ;
+        sh:description "The age at which this person has died." ;
         sh:datatype xsd:date ;
         sh:maxCount 1 ;
         sh:path curie:ageOfDeath
     ],
     [
         sh:name "Patient Identifier" ;
-        sh:description "The identifier of the patient" ;
+        sh:description "The identifier of the patient." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -74,7 +82,7 @@ curie:Person a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Event" ;
-        sh:description "Tumor pathology events for this patient" ;
+        sh:description "Tumor pathology events for this patient." ;
         sh:class curie:TumorPathologyEvent ;
         sh:path curie:hasEvent
     ],
@@ -86,7 +94,7 @@ curie:Person a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Label" ;
-        sh:description "Human readable label for this resource." ;
+        sh:description "Unique person label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -96,27 +104,31 @@ curie:Person a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Description" ;
-        sh:description "Human friendly description." ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
 ] .
 
+curie:isProjectConsent a rdf:Property .
+curie:authorizes a rdf:Property .
+curie:isConsentOf a rdf:Property .
+
 curie:PersonConsent a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
     sh:description "A research consent given by person." ;
-    sh:name "Person Consent" ;
+    sh:name "Person consent" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
-        sh:name "Consent for specific project" ;
+        sh:name "Consent for specific project." ;
         sh:description "" ;
         sh:class curie:ResearchProject ;
         sh:path curie:isProjectConsent
     ],
     [
         sh:name "Consent authorizes" ;
-        sh:description "The samples that is authorized with this consent" ;
+        sh:description "The samples that is authorized with this consent." ;
         sh:class curie:BiologicalSample ;
         sh:path curie:authorizes
     ],
@@ -129,7 +141,7 @@ curie:PersonConsent a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Label" ;
-        sh:description "Human readable label for this resource." ;
+        sh:description "Unique person consent label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ; ;
@@ -139,20 +151,25 @@ curie:PersonConsent a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Description" ;
-        sh:description "Human friendly description." ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
 ] .
 
+curie:projectCode a rdf:Property .
+curie:projectManager a rdf:Property .
+curie:hasCollection a rdf:Property .
+curie:hasPersonConsent a rdf:Property .
+
 curie:ResearchProject a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
-    sh:description "A research project." ;
-    sh:name "Research Project" ;
+    sh:description "" ;
+    sh:name "Research project" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
-        sh:name "Project Code" ;
+        sh:name "Project code" ;
         sh:description "Specific project code." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -160,8 +177,8 @@ curie:ResearchProject a rdfs:Class, sh:NodeShape ;
         sh:path curie:projectCode
     ],
     [
-        sh:name "Investigation Nature" ;
-        sh:description "choose between: basic research, biomedical research, clinical trial, medical diagnosis" ;
+        sh:name "Investigation nature" ;
+        sh:description "Choose between: basic research, biomedical research, clinical trial, medical diagnosis." ;
         sh:in (
                   "basic research"
                   "biomedical research"
@@ -171,8 +188,8 @@ curie:ResearchProject a rdfs:Class, sh:NodeShape ;
         sh:path <investigationNature>
     ],
     [
-        sh:name "Project Manager" ;
-        sh:description "Project manager" ;
+        sh:name "Project manager" ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         sh:path curie:projectManager
@@ -191,7 +208,7 @@ curie:ResearchProject a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Label" ;
-        sh:description "Human readable label for this resource." ;
+        sh:description "Unique research project label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -201,20 +218,28 @@ curie:ResearchProject a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Description" ;
-        sh:description "Human friendly description." ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
 ] .
 
+curie:eventType a rdf:Property .
+curie:eventStartDate a rdf:Property .
+curie:eventEndDate a rdf:Property .
+curie:diagnosisDate a rdf:Property .
+curie:isAnalysedBy a rdf:Property .
+curie:eventSubject a rdf:Property .
+curie:isLinkedTo a rdf:Property .
+
 curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
-    sh:description "Description for osiris:TumorPathologyEvent" ;
-    sh:name "Tumor Pathology Event" ;
+    sh:description "" ;
+    sh:name "Tumor pathology event" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
-        sh:name "Neoplasm Event" ;
+        sh:name "Neoplasm event" ;
         sh:description "The type of tumor event." ;
         sh:in (
                   "primary tumor"
@@ -222,38 +247,38 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
                   "metastatic relapse"
               ) ;
         sh:maxCount 1 ;
-        sh:path curie:EventType
+        sh:path curie:eventType
     ],
     [
-        sh:name "Neoplasm Event Start Date" ;
-        sh:description "The start date of the tumor event" ;
+        sh:name "Neoplasm event start date" ;
+        sh:description "The start date of the tumor event." ;
         sh:datatype xsd:date ;
         sh:maxCount 1 ;
         sh:path curie:eventStartDate
     ],
     [
-        sh:name "Neoplasm Event End Date" ;
-        sh:description "The end date of the tumor event" ;
+        sh:name "Neoplasm event end date" ;
+        sh:description "The end date of the tumor event." ;
         sh:datatype xsd:date ;
         sh:maxCount 1 ;
         sh:path curie:eventEndDate
     ],
     [
         sh:name "Neoplasm diagnosis date" ;
-        sh:description "The date of tumor diagnosis" ;
+        sh:description "The date of tumor diagnosis." ;
         sh:datatype xsd:date ;
         sh:maxCount 1 ;
         sh:path curie:diagnosisDate
     ],
     [
         sh:name "Event is analysed by" ;
-        sh:description "Analyses associated with this tumor pathology event" ;
+        sh:description "Analyses associated with this tumor pathology event." ;
         sh:class  curie:Analysis ;
         sh:path curie:isAnalysedBy
     ],
     [
         sh:name "Event subject" ;
-        sh:description "The patient associated with this event" ;
+        sh:description "The patient associated with this event." ;
         sh:class foaf:Person ;
         sh:maxCount 1 ;
         sh:path curie:eventSubject
@@ -266,7 +291,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Label" ;
-        sh:description "Human readable label for this resource." ;
+        sh:description "Unique tumor pathology event label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -276,48 +301,53 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Description" ;
-        sh:description "Human friendly description." ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
 ] .
 
+curie:collectDate a rdf:Property .
+curie:tumorCellularity a rdf:Property .
+curie:isAuthorizedBy a rdf:Property .
+curie:isChildOf a rdf:Property .
+
 curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
-    sh:description "Description for osiris:BiologicalSample" ;
-    sh:name "Biological Sample" ;
+    sh:description "" ;
+    sh:name "Biological sample" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
-        sh:name "Collect Date" ;
-        sh:description "The collect date of the biological sample" ;
+        sh:name "Collect date" ;
+        sh:description "The collect date of the biological sample." ;
         sh:datatype xsd:date ;
         sh:maxCount 1 ;
         sh:path curie:collectDate
     ],
     [
-        sh:name "Tumor Cellularity" ;
-        sh:description "The percentage of tumor cells in the biological sample (pathological measure)" ;
+        sh:name "Tumor cellularity" ;
+        sh:description "The percentage of tumor cells in the biological sample (pathological measure)." ;
         sh:datatype xsd:integer ;
         sh:maxCount 1 ;
         sh:path curie:tumorCellularity
     ],
     [
         sh:name "Sample is authorized by" ;
-        sh:description "The relevent consent" ;
+        sh:description "The relevant consent" ;
         sh:class curie:PersonConsent ;
         sh:maxCount 1 ;
         sh:path curie:isAuthorizedBy
     ],
     [
         sh:name "Sample is child sample of" ;
-        sh:description "The biological sample has been extracted from this parent sample" ;
+        sh:description "The biological sample has been extracted from this parent sample." ;
         sh:class curie:BiologicalSample ;
         sh:path curie:isChildOf
     ],
     [
         sh:name "Label" ;
-        sh:description "Human readable label for this resource." ;
+        sh:description "Unique biological sample label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -327,21 +357,25 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Description" ;
-        sh:description "Human friendly description." ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
 ] .
 
+curie:analysisCode a rdf:Property .
+curie:analyticPipelineCode a rdf:Property .
+curie:numberOfBreakPoints a rdf:Property .
+
 curie:Analysis a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
-    sh:description "Description for Analysis" ;
+    sh:description "" ;
     sh:name "Analysis" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
         sh:name "Analysis code" ;
-        sh:description "The analysis run identifier" ;
+        sh:description "The analysis run identifier." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -349,7 +383,7 @@ curie:Analysis a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Analytic pipeline code" ;
-        sh:description "Identifier of the pipeline used into the analysis (unique in the center)" ;
+        sh:description "Identifier of the pipeline used into the analysis (unique in the center)." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -357,14 +391,14 @@ curie:Analysis a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Number of break points" ;
-        sh:description "Calculated number of break points in genomic profile" ;
+        sh:description "Calculated number of break points in genomic profile." ;
         sh:datatype xsd:integer ;
         sh:maxCount 1 ;
         sh:path curie:numberOfBreakPoints
     ],
     [
         sh:name "Label" ;
-        sh:description "Human readable label for this resource." ;
+        sh:description "Unique analysis label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -374,7 +408,7 @@ curie:Analysis a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Description" ;
-        sh:description "Human friendly description." ;
+        sh:description "" ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
