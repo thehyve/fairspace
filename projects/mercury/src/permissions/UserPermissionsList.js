@@ -3,9 +3,10 @@ import React, {useContext, useState} from 'react';
 import {IconButton, Menu, Table, TableBody, TableCell, TableRow, Typography, withStyles} from '@material-ui/core';
 import MoreIcon from "@material-ui/icons/MoreVert";
 import MenuItem from "@material-ui/core/MenuItem/MenuItem";
-import {Add, Person, SupervisorAccount} from "@material-ui/icons";
+import {Add, Person} from "@material-ui/icons";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
+import Chip from "@material-ui/core/Chip";
 import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import AlterPermissionDialog from "./AlterPermissionDialog";
@@ -69,8 +70,6 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
     const [selectedPrincipal, setSelectedPrincipal] = useState(null);
 
     const isWorkspaceMember = (principal) => principal && workspaceUsers.some(u => u.iri === principal.iri);
-    const getItemIcon = (principal) => (isWorkspaceMember(principal) ? <SupervisorAccount /> : <Person />);
-
     const sortedPermissions = sortPermissions(permissions);
     const prioritizedSortedPermissions = [
         ...sortedPermissions.filter(p => isWorkspaceMember(p)),
@@ -146,17 +145,18 @@ export const UserPermissionsList = ({permissions, setPermission, collection, cur
                         return (
                             <TableRow key={p.iri} className={classes.tableRow}>
                                 <TableCell style={{width: 30}}>
-                                    {getItemIcon(p)}
+                                    <Person />
                                 </TableCell>
                                 <TableCell
-                                    className={
-                                        `${classes.nameCell} ${isWorkspaceMember(p) && classes.highlightedCell}`
-                                    }
+                                    className={classes.nameCell}
                                     data-testid="permission"
                                 >
                                     {p.name}
                                 </TableCell>
                                 <TableCell style={{width: 60}}>
+                                    {isWorkspaceMember(p) && (<Chip label="Member" />)}
+                                </TableCell>
+                                <TableCell style={{width: 60, fontStyle: "italic"}}>
                                     {p.access}
                                 </TableCell>
                                 <TableCell style={{textAlign: "right", width: 30}} className={classes.iconCellButton}>
