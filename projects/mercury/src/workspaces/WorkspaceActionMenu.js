@@ -17,7 +17,7 @@ type WorkspaceActionMenuProps = {
 const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
     const {workspace, small} = props;
     const history = useHistory();
-    const {deleteWorkspace, refreshWorkspaces} = useContext(WorkspaceContext);
+    const {deleteWorkspace} = useContext(WorkspaceContext);
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [showDeletionConfirmDialog, setShowDeletionConfirmDialog] = useState(false);
@@ -45,8 +45,6 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
             .then(() => {
                 if (currentWorkspace()) {
                     history.push('/workspaces');
-                } else {
-                    refreshWorkspaces();
                 }
             })
             .catch(err => ErrorDialog.showError(
