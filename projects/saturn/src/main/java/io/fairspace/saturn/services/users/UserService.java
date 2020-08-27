@@ -99,7 +99,6 @@ public class UserService {
                                 user.setAdmin(true);
                                 user.setCanViewPublicMetadata(true);
                                 user.setCanViewPublicData(true);
-                                user.setCanAddSharedMetadata(true);
                             }
 
                             updated.add(user);
