@@ -11,7 +11,7 @@ import UsersContext from "../users/UsersContext";
 import {sortPermissions} from "../collections/collectionUtils";
 import AlterUserPermissionsDialog from "./AlterUserPermissionsDialog";
 import UserPermissionsTable from "./UserPermissionsTable";
-import type {Permission} from "../collections/CollectionAPI";
+import type {Permission, Principal, PrincipalPermission} from "../collections/CollectionAPI";
 
 const styles = {
     tableWrapper: {
@@ -41,16 +41,16 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
     const [showAlterUserPermissionsDialog, setShowAlterUserPermissionsDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState();
 
-    const isWorkspaceMember = (user) => user && workspaceUsers.some(u => u.iri === user.iri);
+    const isWorkspaceMember: boolean = (user: Principal) => user && workspaceUsers.some(u => u.iri === user.iri);
     const sortedPermissions = sortPermissions(permissions);
     const prioritizedSortedPermissions = [
         ...sortedPermissions.filter(p => isWorkspaceMember(p)),
         ...sortedPermissions.filter(p => !isWorkspaceMember(p))
     ];
-    const permissionCandidates = users.filter(p => !sortedPermissions.some(c => c.iri === p.iri));
+    const permissionCandidates: PrincipalPermission[] = users.filter(p => !sortedPermissions.some(c => c.iri === p.iri));
 
-    const handleDeletePermission = (user) => {
-        setSelectedUser(user);
+    const handleDeletePermission = (permission: Permission) => {
+        setSelectedUser(permission);
         setShowConfirmDeleteDialog(true);
     };
 
@@ -58,8 +58,8 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
         setShowConfirmDeleteDialog(false);
     };
 
-    const handleChangePermission = (user) => {
-        setSelectedUser(user);
+    const handleChangePermission = (permission: Permission) => {
+        setSelectedUser(permission);
         setShowConfirmChangeDialog(true);
     };
 
@@ -75,8 +75,8 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
         setShowAlterUserPermissionsDialog(false);
     };
 
-    const removePermission = (principal) => {
-        setPermission(collection.location, principal.iri, 'None')
+    const removePermission = (permission: Permission) => {
+        setPermission(collection.location, permission.iri, 'None')
             .catch(e => ErrorDialog.showError(e, 'Error removing permission.'))
             .finally(handleCloseConfirmDeleteDialog);
     };

@@ -60,7 +60,9 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
         return ['Read'];
     };
 
-    const canManagePermission = (permission: Permission) => canManage && currentUser && permission.iri !== currentUser.iri;
+    const canManagePermission:boolean = (permission: Permission) => (
+        canManage && currentUser && permission.iri !== currentUser.iri
+    );
 
     const renderAccessLevelDropdown = (selectedPermission: Permission, accessLevelOptions: AccessLevel[]) => (
         <FormControl>

@@ -11,6 +11,7 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import {sortPermissions} from "../collections/collectionUtils";
 import AlterWorkspacePermissionsDialog from "./AlterWorkspacePermissionsDialog";
 import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
+import type {Permission} from "../collections/CollectionAPI";
 
 const styles = {
     tableWrapper: {
@@ -45,17 +46,17 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
         w => !sortedPermissions.some(p => p.iri === w.iri)
     );
 
-    const handleDeletePermission = (workspace) => {
+    const handleDeletePermission = (permission: Permission) => {
         setShowConfirmDeleteDialog(true);
-        setSelectedWorkspace(workspace);
+        setSelectedWorkspace(permission);
     };
 
     const handleCloseConfirmDeleteDialog = () => {
         setShowConfirmDeleteDialog(false);
     };
 
-    const removePermission = (principal) => {
-        setPermission(collection.location, principal.iri, 'None')
+    const removePermission = (permission: Permission) => {
+        setPermission(collection.location, permission.iri, 'None')
             .catch(e => ErrorDialog.showError(e, 'Error removing permission.'))
             .finally(handleCloseConfirmDeleteDialog);
     };
