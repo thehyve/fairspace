@@ -49,8 +49,4 @@ public class RequestContext {
                 .map(KeycloakSecurityContext::getToken)
                 .orElse(null);
     }
-
-    public static boolean isUserInRole(String role) {
-        return getUserIdentity().map(u -> u.isUserInRole(role, null)).orElse(false);
-    }
 }
