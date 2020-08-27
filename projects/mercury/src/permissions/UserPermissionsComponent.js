@@ -35,7 +35,7 @@ const styles = {
     }
 };
 
-export const UserPermissionsComponent = ({permissions, setPermission, collection, currentUser, workspaceUsers, users, classes = {}}) => {
+export const UserPermissionsComponent = ({permissions, setPermission, collection, currentUser, workspaceUsers, users, classes}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [showConfirmChangeDialog, setShowConfirmChangeDialog] = useState(false);
     const [showAlterUserPermissionsDialog, setShowAlterUserPermissionsDialog] = useState(false);
@@ -90,10 +90,10 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
     const renderHeader = () => (
         <Toolbar className={classes.header}>
             <Typography variant="body1" id="tableTitle" component="div">
-                Users:
+                Users
             </Typography>
-            <Tooltip title="Add users">
-                {collection.canManage && (
+            {collection.canManage && (
+                <Tooltip title="Add users">
                     <IconButton
                         color="primary"
                         aria-label="add user permission"
@@ -102,8 +102,8 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
                     >
                         <Add />
                     </IconButton>
-                )}
-            </Tooltip>
+                </Tooltip>
+            )}
         </Toolbar>
     );
 

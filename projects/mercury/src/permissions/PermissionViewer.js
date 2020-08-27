@@ -49,9 +49,7 @@ PermissionViewer.defaultProps = {
     collaboratingWorkspaces: PropTypes.array,
     collaboratingUsers: PropTypes.array,
     currentUser: PropTypes.object,
-    setPermission: PropTypes.func,
-    error: PropTypes.bool,
-    loading: PropTypes.bool,
+    setPermission: PropTypes.func
 };
 
 const ContextualPermissionViewer = ({collection, workspaceUsers, collaboratingUsers, collaboratingWorkspaces}) => {

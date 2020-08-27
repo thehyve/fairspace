@@ -93,7 +93,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
     const renderAccessLevelControl = () => (
         <div className={classes.accessLevelControl}>
             <Typography component="p">
-                Selected users and access levels:
+                Selected users and access levels
             </Typography>
             <UserPermissionsTable
                 selectedPermissions={selectedPermissions}

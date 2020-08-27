@@ -72,10 +72,10 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
     const renderHeader = () => (
         <Toolbar className={classes.header}>
             <Typography variant="body1" id="tableTitle" component="div">
-                Workspaces:
+                Workspaces
             </Typography>
-            <Tooltip title="Add workspace">
-                {collection.canManage && (
+            {collection.canManage && (
+                <Tooltip title="Add workspace">
                     <IconButton
                         color="primary"
                         aria-label="add workspace"
@@ -84,8 +84,8 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
                     >
                         <Add />
                     </IconButton>
-                )}
-            </Tooltip>
+                </Tooltip>
+            )}
         </Toolbar>
     );
 

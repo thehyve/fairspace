@@ -68,9 +68,8 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                         >
                             {statuses.filter(status => collection.availableStatuses.includes(status))
                                 .map(status => (
-                                    <span className={classes.groupItem}>
+                                    <span className={classes.groupItem} key={status}>
                                         <FormControlLabel
-                                            key={status}
                                             value={status}
                                             control={<Radio />}
                                             label={camelCaseToWords(status)}
@@ -88,7 +87,8 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                 <ConfirmationButton
                     onClick={handleSubmit}
                     disabled={Boolean(!selectedValue)}
-                    message={`Are you sure you want to change the status of collection ${collection.name}`}
+                    message={`Are you sure you want to change the status of collection ${collection.name} to ${selectedValue}`
+                        + ` (${getStatusDescription(selectedValue)})?`}
                     agreeButtonText="Yes"
                     dangerous
                 >

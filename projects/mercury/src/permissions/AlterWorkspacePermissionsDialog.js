@@ -65,7 +65,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
     const renderSelectedWorkspaceList = () => (
         <div className={classes.accessLevelControl}>
             <Typography component="p">
-                Selected workspaces:
+                Selected workspaces
             </Typography>
             <WorkspacePermissionsTable
                 emptyPermissionsText="No workspace selected."
