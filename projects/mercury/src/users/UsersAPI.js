@@ -3,13 +3,6 @@ import axios from 'axios';
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {createMetadataIri} from '../metadata/common/metadataUtils';
 
-export type UserRoles = {
-    admin: boolean;
-    viewPublicMetadata: boolean;
-    viewPublicData: boolean;
-    addSharedMetadata: boolean;
-}
-
 export type User = {
     iri: string;
     id: string;
