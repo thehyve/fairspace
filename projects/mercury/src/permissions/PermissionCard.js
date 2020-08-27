@@ -207,7 +207,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     const renderOwnerWorkspaceAccess = () => (
         <div className={classes.propertyDiv}>
             <FormControl className={classes.propertyText}>
-                <InputLabel className={classes.label}>Default access for all workspace members:</InputLabel>
+                <InputLabel className={classes.label}>Default access for all collection owning workspace members:</InputLabel>
                 <Select
                     value={ownerWorkspaceAccess}
                     onChange={access => handleSetOwnerWorkspaceAccess(access)}

@@ -6,16 +6,11 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
-import {IconButton, Table, TableBody, TableCell, TableRow, Typography} from "@material-ui/core";
-import {Close, Person} from "@material-ui/icons";
-import Chip from "@material-ui/core/Chip";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import {Typography} from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import PermissionCandidateSelect from "./PermissionCandidateSelect";
-import type {AccessLevel, Permission} from "../collections/CollectionAPI";
-import {accessLevels} from "../collections/CollectionAPI";
+import type {Permission} from "../collections/CollectionAPI";
+import UserPermissionsTable from "./UserPermissionsTable";
 
 export const styles = {
     dialog: {
@@ -64,13 +59,12 @@ export const styles = {
 };
 
 export const AlterUserPermissionsDialog = ({collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
-    open = false, onClose, isWorkspaceMember, classes}) => {
+    open = false, onClose, classes}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
-    const handleChangeSelectedPermission = (selectedPermission: Permission) => {
-        const permissionToUpdate = selectedPermissions.find(p => p.iri === selectedPermission.iri);
-        permissionToUpdate.access = selectedPermission.access;
-        setSelectedPermissions([...selectedPermissions]);
+    const handleClose = () => {
+        setSelectedPermissions([]);
+        onClose();
     };
 
     const handleAddSelectedPermission = (selectedPermission: Permission) => {
@@ -83,9 +77,10 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
         setSelectedPermissions(reducedPermissions);
     };
 
-    const handleClose = () => {
-        setSelectedPermissions([]);
-        onClose();
+    const handleChangeSelectedPermission = (selectedPermission: Permission) => {
+        const permissionToUpdate = selectedPermissions.find(p => p.iri === selectedPermission.iri);
+        permissionToUpdate.access = selectedPermission.access;
+        setSelectedPermissions([...selectedPermissions]);
     };
 
     const handleSubmit = () => {
@@ -95,77 +90,21 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
         }
     };
 
-    const getAccessLevelsForPrincipal: AccessLevel[] = (selectedPrincipal) => {
-        if (workspaceUsers.some(wu => wu.iri === selectedPrincipal.iri)) {
-            return accessLevels;
-        }
-        return ['Read'];
-    };
-
-    function renderAccessLevelDropdown(selectedPermission: Permission) {
-        const accessLevelOptions = getAccessLevelsForPrincipal(selectedPermission);
-        return (
-            <FormControl>
-                <Select
-                    value={selectedPermission.access}
-                    onChange={v => handleChangeSelectedPermission({
-                        ...selectedPermission,
-                        access: v.target.value
-                    })}
-                >
-                    {accessLevelOptions.map(access => (
-                        <MenuItem key={access} value={access}>
-                            <span>{access}</span>
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-        );
-    }
-
     const renderAccessLevelControl = () => (
         <div className={classes.accessLevelControl}>
             <Typography component="p">
                 Selected users and access levels:
             </Typography>
-            {selectedPermissions.length === 0 ? (
-                <Typography variant="body2" className={classes.emptySelection}>
-                    No user selected.
-                </Typography>
-            ) : (
-                <Table size="small" className={classes.table}>
-                    <TableBody className={classes.tableBody}>
-                        {
-                            selectedPermissions.map(p => (
-                                <TableRow key={p.iri} className={classes.tableRow}>
-                                    <TableCell style={{width: 30}}>
-                                        <Person />
-                                    </TableCell>
-                                    <TableCell
-                                        className={classes.nameCell}
-                                        data-testid="permission"
-                                    >
-                                        {p.name}
-                                    </TableCell>
-                                    <TableCell style={{width: 40}}>
-                                        {isWorkspaceMember(p) && (<Chip label="Member" />)}
-                                    </TableCell>
-                                    <TableCell style={{width: 85}}>
-                                        {renderAccessLevelDropdown(p)}
-                                    </TableCell>
-                                    <TableCell style={{textAlign: "right", width: 30}}>
-                                        <IconButton
-                                            onClick={() => handleDeleteSelectedPermission(p)}
-                                        >
-                                            <Close />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
-            )}
+            <UserPermissionsTable
+                selectedPermissions={selectedPermissions}
+                workspaceUsers={workspaceUsers}
+                emptyPermissionsText="No user selected"
+                setSelectedPermissions={setSelectedPermissions}
+                canManage={collection.canManage}
+                currentUser={currentUser}
+                handleDeletePermission={handleDeleteSelectedPermission}
+                handleChangePermission={handleChangeSelectedPermission}
+            />
         </div>
     );
 
@@ -223,7 +162,6 @@ AlterUserPermissionsDialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     setPermission: PropTypes.func.isRequired,
-    isWorkspaceMember: PropTypes.func.isRequired,
     collection: PropTypes.object,
     permissionCandidates: PropTypes.array,
     workspaceUsers: PropTypes.array,

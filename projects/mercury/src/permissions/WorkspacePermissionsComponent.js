@@ -1,14 +1,16 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {IconButton, Table, TableBody, TableCell, TableRow, Typography, withStyles} from '@material-ui/core';
-import {Add, Close, Widgets} from "@material-ui/icons";
+import {IconButton, Typography, withStyles} from '@material-ui/core';
+import {Add} from "@material-ui/icons";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
+import PropTypes from "prop-types";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {sortPermissions} from "../collections/collectionUtils";
 import AlterWorkspacePermissionsDialog from "./AlterWorkspacePermissionsDialog";
+import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
 
 const styles = {
     tableWrapper: {
@@ -17,24 +19,6 @@ const styles = {
         marginLeft: 16,
         marginRight: 16,
         marginTop: 16
-    },
-    table: {
-        padding: 0
-    },
-    tableBody: {
-        display: "block",
-        overflow: "auto",
-        maxHeight: 150
-    },
-    tableRow: {
-        display: "table",
-        width: "100%",
-        height: 48
-    },
-    nameCell: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
     },
     header: {
         backgroundColor: "#f5f5f5",
@@ -48,19 +32,12 @@ const styles = {
     },
     addButton: {
         marginLeft: "auto"
-    },
-    iconCellButton: {
-        paddingTop: 0,
-        paddingBottom: 0
-    },
-    emptyPermissions: {
-        margin: 10
     }
 };
 
-export const WorkspacePermissionsList = ({permissions, setPermission, collection, workspaces, classes}) => {
+export const WorkspacePermissionsComponent = ({permissions, setPermission, collection, workspaces, classes}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
-    const [selectedWorkspace, setSelectedWorkspace] = useState(false);
+    const [selectedWorkspace, setSelectedWorkspace] = useState();
     const [showWorkspacePermissionsDialog, setShowWorkspacePermissionsDialog] = useState(false);
 
     const sortedPermissions = sortPermissions(permissions.filter(p => p.iri !== collection.ownerWorkspace));
@@ -112,45 +89,23 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
     );
 
     const renderPermissionTable = () => (
-        <Table size="small" className={classes.table}>
-            <TableBody className={classes.tableBody}>
-                {
-                    sortedPermissions.map(p => (
-                        <TableRow key={p.iri} className={classes.tableRow}>
-                            <TableCell style={{width: 30}}>
-                                <Widgets />
-                            </TableCell>
-                            <TableCell className={classes.nameCell}>
-                                {p.name}
-                            </TableCell>
-                            <TableCell style={{textAlign: "right", width: 30}} className={classes.iconCellButton}>
-                                {collection.canManage && (
-                                    <IconButton
-                                        onClick={() => handleDeletePermission(p)}
-                                    >
-                                        <Close />
-                                    </IconButton>
-                                )}
-                            </TableCell>
-                        </TableRow>
-                    ))
-                }
-            </TableBody>
-        </Table>
+        <WorkspacePermissionsTable
+            emptyPermissionsText="Collection is not shared with other workspaces."
+            selectedPermissions={sortedPermissions}
+            handleDeleteSelectedPermission={handleDeletePermission}
+            canManage={collection.canManage}
+        />
     );
 
     const renderDeletionConfirmationDialog = () => {
         if (!selectedWorkspace || !showConfirmDeleteDialog) {
             return null;
         }
-
-        const content = `Are you sure you do not want to share collection "${collection.name}" with workspace "${selectedWorkspace.name}" anymore?`;
-
         return (
             <ConfirmationDialog
                 open
                 title="Confirmation"
-                content={content}
+                content={`Are you sure you do not want to share collection "${collection.name}" with workspace "${selectedWorkspace.name}" anymore?`}
                 dangerous
                 agreeButtonText="Remove"
                 onAgree={() => removePermission(selectedWorkspace)}
@@ -173,22 +128,26 @@ export const WorkspacePermissionsList = ({permissions, setPermission, collection
     return (
         <div className={classes.tableWrapper}>
             {renderHeader()}
-            {sortedPermissions && sortedPermissions.length > 0 ? renderPermissionTable() : (
-                <Typography variant="body2" className={classes.emptyPermissions}>
-                    Collection is not shared with other workspaces.
-                </Typography>
-            )}
+            {renderPermissionTable()}
             {renderAlterWorkspacePermissionsDialog()}
             {renderDeletionConfirmationDialog()}
         </div>
     );
 };
 
-const ContextualWorkspacePermissionsList = (props) => {
+WorkspacePermissionsComponent.propTypes = {
+    classes: PropTypes.object.isRequired,
+    permissions: PropTypes.array,
+    setPermission: PropTypes.func,
+    collection: PropTypes.object,
+    workspaces: PropTypes.array
+};
+
+const ContextualWorkspacePermissionsComponent = (props) => {
     const {workspaces, workspaceLoading, workspaceError} = useContext(WorkspaceContext);
 
     return (
-        <WorkspacePermissionsList
+        <WorkspacePermissionsComponent
             {...props}
             loading={workspaceLoading}
             error={workspaceError}
@@ -197,4 +156,4 @@ const ContextualWorkspacePermissionsList = (props) => {
     );
 };
 
-export default withStyles(styles)(ContextualWorkspacePermissionsList);
+export default withStyles(styles)(ContextualWorkspacePermissionsComponent);

@@ -6,11 +6,11 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import {withStyles} from '@material-ui/core/styles';
-import {IconButton, Table, TableBody, TableCell, TableRow, Typography} from "@material-ui/core";
-import {Close, Widgets} from "@material-ui/icons";
+import {Typography} from "@material-ui/core";
 import Divider from "@material-ui/core/Divider";
 import PermissionCandidateSelect from "./PermissionCandidateSelect";
 import type {Permission} from "../collections/CollectionAPI";
+import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
 
 export const styles = {
     dialog: {
@@ -30,31 +30,9 @@ export const styles = {
     accessLevelControl: {
         marginTop: 10
     },
-    emptySelection: {
-        fontStyle: 'italic',
-        margin: 10
-    },
     divider: {
         marginTop: 15,
         marginBottom: 15
-    },
-    table: {
-        padding: 0
-    },
-    tableBody: {
-        display: "block",
-        overflow: "auto",
-        maxHeight: 150
-    },
-    tableRow: {
-        display: "table",
-        width: "100%",
-        height: 48
-    },
-    nameCell: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
     }
 };
 
@@ -62,14 +40,14 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
     open = false, onClose, classes}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
-    const handleAddSelectedPermission = (selectedPermission: Permission) => {
-        selectedPermissions.push(selectedPermission);
-        setSelectedPermissions([...selectedPermissions]);
-    };
-
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
         const reducedPermissions = selectedPermissions.filter(p => selectedPermission.iri !== p.iri);
         setSelectedPermissions(reducedPermissions);
+    };
+
+    const handleAddSelectedPermission = (selectedPermission: Permission) => {
+        selectedPermissions.push(selectedPermission);
+        setSelectedPermissions([...selectedPermissions]);
     };
 
     const handleClose = () => {
@@ -89,38 +67,12 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
             <Typography component="p">
                 Selected workspaces:
             </Typography>
-            {selectedPermissions.length === 0 ? (
-                <Typography variant="body2" className={classes.emptySelection}>
-                    No workspace selected.
-                </Typography>
-            ) : (
-                <Table size="small" className={classes.table}>
-                    <TableBody className={classes.tableBody}>
-                        {
-                            selectedPermissions.map(p => (
-                                <TableRow key={p.iri} className={classes.tableRow}>
-                                    <TableCell style={{width: 30}}>
-                                        <Widgets />
-                                    </TableCell>
-                                    <TableCell
-                                        className={classes.nameCell}
-                                        data-testid="permission"
-                                    >
-                                        {p.name}
-                                    </TableCell>
-                                    <TableCell style={{textAlign: "right", width: 30}}>
-                                        <IconButton
-                                            onClick={() => handleDeleteSelectedPermission(p)}
-                                        >
-                                            <Close />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
-            )}
+            <WorkspacePermissionsTable
+                emptyPermissionsText="No workspace selected."
+                selectedPermissions={selectedPermissions}
+                handleDeleteSelectedPermission={handleDeleteSelectedPermission}
+                canManage={collection.canManage}
+            />
         </div>
     );
 

@@ -1,10 +1,11 @@
 import React, {useContext} from 'react';
+import PropTypes from "prop-types";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
-import UserPermissionsList from "./UserPermissionsList";
+import UserPermissionsComponent from "./UserPermissionsComponent";
 import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
-import WorkspacePermissionsList from "./WorkspacePermissionsList";
+import WorkspacePermissionsComponent from "./WorkspacePermissionsComponent";
 import {sortPermissions} from "../collections/collectionUtils";
 
 export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorkspaces,
@@ -16,8 +17,8 @@ export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorks
         return (<LoadingInlay />);
     }
 
-    const renderUserPermissionList = () => (
-        <UserPermissionsList
+    const renderUserPermissionComponent = () => (
+        <UserPermissionsComponent
             permissions={sortPermissions(collaboratingUsers)}
             collection={collection}
             setPermission={setPermission}
@@ -26,8 +27,8 @@ export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorks
         />
     );
 
-    const renderWorkspacePermissionList = () => (
-        <WorkspacePermissionsList
+    const renderWorkspacePermissionComponent = () => (
+        <WorkspacePermissionsComponent
             permissions={sortPermissions(collaboratingWorkspaces)}
             setPermission={setPermission}
             collection={collection}
@@ -36,13 +37,22 @@ export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorks
 
     return (
         <div>
-            {renderUserPermissionList()}
-            {renderWorkspacePermissionList()}
+            {renderUserPermissionComponent()}
+            {renderWorkspacePermissionComponent()}
         </div>
     );
 };
 
-PermissionViewer.defaultProps = {};
+PermissionViewer.defaultProps = {
+    collection: PropTypes.object.isRequired,
+    workspaceUsers: PropTypes.array.isRequired,
+    collaboratingWorkspaces: PropTypes.array,
+    collaboratingUsers: PropTypes.array,
+    currentUser: PropTypes.object,
+    setPermission: PropTypes.func,
+    error: PropTypes.bool,
+    loading: PropTypes.bool,
+};
 
 const ContextualPermissionViewer = ({collection, workspaceUsers, collaboratingUsers, collaboratingWorkspaces}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);

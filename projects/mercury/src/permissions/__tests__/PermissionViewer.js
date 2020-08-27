@@ -2,17 +2,16 @@
 import React from 'react';
 import {shallow} from "enzyme";
 
-import {Button} from "@material-ui/core";
 import {PermissionViewer} from "../PermissionViewer";
-import UserPermissionsList from "../UserPermissionsList";
+import UserPermissionsComponent from "../UserPermissionsComponent";
 
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
-    const permissionsListProps = wrapper.find(UserPermissionsList).first().props();
+    const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
     expect(permissionsListProps.permissions.length).toBe(numberOfCollaborators);
 };
 
 const testOrderingOfCollaborators = (wrapper) => {
-    const permissionsListProps = wrapper.find(UserPermissionsList).first().props();
+    const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
     expect(permissionsListProps.permissions.map(p => p.iri)).toEqual(
         ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id']
     );
@@ -78,10 +77,10 @@ describe('PermissionViewer', () => {
                     collection={mockCollection}
                     collaboratingUsers={mockCollaborators}
                     collaboratingWorkspaces={[]}
-                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaces}
-                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
@@ -104,10 +103,10 @@ describe('PermissionViewer', () => {
                     collection={mockCollection}
                     collaboratingUsers={mockCollaborators}
                     collaboratingWorkspaces={[]}
-                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
-                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
@@ -130,10 +129,11 @@ describe('PermissionViewer', () => {
                     collection={mockCollection}
                     collaboratingUsers={[...mockCollaborators, mockUsers[0]]}
                     collaboratingWorkspaces={[]}
-                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
                     users={mockUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
@@ -152,10 +152,11 @@ describe('PermissionViewer', () => {
                     collection={mockCollection}
                     collaboratingUsers={[...mockCollaborators, mockOwnerWorkspace]}
                     collaboratingWorkspaces={[{iri: 'http://localhost/iri/w2'}]}
-                    workspaces={[mockOwnerWorkspace]}
                     workspaceUsers={mockWorkspaceUsers}
                     users={mockUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
