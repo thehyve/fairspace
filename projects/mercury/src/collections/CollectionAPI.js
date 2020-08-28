@@ -65,7 +65,7 @@ class CollectionAPI {
         return FileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
-    getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
+    getCollections(showDeleted = false): Promise<Collection[]> {
         return FileAPI.list(rootUrl, showDeleted)
             .then(collections => collections.map(mapFilePropertiesToCollection))
             .catch(handleHttpError("Failure when retrieving a list of collections"));

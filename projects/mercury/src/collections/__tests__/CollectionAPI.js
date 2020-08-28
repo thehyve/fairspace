@@ -17,7 +17,7 @@ describe('CollectionAPI', () => {
         ));
 
         it('retrieves data for collections', async () => {
-            await CollectionAPI.getCollections({iri: 'user1'});
+            await CollectionAPI.getCollections();
 
             expect(FileAPI.list).toHaveBeenCalledTimes(1);
             expect(FileAPI.list).toHaveBeenCalledWith('', false);
@@ -26,7 +26,7 @@ describe('CollectionAPI', () => {
         });
 
         it('retrieves collections including deleted', async () => {
-            await CollectionAPI.getCollections({iri: 'user1'}, true);
+            await CollectionAPI.getCollections(true);
             expect(FileAPI.list).toHaveBeenCalledTimes(1);
             expect(FileAPI.list).toHaveBeenCalledWith('', true);
         });
