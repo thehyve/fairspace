@@ -37,15 +37,15 @@ const columns = {
     },
     viewPublicData: {
         valueExtractor: 'canViewPublicData',
-        label: 'View Public Data'
+        label: 'View public data'
     },
     viewPublicMetadata: {
         valueExtractor: 'canViewPublicMetadata',
-        label: 'View Public Metadata'
+        label: 'View public metadata'
     },
     addSharedMetadata: {
         valueExtractor: 'canAddSharedMetadata',
-        label: 'Add Shared Metadata'
+        label: 'Add shared metadata'
     }
 };
 
