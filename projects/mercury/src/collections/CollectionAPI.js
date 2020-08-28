@@ -3,7 +3,6 @@ import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import MetadataAPI from "../metadata/common/MetadataAPI";
 import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
-import type {User} from "../users/UsersAPI";
 
 const rootUrl = '';
 
@@ -65,7 +64,7 @@ class CollectionAPI {
         return FileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
-    getCollections(currentUser: User, showDeleted = false): Promise<Collection[]> {
+    getCollections(showDeleted = false): Promise<Collection[]> {
         return FileAPI.list(rootUrl, showDeleted)
             .then(collections => collections.map(mapFilePropertiesToCollection))
             .catch(handleHttpError("Failure when retrieving a list of collections"));
