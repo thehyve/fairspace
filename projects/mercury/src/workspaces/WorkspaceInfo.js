@@ -9,6 +9,7 @@ import WorkspaceActionMenu from './WorkspaceActionMenu';
 import {isAdmin} from '../users/userUtils';
 import UserContext from '../users/UserContext';
 import type {Workspace} from './WorkspacesAPI';
+import WorkspaceContext from './WorkspaceContext';
 
 const WorkspaceInfoWithProvider = (props) => (
     <LinkedDataMetadataProvider>
@@ -25,8 +26,14 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
     const {iri} = workspace;
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
     const {currentUser} = useContext(UserContext);
+    const {refreshWorkspaces} = useContext(WorkspaceContext);
 
-    const contextMenu = isAdmin(currentUser) ? <WorkspaceActionMenu workspace={workspace} onUpdate={updateLinkedData} /> : null;
+    const onUpdate = () => {
+        updateLinkedData();
+        refreshWorkspaces();
+    };
+
+    const contextMenu = isAdmin(currentUser) ? <WorkspaceActionMenu workspace={workspace} /> : null;
 
     return (
         <>
@@ -41,7 +48,7 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
                         contextMenu={contextMenu}
                         linkedDataLoading={linkedDataLoading}
                         linkedDataError={linkedDataError}
-                        updateLinkedData={updateLinkedData}
+                        updateLinkedData={onUpdate}
                     />
                 ) : (
                     <LinkedDataEntityForm

@@ -25,6 +25,7 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
     return (
         <TextField
             {...otherProps}
+            helperText={property.description}
             margin="dense"
             multiline={property.multiLine}
             value={localValue}

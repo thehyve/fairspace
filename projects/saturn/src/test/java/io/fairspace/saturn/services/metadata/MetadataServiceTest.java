@@ -2,13 +2,11 @@ package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.services.metadata.MetadataService.NIL;
+import static io.fairspace.saturn.vocabulary.FS.NS;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -43,7 +42,7 @@ public class MetadataServiceTest {
     @Before
     public void setUp() {
         setupRequestContext();
-        api = new MetadataService(txn, VOCABULARY, new ComposedValidator());
+        api = new MetadataService(txn, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()));
     }
 
     @Test
@@ -129,12 +128,58 @@ public class MetadataServiceTest {
     }
 
     @Test
+    public void putMultiple() {
+        api.put(modelOf(
+                createStatement(S1, RDF.type, FS.Workspace),
+                createStatement(S1, RDFS.label, createStringLiteral("Test 1"))
+        ));
+        api.put(modelOf(
+                createStatement(S2, RDF.type, FS.Workspace),
+                createStatement(S2, RDFS.label, createStringLiteral("Test 2"))
+        ));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void putDuplicateLabelFails() {
+        api.put(modelOf(
+                createStatement(S1, RDF.type, FS.Workspace),
+                createStatement(S1, RDFS.label, createStringLiteral("Test"))
+                ));
+        api.put(modelOf(
+                createStatement(S2, RDF.type, FS.Workspace),
+                createStatement(S2, RDFS.label, createStringLiteral("Test"))
+        ));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void patchDuplicateLabelFails() {
+        txn.executeWrite(m -> m
+                .add(S1, RDF.type, FS.Workspace)
+                .add(S1, RDFS.label, "Test 1")
+                .add(S2, RDF.type, FS.Workspace)
+                .add(S2, RDFS.label, "Test 2")
+        );
+
+        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral("Test 2"))));
+    }
+
+    @Test
+    public void putSameLabelDifferentType() {
+        api.put(modelOf(
+                createStatement(S1, RDF.type, FS.Workspace),
+                createStatement(S1, RDFS.label, createStringLiteral("Test"))
+        ));
+        api.put(modelOf(
+                createStatement(S2, RDF.type, createResource(NS + "Sample")),
+                createStatement(S2, RDFS.label, createStringLiteral("Test"))
+        ));
+    }
+
+    @Test
     public void testPatchHandlesLifecycleForEntities() {
         var delta = modelOf(STMT1);
         api.patch(delta);
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.modifiedBy));
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateModified));
     }
-
-
 }
