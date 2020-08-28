@@ -49,7 +49,10 @@ describe('<CollectionBrowser />', () => {
         locationField.simulate('change', {target: {value: 'new-collection'}});
 
         const saveButton = wrapper.find('button[aria-label="Save"]').first();
+
+        jest.useFakeTimers();
         saveButton.simulate('click');
+        jest.runAllTimers();
 
         expect(collectionsContextMock.addCollection.mock.calls.length).toEqual(1);
     });

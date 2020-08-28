@@ -132,9 +132,7 @@ describe('CollectionEditor', () => {
 
         it('invokes the save callback with existing parameters if nothing is entered', () => {
             jest.useFakeTimers();
-
             wrapper.instance().handleSave();
-
             jest.runAllTimers();
 
             expect(saveCallback).toHaveBeenCalledTimes(1);
@@ -142,14 +140,12 @@ describe('CollectionEditor', () => {
         });
 
         it('invokes the save callback with parameters entered by the user', () => {
-            jest.useFakeTimers();
-
             wrapper.instance().handleInputChange('name', name);
             wrapper.instance().handleInputChange('description', description);
             wrapper.instance().handleInputChange('location', location);
 
+            jest.useFakeTimers();
             wrapper.instance().handleSave();
-
             jest.runAllTimers();
 
             expect(saveCallback).toHaveBeenCalledTimes(1);
