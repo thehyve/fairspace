@@ -35,6 +35,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,
     dateModified: properties.lastmod,
+    dateDeleted: properties.dateDeleted,
     accessMode: properties.accessMode,
     status: properties.status,
     accessModes: properties.accessModes,
