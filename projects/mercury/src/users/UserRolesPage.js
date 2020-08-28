@@ -17,6 +17,7 @@ import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {setUserRole} from "./UsersAPI";
+import ErrorDialog from "../common/components/ErrorDialog";
 
 const columns = {
     name: {
@@ -60,7 +61,9 @@ const UserRolesPage = () => {
         return (<LoadingInlay />);
     }
 
-    const toggleRole = (id, role, enable) => setUserRole(id, role, enable).then(refresh);
+    const toggleRole = (id, role, enable) => setUserRole(id, role, enable)
+        .then(refresh)
+        .catch(e => ErrorDialog.showError(e, e.message));
 
     return (
         <Paper style={{marginTop: 16}}>
@@ -126,6 +129,7 @@ const UserRolesPage = () => {
                                 <Checkbox
                                     checked={u.canAddSharedMetadata}
                                     onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
+                                    disabled={u.isSuperadmin}
                                 />
                             </TableCell>
                         </TableRow>
