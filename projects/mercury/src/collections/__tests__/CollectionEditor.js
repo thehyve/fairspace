@@ -131,7 +131,9 @@ describe('CollectionEditor', () => {
         });
 
         it('invokes the save callback with existing parameters if nothing is entered', () => {
+            jest.useFakeTimers();
             wrapper.instance().handleSave();
+            jest.runAllTimers();
 
             expect(saveCallback).toHaveBeenCalledTimes(1);
             expect(saveCallback).toHaveBeenCalledWith(collection);
@@ -142,7 +144,9 @@ describe('CollectionEditor', () => {
             wrapper.instance().handleInputChange('description', description);
             wrapper.instance().handleInputChange('location', location);
 
+            jest.useFakeTimers();
             wrapper.instance().handleSave();
+            jest.runAllTimers();
 
             expect(saveCallback).toHaveBeenCalledTimes(1);
             expect(saveCallback).toHaveBeenCalledWith({name, description, location, ownerWorkspace});
