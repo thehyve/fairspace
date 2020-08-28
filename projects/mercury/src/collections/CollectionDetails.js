@@ -31,7 +31,7 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import {camelCaseToWords} from "../common/utils/genericUtils";
-import CollectionPropertyChangeDialog from "./CollectionStatusChangeDialog";
+import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 import {getStatusDescription} from "./collectionUtils";
 
@@ -126,7 +126,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleUndelete = () => {
-        if (this.props.collection.canWrite) {
+        if (this.props.collection.canManage) {
             this.setState({undeleting: true});
             this.handleMenuClose();
         }
@@ -223,7 +223,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={collection.canManage && (
+                        action={(this.canManage || this.canManageStatusAndMode) && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -241,15 +241,21 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                 >
                                     {!collection.dateDeleted && (
                                         <div>
-                                            <MenuItem onClick={this.handleEdit}>
-                                                Edit
-                                            </MenuItem>
-                                            <MenuItem onClick={this.handleChangeStatus}>
-                                                Change status
-                                            </MenuItem>
-                                            <MenuItem onClick={this.handleChangeOwner}>
-                                                Transfer ownership
-                                            </MenuItem>
+                                            {collection.canManage && (
+                                                <>
+                                                    <MenuItem onClick={this.handleEdit}>
+                                                        Edit
+                                                    </MenuItem>
+                                                    <MenuItem onClick={this.handleChangeOwner}>
+                                                        Transfer ownership
+                                                    </MenuItem>
+                                                </>
+                                            )}
+                                            {collection.canManageStatusAndMode && (
+                                                <MenuItem onClick={this.handleChangeStatus}>
+                                                    Change status
+                                                </MenuItem>
+                                            )}
                                         </div>
                                     )}
                                     {collection && collection.dateDeleted && isAdmin(this.props.currentUser) ? (
@@ -294,7 +300,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     />
                 ) : null}
                 {changingStatus ? (
-                    <CollectionPropertyChangeDialog
+                    <CollectionStatusChangeDialog
                         collection={collection}
                         setValue={this.props.setStatus}
                         onClose={() => this.setState({changingStatus: false})}

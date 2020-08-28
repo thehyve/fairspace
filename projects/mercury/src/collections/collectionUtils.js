@@ -98,6 +98,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     dateDeleted: properties.dateDeleted,
     accessMode: properties.accessMode,
     status: properties.status,
+    canManageStatusAndMode: properties.canManageStatusAndMode,
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),
     ...(properties.access && mapCollectionPermissions(properties.access)),

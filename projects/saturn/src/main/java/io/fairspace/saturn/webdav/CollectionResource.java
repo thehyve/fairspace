@@ -20,6 +20,7 @@ import java.util.Set;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
+import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
 import static io.fairspace.saturn.webdav.PathUtils.name;
 import static java.util.stream.Collectors.joining;
 
@@ -110,8 +111,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             subject.getModel()
                     .removeAll(old, FS.canManage, subject)
                     .removeAll(old, FS.canWrite, subject)
-                    .removeAll(old, FS.canRead, subject)
-                    .removeAll(old, FS.canManage, subject);
+                    .removeAll(old, FS.canRead, subject);
 
         }
     }
@@ -119,6 +119,14 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     @Property
     public Access getAccess() {
         return access;
+    }
+
+    @Property
+    public boolean canManageStatusAndMode() {
+        return access.canManage() || (!subject.hasProperty(FS.dateDeleted) && (
+                getGrantedPermission(subject, factory.currentUserResource()) == Access.Manage
+                || factory.currentUserResource().hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
+        ));
     }
 
     @Property
@@ -147,7 +155,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
      * excluded when in status {@link Status#Archived}.
      */
     public Set<AccessMode> availableAccessModes() {
-        if (!access.canManage()) {
+        if (!canManageStatusAndMode()) {
             return EnumSet.of(getAccessMode());
         }
 
@@ -204,7 +212,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     public Set<Status> availableStatuses() {
-        if (!access.canManage()) {
+        if (!canManageStatusAndMode()) {
             return EnumSet.of(getStatus());
         }
 
@@ -253,7 +261,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private void setStatus(Status status) throws NotAuthorizedException, ConflictException {
-        if (!access.canManage()) {
+        if (!canManageStatusAndMode()) {
             throw new NotAuthorizedException(this);
         }
         if (!availableStatuses().contains(status)) {
@@ -263,7 +271,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private void setAccessMode(AccessMode mode) throws NotAuthorizedException, ConflictException {
-        if (!access.canManage()) {
+        if (!canManageStatusAndMode()) {
             throw new NotAuthorizedException(this);
         }
         if (!availableAccessModes().contains(mode)) {
