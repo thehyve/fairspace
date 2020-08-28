@@ -1,13 +1,14 @@
 package io.fairspace.saturn.rdf.search;
 
+import io.fairspace.saturn.services.users.UserService;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
 import org.apache.jena.sparql.util.Context;
 
-import static io.fairspace.saturn.auth.RequestContext.isAdmin;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.Services.FS_ROOT;
+import static io.fairspace.saturn.config.Services.USER_SERVICE;
 
 // TODO: Use Permissions service instead of WebDAV
 public class IndexDispatcher {
@@ -40,7 +41,8 @@ public class IndexDispatcher {
     }
 
     public String[] getAvailableIndexes() {
-        if (isAdmin()) {
+        var userService = (UserService) context.get(USER_SERVICE);
+        if (userService.currentUser().isAdmin()) {
             return ALL_INDEXES;
         }
 

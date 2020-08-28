@@ -1,12 +1,15 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, FolderOpen, OpenInNew, Widgets} from "@material-ui/icons";
+import {Assignment, FolderOpen, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
+import UserContext from "../users/UserContext";
+import {isAdmin} from "../users/userUtils";
 
 export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
+    const {currentUser} = useContext(UserContext);
     return (
         <>
             <List>
@@ -44,6 +47,23 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Metadata" />
                 </ListItem>
+                {
+                    isAdmin(currentUser)
+                    && (
+                        <ListItem
+                            key="users"
+                            component={NavLink}
+                            to="/users"
+                            button
+                            selected={pathname.startsWith('/users')}
+                        >
+                            <ListItemIcon>
+                                <VerifiedUser />
+                            </ListItemIcon>
+                            <ListItemText primary="Users" />
+                        </ListItem>
+                    )
+                }
             </List>
 
             <div>

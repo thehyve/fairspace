@@ -30,6 +30,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 @Getter
 public class Services {
     public static final Symbol FS_ROOT = Symbol.create("file_system_root");
+    public static final Symbol USER_SERVICE = Symbol.create("user_service");
 
     private final Config config;
     private final Transactions transactions;
@@ -50,16 +51,17 @@ public class Services {
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions);
+        dataset.getContext().set(USER_SERVICE, userService);
 
         mailService = new MailService(config.mail);
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, mailService);
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, mailService);
         dataset.getContext().set(FS_ROOT, davFactory.root);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        workspaceService = new WorkspaceService(transactions, mailService);
+        workspaceService = new WorkspaceService(transactions, userService, mailService);
 
-        metadataPermissions = new MetadataPermissions(workspaceService, davFactory);
+        metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(),

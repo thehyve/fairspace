@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -9,7 +10,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
 
-import static io.fairspace.saturn.auth.RequestContext.*;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.util.EnumUtils.max;
 import static io.fairspace.saturn.util.EnumUtils.min;
 import static io.fairspace.saturn.webdav.AccessMode.DataPublished;
@@ -20,14 +21,16 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 public class DavFactory implements ResourceFactory {
     final org.apache.jena.rdf.model.Resource rootSubject;
     final BlobStore store;
+    final UserService userService;
     final MailService mailService;
     private final String baseUri;
     public final RootResource root = new RootResource(this);
 
 
-    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, MailService mailService) {
+    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, MailService mailService) {
         this.rootSubject = rootSubject;
         this.store = store;
+        this.userService = userService;
         this.mailService = mailService;
         var uri = URI.create(rootSubject.getURI());
         this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
@@ -60,7 +63,7 @@ public class DavFactory implements ResourceFactory {
             return Access.None;
         }
 
-        if (isAdmin()) {
+        if (userService.currentUser().isAdmin()) {
             return Access.Manage;
         }
 
@@ -70,10 +73,10 @@ public class DavFactory implements ResourceFactory {
 
         var access = getGrantedPermission(coll, user);
 
-        if (coll.hasLiteral(FS.accessMode, DataPublished.name()) && (canViewPublicData() || access.canRead())) {
+        if (coll.hasLiteral(FS.accessMode, DataPublished.name()) && (userService.currentUser().isCanViewPublicData() || access.canRead())) {
             return Access.Read;
         }
-        if (!access.canList() && canViewPublicMetadata()
+        if (!access.canList() && userService.currentUser().isCanViewPublicMetadata()
                 && (coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
             access = Access.List;
         }

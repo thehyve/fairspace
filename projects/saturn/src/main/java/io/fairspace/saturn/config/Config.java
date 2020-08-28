@@ -74,6 +74,7 @@ public class Config {
         public String realm = "fairspace";
         public String clientId = "workspace-client";
         public boolean enableBasicAuth;
+        public String superAdminUser = "organisation-admin";
     }
 
     public static class WebDAV {

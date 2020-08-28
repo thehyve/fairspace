@@ -4,6 +4,8 @@ import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -16,13 +18,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.mail.Session;
 
-import static io.fairspace.saturn.TestUtils.setAdminFlag;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkspaceServiceTest {
@@ -39,12 +41,16 @@ public class WorkspaceServiceTest {
     @Mock
     Session session;
     @Mock
+    private UserService userService;
+    User user = new User();
+    @Mock
     private MailService mailService = new MailService(session);
 
     @Before
     public void setUp() {
         setupRequestContext();
-        service = new WorkspaceService(txn, mailService);
+        when(userService.currentUser()).thenReturn(user);
+        service = new WorkspaceService(txn, userService, mailService);
 
         txn.executeWrite(model -> model
                 .add(WORKSPACE_1, RDF.type, FS.Workspace)
@@ -58,7 +64,7 @@ public class WorkspaceServiceTest {
 
     @Test
     public void testDeleteEmptyWorkspace() {
-        setAdminFlag(true);
+        user.setAdmin(true);
         service.deleteWorkspace(createURI(EMPTY_WORKSPACE.getURI()));
 
         txn.executeRead(model -> {
@@ -69,13 +75,12 @@ public class WorkspaceServiceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testDeleteEmptyWorkspaceNoPermission() {
-        setAdminFlag(false);
         service.deleteWorkspace(createURI(EMPTY_WORKSPACE.getURI()));
     }
 
     @Test
     public void testDeleteNonWorkspaceResource() {
-        setAdminFlag(true);
+        user.setAdmin(true);
         try {
             service.deleteWorkspace(createURI(RESOURCE_1.getURI()));
             fail();
@@ -86,7 +91,7 @@ public class WorkspaceServiceTest {
 
     @Test
     public void testDeleteNonEmptyWorkspace() {
-        setAdminFlag(true);
+        user.setAdmin(true);
         try {
             service.deleteWorkspace(createURI(WORKSPACE_1.getURI()));
             fail();

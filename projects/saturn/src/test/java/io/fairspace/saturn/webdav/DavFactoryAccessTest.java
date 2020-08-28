@@ -1,6 +1,8 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -13,23 +15,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mock;
 
 import java.util.Arrays;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
-import static io.fairspace.saturn.auth.RequestContext.VIEW_PUBLIC_DATA;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
 public class DavFactoryAccessTest {
     public static final String BASE_PATH = "/api/v1/webdav";
     private static final String baseUri = "http://example.com" + BASE_PATH;
-    @Mock
-    BlobStore store;
-    @Mock
-    MailService mailService;
+    BlobStore store = mock(BlobStore.class);
+    UserService userService = mock(UserService.class);
+    MailService mailService = mock(MailService.class);
+    User user = new User();
     private ResourceFactory factory;
     private Model model = createTxnMem().getDefaultModel();
 
@@ -78,8 +80,11 @@ public class DavFactoryAccessTest {
 
     @Before
     public void before() {
-        setupRequestContext(VIEW_PUBLIC_DATA);
-        factory = new DavFactory(model.createResource(baseUri), store, mailService);
+        setupRequestContext();
+        user.setCanViewPublicData(true);
+        user.setCanViewPublicMetadata(true);
+        when(userService.currentUser()).thenReturn(user);
+        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService);
     }
 
     @Test

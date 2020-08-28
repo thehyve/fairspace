@@ -5,7 +5,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.dao.PersistentEntity;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
 import org.keycloak.OAuth2Constants;
@@ -13,24 +15,34 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UsersResource;
 
 import javax.servlet.ServletException;
-import java.util.List;
+import javax.ws.rs.NotFoundException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.System.getenv;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 public class UserService {
-    private final LoadingCache<Boolean, List<User>> users;
+    private final LoadingCache<Boolean, Map<Node, User>> usersCache;
+    private final Transactions transactions;
+    private final Config.Auth config;
     private final UsersResource usersResource;
 
 
     public UserService(Config.Auth config, Transactions transactions) {
-        usersResource = KeycloakBuilder.builder()
+        this.config = config;
+        this.transactions = transactions;
+
+        this.usersResource = KeycloakBuilder.builder()
                 .serverUrl(config.authServerUrl)
                 .realm(config.realm)
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
@@ -42,28 +54,78 @@ public class UserService {
                 .realm(config.realm)
                 .users();
 
-        users = CacheBuilder.newBuilder()
-                .expireAfterAccess(30, TimeUnit.SECONDS)
+        usersCache = CacheBuilder.newBuilder()
+                .refreshAfterWrite(30, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
-                    public List<User> load(Boolean key) {
-                        var users = fetchKeycloakUsers();
-                        transactions.executeWrite(ds -> users.forEach(new DAO(ds)::write));
-                        return users;
+                    public Map<Node, User> load(Boolean key) {
+                        return fetchUsers();
                     }
                 });
     }
 
-    public User getUser(Node iri) {
-        return getUsers().stream().filter(u -> u.getIri().equals(iri)).findFirst().orElse(null);
+    public Collection<User> getUsers() {
+        return getUsersMap().values();
     }
 
-    public List<User> getUsers() {
+    public User currentUser() {
+        return getUsersMap().get(getUserURI());
+    }
+
+    public Map<Node, User> getUsersMap() {
         try {
-            return users.get(false);
+            return usersCache.get(Boolean.FALSE);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Map<Node, User> fetchUsers() {
+        var keycloakUsers = usersResource.list();
+        var updated = new HashSet<User>();
+        var users = transactions.calculateRead(model -> {
+            var dao = new DAO(model);
+            return keycloakUsers.stream()
+                    .map(ku -> {
+                        var iri = generateMetadataIri(ku.getId());
+                        var user = dao.read(User.class, iri);
+                        if (user == null) {
+                            user = new User();
+                            user.setIri(iri);
+                            user.setId(ku.getId());
+
+                            if (config.superAdminUser.equals(ku.getUsername())) {
+                                user.setSuperadmin(true);
+                                user.setAdmin(true);
+                                user.setCanViewPublicMetadata(true);
+                                user.setCanViewPublicData(true);
+                            }
+
+                            updated.add(user);
+                        }
+
+                        var name = (isNotEmpty(ku.getFirstName()) || isNotEmpty(ku.getLastName()))
+                                ? (ku.getFirstName() + " " + ku.getLastName()).trim()
+                                : ku.getUsername();
+
+                        if (!Objects.equals(user.getName(), name) || !Objects.equals(user.getEmail(), ku.getEmail())) {
+                            user.setEmail(ku.getEmail());
+                            user.setName(name);
+                            updated.add(user);
+                        }
+
+                        return user;
+                    }).collect(toMap(PersistentEntity::getIri, u -> u));
+        });
+
+        if (!updated.isEmpty()) {
+            transactions.executeWrite(model -> {
+                var dao = new DAO(model);
+                updated.forEach(dao::write);
+            });
+        }
+
+        return users;
     }
 
     public void logoutCurrent() {
@@ -74,20 +136,47 @@ public class UserService {
         }
     }
 
-    private List<User> fetchKeycloakUsers() {
-        return usersResource.list()
-                .stream()
-                .map(keycloakUser -> {
-                    var user = new User();
-                    var name = (isNotEmpty(keycloakUser.getFirstName()) || isNotEmpty(keycloakUser.getLastName()))
-                            ? (keycloakUser.getFirstName() + " " + keycloakUser.getLastName()).trim()
-                            : keycloakUser.getUsername();
-                    user.setId(keycloakUser.getId());
-                    user.setIri(generateMetadataIri(keycloakUser.getId()));
-                    user.setName(name);
-                    user.setEmail(keycloakUser.getEmail());
-                    return user;
-                })
-                .collect(Collectors.toList());
+    public void update(UserRolesUpdate roles) {
+        if (!currentUser().isAdmin()) {
+            throw new AccessDeniedException();
+        }
+        transactions.executeWrite(model -> {
+            var dao = new DAO(model);
+            var user = dao.read(User.class, generateMetadataIri(roles.getId()));
+            if (user == null) {
+                throw new NotFoundException();
+            }
+            if (user.isSuperadmin()) {
+                throw new IllegalArgumentException("Cannot modify superadmin's roles");
+            }
+            if (roles.getAdmin() != null) {
+                user.setAdmin(roles.getAdmin());
+                if (user.isAdmin()) {
+                    user.setCanViewPublicData(true);
+                    user.setCanViewPublicMetadata(true);
+                }
+            }
+            if (roles.getCanViewPublicData() != null) {
+                user.setCanViewPublicData(roles.getCanViewPublicData());
+                if (user.isCanViewPublicData()) {
+                    user.setCanViewPublicMetadata(true);
+                }
+            }
+            if (roles.getCanViewPublicMetadata() != null) {
+                user.setCanViewPublicMetadata(roles.getCanViewPublicMetadata());
+            }
+            if (roles.getCanAddSharedMetadata() != null) {
+                user.setCanAddSharedMetadata(roles.getCanAddSharedMetadata());
+            }
+
+            if (user.isAdmin() && !user.isCanViewPublicData()
+            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()) {
+                throw new IllegalArgumentException("Inconsistent organisation-level roles");
+            }
+
+            dao.write(user);
+        });
+
+        usersCache.invalidateAll();
     }
 }

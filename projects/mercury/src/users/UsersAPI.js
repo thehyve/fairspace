@@ -3,20 +3,17 @@ import axios from 'axios';
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {createMetadataIri} from '../metadata/common/metadataUtils';
 
-export type UserRoles = {
-    admin: boolean;
-    viewPublicMetadata: boolean;
-    viewPublicData: boolean;
-    addSharedMetadata: boolean;
-}
-
 export type User = {
     iri: string;
     id: string;
     name: string;
     email?: string;
     access: string;
-    roles: UserRoles;
+    isSuperadmin: boolean;
+    isAdmin: boolean;
+    canViewPublicMetadata: boolean;
+    canViewPublicData: boolean;
+    canAddSharedMetadata: boolean;
 }
 
 const requestOptions = {
@@ -35,3 +32,6 @@ export const getUsers = (): User[] => axios.get('/api/v1/users/', requestOptions
     .catch(handleHttpError('Error while loading users'))
     .then(extractJsonData)
     .then((users: User[]) => users.map(user => ({iri: createMetadataIri(user.id), ...user})));
+
+export const setUserRole = (id: string, role, enable: boolean) => axios.patch('/api/v1/users/', {id, [role]: enable})
+    .catch(handleHttpError('Error altering user\'s role'));

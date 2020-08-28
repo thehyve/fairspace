@@ -21,7 +21,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
 import {canAlterPermission} from "../permissions/permissionUtils";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import type {User, UserRoles} from "./UsersAPI";
+import type {User} from "./UsersAPI";
 import UsersContext from "./UsersContext";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
@@ -49,7 +49,7 @@ const columns = {
 };
 
 type UserListProps = {
-    currentUser: User & UserRoles,
+    currentUser: User,
     workspace: Workspace,
     workspaceRoles: Object,
     workspaceRolesError: boolean,

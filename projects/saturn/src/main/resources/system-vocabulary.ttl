@@ -468,6 +468,38 @@ fs:User a rdfs:Class, sh:NodeShape ;
          sh:path fs:email
     ],
     [
+        sh:name "Is admin" ;
+        sh:description "Is an admin." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:isAdmin
+    ],
+    [
+        sh:name "Can view public metadata" ;
+        sh:description "Allows the user to view public metadata." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:canViewPublicMetadata ;
+    ],
+    [
+        sh:name "Can view public data" ;
+        sh:description "Allows the user to view public data." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:canViewPublicData ;
+    ],
+    [
+        sh:name "Can add shared metadata" ;
+        sh:description "Allows the user to create shared metadata entities." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:canAddSharedMetadata ;
+    ],
+    [
          sh:name "Can list" ;
          sh:description "Visible collections" ;
          sh:class fs:Collection ;
