@@ -32,3 +32,6 @@ export const getUsers = (): User[] => axios.get('/api/v1/users/', requestOptions
     .catch(handleHttpError('Error while loading users'))
     .then(extractJsonData)
     .then((users: User[]) => users.map(user => ({iri: createMetadataIri(user.id), ...user})));
+
+export const setUserRole = (id: string, role, enable: boolean) => axios.patch('/api/v1/users/', {id, [role]: enable})
+    .catch(handleHttpError('Error altering user\'s role'));
