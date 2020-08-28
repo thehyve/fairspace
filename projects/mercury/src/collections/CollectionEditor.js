@@ -84,13 +84,13 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     };
 
     handleAddCollection = (properties: CollectionProperties) => {
-        const {addCollection} = this.props;
-        return addCollection(properties)
-            .then(() => this.close())
+        setTimeout(() => this.props.addCollection(properties)
             .catch(err => {
                 const message = err && err.message ? err.message : "An error occurred while creating a collection";
                 ErrorDialog.showError(err, message);
-            });
+            }), 0);
+
+        this.close();
     };
 
     handleCollectionLocationChange = (newLocation: string) => {
