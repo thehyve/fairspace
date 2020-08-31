@@ -223,7 +223,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={(collection.canManage || collection.canManageStatusAndMode) && (
+                        action={collection.canWrite && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -241,15 +241,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                 >
                                     {!collection.dateDeleted && (
                                         <div>
+                                            <MenuItem onClick={this.handleEdit}>
+                                                Edit
+                                            </MenuItem>
                                             {collection.canManage && (
-                                                <>
-                                                    <MenuItem onClick={this.handleEdit}>
-                                                        Edit
-                                                    </MenuItem>
-                                                    <MenuItem onClick={this.handleChangeOwner}>
-                                                        Transfer ownership
-                                                    </MenuItem>
-                                                </>
+                                                <MenuItem onClick={this.handleChangeOwner}>
+                                                    Transfer ownership
+                                                </MenuItem>
                                             )}
                                             {collection.canManageStatusAndMode && (
                                                 <MenuItem onClick={this.handleChangeStatus}>
@@ -258,15 +256,17 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             )}
                                         </div>
                                     )}
-                                    {collection && collection.dateDeleted && isAdmin(this.props.currentUser) ? (
-                                        <MenuItem onClick={this.handleDelete}>Delete permanently</MenuItem>
-                                    ) : (
-                                        <MenuItem onClick={this.handleDelete}>Delete</MenuItem>
-                                    )}
-                                    {collection.dateDeleted && (
-                                        <MenuItem onClick={this.handleUndelete}>
-                                            Undelete
-                                        </MenuItem>
+                                    {collection.canManage && (
+                                        <div>
+                                            {collection && collection.dateDeleted && isAdmin(this.props.currentUser) ? (
+                                                <MenuItem onClick={this.handleDelete}>Delete permanently</MenuItem>
+                                            ) : (
+                                                <MenuItem onClick={this.handleDelete}>Delete</MenuItem>
+                                            )}
+                                            {collection.dateDeleted && (
+                                                <MenuItem onClick={this.handleUndelete}>Undelete</MenuItem>
+                                            )}
+                                        </div>
                                     )}
                                 </Menu>
                             </>

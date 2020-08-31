@@ -90,6 +90,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     protected void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
         if (purge) {
+            if(!factory.userService.currentUser().isAdmin()) {
+                throw new NotAuthorizedException();
+            }
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
             subject.addProperty(FS.dateDeleted, timestampLiteral())

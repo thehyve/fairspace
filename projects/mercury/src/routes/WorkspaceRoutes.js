@@ -83,6 +83,6 @@ const WorkspaceRoutes = () => {
             <Redirect to="/workspaces" />
         </Switch>
     );
-}
+};
 
 export default WorkspaceRoutes;
