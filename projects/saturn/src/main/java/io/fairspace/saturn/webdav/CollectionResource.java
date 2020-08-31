@@ -159,13 +159,12 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             return EnumSet.of(getAccessMode());
         }
 
-        var accessModes = EnumSet.of(AccessMode.MetadataPublished);
+        var accessModes = EnumSet.of(AccessMode.MetadataPublished, AccessMode.Restricted);
 
         if (getStatus() == Status.Archived) {
             accessModes.add(AccessMode.DataPublished);
-        } else {
-            accessModes.add(AccessMode.Restricted);
         }
+
         return accessModes;
     }
 

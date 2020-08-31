@@ -108,11 +108,11 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
 export const getStatusDescription = (status: Status) => {
     switch (status) {
         case "Active":
-            return "Editing data and metadata enabled.";
+            return "Editing data and metadata enabled";
         case "Archived":
-            return "Data immutable, read-only.";
+            return "Data immutable, read-only";
         case "Closed":
-            return "Data not available for reading.";
+            return "Data not available for reading";
         default:
             return "Unrecognized status";
     }
