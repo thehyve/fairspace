@@ -105,7 +105,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleChangeStatus = () => {
-        if (this.props.collection.canManage) {
+        if (this.props.collection.canManageStatusAndMode) {
             this.setState({changingStatus: true});
             this.handleMenuClose();
         }
@@ -223,7 +223,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={(this.canManage || this.canManageStatusAndMode) && (
+                        action={(collection.canManage || collection.canManageStatusAndMode) && (
                             <>
                                 <IconButton
                                     aria-label="More"
