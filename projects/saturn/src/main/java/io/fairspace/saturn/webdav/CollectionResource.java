@@ -122,11 +122,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Property
-    public boolean canManageStatusAndMode() {
-        return access.canManage() || (!subject.hasProperty(FS.dateDeleted) && (
-                getGrantedPermission(subject, factory.currentUserResource()) == Access.Manage
-                || factory.currentUserResource().hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
-        ));
+    public boolean getCanManageStatusAndMode() {
+        return canManageStatusAndMode();
     }
 
     @Property
@@ -224,6 +221,12 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         };
     }
 
+    private boolean canManageStatusAndMode() {
+        return access.canManage() || (!subject.hasProperty(FS.dateDeleted) && (
+                getGrantedPermission(subject, factory.currentUserResource()) == Access.Manage
+                        || factory.currentUserResource().hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
+        ));
+    }
 
     private String getPermissions(Resource principalType) {
         var builder = new StringBuilder();
