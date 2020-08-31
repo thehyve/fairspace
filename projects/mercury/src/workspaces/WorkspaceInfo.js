@@ -37,7 +37,7 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
 
     return (
         <>
-            <Paper style={{padding: 20}}>
+            <Paper style={{padding: 20, overflowX: 'auto'}}>
                 {workspace.canManage ? (
                     <LinkedDataEntityFormContainer
                         subject={iri}

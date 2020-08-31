@@ -48,9 +48,6 @@ const WorkspaceBrowser = () => {
     const closeCreateWorkspaceDialog = () => setCreatingWorkspace(false);
 
     const renderWorkspaceList = () => (
-    // workspaces.forEach((workspace: Workspace) => {
-    //     workspace.creatorObj = users.find(u => u.iri === workspace.createdBy);
-    // });
         <>
             <WorkspaceList
                 workspaces={workspaces}
