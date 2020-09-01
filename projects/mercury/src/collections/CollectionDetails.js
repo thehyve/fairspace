@@ -19,10 +19,8 @@ import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource, Status} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
-import UserContext from '../users/UserContext';
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
-import {isAdmin} from "../users/userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -62,7 +60,6 @@ type CollectionDetailsProps = {
     loading: boolean;
     collection: Collection;
     workspaces: Array<Workspace>;
-    currentUser: any;
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
@@ -105,7 +102,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleChangeStatus = () => {
-        if (this.props.collection.canManageStatusAndMode) {
+        if (this.props.collection.canManage) {
             this.setState({changingStatus: true});
             this.handleMenuClose();
         }
@@ -119,14 +116,14 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleDelete = () => {
-        if (this.props.collection.canManage) {
+        if (this.props.collection.canDelete) {
             this.setState({deleting: true});
             this.handleMenuClose();
         }
     };
 
     handleUndelete = () => {
-        if (this.props.collection.canManage) {
+        if (this.props.collection.canUndelete) {
             this.setState({undeleting: true});
             this.handleMenuClose();
         }
@@ -219,11 +216,46 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
         const workspaceUsers = users.filter(u => workspaceRoles.some(r => r.iri === u.iri));
 
+        const menuItems = [];
+        if (!collection.dateDeleted) {
+            if (collection.canWrite) {
+                menuItems.push(
+                    <MenuItem key="edit" onClick={this.handleEdit}>
+                        Edit
+                    </MenuItem>
+                );
+            }
+            if (collection.canManage) {
+                menuItems.push([
+                    <MenuItem key="ownership" onClick={this.handleChangeOwner}>
+                        Transfer ownership &hellip;
+                    </MenuItem>,
+                    <MenuItem key="status" onClick={this.handleChangeStatus}>
+                        Change status &hellip;
+                    </MenuItem>
+                ]);
+            }
+        }
+        if (collection.canDelete) {
+            menuItems.push(
+                <MenuItem key="delete" onClick={this.handleDelete}>
+                    {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
+                </MenuItem>
+            );
+        }
+        if (collection.canUndelete) {
+            menuItems.push(
+                <MenuItem key="undelete" onClick={this.handleUndelete}>
+                    Undelete &hellip;
+                </MenuItem>
+            );
+        }
+
         return (
             <>
                 <Card>
                     <CardHeader
-                        action={(collection.canManage || collection.canManageStatusAndMode) && (
+                        action={menuItems && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -239,35 +271,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                     open={Boolean(anchorEl)}
                                     onClose={this.handleMenuClose}
                                 >
-                                    {!collection.dateDeleted && (
-                                        <div>
-                                            {collection.canManage && (
-                                                <>
-                                                    <MenuItem onClick={this.handleEdit}>
-                                                        Edit
-                                                    </MenuItem>
-                                                    <MenuItem onClick={this.handleChangeOwner}>
-                                                        Transfer ownership
-                                                    </MenuItem>
-                                                </>
-                                            )}
-                                            {collection.canManageStatusAndMode && (
-                                                <MenuItem onClick={this.handleChangeStatus}>
-                                                    Change status
-                                                </MenuItem>
-                                            )}
-                                        </div>
-                                    )}
-                                    {collection && collection.dateDeleted && isAdmin(this.props.currentUser) ? (
-                                        <MenuItem onClick={this.handleDelete}>Delete permanently</MenuItem>
-                                    ) : (
-                                        <MenuItem onClick={this.handleDelete}>Delete</MenuItem>
-                                    )}
-                                    {collection.dateDeleted && (
-                                        <MenuItem onClick={this.handleUndelete}>
-                                            Undelete
-                                        </MenuItem>
-                                    )}
+                                    {menuItems}
                                 </Menu>
                             </>
                         )}
@@ -358,7 +362,6 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();
-    const {currentUser} = useContext(UserContext);
     const {users} = useContext(UsersContext);
     const {deleteCollection, undeleteCollection, setStatus, setOwnedBy} = useContext(CollectionsContext);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
@@ -371,7 +374,6 @@ const ContextualCollectionDetails = (props) => {
                         {...props}
                         error={props.error || workspacesError || workspaceRolesError}
                         loading={props.loading || workspacesLoading || workspaceRolesLoading}
-                        currentUser={currentUser}
                         users={users}
                         workspaceRoles={workspaceRoles}
                         workspaces={workspaces}

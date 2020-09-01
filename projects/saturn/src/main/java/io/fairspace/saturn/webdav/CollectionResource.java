@@ -33,7 +33,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
-            case DELETE -> access.canManage();
+            case DELETE -> canDelete();
+            case POST -> canManage();
             default -> super.authorise(request, method, auth);
         };
     }
@@ -122,8 +123,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Property
-    public boolean getCanManageStatusAndMode() {
-        return canManageStatusAndMode();
+    public boolean getCanManage() {
+        return canManage();
     }
 
     @Property
@@ -152,7 +153,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
      * excluded when in status {@link Status#Archived}.
      */
     public Set<AccessMode> availableAccessModes() {
-        if (!canManageStatusAndMode()) {
+        if (!canManage()) {
             return EnumSet.of(getAccessMode());
         }
 
@@ -208,22 +209,22 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     public Set<Status> availableStatuses() {
-        if (!canManageStatusAndMode()) {
+        if (!canManage()) {
             return EnumSet.of(getStatus());
         }
 
-        return switch (getStatus()) {
-            case Closed -> EnumSet.of(Status.Active, Status.Closed);
-            default -> (getAccessMode() == AccessMode.Restricted)
-                    ? EnumSet.allOf(Status.class)
-                    : EnumSet.of(Status.Active, Status.Archived);
-        };
+        if (getAccessMode() == AccessMode.DataPublished) {
+            return EnumSet.of(Status.Archived);
+        }
+
+        return EnumSet.allOf(Status.class);
     }
 
-    private boolean canManageStatusAndMode() {
+    private boolean canManage() {
+        var currentUser = factory.currentUserResource();
         return access.canManage() || (!subject.hasProperty(FS.dateDeleted) && (
-                getGrantedPermission(subject, factory.currentUserResource()) == Access.Manage
-                        || factory.currentUserResource().hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
+                getGrantedPermission(subject, currentUser) == Access.Manage
+                        || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
         ));
     }
 
@@ -263,7 +264,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private void setStatus(Status status) throws NotAuthorizedException, ConflictException {
-        if (!canManageStatusAndMode()) {
+        if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
         if (!availableStatuses().contains(status)) {
@@ -273,7 +274,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private void setAccessMode(AccessMode mode) throws NotAuthorizedException, ConflictException {
-        if (!canManageStatusAndMode()) {
+        if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
         if (!availableAccessModes().contains(mode)) {
@@ -325,17 +326,39 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
     }
 
+    @Property
+    public boolean getCanDelete() {
+        return canDelete();
+    }
+
+    private boolean canDelete() {
+        return canManage();
+    }
+
+    @Property
+    public boolean getCanUndelete() {
+        return canUndelete();
+    }
+
+    private boolean canUndelete() {
+        var currentUser = factory.currentUserResource();
+        return subject.hasProperty(FS.dateDeleted) && (access.canManage() || (
+                getGrantedPermission(subject, currentUser) == Access.Manage
+                        || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
+        ));
+    }
+
     @Override
     public void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
-        switch (getAccessMode()) {
-            case MetadataPublished, DataPublished -> throw new ConflictException(this);
-            default -> super.delete(purge);
+        if (!canDelete()) {
+            throw new ConflictException(this);
         }
+        super.delete(purge);
     }
 
     @Override
     protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
-        if (!access.canManage()) {
+        if (!canUndelete()) {
             throw new NotAuthorizedException(this);
         }
         super.undelete();

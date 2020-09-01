@@ -79,7 +79,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== "List");
 
     const handleSetAccessMode = (event) => {
-        if (collection.canManageStatusAndMode) {
+        if (collection.canManage) {
             setSelectedAccessMode(event.target.value);
             setChangingAccessMode(true);
         }
@@ -193,7 +193,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
 
     const renderAccessMode = () => (
         <div className={classes.propertyDiv}>
-            {collection.canManageStatusAndMode ? (
+            {collection.canManage ? (
                 <FormControl className={classes.propertyText}>
                     <InputLabel className={classes.label}>View mode:</InputLabel>
                     <Select

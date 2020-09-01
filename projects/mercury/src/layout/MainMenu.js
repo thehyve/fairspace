@@ -36,34 +36,33 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
-                <ListItem
-                    key="metadata"
-                    component={NavLink}
-                    to="/metadata"
-                    button
-                >
-                    <ListItemIcon>
-                        <Assignment />
-                    </ListItemIcon>
-                    <ListItemText primary="Metadata" />
-                </ListItem>
-                {
-                    isAdmin(currentUser)
-                    && (
-                        <ListItem
-                            key="users"
-                            component={NavLink}
-                            to="/users"
-                            button
-                            selected={pathname.startsWith('/users')}
-                        >
-                            <ListItemIcon>
-                                <VerifiedUser />
-                            </ListItemIcon>
-                            <ListItemText primary="Users" />
-                        </ListItem>
-                    )
-                }
+                {currentUser.canViewPublicMetadata && (
+                    <ListItem
+                        key="metadata"
+                        component={NavLink}
+                        to="/metadata"
+                        button
+                    >
+                        <ListItemIcon>
+                            <Assignment />
+                        </ListItemIcon>
+                        <ListItemText primary="Metadata" />
+                    </ListItem>
+                )}
+                {isAdmin(currentUser) && (
+                    <ListItem
+                        key="users"
+                        component={NavLink}
+                        to="/users"
+                        button
+                        selected={pathname.startsWith('/users')}
+                    >
+                        <ListItemIcon>
+                            <VerifiedUser />
+                        </ListItemIcon>
+                        <ListItemText primary="Users" />
+                    </ListItem>
+                )}
             </List>
 
             <div>
