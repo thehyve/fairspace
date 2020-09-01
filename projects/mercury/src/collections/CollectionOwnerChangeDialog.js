@@ -9,7 +9,7 @@ import {compareBy} from "../common/utils/genericUtils";
 import Dropdown from "../metadata/common/values/Dropdown";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
-export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy, onClose}) => {
+export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner, onClose}) => {
     const [selectedValue, setSelectedValue] = useState();
     const [openDialog, setOpenDialog] = useState(true);
 
@@ -33,8 +33,7 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy,
     const handleSubmit = () => {
         if (selectedValue) {
             setOpenDialog(false);
-            setOwnedBy(collection.location, selectedValue.iri);
-            onClose();
+            changeOwner(collection, selectedValue);
         }
     };
 
