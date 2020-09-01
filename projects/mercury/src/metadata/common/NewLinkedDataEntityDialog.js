@@ -48,8 +48,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
 
-    const {
-        addValue, updateValue, deleteValue,
+    const {addValue, updateValue, deleteValue,
         getUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid,
         hasFormUpdates, clearForm} = useFormData({}, extendedProperties);

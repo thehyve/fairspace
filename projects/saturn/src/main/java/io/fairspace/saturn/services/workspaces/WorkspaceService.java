@@ -58,7 +58,8 @@ public class WorkspaceService {
                                 .memberCount(memberCount + managers.size())
                                 .build());
                         ws.setManagers(managers);
-                    }).collect(toList());
+                    }).filter(ws -> userService.currentUser().isCanViewPublicMetadata() || ws.isCanManage() || ws.isCanCollaborate())
+                    .collect(toList());
         });
     }
 

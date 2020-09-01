@@ -327,8 +327,16 @@ public class DavFactoryTest {
         assertNotNull(coll.child("file"));
 
         var deleted = (DeletableResource) coll.child("file");
-        deleted.delete();
 
+        try {
+            deleted.delete();
+            fail("Only admin can purge a collection.");
+        } catch (NotAuthorizedException e) {
+            assertNotNull(e);
+        }
+
+        userService.currentUser().setAdmin(true);
+        deleted.delete();
 
         assertNull(coll.child("file"));
     }

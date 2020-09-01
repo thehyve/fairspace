@@ -29,7 +29,7 @@ public class MetadataPermissions {
             var ws = workspaceService.getWorkspace(resource.asNode());
             return ws.isCanCollaborate();
         }
-        return false;
+        return userService.currentUser().isCanViewPublicMetadata();
     }
 
     public boolean canWriteMetadata(Resource resource) {
@@ -43,6 +43,6 @@ public class MetadataPermissions {
             var ws = workspaceService.getWorkspace(resource.asNode());
             return ws.isCanManage();
         }
-        return userService.currentUser().isCanViewPublicMetadata();
+        return userService.currentUser().isCanAddSharedMetadata();
     }
 }

@@ -17,7 +17,7 @@ import {getDisplayName} from "../users/userUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {formatDateTime} from "../common/utils/genericUtils";
+import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 
@@ -29,6 +29,14 @@ const baseColumns = {
     workspace: {
         valueExtractor: 'workspaceName',
         label: 'Workspace'
+    },
+    status: {
+        valueExtractor: 'status',
+        label: 'Status'
+    },
+    viewMode: {
+        valueExtractor: 'accessMode',
+        label: 'View mode'
     },
     created: {
         valueExtractor: 'dateCreated',
@@ -128,14 +136,21 @@ const CollectionList = ({
                                 selected={selected}
                                 className={collection.dateDeleted && classes.deletedCollectionRow}
                             >
-                                <TableCell style={{maxWidth: 160}} scope="row">
+                                <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
                                     <ListItemText
                                         style={{margin: 0}}
                                         primary={collection.name}
-                                        secondary={collection.description} />
+                                        secondary={collection.description}
+                                    />
                                 </TableCell>
                                 <TableCell style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160}}>
                                     {collection.workspaceName}
+                                </TableCell>
+                                <TableCell>
+                                    {collection.status}
+                                </TableCell>
+                                <TableCell>
+                                    {camelCaseToWords(collection.accessMode)}
                                 </TableCell>
                                 <TableCell>
                                     {formatDateTime(collection.dateCreated)}

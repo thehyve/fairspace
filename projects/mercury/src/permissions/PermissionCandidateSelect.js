@@ -17,8 +17,8 @@ const PermissionCandidateSelect = ({filter = () => true, permissionCandidates = 
 
     return (
         <Dropdown
-            {...otherProps}
             clearTextOnSelection={false}
+            {...otherProps}
             options={options}
         />
     );

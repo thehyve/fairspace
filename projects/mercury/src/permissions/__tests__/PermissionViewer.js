@@ -2,24 +2,22 @@
 import React from 'react';
 import {shallow} from "enzyme";
 
-import {Button} from "@material-ui/core";
-import {CollaboratorsViewer} from "../CollaboratorsViewer";
-import PermissionsList from "../PermissionsList";
+import {PermissionViewer} from "../PermissionViewer";
+import UserPermissionsComponent from "../UserPermissionsComponent";
 
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
-    const permissionsListProps = wrapper.find(PermissionsList).first().props();
+    const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
     expect(permissionsListProps.permissions.length).toBe(numberOfCollaborators);
-    expect(permissionsListProps.selectedPrincipal).toBe(null);
 };
 
 const testOrderingOfCollaborators = (wrapper) => {
-    const permissionsListProps = wrapper.find(PermissionsList).first().props();
+    const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
     expect(permissionsListProps.permissions.map(p => p.iri)).toEqual(
         ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id']
     );
 };
 
-describe('CollaboratorsViewer', () => {
+describe('PermissionViewer', () => {
     const mockUsers = [
         {
             iri: 'http://localhost/iri/user2-id',
@@ -68,18 +66,21 @@ describe('CollaboratorsViewer', () => {
         mockUsers[3]
     ];
     const mockOwnerWorkspace = {iri: 'http://localhost/iri/w1'};
+    const mockWorkspaces = [mockOwnerWorkspace, {iri: 'http://localhost/iri/w2'}];
 
     describe('Use Case 1: Current user can manage collection', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
-                    collaborators={mockCollaborators}
-                    ownerWorkspace={mockOwnerWorkspace}
-                    workspaceUsers={mockWorkspaceUsers}
+                    collaboratingUsers={mockCollaborators}
+                    collaboratingWorkspaces={[]}
+                    workspaceUsers={mockWorkspaces}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
@@ -90,10 +91,6 @@ describe('CollaboratorsViewer', () => {
 
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             testOrderingOfCollaborators(wrapper);
-        });
-
-        it('should render add buttons', () => {
-            expect(wrapper.find(Button).length).toEqual(2);
         });
     });
 
@@ -101,13 +98,15 @@ describe('CollaboratorsViewer', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    collaborators={mockCollaborators}
-                    ownerWorkspace={mockOwnerWorkspace}
+                    collaboratingUsers={mockCollaborators}
+                    collaboratingWorkspaces={[]}
                     workspaceUsers={mockWorkspaceUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
@@ -119,23 +118,22 @@ describe('CollaboratorsViewer', () => {
         it('should order permissions by the access rank (Manage-Write-Read)', () => {
             testOrderingOfCollaborators(wrapper);
         });
-
-        it('should NOT render add buttons', () => {
-            expect(wrapper.find('[aria-label="Add"]').length).toEqual(0);
-        });
     });
 
     describe('Access to a collection is added to a new user', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCanManage}
                     collection={mockCollection}
-                    collaborators={[...mockCollaborators, mockUsers[0]]}
-                    ownerWorkspace={mockOwnerWorkspace}
+                    collaboratingUsers={[...mockCollaborators, mockUsers[0]]}
+                    collaboratingWorkspaces={[]}
                     workspaceUsers={mockWorkspaceUsers}
+                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });
@@ -145,17 +143,20 @@ describe('CollaboratorsViewer', () => {
         });
     });
 
-    describe('Access to a collection is added to an owner workspace', () => {
+    describe('Access to a collection is added to a workspace', () => {
         let wrapper;
         beforeAll(() => {
             wrapper = shallow(
-                <CollaboratorsViewer
+                <PermissionViewer
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
-                    collaborators={mockCollaborators}
-                    ownerWorkspace={{...mockOwnerWorkspace, access: 'Write'}}
+                    collaboratingUsers={[...mockCollaborators, mockOwnerWorkspace]}
+                    collaboratingWorkspaces={[{iri: 'http://localhost/iri/w2'}]}
                     workspaceUsers={mockWorkspaceUsers}
+                    users={mockUsers}
                     setPermission={mockSetPermissionFn}
+                    error={false}
+                    loading={false}
                 />
             );
         });

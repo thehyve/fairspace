@@ -1,9 +1,10 @@
 import React from 'react';
 import {createMount, createShallow} from '@material-ui/core/test-utils';
 import {Button} from '@material-ui/core';
-import CollectionPropertyChangeDialog from "../CollectionPropertyChangeDialog";
+import CollectionStatusChangeDialog from "../CollectionStatusChangeDialog";
+import {statuses} from "../CollectionAPI";
 
-describe('CollectionPropertyChangeDialog', () => {
+describe('CollectionStatusChangeDialog', () => {
     let shallow;
     let mount;
 
@@ -11,10 +12,10 @@ describe('CollectionPropertyChangeDialog', () => {
 
     const mockCollection = {
         iri: 'http://localhost/iri/c1',
-        location: 'c1'
+        location: 'c1',
+        availableStatuses: statuses,
+        status: 'Active'
     };
-
-    const mockAvailableValues = ["x", "y", "z"];
 
     let wrapper;
 
@@ -28,26 +29,24 @@ describe('CollectionPropertyChangeDialog', () => {
     });
 
     it('should render initial state of the dialog correctly', () => {
-        wrapper = shallow(<CollectionPropertyChangeDialog
+        wrapper = shallow(<CollectionStatusChangeDialog
             collection={mockCollection}
-            title="Select collection property value"
-            currentValue="x"
-            availableValues={mockAvailableValues}
             setValue={mockSetValueFn}
             onClose={() => {}}
+            classes={{}}
         />);
 
         // initial state if it's open or not
         expect(wrapper.find('[data-testid="property-change-dialog"]').prop('openDialog')).toBeFalsy();
 
         // title
-        expect(wrapper.find('#property-change-dialog-title').childAt(0).text()).toEqual("Select collection property value");
+        expect(wrapper.find('#property-change-dialog-title').childAt(0).text()).toEqual("Select collection status");
 
         // render available values
-        expect(wrapper.find('[aria-label="Available values"]').prop('value')).toEqual('x');
-        expect(wrapper.find('[aria-label="Available values"]').childAt(0).prop('value')).toEqual(mockAvailableValues[0]);
-        expect(wrapper.find('[aria-label="Available values"]').childAt(1).prop('value')).toEqual(mockAvailableValues[1]);
-        expect(wrapper.find('[aria-label="Available values"]').childAt(2).prop('value')).toEqual(mockAvailableValues[2]);
+        expect(wrapper.find('[aria-label="Available values"]').prop('value')).toEqual('Active');
+        expect(wrapper.find('[aria-label="Available values"]').childAt(0).childAt(0).prop('value')).toEqual(statuses[0]);
+        expect(wrapper.find('[aria-label="Available values"]').childAt(1).childAt(0).prop('value')).toEqual(statuses[1]);
+        expect(wrapper.find('[aria-label="Available values"]').childAt(2).childAt(0).prop('value')).toEqual(statuses[2]);
 
         // render cancel and submit buttons
         expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');
