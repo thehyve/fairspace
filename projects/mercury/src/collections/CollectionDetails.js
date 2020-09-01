@@ -14,7 +14,7 @@ import {
     MenuItem,
     Typography
 } from '@material-ui/core';
-import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
+import {CloudDownload, FolderOutlined, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 
 import CollectionEditor from "./CollectionEditor";
@@ -39,7 +39,7 @@ import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
 
 export const ICONS = {
-    LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
+    LOCAL_STORAGE: <FolderOutlined aria-label="Local storage" />,
     AZURE_BLOB_STORAGE: <CloudDownload />,
     S3_BUCKET: <CloudDownload />,
     GOOGLE_CLOUD_BUCKET: <CloudDownload />
@@ -190,7 +190,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                             this.props.history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
                         }}
                     >
-                        <Typography>{workspace.name}</Typography>
+                        <Typography variant="body2">{workspace.name}</Typography>
                     </Link>
                 </FormGroup>
             </FormControl>

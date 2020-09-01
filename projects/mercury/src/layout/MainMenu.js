@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, FolderOpen, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
+import {Assignment, FolderOutlined, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
@@ -32,7 +32,7 @@ export default () => {
                     selected={pathname.startsWith('/collections')}
                 >
                     <ListItemIcon>
-                        <FolderOpen />
+                        <FolderOutlined />
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>

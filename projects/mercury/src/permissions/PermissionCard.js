@@ -57,7 +57,7 @@ const styles = theme => ({
         margin: '0 4px'
     },
     property: {
-        marginTop: '2em'
+        marginTop: 10
     }
 });
 
@@ -252,20 +252,22 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    <List>
-                        <ListItem disableGutters>
-                            {renderAccessMode()}
-                        </ListItem>
-                        <ListItem disableGutters>
-                            {renderOwnerWorkspaceAccess()}
-                        </ListItem>
-                    </List>
-                    <PermissionViewer
-                        collection={collection}
-                        collaboratingUsers={collaboratingUsers}
-                        collaboratingWorkspaces={collaboratingWorkspaces}
-                        workspaceUsers={workspaceUsers}
-                    />
+                    <div style={{overflowX: 'auto'}}>
+                        <List>
+                            <ListItem disableGutters>
+                                {renderAccessMode()}
+                            </ListItem>
+                            <ListItem disableGutters>
+                                {renderOwnerWorkspaceAccess()}
+                            </ListItem>
+                        </List>
+                        <PermissionViewer
+                            collection={collection}
+                            collaboratingUsers={collaboratingUsers}
+                            collaboratingWorkspaces={collaboratingWorkspaces}
+                            workspaceUsers={workspaceUsers}
+                        />
+                    </div>
                 </CardContent>
                 {changingAccessMode && renderAccessModeChangeConfirmation()}
                 {changingOwnerWorkspaceAccess && renderOwnerWorkspaceAccessChangeConfirmation()}

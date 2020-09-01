@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import {IconButton, Table, TableBody, TableCell, TableRow, Typography, withStyles} from '@material-ui/core';
+import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography, withStyles} from '@material-ui/core';
 import {Close, Person} from "@material-ui/icons";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
@@ -14,19 +14,14 @@ const styles = {
         padding: 0
     },
     tableBody: {
-        display: "block",
-        overflow: "auto",
-        maxHeight: 150
+        display: 'block',
+        maxHeight: 150,
+        overflowX: 'auto'
     },
     tableRow: {
-        display: "table",
-        width: "100%",
-        height: 48,
-    },
-    nameCell: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
+        display: 'block',
+        height: 49,
+        width: '100%'
     },
     iconCellButton: {
         paddingTop: 0,
@@ -34,7 +29,8 @@ const styles = {
         textAlign: "right"
     },
     emptyPermissions: {
-        margin: 10,
+        margin: 15,
+        width: 350,
         fontStyle: 'italic'
     },
     accessDropdown: {
@@ -92,23 +88,27 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                         const canManageCurrentPermission = canManagePermission(p);
                         return (
                             <TableRow key={p.iri} className={classes.tableRow}>
-                                <TableCell style={{width: 30}}>
+                                <TableCell width={30}>
                                     <Person />
                                 </TableCell>
                                 <TableCell
-                                    className={classes.nameCell}
+                                    width={275}
                                     data-testid="permission"
                                 >
-                                    <span>{p.name}</span>
+                                    <Tooltip title={p.name} placement="left-start" arrow>
+                                        <Typography variant="body2" noWrap style={{width: 275}}>
+                                            {p.name}
+                                        </Typography>
+                                    </Tooltip>
                                 </TableCell>
-                                <TableCell style={{width: 85}}>
+                                <TableCell width={90}>
                                     {canManageCurrentPermission && accessLevelOptions.length > 1 ? (
                                         renderAccessLevelDropdown(p, accessLevelOptions)
                                     ) : (
                                         <span>{p.access}</span>
                                     )}
                                 </TableCell>
-                                <TableCell style={{width: 40}} className={classes.iconCellButton}>
+                                <TableCell width={40} className={classes.iconCellButton}>
                                     <IconButton
                                         onClick={() => handleDeletePermission(p)}
                                         disabled={!canManageCurrentPermission}
