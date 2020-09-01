@@ -33,16 +33,12 @@ public class TestUtils {
         return argThat(a -> a.containsAll(m));
     }
 
-    public static void setupRequestContext(String... roles) {
+    public static void setupRequestContext() {
         var request = mock(Request.class);
         setCurrentRequest(request);
         var auth = mock(Authentication.User.class);
         when(request.getAuthentication()).thenReturn(auth);
         var identity = mock(UserIdentity.class, withSettings().lenient());
-        when(identity.isUserInRole(any(), any())).thenAnswer(invocation -> {
-            var role = invocation.getArgument(0);
-            return List.of(roles).contains(role);
-        });
         when(auth.getUserIdentity()).thenReturn(identity);
         var principal = mock(KeycloakPrincipal.class, withSettings().lenient());
         when(identity.getUserPrincipal()).thenReturn(principal);

@@ -11,6 +11,7 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.MakeCollectionableResource;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.util.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ public class DavFactoryAccessTest {
     private Status status;
     private AccessMode accessMode;
     private Access expectedAccess;
+    private Context context = new Context();
 
     public DavFactoryAccessTest(Access grantedAccess, Status status, AccessMode accessMode, Access expectedAccess) {
         this.grantedAccess = grantedAccess;
@@ -84,7 +86,7 @@ public class DavFactoryAccessTest {
         user.setCanViewPublicData(true);
         user.setCanViewPublicMetadata(true);
         when(userService.currentUser()).thenReturn(user);
-        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService);
+        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
     }
 
     @Test

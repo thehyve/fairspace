@@ -31,6 +31,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 public class Services {
     public static final Symbol FS_ROOT = Symbol.create("file_system_root");
     public static final Symbol USER_SERVICE = Symbol.create("user_service");
+    public static final Symbol METADATA_SERVICE = Symbol.create("metadata_service");
 
     private final Config config;
     private final Transactions transactions;
@@ -55,7 +56,7 @@ public class Services {
 
         mailService = new MailService(config.mail);
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, mailService);
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, mailService, dataset.getContext());
         dataset.getContext().set(FS_ROOT, davFactory.root);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
@@ -72,6 +73,7 @@ public class Services {
                 new ShaclValidator());
 
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
+        dataset.getContext().set(METADATA_SERVICE, metadataService);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
     }

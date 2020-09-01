@@ -41,12 +41,12 @@ public class IndexDispatcher {
     }
 
     public String[] getAvailableIndexes() {
-        var userService = (UserService) context.get(USER_SERVICE);
+        UserService userService = context.get(USER_SERVICE);
         if (userService.currentUser().isAdmin()) {
             return ALL_INDEXES;
         }
 
-        var collectionsRoot = (CollectionResource) context.get(FS_ROOT);
+        CollectionResource collectionsRoot = context.get(FS_ROOT);
         if (collectionsRoot == null) {
             return ALL_INDEXES;
         }

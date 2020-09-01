@@ -53,7 +53,7 @@ public class MetadataService {
      *                             certain properties marked as fs:importantProperty in the vocabulary
      * @return
      */
-    Model get(String subject, boolean withObjectProperties) {
+    public Model get(String subject, boolean withObjectProperties) {
         var model = createDefaultModel();
 
         transactions.executeRead(m -> m
@@ -84,7 +84,7 @@ public class MetadataService {
      *
      * @param model
      */
-    void put(Model model) {
+    public void put(Model model) {
         logUpdates(update(EMPTY_MODEL, model));
     }
 
@@ -93,7 +93,7 @@ public class MetadataService {
      *
      * @param subject Subject URI to mark as deleted
      */
-    boolean softDelete(Resource subject) {
+    public boolean softDelete(Resource subject) {
         var success = transactions.calculateWrite(model -> {
             var resource = subject.inModel(model);
 
@@ -128,7 +128,7 @@ public class MetadataService {
      *
      * @param model
      */
-    void delete(Model model) {
+    public void delete(Model model) {
         logUpdates(update(model, EMPTY_MODEL));
     }
 
@@ -146,7 +146,7 @@ public class MetadataService {
      *
      * @param model
      */
-    void patch(Model model) {
+    public void patch(Model model) {
         logUpdates(transactions.calculateWrite(before -> {
             var existing = createDefaultModel();
             model.listStatements()

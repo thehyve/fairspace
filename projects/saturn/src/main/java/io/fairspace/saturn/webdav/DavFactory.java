@@ -6,6 +6,7 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 
 import java.net.URI;
@@ -23,15 +24,17 @@ public class DavFactory implements ResourceFactory {
     final BlobStore store;
     final UserService userService;
     final MailService mailService;
+    final Context context;
     private final String baseUri;
     public final RootResource root = new RootResource(this);
 
 
-    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, MailService mailService) {
+    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, MailService mailService, Context context) {
         this.rootSubject = rootSubject;
         this.store = store;
         this.userService = userService;
         this.mailService = mailService;
+        this.context = context;
         var uri = URI.create(rootSubject.getURI());
         this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
     }
