@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {
+    ListItemText,
     Paper,
     Table,
     TableBody,
@@ -135,8 +136,12 @@ const CollectionList = ({
                                 selected={selected}
                                 className={collection.dateDeleted && classes.deletedCollectionRow}
                             >
-                                <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} component="th" scope="row">
-                                    {collection.name}
+                                <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
+                                    <ListItemText
+                                        style={{margin: 0}}
+                                        primary={collection.name}
+                                        secondary={collection.description}
+                                    />
                                 </TableCell>
                                 <TableCell style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160}}>
                                     {collection.workspaceName}

@@ -1,10 +1,9 @@
 // @flow
 import React, {useContext} from 'react';
-import {Accordion, AccordionDetails, AccordionSummary, Typography, withStyles} from '@material-ui/core';
+import {Accordion, AccordionDetails, AccordionSummary, Typography} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withRouter} from 'react-router-dom';
 
-import styles from '../common/components/InformationDrawer.styles';
 import CollectionDetails from "./CollectionDetails";
 import PathMetadata from "../metadata/PathMetadata";
 import CollectionsContext from "./CollectionsContext";
@@ -25,7 +24,6 @@ const pathHierarchy = (fullPath) => {
 };
 
 type CollectionInformationDrawerProps = {
-    classes: any;
     path: string;
     inCollectionsBrowser: boolean;
     atLeastSingleCollectionExists: boolean;
@@ -38,7 +36,7 @@ type CollectionInformationDrawerProps = {
 
 export const CollectionInformationDrawer = (props: CollectionInformationDrawerProps) => {
     const {
-        classes, collection, loading, atLeastSingleCollectionExists, setHasCollectionMetadataUpdates,
+        collection, loading, atLeastSingleCollectionExists, setHasCollectionMetadataUpdates,
         inCollectionsBrowser, path, showDeleted
     } = props;
 
@@ -81,9 +79,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
                         >
-                            <Typography
-                                className={classes.heading}
-                            >
+                            <Typography>
                                 Metadata for {relativePath(metadataPath)}
                             </Typography>
                         </AccordionSummary>
@@ -124,4 +120,4 @@ const ContextualCollectionInformationDrawer = ({selectedCollectionIri, ...props}
     );
 };
 
-export default withRouter(withStyles(styles)(ContextualCollectionInformationDrawer));
+export default withRouter(ContextualCollectionInformationDrawer);

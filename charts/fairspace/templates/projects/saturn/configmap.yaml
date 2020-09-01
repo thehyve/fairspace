@@ -33,7 +33,7 @@ data:
       realm: {{ .Values.external.keycloak.realm }}
       clientId: {{ .Values.external.keycloak.clientId }}
       enableBasicAuth: {{ .Values.saturn.auth.enableBasicAuth }}
-      superAdminRole: organisation-admin-{{ .Values.external.keycloak.realm }}
+      superAdminUser: organisation-admin-{{ .Values.external.keycloak.realm }}
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     services:
