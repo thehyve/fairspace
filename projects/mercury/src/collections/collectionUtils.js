@@ -104,6 +104,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     createdBy: properties.createdBy,
     dateModified: properties.lastmod,
     dateDeleted: properties.dateDeleted,
+    deletedBy: properties.deletedBy,
     accessMode: properties.accessMode,
     status: properties.status,
     canDelete: properties.canDelete?.toLowerCase() === 'true',

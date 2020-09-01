@@ -1,15 +1,26 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import {Avatar, Card, CardContent, CardHeader, Collapse, Grid, IconButton, withStyles} from "@material-ui/core";
+import {ExpandMore, LockOpen} from "@material-ui/icons";
+import {
+    Avatar,
+    Card,
+    CardContent,
+    CardHeader,
+    Collapse,
+    FormControl,
+    FormGroup,
+    FormHelperText,
+    FormLabel,
+    IconButton, Typography,
+    List,
+    ListItem,
+    ListItemText,
+    MenuItem,
+    Select,
+    withStyles
+} from "@material-ui/core";
 import classnames from "classnames";
 
-import LockOpen from "@material-ui/icons/LockOpen";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import InputLabel from "@material-ui/core/InputLabel";
 import PermissionViewer from "./PermissionViewer";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionsContext from "../collections/CollectionsContext";
@@ -45,19 +56,8 @@ const styles = theme => ({
         verticalAlign: 'middle',
         margin: '0 4px'
     },
-    propertyLabel: {
-        color: 'gray'
-    },
-    propertyText: {
-        marginTop: 2,
-        marginBottom: 0,
-        marginInlineStart: 4,
-        width: '100%'
-    },
-    propertyDiv: {
-        marginLeft: 16,
-        marginRight: 16,
-        marginBottom: 16
+    property: {
+        marginTop: '2em'
     }
 });
 
@@ -157,24 +157,6 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         </>
     );
 
-    const renderPropertyValue = (property: string, value: string, helperValue: string = null) => (
-        <Grid container direction="row">
-            <Grid item xs={2}>
-                <p className={`${classes.propertyLabel} ${classes.propertyText}`}>
-                    {property}:
-                </p>
-            </Grid>
-            <Grid item xs={10}>
-                <p className={classes.propertyText}>
-                    {camelCaseToWords(value)}
-                </p>
-                {helperValue && (
-                    <FormHelperText>{helperValue}</FormHelperText>
-                )}
-            </Grid>
-        </Grid>
-    );
-
     const renderAccessModeChangeConfirmation = () => (
         <ConfirmationDialog
             open
@@ -192,31 +174,34 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     );
 
     const renderAccessMode = () => (
-        <div className={classes.propertyDiv}>
-            {collection.canManage ? (
-                <FormControl className={classes.propertyText}>
-                    <InputLabel className={classes.label}>View mode:</InputLabel>
-                    <Select
-                        value={collection.accessMode}
-                        onChange={mode => handleSetAccessMode(mode)}
-                        inputProps={{'aria-label': 'View mode'}}
-                    >
-                        {collection.availableAccessModes.map(mode => (
-                            <MenuItem key={mode} value={mode}>
-                                <span style={{marginRight: 10}}>{camelCaseToWords(mode)}</span>
-                                <FormHelperText>{getAccessModeDescription(mode)}</FormHelperText>
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            ) : (
-                renderPropertyValue(
-                    "View mode",
-                    camelCaseToWords(collection.accessMode),
-                    getAccessModeDescription(collection.accessMode)
-                )
-            )}
-        </div>
+        <FormControl className={classes.property}>
+            <FormLabel>View mode</FormLabel>
+            <FormGroup>
+                {(collection.canManage && collection.availableAccessModes.length > 1) ? (
+                    <FormControl>
+                        <Select
+                            value={collection.accessMode}
+                            onChange={mode => handleSetAccessMode(mode)}
+                            inputProps={{'aria-label': 'View mode'}}
+                        >
+                            {collection.availableAccessModes.map(mode => (
+                                <MenuItem key={mode} value={mode}>
+                                    <ListItemText
+                                        primary={camelCaseToWords(mode)}
+                                        secondary={getAccessModeDescription(mode)}
+                                    />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                ) : (
+                    <ListItemText
+                        primary={camelCaseToWords(collection.accessMode)}
+                        secondary={getAccessModeDescription(collection.accessMode)}
+                    />
+                )}
+            </FormGroup>
+        </FormControl>
     );
 
     const renderOwnerWorkspaceAccessChangeConfirmation = () => (
@@ -233,12 +218,10 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
     );
 
     const renderOwnerWorkspaceAccess = () => (
-        <div className={classes.propertyDiv}>
-            {collection.canManage ? (
-                <FormControl className={classes.propertyText}>
-                    <InputLabel className={classes.label}>
-                        Default access for all collection owning workspace members:
-                    </InputLabel>
+        <FormControl className={classes.property}>
+            <FormLabel>Members access</FormLabel>
+            <FormGroup>
+                {collection.canManage ? (
                     <Select
                         value={ownerWorkspaceAccess}
                         onChange={access => handleSetOwnerWorkspaceAccess(access)}
@@ -250,15 +233,10 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                             </MenuItem>
                         ))}
                     </Select>
-                </FormControl>
-            ) : (
-                renderPropertyValue(
-                    "Members access",
-                    camelCaseToWords(ownerWorkspaceAccess),
-                    "Default access for all collection owning workspace members"
-                )
-            )}
-        </div>
+                ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
+            </FormGroup>
+            <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
+        </FormControl>
     );
 
     return (
@@ -274,8 +252,14 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    {renderAccessMode()}
-                    {renderOwnerWorkspaceAccess()}
+                    <List>
+                        <ListItem disableGutters>
+                            {renderAccessMode()}
+                        </ListItem>
+                        <ListItem disableGutters>
+                            {renderOwnerWorkspaceAccess()}
+                        </ListItem>
+                    </List>
                     <PermissionViewer
                         collection={collection}
                         collaboratingUsers={collaboratingUsers}

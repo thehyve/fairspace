@@ -112,8 +112,6 @@ export const shouldPropertyBeHidden = (key, domain) => {
         case '@type':
         case consts.TYPE_URI:
         case consts.FILE_PATH_URI:
-        case consts.DATE_DELETED_URI:
-        case consts.DELETED_BY_URI:
         case consts.CAN_LIST_URI:
         case consts.CAN_READ_URI:
         case consts.CAN_WRITE_URI:
@@ -123,6 +121,8 @@ export const shouldPropertyBeHidden = (key, domain) => {
             return true;
         case consts.LABEL_URI:
             return isManaged;
+        case consts.DATE_DELETED_URI:
+        case consts.DELETED_BY_URI:
         case consts.COMMENT_URI:
             return isCollection;
         default:

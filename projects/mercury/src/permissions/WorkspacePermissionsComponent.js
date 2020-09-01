@@ -17,8 +17,6 @@ const styles = {
     tableWrapper: {
         border: "1px solid #e0e0e0",
         borderRadius: 6,
-        marginLeft: 16,
-        marginRight: 16,
         marginTop: 16
     },
     header: {
