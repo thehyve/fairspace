@@ -9,7 +9,6 @@ import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 
 import java.time.Instant;
-import java.util.List;
 
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static java.time.Instant.now;

@@ -156,7 +156,6 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     }
 
     private void prepareMetadata(FileItem file, Model model) throws BadRequestException {
-
         try (var csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new InputStreamReader(file.getInputStream()))) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
             for (var record : csvParser) {

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
@@ -14,7 +13,6 @@ import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.util.Context;
-import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -24,20 +22,16 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
-import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

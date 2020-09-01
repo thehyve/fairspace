@@ -1,8 +1,9 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.vocabulary.*;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.*;
+import io.fairspace.saturn.vocabulary.FS;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 public class UniqueLabelValidator implements MetadataRequestValidator {
     @Override
