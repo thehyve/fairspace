@@ -34,6 +34,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> access.canManage();
+            case POST -> access.canManage() || canManageStatusAndMode();
             default -> super.authorise(request, method, auth);
         };
     }
