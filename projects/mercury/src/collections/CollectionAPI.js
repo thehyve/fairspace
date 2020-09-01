@@ -44,6 +44,7 @@ export type CollectionPermissions = {|
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
+    canManageStatusAndMode: boolean;
 |};
 
 export type Resource = {|
