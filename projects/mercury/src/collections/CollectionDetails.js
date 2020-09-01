@@ -137,6 +137,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         this.setState({undeleting: false});
     };
 
+    handleCloseChangingOwner = () => {
+        this.setState({changingOwner: false});
+    };
+
     handleMenuClick = (event: Event) => {
         this.setState({anchorEl: event.currentTarget});
     };
@@ -146,8 +150,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleCollectionDelete = (collection: Collection) => {
-        const {setBusy, deleteCollection, history} = this.props;
-        setBusy(true);
+        const {deleteCollection, history} = this.props;
         this.handleCloseDelete();
         deleteCollection(collection)
             .then(() => history.push('/collections'))
@@ -155,13 +158,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 err,
                 "An error occurred while deleting a collection",
                 () => this.handleCollectionDelete(collection)
-            ))
-            .finally(() => setBusy(false));
+            ));
     };
 
     handleCollectionUndelete = (collection: Collection) => {
-        const {setBusy, undeleteCollection, history} = this.props;
-        setBusy(true);
+        const {undeleteCollection, history} = this.props;
         this.handleCloseUndelete();
         undeleteCollection(collection)
             .then(() => history.push('/collections'))
@@ -169,8 +170,19 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 err,
                 "An error occurred while undeleting a collection",
                 () => this.handleCollectionUndelete(collection)
-            ))
-            .finally(() => setBusy(false));
+            ));
+    };
+
+    handleCollectionOwnerChange = (collection: Collection, selectedOwner: Workspace) => {
+        const {setOwnedBy, history} = this.props;
+        this.handleCloseChangingOwner();
+        setOwnedBy(collection.location, selectedOwner.iri)
+            .then(() => history.push('/collections'))
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while changing an owner of a collection",
+                () => this.handleCollectionOwnerChange(collection, selectedOwner)
+            ));
     };
 
     renderCollectionProperty = (property: string, value: string, helperValue: string = null) => (
@@ -314,8 +326,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CollectionOwnerChangeDialog
                         collection={collection}
                         workspaces={workspaces}
-                        setOwnedBy={this.props.setOwnedBy}
-                        onClose={() => this.setState({changingOwner: false})}
+                        changeOwner={this.handleCollectionOwnerChange}
+                        onClose={() => this.handleCloseChangingOwner()}
                     />
                 ) : null}
                 {undeleting ? (
