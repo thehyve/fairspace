@@ -23,7 +23,7 @@ const LinkedDataLink = ({uri, children}) => (
 
 LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,
-    children: PropTypes.any
+    children: PropTypes.any.isRequired
 };
 
 export default LinkedDataLink;
