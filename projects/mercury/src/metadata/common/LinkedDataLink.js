@@ -1,6 +1,7 @@
 import React from 'react';
-import {Link} from "react-router-dom";
+import {Link as RouterLink} from "react-router-dom";
 import * as PropTypes from "prop-types";
+import {Link} from '@material-ui/core';
 import {METADATA_PATH} from "../../constants";
 
 /**
@@ -9,11 +10,20 @@ import {METADATA_PATH} from "../../constants";
  * @param props
  * @constructor
  */
-const LinkedDataLink = ({uri, children}) => <Link to={{pathname: METADATA_PATH, search: "?iri=" + encodeURIComponent(uri)}}>{children}</Link>;
+const LinkedDataLink = ({uri, children}) => (
+    <Link
+        component={RouterLink}
+        to={{pathname: METADATA_PATH, search: "?iri=" + encodeURIComponent(uri)}}
+        color="inherit"
+        underline="hover"
+    >
+        {children}
+    </Link>
+);
 
 LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,
-    children: PropTypes.any
+    children: PropTypes.any.isRequired
 };
 
 export default LinkedDataLink;

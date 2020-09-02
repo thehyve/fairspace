@@ -4,17 +4,19 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Grid,
+    FormControl, FormGroup, FormLabel,
     IconButton,
+    Link,
+    List,
+    ListItem,
+    ListItemText,
     Menu,
     MenuItem,
-    Typography,
-    withStyles
+    Typography
 } from '@material-ui/core';
-import {CloudDownload, FolderOpen, MoreVert} from '@material-ui/icons';
+import {CloudDownload, FolderOutlined, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 
-import FormHelperText from "@material-ui/core/FormHelperText";
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource, Status} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
@@ -28,13 +30,16 @@ import PermissionCard from "../permissions/PermissionCard";
 import MessageDisplay from "../common/components/MessageDisplay";
 import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 import {getStatusDescription} from "./collectionUtils";
+import {getDisplayName} from '../users/userUtils';
+import {formatDateTime} from '../common/utils/genericUtils';
+import type {User} from '../users/UsersAPI';
+import LinkedDataLink from '../metadata/common/LinkedDataLink';
 
 export const ICONS = {
-    LOCAL_STORAGE: <FolderOpen aria-label="Local storage" />,
+    LOCAL_STORAGE: <FolderOutlined aria-label="Local storage" />,
     AZURE_BLOB_STORAGE: <CloudDownload />,
     S3_BUCKET: <CloudDownload />,
     GOOGLE_CLOUD_BUCKET: <CloudDownload />
@@ -42,24 +47,10 @@ export const ICONS = {
 
 const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
-const styles = {
-    propertyLabel: {
-        color: 'gray'
-    },
-    propertyText: {
-        marginTop: 2,
-        marginBottom: 0,
-        marginInlineStart: 4
-    },
-    propertyDetails: {
-        marginLeft: 8
-    }
-};
-
 type CollectionDetailsProps = {
     loading: boolean;
     collection: Collection;
-    workspaces: Array<Workspace>;
+    workspaces: Workspace[];
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
@@ -67,7 +58,6 @@ type CollectionDetailsProps = {
     setOwnedBy: (location: string, owner: string) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
-    classes: any;
 };
 
 type CollectionDetailsState = {
@@ -185,33 +175,68 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             ));
     };
 
-    renderCollectionProperty = (property: string, value: string, helperValue: string = null) => (
-        <Grid container direction="row">
-            <Grid item xs={2}>
-                <p className={`${this.props.classes.propertyLabel} ${this.props.classes.propertyText}`}>
-                    {property}:
-                </p>
-            </Grid>
-            <Grid item xs={10}>
-                <p className={this.props.classes.propertyText}>
-                    {camelCaseToWords(value)}
-                </p>
-                {helperValue && (
-                    <FormHelperText>{helperValue}</FormHelperText>
-                )}
-            </Grid>
-        </Grid>
-    );
-
-    renderCollectionDescription = () => (
-        <Typography component="p" className={this.props.classes.propertyText}>
-            {this.props.collection.description}
-        </Typography>
+    renderCollectionOwner = (workspace: Workspace) => (
+        workspace
+        && (
+            <FormControl>
+                <FormLabel>Owner workspace</FormLabel>
+                <FormGroup>
+                    <Link
+                        color="inherit"
+                        underline="hover"
+                        href={`/workspace?iri=${encodeURI(workspace.iri)}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            this.props.history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
+                        }}
+                    >
+                        <Typography variant="body2">{workspace.name}</Typography>
+                    </Link>
+                </FormGroup>
+            </FormControl>
+        )
     );
 
     renderCollectionStatus = () => (
         this.props.collection.status
-        && this.renderCollectionProperty('Status', this.props.collection.status, getStatusDescription(this.props.collection.status))
+        && (
+            <FormControl>
+                <FormLabel>Status</FormLabel>
+                <FormGroup>
+                    <ListItemText
+                        primary={this.props.collection.status}
+                        secondary={getStatusDescription(this.props.collection.status)}
+                    />
+                </FormGroup>
+            </FormControl>
+        )
+    );
+
+    renderDeleted = (dateDeleted: string, deletedBy: User) => (
+        dateDeleted && [
+            <ListItem disableGutters>
+                <FormControl>
+                    <FormLabel>Deleted</FormLabel>
+                    <FormGroup>
+                        <Typography variant="body2">
+                            {formatDateTime(dateDeleted)}
+                        </Typography>
+                    </FormGroup>
+                </FormControl>
+            </ListItem>,
+            <ListItem disableGutters>
+                <FormControl>
+                    <FormLabel>Deleted by</FormLabel>
+                    <FormGroup>
+                        <Typography variant="body2">
+                            <LinkedDataLink uri={deletedBy.iri}>
+                                {getDisplayName(deletedBy)}
+                            </LinkedDataLink>
+                        </Typography>
+                    </FormGroup>
+                </FormControl>
+            </ListItem>
+        ]
     );
 
     render() {
@@ -227,6 +252,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             return <LoadingInlay />;
         }
         const workspaceUsers = users.filter(u => workspaceRoles.some(r => r.iri === u.iri));
+
+        const ownerWorkspace = workspaces.find(w => w.iri === collection.ownerWorkspace);
+
+        const deletedBy = collection.deletedBy && users.find(u => u.iri === collection.deletedBy);
 
         const menuItems = [];
         if (!collection.dateDeleted) {
@@ -267,7 +296,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={menuItems && (
+                        action={menuItems && menuItems.length > 0 && (
                             <>
                                 <IconButton
                                     aria-label="More"
@@ -293,8 +322,18 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         style={{wordBreak: 'break-word'}}
                     />
                     <CardContent style={{paddingTop: 0}}>
-                        {this.renderCollectionDescription()}
-                        {this.renderCollectionStatus()}
+                        <Typography component="p">
+                            {collection.description}
+                        </Typography>
+                        <List>
+                            <ListItem disableGutters>
+                                {this.renderCollectionOwner(ownerWorkspace)}
+                            </ListItem>
+                            <ListItem disableGutters>
+                                {this.renderCollectionStatus()}
+                            </ListItem>
+                            {this.renderDeleted(collection.dateDeleted, deletedBy)}
+                        </List>
                     </CardContent>
                 </Card>
 
@@ -401,4 +440,4 @@ const ContextualCollectionDetails = (props) => {
     );
 };
 
-export default withRouter(withStyles(styles)(ContextualCollectionDetails));
+export default withRouter(ContextualCollectionDetails);

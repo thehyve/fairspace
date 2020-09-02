@@ -137,7 +137,7 @@ const LinkedDataEntityFormContainer = ({
 
 LinkedDataEntityFormContainer.propTypes = {
     subject: PropTypes.string.isRequired,
-    editable: PropTypes.bool,
+    hasEditRight: PropTypes.bool,
 };
 
 export const LinkedDataEntityFormWithLinkedData = (

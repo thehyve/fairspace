@@ -112,17 +112,22 @@ export const shouldPropertyBeHidden = (key, domain) => {
         case '@type':
         case consts.TYPE_URI:
         case consts.FILE_PATH_URI:
-        case consts.DATE_DELETED_URI:
-        case consts.DELETED_BY_URI:
         case consts.CAN_LIST_URI:
         case consts.CAN_READ_URI:
         case consts.CAN_WRITE_URI:
         case consts.CAN_MANAGE_URI:
+        case consts.CAN_ADD_SHARED_METADATA_URI:
+        case consts.CAN_VIEW_PUBLIC_METADATA_URI:
+        case consts.CAN_VIEW_PUBLIC_DATA_URI:
+        case consts.IS_ADMIN:
+        case consts.IS_SUPERADMIN:
         case consts.IS_MEMBER_OF_URI:
         case consts.IS_MANAGER_OF_URI:
             return true;
         case consts.LABEL_URI:
             return isManaged;
+        case consts.DATE_DELETED_URI:
+        case consts.DELETED_BY_URI:
         case consts.COMMENT_URI:
             return isCollection;
         default:

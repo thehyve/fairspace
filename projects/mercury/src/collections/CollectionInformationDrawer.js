@@ -1,15 +1,18 @@
 // @flow
-import React, {useContext} from 'react';
-import {Accordion, AccordionDetails, AccordionSummary, Typography} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import React, {useContext, useState} from 'react';
+import {Card, CardContent, CardHeader, Collapse, IconButton} from '@material-ui/core';
 import {withRouter} from 'react-router-dom';
 
+import {ExpandMore, FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
+import {makeStyles} from '@material-ui/core/styles';
 import CollectionDetails from "./CollectionDetails";
-import PathMetadata from "../metadata/PathMetadata";
 import CollectionsContext from "./CollectionsContext";
 import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
 import type {Collection} from './CollectionAPI';
 import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
+import useAsync from '../common/hooks/UseAsync';
+import FileAPI from '../file/FileAPI';
+import MessageDisplay from '../common/components/MessageDisplay';
 
 const pathHierarchy = (fullPath) => {
     if (!fullPath) return [];
@@ -22,6 +25,86 @@ const pathHierarchy = (fullPath) => {
     }
     return paths.reverse();
 };
+
+const useStyles = makeStyles(() => ({
+    expandOpen: {
+        transform: 'rotate(180deg)',
+    }
+}));
+
+const MetadataCard = React.forwardRef((props, ref) => {
+    const {title, avatar, children} = props;
+    const [expanded, setExpanded] = useState(true);
+    const toggleExpand = () => setExpanded(!expanded);
+    const classes = useStyles();
+
+    return (
+        <Card style={{marginTop: 10}} ref={ref}>
+            <CardHeader
+                titleTypographyProps={{variant: 'h6'}}
+                title={title}
+                avatar={avatar}
+                style={{wordBreak: 'break-word'}}
+                action={(
+                    <IconButton
+                        onClick={toggleExpand}
+                        aria-expanded={expanded}
+                        aria-label="Show more"
+                        className={expanded ? classes.expandOpen : ''}
+                    >
+                        <ExpandMore />
+                    </IconButton>
+                )}
+            />
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <CardContent>
+                    {children}
+                </CardContent>
+            </Collapse>
+        </Card>
+    );
+});
+
+const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false}, ref) => {
+    const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
+
+    let body;
+    let avatar = <FolderOpenOutlined />;
+    if (error) {
+        body = <MessageDisplay message="An error occurred while determining metadata subject" />;
+    } else if (loading) {
+        body = <div>Loading...</div>;
+    } else {
+        // Parse stat data
+        const fileProps = data && data.props;
+        const subject = fileProps && fileProps.iri;
+
+        if (!subject || !fileProps) {
+            body = <div>No metadata found</div>;
+        } else {
+            body = (
+                <LinkedDataEntityFormWithLinkedData
+                    subject={fileProps.iri}
+                    hasEditRight={hasEditRight}
+                />
+            );
+            if (fileProps.iscollection && (fileProps.iscollection.toLowerCase() === 'false')) {
+                avatar = <InsertDriveFileOutlined />;
+            }
+        }
+    }
+    const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
+
+    return (
+        <MetadataCard
+            ref={ref}
+            title={`Metadata for ${relativePath(path)}`}
+            avatar={avatar}
+        >
+            {body}
+        </MetadataCard>
+    );
+});
 
 type CollectionInformationDrawerProps = {
     path: string;
@@ -47,8 +130,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             && <EmptyInformationDrawer message="Select a collection to display its metadata" />;
     }
 
-    const hasEditRight = collection && collection.canWrite && paths.length === 0;
-    const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
+    const hasEditRight = collection && collection.canWrite;
 
     return (
         <>
@@ -58,40 +140,24 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                 loading={loading}
                 setBusy={props.setBusy}
             />
-            <Accordion defaultExpanded>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Metadata for {collection.name}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    <LinkedDataEntityFormWithLinkedData
-                        subject={collection.iri}
-                        hasEditRight={hasEditRight}
-                        setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
-                    />
-                </AccordionDetails>
-            </Accordion>
+            <MetadataCard
+                title={`Metadata for ${collection.name}`}
+                avatar={<FolderOutlined />}
+            >
+                <LinkedDataEntityFormWithLinkedData
+                    subject={collection.iri}
+                    hasEditRight={hasEditRight}
+                    setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
+                />
+            </MetadataCard>
             {
-                paths.map(metadataPath => (
-                    <Accordion
+                paths.map((metadataPath) => (
+                    <PathMetadata
                         key={metadataPath}
-                        defaultExpanded
-                    >
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                        >
-                            <Typography>
-                                Metadata for {relativePath(metadataPath)}
-                            </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <PathMetadata
-                                path={metadataPath}
-                                showDeleted={showDeleted}
-                                isMetaDataEditable={collection.canWrite && metadataPath === paths[paths.length - 1]}
-                                style={{width: '100%'}}
-                            />
-                        </AccordionDetails>
-                    </Accordion>
+                        path={metadataPath}
+                        showDeleted={showDeleted}
+                        hasEditRight={hasEditRight}
+                    />
                 ))
             }
         </>

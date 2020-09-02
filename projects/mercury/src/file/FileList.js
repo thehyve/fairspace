@@ -43,7 +43,7 @@ const FileList = ({
         },
         dateDeleted: {
             valueExtractor: f => f.dateDeleted,
-            label: 'Deletion date'
+            label: 'Deleted'
         }
     };
 
@@ -118,7 +118,7 @@ const FileList = ({
                                     direction={orderAscending ? 'asc' : 'desc'}
                                     onClick={() => toggleSort('dateDeleted')}
                                 >
-                                    Deletion date
+                                    Deleted
                                 </TableSortLabel>
                             </TableCell>
                         )}

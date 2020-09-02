@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Switch, withStyles} from "@material-ui/core";
@@ -29,7 +29,17 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
         handleCollectionSearchRedirect(history, value);
     };
 
+    let unmounting = false;
+
+    useEffect(() => function cleanup() {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        unmounting = true;
+    });
+
     const toggleCollection = (collectionIri) => {
+        if (unmounting) {
+            return;
+        }
         setPreselectedCollectionIri(collectionIri);
         if (hasCollectionMetadataUpdates) {
             setShowConfirmDialog(true);

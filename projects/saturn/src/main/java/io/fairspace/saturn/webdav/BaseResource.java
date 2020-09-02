@@ -246,6 +246,15 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         return parseDate(subject, FS.dateDeleted);
     }
 
+    @Property
+    public String getDeletedBy() {
+        var deletedBy = subject.getPropertyResourceValue(FS.deletedBy);
+        if (deletedBy != null) {
+            return deletedBy.getURI();
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return subject.getURI().substring(factory.rootSubject.getURI().length());

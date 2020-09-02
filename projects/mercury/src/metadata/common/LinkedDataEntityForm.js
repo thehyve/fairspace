@@ -4,7 +4,14 @@ import {List, ListItem} from '@material-ui/core';
 
 import LinkedDataProperty from "./LinkedDataProperty";
 import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";
-import {LABEL_URI} from '../../constants';
+import {
+    COMMENT_URI,
+    CREATED_BY_URI,
+    DATE_CREATED_URI,
+    DATE_MODIFIED_URI,
+    LABEL_URI,
+    MODIFIED_BY_URI
+} from '../../constants';
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import {compareBy, comparing} from "../../common/utils/genericUtils";
@@ -12,6 +19,11 @@ import {compareBy, comparing} from "../../common/utils/genericUtils";
 type PropertyType = {
     key: string;
 }
+
+const systemProperties = [DATE_CREATED_URI, CREATED_BY_URI, DATE_MODIFIED_URI, MODIFIED_BY_URI];
+
+const systemPropertiesLast = compareBy(x => systemProperties.indexOf(x.key));
+
 function labelFirst(x: PropertyType, y: PropertyType): number {
     if (x.key === y.key) {
         return 0;
@@ -20,6 +32,19 @@ function labelFirst(x: PropertyType, y: PropertyType): number {
         return -1;
     }
     if (y.key === LABEL_URI) {
+        return 1;
+    }
+    return 0;
+}
+
+function descriptionFirst(x: PropertyType, y: PropertyType): number {
+    if (x.key === y.key) {
+        return 0;
+    }
+    if (x.key === COMMENT_URI) {
+        return -1;
+    }
+    if (y.key === COMMENT_URI) {
         return 1;
     }
     return 0;
@@ -70,6 +95,8 @@ export const LinkedDataEntityForm = ({
                         // Properties are sorted based on the sh:order property, or by its label otherwise
                         .sort(comparing(
                             labelFirst,
+                            descriptionFirst,
+                            systemPropertiesLast,
                             compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
                             compareBy('label')
                         ))
