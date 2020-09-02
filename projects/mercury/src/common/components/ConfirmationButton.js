@@ -34,7 +34,7 @@ const ConfirmationButton = ({children, message, disabled, onClick, ...otherProps
 
 ConfirmationButton.propTypes = {
     onClick: PropTypes.func.isRequired,
-    message: PropTypes.string.isRequired,
+    message: PropTypes.any.isRequired,
     disabled: PropTypes.bool
 };
 

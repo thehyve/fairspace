@@ -64,8 +64,12 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
                 <ConfirmationButton
                     onClick={handleSubmit}
                     disabled={Boolean(!selectedValue)}
-                    message={`Are you sure you want to transfer the ownership 
-                    on collection ${collection.name} to workspace ${selectedValue && selectedValue.label}?`}
+                    message={(
+                        <span>
+                           Are you sure you want to <b>transfer the ownership</b> on
+                           collection <em>{collection.name}</em> to workspace <em>{selectedValue && selectedValue.label}</em>?
+                        </span>
+                    )}
                     agreeButtonText="Yes"
                     dangerous
                 >

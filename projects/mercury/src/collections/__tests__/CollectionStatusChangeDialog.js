@@ -40,13 +40,13 @@ describe('CollectionStatusChangeDialog', () => {
         expect(wrapper.find('[data-testid="property-change-dialog"]').prop('openDialog')).toBeFalsy();
 
         // title
-        expect(wrapper.find('#property-change-dialog-title').childAt(0).text()).toEqual("Select collection status");
+        expect(wrapper.find('#property-change-dialog-title').childAt(0).text()).toEqual("Change collection status");
 
         // render available values
         expect(wrapper.find('[aria-label="Available values"]').prop('value')).toEqual('Active');
-        expect(wrapper.find('[aria-label="Available values"]').childAt(0).childAt(0).prop('value')).toEqual(statuses[0]);
-        expect(wrapper.find('[aria-label="Available values"]').childAt(1).childAt(0).prop('value')).toEqual(statuses[1]);
-        expect(wrapper.find('[aria-label="Available values"]').childAt(2).childAt(0).prop('value')).toEqual(statuses[2]);
+        expect(wrapper.find('[aria-label="Available values"]').childAt(0).prop('value')).toEqual(statuses[0]);
+        expect(wrapper.find('[aria-label="Available values"]').childAt(1).prop('value')).toEqual(statuses[1]);
+        expect(wrapper.find('[aria-label="Available values"]').childAt(2).prop('value')).toEqual(statuses[2]);
 
         // render cancel and submit buttons
         expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');

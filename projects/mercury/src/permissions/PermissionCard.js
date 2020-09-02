@@ -27,7 +27,8 @@ import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {accessLevels} from "../collections/CollectionAPI";
-import {getAccessModeDescription, getPrincipalsWithCollectionAccess} from "../collections/collectionUtils";
+import {descriptionForAccessMode, getPrincipalsWithCollectionAccess} from "../collections/collectionUtils";
+import type {AccessMode} from '../collections/CollectionAPI';
 
 const styles = theme => ({
     expand: {
@@ -157,14 +158,45 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         </>
     );
 
+    const confirmationMessageForAccessMode = (accessMode: AccessMode) => {
+        switch (accessMode) {
+            case 'Restricted':
+                return (
+                    <span>
+                        Are you sure you want to change the view mode of
+                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br />
+                        Metadata and data files will only be findable and readable for users
+                        that have been granted access to the collection explicitly.
+                    </span>
+                );
+            case 'MetadataPublished':
+                return (
+                    <span>
+                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br />
+                        The metadata will be findable and readable for all users with access to public data.
+                    </span>
+                );
+            case 'DataPublished':
+                return (
+                    <span>
+                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br />
+                        The data will be findable and readable for all users with access to public data.<br />
+                        <strong>
+                            Warning: This action cannot be reverted.
+                            Once published, the collection cannot be unpublished, moved or deleted.
+                        </strong>
+                    </span>
+                );
+            default:
+                throw Error(`Unknown access mode: ${accessMode}`);
+        }
+    };
+
     const renderAccessModeChangeConfirmation = () => (
         <ConfirmationDialog
             open
             title="Confirmation"
-            content={
-                `Are you sure you want to change the view mode of ${collection.name} to ${camelCaseToWords(selectedAccessMode)}`
-                + ` (${getAccessModeDescription(selectedAccessMode)})?`
-            }
+            content={confirmationMessageForAccessMode(selectedAccessMode)}
             dangerous
             agreeButtonText="Confirm"
             onAgree={handleConfirmSetAccessMode}
@@ -188,7 +220,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                                 <MenuItem key={mode} value={mode}>
                                     <ListItemText
                                         primary={camelCaseToWords(mode)}
-                                        secondary={getAccessModeDescription(mode)}
+                                        secondary={descriptionForAccessMode(mode)}
                                     />
                                 </MenuItem>
                             ))}
@@ -197,7 +229,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                 ) : (
                     <ListItemText
                         primary={camelCaseToWords(collection.accessMode)}
-                        secondary={getAccessModeDescription(collection.accessMode)}
+                        secondary={descriptionForAccessMode(collection.accessMode)}
                     />
                 )}
             </FormGroup>

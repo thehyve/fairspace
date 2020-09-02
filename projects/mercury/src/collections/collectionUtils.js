@@ -57,16 +57,16 @@ export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principal
     });
     return results;
 };
-export const getAccessModeDescription = (accessMode: AccessMode) => {
+export const descriptionForAccessMode = (accessMode: AccessMode) => {
     switch (accessMode) {
         case "Restricted":
-            return "collection data limited to users with explicitly granted access";
+            return "Access to data limited to users with explicitly granted access.";
         case "MetadataPublished":
-            return "all users can see collection metadata";
+            return "All users can see collection metadata.";
         case "DataPublished":
-            return "all users can see collection data";
+            return "All users can see collection data.";
         default:
-            return "unrecognized view mode.";
+            return "";
     }
 };
 
@@ -116,15 +116,15 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     workspacePermissions: parsePermissions(properties.workspacePermissions)
 });
 
-export const getStatusDescription = (status: Status) => {
+export const descriptionForStatus = (status: Status) => {
     switch (status) {
         case "Active":
-            return "Editing data and metadata enabled";
+            return "Editing data and metadata enabled.";
         case "Archived":
-            return "Data immutable, read-only";
+            return "Data immutable, read-only.";
         case "Closed":
-            return "Data not available for reading";
+            return "Data not available for reading.";
         default:
-            return "Unrecognized status";
+            return "";
     }
 };
