@@ -503,6 +503,14 @@ fs:User a rdfs:Class, sh:NodeShape ;
         sh:path fs:isAdmin
     ],
     [
+        sh:name "Is superadmin" ;
+        sh:description "Is a superadmin." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:isSuperadmin
+    ],
+    [
         sh:name "Can view public metadata" ;
         sh:description "Allows the user to view public metadata." ;
         sh:class xsd:boolean;
