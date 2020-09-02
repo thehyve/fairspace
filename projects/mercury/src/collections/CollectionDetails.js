@@ -214,7 +214,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     renderDeleted = (dateDeleted: string, deletedBy: User) => (
         dateDeleted && [
-            <ListItem disableGutters>
+            <ListItem key="dateDeleted" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted</FormLabel>
                     <FormGroup>
@@ -224,7 +224,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </FormGroup>
                 </FormControl>
             </ListItem>,
-            <ListItem disableGutters>
+            <ListItem key="deletedBy" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted by</FormLabel>
                     <FormGroup>
