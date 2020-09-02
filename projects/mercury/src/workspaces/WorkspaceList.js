@@ -90,7 +90,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
 
     return (
         <>
-            <Paper>
+            <Paper style={{width: '100%', overflowX: 'auto'}}>
                 <Table>
                     <TableHead>
                         <TableRow>
