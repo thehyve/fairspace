@@ -258,36 +258,30 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const deletedBy = collection.deletedBy && users.find(u => u.iri === collection.deletedBy);
 
         const menuItems = [];
-        if (!collection.dateDeleted) {
-            if (collection.canWrite) {
-                menuItems.push(
-                    <MenuItem key="edit" onClick={this.handleEdit}>
-                        Edit
-                    </MenuItem>
-                );
-            }
-            if (collection.canManage) {
-                menuItems.push([
-                    <MenuItem key="ownership" onClick={this.handleChangeOwner}>
-                        Transfer ownership &hellip;
-                    </MenuItem>,
-                    <MenuItem
-                        key="status"
-                        onClick={this.handleChangeStatus}
-                        disabled={collection.availableStatuses.length === 1}
-                    >
-                        Change status &hellip;
-                    </MenuItem>
-                ]);
-            }
+        if (collection.canWrite && !collection.dateDeleted) {
+            menuItems.push(
+                <MenuItem key="edit" onClick={this.handleEdit}>
+                    Edit
+                </MenuItem>
+            );
         }
         if (collection.canManage) {
-            menuItems.push(
+            menuItems.push([
+                <MenuItem key="ownership" onClick={this.handleChangeOwner}>
+                    Transfer ownership &hellip;
+                </MenuItem>,
                 <MenuItem
-                    key="delete"
-                    onClick={this.handleDelete}
-                    disabled={!collection.canDelete}
+                    key="status"
+                    onClick={this.handleChangeStatus}
+                    disabled={collection.availableStatuses.length === 1}
                 >
+                    Change status &hellip;
+                </MenuItem>
+            ]);
+        }
+        if (collection.canDelete) {
+            menuItems.push(
+                <MenuItem key="delete" onClick={this.handleDelete}>
                     {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
                 </MenuItem>
             );
