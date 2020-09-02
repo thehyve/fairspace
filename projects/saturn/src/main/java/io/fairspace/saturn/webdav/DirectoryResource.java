@@ -14,7 +14,6 @@ import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
 import io.milton.resource.Resource;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
@@ -134,30 +133,25 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     @Override
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
-            case "metadata" -> uploadMetadata(files.values());
+            // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' -F 'action=metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
+            case "metadata" -> uploadMetadata(files.get("file"));
             default -> super.performAction(action, parameters, files);
         }
-
     }
 
-    private void uploadMetadata(Collection<FileItem> files) throws BadRequestException {
+    private void uploadMetadata(FileItem file) throws BadRequestException {
+        if (file == null) {
+            throw new BadRequestException("Missing 'file' parameter");
+        }
         var model = createDefaultModel();
 
-        for (var file : files) {
-            prepareMetadata(file, model);
-        }
-
-        MetadataService metadataService = factory.context.get(METADATA_SERVICE);
-        try {
-            metadataService.put(model);
-        } catch (Exception e) {
-            throw new BadRequestException("Error applying metadata");
-        }
-    }
-
-    private void prepareMetadata(FileItem file, Model model) throws BadRequestException {
-        try (var csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new InputStreamReader(file.getInputStream()))) {
+        try (var is = file.getInputStream();
+             var reader = new InputStreamReader(is);
+             var csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
+            if (!headers.contains("Path")) {
+                throw new BadRequestException("Invalid file format");
+            }
             for (var record : csvParser) {
                 var path = record.get("Path");
                 org.apache.jena.rdf.model.Resource s;
@@ -209,6 +203,13 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             }
         } catch (IOException e) {
             throw new BadRequestException("Error parsing file " + file.getName(), e);
+        }
+
+        MetadataService metadataService = factory.context.get(METADATA_SERVICE);
+        try {
+            metadataService.patch(model);
+        } catch (Exception e) {
+            throw new BadRequestException("Error applying metadata", e);
         }
     }
 }
