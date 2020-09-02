@@ -296,7 +296,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={menuItems && (
+                        action={menuItems && menuItems.length > 0 && (
                             <>
                                 <IconButton
                                     aria-label="More"
