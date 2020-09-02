@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -45,6 +46,7 @@ public class CollectionResourceTest {
     @SneakyThrows
     @Before
     public void before() {
+        setupRequestContext();
         model.add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(WORKSPACE_2, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
