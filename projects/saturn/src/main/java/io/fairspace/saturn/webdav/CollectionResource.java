@@ -88,7 +88,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     public void setOwnedBy(Resource owner) throws NotAuthorizedException, BadRequestException {
-        if (!access.canManage()) {
+        if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
         if (!owner.hasProperty(RDF.type, FS.Workspace)) {
@@ -284,7 +284,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private void setPermission(Resource principal, Access grantedAccess) throws BadRequestException, NotAuthorizedException {
-        if (!access.canManage()) {
+        if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
         if (principal.hasProperty(RDF.type, FS.User)) {
