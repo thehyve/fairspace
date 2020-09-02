@@ -277,9 +277,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 ]);
             }
         }
-        if (collection.canDelete) {
+        if (collection.canManage) {
             menuItems.push(
-                <MenuItem key="delete" onClick={this.handleDelete}>
+                <MenuItem
+                    key="delete"
+                    onClick={this.handleDelete}
+                    disabled={!collection.canDelete}
+                >
                     {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
                 </MenuItem>
             );

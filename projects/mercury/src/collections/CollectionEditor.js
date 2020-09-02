@@ -169,13 +169,16 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         }
     };
 
+    editLocationEnabled = (!this.props.collection) || this.props.collection.accessMode !== 'DataPublished';
+
     /**
      * Determines whether the location should be updated when the name changes.
      *
-     * Returns true if the user has not changed the location.
+     * Returns true if the user has not changed the location manually
+     * and if location change is allowed (i.e., the collection has not been published yet).
      * @type {function}
      */
-    shouldUpdateLocationOnNameChange = () => convertToSafeDirectoryName(this.state.properties.name) === this.state.properties.location;
+    shouldUpdateLocationOnNameChange = () => this.editLocationEnabled && convertToSafeDirectoryName(this.state.properties.name) === this.state.properties.location;
 
     isSaveEnabled = () => isInputValid(this.state.properties) && havePropertiesChanged(this.props.collection, this.state.properties);
 
@@ -196,6 +199,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="name"
                         label="Name"
+                        helperText="Unique collection name"
                         value={this.state.properties.name}
                         name="name"
                         onChange={(event) => this.handleNameChange(event)}
@@ -216,12 +220,15 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="location"
                         label="Collection identifier"
-                        helperText="This identifier does not allow special characters and has to be unique."
+                        helperText={this.editLocationEnabled
+                            ? 'This identifier does not allow special characters and has to be unique.'
+                            : 'Published collections cannot be moved.'}
                         value={this.state.properties.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}
                         fullWidth
                         required
+                        disabled={!this.editLocationEnabled}
                     />
 
                 </DialogContent>

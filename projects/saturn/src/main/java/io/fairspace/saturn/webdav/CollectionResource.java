@@ -59,6 +59,9 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
+        if (getAccessMode() == AccessMode.DataPublished) {
+            throw new BadRequestException(this, "Cannot move a published collection.");
+        }
         ensureNameIsAvailable(name);
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
@@ -332,7 +335,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private boolean canDelete() {
-        return canManage();
+        if (getAccessMode() == AccessMode.DataPublished) {
+            return false;
+        }
+        if (subject.hasProperty(FS.dateDeleted)) {
+            // The resource is already deleted. Deleting it permanently
+            // required the admin role.
+            return factory.userService.currentUser().isAdmin();
+        } else {
+            return canManage();
+        }
     }
 
     @Property
@@ -341,11 +353,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private boolean canUndelete() {
-        var currentUser = factory.currentUserResource();
-        return subject.hasProperty(FS.dateDeleted) && (access.canManage() || (
-                getGrantedPermission(subject, currentUser) == Access.Manage
-                        || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
-        ));
+        return subject.hasProperty(FS.dateDeleted) && canManage();
     }
 
     @Override
