@@ -151,7 +151,6 @@ export const FileBrowser = ({
                 data-testid="tabs"
                 value={currentTab}
                 onChange={(e, tab) => setCurrentTab(tab)}
-                centered
                 style={{marginBottom: 8}}
             >
                 <Tab value={TAB_FILES} label="Files" />

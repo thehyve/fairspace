@@ -22,7 +22,7 @@ const WorkspacesPage = () => {
         >
             <BreadCrumbs />
             <Grid container spacing={1}>
-                <Grid item style={{maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT}}>
+                <Grid item style={{maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT, maxWidth: '100%'}}>
                     <WorkspaceBrowser />
                 </Grid>
             </Grid>
