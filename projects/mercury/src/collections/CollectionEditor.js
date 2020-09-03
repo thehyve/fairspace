@@ -83,12 +83,21 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             : {name: '', description: '', location: '', ownerWorkspace: this.props.workspaceIri}
     };
 
+    handleCollectionUpdateError(err) {
+        let message;
+        if (err && err.details && err.details.some(d => d.message === "Duplicate label")) {
+            message = "A collection with that name already exists. Collection names must be unique.";
+        } else if (err && err.message) {
+            message = err.message;
+        } else {
+            message = "An error occurred while updating a collection";
+        }
+        ErrorDialog.showError(err, message);
+    }
+
     handleAddCollection = (properties: CollectionProperties) => {
         setTimeout(() => this.props.addCollection(properties)
-            .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                ErrorDialog.showError(err, message);
-            }), 0);
+            .catch(this.handleCollectionUpdateError), 0);
 
         this.close();
     };
@@ -123,10 +132,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     this.close();
                 }
             })
-            .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while updating a collection";
-                ErrorDialog.showError(err, message);
-            })
+            .catch(this.handleCollectionUpdateError)
             .finally(() => setBusy(false));
     };
 
