@@ -25,15 +25,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.PathUtils.encodePath;
-import static io.fairspace.saturn.webdav.PathUtils.normalizePath;
+import static io.fairspace.saturn.webdav.PathUtils.*;
+import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
@@ -55,10 +58,14 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
+        return createNew(newName, getBlob(), contentType);
+    }
+
+    private Resource createNew(String newName, BlobInfo blob, String contentType) throws NotAuthorizedException, ConflictException, BadRequestException {
         var subj = createResource(newName)
                 .addProperty(RDF.type, FS.File)
                 .addLiteral(FS.currentVersion, 1)
-                .addProperty(FS.versions, subject.getModel().createList(newVersion()));
+                .addProperty(FS.versions, subject.getModel().createList(newVersion(blob)));
 
         if (contentType != null) {
             subj.addProperty(FS.contentType, contentType);
@@ -134,11 +141,51 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     @Override
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
-            // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' -F 'action=metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
-            case "metadata" -> uploadMetadata(files.get("file"));
+            // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
+            // -F 'action=upload-files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
+            // -F '/dir/subdir/file2.ext=@/dir/subdir/file2.ext' \
+            // http://localhost:8080/api/v1/webdav/c1/
+            case "upload-files" -> uploadFiles(files);
+            // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
+            // -F 'action=upload-metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
+            case "upload-metadata" -> uploadMetadata(files.get("file"));
             default -> super.performAction(action, parameters, files);
         }
     }
+
+    private void uploadFiles(Map<String, FileItem> files) throws NotAuthorizedException, ConflictException, BadRequestException {
+        for(var entry: files.entrySet()) {
+            uploadFile(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void uploadFile(String path, FileItem file) throws NotAuthorizedException, BadRequestException, ConflictException {
+        path = normalizePath(path);
+        if (path.contains("/")) {
+            var segments = splitPath(path);
+            var child = this.child(segments[0]);
+            if (child == null) {
+                child = createCollection(segments[0]);
+            }
+            if (!(child instanceof DirectoryResource)) {
+                throw new ConflictException(child);
+            }
+            var dir = (DirectoryResource) child;
+            var relPath = Stream.of(segments)
+                    .skip(1)
+                    .collect(joining("/"));
+            dir.uploadFile(relPath, file);
+        } else {
+            BlobInfo blob;
+            try {
+                blob = factory.store.store(file.getInputStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            createNew(path, blob, file.getContentType());
+        }
+     }
 
     private void uploadMetadata(FileItem file) throws BadRequestException {
         if (file == null) {

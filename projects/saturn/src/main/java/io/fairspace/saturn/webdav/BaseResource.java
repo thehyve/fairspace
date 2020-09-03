@@ -249,8 +249,10 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     protected org.apache.jena.rdf.model.Resource newVersion() {
-        var blob = getBlob();
+        return newVersion(getBlob());
+    }
 
+    protected org.apache.jena.rdf.model.Resource newVersion(BlobInfo blob) {
         return subject.getModel()
                 .createResource()
                 .addProperty(RDF.type, FS.FileVersion)
