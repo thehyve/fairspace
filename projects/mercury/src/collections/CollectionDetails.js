@@ -267,7 +267,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
         if (collection.canManage) {
             menuItems.push([
-                <MenuItem key="ownership" onClick={this.handleChangeOwner}>
+                <MenuItem
+                    key="ownership"
+                    onClick={this.handleChangeOwner}
+                    disabled={workspaces.length <= 1}
+                >
                     Transfer ownership &hellip;
                 </MenuItem>,
                 <MenuItem
