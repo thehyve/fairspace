@@ -20,6 +20,7 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
+import {currentWorkspace} from '../workspaces/workspaces';
 
 const baseColumns = {
     name: {
@@ -64,6 +65,11 @@ const CollectionList = ({
     onCollectionDoubleClick,
     classes
 }) => {
+    const columns = {...baseColumns};
+    if (currentWorkspace()) {
+        delete columns.workspace;
+    }
+
     // Extend collections with displayName to avoid computing it when sorting
     const collectionsWithDisplayName = collections.map(collection => ({
         ...collection,
@@ -98,7 +104,7 @@ const CollectionList = ({
                 <TableHead>
                     <TableRow>
                         {
-                            Object.entries(baseColumns).map(([key, column]) => (
+                            Object.entries(columns).map(([key, column]) => (
                                 <TableCell key={key}>
                                     <TableSortLabel
                                         active={orderBy === key}
@@ -143,9 +149,17 @@ const CollectionList = ({
                                         secondary={collection.description}
                                     />
                                 </TableCell>
-                                <TableCell style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160}}>
-                                    {collection.workspaceName}
-                                </TableCell>
+                                { currentWorkspace() ? null : (
+                                    <TableCell style={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: 160
+                                    }}
+                                    >
+                                        {collection.workspaceName}
+                                    </TableCell>
+                                ) }
                                 <TableCell>
                                     {collection.status}
                                 </TableCell>
