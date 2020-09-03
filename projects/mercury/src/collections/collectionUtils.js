@@ -13,6 +13,15 @@ import type {
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
 
+export const isCollectionPage = () => {
+    const {pathname} = new URL(window.location);
+    const parts = pathname.split('/');
+    if (parts.length > 0 && parts[0] === '') {
+        parts.splice(0, 1);
+    }
+    return (parts.length > 1 && parts[0] === 'collections');
+};
+
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 
 export const handleCollectionSearchRedirect = (history, value) => {
