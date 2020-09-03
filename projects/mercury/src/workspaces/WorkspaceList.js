@@ -38,7 +38,7 @@ const columns = {
         label: 'Name'
     },
     collectionCount: {
-        valueExtractor: 'summary.collectionCount',
+        valueExtractor: 'summary.nonDeletedCollectionCount',
         label: 'Collections',
         align: 'right'
     },
@@ -124,10 +124,11 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     <ListItemText
                                         style={{margin: 0}}
                                         primary={workspace.name}
-                                        secondary={workspace.comment} />
+                                        secondary={workspace.comment}
+                                    />
                                 </TableCell>
                                 <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
-                                    {workspace.summary ? workspace.summary.collectionCount : ''}
+                                    {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
                                 </TableCell>
                                 <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
                                     {workspace.summary ? workspace.summary.memberCount : ''}

@@ -8,7 +8,6 @@ import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import ErrorDialog from '../common/components/ErrorDialog';
 import WorkspaceContext from './WorkspaceContext';
 import {currentWorkspace} from './workspaces';
-import CollectionsContext from '../collections/CollectionsContext';
 
 type WorkspaceActionMenuProps = {
     workspace: Workspace;
@@ -19,9 +18,8 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
     const {workspace, small} = props;
     const history = useHistory();
     const {deleteWorkspace} = useContext(WorkspaceContext);
-    const {collections} = useContext(CollectionsContext);
 
-    const isWorkspaceEmpty = !collections.some(c => c.ownerWorkspace === workspace.iri);
+    const isWorkspaceEmpty = workspace.summary.totalCollectionCount === 0;
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [showDeletionConfirmDialog, setShowDeletionConfirmDialog] = useState(false);

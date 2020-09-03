@@ -42,10 +42,14 @@ public class WorkspaceService {
                         var res = m.wrapAsResource(ws.getIri());
                         ws.setCanManage(userService.currentUser().isAdmin() || user.hasProperty(FS.isManagerOf, res));
                         ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
-                        var collectionCount = m
-                                .listSubjectsWithProperty(RDF.type, FS.Collection)
-                                .filterKeep(collection -> collection.hasProperty(FS.ownedBy, res))
-                                .toList().size();
+                        var workspaceCollections = m
+                                .listSubjectsWithProperty(FS.ownedBy, res)
+                                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
+                                .toList();
+                        var totalCollectionCount = workspaceCollections.size();
+                        var nonDeletedCollectionCount = (int) workspaceCollections.stream()
+                                .filter(collection -> !collection.hasProperty(FS.dateDeleted))
+                                .count();
                         var memberCount = m
                                 .listSubjectsWithProperty(RDF.type, FS.User)
                                 .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
@@ -54,7 +58,8 @@ public class WorkspaceService {
                                 .filter(u -> m.wrapAsResource(u.getIri()).hasProperty(FS.isManagerOf, res))
                                 .collect(toList());
                         ws.setSummary(WorkspaceSummary.builder()
-                                .collectionCount(collectionCount)
+                                .totalCollectionCount(totalCollectionCount)
+                                .nonDeletedCollectionCount(nonDeletedCollectionCount)
                                 .memberCount(memberCount + managers.size())
                                 .build());
                         ws.setManagers(managers);
