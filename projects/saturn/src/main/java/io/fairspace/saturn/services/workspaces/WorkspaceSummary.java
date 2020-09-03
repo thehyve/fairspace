@@ -6,6 +6,7 @@ import lombok.*;
 @Data
 @Builder
 public class WorkspaceSummary {
-    private int collectionCount;
+    private int totalCollectionCount;
+    private int nonDeletedCollectionCount;
     private int memberCount;
 }
