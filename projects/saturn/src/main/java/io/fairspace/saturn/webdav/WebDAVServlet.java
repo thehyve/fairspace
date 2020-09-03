@@ -3,13 +3,9 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
-import io.milton.http.AuthenticationService;
-import io.milton.http.HttpManager;
-import io.milton.http.ProtocolHandlers;
-import io.milton.http.ResourceFactory;
+import io.milton.http.*;
 import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;
-import io.milton.servlet.ServletRequest;
 import io.milton.servlet.ServletResponse;
 import org.apache.jena.rdf.model.Literal;
 
@@ -86,7 +82,11 @@ public class WebDAVServlet extends HttpServlet {
                 }
             }
 
-            httpManager.process(new ServletRequest(req, req.getServletContext()), new ServletResponse(res));
+            try {
+                httpManager.process(new PreParsedServletRequest(req), new ServletResponse(res));
+            } catch (RequestParseException e) {
+                throw new IOException(e);
+            }
 
             var postCommitAction = (Runnable) req.getAttribute(POST_COMMIT_ACTION_ATTRIBUTE);
             if (postCommitAction != null) {
