@@ -32,7 +32,7 @@ import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
-import {getStatusDescription} from "./collectionUtils";
+import {descriptionForStatus} from "./collectionUtils";
 import {getDisplayName} from '../users/userUtils';
 import {formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
@@ -205,7 +205,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 <FormGroup>
                     <ListItemText
                         primary={this.props.collection.status}
-                        secondary={getStatusDescription(this.props.collection.status)}
+                        secondary={descriptionForStatus(this.props.collection.status)}
                     />
                 </FormGroup>
             </FormControl>
@@ -214,7 +214,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     renderDeleted = (dateDeleted: string, deletedBy: User) => (
         dateDeleted && [
-            <ListItem disableGutters>
+            <ListItem key="dateDeleted" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted</FormLabel>
                     <FormGroup>
@@ -224,7 +224,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </FormGroup>
                 </FormControl>
             </ListItem>,
-            <ListItem disableGutters>
+            <ListItem key="deletedBy" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted by</FormLabel>
                     <FormGroup>
@@ -258,24 +258,26 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const deletedBy = collection.deletedBy && users.find(u => u.iri === collection.deletedBy);
 
         const menuItems = [];
-        if (!collection.dateDeleted) {
-            if (collection.canWrite) {
-                menuItems.push(
-                    <MenuItem key="edit" onClick={this.handleEdit}>
-                        Edit
-                    </MenuItem>
-                );
-            }
-            if (collection.canManage) {
-                menuItems.push([
-                    <MenuItem key="ownership" onClick={this.handleChangeOwner}>
-                        Transfer ownership &hellip;
-                    </MenuItem>,
-                    <MenuItem key="status" onClick={this.handleChangeStatus}>
-                        Change status &hellip;
-                    </MenuItem>
-                ]);
-            }
+        if (collection.canWrite && !collection.dateDeleted) {
+            menuItems.push(
+                <MenuItem key="edit" onClick={this.handleEdit}>
+                    Edit
+                </MenuItem>
+            );
+        }
+        if (collection.canManage) {
+            menuItems.push([
+                <MenuItem key="ownership" onClick={this.handleChangeOwner}>
+                    Transfer ownership &hellip;
+                </MenuItem>,
+                <MenuItem
+                    key="status"
+                    onClick={this.handleChangeStatus}
+                    disabled={collection.availableStatuses.length === 1}
+                >
+                    Change status &hellip;
+                </MenuItem>
+            ]);
         }
         if (collection.canDelete) {
             menuItems.push(
@@ -373,7 +375,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={`Undelete collection ${collection.name}`}
+                        content={(
+                            <span>
+                                Are you sure you want to <b>undelete</b> collection <em>{collection.name}</em>?
+                            </span>
+                        )}
                         dangerous
                         agreeButtonText="Undelete"
                         onAgree={() => this.handleCollectionUndelete(this.props.collection)}
@@ -385,8 +391,12 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={`Collection ${collection.name} is already marked as deleted.`
-                        + " Are you sure you want to delete it permanently?"}
+                        content={(
+                            <span>
+                                Collection {collection.name} is already marked as deleted.<br />
+                                <b>Are you sure you want to delete it permanently</b>?
+                            </span>
+                        )}
                         dangerous
                         agreeButtonText="Delete permanently"
                         onAgree={() => this.handleCollectionDelete(this.props.collection)}
@@ -398,7 +408,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={`Delete collection ${collection.name}`}
+                        content={(
+                            <span>
+                                Are you sure you want to <b>delete</b> collection <em>{collection.name}</em>?
+                            </span>
+                        )}
                         dangerous
                         agreeButtonText="Delete"
                         onAgree={() => this.handleCollectionDelete(this.props.collection)}

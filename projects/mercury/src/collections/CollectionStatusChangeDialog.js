@@ -1,20 +1,23 @@
 // @flow
 import React, {useState} from 'react';
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import FormControl from "@material-ui/core/FormControl";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import {withStyles} from "@material-ui/core/styles";
-import FormHelperText from "@material-ui/core/FormHelperText";
+import {
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogActions,
+    DialogContent,
+    FormControl,
+    FormControlLabel,
+    ListItemText,
+    Radio,
+    RadioGroup,
+    withStyles
+} from "@material-ui/core";
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import ConfirmationButton from "../common/components/ConfirmationButton";
-import {getStatusDescription} from "./collectionUtils";
+import {descriptionForStatus} from "./collectionUtils";
 import {statuses} from './CollectionAPI';
+import type {Status} from './CollectionAPI';
 
 export const styles = {
     group: {
@@ -50,12 +53,40 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
         onClose();
     };
 
+    const confirmationMessage = (status: Status) => {
+        switch (status) {
+            case 'Active':
+                return (
+                    <span>
+                        Are you sure you want to <b>activate</b> collection <em>{collection.name}</em>?<br />
+                        Editing data and metadata will be enabled.
+                    </span>
+                );
+            case 'Archived':
+                return (
+                    <span>
+                        Are you sure you want to <b>archive</b> collection <em>{collection.name}</em>?<br />
+                        Data will be immutable, i.e., read-only.
+                    </span>
+                );
+            case 'Closed':
+                return (
+                    <span>
+                        Are you sure you want to <b>close</b> collection <em>{collection.name}</em>?<br />
+                        Closing the collection will make the data unavailable for reading.
+                    </span>
+                );
+            default:
+                throw Error(`Unknown status: ${status}`);
+        }
+    };
+
     return (
         <Dialog
             open={openDialog}
             data-testid="property-change-dialog"
         >
-            <DialogTitle id="property-change-dialog-title">Select collection status</DialogTitle>
+            <DialogTitle id="property-change-dialog-title">Change collection status</DialogTitle>
             <DialogContent>
                 <div>
                     <FormControl>
@@ -68,16 +99,17 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                         >
                             {statuses.filter(status => collection.availableStatuses.includes(status))
                                 .map(status => (
-                                    <span className={classes.groupItem} key={status}>
-                                        <FormControlLabel
-                                            value={status}
-                                            control={<Radio />}
-                                            label={camelCaseToWords(status)}
-                                        />
-                                        <FormHelperText className={classes.helperText}>
-                                            {getStatusDescription(status)}
-                                        </FormHelperText>
-                                    </span>
+                                    <FormControlLabel
+                                        key={status}
+                                        value={status}
+                                        control={<Radio />}
+                                        label={(
+                                            <ListItemText
+                                                primary={camelCaseToWords(status)}
+                                                secondary={descriptionForStatus(status)}
+                                            />
+                                        )}
+                                    />
                                 ))}
                         </RadioGroup>
                     </FormControl>
@@ -87,8 +119,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                 <ConfirmationButton
                     onClick={handleSubmit}
                     disabled={Boolean(!selectedValue)}
-                    message={`Are you sure you want to change the status of collection ${collection.name} to ${selectedValue}`
-                        + ` (${getStatusDescription(selectedValue)})?`}
+                    message={confirmationMessage(selectedValue)}
                     agreeButtonText="Yes"
                     dangerous
                 >

@@ -3,6 +3,7 @@ import React, {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {
     Chip,
+    Link,
     ListItemText,
     Paper,
     Table,
@@ -58,7 +59,7 @@ const columns = {
 const EmailChip = ({email, label}) => {
     const chip = <Chip style={{margin: 1, cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
     if (email) {
-        return <a title={email} href={`mailto:${email}`}>{chip}</a>;
+        return <Link underline="hover" color="inherit" title={email} href={`mailto:${email}`}>{chip}</Link>;
     }
     return chip;
 };
@@ -90,7 +91,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
 
     return (
         <>
-            <Paper>
+            <Paper style={{width: '100%', overflowX: 'auto'}}>
                 <Table>
                     <TableHead>
                         <TableRow>

@@ -34,7 +34,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> canDelete();
-            case POST -> canManage();
+            case POST -> canManage() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
     }
@@ -58,6 +58,9 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
+        }
+        if (getAccessMode() == AccessMode.DataPublished) {
+            throw new BadRequestException(this, "Cannot move a published collection.");
         }
         ensureNameIsAvailable(name);
         var oldName = getStringProperty(subject, RDFS.label);
@@ -220,12 +223,21 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return EnumSet.allOf(Status.class);
     }
 
+    /**
+     * Whether the current user has the permission to manage the collection, i.e.,
+     * manage access and change status or view mode.
+     * A deleted collection cannot be managed (but can only be undeleted or permanently deleted).
+     * In other statuses, manage access is granted to users that have Manage permission on the collection
+     * and to managers of the owner workspace.
+     */
     private boolean canManage() {
         var currentUser = factory.currentUserResource();
-        return access.canManage() || (!subject.hasProperty(FS.dateDeleted) && (
-                getGrantedPermission(subject, currentUser) == Access.Manage
-                        || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
-        ));
+        if (subject.hasProperty(FS.dateDeleted)) {
+            return false;
+        }
+        return access.canManage()
+                || getGrantedPermission(subject, currentUser) == Access.Manage
+                || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy));
     }
 
     private String getPermissions(Resource principalType) {
@@ -332,7 +344,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private boolean canDelete() {
-        return canManage();
+        if (getAccessMode() == AccessMode.DataPublished) {
+            return false;
+        }
+        if (subject.hasProperty(FS.dateDeleted)) {
+            // The resource is already deleted. Deleting it permanently
+            // required the admin role.
+            return factory.userService.currentUser().isAdmin();
+        } else {
+            return canManage();
+        }
     }
 
     @Property
@@ -341,11 +362,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     private boolean canUndelete() {
-        var currentUser = factory.currentUserResource();
-        return subject.hasProperty(FS.dateDeleted) && (access.canManage() || (
-                getGrantedPermission(subject, currentUser) == Access.Manage
-                        || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy))
-        ));
+        return subject.hasProperty(FS.dateDeleted) && factory.userService.currentUser().isAdmin();
     }
 
     @Override
