@@ -32,7 +32,7 @@ import UsersContext from "../users/UsersContext";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
-import {descriptionForStatus} from "./collectionUtils";
+import {descriptionForStatus, isCollectionPage} from "./collectionUtils";
 import {getDisplayName} from '../users/userUtils';
 import {formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
@@ -143,7 +143,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {deleteCollection, history} = this.props;
         this.handleCloseDelete();
         deleteCollection(collection)
-            .then(() => history.push('/collections'))
+            .then(() => {
+                if (isCollectionPage()) {
+                    history.push('/collections');
+                }
+            })
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while deleting a collection",
@@ -152,10 +156,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleCollectionUndelete = (collection: Collection) => {
-        const {undeleteCollection, history} = this.props;
+        const {undeleteCollection} = this.props;
         this.handleCloseUndelete();
         undeleteCollection(collection)
-            .then(() => history.push('/collections'))
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while undeleting a collection",
@@ -167,7 +170,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {setOwnedBy, history} = this.props;
         this.handleCloseChangingOwner();
         setOwnedBy(collection.location, selectedOwner.iri)
-            .then(() => history.push('/collections'))
+            .then(() => {
+                if (isCollectionPage()) {
+                    history.push('/collections');
+                }
+            })
             .catch(err => ErrorDialog.showError(
                 err,
                 "An error occurred while changing an owner of a collection",
