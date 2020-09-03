@@ -93,6 +93,11 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
                         inCollectionsBrowser
                         setBusy={setBusy}
                         selectedCollectionIri={selected}
+                        onChangeOwner={() => {
+                            if (workspaceIri) {
+                                toggleCollection(selected);
+                            }
+                        }}
                         setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
                     />
                 </Grid>
