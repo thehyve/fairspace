@@ -50,6 +50,7 @@ const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 type CollectionDetailsProps = {
     loading: boolean;
     collection: Collection;
+    onChangeOwner: () => void;
     workspaces: Workspace[];
     inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
@@ -71,6 +72,7 @@ type CollectionDetailsState = {
 
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
+        onChangeOwner: () => {},
         inCollectionsBrowser: false,
         setBusy: () => {}
     };
@@ -167,11 +169,12 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleCollectionOwnerChange = (collection: Collection, selectedOwner: Workspace) => {
-        const {setOwnedBy, history} = this.props;
+        const {setOwnedBy, onChangeOwner, history} = this.props;
         this.handleCloseChangingOwner();
+        onChangeOwner();
         setOwnedBy(collection.location, selectedOwner.iri)
             .then(() => {
-                if (isCollectionPage()) {
+                if (!selectedOwner.canCollaborate) {
                     history.push('/collections');
                 }
             })
