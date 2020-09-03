@@ -27,12 +27,13 @@ import java.io.OutputStream;
 import java.util.*;
 
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
+import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.PathUtils.normalizePath;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
@@ -173,6 +174,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 }
 
                 var classShape = s.getPropertyResourceValue(RDF.type).inModel(VOCABULARY);
+                var propertyShapes = new HashMap<String, org.apache.jena.rdf.model.Resource>();
+
                 classShape.listProperties(SHACLM.property)
                         .mapWith(Statement::getObject)
                         .mapWith(RDFNode::asResource)
@@ -180,26 +183,43 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                                 && propertyShape.hasProperty(SHACLM.path)
                                 && propertyShape.getProperty(SHACLM.path).getObject().isURIResource())
                         .forEachRemaining(propertyShape -> {
-                            var property = model.createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());
-                            var name = propertyShape.getProperty(SHACLM.name).getString();
-                            if (headers.contains(name)) {
-                                var datatype = propertyShape.getPropertyResourceValue(SHACLM.datatype);
-                                var class_ = propertyShape.getPropertyResourceValue(SHACLM.class_);
-                                assert (datatype != null) ^ (class_ != null);
-
-                                var text = record.get(name);
-                                if (isNotBlank(text)) {
-                                    var values = text.split("\\|");
-
-                                    for (var value : values) {
-                                        var o = (class_ != null)
-                                                ? model.wrapAsResource(generateMetadataIri(value))
-                                                : model.createTypedLiteral(value, datatype.getURI());
-                                        model.add(s, property, o);
-                                    }
-                                }
+                            var name = getStringProperty(propertyShape, SHACLM.name);
+                            if (name != null) {
+                                propertyShapes.put(name, propertyShape);
                             }
                         });
+
+                for (var header : headers) {
+                    if (header.equals("Path")) {
+                        return;
+                    }
+
+                    var text = record.get(header);
+
+                    if (isBlank(text)) {
+                        return;
+                    }
+
+                    var propertyShape = propertyShapes.get(header);
+
+                    if (propertyShape == null) {
+                        throw new BadRequestException("Unknown attribute: " + header);
+                    }
+
+                    var property = model.createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());
+                    var datatype = propertyShape.getPropertyResourceValue(SHACLM.datatype);
+                    var class_ = propertyShape.getPropertyResourceValue(SHACLM.class_);
+                    assert (datatype != null) ^ (class_ != null);
+
+                    var values = text.split("\\|");
+
+                    for (var value : values) {
+                        var o = (class_ != null)
+                                ? model.wrapAsResource(generateMetadataIri(value))
+                                : model.createTypedLiteral(value, datatype.getURI());
+                        model.add(s, property, o);
+                    }
+                }
             }
         } catch (IOException e) {
             throw new BadRequestException("Error parsing file " + file.getName(), e);
