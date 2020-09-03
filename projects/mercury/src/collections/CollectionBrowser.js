@@ -21,7 +21,8 @@ export const CollectionBrowser = ({
     history,
     workspaceIri,
     canAddCollection = true,
-    showDeleted
+    showDeleted,
+    setBusy = () => {}
 }) => {
     const [addingNewCollection, setAddingNewCollection] = useState(false);
 
@@ -52,6 +53,7 @@ export const CollectionBrowser = ({
                 />
                 {addingNewCollection ? (
                     <CollectionEditor
+                        setBusy={setBusy}
                         onClose={handleCancelAddCollection}
                         workspaceIri={workspaceIri}
                     />
