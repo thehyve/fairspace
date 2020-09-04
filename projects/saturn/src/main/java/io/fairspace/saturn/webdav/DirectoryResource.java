@@ -209,7 +209,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             for (var record : csvParser) {
                 var path = record.get("Path");
                 org.apache.jena.rdf.model.Resource s;
-                if (path.equals(".") || path.equals("./")) {
+                if (path.equals(".") || path.equals("./") || path.equals("/")) {
                     s = subject;
                 } else {
                     if (path.startsWith("./")) {
