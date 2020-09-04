@@ -36,7 +36,6 @@ import static io.fairspace.saturn.webdav.PathUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
@@ -238,13 +237,13 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
                 for (var header : headers) {
                     if (header.equals("Path")) {
-                        return;
+                        continue;
                     }
 
                     var text = record.get(header);
 
                     if (isBlank(text)) {
-                        return;
+                        continue;
                     }
 
                     var propertyShape = propertyShapes.get(header);
