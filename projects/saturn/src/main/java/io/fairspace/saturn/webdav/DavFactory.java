@@ -63,16 +63,12 @@ public class DavFactory implements ResourceFactory {
             return Access.None;
         }
 
-        if (userService.currentUser().isAdmin()) {
-            return Access.Manage;
-        }
-
         var user = currentUserResource();
         var ownerWs = coll.getPropertyResourceValue(FS.ownedBy);
         var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
 
         var access = getGrantedPermission(coll, user);
-        if(user.hasProperty(FS.isManagerOf, ownerWs)) {
+        if(user.hasProperty(FS.isManagerOf, ownerWs) || userService.currentUser().isAdmin()) {
             access = Access.Manage;
         }
 
