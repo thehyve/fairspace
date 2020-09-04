@@ -215,11 +215,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     if (path.startsWith("./")) {
                         path = path.substring(2);
                     }
-                    if (path.contains("./")) {
-                        setErrorMessage("Line " +  record.getRecordNumber() + ". Malformed file path");
-                    }
                     path = normalizePath(path);
-                    s = this.subject.getModel().createResource(subject + "/" + encodePath(path));
+                    s = subject.getModel().createResource(subject + "/" + encodePath(path));
                 }
                 if (!s.getModel().containsResource(s)) {
                     setErrorMessage("Line " +  record.getRecordNumber() + ". File \"" + path + "\" not found");
