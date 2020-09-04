@@ -209,11 +209,14 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             for (var record : csvParser) {
                 var path = record.get("Path");
                 org.apache.jena.rdf.model.Resource s;
-                if (path.equals(".")) {
+                if (path.equals(".") || path.equals("./")) {
                     s = subject;
                 } else {
-                    if (path.startsWith(".")) {
-                        path = path.substring(1);
+                    if (path.startsWith("./")) {
+                        path = path.substring(2);
+                    }
+                    if (path.contains("./")) {
+                        setErrorMessage("Line " +  record.getRecordNumber() + ". Malformed file path");
                     }
                     path = normalizePath(path);
                     s = this.subject.getModel().createResource(subject + "/" + encodePath(path));
