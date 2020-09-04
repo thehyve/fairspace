@@ -52,7 +52,6 @@ type CollectionDetailsProps = {
     collection: Collection;
     onChangeOwner: () => void;
     workspaces: Workspace[];
-    inCollectionsBrowser: boolean;
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
     setStatus: (location: string, status: Status) => Promise<void>;
@@ -73,7 +72,6 @@ type CollectionDetailsState = {
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
         onChangeOwner: () => {},
-        inCollectionsBrowser: false,
         setBusy: () => {}
     };
 
@@ -85,6 +83,12 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         deleting: false,
         undeleting: false
     };
+
+    unmounting = false;
+
+    componentWillUnmount() {
+        this.unmounting = true;
+    }
 
     handleEdit = () => {
         if (this.props.collection.canWrite) {
@@ -250,7 +254,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     );
 
     render() {
-        const {loading, error, collection, users, workspaceRoles, workspaces, inCollectionsBrowser = false} = this.props;
+        const {loading, error, collection, users, workspaceRoles, workspaces} = this.props;
         const {anchorEl, editing, changingStatus, changingOwner, deleting, undeleting} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
@@ -365,9 +369,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CollectionEditor
                         collection={collection}
                         updateExisting
-                        inCollectionsBrowser={inCollectionsBrowser}
                         setBusy={this.props.setBusy}
-                        onClose={() => this.setState({editing: false})}
+                        onClose={() => { if (!this.unmounting) { this.setState({editing: false})} }}
                     />
                 ) : null}
                 {changingStatus ? (

@@ -137,7 +137,6 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             <CollectionDetails
                 collection={collection}
                 onChangeOwner={props.onChangeOwner}
-                inCollectionsBrowser={props.inCollectionsBrowser}
                 loading={loading}
                 setBusy={props.setBusy}
             />

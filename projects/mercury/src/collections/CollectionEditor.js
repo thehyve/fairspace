@@ -10,7 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
-import {getCollectionAbsolutePath} from './collectionUtils';
+import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from "../common/components/ErrorDialog";
 
@@ -53,7 +53,6 @@ type PathParam = {
 type CollectionEditorProps = {
     collection: Collection,
     updateExisting: boolean,
-    inCollectionsBrowser: boolean,
     addCollection: (CollectionProperties) => Promise<void>,
     updateCollection: (Collection) => Promise<void>,
     relocateCollection: (Collection) => Promise<void>,
@@ -66,22 +65,29 @@ type CollectionEditorProps = {
 
 type CollectionEditorState = {
     editing: boolean,
+    saveInProgress: false,
     properties: CollectionProperties
 };
 
 export class CollectionEditor extends React.Component<CollectionEditorProps, CollectionEditorState> {
     static defaultProps = {
         setBusy: () => {},
-        updateExisting: false,
-        inCollectionsBrowser: false
+        updateExisting: false
     };
 
     state = {
         editing: true,
+        saveInProgress: false,
         properties: this.props.collection
             ? copyProperties(this.props.collection)
             : {name: '', description: '', location: '', ownerWorkspace: this.props.workspaceIri}
     };
+
+    unmounting = false;
+
+    componentWillUnmount() {
+        this.unmounting = true;
+    }
 
     handleCollectionUpdateError(err) {
         let message;
@@ -95,45 +101,70 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         ErrorDialog.showError(err, message);
     }
 
-    handleAddCollection = (properties: CollectionProperties) => {
-        setTimeout(() => this.props.addCollection(properties)
-            .catch(this.handleCollectionUpdateError), 0);
+    onSaveStart = () => {
+        const {setBusy} = this.props;
+        this.setState({saveInProgress: true});
+        setBusy(true);
+    };
 
-        this.close();
+    onSaveComplete = () => {
+        if (!this.unmounting) {
+            this.setState({saveInProgress: false});
+        }
+        const {setBusy} = this.props;
+        setBusy(false);
+    };
+
+    handleAddCollection = (properties: CollectionProperties) => {
+        const {addCollection} = this.props;
+        this.onSaveStart();
+        return addCollection(properties)
+            .then(() => {
+                this.close();
+            })
+            .catch(this.handleCollectionUpdateError)
+            .finally(() => {
+                this.onSaveComplete();
+            });
     };
 
     handleCollectionLocationChange = (newLocation: string) => {
         const {collection, relocateCollection} = this.props;
         return relocateCollection(collection.location, newLocation)
             .then(() => {
-                const {history, inCollectionsBrowser, match: {params: {path}}} = this.props;
-                if (inCollectionsBrowser) {
+                this.onSaveComplete();
+                if (isCollectionPage()) {
+                    // If the collection location changes, the URI for the current page should change as well
+                    const {history, match: {params: {path}}} = this.props;
+                    history.push(`${getCollectionAbsolutePath(newLocation)}/${path || ''}`);
+                } else {
                     this.close();
-                    return;
                 }
-                // If the collection location changes, the URI for the current page should change as well
-                history.push(`${getCollectionAbsolutePath(newLocation)}/${path || ''}`);
             })
             .catch(err => {
+                this.onSaveComplete();
                 const message = err && err.message ? err.message : "An error occurred while renaming a collection";
                 ErrorDialog.showError(err, message);
             });
     };
 
     handleUpdateCollection = (properties: CollectionProperties) => {
-        const {collection, updateCollection, setBusy} = this.props;
-        setBusy(true);
+        const {collection, updateCollection} = this.props;
+        this.onSaveStart();
 
         return updateCollection((({iri: collection.iri, ...properties}: any): Collection))
             .then(() => {
                 if (collection.location !== properties.location) {
                     this.handleCollectionLocationChange(properties.location);
                 } else {
+                    this.onSaveComplete();
                     this.close();
                 }
             })
-            .catch(this.handleCollectionUpdateError)
-            .finally(() => setBusy(false));
+            .catch((err) => {
+                this.onSaveComplete();
+                this.handleCollectionUpdateError(err);
+            });
     };
 
     handleSave = () => {
@@ -145,7 +176,9 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     };
 
     close = () => {
-        this.setState({editing: false});
+        if (!this.unmounting) {
+            this.setState({editing: false});
+        }
         if (this.props.onClose) {
             this.props.onClose();
         }
@@ -180,7 +213,9 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
      */
     shouldUpdateLocationOnNameChange = () => this.editLocationEnabled && convertToSafeDirectoryName(this.state.properties.name) === this.state.properties.location;
 
-    isSaveEnabled = () => isInputValid(this.state.properties) && havePropertiesChanged(this.props.collection, this.state.properties);
+    isSaveEnabled = () => (!this.state.saveInProgress)
+        && isInputValid(this.state.properties)
+        && havePropertiesChanged(this.props.collection, this.state.properties);
 
     render() {
         return (

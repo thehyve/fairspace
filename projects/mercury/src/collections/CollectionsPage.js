@@ -82,6 +82,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
             <Grid container spacing={1}>
                 <Grid item className={classes.centralPanel}>
                     <CollectionBrowser
+                        setBusy={setBusy}
                         isSelected={collection => isSelected(collection.iri)}
                         toggleCollection={collection => toggleCollection(collection.iri)}
                         workspaceIri={workspaceIri}
