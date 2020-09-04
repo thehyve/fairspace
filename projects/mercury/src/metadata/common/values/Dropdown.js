@@ -26,6 +26,10 @@ const Dropdown = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchText, touched]);
 
+    useEffect(() => {
+        setOptionsToShow(options);
+    }, [options]);
+
     const inputProps = (params) => ({
         ...params.inputProps,
         value: searchText,

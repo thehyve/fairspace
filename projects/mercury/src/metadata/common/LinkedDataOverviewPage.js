@@ -12,11 +12,12 @@ import {METADATA_PATH, SHACL_TARGET_CLASS} from "../../constants";
 import {getLabel} from "./metadataUtils";
 import {getClassesInCatalog} from './vocabularyUtils';
 import BreadCrumbs from "../../common/components/BreadCrumbs";
+import {canAddSharedMetadata} from "../../users/userUtils";
 
 const getEntityRelativeUrl = (id) => `${METADATA_PATH}?iri=${encodeURIComponent(id)}`;
 
 const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsComponent}) => {
-    const {requireIdentifier, hasEditRight, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
+    const {requireIdentifier, shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
 
     const {
         query, setQuery, selectedTypes, setSelectedTypes,
@@ -64,7 +65,7 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
                 availableTypes={availableTypes}
             />
             {
-                hasEditRight ? (
+                canAddSharedMetadata ? (
                     <LinkedDataCreator
                         shapesLoading={shapesLoading}
                         shapesError={shapesError}

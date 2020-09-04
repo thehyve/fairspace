@@ -30,7 +30,7 @@ describe('FileList', () => {
         const {queryByText} = render(<FileList files={files} />);
 
         expect(queryByText(/empty directory/i)).not.toBeInTheDocument();
-        expect(queryByText(/deletion date/i)).not.toBeInTheDocument();
+        expect(queryByText(/deleted/i)).not.toBeInTheDocument();
         expect(queryByText(/name/i)).toBeInTheDocument();
         expect(queryByText(/size/i)).toBeInTheDocument();
         expect(queryByText(/last modified/i)).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('FileList', () => {
         const {queryByText} = render(<FileList files={files} showDeleted />);
 
         expect(queryByText(/empty directory/i)).not.toBeInTheDocument();
-        expect(queryByText(/deletion date/i)).toBeInTheDocument();
+        expect(queryByText(/deleted/i)).toBeInTheDocument();
         expect(queryByText(/name/i)).toBeInTheDocument();
         expect(queryByText(/size/i)).toBeInTheDocument();
         expect(queryByText(/last modified/i)).toBeInTheDocument();

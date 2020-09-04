@@ -9,8 +9,7 @@ import {compareBy} from "../common/utils/genericUtils";
 import Dropdown from "../metadata/common/values/Dropdown";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 
-
-export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy, onClose}) => {
+export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner, onClose}) => {
     const [selectedValue, setSelectedValue] = useState();
     const [openDialog, setOpenDialog] = useState(true);
 
@@ -34,8 +33,7 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy,
     const handleSubmit = () => {
         if (selectedValue) {
             setOpenDialog(false);
-            setOwnedBy(collection.location, selectedValue.iri);
-            onClose();
+            changeOwner(collection, selectedValue);
         }
     };
 
@@ -66,8 +64,12 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, setOwnedBy,
                 <ConfirmationButton
                     onClick={handleSubmit}
                     disabled={Boolean(!selectedValue)}
-                    message={`Are you sure you want to transfer the ownership 
-                    on collection ${collection.name} to workspace ${selectedValue && selectedValue.label}?`}
+                    message={(
+                        <span>
+                           Are you sure you want to <b>transfer the ownership</b> on
+                           collection <em>{collection.name}</em> to workspace <em>{selectedValue && selectedValue.label}</em>?
+                        </span>
+                    )}
                     agreeButtonText="Yes"
                     dangerous
                 >

@@ -75,6 +75,9 @@ public class DavFactory implements ResourceFactory {
         var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
 
         var access = getGrantedPermission(coll, user);
+        if(user.hasProperty(FS.isManagerOf, ownerWs)) {
+            access = Access.Manage;
+        }
 
         if (coll.hasLiteral(FS.accessMode, DataPublished.name()) && (userService.currentUser().isCanViewPublicData() || access.canRead())) {
             return Access.Read;
@@ -104,7 +107,7 @@ public class DavFactory implements ResourceFactory {
         return access;
     }
 
-    private static Access getGrantedPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
+    protected static Access getGrantedPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
         if (principal.hasProperty(FS.canManage, resource)) {
             return Access.Manage;
         }

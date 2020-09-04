@@ -1,8 +1,9 @@
 // @flow
+// eslint-disable-next-line import/no-cycle
+import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
 import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import MetadataAPI from "../metadata/common/MetadataAPI";
-import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
 
 const rootUrl = '';
 
@@ -17,6 +18,13 @@ export type Permission = {
     iri: string; // iri
     access: AccessLevel;
 }
+
+export type Principal = {|
+    iri: string;
+    name: string;
+|};
+
+export type PrincipalPermission = Permission & Principal;
 
 export type CollectionProperties = {|
     name: string;
@@ -36,6 +44,8 @@ export type CollectionPermissions = {|
     canRead: boolean;
     canWrite: boolean;
     canManage: boolean;
+    canDelete: boolean;
+    canUndelete: boolean;
 |};
 
 export type Resource = {|
@@ -103,10 +113,7 @@ class CollectionAPI {
     updateCollection(collection: Collection, vocabulary): Promise<void> {
         const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
         return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
-            .catch(e => {
-                console.error(e);
-                throw Error("Failure while updating a collection");
-            });
+            .catch(handleHttpError("Failure while updating a collection"));
     }
 
     setAccessMode(location: string, mode: AccessMode) {

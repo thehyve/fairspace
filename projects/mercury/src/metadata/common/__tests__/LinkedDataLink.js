@@ -1,22 +1,61 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React from 'react';
-import {shallow} from "enzyme";
-import {Link} from "react-router-dom";
+import {mount} from "enzyme";
+import {Router} from 'react-router-dom';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {createMemoryHistory} from 'history';
 import LinkedDataLink from "../LinkedDataLink";
 import {METADATA_PATH} from "../../../constants";
 
-describe('MetadataLink', () => {
-    // Please note that for tests, the window.location.origin is set to http://localhost
-    const search = '?iri=';
-
+describe('LinkedDataLink', () => {
     it('should render internal link for any uri', () => {
-        const wrapper = shallow(<LinkedDataLink uri="http://google.nl/some-path?search#hash" />);
-        expect(wrapper.containsMatchingElement(<Link to={{pathname: METADATA_PATH, search: search + encodeURIComponent("http://google.nl/some-path?search#hash")}} />)).toBe(true);
+        const history: History = createMemoryHistory();
+        history.push = jest.fn();
+
+        const wrapper = mount(
+            <Router history={history}>
+                <LinkedDataLink uri="http://google.nl/some-path?search#hash">Go</LinkedDataLink>
+            </Router>
+        );
+
+        const anchor = wrapper.find('a').first();
+        expect(anchor).toBeTruthy();
+        const expectedLocation = `${METADATA_PATH}?iri=${encodeURIComponent("http://google.nl/some-path?search#hash")}`;
+        expect(anchor.prop('href')).toEqual(expectedLocation);
+        expect(anchor.text()).toEqual('Go');
+        expect(anchor.prop('onClick')).toBeTruthy();
+
+        anchor.prop('onClick')(new MouseEvent('click'));
+        expect(history.push).toBeCalledTimes(1);
+        expect(history.push).toBeCalledWith({
+            pathname: METADATA_PATH,
+            search: `?iri=${encodeURIComponent("http://google.nl/some-path?search#hash")}`
+        });
     });
 
     it('should not break on an invalid url (return children only)', () => {
         const uri = `some-invalid-url`;
-        const wrapper = shallow(<LinkedDataLink uri={uri}>something</LinkedDataLink>);
-        expect(wrapper.containsMatchingElement(<Link to={{pathname: METADATA_PATH, search: "?iri=some-invalid-url"}}>something</Link>)).toBe(true);
+        const history: History = createMemoryHistory();
+        history.push = jest.fn();
+
+        const wrapper = mount(
+            <Router history={history}>
+                <LinkedDataLink uri={uri}>something</LinkedDataLink>
+            </Router>
+        );
+
+        const anchor = wrapper.find('a').first();
+        expect(anchor).toBeTruthy();
+        const expectedLocation = `${METADATA_PATH}?iri=${encodeURIComponent(uri)}`;
+        expect(anchor.prop('href')).toEqual(expectedLocation);
+        expect(anchor.text()).toEqual('something');
+        expect(anchor.prop('onClick')).toBeTruthy();
+
+        anchor.prop('onClick')(new MouseEvent('click'));
+        expect(history.push).toBeCalledTimes(1);
+        expect(history.push).toBeCalledWith({
+            pathname: METADATA_PATH,
+            search: `?iri=${encodeURIComponent(uri)}`
+        });
     });
 });

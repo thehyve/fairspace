@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {
+    ListItemText,
     Paper,
     Table,
     TableBody,
@@ -16,9 +17,10 @@ import {getDisplayName} from "../users/userUtils";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {formatDateTime} from "../common/utils/genericUtils";
+import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
+import {currentWorkspace} from '../workspaces/workspaces';
 
 const baseColumns = {
     name: {
@@ -28,6 +30,14 @@ const baseColumns = {
     workspace: {
         valueExtractor: 'workspaceName',
         label: 'Workspace'
+    },
+    status: {
+        valueExtractor: 'status',
+        label: 'Status'
+    },
+    viewMode: {
+        valueExtractor: 'accessMode',
+        label: 'View mode'
     },
     created: {
         valueExtractor: 'dateCreated',
@@ -55,6 +65,11 @@ const CollectionList = ({
     onCollectionDoubleClick,
     classes
 }) => {
+    const columns = {...baseColumns};
+    if (currentWorkspace()) {
+        delete columns.workspace;
+    }
+
     // Extend collections with displayName to avoid computing it when sorting
     const collectionsWithDisplayName = collections.map(collection => ({
         ...collection,
@@ -89,7 +104,7 @@ const CollectionList = ({
                 <TableHead>
                     <TableRow>
                         {
-                            Object.entries(baseColumns).map(([key, column]) => (
+                            Object.entries(columns).map(([key, column]) => (
                                 <TableCell key={key}>
                                     <TableSortLabel
                                         active={orderBy === key}
@@ -127,11 +142,29 @@ const CollectionList = ({
                                 selected={selected}
                                 className={collection.dateDeleted && classes.deletedCollectionRow}
                             >
-                                <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                    {collection.name}
+                                <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
+                                    <ListItemText
+                                        style={{margin: 0}}
+                                        primary={collection.name}
+                                        secondary={collection.description}
+                                    />
                                 </TableCell>
-                                <TableCell style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160}}>
-                                    {collection.workspaceName}
+                                { currentWorkspace() ? null : (
+                                    <TableCell style={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: 160
+                                    }}
+                                    >
+                                        {collection.workspaceName}
+                                    </TableCell>
+                                ) }
+                                <TableCell>
+                                    {collection.status}
+                                </TableCell>
+                                <TableCell>
+                                    {camelCaseToWords(collection.accessMode)}
                                 </TableCell>
                                 <TableCell>
                                     {formatDateTime(collection.dateCreated)}

@@ -63,12 +63,12 @@ const WorkspaceRoutes = () => {
                 render={() => {
                     const subject = getSubject();
 
-                    return (
+                    return (currentUser.canViewPublicMetadata && (
                         <MetadataWrapper>
                             {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
                                 : <MetadataOverviewPage />}
                         </MetadataWrapper>
-                    );
+                    ));
                 }}
             />
 
@@ -76,13 +76,15 @@ const WorkspaceRoutes = () => {
                 path="/search"
                 render={({location, history}) => <SearchPage location={location} history={history} />}
             />
-            {
-                isAdmin(currentUser) && (<UserRolesPage />)
-            }
+            <Route
+                path="/users"
+                exact
+                render={() => (isAdmin(currentUser) && (<UserRolesPage />))}
+            />
 
             <Redirect to="/workspaces" />
         </Switch>
     );
-}
+};
 
 export default WorkspaceRoutes;

@@ -3,6 +3,8 @@ import React, {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
 import {
     Chip,
+    Link,
+    ListItemText,
     Paper,
     Table,
     TableBody,
@@ -35,12 +37,8 @@ const columns = {
         valueExtractor: 'name',
         label: 'Name'
     },
-    comment: {
-        valueExtractor: 'comment',
-        label: 'Short description'
-    },
     collectionCount: {
-        valueExtractor: 'summary.collectionCount',
+        valueExtractor: 'summary.nonDeletedCollectionCount',
         label: 'Collections',
         align: 'right'
     },
@@ -59,9 +57,9 @@ const columns = {
 };
 
 const EmailChip = ({email, label}) => {
-    const chip = <Chip style={{cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
+    const chip = <Chip style={{margin: 1, cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
     if (email) {
-        return <a title={email} href={`mailto:${email}`}>{chip}</a>;
+        return <Link underline="hover" color="inherit" title={email} href={`mailto:${email}`}>{chip}</Link>;
     }
     return chip;
 };
@@ -93,7 +91,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
 
     return (
         <>
-            <Paper>
+            <Paper style={{width: '100%', overflowX: 'auto'}}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -122,14 +120,15 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                 <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
                                     {!workspace.canCollaborate && (<Lock />)}
                                 </TableCell>
-                                <TableCell variant="head" style={{minWidth: 150, maxWidth: 150}} scope="row" key="name">
-                                    {workspace.name}
-                                </TableCell>
-                                <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="comment">
-                                    {workspace.comment}
+                                <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="name">
+                                    <ListItemText
+                                        style={{margin: 0}}
+                                        primary={workspace.name}
+                                        secondary={workspace.comment}
+                                    />
                                 </TableCell>
                                 <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
-                                    {workspace.summary ? workspace.summary.collectionCount : ''}
+                                    {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
                                 </TableCell>
                                 <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
                                     {workspace.summary ? workspace.summary.memberCount : ''}

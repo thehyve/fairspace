@@ -47,7 +47,7 @@ const confirmationDialog = ({
 confirmationDialog.propTypes = {
     open: PropTypes.bool,
     title: PropTypes.string,
-    content: PropTypes.string,
+    content: PropTypes.any,
     agreeButtonText: PropTypes.string,
     disagreeButtonText: PropTypes.string,
     onAgree: PropTypes.func,

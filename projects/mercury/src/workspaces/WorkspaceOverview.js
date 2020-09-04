@@ -48,8 +48,16 @@ const a11yProps = (index) => ({
 const WorkspaceOverview = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
-
     const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        const updated = workspaces.find(w => w.iri === currentWorkspace());
+        if (updated && workspace !== updated) {
+            setWorkspace(updated);
+        }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [workspaces]);
 
     if (workspacesLoading) {
         return (<LoadingInlay />);
@@ -63,15 +71,6 @@ const WorkspaceOverview = (props) => {
     if (workspacesError || !workspace.iri) {
         return (<MessageDisplay message="Error loading workspace." />);
     }
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-        const updated = workspaces.find(w => w.iri === currentWorkspace());
-        if (updated && workspace !== updated) {
-            setWorkspace(updated);
-        }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [workspaces]);
 
     const changeTab = (event, tabIndex) => {
         setSelectedTab(tabIndex);

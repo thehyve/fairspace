@@ -16,7 +16,7 @@ import {encodePath} from "./fileUtils";
 const TAB_FILES = 'FILES';
 const TAB_UPLOAD = 'UPLOAD';
 
-export const DisconnectedFileBrowser = ({
+export const FileBrowser = ({
     history,
     openedCollection,
     collectionsLoading = false,
@@ -151,7 +151,6 @@ export const DisconnectedFileBrowser = ({
                 data-testid="tabs"
                 value={currentTab}
                 onChange={(e, tab) => setCurrentTab(tab)}
-                centered
                 style={{marginBottom: 8}}
             >
                 <Tab value={TAB_FILES} label="Files" />
@@ -164,10 +163,10 @@ export const DisconnectedFileBrowser = ({
     );
 };
 
-export default withRouter(({openedPath, fileApi, showDeleted, ...props}) => {
+const ContextualFileBrowser = ({openedPath, fileApi, showDeleted, ...props}) => {
     const {files, loading, error, refresh, fileActions} = useFiles(openedPath, showDeleted, fileApi);
     return (
-        <DisconnectedFileBrowser
+        <FileBrowser
             files={files}
             loading={loading}
             error={error}
@@ -179,4 +178,6 @@ export default withRouter(({openedPath, fileApi, showDeleted, ...props}) => {
             {...props}
         />
     );
-});
+};
+
+export default withRouter(ContextualFileBrowser);

@@ -143,20 +143,6 @@ describe('Metadata Utils', () => {
             expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
-        it('should never show fs:dateDeleted', () => {
-            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, constants.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, constants.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(constants.DATE_DELETED_URI, constants.COLLECTION_URI)).toBe(true);
-        });
-
-        it('should never show fs:deletedBy', () => {
-            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, 'http://example.com')).toBe(true);
-            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, constants.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, constants.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(constants.DELETED_BY_URI, constants.COLLECTION_URI)).toBe(true);
-        });
-
         it('should always show regular properties', () => {
             expect(shouldPropertyBeHidden('http://example.com/property', 'http://example.com')).toBe(false);
             expect(shouldPropertyBeHidden('http://example.com/property', constants.FILE_URI)).toBe(false);

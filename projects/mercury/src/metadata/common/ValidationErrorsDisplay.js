@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-    ExpansionPanel,
-    ExpansionPanelDetails,
-    ExpansionPanelSummary,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Table,
     TableBody,
     TableCell,
@@ -42,22 +42,22 @@ export default ({entityErrors, otherErrors}) => {
         <>
             {hasEntityErrors && (
                 hasOtherErrors ? ( // No expansion panel if only entity errors
-                    <ExpansionPanel defaultExpanded>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Accordion defaultExpanded>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography>Current entity</Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
+                        </AccordionSummary>
+                        <AccordionDetails>
                             {entityErrorsTable}
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
+                        </AccordionDetails>
+                    </Accordion>
                 ) : entityErrorsTable)}
 
             {hasOtherErrors && (
-                <ExpansionPanel defaultExpanded={!hasEntityErrors}>
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Accordion defaultExpanded={!hasEntityErrors}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography>Other affected entities</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                         <Table padding="checkbox">
                             <TableHead>
                                 <TableRow>
@@ -82,8 +82,8 @@ export default ({entityErrors, otherErrors}) => {
                                 ))}
                             </TableBody>
                         </Table>
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
+                    </AccordionDetails>
+                </Accordion>
             )}
         </>
     );

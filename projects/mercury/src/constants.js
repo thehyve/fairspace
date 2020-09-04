@@ -98,6 +98,11 @@ export const CAN_LIST_URI = FAIRSPACE_NS + 'canList';
 export const CAN_READ_URI = FAIRSPACE_NS + 'canRead';
 export const CAN_WRITE_URI = FAIRSPACE_NS + 'canWrite';
 export const CAN_MANAGE_URI = FAIRSPACE_NS + 'canManage';
+export const CAN_ADD_SHARED_METADATA_URI = FAIRSPACE_NS + 'canAddSharedMetadata';
+export const CAN_VIEW_PUBLIC_METADATA_URI = FAIRSPACE_NS + 'canViewPublicMetadata';
+export const CAN_VIEW_PUBLIC_DATA_URI = FAIRSPACE_NS + 'canViewPublicData';
+export const IS_ADMIN = FAIRSPACE_NS + 'isAdmin';
+export const IS_SUPERADMIN = FAIRSPACE_NS + 'isSuperadmin';
 export const IS_MEMBER_OF_URI = FAIRSPACE_NS + 'isMemberOf';
 export const IS_MANAGER_OF_URI = FAIRSPACE_NS + 'isManagerOf';
 

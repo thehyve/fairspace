@@ -83,12 +83,21 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             : {name: '', description: '', location: '', ownerWorkspace: this.props.workspaceIri}
     };
 
+    handleCollectionUpdateError(err) {
+        let message;
+        if (err && err.details && err.details.some(d => d.message === "Duplicate label")) {
+            message = "A collection with that name already exists. Collection names must be unique.";
+        } else if (err && err.message) {
+            message = err.message;
+        } else {
+            message = "An error occurred while updating a collection";
+        }
+        ErrorDialog.showError(err, message);
+    }
+
     handleAddCollection = (properties: CollectionProperties) => {
         setTimeout(() => this.props.addCollection(properties)
-            .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while creating a collection";
-                ErrorDialog.showError(err, message);
-            }), 0);
+            .catch(this.handleCollectionUpdateError), 0);
 
         this.close();
     };
@@ -123,10 +132,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     this.close();
                 }
             })
-            .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while updating a collection";
-                ErrorDialog.showError(err, message);
-            })
+            .catch(this.handleCollectionUpdateError)
             .finally(() => setBusy(false));
     };
 
@@ -163,13 +169,16 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         }
     };
 
+    editLocationEnabled = (!this.props.collection) || this.props.collection.accessMode !== 'DataPublished';
+
     /**
      * Determines whether the location should be updated when the name changes.
      *
-     * Returns true if the user has not changed the location.
+     * Returns true if the user has not changed the location manually
+     * and if location change is allowed (i.e., the collection has not been published yet).
      * @type {function}
      */
-    shouldUpdateLocationOnNameChange = () => convertToSafeDirectoryName(this.state.properties.name) === this.state.properties.location;
+    shouldUpdateLocationOnNameChange = () => this.editLocationEnabled && convertToSafeDirectoryName(this.state.properties.name) === this.state.properties.location;
 
     isSaveEnabled = () => isInputValid(this.state.properties) && havePropertiesChanged(this.props.collection, this.state.properties);
 
@@ -190,6 +199,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="name"
                         label="Name"
+                        helperText="Unique collection name"
                         value={this.state.properties.name}
                         name="name"
                         onChange={(event) => this.handleNameChange(event)}
@@ -210,12 +220,15 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="location"
                         label="Collection identifier"
-                        helperText="This identifier does not allow special characters and has to be unique."
+                        helperText={this.editLocationEnabled
+                            ? 'This identifier does not allow special characters and has to be unique.'
+                            : 'Published collections cannot be moved.'}
                         value={this.state.properties.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}
                         fullWidth
                         required
+                        disabled={!this.editLocationEnabled}
                     />
 
                 </DialogContent>

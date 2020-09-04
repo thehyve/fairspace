@@ -17,7 +17,8 @@ export type WorkspacePermissions = {|
 |};
 
 export type WorkspaceSummary = {|
-    collectionCount: number;
+    totalCollectionCount: number;
+    nonDeletedCollectionCount: number;
     memberCount: number;
 |};
 export type WorkspaceProperties = {|
