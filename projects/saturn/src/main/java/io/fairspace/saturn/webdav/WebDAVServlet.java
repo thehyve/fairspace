@@ -85,7 +85,7 @@ public class WebDAVServlet extends HttpServlet {
             }
 
             try {
-                httpManager.process(new PreParsedServletRequest(req), new ServletResponse(res));
+                httpManager.process(new PreParsedServletRequest(req, store), new ServletResponse(res));
             } catch (RequestParseException e) {
                 throw new IOException(e);
             }

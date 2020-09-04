@@ -177,13 +177,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     .collect(joining("/"));
             dir.uploadFile(relPath, file);
         } else {
-            BlobInfo blob;
-            try {
-                blob = factory.store.store(file.getInputStream());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
+            var blob = ((BlobFileItem) file).getBlob();
             var child = child(path);
             if (child != null) {
                 if (child instanceof FileResource) {

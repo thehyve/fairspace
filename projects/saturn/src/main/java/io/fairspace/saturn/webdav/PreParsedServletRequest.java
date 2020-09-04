@@ -10,15 +10,23 @@ import java.util.Map;
 
 import static io.milton.http.ResourceHandlerHelper.ATT_NAME_FILES;
 import static io.milton.http.ResourceHandlerHelper.ATT_NAME_PARAMS;
+import static java.util.stream.Collectors.toMap;
 
 public class PreParsedServletRequest extends ServletRequest {
 
-    public PreParsedServletRequest(HttpServletRequest request) throws RequestParseException {
+    public PreParsedServletRequest(HttpServletRequest request, BlobStore store) throws RequestParseException {
         super(request, request.getServletContext());
 
         var params = new HashMap<String, String>();
-        var files = new HashMap<String, FileItem>();
+        Map<String, FileItem> files = new HashMap<>();
         super.parseRequestParameters(params, files);
+
+        if ("upload-files".equals(params.get("action"))) {
+            files = files.entrySet()
+                    .stream()
+                    .collect(toMap(Map.Entry::getKey, e -> new BlobFileItem(e.getValue(), store)));
+        }
+
         getAttributes().put(ATT_NAME_PARAMS, params);
         getAttributes().put(ATT_NAME_FILES, files);
     }
