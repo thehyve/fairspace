@@ -71,7 +71,7 @@ public class DirectoryResourceTest {
     public void testFileUploadSuccess() throws NotAuthorizedException, ConflictException, BadRequestException {
         when(file.getInputStream()).thenAnswer(invocation -> new ByteArrayInputStream(new byte[FILE_SIZE]));
 
-        dir.processForm(Map.of("action", "upload-files"), Map.of("/subdir/file.ext", file));
+        dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", file));
 
         assertTrue(dir.child("subdir") instanceof DirectoryResource);
 
@@ -89,7 +89,7 @@ public class DirectoryResourceTest {
         when(file.getInputStream()).thenAnswer(invocation -> new ByteArrayInputStream(new byte[FILE_SIZE]));
 
         dir.createCollection("subdir");
-        dir.processForm(Map.of("action", "upload-files"), Map.of("/subdir/file.ext", file));
+        dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", file));
 
         assertTrue(dir.child("subdir") instanceof DirectoryResource);
 
@@ -112,7 +112,7 @@ public class DirectoryResourceTest {
 
         var subdir = (DirectoryResource) dir.createCollection("subdir");
 
-        dir.processForm(Map.of("action", "upload-metadata"), Map.of("file", file));
+        dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
 
         verify(metadataService).patch(isomorphic(modelOf(
                dir.subject, RDFS.comment, model.createTypedLiteral("Blah"),
@@ -128,7 +128,7 @@ public class DirectoryResourceTest {
 
         dir.createCollection("subdir");
 
-        dir.processForm(Map.of("action", "upload-metadata"), Map.of("file", file));
+        dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
 
     }
 
@@ -139,7 +139,7 @@ public class DirectoryResourceTest {
                         "./subdir,\"Blah blah\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
 
-        dir.processForm(Map.of("action", "upload-metadata"), Map.of("file", file));
+        dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
     }
 
     @Test(expected = BadRequestException.class)
@@ -152,6 +152,6 @@ public class DirectoryResourceTest {
         var subdir = (DirectoryResource) dir.createCollection("subdir");
         subdir.delete();
 
-        dir.processForm(Map.of("action", "upload-metadata"), Map.of("file", file));
+        dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
     }
 }

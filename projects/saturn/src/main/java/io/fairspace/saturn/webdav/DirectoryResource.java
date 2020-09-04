@@ -143,13 +143,13 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
-            // -F 'action=upload-files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
+            // -F 'action=upload_files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
             // -F '/dir/subdir/file2.ext=@/dir/subdir/file2.ext' \
             // http://localhost:8080/api/v1/webdav/c1/
-            case "upload-files" -> uploadFiles(files);
+            case "upload_files" -> uploadFiles(files);
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
-            // -F 'action=upload-metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
-            case "upload-metadata" -> uploadMetadata(files.get("file"));
+            // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
+            case "upload_metadata" -> uploadMetadata(files.get("file"));
             default -> super.performAction(action, parameters, files);
         }
     }
