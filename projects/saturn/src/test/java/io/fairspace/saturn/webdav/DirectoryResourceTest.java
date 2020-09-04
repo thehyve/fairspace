@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.isomorphic;
@@ -29,7 +28,6 @@ import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,28 +48,33 @@ public class DirectoryResourceTest {
     MetadataService metadataService;
     @Mock
     FileItem file;
+    @Mock
+    BlobFileItem blobFileItem;
 
     Context context = new Context();
 
     DirectoryResource dir;
 
     @Before
-    public void before() throws IOException {
+    public void before() {
         context.set(METADATA_SERVICE, metadataService);
         var factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
         dir = new DirectoryResource(factory, model.createResource(baseUri + "/coll/dir"), Access.Manage);
         dir.subject.addProperty(RDF.type, FS.Directory);
 
-        when(store.store(any())).thenReturn(new BlobInfo("id", FILE_SIZE, "md5"));
+        var blob = new BlobInfo("id", FILE_SIZE, "md5");
+        when(blobFileItem.getBlob()).thenReturn(blob);
+        //when(store.store(any())).thenReturn(blob);
+
+        when(file.getInputStream()).thenAnswer(invocation -> new ByteArrayInputStream(new byte[FILE_SIZE]));
+
 
         setupRequestContext();
     }
 
     @Test
     public void testFileUploadSuccess() throws NotAuthorizedException, ConflictException, BadRequestException {
-        when(file.getInputStream()).thenAnswer(invocation -> new ByteArrayInputStream(new byte[FILE_SIZE]));
-
-        dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", file));
+        dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", blobFileItem));
 
         assertTrue(dir.child("subdir") instanceof DirectoryResource);
 
@@ -86,10 +89,8 @@ public class DirectoryResourceTest {
 
     @Test
     public void testFileUploadExistingDir() throws NotAuthorizedException, ConflictException, BadRequestException {
-        when(file.getInputStream()).thenAnswer(invocation -> new ByteArrayInputStream(new byte[FILE_SIZE]));
-
         dir.createCollection("subdir");
-        dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", file));
+        dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", blobFileItem));
 
         assertTrue(dir.child("subdir") instanceof DirectoryResource);
 
