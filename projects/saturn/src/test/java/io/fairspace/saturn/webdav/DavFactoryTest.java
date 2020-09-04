@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -11,6 +12,7 @@ import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.*;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.util.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +46,10 @@ public class DavFactoryTest {
     UserService userService;
     @Mock
     MailService mailService;
+    @Mock
+    MetadataService metadataService;
+
+    Context context = new Context();
     User user = new User();
     private org.eclipse.jetty.server.Request request;
 
@@ -52,7 +58,7 @@ public class DavFactoryTest {
 
     @Before
     public void before() {
-        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService);
+        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
 
         setupRequestContext();
         request = getCurrentRequest();

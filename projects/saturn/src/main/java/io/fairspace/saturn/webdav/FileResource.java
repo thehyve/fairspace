@@ -22,6 +22,7 @@ import java.util.Map;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
+import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static java.lang.Integer.parseInt;
 
 class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
@@ -85,7 +86,11 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     @Override
     public void replaceContent(InputStream in, Long length) throws BadRequestException, ConflictException, NotAuthorizedException {
-        var versions = getListProperty(subject, FS.versions).cons(newVersion());
+        replaceContent(getBlob());
+    }
+
+    void replaceContent(BlobInfo blobInfo) throws BadRequestException, ConflictException, NotAuthorizedException {
+        var versions = getListProperty(subject, FS.versions).cons(newVersion(blobInfo));
         var current = subject.getRequiredProperty(FS.currentVersion).getInt() + 1;
 
         subject.removeAll(FS.versions)

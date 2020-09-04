@@ -1,13 +1,14 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.mail.MailService;
+import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import lombok.SneakyThrows;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -42,18 +44,23 @@ public class CollectionResourceTest {
     UserService userService;
     @Mock
     MailService mailService;
+    @Mock
+    MetadataService metadataService;
 
-    @SneakyThrows
+    Context context = new Context();
+
     @Before
     public void before() {
-        setupRequestContext();
         model.add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(WORKSPACE_2, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
                 .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1);
 
-        DavFactory factory = new DavFactory(model.createResource(baseUri), store, userService, mailService);
+        context.set(METADATA_SERVICE, metadataService);
+        var factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
         resource = new CollectionResource(factory, COLLECTION_1, Access.Manage);
+
+        setupRequestContext();
     }
 
     @Test

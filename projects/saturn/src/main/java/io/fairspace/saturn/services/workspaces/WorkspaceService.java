@@ -4,15 +4,20 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.mail.MailService;
-import io.fairspace.saturn.services.users.*;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.fairspace.saturn.audit.Audit.audit;
