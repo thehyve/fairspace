@@ -21,7 +21,7 @@ public class PreParsedServletRequest extends ServletRequest {
         Map<String, FileItem> files = new HashMap<>();
         super.parseRequestParameters(params, files);
 
-        if ("upload-files".equals(params.get("action"))) {
+        if ("upload_files".equals(params.get("action"))) {
             files = files.entrySet()
                     .stream()
                     .collect(toMap(Map.Entry::getKey, e -> new BlobFileItem(e.getValue(), store)));
