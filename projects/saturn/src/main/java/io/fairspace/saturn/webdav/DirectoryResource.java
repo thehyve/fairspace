@@ -12,6 +12,7 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
 import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
+import io.milton.resource.PutableResource;
 import io.milton.resource.Resource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.jena.rdf.model.RDFNode;
@@ -34,6 +35,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
+import static io.fairspace.saturn.webdav.WebDAVServlet.setErrorMessage;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -162,7 +164,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         path = normalizePath(path);
         if (path.contains("/")) {
             var segments = splitPath(path);
-            var child = this.child(segments[0]);
+            var child = child(segments[0]);
             if (child == null) {
                 child = createCollection(segments[0]);
             }
@@ -182,13 +184,23 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 throw new RuntimeException(e);
             }
 
-            createNew(path, blob, file.getContentType());
+            var child = child(path);
+            if (child != null) {
+                if (child instanceof FileResource) {
+                    ((FileResource) child).replaceContent(blob);
+                } else {
+                    throw new ConflictException(child);
+                }
+            } else {
+                createNew(path, blob, file.getContentType());
+            }
         }
      }
 
     private void uploadMetadata(FileItem file) throws BadRequestException {
         if (file == null) {
-            throw new BadRequestException("Missing 'file' parameter");
+            setErrorMessage("Missing 'file' parameter");
+            throw new BadRequestException(this);
         }
         var model = createDefaultModel();
 
@@ -197,7 +209,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
              var csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
             if (!headers.contains("Path")) {
-                throw new BadRequestException("Invalid file format");
+                setErrorMessage("Invalid file format. 'Path' column is missing.");
+                throw new BadRequestException(this);
             }
             for (var record : csvParser) {
                 var path = record.get("Path");
@@ -212,11 +225,13 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     s = this.subject.getModel().createResource(subject + "/" + encodePath(path));
                 }
                 if (!s.getModel().containsResource(s)) {
-                    throw new BadRequestException("File \"" + path + "\" not found");
+                    setErrorMessage("Line " +  record.getRecordNumber() + ". File \"" + path + "\" not found");
+                    throw new BadRequestException(this);
                 }
 
                 if (s.hasProperty(FS.dateDeleted)) {
-                    throw new BadRequestException("File \"" + path + "\" was deleted");
+                    setErrorMessage("Line " +  record.getRecordNumber() + ". File \"" + path + "\" was deleted");
+                    throw new BadRequestException(this);
                 }
 
                 var classShape = s.getPropertyResourceValue(RDF.type).inModel(VOCABULARY);
@@ -249,7 +264,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     var propertyShape = propertyShapes.get(header);
 
                     if (propertyShape == null) {
-                        throw new BadRequestException("Unknown attribute: " + header);
+                        setErrorMessage("Line " +  record.getRecordNumber() + ". Unknown attribute: " + header);
+                        throw new BadRequestException(this);
                     }
 
                     var property = model.createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());

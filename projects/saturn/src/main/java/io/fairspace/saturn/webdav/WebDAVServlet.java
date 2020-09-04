@@ -34,6 +34,7 @@ public class WebDAVServlet extends HttpServlet {
     private static final String BLOB_ATTRIBUTE = "BLOB";
     private static final String TIMESTAMP_ATTRIBUTE = "TIMESTAMP";
     public static final String POST_COMMIT_ACTION_ATTRIBUTE = "POST_COMMIT";
+    public static final String ERROR_MESSAGE = "ERROR_MESSAGE";
 
     private final HttpManager httpManager;
     private final BlobStore store;
@@ -49,6 +50,7 @@ public class WebDAVServlet extends HttpServlet {
                 setValueWriters(new NullSafeValueWriters());
                 setEnabledJson(false);
                 setEnabledCkBrowser(false);
+                setContentGenerator(new AdvancedContentGenerator());
             }
 
             @Override
@@ -122,6 +124,14 @@ public class WebDAVServlet extends HttpServlet {
 
     static BlobInfo getBlob() {
         return (BlobInfo) getCurrentRequest().getAttribute(BLOB_ATTRIBUTE);
+    }
+
+    static void setErrorMessage(String message) {
+        getCurrentRequest().setAttribute(ERROR_MESSAGE, message);
+    }
+
+    static String getErrorMessage() {
+        return (String) getCurrentRequest().getAttribute(ERROR_MESSAGE);
     }
 
     static Literal timestampLiteral() {
