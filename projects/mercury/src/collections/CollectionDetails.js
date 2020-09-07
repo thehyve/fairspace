@@ -332,15 +332,19 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
         if (collection.canDelete) {
             menuItems.push(
-                <MenuItem key="delete" onClick={this.handleDelete} style={{color: collection.dateDeleted ? "red" : "inherit"}}>
-                    {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
+                <MenuItem key="delete" onClick={this.handleDelete}>
+                    <Typography color={collection.dateDeleted ? "error" : "inherit"}>
+                        {collection.dateDeleted ? "Delete permanently" : "Delete"} &hellip;
+                    </Typography>
                 </MenuItem>
             );
         }
-        if (collection.accessMode === "DataPublished" && isAdmin(currentUser)) {
+        if (collection.accessMode === 'DataPublished' && isAdmin(currentUser)) {
             menuItems.push(
-                <MenuItem key="unpublish" onClick={this.handleUnpublish} style={{color: "red"}}>
-                    Unpublish &hellip;
+                <MenuItem key="unpublish" onClick={this.handleUnpublish}>
+                    <Typography color="error">
+                        Unpublish &hellip;
+                    </Typography>
                 </MenuItem>
             );
         }
@@ -476,7 +480,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         title="Confirmation"
                         content={(
                             <span>
-                                <b>This action is not recommended!</b><br />
+
+                                <b>Warning: The action is not recommended! Collection (meta)data may already be referenced in other systems.</b><br />
                                 Are you sure you want to <b>unpublish</b> collection <em>{collection.name}</em>?<br />
                                 Collection view mode will be changed to <em>Metadata published</em>.
                             </span>
