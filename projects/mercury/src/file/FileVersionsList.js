@@ -71,7 +71,7 @@ const columns = [
     }
 ];
 
-const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
+const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, classes}) => {
     const {data: selectedFileDetails, error, loading} = useAsync(
         () => FileAPI.stat(selectedFile.filename, false)
     );
@@ -244,15 +244,17 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                     cellRenderer={({rowIndex}) => renderDownloadActionCell(rowIndex)}
                                     width={80}
                                 />
-                                <Column
-                                    key="revert"
-                                    label=""
-                                    dataKey="revert"
-                                    headerRenderer={renderHeader}
-                                    className={classes.flexContainer}
-                                    cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
-                                    width={80}
-                                />
+                                {isWritingEnabled && (
+                                    <Column
+                                        key="revert"
+                                        label=""
+                                        dataKey="revert"
+                                        headerRenderer={renderHeader}
+                                        className={classes.flexContainer}
+                                        cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
+                                        width={80}
+                                    />
+                                )}
                             </Table>
                         )}
                     </InfiniteLoader>
