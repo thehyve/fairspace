@@ -188,7 +188,6 @@ saturn:
   initContainer:
     image: alpine:3.9
     pullPolicy: IfNotPresent
-
   resources:
     limits:
       cpu: 1

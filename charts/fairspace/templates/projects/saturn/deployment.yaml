@@ -62,7 +62,7 @@ spec:
             successThreshold: {{ .Values.saturn.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
-{{ toYaml .resources | indent 12 }}
+{{ toYaml .Values.saturn.resources | indent 12 }}
     {{- with .Values.saturn.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
