@@ -73,7 +73,7 @@ curie:Person a rdfs:Class, sh:NodeShape ;
         sh:path curie:ageOfDeath
     ],
     [
-        sh:name "Patient Identifier" ;
+        sh:name "Patient identifier" ;
         sh:description "The identifier of the patient." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
