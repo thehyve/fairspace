@@ -117,8 +117,11 @@ export const CollectionSearchResultListContainer = ({
     vocabulary, vocabularyLoading, vocabularyError,
     classes, history, searchFunction = SearchAPI.search
 }) => {
-    const {data: {items = [], total}, loading, error} = useAsync(() => searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
+    const {data, loading, error} = useAsync(() => searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
         .catch(handleSearchError), [search, query, searchFunction]);
+
+    const items = data ? data.items : [];
+    const total = data ? data.total : 0;
 
     const handleSearch = (value) => {
         handleCollectionSearchRedirect(history, value);
@@ -131,7 +134,6 @@ export const CollectionSearchResultListContainer = ({
                 disableUnderline={false}
                 onSearchChange={handleSearch}
                 query={query}
-                classes={classes}
             />
             <CollectionSearchResultList
                 items={items}
