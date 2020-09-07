@@ -35,9 +35,6 @@ repositories {
     maven {
         url "https://dl.bintray.com/milton/Milton"
     }
-
-    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
-    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
 }
 
 dependencies {
