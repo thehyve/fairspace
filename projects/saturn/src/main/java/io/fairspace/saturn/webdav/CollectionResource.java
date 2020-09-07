@@ -271,6 +271,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case "set_status" -> setStatus(getEnumParameter(parameters, "status", Status.class));
             case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
             case "set_owned_by" -> setOwnedBy(getResourceParameter(parameters, "owner"));
+            case "unpublish" -> unpublish();
             default -> super.performAction(action, parameters, files);
         }
     }
@@ -336,6 +337,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
                     (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
 
         }
+    }
+
+    private void unpublish() throws NotAuthorizedException, ConflictException {
+        if (!factory.userService.currentUser().isAdmin()) {
+            throw new NotAuthorizedException(this);
+        }
+        if (getAccessMode() != AccessMode.DataPublished) {
+            throw new ConflictException(this, "Cannot unpublish collection that is not published.");
+        }
+        subject.removeAll(FS.accessMode).addProperty(FS.accessMode, AccessMode.MetadataPublished.name());
     }
 
     @Property

@@ -33,10 +33,11 @@ import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspac
 import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 import {descriptionForStatus, isCollectionPage} from "./collectionUtils";
-import {getDisplayName} from '../users/userUtils';
+import {getDisplayName, isAdmin} from '../users/userUtils';
 import {formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
+import UserContext from "../users/UserContext";
 
 export const ICONS = {
     LOCAL_STORAGE: <FolderOutlined aria-label="Local storage" />,
@@ -54,6 +55,7 @@ type CollectionDetailsProps = {
     workspaces: Workspace[];
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
+    unpublish: (Resource) => Promise<void>;
     setStatus: (location: string, status: Status) => Promise<void>;
     setOwnedBy: (location: string, owner: string) => Promise<void>;
     setBusy: (boolean) => void;
@@ -66,6 +68,7 @@ type CollectionDetailsState = {
     changingOwner: boolean,
     deleting: boolean;
     undeleting: boolean;
+    unpublishing: boolean;
     anchorEl: any;
 }
 
@@ -81,7 +84,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         changingOwner: false,
         anchorEl: null,
         deleting: false,
-        undeleting: false
+        undeleting: false,
+        unpublishing: false
     };
 
     unmounting = false;
@@ -125,12 +129,23 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
     };
 
+    handleUnpublish = () => {
+        if (isAdmin(this.props.currentUser)) {
+            this.setState({unpublishing: true});
+            this.handleMenuClose();
+        }
+    };
+
     handleCloseDelete = () => {
         this.setState({deleting: false});
     };
 
     handleCloseUndelete = () => {
         this.setState({undeleting: false});
+    };
+
+    handleCloseUnpublish = () => {
+        this.setState({unpublishing: false});
     };
 
     handleCloseChangingOwner = () => {
@@ -169,6 +184,17 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 err,
                 "An error occurred while undeleting a collection",
                 () => this.handleCollectionUndelete(collection)
+            ));
+    };
+
+    handleCollectionUnpublish = (collection: Collection) => {
+        const {unpublish} = this.props;
+        this.handleCloseUnpublish();
+        unpublish(collection)
+            .catch(err => ErrorDialog.showError(
+                err,
+                "An error occurred while unpublishing a collection",
+                () => this.handleCollectionUnpublish(collection)
             ));
     };
 
@@ -254,8 +280,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     );
 
     render() {
-        const {loading, error, collection, users, workspaceRoles, workspaces} = this.props;
-        const {anchorEl, editing, changingStatus, changingOwner, deleting, undeleting} = this.state;
+        const {loading, error, collection, users, currentUser, workspaceRoles, workspaces} = this.props;
+        const {anchorEl, editing, changingStatus, changingOwner, deleting, undeleting, unpublishing} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (error) {
@@ -297,17 +323,28 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 </MenuItem>
             ]);
         }
-        if (collection.canDelete) {
-            menuItems.push(
-                <MenuItem key="delete" onClick={this.handleDelete}>
-                    {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
-                </MenuItem>
-            );
-        }
         if (collection.canUndelete) {
             menuItems.push(
                 <MenuItem key="undelete" onClick={this.handleUndelete}>
                     Undelete &hellip;
+                </MenuItem>
+            );
+        }
+        if (collection.canDelete) {
+            menuItems.push(
+                <MenuItem key="delete" onClick={this.handleDelete}>
+                    <Typography color={collection.dateDeleted ? "error" : "inherit"}>
+                        {collection.dateDeleted ? "Delete permanently" : "Delete"} &hellip;
+                    </Typography>
+                </MenuItem>
+            );
+        }
+        if (collection.accessMode === 'DataPublished' && isAdmin(currentUser)) {
+            menuItems.push(
+                <MenuItem key="unpublish" onClick={this.handleUnpublish}>
+                    <Typography color="error">
+                        Unpublish &hellip;
+                    </Typography>
                 </MenuItem>
             );
         }
@@ -370,7 +407,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         collection={collection}
                         updateExisting
                         setBusy={this.props.setBusy}
-                        onClose={() => { if (!this.unmounting) { this.setState({editing: false})} }}
+                        onClose={() => { if (!this.unmounting) { this.setState({editing: false});} }}
                     />
                 ) : null}
                 {changingStatus ? (
@@ -437,6 +474,25 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         onClose={this.handleCloseDelete}
                     />
                 )}
+                {unpublishing && (
+                    <ConfirmationDialog
+                        open
+                        title="Confirmation"
+                        content={(
+                            <span>
+
+                                <b>Warning: The action is not recommended! Collection (meta)data may already be referenced in other systems.</b><br />
+                                Are you sure you want to <b>unpublish</b> collection <em>{collection.name}</em>?<br />
+                                Collection view mode will be changed to <em>Metadata published</em>.
+                            </span>
+                        )}
+                        dangerous
+                        agreeButtonText="Unpublish"
+                        onAgree={() => this.handleCollectionUnpublish(this.props.collection)}
+                        onDisagree={this.handleCloseUnpublish}
+                        onClose={this.handleCloseUnpublish}
+                    />
+                )}
             </>
         );
     }
@@ -445,7 +501,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 const ContextualCollectionDetails = (props) => {
     const history = useHistory();
     const {users} = useContext(UsersContext);
-    const {deleteCollection, undeleteCollection, setStatus, setOwnedBy} = useContext(CollectionsContext);
+    const {currentUser} = useContext(UserContext);
+    const {deleteCollection, undeleteCollection, setStatus, setOwnedBy, unpublish} = useContext(CollectionsContext);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
     return (
@@ -457,11 +514,13 @@ const ContextualCollectionDetails = (props) => {
                         error={props.error || workspacesError || workspaceRolesError}
                         loading={props.loading || workspacesLoading || workspaceRolesLoading}
                         users={users}
+                        currentUser={currentUser}
                         workspaceRoles={workspaceRoles}
                         workspaces={workspaces}
                         history={history}
                         deleteCollection={deleteCollection}
                         undeleteCollection={undeleteCollection}
+                        unpublish={unpublish}
                         setStatus={setStatus}
                         setOwnedBy={setOwnedBy}
                     />

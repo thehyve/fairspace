@@ -105,6 +105,10 @@ class CollectionAPI {
             .catch(handleHttpError("Failure while undeleting collection"));
     }
 
+    unpublish(collection: CollectionProperties): Promise<void> {
+        return FileAPI.post(collection.location, {action: 'unpublish'});
+    }
+
     relocateCollection(oldLocation: string, newLocation: string): Promise<void> {
         return FileAPI.move(oldLocation, newLocation)
             .catch(handleHttpError("Failure while relocating collection"));
@@ -116,19 +120,19 @@ class CollectionAPI {
             .catch(handleHttpError("Failure while updating a collection"));
     }
 
-    setAccessMode(location: string, mode: AccessMode) {
+    setAccessMode(location: string, mode: AccessMode): Promise<void> {
         return FileAPI.post(location, {action: 'set_access_mode', mode});
     }
 
-    setStatus(location: string, status: Status) {
+    setStatus(location: string, status: Status): Promise<void> {
         return FileAPI.post(location, {action: 'set_status', status});
     }
 
-    setPermission(location: string, principal: string, access: AccessLevel) {
+    setPermission(location: string, principal: string, access: AccessLevel): Promise<void> {
         return FileAPI.post(location, {action: 'set_permission', principal, access});
     }
 
-    setOwnedBy(location: string, owner: string) {
+    setOwnedBy(location: string, owner: string): Promise<void> {
         return FileAPI.post(location, {action: 'set_owned_by', owner});
     }
 }
