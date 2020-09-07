@@ -28,10 +28,6 @@ fairspace:
       configurationScriptsTag: 0.1.9-SNAPSHOT
       pullPolicy: Always
 
-keycloak:
-  keycloak:
-    password: keycloak-ci-123
-
 services:
   jupyterhub: https://jupyter.fairspace.ci.fairway.app
 
