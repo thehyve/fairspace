@@ -12,7 +12,7 @@
 fs:Collection a sh:NodeShape, fs:ClassShape ;
     sh:description "Collection of files with associated metadata and access rules." ;
     sh:name "Collection" ;
-    sh:targetClass fs:Collection ; 
+    sh:targetClass fs:Collection ;
     sh:property
         fs:labelShape,
         fs:commentShape .
@@ -24,20 +24,20 @@ fs:labelShape a fs:DatatypePropertyShape ;
     sh:maxCount 1 ;
     sh:maxLength 128 ;
     fs:fixedShape true ;
-    sh:path rdfs:label . 
- 
+    sh:path rdfs:label .
+
 fs:commentShape a fs:DatatypePropertyShape ;
     sh:name "Description" ;
     sh:description "Human friendly description." ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:path rdfs:comment . 
+    sh:path rdfs:comment .
 
 <PersonShape> a fs:ClassShape ;
     sh:closed false ;
     sh:description "A person that is subject of research." ;
     sh:name "Person" ;
-    sh:targetClass foaf:Person ;
+    sh:targetClass curie:Person ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     fs:showInCatalog true ;
     sh:property
@@ -50,13 +50,13 @@ fs:commentShape a fs:DatatypePropertyShape ;
     sh:description "The identifier of the patient" ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:minCount 1 ; 
+    sh:minCount 1 ;
     sh:maxLength 128 ;
     sh:path <patientIdentifier> .
 
 <aboutPersonShape> a fs:RelationShape ;
     sh:name "Is about person" ;
     sh:description "Persons that are featured in this collection." ;
-    sh:class foaf:Person ;
+    sh:class curie:Person ;
     fs:inverseRelation <hasDataShape> ;
     sh:path <aboutPerson> .
