@@ -23,7 +23,7 @@ fs:File sh:property
     [
         sh:name "Is about person" ;
         sh:description "Persons that are featured in this collection." ;
-        sh:class foaf:Person ;
+        sh:class curie:Person ;
         sh:path curie:aboutPerson
     ],
     [
@@ -135,7 +135,7 @@ curie:PersonConsent a rdfs:Class, sh:NodeShape ;
     [
          sh:name "Is consent of" ;
          sh:description "" ;
-         sh:class foaf:Person ;
+         sh:class curie:Person ;
          sh:maxCount 1 ;
          sh:path curie:isConsentOf
     ],
@@ -279,7 +279,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Event subject" ;
         sh:description "The patient associated with this event." ;
-        sh:class foaf:Person ;
+        sh:class curie:Person ;
         sh:maxCount 1 ;
         sh:path curie:eventSubject
     ],
