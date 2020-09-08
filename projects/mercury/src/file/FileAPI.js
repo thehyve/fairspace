@@ -352,6 +352,24 @@ class FileAPI {
             .catch(handleHttpError("Error performing POST request"));
     }
 
+    uploadMetadata(path, file) {
+        const formData = new FormData();
+        formData.append('action', 'upload_metadata');
+        formData.append('file', file);
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "multipart/form-data"
+            },
+            responseType: "text",
+            data: formData
+        };
+        return this.client()
+            .customRequest(path, requestOptions)
+            .catch(handleHttpError("Error uploading metadata"));
+    }
+
     showFileHistory(file, startIndex, endIndex) {
         const versions = [];
         for (let i = file.version - startIndex; i >= file.version - endIndex && i >= 1; i -= 1) {

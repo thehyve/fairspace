@@ -67,7 +67,6 @@ const MetadataCard = React.forwardRef((props, ref) => {
 
 const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false}, ref) => {
     const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
-
     let body;
     let avatar = <FolderOpenOutlined />;
     if (error) {
@@ -86,6 +85,7 @@ const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false}
                 <LinkedDataEntityFormWithLinkedData
                     subject={fileProps.iri}
                     hasEditRight={hasEditRight}
+                    onUploadMetadata={hasEditRight && (file => FileAPI.uploadMetadata(path, file))}
                 />
             );
             if (fileProps.iscollection && (fileProps.iscollection.toLowerCase() === 'false')) {
@@ -148,6 +148,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                     subject={collection.iri}
                     hasEditRight={hasEditRight && paths.length === 0}
                     setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
+                    onUploadMetadata={hasEditRight && (file => FileAPI.uploadMetadata(collection.location, file))}
                 />
             </MetadataCard>
             {
