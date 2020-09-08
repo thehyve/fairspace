@@ -24,6 +24,7 @@ fs:dateDeleted a rdf:Property .
 fs:movedTo a rdf:Property .
 fs:versions a rdf:Property .
 fs:currentVersion a rdf:Property .
+fs:contentType a rdf:Property .
 fs:markdown rdfs:label "Markdown" .
 
 ########################
@@ -86,7 +87,15 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-    ] ;
+    ],
+    [
+        sh:name "Content type" ;
+        sh:description "" ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:contentType
+    ];
     sh:property
     [
         sh:name "Created by" ;
@@ -137,6 +146,14 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
+    ],
+    [
+        sh:name "Content type" ;
+        sh:description "" ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:contentType
     ] .
 
 fs:contains a rdf:Property .
