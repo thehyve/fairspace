@@ -6,7 +6,7 @@ import FileVersionsList from "./FileVersionsList";
 const FileVersionsDialog = ({onClose, selectedFile, isWritingEnabled, onRevertVersion = () => {}}) => (
     <Dialog onClose={onClose} aria-labelledby="file-version-dialog" open>
         <DialogTitle id="file-version-dialog">
-            {`Select version of ${selectedFile.basename} to be reverted:`}
+            History of <em>{selectedFile.basename}</em>
         </DialogTitle>
         <DialogContent>
             <FileVersionsList
