@@ -51,7 +51,7 @@ describe('UploadsProvider', () => {
     });
 
     it('should change state for uploads on start', async () => {
-        const getContext = getUploadsProviderValue({fileApi: {upload: () => Promise.resolve()}});
+        const getContext = getUploadsProviderValue({fileApi: {uploadMulti: () => Promise.resolve()}});
         let context;
 
         context = getContext();
@@ -85,7 +85,7 @@ describe('UploadsProvider', () => {
     });
 
     it('should handle upload errors', async () => {
-        const getContext = getUploadsProviderValue({fileApi: {upload: () => Promise.reject()}});
+        const getContext = getUploadsProviderValue({fileApi: {uploadMulti: () => Promise.reject()}});
         let context;
 
         context = getContext();
@@ -110,7 +110,7 @@ describe('UploadsProvider', () => {
 
     it('should store upload progress', async () => {
         const fileApi = {
-            upload: (upload, onProgress) => new Promise(resolve => {
+            uploadMulti: (destination, files, onProgress) => new Promise(resolve => {
                 // Set progress to 50 on start
                 onProgress({loaded: 1024, total: 2048});
 

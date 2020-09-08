@@ -39,7 +39,7 @@ export const UploadsProvider = ({children, fileApi = FileAPI}) => {
             u => ({...u, progress: (progressEvent.loaded * 100) / progressEvent.total})
         );
         setStateForUpload(upload, UPLOAD_STATUS_IN_PROGRESS);
-        return fileApi.upload(upload, onUploadProgress)
+        return fileApi.uploadMulti(upload.destinationPath, [upload.file], onUploadProgress)
             .then(() => setStateForUpload(upload, UPLOAD_STATUS_FINISHED))
             .catch(() => setStateForUpload(upload, UPLOAD_STATUS_ERROR));
     };
