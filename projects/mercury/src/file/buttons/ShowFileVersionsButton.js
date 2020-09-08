@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import useIsMounted from "react-is-mounted-hook";
 import FileVersionsDialog from "../FileVersionsDialog";
 
-const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert}) => {
+const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert, isWritingEnabled}) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
@@ -31,6 +31,7 @@ const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert}) =>
                     onClose={closeDialog}
                     selectedFile={selectedFile}
                     onRevertVersion={revertVersion}
+                    isWritingEnabled={isWritingEnabled}
                 />
             ) : null}
         </>
