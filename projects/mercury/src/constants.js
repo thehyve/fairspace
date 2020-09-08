@@ -72,6 +72,7 @@ export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
 export const MARKDOWN_URI = FAIRSPACE_NS + 'markdown';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
+export const USER_URI = FAIRSPACE_NS + 'User';
 export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
 export const FILE_URI = FAIRSPACE_NS + 'File';
 export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';
