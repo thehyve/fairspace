@@ -18,8 +18,7 @@ const WorkspaceBrowser = () => {
     const {workspaces,
         workspacesLoading,
         workspacesError,
-        createWorkspace,
-        refreshWorkspaces} = useContext(WorkspaceContext);
+        createWorkspace} = useContext(WorkspaceContext);
 
     const loading = currentUserLoading || workspacesLoading;
     const error = currentUserError || workspacesError;
@@ -32,7 +31,6 @@ const WorkspaceBrowser = () => {
     const handleSaveWorkspace = async (workspace: Workspace) => {
         setLoadingCreatedWorkspace(true);
         return createWorkspace(workspace)
-            .then(() => refreshWorkspaces())
             .then(() => {
                 setCreatingWorkspace(false);
                 setLoadingCreatedWorkspace(false);
