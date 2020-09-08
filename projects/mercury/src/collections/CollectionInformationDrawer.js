@@ -146,17 +146,17 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             >
                 <LinkedDataEntityFormWithLinkedData
                     subject={collection.iri}
-                    hasEditRight={hasEditRight}
+                    hasEditRight={hasEditRight && paths.length === 0}
                     setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
                 />
             </MetadataCard>
             {
-                paths.map((metadataPath) => (
+                paths.map((metadataPath, index) => (
                     <PathMetadata
                         key={metadataPath}
                         path={metadataPath}
                         showDeleted={showDeleted}
-                        hasEditRight={hasEditRight}
+                        hasEditRight={hasEditRight && index === paths.length - 1}
                     />
                 ))
             }
