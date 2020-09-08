@@ -36,7 +36,7 @@ const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
 
 const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
     const pathForIri = (iri: string) => {
-        const path = new URL(iri).pathname;
+        const path = decodeURIComponent(new URL(iri).pathname);
         return path.replace('/api/v1/webdav/', '');
     };
 
