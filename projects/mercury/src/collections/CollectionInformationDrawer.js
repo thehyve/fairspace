@@ -33,9 +33,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 const MetadataCard = React.forwardRef((props, ref) => {
-    const {title, avatar, children} = props;
-    const [expanded, setExpanded] = useState(true);
-    const toggleExpand = () => setExpanded(!expanded);
+    const {title, avatar, children, forceExpand} = props;
+    const [expandedManually, setExpandedManually] = useState(null); // true | false | null
+    const expanded = (expandedManually != null) ? expandedManually : forceExpand;
+    const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
     const classes = useStyles();
 
     return (
@@ -65,7 +66,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
     );
 });
 
-const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false}, ref) => {
+const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
     const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
 
     let body;
@@ -100,6 +101,7 @@ const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false}
             ref={ref}
             title={`Metadata for ${relativePath(path)}`}
             avatar={avatar}
+            forceExpand={forceExpand}
         >
             {body}
         </MetadataCard>
@@ -143,6 +145,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             <MetadataCard
                 title={`Metadata for ${collection.name}`}
                 avatar={<FolderOutlined />}
+                forceExpand={paths.length === 0}
             >
                 <LinkedDataEntityFormWithLinkedData
                     subject={collection.iri}
@@ -151,12 +154,13 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                 />
             </MetadataCard>
             {
-                paths.map((metadataPath) => (
+                paths.map((metadataPath, index) => (
                     <PathMetadata
                         key={metadataPath}
                         path={metadataPath}
                         showDeleted={showDeleted}
                         hasEditRight={hasEditRight}
+                        forceExpand={index === paths.length - 1}
                     />
                 ))
             }
