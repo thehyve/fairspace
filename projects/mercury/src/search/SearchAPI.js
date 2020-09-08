@@ -27,10 +27,11 @@ export class SearchAPI {
      * @param size
      * @param from
      * @param types     List of class URIs to search for. If empty, it returns all types
+     * @param shared    Whether the search is for shared metadata only (true) or also for collections (false).
      * @param sort
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, sort = SORT_SCORE}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, shared = false, sort = SORT_SCORE}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
@@ -58,7 +59,7 @@ export class SearchAPI {
 
         // Send the query to the backend and transform the results
         return this.client.search({
-            index: '_all',
+            index: shared ? 'shared' : '_all',
             body: {
                 size,
                 from,
@@ -81,6 +82,7 @@ export class SearchAPI {
         size,
         types,
         from: page * size,
+        shared: true,
         sort
     });
 
