@@ -16,11 +16,11 @@ import {
 import vocabularyJsonLd from './test.vocabulary.json';
 import * as constants from "../../../constants";
 import {getFirstPredicateId} from "../jsonLdUtils";
-import {SHACL_NAME, SHACL_PROPERTY} from '../../../constants';
+import {SHACL_NAME, SHACL_PATH, SHACL_PROPERTY} from '../../../constants';
 
 describe('getLabelForType', () => {
     it('returns the label for a known type', () => {
-        expect(getLabelForType(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#label')).toEqual('Label');
+        expect(getLabelForType(vocabularyJsonLd, 'http://fairspace.io/ontology#Directory')).toEqual('Directory');
     });
 
     it('returns the uri if no label is known for a type', () => {
@@ -48,14 +48,17 @@ describe('typeShapeWithProperties', () => {
 
 describe('determineShapeForProperty', () => {
     it('returns the correct shape given a url', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#comment')['@id']).toEqual('http://www.w3.org/2000/01/rdf-schema#comment');
+        expect(determineShapeForProperty(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#comment')[SHACL_PATH][0]['@id'])
+            .toEqual('http://www.w3.org/2000/01/rdf-schema#comment');
     });
     it('returns the correct shape if there is also a blank node pointing to it', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'http://fairspace.io/ontology#list')['@id']).toEqual('http://fairspace.io/ontology#list');
+        expect(determineShapeForProperty(vocabularyJsonLd, 'http://fairspace.io/ontology#list')[SHACL_PATH][0]['@id'])
+            .toEqual('http://fairspace.io/ontology#list');
     });
 
     it('is undefined if there is only a blank node for a property', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'http://fairspace.io/ontology#only-blank')).toBe(undefined);
+        expect(determineShapeForProperty(vocabularyJsonLd, 'http://fairspace.io/ontology#only-blank'))
+            .toBe(undefined);
     });
 });
 
@@ -185,7 +188,7 @@ describe('getNamespaces', () => {
 
         expect(namespaces.length).toEqual(2);
         expect(namespaces[0]).toEqual({
-            id: "http://fairspace.io/ontology#Namespace1",
+            id: "_:Namespace1",
             label: "Namespace1",
             prefix: "ns1",
             namespace: "http://namespace1#",
