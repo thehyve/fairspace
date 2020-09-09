@@ -6,6 +6,7 @@ import LinkedDataProperty from "./LinkedDataProperty";
 import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";
 import {
     COMMENT_URI,
+    CONTENT_TYPE_URI,
     CREATED_BY_URI,
     DATE_CREATED_URI,
     DATE_MODIFIED_URI,
@@ -20,7 +21,7 @@ type PropertyType = {
     key: string;
 }
 
-const systemProperties = [DATE_CREATED_URI, CREATED_BY_URI, DATE_MODIFIED_URI, MODIFIED_BY_URI];
+const systemProperties = [CONTENT_TYPE_URI, DATE_CREATED_URI, CREATED_BY_URI, DATE_MODIFIED_URI, MODIFIED_BY_URI];
 
 const systemPropertiesLast = compareBy(x => systemProperties.indexOf(x.key));
 

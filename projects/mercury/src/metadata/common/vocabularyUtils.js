@@ -1,5 +1,6 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
+import {SHACL_PROPERTY, SUBCLASS_URI} from '../../constants';
 
 const TYPE_PROPERTY = {
     key: '@type',
@@ -101,6 +102,33 @@ export const getShape = (vocabulary, id) => vocabulary.find(el => el['@id'] === 
 export const determineShapeForTypes = (vocabulary, typeUris) => vocabulary.find(entry => typeUris.includes(entry['@id']) || typeUris.includes(getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS))) || {};
 
 /**
+ * Retrieve the SHACL shape for a type from the vocabulary,
+ * and replaces the property references with full property
+ * descriptors.
+ * @param vocabulary
+ * @param typeUris
+ * @returns {null|*}
+ */
+export const typeShapeWithProperties = (vocabulary, typeUris) => {
+    if (!typeUris || typeUris.length === 0) {
+        return null;
+    }
+    const shape = vocabulary.find(def => def['@id'] === typeUris[0]);
+    if (!shape) {
+        return null;
+    }
+    shape[SHACL_PROPERTY] = shape[SHACL_PROPERTY].map(propertyRef => {
+        const propertyId = propertyRef['@id'];
+        return vocabulary.find(def => def['@id'] === propertyId);
+    });
+    if (shape[SUBCLASS_URI]) {
+        const superclassShape = typeShapeWithProperties(vocabulary, shape[SUBCLASS_URI].map(ref => ref['@id']));
+        shape[SHACL_PROPERTY] = superclassShape[SHACL_PROPERTY].concat(shape[SHACL_PROPERTY]);
+    }
+    return shape;
+};
+
+/**
  * Determines the SHACL shape to be applied to the given type.
  *
  * This method filters out any node that does not have a required SHACL name. This avoid an issue where
@@ -116,11 +144,14 @@ export const determineShapeForProperty = (vocabulary, propertyUri) => vocabulary
 );
 
 /**
- * Returns a human readable label for the given predicate or the uri if no label is specified
- * @param uri
+ * Returns a human readable label for the given type or the uri if no label is specified
+ * @param typeUri
  * @returns {string}
  */
-export const getLabelForPredicate = (vocabulary, uri) => getFirstPredicateValue(determineShapeForProperty(vocabulary, uri), constants.SHACL_NAME) || uri;
+export const getLabelForType = (vocabulary: any[], typeUri: string) => {
+    const typeShape = vocabulary.find(shape => shape['@id'] === typeUri);
+    return getFirstPredicateValue(typeShape, constants.SHACL_NAME) || typeUri;
+};
 
 /**
  * Returns a list of property shapes that are in given node shape

@@ -21,7 +21,7 @@ const useLinkedDataSearch = (selectedTypes, query, size, page, availableTypes) =
         }
 
         const getTypesToQuery = () => (selectedTypes.length === 0
-            ? targetClassesInCatalog
+            ? null
             : selectedTypes.filter(type => targetClassesInCatalog.includes(type)));
 
         searchLinkedData({
