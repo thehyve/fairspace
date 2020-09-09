@@ -1,9 +1,8 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import {Button, CircularProgress, Grid, IconButton} from "@material-ui/core";
 import {Edit} from '@material-ui/icons';
 
-import {useDropzone} from "react-dropzone";
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from './UseFormData';
 import LinkedDataContext from "../LinkedDataContext";
@@ -12,13 +11,11 @@ import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "./UseLinkedData";
 import {DATE_DELETED_URI} from "../../constants";
 import ConfirmationDialog from "../../common/components/ConfirmationDialog";
-import ErrorDialog from "../../common/components/ErrorDialog";
 
 const LinkedDataEntityFormContainer = ({
     subject, hasEditRight = true, showEditButtons = false, fullpage = false,
     contextMenu = null,
-    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, onUploadMetadata,
-    ...otherProps
+    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
     const [editingEnabled, setEditingEnabled] = useState(hasEditRight && !showEditButtons && !isDeleted);
@@ -34,22 +31,6 @@ const LinkedDataEntityFormContainer = ({
     useEffect(() => {
         setEditingEnabled(hasEditRight && !showEditButtons && !isDeleted);
     }, [hasEditRight, isDeleted, showEditButtons]);
-
-    const [metadataUploading, setMetadataUploading] = useState(false);
-
-    const uploadMetadata = file => {
-        setMetadataUploading(true);
-        onUploadMetadata(file)
-            .catch(e => ErrorDialog.showError(e,"Error uploading metadata"))
-            .finally(() => setMetadataUploading(false));
-    };
-
-    const onDropMetatata = useCallback(uploadMetadata, []);
-    const {getRootProps, getInputProps} = useDropzone({onDropAccepted: (files) => {
-        if (files.length === 1) {
-            onDropMetatata(files[0]);
-        }
-    }});
 
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
@@ -89,17 +70,14 @@ const LinkedDataEntityFormContainer = ({
                 >
                     Update
                 </Button>
-                <Button
-                    color="default"
-                    onClick={() => clearForm()}
-                    disabled={!hasFormUpdates}
-                >Cancel
-                </Button>
-                {onUploadMetadata && (
-                    <Button {...getRootProps()} disabled={metadataUploading}>
-                        <input {...getInputProps()} />
-                        Upload metadata
-                        {metadataUploading && (<CircularProgress size={16} />)}
+                {hasEditRight && showEditButtons && (
+                    <Button
+                        color="default"
+                        onClick={() => {
+                            clearForm();
+                            setEditingEnabled(false);
+                        }}
+                    >Cancel
                     </Button>
                 )}
             </div>
@@ -163,7 +141,7 @@ LinkedDataEntityFormContainer.propTypes = {
 };
 
 export const LinkedDataEntityFormWithLinkedData = (
-    {subject, hasEditRight, setHasCollectionMetadataUpdates, onUploadMetadata}
+    {subject, hasEditRight, setHasCollectionMetadataUpdates}
 ) => {
     const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
@@ -177,7 +155,6 @@ export const LinkedDataEntityFormWithLinkedData = (
             linkedDataError={linkedDataError}
             updateLinkedData={updateLinkedData}
             setHasUpdates={setHasCollectionMetadataUpdates}
-            onUploadMetadata={onUploadMetadata}
         />
     );
 };

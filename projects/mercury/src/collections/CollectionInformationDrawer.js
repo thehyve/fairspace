@@ -3,8 +3,10 @@ import React, {useContext, useState} from 'react';
 import {Card, CardContent, CardHeader, Collapse, IconButton} from '@material-ui/core';
 import {withRouter} from 'react-router-dom';
 
-import {ExpandMore, FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
+import {CloudUpload, ExpandMore, FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
 import {makeStyles} from '@material-ui/core/styles';
+import {useDropzone} from "react-dropzone";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import CollectionDetails from "./CollectionDetails";
 import CollectionsContext from "./CollectionsContext";
 import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
@@ -13,6 +15,7 @@ import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer"
 import useAsync from '../common/hooks/UseAsync';
 import FileAPI from '../file/FileAPI';
 import MessageDisplay from '../common/components/MessageDisplay';
+import ErrorDialog from "../common/components/ErrorDialog";
 
 const pathHierarchy = (fullPath) => {
     if (!fullPath) return [];
@@ -33,28 +36,56 @@ const useStyles = makeStyles(() => ({
 }));
 
 const MetadataCard = React.forwardRef((props, ref) => {
-    const {title, avatar, children, forceExpand} = props;
+    const {title, avatar, children, forceExpand, metadataUploadPath} = props;
     const [expandedManually, setExpandedManually] = useState(null); // true | false | null
     const expanded = (expandedManually != null) ? expandedManually : forceExpand;
     const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
     const classes = useStyles();
 
+    const [uploadingMetadata, setUploadingMetadata] = useState(false);
+
+    const uploadMetadata = (file) => {
+        setUploadingMetadata(true);
+        FileAPI.uploadMetadata(metadataUploadPath, file)
+            .catch(e => ErrorDialog.showError(e, "Error uploading metadata"))
+            .finally(() => setUploadingMetadata(false));
+    };
+
+    const {getRootProps, getInputProps, open} = useDropzone({noClick: true,
+        noKeyboard: true,
+        accept: '.csv',
+        onDropAccepted: (files) => {
+            if (files.length === 1) {
+                uploadMetadata(files[0]);
+            }
+        }});
+
+    const rootProps = metadataUploadPath && getRootProps();
+    const inputProps = metadataUploadPath && getInputProps();
+
     return (
-        <Card style={{marginTop: 10}} ref={ref}>
+        <Card {...rootProps} style={{marginTop: 10}} ref={ref}>
+            {inputProps && (<input {...inputProps} />)}
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
                 title={title}
+                subheader={metadataUploadPath && 'Drag \'n\' drop a metadata file here'}
                 avatar={avatar}
                 style={{wordBreak: 'break-word'}}
                 action={(
-                    <IconButton
-                        onClick={toggleExpand}
-                        aria-expanded={expanded}
-                        aria-label="Show more"
-                        className={expanded ? classes.expandOpen : ''}
-                    >
-                        <ExpandMore />
-                    </IconButton>
+                    <>
+                        {metadataUploadPath && (uploadingMetadata
+                            ? <CircularProgress size={10} />
+                            : <IconButton onClick={open}><CloudUpload /></IconButton>)}
+                        <IconButton
+                            onClick={toggleExpand}
+                            aria-expanded={expanded}
+                            aria-label="Show more"
+                            className={expanded ? classes.expandOpen : ''}
+                        >
+                            <ExpandMore />
+                        </IconButton>
+                    </>
                 )}
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -68,30 +99,28 @@ const MetadataCard = React.forwardRef((props, ref) => {
 
 const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
     const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
+    // Parse stat data
+    const fileProps = data && data.props;
+    const subject = fileProps && fileProps.iri;
+    const isDirectory = fileProps && fileProps.iscollection && (fileProps.iscollection.toLowerCase() === 'true');
     let body;
     let avatar = <FolderOpenOutlined />;
     if (error) {
         body = <MessageDisplay message="An error occurred while determining metadata subject" />;
     } else if (loading) {
         body = <div>Loading...</div>;
+    } else if (!subject || !fileProps) {
+        body = <div>No metadata found</div>;
     } else {
-        // Parse stat data
-        const fileProps = data && data.props;
-        const subject = fileProps && fileProps.iri;
-
-        if (!subject || !fileProps) {
-            body = <div>No metadata found</div>;
-        } else {
-            body = (
-                <LinkedDataEntityFormWithLinkedData
-                    subject={fileProps.iri}
-                    hasEditRight={hasEditRight}
-                    onUploadMetadata={hasEditRight && (file => FileAPI.uploadMetadata(path, file))}
-                />
-            );
-            if (fileProps.iscollection && (fileProps.iscollection.toLowerCase() === 'false')) {
-                avatar = <InsertDriveFileOutlined />;
-            }
+        body = (
+            <LinkedDataEntityFormWithLinkedData
+                subject={fileProps.iri}
+                hasEditRight={hasEditRight}
+                onUploadMetadata={hasEditRight && (file => FileAPI.uploadMetadata(path, file))}
+            />
+        );
+        if (!isDirectory) {
+            avatar = <InsertDriveFileOutlined />;
         }
     }
     const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
@@ -102,6 +131,7 @@ const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false,
             title={`Metadata for ${relativePath(path)}`}
             avatar={avatar}
             forceExpand={forceExpand}
+            metadataUploadPath={hasEditRight && forceExpand && isDirectory && path}
         >
             {body}
         </MetadataCard>
@@ -146,12 +176,12 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                 title={`Metadata for ${collection.name}`}
                 avatar={<FolderOutlined />}
                 forceExpand={paths.length === 0}
+                metadataUploadPath={hasEditRight && paths.length === 0 && collection.location}
             >
                 <LinkedDataEntityFormWithLinkedData
                     subject={collection.iri}
                     hasEditRight={hasEditRight && paths.length === 0}
                     setHasCollectionMetadataUpdates={setHasCollectionMetadataUpdates}
-                    onUploadMetadata={hasEditRight && (file => FileAPI.uploadMetadata(collection.location, file))}
                 />
             </MetadataCard>
             {
