@@ -71,13 +71,13 @@ const columns = [
     }
 ];
 
-const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
+const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, classes}) => {
     const {data: selectedFileDetails, error, loading} = useAsync(
         () => FileAPI.stat(selectedFile.filename, false)
     );
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
-    const [loadedData, setLoadedData] = useState([{}]);
+    const [loadedData, setLoadedData] = useState([selectedFile]);
 
     if (error) {
         return (<MessageDisplay message="An error occurred while fetching file history." />);
@@ -87,8 +87,8 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     }
 
     const selectedFileVersion = selectedFileDetails && parseInt(selectedFileDetails.version, 10);
-    if (!selectedFileVersion || selectedFileVersion === 1) {
-        return (<div>No previous version found.</div>);
+    if (!selectedFileVersion) {
+        return (<div>No version found.</div>);
     }
 
     const handleOpenVersion = (version) => {
@@ -160,6 +160,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                 aria-label="Revert to this version"
                 title="Revert to this version"
                 onClick={() => handleRevertToVersion(loadedData[rowIndex].version)}
+                disabled={loadedData[rowIndex].version === selectedFileVersion}
             >
                 <SettingsBackupRestore />
             </IconButton>
@@ -182,7 +183,6 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
     }]);
 
     const isRowLoaded = ({index}) => !!loadedData[index];
-    const isOnlyInitialRowLoaded: boolean = (loadedData.length === 1 && Object.keys(loadedData[0]).length === 0);
 
     const loadMoreRows = ({startIndex, stopIndex}) => {
         const fromVersion = startIndex === 1 ? startIndex : startIndex + 1;
@@ -190,11 +190,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
         FileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion)
             .then(res => {
                 if (res) {
-                    if (isOnlyInitialRowLoaded) {
-                        setLoadedData([...res]);
-                    } else {
-                        setLoadedData([...loadedData, ...res]);
-                    }
+                    setLoadedData([...loadedData, ...res]);
                 }
             });
     };
@@ -208,7 +204,6 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                         loadMoreRows={loadMoreRows}
                         rowCount={selectedFileVersion}
                         minimumBatchSize={1}
-                        threshold={1}
                     >
                         {({onRowsRendered, registerChild}) => (
                             <Table
@@ -237,22 +232,22 @@ const FileVersionsList = ({selectedFile, onRevertVersion, classes}) => {
                                 ))}
                                 <Column
                                     key="download"
-                                    label=""
                                     dataKey="download"
                                     headerRenderer={renderHeader}
                                     className={classes.flexContainer}
                                     cellRenderer={({rowIndex}) => renderDownloadActionCell(rowIndex)}
                                     width={80}
                                 />
-                                <Column
-                                    key="revert"
-                                    label=""
-                                    dataKey="revert"
-                                    headerRenderer={renderHeader}
-                                    className={classes.flexContainer}
-                                    cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
-                                    width={80}
-                                />
+                                {isWritingEnabled && (
+                                    <Column
+                                        key="revert"
+                                        dataKey="revert"
+                                        headerRenderer={renderHeader}
+                                        className={classes.flexContainer}
+                                        cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
+                                        width={80}
+                                    />
+                                )}
                             </Table>
                         )}
                     </InfiniteLoader>

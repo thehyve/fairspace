@@ -277,6 +277,7 @@ export const FileOperations = ({
                         selectedFile={selectedItem}
                         onRevert={handleRevert}
                         disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                        isWritingEnabled={isWritingEnabled}
                     >
                         <IconButton
                             aria-label="Show history"

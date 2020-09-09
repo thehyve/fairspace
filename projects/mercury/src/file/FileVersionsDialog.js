@@ -3,13 +3,17 @@ import React from "react";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@material-ui/core";
 import FileVersionsList from "./FileVersionsList";
 
-const FileVersionsDialog = ({onClose, selectedFile, onRevertVersion = () => {}}) => (
+const FileVersionsDialog = ({onClose, selectedFile, isWritingEnabled, onRevertVersion = () => {}}) => (
     <Dialog onClose={onClose} aria-labelledby="file-version-dialog" open>
         <DialogTitle id="file-version-dialog">
-            {`Select version of ${selectedFile.basename} to be reverted:`}
+            History of <em>{selectedFile.basename}</em>
         </DialogTitle>
         <DialogContent>
-            <FileVersionsList selectedFile={selectedFile} onRevertVersion={onRevertVersion} />
+            <FileVersionsList
+                selectedFile={selectedFile}
+                onRevertVersion={onRevertVersion}
+                isWritingEnabled={isWritingEnabled}
+            />
         </DialogContent>
         <DialogActions>
             <Button

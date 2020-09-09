@@ -122,6 +122,25 @@ class FileAPI {
             });
     }
 
+    uploadMulti(destinationPath, files, onUploadProgress = () => {}) {
+        const formData = new FormData();
+        formData.append('action', 'upload_files');
+        files.forEach(f => formData.append(f.path, f));
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "multipart/form-data"
+            },
+            responseType: "text",
+            onUploadProgress,
+            data: formData
+        };
+        return this.client()
+            .customRequest(destinationPath, requestOptions)
+            .catch(handleHttpError("Error uploading files"));
+    }
+
     /**
      * It will calls the browser API to open the file if it's 'openable' otherwise the browser will show download dialog
      * @param path
