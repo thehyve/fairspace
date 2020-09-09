@@ -200,7 +200,11 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
         try (var is = file.getInputStream();
              var reader = new InputStreamReader(is);
-             var csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
+             var csvParser = CSVFormat.DEFAULT
+                     .withFirstRecordAsHeader()
+                     .withCommentMarker('#')
+                     .withIgnoreEmptyLines()
+                     .parse(reader)) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
             if (!headers.contains("Path")) {
                 setErrorMessage("Invalid file format. 'Path' column is missing.");

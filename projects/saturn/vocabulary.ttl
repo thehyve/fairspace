@@ -36,7 +36,6 @@ fs:File sh:property
         sh:name "Analysed by" ;
         sh:description "The files associated to the analysis" ;
         sh:class curie:Analysis ;
-        sh:maxCount 1 ;
         sh:path curie:associatedAnalysis
 ] .
 
