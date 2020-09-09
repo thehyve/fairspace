@@ -70,16 +70,15 @@ const LinkedDataEntityFormContainer = ({
                 >
                     Update
                 </Button>
-                {hasEditRight && showEditButtons && (
-                    <Button
-                        color="default"
-                        onClick={() => {
-                            clearForm();
-                            setEditingEnabled(false);
-                        }}
-                    >Cancel
-                    </Button>
-                )}
+                <Button
+                    color="default"
+                    disabled={!hasFormUpdates && !showEditButtons}
+                    onClick={() => {
+                        clearForm();
+                        setEditingEnabled(!showEditButtons);
+                    }}
+                >Cancel
+                </Button>
             </div>
         );
     }
