@@ -216,11 +216,6 @@ public class TextIndexESBulk implements TextIndex {
      */
     @Override
     public void addEntity(Entity entity) {
-        // Skip anonymous nodes such as lists and file versions.
-        if (entity.getId().startsWith("_:")) {
-            return;
-        }
-
         LOGGER.trace("Adding/Updating the entity {} in ES", entity.getId());
 
         var indexName = indexDispatcher.getIndex(entity.getId());

@@ -30,6 +30,11 @@ public class SingleTripleTextDocProducer extends AbstractDatasetChanges implemen
 
     @Override
     public void change(QuadAction qaction, Node g, Node s, Node p, Node o) {
+        // Skip anonymous nodes such as lists and file versions.
+        if (s.isBlank()) {
+            return;
+        }
+
         if (qaction != QuadAction.ADD && qaction != QuadAction.DELETE) {
             return;
         }
