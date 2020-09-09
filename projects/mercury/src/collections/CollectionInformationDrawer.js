@@ -3,7 +3,7 @@ import React, {useContext, useState} from 'react';
 import {Card, CardContent, CardHeader, Collapse, IconButton} from '@material-ui/core';
 import {withRouter} from 'react-router-dom';
 
-import {ExpandMore, FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
+import {ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
 import {makeStyles} from '@material-ui/core/styles';
 import CollectionDetails from "./CollectionDetails";
 import CollectionsContext from "./CollectionsContext";
@@ -144,7 +144,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             />
             <MetadataCard
                 title={`Metadata for ${collection.name}`}
-                avatar={<FolderOutlined />}
+                avatar={<Folder />}
                 forceExpand={paths.length === 0}
             >
                 <LinkedDataEntityFormWithLinkedData
