@@ -6,7 +6,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import styles from './SearchBar.styles';
 
 const SearchBar = ({
-    classes, query = '', placeholder, onSearchChange = () => {}, disableUnderline = true,
+    classes, query = '', placeholder, onSearchChange = () => {}, disableUnderline = true, disabled = false
 }) => {
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
@@ -42,6 +42,7 @@ const SearchBar = ({
                     value={value}
                     onChange={handleChange}
                     disableUnderline={disableUnderline}
+                    disabled={disabled}
                 />
             </form>
         </div>

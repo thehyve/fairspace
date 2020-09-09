@@ -4,7 +4,7 @@ import elasticsearch from "elasticsearch";
 import {SEARCH_DEFAULT_SIZE} from '../common/constants';
 import {USER_URI, WORKSPACE_URI} from '../constants';
 
-const SORT_SCORE = ["_score"];
+export const SORT_SCORE = ["_score"];
 
 export const SORT_DATE_CREATED = [
     "_score",
