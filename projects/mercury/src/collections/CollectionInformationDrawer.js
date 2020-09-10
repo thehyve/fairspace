@@ -10,6 +10,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Tooltip from "@material-ui/core/Tooltip";
 import Link from "@material-ui/core/Link";
 import table from "text-table";
+import {SnackbarProvider, useSnackbar} from "notistack";
 import CollectionDetails from "./CollectionDetails";
 import CollectionsContext from "./CollectionsContext";
 import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
@@ -104,11 +105,13 @@ const MetadataCard = React.forwardRef((props, ref) => {
     const {vocabulary} = useContext(VocabularyContext);
     const fileTemplate = vocabulary && metadataUploadPath && generateTemplate(vocabulary);
     const [uploadingMetadata, setUploadingMetadata] = useState(false);
+    const {enqueueSnackbar} = useSnackbar();
 
     const uploadMetadata = (file) => {
         setUploadingMetadata(true);
         FileAPI.uploadMetadata(metadataUploadPath, file)
-            .catch(e => ErrorDialog.showError(e, "Error uploading metadata"))
+            .then(() => enqueueSnackbar('Metadata have been successfully uploaded'))
+            .catch(e => ErrorDialog.showError(e, 'Error uploading metadata'))
             .finally(() => setUploadingMetadata(false));
     };
 
@@ -140,7 +143,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
                 action={(
                     <>
                         {metadataUploadPath && (uploadingMetadata
-                            ? <CircularProgress size={10}/>
+                            ? <CircularProgress size={10} />
                             : (
                                 <Tooltip
                                     interactive
@@ -148,15 +151,17 @@ const MetadataCard = React.forwardRef((props, ref) => {
                                         <>
                                             <div>Upload metadata in CSV format.</div>
                                             <div>
-                                                {'Click '}
-                                                <Link download="metadata.csv"
-                                                      href={'data:text/csv;charset=utf-8,' + encodeURIComponent(fileTemplate)}>here</Link>
-                                                {' to download the template file'}
+                                                {'Download '}
+                                                <Link
+                                                    download="metadata.csv"
+                                                    href={'data:text/csv;charset=utf-8,' + encodeURIComponent(fileTemplate)}
+                                                >template file
+                                                </Link>
                                             </div>
                                         </>
                                     )}
                                 >
-                                    <IconButton onClick={open}><CloudUpload/></IconButton>
+                                    <IconButton onClick={open}><CloudUpload /></IconButton>
                                 </Tooltip>
                             ))}
                         <IconButton
@@ -165,7 +170,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
                             aria-label="Show more"
                             className={expanded ? classes.expandOpen : ''}
                         >
-                            <ExpandMore/>
+                            <ExpandMore />
                         </IconButton>
                     </>
                 )}
@@ -186,9 +191,9 @@ const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false,
     const subject = fileProps && fileProps.iri;
     const isDirectory = fileProps && fileProps.iscollection && (fileProps.iscollection.toLowerCase() === 'true');
     let body;
-    let avatar = <FolderOpenOutlined/>;
+    let avatar = <FolderOpenOutlined />;
     if (error) {
-        body = <MessageDisplay message="An error occurred while determining metadata subject"/>;
+        body = <MessageDisplay message="An error occurred while determining metadata subject" />;
     } else if (loading) {
         body = <div>Loading...</div>;
     } else if (!subject || !fileProps) {
@@ -202,7 +207,7 @@ const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false,
             />
         );
         if (!isDirectory) {
-            avatar = <InsertDriveFileOutlined/>;
+            avatar = <InsertDriveFileOutlined />;
         }
     }
     const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
@@ -241,7 +246,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
 
     if (!collection) {
         return atLeastSingleCollectionExists && inCollectionsBrowser
-            && <EmptyInformationDrawer message="Select a collection to display its metadata"/>;
+            && <EmptyInformationDrawer message="Select a collection to display its metadata" />;
     }
 
     const hasEditRight = collection && collection.canWrite;
@@ -256,7 +261,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             />
             <MetadataCard
                 title={`Metadata for ${collection.name}`}
-                avatar={<FolderOutlined/>}
+                avatar={<FolderOutlined />}
                 forceExpand={paths.length === 0}
                 metadataUploadPath={hasEditRight && paths.length === 0 && collection.location}
             >
@@ -293,13 +298,15 @@ const ContextualCollectionInformationDrawer = ({selectedCollectionIri, ...props}
     const atLeastSingleCollectionExists = collections.length > 0;
 
     return (
-        <CollectionInformationDrawer
-            {...props}
-            loading={loading}
-            collection={collection}
-            showDeleted={showDeleted}
-            atLeastSingleCollectionExists={atLeastSingleCollectionExists}
-        />
+        <SnackbarProvider maxSnack={3}>
+            <CollectionInformationDrawer
+                {...props}
+                loading={loading}
+                collection={collection}
+                showDeleted={showDeleted}
+                atLeastSingleCollectionExists={atLeastSingleCollectionExists}
+            />
+        </SnackbarProvider>
     );
 };
 
