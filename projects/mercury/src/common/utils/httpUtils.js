@@ -6,18 +6,17 @@
  * @param providedMessage   If the backend does not provide an error message, this message will be given in the Error
  * @returns {Function}
  */
-import {AxiosError} from 'axios';
 import ErrorDialog from "../components/ErrorDialog";
 
 export const handleAuthError = (status) => {
     switch (status) {
         case 401:
-            ErrorDialog.showError(null, 'Your session has expired. Please log in again.',
+            ErrorDialog.showError('Your session has expired. Please log in again.',
                 null,
                 () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
             break;
         case 403:
-            ErrorDialog.showError(null, 'You have no access to this resource. Ask your administrator to grant you access.',
+            ErrorDialog.showError('You have no access to this resource. Ask your administrator to grant you access.',
                 null,
                 () => window.location.assign('/workspaces'));
             break;
@@ -26,27 +25,19 @@ export const handleAuthError = (status) => {
 };
 
 export function handleHttpError(providedMessage) {
-    return (e: Error | AxiosError) => {
+    return (e: Error) => {
         if (!e || !e.response) {
-            throw e;
+            throw Error(providedMessage);
         }
-        const {response: {status, data, message}} = e;
+        const {response: {status, data}} = e;
 
         switch (status) {
             case 401:
             case 403:
                 handleAuthError(status);
                 break;
-            default: {
-                if (status === 400 && data && data.details) {
-                    // eslint-disable-next-line no-throw-literal
-                    throw {details: data.details, message: data.message};
-                }
-
-                // If a message was provided by the backend, provide it to the calling party
-                const defaultMessage = `${providedMessage} ${message || ''}`.trim();
-                throw Error((data && data.message) || defaultMessage);
-            }
+            default:
+                throw Error(providedMessage + (data && `: ${data}`));
         }
     };
 }

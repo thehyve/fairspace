@@ -90,15 +90,10 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     }
 
     handleCollectionUpdateError(err) {
-        let message;
-        if (err && err.details && err.details.some(d => d.message === "Duplicate label")) {
-            message = "A collection with that name already exists. Collection names must be unique.";
-        } else if (err && err.message) {
-            message = err.message;
-        } else {
-            message = "An error occurred while updating a collection";
-        }
-        ErrorDialog.showError(err, message);
+        const msg = (err && err.message && err.message.includes('Duplicate label'))
+            ? "A collection with that name already exists. Collection names must be unique."
+            : err;
+        ErrorDialog.showError("An error occurred while updating a collection", msg);
     }
 
     onSaveStart = () => {
@@ -143,8 +138,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             })
             .catch(err => {
                 this.onSaveComplete();
-                const message = err && err.message ? err.message : "An error occurred while renaming a collection";
-                ErrorDialog.showError(err, message);
+                ErrorDialog.showError("An error occurred while renaming a collection", err);
             });
     };
 

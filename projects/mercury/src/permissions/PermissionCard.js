@@ -94,8 +94,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         setBusy(true);
         setAccessMode(collection.location, selectedAccessMode)
             .then(handleCancelSetAccessMode)
-            .catch(err => ErrorDialog.showError(
-                err,
+            .catch(() => ErrorDialog.showError(
                 "An error occurred while setting an access mode",
                 () => handleConfirmSetAccessMode()
             ))
@@ -117,8 +116,7 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         setBusy(true);
         setPermission(collection.location, collection.ownerWorkspace, selectedOwnerWorkspaceAccess)
             .then(handleCancelSetOwnerWorkspaceAccess)
-            .catch(err => ErrorDialog.showError(
-                err,
+            .catch(() => ErrorDialog.showError(
                 "An error occurred while setting an access level",
                 () => handleConfirmSetOwnerWorkspaceAccess()
             ))

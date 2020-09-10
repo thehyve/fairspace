@@ -63,7 +63,7 @@ const UserRolesPage = () => {
 
     const toggleRole = (id, role, enable) => setUserRole(id, role, enable)
         .then(refresh)
-        .catch(e => ErrorDialog.showError(e, e.message));
+        .catch(e => ErrorDialog.showError("Error assigning role", e));
 
     return (
         <Paper style={{marginTop: 16}}>

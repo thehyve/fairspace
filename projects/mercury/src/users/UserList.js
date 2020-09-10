@@ -77,7 +77,7 @@ const UserList = (props: UserListProps) => {
         setWorkspaceRole(userIri, role)
             .catch(err => {
                 const message = err && err.message ? err.message : "An error occurred while updating a workspace users";
-                ErrorDialog.showError(err, message);
+                ErrorDialog.showError(message);
             })
             .finally(() => setShowAddUserDialog(false));
     };

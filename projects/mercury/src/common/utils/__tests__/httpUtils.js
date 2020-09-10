@@ -7,24 +7,24 @@ describe('Http Utils', () => {
             window.location.assign = jest.fn();
             ErrorDialog.showError = jest.fn();
             handleHttpError("Default error")({response: {status: 401}});
-            expect(ErrorDialog.showError).toHaveBeenCalledWith(null, "Your session has expired. Please log in again.", null, expect.anything());
+            expect(ErrorDialog.showError).toHaveBeenCalledWith("Your session has expired. Please log in again.", null, expect.anything());
         });
 
         it('Should show an error on 403', () => {
             window.location.assign = jest.fn();
             ErrorDialog.showError = jest.fn();
             handleHttpError("Default error")({response: {status: 403}});
-            expect(ErrorDialog.showError).toHaveBeenCalledWith(null, "You have no access to this resource. Ask your administrator to grant you access.", null, expect.anything());
+            expect(ErrorDialog.showError).toHaveBeenCalledWith("You have no access to this resource. Ask your administrator to grant you access.", null, expect.anything());
         });
 
         it('Should throw an exception with the backend error on responses other than 401', () => {
             expect(
                 () => {
                     handleHttpError("Default error")({
-                        response: {status: 500, data: {message: 'Backend error'}}
+                        response: {status: 500, data: 'Backend error'}
                     });
                 }
-            ).toThrow(new Error('Backend error'));
+            ).toThrow(new Error('Default error: Backend error'));
         });
     });
 

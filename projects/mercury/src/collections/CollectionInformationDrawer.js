@@ -111,7 +111,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
         setUploadingMetadata(true);
         FileAPI.uploadMetadata(metadataUploadPath, file)
             .then(() => enqueueSnackbar('Metadata have been successfully uploaded'))
-            .catch(e => ErrorDialog.showError(e, 'Error uploading metadata'))
+            .catch(e => ErrorDialog.showError('Error uploading metadata', e))
             .finally(() => setUploadingMetadata(false));
     };
 
@@ -123,7 +123,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
             if (files.length === 1) {
                 uploadMetadata(files[0]);
             } else {
-                ErrorDialog.showError(null, "Please upload metadata files one by one");
+                ErrorDialog.showError("Please upload metadata files one by one");
             }
         }
     });

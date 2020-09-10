@@ -4,8 +4,11 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
 import io.milton.http.*;
+import io.milton.http.entity.StringEntity;
+import io.milton.http.http11.DefaultHttp11ResponseHandler;
 import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;
+import io.milton.resource.Resource;
 import io.milton.servlet.ServletResponse;
 import org.apache.jena.rdf.model.Literal;
 
@@ -61,6 +64,17 @@ public class WebDAVServlet extends HttpServlet {
                         .stream()
                         .map(p -> new TransactionalHttpExtensionWrapper(p, txn))
                         .collect(toList())));
+            }
+
+            @Override
+            protected DefaultHttp11ResponseHandler createDefaultHttp11ResponseHandler(AuthenticationService authenticationService) {
+                return new DefaultHttp11ResponseHandler(authenticationService, geteTagGenerator(), getContentGenerator()) {
+                    @Override
+                    public void respondBadRequest(Resource resource, Response response, Request request) {
+                        super.respondBadRequest(resource, response, request);
+                        getContentGenerator().generate(resource, request, response, Response.Status.SC_BAD_REQUEST);
+                    }
+                };
             }
         }.buildHttpManager();
 
