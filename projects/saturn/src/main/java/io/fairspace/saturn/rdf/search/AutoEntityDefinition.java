@@ -1,13 +1,20 @@
 package io.fairspace.saturn.rdf.search;
 
+import io.fairspace.saturn.vocabulary.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.text.EntityDefinition;
 import org.apache.jena.vocabulary.RDFS;
+
+import java.util.*;
 
 /**
  * An entity definition with reasonable defaults
  */
 public class AutoEntityDefinition extends EntityDefinition {
+    private static final Set<String> sensitiveProperties = Set.of(
+            FS.WORKSPACE_DESCRIPTION_URI
+    );
+
     public AutoEntityDefinition() {
         super("iri", "label", null, RDFS.label.asNode());
     }
@@ -20,6 +27,10 @@ public class AutoEntityDefinition extends EntityDefinition {
         }
 
         var uri = predicate.getURI();
+
+        if (sensitiveProperties.contains(uri)) {
+            return null;
+        }
 
         var separatorPos = uri.lastIndexOf('#');
         if (separatorPos < 0) {

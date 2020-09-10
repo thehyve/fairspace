@@ -2,8 +2,9 @@
 import elasticsearch from "elasticsearch";
 
 import {SEARCH_DEFAULT_SIZE} from '../common/constants';
+import {USER_URI, WORKSPACE_URI} from '../constants';
 
-const SORT_SCORE = ["_score"];
+export const SORT_SCORE = ["_score"];
 
 export const SORT_DATE_CREATED = [
     "_score",
@@ -38,11 +39,19 @@ export class SearchAPI {
                 must: [{
                     query_string: {query: query || '*'}
                 }],
-                must_not: {
+                must_not: [{
                     exists: {
                         field: "dateDeleted"
                     }
-                }
+                }, {
+                    term: {
+                        "type.keyword": USER_URI
+                    }
+                }, {
+                    term: {
+                        "type.keyword": WORKSPACE_URI
+                    }
+                }]
             }
         };
 
