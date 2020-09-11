@@ -37,7 +37,7 @@ export function handleHttpError(providedMessage) {
                 handleAuthError(status);
                 break;
             default:
-                throw Error(providedMessage + (data && `: ${data}`));
+                throw Error(providedMessage + (data ? `: ${data}` : ''));
         }
     };
 }
