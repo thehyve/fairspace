@@ -9,7 +9,7 @@ import {
     Slide,
     Typography,
 } from '@material-ui/core';
-import {Error} from '@material-ui/icons';
+import {Error as ErrorIcon} from '@material-ui/icons';
 import DialogContentText from "@material-ui/core/DialogContentText";
 
 const Transition = React.forwardRef(
@@ -88,7 +88,7 @@ class ErrorDialog extends React.Component {
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={1}>
                         <Grid item>
-                            <Error color="error" style={{fontSize: 40}} />
+                            <ErrorIcon color="error" style={{fontSize: 40}} />
                         </Grid>
                         <Grid item>
                             <Typography variant="h6" gutterBottom>
