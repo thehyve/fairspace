@@ -1,20 +1,40 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {withRouter} from "react-router-dom";
-import {Button, Tab, Tabs} from "@material-ui/core";
-import Play from "mdi-material-ui/Play";
+import {useDropzone} from "react-dropzone";
+import {withStyles} from "@material-ui/core";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
-import UploadList from "./UploadList";
-import useUploads from "./UseUploads";
-import {UPLOAD_STATUS_INITIAL} from "./UploadsContext";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {encodePath} from "./fileUtils";
+import useUploads from "./UseUploads";
 
-const TAB_FILES = 'FILES';
-const TAB_UPLOAD = 'UPLOAD';
+const styles = () => ({
+    dropzone: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#fafafa",
+        color: "#bdbdbd",
+        outline: "none",
+        transitionBorder: ".24s",
+        easeInOut: true
+    },
+    activeStyle: {
+        borderColor: '#2196f3',
+        borderWidth: 2,
+        borderRadius: 2,
+        borderStyle: "dashed",
+    },
+    acceptStyle: {
+        borderColor: '#00e676'
+    },
+    rejectStyle: {
+        borderColor: '#ff1744'
+    }
+});
 
 export const FileBrowser = ({
     history,
@@ -29,15 +49,30 @@ export const FileBrowser = ({
     showDeleted,
     refreshFiles = () => {},
     fileActions = {},
-    selection = {}
+    selection = {},
+    classes
 }) => {
-    const [currentTab, setCurrentTab] = useState(TAB_FILES);
-
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
     const existingFilenames = files ? files.map(file => file.basename) : [];
-    const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
+    const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames, refreshFiles);
+
+    const {
+        getRootProps,
+        getInputProps,
+        isDragActive,
+        isDragAccept,
+        isDragReject,
+        open
+    } = useDropzone({
+        noClick: true,
+        noKeyboard: true,
+        onDropAccepted: (droppedFiles) => {
+            enqueue(droppedFiles);
+            startAll();
+        }
+    });
 
     // Deselect all files on history changes
     useEffect(() => {
@@ -50,13 +85,6 @@ export const FileBrowser = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [history]);
-
-    // Reload the files after returning from the upload tab
-    useEffect(() => {
-        refreshFiles(openedPath, showDeleted);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentTab, openedPath]);
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
@@ -106,60 +134,30 @@ export const FileBrowser = ({
                 fileActions={fileActions}
                 clearSelection={selection.deselectAll}
                 refreshFiles={refreshFiles}
+                openUploadFileDialog={open}
             />
-        </div>
-    );
-
-    const renderTabFiles = () => (
-        <div data-testid="files-view">
-            <FileList
-                selectionEnabled={openedCollection.canRead}
-                files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
-                onPathCheckboxClick={path => selection.toggle(path.filename)}
-                onPathHighlight={handlePathHighlight}
-                onPathDoubleClick={handlePathDoubleClick}
-                onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
-                showDeleted={showDeleted}
-            />
-            {openedCollection.canRead && renderFileOperations()}
-        </div>
-    );
-
-    const renderTabUpload = () => (
-        <div data-testid="upload-view">
-            <UploadList
-                uploads={uploads}
-                enqueue={enqueue}
-            />
-            <div style={{marginTop: 12}}>
-                <Button
-                    data-testid="upload-button"
-                    color="primary"
-                    variant="contained"
-                    disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
-                    onClick={startAll}
-                >
-                    <Play /> Start uploading
-                </Button>
-            </div>
         </div>
     );
 
     return (
-        <>
-            <Tabs
-                data-testid="tabs"
-                value={currentTab}
-                onChange={(e, tab) => setCurrentTab(tab)}
-                style={{marginBottom: 8}}
+        <div data-testid="files-view" className="container">
+            <div
+                {...getRootProps({isDragActive, isDragAccept, isDragReject})}
+                className={`${classes.dropzone} ${isDragActive && classes.activeStyle} ${isDragAccept && classes.acceptStyle} ${isDragReject && classes.rejectStyle}`}
             >
-                <Tab value={TAB_FILES} label="Files" />
-                {isWritingEnabled && (
-                    <Tab value={TAB_UPLOAD} label="Upload" data-testid="upload-tab" />
-                )}
-            </Tabs>
-            {(currentTab === TAB_FILES) ? renderTabFiles() : renderTabUpload()}
-        </>
+                <input {...getInputProps()} />
+                <FileList
+                    selectionEnabled={openedCollection.canRead}
+                    files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                    onPathCheckboxClick={path => selection.toggle(path.filename)}
+                    onPathHighlight={handlePathHighlight}
+                    onPathDoubleClick={handlePathDoubleClick}
+                    onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
+                    showDeleted={showDeleted}
+                />
+                {openedCollection.canRead && renderFileOperations()}
+            </div>
+        </div>
     );
 };
 
@@ -180,4 +178,4 @@ const ContextualFileBrowser = ({openedPath, fileApi, showDeleted, ...props}) => 
     );
 };
 
-export default withRouter(ContextualFileBrowser);
+export default withRouter(withStyles(styles)(ContextualFileBrowser));

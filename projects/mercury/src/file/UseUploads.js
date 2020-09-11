@@ -5,7 +5,7 @@ import UploadsContext, {UPLOAD_STATUS_INITIAL} from "./UploadsContext";
 /**
  * This hook contains logic about uploads for a certain directory.
  */
-export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqueueUploads, startUpload) => {
+export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqueueUploads, startUpload, refreshFiles) => {
     const uploads = allUploads.filter(upload => upload.destinationPath === path);
 
     // Create a list of used filenames, including the current uploads
@@ -21,7 +21,7 @@ export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqu
 
     const startAll = () => uploads
         .filter(upload => upload.status === UPLOAD_STATUS_INITIAL)
-        .map(upload => startUpload(upload));
+        .map(upload => startUpload(upload).then(refreshFiles));
 
     return {
         enqueue,
@@ -30,10 +30,10 @@ export const disconnectedUseUploads = (path, existingFilenames, allUploads, enqu
     };
 };
 
-const useUploads = (path, existingFilenames = []) => {
+const useUploads = (path, existingFilenames = [], refreshFiles) => {
     const {getUploads, enqueueUploads, startUpload} = useContext(UploadsContext);
 
-    return disconnectedUseUploads(path, existingFilenames, getUploads(), enqueueUploads, startUpload);
+    return disconnectedUseUploads(path, existingFilenames, getUploads(), enqueueUploads, startUpload, refreshFiles);
 };
 
 export default useUploads;
