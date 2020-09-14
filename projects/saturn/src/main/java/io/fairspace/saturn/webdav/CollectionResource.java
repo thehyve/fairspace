@@ -121,8 +121,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Property
-    public Access getAccess() {
-        return access;
+    public boolean getCanRead() {
+        return access.canRead();
+    }
+
+    @Property
+    public boolean getCanWrite() {
+        return access.canWrite();
     }
 
     @Property
@@ -335,7 +340,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             var email = principal.getProperty(FS.email).getString();
             getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
                     (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
-
         }
     }
 

@@ -4,7 +4,6 @@ import type {
     AccessLevel,
     AccessMode,
     Collection,
-    CollectionPermissions,
     Permission,
     PrincipalPermission,
     Status
@@ -79,20 +78,6 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
     }
 };
 
-type CollectionPermissionProperties = {
-    canManage: string;
-    access: AccessLevel;
-}
-
-const mapCollectionPermissions: CollectionPermissions = (properties: CollectionPermissionProperties) => {
-    const {canManage, access} = properties;
-    return ({
-        canManage: (canManage?.toLowerCase() === 'true'),
-        canWrite: compareTo({access}, {access: "Write"}),
-        canRead: compareTo({access}, {access: "Read"}),
-    });
-};
-
 export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({
     [LABEL_URI]: [{value: name}],
     [COMMENT_URI]: [{value: description}]
@@ -116,11 +101,13 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     deletedBy: properties.deletedBy,
     accessMode: properties.accessMode,
     status: properties.status,
+    canRead: (properties.canRead?.toLowerCase() === 'true'),
+    canWrite: (properties.canWrite?.toLowerCase() === 'true'),
+    canManage: (properties.canManage?.toLowerCase() === 'true'),
     canDelete: properties.canDelete?.toLowerCase() === 'true',
     canUndelete: properties.canUndelete?.toLowerCase() === 'true',
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),
-    ...(mapCollectionPermissions(properties)),
     userPermissions: parsePermissions(properties.userPermissions),
     workspacePermissions: parsePermissions(properties.workspacePermissions)
 });

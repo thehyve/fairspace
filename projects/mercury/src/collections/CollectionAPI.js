@@ -38,7 +38,6 @@ export type CollectionType = {|
 |};
 
 export type CollectionPermissions = {|
-    access?: AccessLevel;
     userPermissions: Permission[];
     workspacePermissions: Permission[];
     canRead: boolean;
