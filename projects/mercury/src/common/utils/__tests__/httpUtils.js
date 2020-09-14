@@ -24,7 +24,7 @@ describe('Http Utils', () => {
                         response: {status: 500, data: 'Backend error'}
                     });
                 }
-            ).toThrow(new Error('Default error: Backend error'));
+            ).toThrow(new Error('Backend error'));
         });
     });
 
