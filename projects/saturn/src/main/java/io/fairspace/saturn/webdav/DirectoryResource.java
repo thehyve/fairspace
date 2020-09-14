@@ -291,14 +291,23 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             metadataService.patch(model);
         } catch (ValidationException e) {
             var message = new StringBuilder("Error applying metadata: \n");
-            e.getViolations().forEach(v -> message.append(v.getMessage())
-                    .append(". Subject: ")
-                    .append(v.getSubject())
-                    .append(". Predicate: ")
-                    .append(v.getPredicate())
-                    .append(". Value: ")
-                    .append(v.getValue())
-                    .append('\n'));
+            var n = 0;
+            for (var v: e.getViolations()) {
+                message.append(v.getMessage())
+                        .append(". Subject: ")
+                        .append(v.getSubject())
+                        .append(". Predicate: ")
+                        .append(v.getPredicate())
+                        .append(". Value: ")
+                        .append(v.getValue())
+                        .append('\n');
+                if (++n == 10) {
+                    if (e.getViolations().size() > n) {
+                        message.append("+ ").append(e.getViolations().size() - n).append(" more errors.");
+                    }
+                    break;
+                }
+            }
             setErrorMessage(message.toString());
             throw new BadRequestException("Error applying metadata", e);
         } catch (Exception e) {
