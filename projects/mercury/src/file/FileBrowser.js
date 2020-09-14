@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
 import {withStyles} from "@material-ui/core";
@@ -9,9 +9,18 @@ import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {encodePath} from "./fileUtils";
-import useUploads from "./UseUploads";
+import UploadProgressComponent from "./UploadProgressComponent";
+import UploadsContext from "./UploadsContext";
+import {generateUuid} from "../metadata/common/metadataUtils";
+import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
 const styles = () => ({
+    container: {
+        height: "100%"
+    },
+    uploadProgress: {
+        marginTop: 20
+    },
     dropzone: {
         flex: 1,
         display: "flex",
@@ -29,7 +38,8 @@ const styles = () => ({
         borderStyle: "dashed",
     },
     acceptStyle: {
-        borderColor: '#00e676'
+        borderColor: '#00e676',
+        opacity: 0.4
     },
     rejectStyle: {
         borderColor: '#ff1744'
@@ -56,7 +66,11 @@ export const FileBrowser = ({
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
     const existingFilenames = files ? files.map(file => file.basename) : [];
-    const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames, refreshFiles);
+
+    const {getUploads, startUpload} = useContext(UploadsContext);
+    const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
+    const [overwriteCandidateNames, setOverwriteCandidateNames] = useState([]);
+    const [currentUpload, setCurrentUpload] = useState({});
 
     const {
         getRootProps,
@@ -69,8 +83,19 @@ export const FileBrowser = ({
         noClick: true,
         noKeyboard: true,
         onDropAccepted: (droppedFiles) => {
-            enqueue(droppedFiles);
-            startAll();
+            const newUpload = {
+                id: generateUuid(),
+                files: droppedFiles,
+                destinationPath: openedPath,
+            };
+            const newOverwriteCandidates = droppedFiles.filter(f => existingFilenames.includes(f.name));
+            if (newOverwriteCandidates.length > 0) {
+                setCurrentUpload(newUpload);
+                setOverwriteCandidateNames(newOverwriteCandidates.map(c => c.name));
+                setShowOverwriteConfirmation(true);
+            } else {
+                startUpload(newUpload).then(refreshFiles);
+            }
         }
     });
 
@@ -104,6 +129,12 @@ export const FileBrowser = ({
         }
     };
 
+    const handleCloseUpload = () => {
+        setShowOverwriteConfirmation(false);
+        setOverwriteCandidateNames([]);
+        setCurrentUpload({});
+    };
+
     if (loading || collectionsLoading) {
         return <LoadingInlay />;
     }
@@ -123,6 +154,34 @@ export const FileBrowser = ({
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
+    const renderOverwriteConfirmation = () => (
+        <ConfirmationDialog
+            open
+            title="Warning"
+            content={
+                overwriteCandidateNames.length > 1 ? (
+                    <span>
+                        Files: <em>{overwriteCandidateNames.join(', ')}</em> already exist.<br />
+                        Do you want to overwrite them?
+                    </span>
+                ) : (
+                    <span>
+                        File <em>{overwriteCandidateNames[0]}</em> already exists.<br />
+                        Do you want to overwrite it?
+                    </span>
+                )
+            }
+            dangerous
+            agreeButtonText="Overwrite"
+            onAgree={() => {
+                startUpload(currentUpload).then(refreshFiles);
+                handleCloseUpload();
+            }}
+            onDisagree={handleCloseUpload}
+            onClose={handleCloseUpload}
+        />
+    );
+
     const renderFileOperations = () => (
         <div style={{marginTop: 8}}>
             <FileOperations
@@ -140,7 +199,7 @@ export const FileBrowser = ({
     );
 
     return (
-        <div data-testid="files-view" className="container">
+        <div data-testid="files-view" className={classes.container}>
             <div
                 {...getRootProps({isDragActive, isDragAccept, isDragReject})}
                 className={`${classes.dropzone} ${isDragActive && classes.activeStyle} ${isDragAccept && classes.acceptStyle} ${isDragReject && classes.rejectStyle}`}
@@ -157,6 +216,12 @@ export const FileBrowser = ({
                 />
                 {openedCollection.canRead && renderFileOperations()}
             </div>
+            {getUploads().length > 0 && (
+                <div className={classes.uploadProgress}>
+                    <UploadProgressComponent uploads={getUploads()} />
+                </div>
+            )}
+            {showOverwriteConfirmation && (renderOverwriteConfirmation())}
         </div>
     );
 };

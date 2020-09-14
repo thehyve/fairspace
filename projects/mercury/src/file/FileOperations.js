@@ -186,26 +186,26 @@ export const FileOperations = ({
                                 </IconButton>
                             </CreateDirectoryButton>
                         </ProgressButton>
-                        <ProgressButton active={activeOperation === Operations.MKDIR}>
-                            <IconButton
-                                aria-label="Upload"
-                                title="Upload &hellip;"
-                                disabled={busy}
-                                onClick={handleUploadMenuClick}
-                            >
-                                <CloudUpload />
-                            </IconButton>
-                            <Menu
-                                id="upload-menu"
-                                anchorEl={anchorEl}
-                                keepMounted
-                                open={Boolean(anchorEl)}
-                                onClose={handleUploadMenuClose}
-                            >
-                                <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
-                                <MenuItem onClick={handleUploadMenuClose} disabled>Upload folder</MenuItem>
-                            </Menu>
-                        </ProgressButton>
+
+                        <IconButton
+                            aria-label="Upload"
+                            title="Upload &hellip;"
+                            disabled={busy}
+                            onClick={handleUploadMenuClick}
+                        >
+                            <CloudUpload />
+                        </IconButton>
+                        <Menu
+                            id="upload-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleUploadMenuClose}
+                        >
+                            <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
+                            <MenuItem onClick={handleUploadMenuClose} disabled>Upload folder</MenuItem>
+                        </Menu>
+
                     </>
                 )}
             </FileOperationsGroup>
