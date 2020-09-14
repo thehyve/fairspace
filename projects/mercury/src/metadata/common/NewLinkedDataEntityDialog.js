@@ -64,11 +64,13 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         getIdentifier()
     );
 
+    const typeLabel = getLabel(shape);
+
     const createEntity = (event) => {
         if (event) event.stopPropagation();
 
         const hasErrors = validateAll(extendedProperties);
-        if (!hasErrors) submitForm();
+        if (!hasErrors) submitForm(typeLabel);
     };
 
     const handleCloseDialog = (e) => {
@@ -115,8 +117,6 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     };
 
     const canCreate = () => !requireIdentifier || isValidLinkedDataIdentifier(getIdentifier());
-
-    const typeLabel = getLabel(shape);
 
     const typeDescription = getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION);
 
