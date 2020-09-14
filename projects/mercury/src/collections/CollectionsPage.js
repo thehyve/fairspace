@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Switch, withStyles} from "@material-ui/core";
@@ -14,9 +14,12 @@ import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import styles from "./CollectionsPage.styles";
+import CollectionsContext from './CollectionsContext';
 
 const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
     usePageTitleUpdater("Collections");
+
+    const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
 
     const [busy, setBusy] = useState(false);
     const [showDeletedCollections, setShowDeletedCollections] = useState(false);
@@ -64,6 +67,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
                         placeholder="Search"
                         disableUnderline={false}
                         onSearchChange={handleSearch}
+                        disabled={collectionsLoading || collectionsError || !collections || collections.length === 0}
                     />
                 </Grid>
                 <Grid item xs={3} className={classes.topBarSwitch}>

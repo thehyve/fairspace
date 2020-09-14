@@ -3,7 +3,7 @@ import React, {useContext, useState} from 'react';
 import {Card, CardContent, CardHeader, Collapse, IconButton} from '@material-ui/core';
 import {withRouter} from 'react-router-dom';
 
-import {CloudUpload, ExpandMore, FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
+import {CloudUpload, ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
 import {makeStyles} from '@material-ui/core/styles';
 import {useDropzone} from "react-dropzone";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -261,7 +261,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
             />
             <MetadataCard
                 title={`Metadata for ${collection.name}`}
-                avatar={<FolderOutlined />}
+                avatar={<Folder />}
                 forceExpand={paths.length === 0}
                 metadataUploadPath={hasEditRight && paths.length === 0 && collection.location}
             >

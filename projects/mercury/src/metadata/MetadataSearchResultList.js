@@ -1,25 +1,25 @@
 import React, {useContext} from "react";
 
-import Iri from "../common/components/Iri";
 import LinkedDataContext from "./LinkedDataContext";
 import {getLabel} from "./common/metadataUtils";
 import LinkedDataList from "./common/LinkedDataList";
-import {determineShapeForTypes} from "./common/vocabularyUtils";
+import {typeShapeWithProperties} from "./common/vocabularyUtils";
+import {renderSearchResultProperty} from '../search/searchUtils';
 
 export default ({items, ...otherProps}) => {
     const {shapes} = useContext(LinkedDataContext);
 
-    const entities = items.map(({id, label, comment, type, highlights}) => {
-        const shape = determineShapeForTypes(shapes, type);
+    const entities = items.map((item) => {
+        const {id, type, highlights} = item;
+        const shape = typeShapeWithProperties(shapes, type);
         const typeLabel = getLabel(shape, true);
-        const shapeUrl = shape['@id'];
 
         return {
             id,
-            primaryText: (label && label[0]) || <Iri iri={id} />,
-            secondaryText: (comment && comment[0]),
+            primaryText: renderSearchResultProperty(item, 'label'),
+            secondaryText: renderSearchResultProperty(item, 'comment'),
             typeLabel,
-            shapeUrl,
+            shape,
             highlights
         };
     });

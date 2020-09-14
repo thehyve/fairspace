@@ -1,6 +1,6 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.rdf.search.*;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -45,9 +45,9 @@ public class Services {
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final FilteredDatasetGraph filteredDatasetGraph;
+    private final SearchProxyServlet searchProxyServlet;
 
-
-    public Services(@NonNull Config config, @NonNull Dataset dataset) {
+    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull Dataset dataset) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -76,5 +76,11 @@ public class Services {
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
+
+        searchProxyServlet = new SearchProxyServlet(
+                apiPrefix,
+                CONFIG.elasticsearchUrl,
+                transactions,
+                new IndexDispatcher(dataset.getContext()));
     }
 }

@@ -48,7 +48,7 @@ const LinkedDataList = ({
     }
 
     const renderRow = (entry) => {
-        const {id, primaryText, secondaryText, highlights} = entry;
+        const {id, typeLabel, primaryText, secondaryText, highlights, shape} = entry;
 
         return (
             <IriTooltip
@@ -70,11 +70,11 @@ const LinkedDataList = ({
                         <ListItemText primary={primaryText} secondary={secondaryText} />
                     </TableCell>
                     <TableCell style={{minWidth: 140}}>
-                        {entry.typeLabel}
+                        {typeLabel}
                     </TableCell>
                     {hasHighlights && (
                         <TableCell style={{minWidth: 200}}>
-                            <SearchResultHighlights highlights={highlights} />
+                            <SearchResultHighlights highlights={highlights} typeShape={shape} />
                         </TableCell>
                     )}
                 </TableRow>

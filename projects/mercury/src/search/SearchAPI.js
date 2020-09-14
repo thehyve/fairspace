@@ -2,8 +2,9 @@
 import elasticsearch from "elasticsearch";
 
 import {SEARCH_DEFAULT_SIZE} from '../common/constants';
+import {USER_URI, WORKSPACE_URI} from '../constants';
 
-const SORT_SCORE = ["_score"];
+export const SORT_SCORE = ["_score"];
 
 export const SORT_DATE_CREATED = [
     "_score",
@@ -27,21 +28,30 @@ export class SearchAPI {
      * @param size
      * @param from
      * @param types     List of class URIs to search for. If empty, it returns all types
+     * @param shared    Whether the search is for shared metadata only (true) or also for collections (false).
      * @param sort
      * @return Promise
      */
-    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, sort = SORT_SCORE}) => {
+    search = ({query, size = SEARCH_DEFAULT_SIZE, from = 0, types, shared = false, sort = SORT_SCORE}) => {
         // Create basic query, excluding any deleted files
         const esQuery = {
             bool: {
                 must: [{
                     query_string: {query: query || '*'}
                 }],
-                must_not: {
+                must_not: [{
                     exists: {
                         field: "dateDeleted"
                     }
-                }
+                }, {
+                    term: {
+                        "type.keyword": USER_URI
+                    }
+                }, {
+                    term: {
+                        "type.keyword": WORKSPACE_URI
+                    }
+                }]
             }
         };
 
@@ -58,7 +68,7 @@ export class SearchAPI {
 
         // Send the query to the backend and transform the results
         return this.client.search({
-            index: '_all',
+            index: shared ? 'shared' : '_all',
             body: {
                 size,
                 from,
@@ -81,6 +91,7 @@ export class SearchAPI {
         size,
         types,
         from: page * size,
+        shared: true,
         sort
     });
 

@@ -1,360 +1,294 @@
 [
   {
     "@id": "_:blank2",
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://fairspace.io/ontology#list"
-      }
-    ]
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#list"
+    }]
+  },
+  {
+    "@id": "_:label",
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://www.w3.org/2000/01/rdf-schema#label"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Label"
+    }],
+    "http://www.w3.org/ns/shacl#datatype": [{
+      "@id": "http://www.w3.org/2001/XMLSchema#string"
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+        "@value": "Unique resource label."
+    }],
+    "http://www.w3.org/ns/shacl#maxCount": [{
+      "@value": 1
+    }],
+    "http://www.w3.org/ns/shacl#maxLength": [{
+      "@value": 128
+    }]
+  },
+  {
+    "@id": "_:description",
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://www.w3.org/2000/01/rdf-schema#comment"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Description"
+    }],
+    "http://www.w3.org/ns/shacl#datatype": [{
+      "@id": "http://www.w3.org/2001/XMLSchema#string"
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+      "@value": ""
+    }],
+    "http://www.w3.org/ns/shacl#maxCount": [{
+      "@value": 1
+    }]
   },
   {
     "@id": "http://fairspace.io/ontology#DeletedClass",
     "@type": [
       "http://www.w3.org/ns/shacl#NodeShape"
     ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "Deleted class"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#property": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#targetClass": [
-      {
-        "@id": "http://fairspace.io/ontology#Some-Class"
-      }
-    ],
-    "http://fairspace.io/ontology#dateDeleted": [
-      {
-        "@value": "2010-01-01"
-      }
-    ],
-    "http://fairspace.io/ontology#deletedBy": [
-      {
-        "@id": "http://some-person"
-      }
-    ]
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Deleted class"
+    }],
+    "http://www.w3.org/ns/shacl#property": [{
+      "@id": "_:label"
+    }],
+    "http://fairspace.io/ontology#dateDeleted": [{
+      "@value": "2010-01-01"
+    }],
+    "http://fairspace.io/ontology#deletedBy": [{
+      "@id": "http://some-person"
+    }]
   },
   {
-    "@id": "http://fairspace.io/ontology#CollectionShape",
+    "@id": "_:creator",
+    "http://fairspace.io/ontology#machineOnly": [{
+      "@value": true
+    }],
+    "http://www.w3.org/ns/shacl#class": [{
+      "@id": "http://fairspace.io/ontology#User"
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+      "@value": "User that created this resource."
+    }],
+    "http://www.w3.org/ns/shacl#maxCount": [{
+      "@value": 1
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Creator"
+    }],
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://www.schema.org/creator"
+    }]
+  },
+  {
+    "@id": "_:contains",
+    "http://www.w3.org/ns/shacl#class": [{
+      "@id": "http://fairspace.io/ontology#File"
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+      "@value": "All files and directories that are in (sub)directories."
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Contains file"
+    }],
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#contains"
+    }]
+  },
+  {
+    "@id": "_:canList",
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#canList"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Can list"
+    }]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#Collection",
     "@type": [
       "http://www.w3.org/ns/shacl#NodeShape"
     ],
-    "http://www.w3.org/ns/shacl#closed": [
-      {
-        "@value": true
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "Collection of files with associated metadata and access rules."
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "Collection"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#property": [
-      {
-        "@id": "http://www.schema.org/creatorShape"
-      },
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape"
-      },
-      {
-        "@id": "http://fairspace.io/ontology#hasFileShape"
-      },
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#commentShape"
-      },
-      {
-        "@id": "http://fairspace.io/ontology#listShape"
-      }
-    ],
-    "http://fairspace.io/ontology#machineOnly": [
-      {
-        "@value": true
-      }
-    ],
-    "http://www.w3.org/ns/shacl#targetClass": [
-      {
-        "@id": "http://fairspace.io/ontology#Collection"
-      }
-    ]
+    "http://www.w3.org/ns/shacl#closed": [{
+      "@value": true
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+      "@value": "Collection of files with associated metadata and access rules."
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Collection"
+    }],
+    "http://www.w3.org/ns/shacl#property": [{
+      "@id": "_:creator"
+    }, {
+      "@id": "_:contains"
+    }, {
+      "@id": "_:label"
+    }, {
+      "@id": "_:description"
+    }, {
+      "@id": "_:canList"
+    }],
+    "http://fairspace.io/ontology#machineOnly": [{
+      "@value": true
+    }]
   },
   {
-    "@id": "http://fairspace.io/ontology#UserShape",
+    "@id": "http://fairspace.io/ontology#User",
     "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class",
       "http://www.w3.org/ns/shacl#NodeShape"
     ],
-    "http://www.w3.org/ns/shacl#closed": [
-      {
-        "@value": true
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "Description for fs:User"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "User"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#property": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape"
-      },
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#commentShape"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#targetClass": [
-      {
-        "@id": "http://fairspace.io/ontology#User"
-      }
-    ]
+    "http://www.w3.org/ns/shacl#closed": [{
+      "@value": true
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+      "@value": "Description for fs:User"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "User"
+    }],
+    "http://www.w3.org/ns/shacl#property": [{
+      "@id": "_:label"
+    }, {
+      "@id": "_:description"
+    }]
   },
   {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#commentShape",
-    "@type": [
-      "http://fairspace.io/ontology#PropertyShape"
-    ],
-    "http://www.w3.org/ns/shacl#datatype": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "Human friendly description."
-      }
-    ],
-    "http://www.w3.org/ns/shacl#maxCount": [
-      {
-        "@value": 1
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "Description"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#comment"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
-    "@type": [
-      "http://fairspace.io/ontology#PropertyShape"
-    ],
-    "http://www.w3.org/ns/shacl#datatype": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "Human readable label for this resource."
-      }
-    ],
-    "http://www.w3.org/ns/shacl#maxCount": [
-      {
-        "@value": 1
-      }
-    ],
-    "http://www.w3.org/ns/shacl#maxLength": [
-      {
-        "@value": 128
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "Label"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#label"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.schema.org/creatorShape",
-    "@type": [
-      "http://fairspace.io/ontology#RelationShape"
-    ],
-    "http://fairspace.io/ontology#machineOnly": [
-      {
-        "@value": true
-      }
-    ],
-    "http://www.w3.org/ns/shacl#class": [
-      {
-        "@id": "http://fairspace.io/ontology#User"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "User that created this resource."
-      }
-    ],
-    "http://www.w3.org/ns/shacl#maxCount": [
-      {
-        "@value": 1
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "Creator"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://www.schema.org/creator"
-      }
-    ]
-  },
-  {
-    "@id": "http://fairspace.io/ontology#hasFileShape",
-    "@type": [
-      "http://fairspace.io/ontology#RelationShape"
-    ],
-    "http://www.w3.org/ns/shacl#class": [
-      {
-        "@id": "http://fairspace.io/ontology#File"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "All files and directories that are in (sub)directories."
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "Files in this collection"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://fairspace.io/ontology#hasFile"
-      }
-    ]
-  },
-  {
-    "@id": "http://fairspace.io/ontology#listShape",
-    "@type": [
-      "http://fairspace.io/ontology#RelationShape"
-    ],
-    "http://www.w3.org/ns/shacl#node": [
-      {
-        "@id": "http://datashapes.org/dash#ListShape"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#description": [
-      {
-        "@value": "A list of values"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#name": [
-      {
-        "@value": "List"
-      }
-    ],
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://fairspace.io/ontology#list"
-      }
-    ]
+    "@id": "http://fairspace.io/ontology#list",
+    "http://www.w3.org/ns/shacl#node": [{
+      "@id": "http://datashapes.org/dash#List"
+    }],
+    "http://www.w3.org/ns/shacl#description": [{
+      "@value": "A list of values"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "List"
+    }],
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#list"
+    }]
   },
   {
     "@id": "_:blank1",
-    "http://www.w3.org/ns/shacl#path": [
-      {
-        "@id": "http://fairspace.io/ontology#only-blank"
-      }
-    ]
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#only-blank"
+    }]
   },
   {
-    "@id": "http://fairspace.io/ontology#ControlledVocabularyPropertyShape",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://www.w3.org/ns/shacl#PropertyShape"
-      }
-    ]
-  },
-  {
-    "@id": "http://fairspace.io/ontology#DatatypePropertyShape",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://www.w3.org/ns/shacl#PropertyShape"
-      }
-    ]
-  },
-  {
-    "@type": [
-      "http://fairspace.io/ontology#Class"
-    ],
     "@id": "http://fairspace.io/ontology#Directory",
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://fairspace.io/ontology#File"
-      }
-    ]
-  },
-  {
-    "@id": "http://fairspace.io/ontology#SpecialDatatypePropertyShape",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
+      "http://www.w3.org/ns/shacl#NodeShape"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://fairspace.io/ontology#DatatypePropertyShape"
-      }
-    ]
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Directory"
+    }],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [{
+      "@id": "http://fairspace.io/ontology#File"
+    }]
   },
   {
-    "@id": "http://fairspace.io/ontology#AVerySpecialDatatypePropertyShape",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://fairspace.io/ontology#DatatypePropertyShape"
-      }
-    ]
-  },
-  {
-    "@id": "http://fairspace.io/ontology#Namespace1",
+    "@id": "_:Namespace1",
     "@type": [
       "http://www.w3.org/ns/shacl#PrefixDeclaration"
     ],
-    "http://www.w3.org/ns/shacl#name": [{"@value":  "Namespace1"}],
-    "http://www.w3.org/ns/shacl#prefix":  [{"@value":  "ns1"}],
-    "http://www.w3.org/ns/shacl#namespace":  [{"@id":  "http://namespace1#"}],
-    "http://fairspace.io/ontology#defaultNamespace": [{"@value":  true}]
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Namespace1"
+    }],
+    "http://www.w3.org/ns/shacl#prefix":  [{
+      "@value": "ns1"
+    }],
+    "http://www.w3.org/ns/shacl#namespace":  [{
+      "@id": "http://namespace1#"
+    }],
+    "http://fairspace.io/ontology#defaultNamespace": [{
+      "@value": true
+    }]
   },
   {
-    "@id": "http://fairspace.io/ontology#Namespace2",
+    "@id": "_:Namespace2",
     "@type": [
       "http://www.w3.org/ns/shacl#PrefixDeclaration"
     ],
-    "http://www.w3.org/ns/shacl#name": [{"@value":  "Namespace2"}],
-    "http://www.w3.org/ns/shacl#prefix":  [{"@value":  "ns2"}],
-    "http://www.w3.org/ns/shacl#namespace":  [{"@id":  "http://namespace2#"}]
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Namespace2"
+    }],
+    "http://www.w3.org/ns/shacl#prefix": [{
+      "@value": "ns2"
+    }],
+    "http://www.w3.org/ns/shacl#namespace": [{
+      "@id": "http://namespace2#"
+    }]
+  },
+  {
+    "@id": "_:projectType",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Property"
+    ],
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#projectType"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Project type"
+    }]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#Project",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class",
+      "http://www.w3.org/ns/shacl#NodeShape"
+    ],
+    "http://www.w3.org/ns/shacl#name": [{
+        "@value": "Project"
+    }],
+    "http://www.w3.org/ns/shacl#property": [{
+      "@id": "_:label"
+    }, {
+      "@id": "_:projectType"
+    }]
+  },
+  {
+    "@id": "_:grantType",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Property"
+    ],
+    "http://www.w3.org/ns/shacl#path": [{
+      "@id": "http://fairspace.io/ontology#grantType"
+    }],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Grant type"
+    }]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#ResearchProject",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class",
+      "http://www.w3.org/ns/shacl#NodeShape"
+    ],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "Research project"
+    }],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [{
+      "@id": "http://fairspace.io/ontology#Project"
+    }],
+    "http://www.w3.org/ns/shacl#property": [{
+      "@id": "_:grantType"
+    }]
+  },
+  {
+    "@id": "http://fairspace.io/ontology#ExternalResearchProject",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class",
+      "http://www.w3.org/ns/shacl#NodeShape"
+    ],
+    "http://www.w3.org/ns/shacl#name": [{
+      "@value": "External research project"
+    }],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [{
+      "@id": "http://fairspace.io/ontology#ResearchProject"
+    }]
   }
 ]

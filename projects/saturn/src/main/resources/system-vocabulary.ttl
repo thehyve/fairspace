@@ -21,11 +21,10 @@ fs:modifiedBy a rdf:Property .
 fs:dateModified a rdf:Property .
 fs:deletedBy a rdf:Property .
 fs:dateDeleted a rdf:Property .
-fs:replaces a rdf:Property .
-fs:isReplacedBy a rdf:Property .
 fs:movedTo a rdf:Property .
 fs:versions a rdf:Property .
 fs:currentVersion a rdf:Property .
+fs:contentType a rdf:Property .
 fs:markdown rdfs:label "Markdown" .
 
 ########################
@@ -92,19 +91,13 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
-        sh:name "Replaces" ;
-        sh:description "Previous version of this file." ;
-        sh:class fs:File ;
+        sh:name "Content type" ;
+        sh:description "" ;
+        sh:datatype xsd:string ;
         sh:maxCount 1 ;
-        sh:path fs:replaces
-    ],
-    [
-        sh:name "Is replaced by" ;
-        sh:description "New version of this file." ;
-        sh:class fs:File ;
-        sh:maxCount 1 ;
-        sh:path fs:isReplacedBy
-    ] ;
+        fs:machineOnly true ;
+        sh:path fs:contentType
+    ];
     sh:property
     [
         sh:name "Created by" ;
@@ -157,19 +150,13 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
-         sh:name "Replaces" ;
-         sh:description "Previous version of this file." ;
-         sh:class fs:File ;
-         sh:maxCount 1 ;
-         sh:path fs:replaces
-    ],
-    [
-         sh:name "Is replaced by" ;
-         sh:description "New version of this file." ;
-         sh:class fs:File ;
-         sh:maxCount 1 ;
-         sh:path fs:isReplacedBy
-] .
+        sh:name "Content type" ;
+        sh:description "" ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:contentType
+    ] .
 
 fs:contains a rdf:Property .
 
@@ -396,6 +383,14 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
     ] ;
     sh:property
     [
+        sh:name "Owned by" ;
+        sh:description "Owner workspace." ;
+        sh:class fs:Workspace ;
+        sh:maxCount 1 ;
+        fs:machineOnly true ;
+        sh:path fs:ownedBy
+    ],
+    [
         sh:name "Created by" ;
         sh:description "User that created this resource." ;
         sh:class fs:User ;
@@ -459,15 +454,20 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
 
 fs:email a rdf:Property .
-fs:list a rdf:Property .
-fs:read a rdf:Property .
-fs:write a rdf:Property .
-fs:manage a rdf:Property .
+fs:canList a rdf:Property .
+fs:canRead a rdf:Property .
+fs:canWrite a rdf:Property .
+fs:canManage a rdf:Property .
 fs:isMemberOf a rdf:Property .
 fs:isManagerOf a rdf:Property .
+fs:isAdmin a rdf:Property .
+fs:isSuperadmin a rdf:Property .
+fs:canViewPublicMetadata a rdf:Property .
+fs:canViewPublicData a rdf:Property .
+fs:canAddSharedMetadata a rdf:Property .
 
 fs:User a rdfs:Class, sh:NodeShape ;
     sh:description "" ;
@@ -545,28 +545,28 @@ fs:User a rdfs:Class, sh:NodeShape ;
          sh:description "Visible collections." ;
          sh:class fs:Collection ;
          fs:machineOnly true ;
-         sh:path fs:list
+         sh:path fs:canList
     ],
     [
          sh:name "Can read" ;
          sh:description "Can read collections." ;
          sh:class fs:Collection ;
          fs:machineOnly true ;
-         sh:path fs:read
+         sh:path fs:canRead
     ],
     [
          sh:name "Can write to" ;
          sh:description "Can write to collections." ;
          sh:class fs:Collection ;
          fs:machineOnly true ;
-         sh:path fs:write
+         sh:path fs:canWrite
     ],
     [
         sh:name "Can manage" ;
         sh:description "Can manage collections." ;
         sh:class fs:Collection ;
         fs:machineOnly true ;
-        sh:path fs:manage
+        sh:path fs:canManage
     ],
     [
          sh:name "Is a member of" ;

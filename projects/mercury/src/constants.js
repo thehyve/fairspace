@@ -72,12 +72,14 @@ export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
 export const MARKDOWN_URI = FAIRSPACE_NS + 'markdown';
 
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
+export const USER_URI = FAIRSPACE_NS + 'User';
 export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
 export const FILE_URI = FAIRSPACE_NS + 'File';
 export const DIRECTORY_URI = FAIRSPACE_NS + 'Directory';
 export const FILE_PATH_URI = FAIRSPACE_NS + 'filePath';
 export const FILE_SIZE_URI = FAIRSPACE_NS + 'fileSize';
 export const MD5_URI = FAIRSPACE_NS + 'md5';
+export const CONTENT_TYPE_URI = FAIRSPACE_NS + 'contentType';
 export const DATE_CREATED_URI = FAIRSPACE_NS + 'dateCreated';
 export const CREATED_BY_URI = FAIRSPACE_NS + 'createdBy';
 export const DATE_MODIFIED_URI = FAIRSPACE_NS + 'dateModified';

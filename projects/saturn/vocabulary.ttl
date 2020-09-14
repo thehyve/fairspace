@@ -37,7 +37,7 @@ fs:File sh:property
         sh:description "The files associated to the analysis" ;
         sh:class curie:Analysis ;
         sh:path curie:associatedAnalysis
-] .
+    ] .
 
 
 ## User class Shapes
@@ -72,7 +72,7 @@ curie:Person a rdfs:Class, sh:NodeShape ;
         sh:path curie:ageOfDeath
     ],
     [
-        sh:name "Patient Identifier" ;
+        sh:name "Patient identifier" ;
         sh:description "The identifier of the patient." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
@@ -107,7 +107,7 @@ curie:Person a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
 
 curie:isProjectConsent a rdf:Property .
 curie:authorizes a rdf:Property .
@@ -154,7 +154,7 @@ curie:PersonConsent a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
 
 curie:projectCode a rdf:Property .
 curie:projectManager a rdf:Property .
@@ -221,7 +221,7 @@ curie:ResearchProject a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
 
 curie:eventType a rdf:Property .
 curie:eventStartDate a rdf:Property .
@@ -304,7 +304,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
 
 curie:collectDate a rdf:Property .
 curie:tumorCellularity a rdf:Property .
@@ -360,7 +360,7 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
 
 curie:analysisCode a rdf:Property .
 curie:analyticPipelineCode a rdf:Property .
@@ -411,4 +411,4 @@ curie:Analysis a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-] .
+    ] .
