@@ -21,7 +21,7 @@ public class ServicesTest {
     @Before
     public void before() throws Exception {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        svc = new Services(config, dataset);
+        svc = new Services("/api/v1", config, dataset);
     }
 
     @Test

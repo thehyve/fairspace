@@ -6,6 +6,8 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
 import org.apache.jena.sparql.util.Context;
 
+import java.util.stream.*;
+
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.Services.FS_ROOT;
 import static io.fairspace.saturn.config.Services.USER_SERVICE;
@@ -52,10 +54,13 @@ public class IndexDispatcher {
         }
 
         try {
-            return collectionsRoot.getChildren()
-                    .stream()
-                    .map(c -> COLLECTION_PREFIX + c.getName().toLowerCase())
-                    .toArray(String[]::new);
+            Stream<String> shared = userService.currentUser().isCanViewPublicMetadata()
+                    ? Stream.of(SHARED_INDEX) : Stream.empty();
+            return Stream.concat(
+                    shared,
+                    collectionsRoot.getChildren().stream()
+                            .map(c -> COLLECTION_PREFIX + c.getName().toLowerCase())
+            ).toArray(String[]::new);
         } catch (NotAuthorizedException | BadRequestException e) {
             throw new RuntimeException(e);
         }
