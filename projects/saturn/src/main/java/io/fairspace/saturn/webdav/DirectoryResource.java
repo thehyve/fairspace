@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
@@ -288,6 +289,18 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         MetadataService metadataService = factory.context.get(METADATA_SERVICE);
         try {
             metadataService.patch(model);
+        } catch (ValidationException e) {
+            var message = new StringBuilder("Error applying metadata: \n");
+            e.getViolations().forEach(v -> message.append(v.getMessage())
+                    .append(". Subject: ")
+                    .append(v.getSubject())
+                    .append(". Predicate: ")
+                    .append(v.getPredicate())
+                    .append(". Value: ")
+                    .append(v.getValue())
+                    .append('\n'));
+            setErrorMessage(message.toString());
+            throw new BadRequestException("Error applying metadata", e);
         } catch (Exception e) {
             throw new BadRequestException("Error applying metadata", e);
         }
