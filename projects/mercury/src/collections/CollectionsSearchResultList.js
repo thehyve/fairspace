@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, withStyles} from '@material-ui/core';
 
 import {Link as RouterLink} from 'react-router-dom';
-import {FolderOpenOutlined, FolderOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
+import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
 import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
 import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
@@ -48,7 +48,7 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
         let avatar;
         switch (typeLabel) {
             case 'Collection':
-                avatar = <FolderOutlined />;
+                avatar = <Folder />;
                 break;
             case 'Directory':
                 avatar = <FolderOpenOutlined />;

@@ -14,7 +14,7 @@ import {
     MenuItem,
     Typography
 } from '@material-ui/core';
-import {CloudDownload, FolderOutlined, MoreVert} from '@material-ui/icons';
+import {CloudDownload, Folder, MoreVert} from '@material-ui/icons';
 import {useHistory, withRouter} from 'react-router-dom';
 
 import CollectionEditor from "./CollectionEditor";
@@ -40,7 +40,7 @@ import LinkedDataLink from '../metadata/common/LinkedDataLink';
 import UserContext from "../users/UserContext";
 
 export const ICONS = {
-    LOCAL_STORAGE: <FolderOutlined aria-label="Local storage" />,
+    LOCAL_STORAGE: <Folder aria-label="Local storage" />,
     AZURE_BLOB_STORAGE: <CloudDownload />,
     S3_BUCKET: <CloudDownload />,
     GOOGLE_CLOUD_BUCKET: <CloudDownload />
