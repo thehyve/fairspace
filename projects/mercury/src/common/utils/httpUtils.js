@@ -24,10 +24,10 @@ export const handleAuthError = (status) => {
     }
 };
 
-export function handleHttpError(providedMessage) {
+export function handleHttpError(defaultMessage) {
     return (e: Error) => {
         if (!e || !e.response) {
-            throw Error(providedMessage);
+            throw Error(defaultMessage);
         }
         const {response: {status, data}} = e;
 
@@ -37,7 +37,7 @@ export function handleHttpError(providedMessage) {
                 handleAuthError(status);
                 break;
             default:
-                throw Error(providedMessage + (data ? `: ${data}` : ''));
+                throw Error(data || '');
         }
     };
 }

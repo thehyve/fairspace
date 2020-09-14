@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, IconButton} from '@material-ui/core';
+import {Card, CardContent, CardHeader, Collapse, DialogContentText, IconButton, Typography} from '@material-ui/core';
 import {withRouter} from 'react-router-dom';
 
 import {CloudUpload, ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
@@ -111,7 +111,16 @@ const MetadataCard = React.forwardRef((props, ref) => {
         setUploadingMetadata(true);
         FileAPI.uploadMetadata(metadataUploadPath, file)
             .then(() => enqueueSnackbar('Metadata have been successfully uploaded'))
-            .catch(e => ErrorDialog.showError('Error uploading metadata', e))
+            .catch(e => {
+                const errorContents = (
+                    <DialogContentText>
+                        <Typography style={{fontFamily: 'Monospace', fontSize: 16}} component="pre">
+                            {e.message}
+                        </Typography>
+                    </DialogContentText>
+                );
+                ErrorDialog.showError('Error uploading metadata', errorContents);
+            })
             .finally(() => setUploadingMetadata(false));
     };
 
@@ -203,7 +212,6 @@ const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false,
             <LinkedDataEntityFormWithLinkedData
                 subject={fileProps.iri}
                 hasEditRight={hasEditRight}
-                onUploadMetadata={hasEditRight && (file => FileAPI.uploadMetadata(path, file))}
             />
         );
         if (!isDirectory) {
