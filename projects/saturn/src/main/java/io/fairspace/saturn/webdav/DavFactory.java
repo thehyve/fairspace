@@ -92,8 +92,12 @@ public class DavFactory implements ResourceFactory {
             access = max(access, getGrantedPermission(coll, userWorkspacesIterator.next()));
         }
 
-        if (deleted && (!showDeleted() || !access.canWrite())) {
-            return Access.None;
+        if (deleted) {
+            if (!showDeleted() || !access.canWrite()) {
+                return Access.None;
+            } else {
+                access = min(access, Access.List);
+            }
         } else if (coll.hasProperty(FS.status, Status.Archived.name())) {
             access = min(access, Access.Read);
         } else if (coll.hasProperty(FS.status, Status.Closed.name())) {
