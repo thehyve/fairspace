@@ -52,6 +52,28 @@ const pathHierarchy = (fullPath) => {
 const useStyles = makeStyles(() => ({
     expandOpen: {
         transform: 'rotate(180deg)',
+    },
+    card: {
+        marginTop: 10,
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        outline: "none",
+        transitionBorder: ".24s",
+        easeInOut: true
+    },
+    activeStyle: {
+        borderColor: '#2196f3',
+        borderWidth: 2,
+        borderRadius: 2,
+        borderStyle: "dashed",
+        opacity: 0.4
+    },
+    acceptStyle: {
+        borderColor: '#00e676'
+    },
+    rejectStyle: {
+        borderColor: '#ff1744'
     }
 }));
 
@@ -115,10 +137,10 @@ const MetadataCard = React.forwardRef((props, ref) => {
             .finally(() => setUploadingMetadata(false));
     };
 
-    const {getRootProps, getInputProps, open} = useDropzone({
+    const {getRootProps, getInputProps, open, isDragActive, isDragAccept, isDragReject} = useDropzone({
         noClick: true,
         noKeyboard: true,
-        accept: '.csv',
+        accept: ".csv,text/csv",
         onDropAccepted: (files) => {
             if (files.length === 1) {
                 uploadMetadata(files[0]);
@@ -130,9 +152,13 @@ const MetadataCard = React.forwardRef((props, ref) => {
 
     const rootProps = metadataUploadPath && getRootProps();
     const inputProps = metadataUploadPath && getInputProps();
+    const dropzoneClassName = () => `${classes.card} ${isDragActive && classes.activeStyle} ${isDragReject && classes.rejectStyle} ${isDragAccept && classes.acceptStyle}`;
 
     return (
-        <Card {...rootProps} style={{marginTop: 10}} ref={ref}>
+        <Card
+            {...rootProps}
+            className={dropzoneClassName()}
+        >
             {inputProps && (<input {...inputProps} />)}
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}

@@ -201,7 +201,7 @@ export const FileBrowser = ({
     return (
         <div data-testid="files-view" className={classes.container}>
             <div
-                {...getRootProps({isDragActive, isDragAccept, isDragReject})}
+                {...getRootProps()}
                 className={`${classes.dropzone} ${isDragActive && classes.activeStyle} ${isDragAccept && classes.acceptStyle} ${isDragReject && classes.rejectStyle}`}
             >
                 <input {...getInputProps()} />

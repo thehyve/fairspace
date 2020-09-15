@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
 import {ExpandMore} from "@material-ui/icons";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import classnames from "classnames";
 import Table from "@material-ui/core/Table";
@@ -29,7 +28,6 @@ const styles = theme => ({
 });
 
 export const UploadProgressComponent = ({uploads = [], classes}) => {
-    const [uploading, setUploading] = useState(false);
     const [expanded, setExpanded] = useState(true);
 
     const toggleExpand = () => setExpanded(!expanded);
@@ -50,19 +48,16 @@ export const UploadProgressComponent = ({uploads = [], classes}) => {
     };
 
     const cardHeaderAction = (
-        <>
-            {uploading && (<CircularProgress size={10} />)}
-            <IconButton
-                onClick={toggleExpand}
-                className={classnames(classes.expand, {
-                    [classes.expandOpen]: expanded,
-                })}
-                aria-expanded={expanded}
-                aria-label="Show more"
-            >
-                <ExpandMore />
-            </IconButton>
-        </>
+        <IconButton
+            onClick={toggleExpand}
+            className={classnames(classes.expand, {
+                [classes.expandOpen]: expanded,
+            })}
+            aria-expanded={expanded}
+            aria-label="Show more"
+        >
+            <ExpandMore />
+        </IconButton>
     );
 
     const renderUploadName = (upload) => (
