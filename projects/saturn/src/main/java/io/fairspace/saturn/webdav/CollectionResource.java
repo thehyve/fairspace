@@ -376,7 +376,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return canUndelete();
     }
 
-    private boolean canUndelete() {
+    @Override
+    protected boolean canUndelete() {
         return subject.hasProperty(FS.dateDeleted) && factory.userService.currentUser().isAdmin();
     }
 
@@ -386,14 +387,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             throw new ConflictException(this);
         }
         super.delete(purge);
-    }
-
-    @Override
-    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
-        if (!canUndelete()) {
-            throw new NotAuthorizedException(this);
-        }
-        super.undelete();
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {
