@@ -121,8 +121,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Property
-    public Access getAccess() {
-        return access;
+    public boolean getCanRead() {
+        return access.canRead();
+    }
+
+    @Property
+    public boolean getCanWrite() {
+        return access.canWrite();
     }
 
     @Property
@@ -335,7 +340,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             var email = principal.getProperty(FS.email).getString();
             getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
                     (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
-
         }
     }
 
@@ -372,7 +376,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return canUndelete();
     }
 
-    private boolean canUndelete() {
+    @Override
+    protected boolean canUndelete() {
         return subject.hasProperty(FS.dateDeleted) && factory.userService.currentUser().isAdmin();
     }
 
@@ -382,14 +387,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             throw new ConflictException(this);
         }
         super.delete(purge);
-    }
-
-    @Override
-    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
-        if (!canUndelete()) {
-            throw new NotAuthorizedException(this);
-        }
-        super.undelete();
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {

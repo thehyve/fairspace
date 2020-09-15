@@ -295,8 +295,12 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         }
     }
 
+    protected boolean canUndelete() {
+        return access.canWrite();
+    }
+
     protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
-        if (!access.canWrite()) {
+        if (!canUndelete()) {
             throw new NotAuthorizedException(this);
         }
         if (!subject.hasProperty(FS.dateDeleted)) {
