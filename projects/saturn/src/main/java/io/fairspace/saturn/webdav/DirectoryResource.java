@@ -13,19 +13,17 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
 import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
-import io.milton.resource.PutableResource;
 import io.milton.resource.Resource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.shacl.vocabulary.SHACLM;
+import org.apache.jena.shacl.vocabulary.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -39,6 +37,7 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.setErrorMessage;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
@@ -190,9 +189,9 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 createNew(path, blob, file.getContentType());
             }
         }
-     }
+    }
 
-    private void uploadMetadata(FileItem file) throws BadRequestException {
+    private void uploadMetadata(FileItem file) throws BadRequestException, ConflictException, NotAuthorizedException {
         if (file == null) {
             setErrorMessage("Missing 'file' parameter");
             throw new BadRequestException(this);
@@ -290,18 +289,23 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         try {
             metadataService.patch(model);
         } catch (ValidationException e) {
-            var message = new StringBuilder("Error applying metadata: \n");
+            var message = new StringBuilder("Validation of the uploaded metadata failed.\n");
             var n = 0;
             for (var v: e.getViolations()) {
-                message.append(v.getMessage())
-                        .append(". Subject: ")
-                        .append(v.getSubject())
-                        .append(". Predicate: ")
-                        .append(v.getPredicate())
-                        .append(". Value: ")
-                        .append(v.getValue())
-                        .append('\n');
-                if (++n == 10) {
+                var path = v.getSubject().replaceFirst(subject.getURI(), "");
+                path = URLDecoder.decode(path, StandardCharsets.UTF_8);
+                var propertyShapes = VOCABULARY.listResourcesWithProperty(SHACLM.path, createURI(v.getPredicate()));
+                var propertyName = propertyShapes.hasNext()
+                        ? getStringProperty(propertyShapes.next(), SHACLM.name)
+                        : createURI(v.getPredicate()).getLocalName();
+                message.append("- <")
+                        .append(path)
+                        .append("> has an invalid value for property *")
+                        .append(propertyName)
+                        .append("*: ")
+                        .append(v.getMessage())
+                        .append(".\n");
+                if (++n == 5) {
                     if (e.getViolations().size() > n) {
                         message.append("+ ").append(e.getViolations().size() - n).append(" more errors.");
                     }
