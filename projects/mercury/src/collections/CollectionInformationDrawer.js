@@ -118,7 +118,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
     const {getRootProps, getInputProps, open} = useDropzone({
         noClick: true,
         noKeyboard: true,
-        accept: '.csv',
+        accept: ".csv,text/csv"
         onDropAccepted: (files) => {
             if (files.length === 1) {
                 uploadMetadata(files[0]);
