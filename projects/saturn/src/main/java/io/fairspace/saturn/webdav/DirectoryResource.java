@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
@@ -12,19 +13,17 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
 import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
-import io.milton.resource.PutableResource;
 import io.milton.resource.Resource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.shacl.vocabulary.SHACLM;
+import org.apache.jena.shacl.vocabulary.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -38,6 +37,7 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.setErrorMessage;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
@@ -189,9 +189,9 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 createNew(path, blob, file.getContentType());
             }
         }
-     }
+    }
 
-    private void uploadMetadata(FileItem file) throws BadRequestException {
+    private void uploadMetadata(FileItem file) throws BadRequestException, ConflictException, NotAuthorizedException {
         if (file == null) {
             setErrorMessage("Missing 'file' parameter");
             throw new BadRequestException(this);
@@ -200,7 +200,11 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
         try (var is = file.getInputStream();
              var reader = new InputStreamReader(is);
-             var csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader)) {
+             var csvParser = CSVFormat.DEFAULT
+                     .withFirstRecordAsHeader()
+                     .withCommentMarker('#')
+                     .withIgnoreEmptyLines()
+                     .parse(reader)) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
             if (!headers.contains("Path")) {
                 setErrorMessage("Invalid file format. 'Path' column is missing.");
@@ -284,6 +288,32 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         MetadataService metadataService = factory.context.get(METADATA_SERVICE);
         try {
             metadataService.patch(model);
+        } catch (ValidationException e) {
+            var message = new StringBuilder("Validation of the uploaded metadata failed.\n");
+            var n = 0;
+            for (var v: e.getViolations()) {
+                var path = v.getSubject().replaceFirst(subject.getURI(), "");
+                path = URLDecoder.decode(path, StandardCharsets.UTF_8);
+                var propertyShapes = VOCABULARY.listResourcesWithProperty(SHACLM.path, createURI(v.getPredicate()));
+                var propertyName = propertyShapes.hasNext()
+                        ? getStringProperty(propertyShapes.next(), SHACLM.name)
+                        : createURI(v.getPredicate()).getLocalName();
+                message.append("- <")
+                        .append(path)
+                        .append("> has an invalid value for property *")
+                        .append(propertyName)
+                        .append("*: ")
+                        .append(v.getMessage())
+                        .append(".\n");
+                if (++n == 5) {
+                    if (e.getViolations().size() > n) {
+                        message.append("+ ").append(e.getViolations().size() - n).append(" more errors.");
+                    }
+                    break;
+                }
+            }
+            setErrorMessage(message.toString());
+            throw new BadRequestException("Error applying metadata", e);
         } catch (Exception e) {
             throw new BadRequestException("Error applying metadata", e);
         }

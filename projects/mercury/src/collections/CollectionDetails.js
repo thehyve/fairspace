@@ -169,9 +169,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     history.push('/collections');
                 }
             })
-            .catch(err => ErrorDialog.showError(
-                err,
+            .catch(e => ErrorDialog.showError(
                 "An error occurred while deleting a collection",
+                e,
                 () => this.handleCollectionDelete(collection)
             ));
     };
@@ -180,9 +180,9 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {undeleteCollection} = this.props;
         this.handleCloseUndelete();
         undeleteCollection(collection)
-            .catch(err => ErrorDialog.showError(
-                err,
+            .catch(e => ErrorDialog.showError(
                 "An error occurred while undeleting a collection",
+                e,
                 () => this.handleCollectionUndelete(collection)
             ));
     };
@@ -192,8 +192,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         this.handleCloseUnpublish();
         unpublish(collection)
             .catch(err => ErrorDialog.showError(
-                err,
                 "An error occurred while unpublishing a collection",
+                err,
                 () => this.handleCollectionUnpublish(collection)
             ));
     };
@@ -209,8 +209,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 }
             })
             .catch(err => ErrorDialog.showError(
-                err,
                 "An error occurred while changing an owner of a collection",
+                err,
                 () => this.handleCollectionOwnerChange(collection, selectedOwner)
             ));
     };

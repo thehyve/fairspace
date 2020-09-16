@@ -4,20 +4,17 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     Grid,
     Slide,
     Typography,
 } from '@material-ui/core';
-import {Error} from '@material-ui/icons';
+import {Error as ErrorIcon} from '@material-ui/icons';
+import DialogContentText from "@material-ui/core/DialogContentText";
 
 const Transition = React.forwardRef(
     (props, ref) => <Slide ref={ref} direction="up" {...props} />
 );
-
-const DEFAULT_ERROR_TITLE = 'An error has occurred';
-const DEFAULT_MAX_WIDTH = 'sm';
 
 class ErrorDialog extends React.Component {
     static instance;
@@ -25,32 +22,21 @@ class ErrorDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showDialog: false,
-            errorAsComponent: DialogContentText,
-            errorAsComponentProps: null,
-            title: DEFAULT_ERROR_TITLE,
+            title: null,
+            message: null,
             onRetry: null,
             onDismiss: null
         };
         ErrorDialog.instance = this;
     }
 
-    static showError(error, message, onRetry, onDismiss, printToConsole = true) {
-        if (printToConsole) {
-            console.error(message, error);
-        }
-
-        ErrorDialog.renderError(DialogContentText, {children: message}, DEFAULT_ERROR_TITLE, DEFAULT_MAX_WIDTH, onRetry, onDismiss);
-    }
-
-    static renderError(component, props, title = DEFAULT_ERROR_TITLE, maxWidth, onRetry, onDismiss) {
+    static showError(title, details, onRetry, onDismiss) {
         if (ErrorDialog.instance) {
+            const message = (details instanceof Error) ? details.message : details;
+
             ErrorDialog.instance.setState({
-                showDialog: true,
-                errorAsComponent: component,
-                errorAsComponentProps: props,
                 title,
-                maxWidth: maxWidth || 'md',
+                message,
                 onRetry,
                 onDismiss,
             });
@@ -58,12 +44,14 @@ class ErrorDialog extends React.Component {
     }
 
     componentDidCatch(error) {
-        ErrorDialog.showError(error, error.message);
+        console.error(error);
+        ErrorDialog.showError('An error has occurred', error);
     }
 
     resetState = () => {
         this.setState({
-            showDialog: false,
+            title: null,
+            message: null,
             onRetry: null,
             onDismiss: null
         });
@@ -84,11 +72,11 @@ class ErrorDialog extends React.Component {
     };
 
     render() {
-        const {showDialog, title, errorAsComponent: ErrorComponent, errorAsComponentProps, onRetry, maxWidth} = this.state;
+        const {title, message, onRetry, maxWidth} = this.state;
 
         const dialog = (
             <Dialog
-                open={showDialog}
+                open={Boolean(title)}
                 TransitionComponent={Transition}
                 onClose={this.handleClose}
                 aria-labelledby="alert-dialog-slide-title"
@@ -100,17 +88,23 @@ class ErrorDialog extends React.Component {
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={1}>
                         <Grid item>
-                            <Error color="error" style={{fontSize: 40}} />
+                            <ErrorIcon color="error" style={{fontSize: 40}} />
                         </Grid>
                         <Grid item>
                             <Typography variant="h6" gutterBottom>
-                                {title || DEFAULT_ERROR_TITLE}
+                                {title}
                             </Typography>
                         </Grid>
                     </Grid>
                 </DialogTitle>
                 <DialogContent>
-                    <ErrorComponent {...errorAsComponentProps} />
+                    {(typeof message) === 'string'
+                        ? (
+                            <DialogContentText>
+                                <Typography component="pre">{message}</Typography>
+                            </DialogContentText>
+                        )
+                        : message}
                 </DialogContent>
                 <DialogActions>
                     <Button

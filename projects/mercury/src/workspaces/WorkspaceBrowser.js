@@ -38,8 +38,7 @@ const WorkspaceBrowser = () => {
             })
             .catch(err => {
                 setLoadingCreatedWorkspace(false);
-                const message = err && err.message ? err.message : "An error occurred while creating a workspace";
-                ErrorDialog.showError(err, message);
+                ErrorDialog.showError("An error occurred while creating a workspace", err);
             });
     };
 

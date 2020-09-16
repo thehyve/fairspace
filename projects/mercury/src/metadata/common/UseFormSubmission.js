@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import useIsMounted from "react-is-mounted-hook";
 import {getNamespacedIri, partitionErrors} from "./metadataUtils";
 import ValidationErrorsDisplay from "./ValidationErrorsDisplay";
@@ -25,9 +25,9 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
             const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
             const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
 
-            errorDialog.renderError(ValidationErrorsDisplay, {otherErrors, entityErrors}, error.message);
+            errorDialog.showError((<ValidationErrorsDisplay otherErrors={otherErrors} entityErrors={entityErrors} />));
         } else {
-            errorDialog.showError(error, `Error saving entity.\n${error.message}`);
+            errorDialog.showError('Error saving entity.', error);
         }
     };
 

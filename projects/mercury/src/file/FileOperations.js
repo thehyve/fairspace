@@ -92,9 +92,7 @@ export const FileOperations = ({
         if (operation) {
             return fileOperation(Operations.PASTE, operation)
                 .then(clipboard.clear)
-                .catch((err) => {
-                    ErrorDialog.showError(err, err.message || "An error occurred while pasting your contents");
-                });
+                .catch(err => ErrorDialog.showError("An error occurred while pasting your contents", err));
         }
 
         return Promise.resolve();
@@ -102,19 +100,19 @@ export const FileOperations = ({
 
     const handleCreateDirectory = name => fileOperation(Operations.MKDIR, fileActions.createDirectory(joinPaths(openedPath, name)))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while creating directory", () => handleCreateDirectory(name));
+            ErrorDialog.showError("An error occurred while creating directory", err, () => handleCreateDirectory(name));
             return true;
         });
 
     const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while renaming file or directory", () => handlePathRename(path, newName));
+            ErrorDialog.showError("An error occurred while renaming file or directory", err, () => handlePathRename(path, newName));
             return false;
         });
 
     const handleRevert = (versionToRevert) => fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem, versionToRevert))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while reverting a file to a previous version", () => handleRevert(versionToRevert));
+            ErrorDialog.showError("An error occurred while reverting a file to a previous version", err, () => handleRevert(versionToRevert));
             return false;
         });
 
@@ -131,7 +129,7 @@ export const FileOperations = ({
 
     const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while deleting file or directory", () => handleDelete());
+            ErrorDialog.showError("An error occurred while deleting file or directory", err,() => handleDelete());
         });
 
     const getDeletionConfirmationMessage = () => {
@@ -148,7 +146,7 @@ export const FileOperations = ({
 
     const handleUndelete = () => fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError(err, err.message || "An error occurred while undeleting file or directory", () => handleUndelete());
+            ErrorDialog.showError("An error occurred while undeleting file or directory", err,() => handleUndelete());
         });
 
     return (

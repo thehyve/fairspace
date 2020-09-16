@@ -57,7 +57,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
 
     const removePermission = (permission: Permission) => {
         setPermission(collection.location, permission.iri, 'None')
-            .catch(e => ErrorDialog.showError(e, 'Error removing permission.'))
+            .catch(err => ErrorDialog.showError('Error removing permission.', err))
             .finally(handleCloseConfirmDeleteDialog);
     };
 

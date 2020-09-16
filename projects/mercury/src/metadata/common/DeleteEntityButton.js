@@ -20,7 +20,7 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
         setDeleting(true);
 
         deleteLinkedDataEntity(subject)
-            .catch(e => ErrorDialog.showError(e, "An error occurred deleting the entity"))
+            .catch(e => ErrorDialog.showError("An error occurred deleting the entity", e))
             .then(updateLinkedData)
             .then(() => isMounted() && setDeleting(false));
     };
