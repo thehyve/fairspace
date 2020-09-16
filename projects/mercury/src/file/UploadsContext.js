@@ -60,17 +60,15 @@ export const UploadsProvider = ({children, fileApi = FileAPI}) => {
             })
             .catch(() => {
                 setStateForUpload(newUpload, UPLOAD_STATUS_ERROR);
-                removeUpload(newUpload);
             });
     };
-
-    const getUploads = () => uploads;
 
     return (
         <UploadsContext.Provider
             value={{
-                getUploads,
-                startUpload
+                uploads,
+                startUpload,
+                removeUpload
             }}
         >
             {children}

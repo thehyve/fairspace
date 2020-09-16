@@ -1,13 +1,22 @@
-import React, {useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, IconButton, withStyles} from "@material-ui/core";
-import {ExpandMore} from "@material-ui/icons";
+import React, {useContext, useState} from 'react';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    Collapse,
+    IconButton,
+    TableHead,
+    Typography,
+    withStyles
+} from "@material-ui/core";
+import {ExpandMore, HighlightOffOutlined} from "@material-ui/icons";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import classnames from "classnames";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import {
+import UploadsContext, {
     UPLOAD_STATUS_ERROR,
     UPLOAD_STATUS_FINISHED,
     UPLOAD_STATUS_IN_PROGRESS,
@@ -27,8 +36,13 @@ const styles = theme => ({
     },
 });
 
-export const UploadProgressComponent = ({uploads = [], classes}) => {
+export const UploadProgressComponent = ({classes}) => {
+    const {uploads, removeUpload} = useContext(UploadsContext);
     const [expanded, setExpanded] = useState(true);
+
+    if (!uploads || uploads.length === 0) {
+        return null;
+    }
 
     const toggleExpand = () => setExpanded(!expanded);
 
@@ -41,7 +55,7 @@ export const UploadProgressComponent = ({uploads = [], classes}) => {
             case UPLOAD_STATUS_FINISHED:
                 return "Finished";
             case UPLOAD_STATUS_ERROR:
-                return "Error uploading";
+                return <Typography variant="body2" color="error">Error uploading</Typography>;
             default:
                 return "";
         }
@@ -73,11 +87,26 @@ export const UploadProgressComponent = ({uploads = [], classes}) => {
         <div style={{overflowX: 'auto'}}>
             {uploads.length > 0 && (
                 <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>File</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell />
+                        </TableRow>
+                    </TableHead>
                     <TableBody>
                         {uploads.map(upload => (
                             <TableRow key={upload.id}>
                                 <TableCell>{renderUploadName(upload)}</TableCell>
-                                <TableCell>{progress(upload)}</TableCell>
+                                <TableCell width={100}>{progress(upload)}</TableCell>
+                                <TableCell width={40} padding="none">
+                                    { upload.status === UPLOAD_STATUS_ERROR
+                                        && (
+                                            <IconButton aria-label="remove" onClick={() => removeUpload(upload)}>
+                                                <HighlightOffOutlined fontSize="small" />
+                                            </IconButton>
+                                        )}
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -91,7 +120,7 @@ export const UploadProgressComponent = ({uploads = [], classes}) => {
             <CardHeader
                 action={cardHeaderAction}
                 titleTypographyProps={{variant: 'h6'}}
-                title="File upload progress"
+                title="Uploads"
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>

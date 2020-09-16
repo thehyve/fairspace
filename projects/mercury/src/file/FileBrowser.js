@@ -65,7 +65,7 @@ export const FileBrowser = ({
 
     const existingFilenames = files ? files.map(file => file.basename) : [];
 
-    const {getUploads, startUpload} = useContext(UploadsContext);
+    const {startUpload} = useContext(UploadsContext);
     const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
     const [overwriteCandidateNames, setOverwriteCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
@@ -222,11 +222,9 @@ export const FileBrowser = ({
                 />
                 {openedCollection.canRead && renderFileOperations()}
             </div>
-            {getUploads().length > 0 && (
-                <div className={classes.uploadProgress}>
-                    <UploadProgressComponent uploads={getUploads()} />
-                </div>
-            )}
+            <div className={classes.uploadProgress}>
+                <UploadProgressComponent />
+            </div>
             {showOverwriteConfirmation && (renderOverwriteConfirmation())}
         </div>
     );
