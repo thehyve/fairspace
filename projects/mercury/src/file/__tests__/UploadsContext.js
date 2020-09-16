@@ -30,21 +30,21 @@ describe('UploadsProvider', () => {
 
         // List should be empty on start
         context = getContext();
-        expect(context.getUploads().length).toEqual(0);
+        expect(context.uploads.length).toEqual(0);
 
         const upload = {files: ['first.txt', 'second.txt'], id: "upload1", destinationPath: "/"};
         const uploadPromise = act(() => context.startUpload(upload));
 
         context = getContext();
-        expect(context.getUploads().length).toEqual(1);
-        expect(context.getUploads().map(u => u.progress)).toEqual([0]);
-        expect(context.getUploads().map(u => u.status)).toEqual([UPLOAD_STATUS_IN_PROGRESS]);
+        expect(context.uploads.length).toEqual(1);
+        expect(context.uploads.map(u => u.progress)).toEqual([0]);
+        expect(context.uploads.map(u => u.status)).toEqual([UPLOAD_STATUS_IN_PROGRESS]);
 
         // When the promise has resolved, the status of the selected file should be 'finished'
         await uploadPromise;
 
         context = getContext();
-        expect(context.getUploads().find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
+        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
     });
 
     it('should handle upload errors', async () => {
@@ -57,14 +57,33 @@ describe('UploadsProvider', () => {
 
         // Refresh context to get new state
         context = getContext();
-        expect(context.getUploads().length).toEqual(1);
-        expect(context.getUploads().map(u => u.progress)).toEqual([0]);
-        expect(context.getUploads().map(u => u.status)).toEqual([UPLOAD_STATUS_IN_PROGRESS]);
+        expect(context.uploads.length).toEqual(1);
+        expect(context.uploads.map(u => u.progress)).toEqual([0]);
+        expect(context.uploads.map(u => u.status)).toEqual([UPLOAD_STATUS_IN_PROGRESS]);
 
-        // Check whether the upload was removed after failing
+        // Check that the upload remains after failing
         await uploadPromise;
         context = getContext();
-        expect(context.getUploads().length).toEqual(0);
+        expect(context.uploads.length).toEqual(1);
+    });
+
+    it('should remove uploads from list', async () => {
+        const getContext = getUploadsProviderValue({fileApi: {uploadMulti: () => Promise.reject()}});
+        let context;
+
+        context = getContext();
+        const upload = {files: ['error.txt'], id: 'upload2', destinationPath: '/'};
+        const uploadPromise = act(() => context.startUpload(upload));
+
+        // Check that the upload remains after failing
+        await uploadPromise;
+        context = getContext();
+        expect(context.uploads.length).toEqual(1);
+
+        // Check that the upload can be removed
+        context.removeUpload(upload);
+        context = getContext();
+        expect(context.uploads.length).toEqual(0);
     });
 
     it('should store upload progress', async () => {
@@ -93,13 +112,13 @@ describe('UploadsProvider', () => {
         context = getContext();
 
         // Verify the upload progress, which should be set to 50%
-        expect(context.getUploads().find(u => u.file === upload.file).progress).toEqual(50);
+        expect(context.uploads.find(u => u.file === upload.file).progress).toEqual(50);
 
         // When the promise has resolved, the status of the selected file should be 'finished'
         await uploadPromise;
 
         context = getContext();
-        expect(context.getUploads().find(u => u.file === upload.file).progress).toEqual(100);
-        expect(context.getUploads().find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
+        expect(context.uploads.find(u => u.file === upload.file).progress).toEqual(100);
+        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
     });
 });
