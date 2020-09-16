@@ -36,10 +36,10 @@ const styles = () => ({
         borderWidth: 2,
         borderRadius: 2,
         borderStyle: "dashed",
+        opacity: 0.4
     },
     acceptStyle: {
-        borderColor: '#00e676',
-        opacity: 0.4
+        borderColor: '#00e676'
     },
     rejectStyle: {
         borderColor: '#ff1744'
@@ -71,6 +71,7 @@ export const FileBrowser = ({
     const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
     const [overwriteCandidateNames, setOverwriteCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
+    const [isFolderUpload, setIsFolderUpload] = useState(true);
 
     const {
         getRootProps,
@@ -195,6 +196,7 @@ export const FileBrowser = ({
                 clearSelection={selection.deselectAll}
                 refreshFiles={refreshFiles}
                 openUploadFileDialog={open}
+                setIsFolderUpload={setIsFolderUpload}
             />
         </div>
     );
@@ -205,7 +207,7 @@ export const FileBrowser = ({
                 {...getRootProps()}
                 className={`${classes.dropzone} ${isDragActive && classes.activeStyle} ${isDragAccept && classes.acceptStyle} ${isDragReject && classes.rejectStyle}`}
             >
-                <input {...getInputProps()} />
+                <input {...getInputProps()} {...(isFolderUpload && {webkitdirectory: ""})} />
                 <FileList
                     selectionEnabled={openedCollection.canRead}
                     files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}

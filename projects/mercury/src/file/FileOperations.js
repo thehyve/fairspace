@@ -40,6 +40,7 @@ export const FileOperations = ({
     files,
     refreshFiles,
     openUploadFileDialog,
+    setIsFolderUpload,
     clipboard
 }) => {
     const [activeOperation, setActiveOperation] = useState();
@@ -130,6 +131,13 @@ export const FileOperations = ({
     };
 
     const handleUploadFile = () => {
+        setIsFolderUpload(false);
+        handleUploadMenuClose();
+        openUploadFileDialog();
+    };
+
+    const handleUploadFolder = () => {
+        setIsFolderUpload(true);
         handleUploadMenuClose();
         openUploadFileDialog();
     };
@@ -203,7 +211,7 @@ export const FileOperations = ({
                             onClose={handleUploadMenuClose}
                         >
                             <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
-                            <MenuItem onClick={handleUploadMenuClose} disabled>Upload folder</MenuItem>
+                            <MenuItem onClick={handleUploadFolder}>Upload folder</MenuItem>
                         </Menu>
 
                     </>
