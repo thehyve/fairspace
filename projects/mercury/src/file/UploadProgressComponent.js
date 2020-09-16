@@ -9,7 +9,7 @@ import {
     Typography,
     withStyles
 } from "@material-ui/core";
-import {ExpandMore, HighlightOffOutlined} from "@material-ui/icons";
+import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from "@material-ui/icons";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import classnames from "classnames";
 import Table from "@material-ui/core/Table";
@@ -22,6 +22,8 @@ import UploadsContext, {
     UPLOAD_STATUS_IN_PROGRESS,
     UPLOAD_STATUS_INITIAL
 } from "./UploadsContext";
+import {splitPathIntoArray} from "./fileUtils";
+import {PATH_SEPARATOR} from "../constants";
 
 const styles = theme => ({
     expand: {
@@ -34,6 +36,10 @@ const styles = theme => ({
     expandOpen: {
         transform: 'rotate(180deg)',
     },
+    wrapIcon: {
+        verticalAlign: 'middle',
+        display: 'inline-flex'
+    }
 });
 
 export const UploadProgressComponent = ({classes}) => {
@@ -74,14 +80,35 @@ export const UploadProgressComponent = ({classes}) => {
         </IconButton>
     );
 
-    const renderUploadName = (upload) => (
-        <span>
-            {upload.destinationPath}/{upload.files[0].name}
+    const renderFolderUploadName = (upload, folderName) => {
+        const additionalFilesOrFolders = upload.files.filter(f => !f.path.startsWith(`${folderName}${PATH_SEPARATOR}`));
+        return (
+            <Typography variant="body2" className={classes.wrapIcon}>
+                <FolderOpen fontSize="small" />&nbsp;{upload.destinationPath}/{folderName}
+                {additionalFilesOrFolders.length > 0 && (
+                    <em>&nbsp;and {additionalFilesOrFolders.length} other(s)</em>
+                )}
+            </Typography>
+        );
+    };
+
+    const renderFileUploadName = (upload) => (
+        <Typography variant="body2" className={classes.wrapIcon}>
+            <NoteOutlined fontSize="small" />&nbsp;{upload.destinationPath}/{upload.files[0].path}
             {upload.files.length > 1 && (
-                <em> and {upload.files.length - 1} other(s)</em>
+                <em>&nbsp;and {upload.files.length - 1} other(s)</em>
             )}
-        </span>
+        </Typography>
     );
+
+    const renderUploadName = (upload) => {
+        const folder = upload.files.find(f => splitPathIntoArray(f.path).length > 1);
+        if (folder) {
+            const folderName = splitPathIntoArray(folder.path)[0];
+            return renderFolderUploadName(upload, folderName);
+        }
+        return renderFileUploadName(upload);
+    };
 
     const renderUploadList = () => (
         <div style={{overflowX: 'auto'}}>
