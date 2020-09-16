@@ -12,5 +12,9 @@ public enum Status {
     /**
      * The contents of the collection is not accessible.
      */
-    Closed
+    Closed,
+    /**
+     * The content of the collection is permanently unavailable.
+     */
+    Deleted
 }
