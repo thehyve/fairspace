@@ -82,6 +82,7 @@ export const FileBrowser = ({
     } = useDropzone({
         noClick: true,
         noKeyboard: true,
+        multiple: true,
         onDropAccepted: (droppedFiles) => {
             const newUpload = {
                 id: generateUuid(),
