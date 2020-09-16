@@ -49,7 +49,7 @@ const pathHierarchy = (fullPath) => {
     return paths.reverse();
 };
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     expandOpen: {
         transform: 'rotate(180deg)',
     },
@@ -63,17 +63,17 @@ const useStyles = makeStyles(() => ({
         easeInOut: true
     },
     activeStyle: {
-        borderColor: '#2196f3',
+        borderColor: theme.palette.info.main,
         borderWidth: 2,
         borderRadius: 2,
         borderStyle: "dashed",
         opacity: 0.4
     },
     acceptStyle: {
-        borderColor: '#00e676'
+        borderColor: theme.palette.success.main
     },
     rejectStyle: {
-        borderColor: '#ff1744'
+        borderColor: theme.palette.error.main
     }
 }));
 

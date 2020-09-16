@@ -14,7 +14,7 @@ import UploadsContext from "./UploadsContext";
 import {generateUuid} from "../metadata/common/metadataUtils";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
-const styles = () => ({
+const styles = (theme) => ({
     container: {
         height: "100%"
     },
@@ -25,24 +25,22 @@ const styles = () => ({
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#fafafa",
-        color: "#bdbdbd",
         outline: "none",
         transitionBorder: ".24s",
         easeInOut: true
     },
     activeStyle: {
-        borderColor: '#2196f3',
+        borderColor: theme.palette.info.main,
         borderWidth: 2,
         borderRadius: 2,
         borderStyle: "dashed",
         opacity: 0.4
     },
     acceptStyle: {
-        borderColor: '#00e676'
+        borderColor: theme.palette.success.main
     },
     rejectStyle: {
-        borderColor: '#ff1744'
+        borderColor: theme.palette.error.main
     }
 });
 
