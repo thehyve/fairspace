@@ -39,8 +39,8 @@ export const FileOperations = ({
 
     files,
     refreshFiles,
-    openUploadFileDialog,
-    setIsFolderUpload,
+    uploadFolder,
+    uploadFile,
     clipboard
 }) => {
     const [activeOperation, setActiveOperation] = useState();
@@ -131,15 +131,13 @@ export const FileOperations = ({
     };
 
     const handleUploadFile = () => {
-        setIsFolderUpload(false);
         handleUploadMenuClose();
-        openUploadFileDialog();
+        uploadFile();
     };
 
     const handleUploadFolder = () => {
-        setIsFolderUpload(true);
         handleUploadMenuClose();
-        openUploadFileDialog();
+        uploadFolder();
     };
 
     const addBadgeIfNotEmpty = (badgeContent, children) => {

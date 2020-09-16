@@ -113,6 +113,11 @@ export const FileBrowser = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [history]);
 
+    useEffect(() => open(), [isFolderUpload, open]);
+
+    const uploadFolder = () => setIsFolderUpload(true);
+    const uploadFile = () => setIsFolderUpload(false);
+
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
         selection.deselectAll();
@@ -195,8 +200,8 @@ export const FileBrowser = ({
                 fileActions={fileActions}
                 clearSelection={selection.deselectAll}
                 refreshFiles={refreshFiles}
-                openUploadFileDialog={open}
-                setIsFolderUpload={setIsFolderUpload}
+                uploadFolder={uploadFolder}
+                uploadFile={uploadFile}
             />
         </div>
     );
