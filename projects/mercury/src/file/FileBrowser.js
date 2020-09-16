@@ -111,10 +111,24 @@ export const FileBrowser = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [history]);
 
+    // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
     useEffect(() => open(), [isFolderUpload, open]);
 
-    const uploadFolder = () => setIsFolderUpload(true);
-    const uploadFile = () => setIsFolderUpload(false);
+    const uploadFolder = () => {
+        if (isFolderUpload) {
+            open();
+        } else {
+            setIsFolderUpload(true);
+        }
+    };
+
+    const uploadFile = () => {
+        if (!isFolderUpload) {
+            open();
+        } else {
+            setIsFolderUpload(false);
+        }
+    };
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
