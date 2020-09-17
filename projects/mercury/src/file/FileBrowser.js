@@ -1,14 +1,14 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
-import {withStyles} from "@material-ui/core";
+import {Typography, withStyles} from "@material-ui/core";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {encodePath} from "./fileUtils";
+import {encodePath, splitPathIntoArray} from "./fileUtils";
 import UploadProgressComponent from "./UploadProgressComponent";
 import UploadsContext from "./UploadsContext";
 import {generateUuid} from "../metadata/common/metadataUtils";
@@ -44,6 +44,19 @@ const styles = (theme) => ({
     }
 });
 
+const getConflictingFolders: string[] = (newFiles, existingFolderNames) => {
+    const droppedFolderNames = new Set(
+        newFiles
+            .filter(f => splitPathIntoArray(f.path).length > 1)
+            .map(f => splitPathIntoArray(f.path)[0])
+    );
+    return Array.from(droppedFolderNames).filter(f => existingFolderNames.includes(f));
+};
+
+const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
+    newFiles.filter(f => existingFileNames.includes(f.path)).map(c => c.name)
+);
+
 export const FileBrowser = ({
     history,
     openedCollection,
@@ -63,11 +76,13 @@ export const FileBrowser = ({
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
-    const existingFilenames = files ? files.map(file => file.basename) : [];
+    const existingFileNames = files ? files.filter(file => file.type === "file").map(file => file.basename) : [];
+    const existingFolderNames = files ? files.filter(file => file.type === "directory").map(file => file.basename) : [];
 
     const {startUpload} = useContext(UploadsContext);
     const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
-    const [overwriteCandidateNames, setOverwriteCandidateNames] = useState([]);
+    const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
+    const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
     const [isFolderUpload, setIsFolderUpload] = useState(true);
 
@@ -88,10 +103,13 @@ export const FileBrowser = ({
                 files: droppedFiles,
                 destinationPath: openedPath,
             };
-            const newOverwriteCandidates = droppedFiles.filter(f => existingFilenames.includes(f.name));
-            if (newOverwriteCandidates.length > 0) {
+            const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
+            const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
+
+            if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
                 setCurrentUpload(newUpload);
-                setOverwriteCandidateNames(newOverwriteCandidates.map(c => c.name));
+                setOverwriteFileCandidateNames(newOverwriteFileCandidates);
+                setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
                 setShowOverwriteConfirmation(true);
             } else {
                 startUpload(newUpload).then(refreshFiles);
@@ -150,7 +168,7 @@ export const FileBrowser = ({
 
     const handleCloseUpload = () => {
         setShowOverwriteConfirmation(false);
-        setOverwriteCandidateNames([]);
+        setOverwriteFileCandidateNames([]);
         setCurrentUpload({});
     };
 
@@ -173,23 +191,44 @@ export const FileBrowser = ({
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
+    const getOverwriteConfirmationMessage: string = () => {
+        const messages = [];
+        if (overwriteFolderCandidateNames.length > 1) {
+            messages.push(
+                `Folders: <em>${overwriteFolderCandidateNames.join(', ')}</em> already exist <br />and their content might be overwritten. <br />`
+            );
+        } else if (overwriteFolderCandidateNames.length === 1) {
+            messages.push(
+                `Folder <em>${overwriteFolderCandidateNames[0]}</em> already exists and its content might be overwritten. <br />`
+            );
+        }
+        if (overwriteFileCandidateNames.length > 1) {
+            messages.push(
+                `Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.<br />`
+            );
+        } else if (overwriteFileCandidateNames.length === 1) {
+            messages.push(
+                `File <em>${overwriteFileCandidateNames[0]}</em> already exists.<br />`
+            );
+        }
+        if (overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1) {
+            messages.push("Do you want to <b>overwrite</b> it?");
+        } else {
+            messages.push("Do you want to <b>overwrite</b> them?");
+        }
+        return messages.join("");
+    };
+
     const renderOverwriteConfirmation = () => (
         <ConfirmationDialog
             open
             title="Warning"
-            content={
-                overwriteCandidateNames.length > 1 ? (
-                    <span>
-                        Files: <em>{overwriteCandidateNames.join(', ')}</em> already exist.<br />
-                        Do you want to overwrite them?
-                    </span>
-                ) : (
-                    <span>
-                        File <em>{overwriteCandidateNames[0]}</em> already exists.<br />
-                        Do you want to overwrite it?
-                    </span>
-                )
-            }
+            content={(
+                <Typography variant="body2">
+                    {/* eslint-disable-next-line react/no-danger */}
+                    <span dangerouslySetInnerHTML={{__html: getOverwriteConfirmationMessage()}} />
+                </Typography>
+            )}
             dangerous
             agreeButtonText="Overwrite"
             onAgree={() => {
