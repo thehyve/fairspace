@@ -6,6 +6,12 @@ export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
 export const UPLOAD_STATUS_ERROR = 'ERROR';
 export const UPLOAD_STATUS_FINISHED = 'FINISHED';
 
+export type FileUpload = {
+    id: string,
+    files: any[],
+    destinationPath: string
+}
+
 export const UploadsContext = React.createContext({});
 
 export const UploadsProvider = ({children, fileApi = FileAPI}) => {
@@ -13,7 +19,7 @@ export const UploadsProvider = ({children, fileApi = FileAPI}) => {
 
     const updateSpecificUpload = (selected, updateFunc) => setUploads(
         currentUploads => currentUploads.map(upload => {
-            if (upload.destinationPath === selected.destinationPath && upload.destinationFilename === selected.destinationFilename) {
+            if (upload.id === selected.id) {
                 return updateFunc(upload);
             }
 
@@ -26,32 +32,43 @@ export const UploadsProvider = ({children, fileApi = FileAPI}) => {
         upload => ({...upload, status: newState})
     );
 
-    const enqueueUploads = newUploads => setUploads(
+    const removeUpload = upload => setUploads(
         currentUploads => [
-            ...currentUploads,
-            ...newUploads.map(upload => ({...upload, status: UPLOAD_STATUS_INITIAL, progress: 0}))
+            ...currentUploads.filter(u => u.id !== upload.id)
         ]
     );
 
-    const startUpload = upload => {
+    const enqueueUploads = newUpload => setUploads(
+        currentUploads => [
+            ...currentUploads,
+            newUpload
+        ]
+    );
+
+    const startUpload = (upload: FileUpload) => {
+        const newUpload = {...upload, status: UPLOAD_STATUS_INITIAL, progress: 0};
+        enqueueUploads(newUpload);
         const onUploadProgress = progressEvent => updateSpecificUpload(
-            upload,
+            newUpload,
             u => ({...u, progress: (progressEvent.loaded * 100) / progressEvent.total})
         );
-        setStateForUpload(upload, UPLOAD_STATUS_IN_PROGRESS);
-        return fileApi.uploadMulti(upload.destinationPath, [upload.file], onUploadProgress)
-            .then(() => setStateForUpload(upload, UPLOAD_STATUS_FINISHED))
-            .catch(() => setStateForUpload(upload, UPLOAD_STATUS_ERROR));
+        setStateForUpload(newUpload, UPLOAD_STATUS_IN_PROGRESS);
+        return fileApi.uploadMulti(newUpload.destinationPath, newUpload.files, onUploadProgress)
+            .then(() => {
+                setStateForUpload(newUpload, UPLOAD_STATUS_FINISHED);
+                setTimeout(() => removeUpload(newUpload), 5000);
+            })
+            .catch(() => {
+                setStateForUpload(newUpload, UPLOAD_STATUS_ERROR);
+            });
     };
-
-    const getUploads = () => uploads;
 
     return (
         <UploadsContext.Provider
             value={{
-                getUploads,
-                enqueueUploads,
-                startUpload
+                uploads,
+                startUpload,
+                removeUpload
             }}
         >
             {children}

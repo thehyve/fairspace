@@ -1,10 +1,12 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton} from "@material-ui/core";
-import {BorderColor, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@material-ui/icons';
+import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
+import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@material-ui/core/Menu";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 import {getParentPath, joinPaths} from "./fileUtils";
@@ -37,9 +39,13 @@ export const FileOperations = ({
 
     files,
     refreshFiles,
+    uploadFolder,
+    uploadFile,
     clipboard
 }) => {
     const [activeOperation, setActiveOperation] = useState();
+    const [anchorEl, setAnchorEl] = useState(null);
+
     const busy = !!activeOperation;
 
     const noPathSelected = selectedPaths.length === 0;
@@ -116,6 +122,24 @@ export const FileOperations = ({
             return false;
         });
 
+    const handleUploadMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleUploadMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleUploadFile = () => {
+        handleUploadMenuClose();
+        uploadFile();
+    };
+
+    const handleUploadFolder = () => {
+        handleUploadMenuClose();
+        uploadFolder();
+    };
+
     const addBadgeIfNotEmpty = (badgeContent, children) => {
         if (badgeContent) {
             return (
@@ -153,20 +177,42 @@ export const FileOperations = ({
         <>
             <FileOperationsGroup>
                 {isWritingEnabled && (
-                    <ProgressButton active={activeOperation === Operations.MKDIR}>
-                        <CreateDirectoryButton
-                            onCreate={name => handleCreateDirectory(name)}
-                            disabled={busy}
-                        >
-                            <IconButton
-                                aria-label="Create directory"
-                                title="Create directory"
+                    <>
+                        <ProgressButton active={activeOperation === Operations.MKDIR}>
+                            <CreateDirectoryButton
+                                onCreate={name => handleCreateDirectory(name)}
                                 disabled={busy}
                             >
-                                <CreateNewFolder />
-                            </IconButton>
-                        </CreateDirectoryButton>
-                    </ProgressButton>
+                                <IconButton
+                                    aria-label="Create directory"
+                                    title="Create directory"
+                                    disabled={busy}
+                                >
+                                    <CreateNewFolder />
+                                </IconButton>
+                            </CreateDirectoryButton>
+                        </ProgressButton>
+
+                        <IconButton
+                            aria-label="Upload"
+                            title="Upload &hellip;"
+                            disabled={busy}
+                            onClick={handleUploadMenuClick}
+                        >
+                            <CloudUpload />
+                        </IconButton>
+                        <Menu
+                            id="upload-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleUploadMenuClose}
+                        >
+                            <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
+                            <MenuItem onClick={handleUploadFolder}>Upload folder</MenuItem>
+                        </Menu>
+
+                    </>
                 )}
             </FileOperationsGroup>
             <FileOperationsGroup>

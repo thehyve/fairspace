@@ -51,7 +51,8 @@ const initialProps = {
     files: [{
         filename: 'a'
     }],
-    selection: selectionMock
+    selection: selectionMock,
+    classes: {}
 };
 
 describe('FileBrowser', () => {
@@ -71,13 +72,6 @@ describe('FileBrowser', () => {
         );
 
         expect(queryByTestId('files-view')).toBeInTheDocument();
-        expect(queryByTestId('upload-view')).not.toBeInTheDocument();
-
-        const uploadTab = queryByTestId('upload-tab');
-        fireEvent.click(uploadTab);
-
-        expect(queryByTestId('files-view')).not.toBeInTheDocument();
-        expect(queryByTestId('upload-view')).toBeInTheDocument();
     });
 
     it('show error when no open collection is provided', () => {

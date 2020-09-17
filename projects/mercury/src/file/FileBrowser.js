@@ -1,20 +1,61 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
-import {Button, Tab, Tabs} from "@material-ui/core";
-import Play from "mdi-material-ui/Play";
+import {useDropzone} from "react-dropzone";
+import {Typography, withStyles} from "@material-ui/core";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
-import UploadList from "./UploadList";
-import useUploads from "./UseUploads";
-import {UPLOAD_STATUS_INITIAL} from "./UploadsContext";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {encodePath} from "./fileUtils";
+import {encodePath, splitPathIntoArray} from "./fileUtils";
+import UploadProgressComponent from "./UploadProgressComponent";
+import UploadsContext from "./UploadsContext";
+import {generateUuid} from "../metadata/common/metadataUtils";
+import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
-const TAB_FILES = 'FILES';
-const TAB_UPLOAD = 'UPLOAD';
+const styles = (theme) => ({
+    container: {
+        height: "100%"
+    },
+    uploadProgress: {
+        marginTop: 20
+    },
+    dropzone: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        outline: "none",
+        transitionBorder: ".24s",
+        easeInOut: true
+    },
+    activeStyle: {
+        borderColor: theme.palette.info.main,
+        borderWidth: 2,
+        borderRadius: 2,
+        borderStyle: "dashed",
+        opacity: 0.4
+    },
+    acceptStyle: {
+        borderColor: theme.palette.success.main
+    },
+    rejectStyle: {
+        borderColor: theme.palette.error.main
+    }
+});
+
+const getConflictingFolders: string[] = (newFiles, existingFolderNames) => {
+    const droppedFolderNames = new Set(
+        newFiles
+            .filter(f => splitPathIntoArray(f.path).length > 1)
+            .map(f => splitPathIntoArray(f.path)[0])
+    );
+    return Array.from(droppedFolderNames).filter(f => existingFolderNames.includes(f));
+};
+
+const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
+    newFiles.filter(f => existingFileNames.includes(f.path)).map(c => c.name)
+);
 
 export const FileBrowser = ({
     history,
@@ -29,15 +70,52 @@ export const FileBrowser = ({
     showDeleted,
     refreshFiles = () => {},
     fileActions = {},
-    selection = {}
+    selection = {},
+    classes
 }) => {
-    const [currentTab, setCurrentTab] = useState(TAB_FILES);
-
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
-    const existingFilenames = files ? files.map(file => file.basename) : [];
-    const {uploads, enqueue, startAll} = useUploads(openedPath, existingFilenames);
+    const existingFileNames = files ? files.filter(file => file.type === "file").map(file => file.basename) : [];
+    const existingFolderNames = files ? files.filter(file => file.type === "directory").map(file => file.basename) : [];
+
+    const {startUpload} = useContext(UploadsContext);
+    const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
+    const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
+    const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
+    const [currentUpload, setCurrentUpload] = useState({});
+    const [isFolderUpload, setIsFolderUpload] = useState(true);
+
+    const {
+        getRootProps,
+        getInputProps,
+        isDragActive,
+        isDragAccept,
+        isDragReject,
+        open
+    } = useDropzone({
+        noClick: true,
+        noKeyboard: true,
+        multiple: true,
+        onDropAccepted: (droppedFiles) => {
+            const newUpload = {
+                id: generateUuid(),
+                files: droppedFiles,
+                destinationPath: openedPath,
+            };
+            const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
+            const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
+
+            if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
+                setCurrentUpload(newUpload);
+                setOverwriteFileCandidateNames(newOverwriteFileCandidates);
+                setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
+                setShowOverwriteConfirmation(true);
+            } else {
+                startUpload(newUpload).then(refreshFiles);
+            }
+        }
+    });
 
     // Deselect all files on history changes
     useEffect(() => {
@@ -51,12 +129,24 @@ export const FileBrowser = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [history]);
 
-    // Reload the files after returning from the upload tab
-    useEffect(() => {
-        refreshFiles(openedPath, showDeleted);
+    // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
+    useEffect(() => open(), [isFolderUpload, open]);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentTab, openedPath]);
+    const uploadFolder = () => {
+        if (isFolderUpload) {
+            open();
+        } else {
+            setIsFolderUpload(true);
+        }
+    };
+
+    const uploadFile = () => {
+        if (!isFolderUpload) {
+            open();
+        } else {
+            setIsFolderUpload(false);
+        }
+    };
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
@@ -74,6 +164,12 @@ export const FileBrowser = ({
         } else if (isReadingEnabled) {
             FileAPI.open(path.filename);
         }
+    };
+
+    const handleCloseUpload = () => {
+        setShowOverwriteConfirmation(false);
+        setOverwriteFileCandidateNames([]);
+        setCurrentUpload({});
     };
 
     if (loading || collectionsLoading) {
@@ -95,6 +191,54 @@ export const FileBrowser = ({
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
+    const renderOverwriteConfirmationMessage = () => (
+        <Typography variant="body2" component="span">
+            {(overwriteFolderCandidateNames.length > 1) && (
+                <span>
+                    Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist <br />
+                    and their content might be overwritten.<br />
+                </span>
+            )}
+            {(overwriteFolderCandidateNames.length === 1) && (
+                <span>
+                    Folder <em>{overwriteFolderCandidateNames[0]} </em>
+                    already exists and its content might be overwritten.<br />
+                </span>
+            )}
+            {(overwriteFileCandidateNames.length > 1) && (
+                <span>
+                    Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.<br />
+                </span>
+            )}
+            {(overwriteFileCandidateNames.length === 1) && (
+                <span>
+                    File <em>{overwriteFileCandidateNames[0]}</em> already exists.<br />
+                </span>
+            )}
+            {(overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1) ? (
+                <span>Do you want to <b>overwrite</b> it?</span>
+            ) : (
+                <span>Do you want to <b>overwrite</b> them?</span>
+            )}
+        </Typography>
+    );
+
+    const renderOverwriteConfirmation = () => (
+        <ConfirmationDialog
+            open
+            title="Warning"
+            content={renderOverwriteConfirmationMessage()}
+            dangerous
+            agreeButtonText="Overwrite"
+            onAgree={() => {
+                startUpload(currentUpload).then(refreshFiles);
+                handleCloseUpload();
+            }}
+            onDisagree={handleCloseUpload}
+            onClose={handleCloseUpload}
+        />
+    );
+
     const renderFileOperations = () => (
         <div style={{marginTop: 8}}>
             <FileOperations
@@ -106,60 +250,35 @@ export const FileBrowser = ({
                 fileActions={fileActions}
                 clearSelection={selection.deselectAll}
                 refreshFiles={refreshFiles}
+                uploadFolder={uploadFolder}
+                uploadFile={uploadFile}
             />
-        </div>
-    );
-
-    const renderTabFiles = () => (
-        <div data-testid="files-view">
-            <FileList
-                selectionEnabled={openedCollection.canRead}
-                files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
-                onPathCheckboxClick={path => selection.toggle(path.filename)}
-                onPathHighlight={handlePathHighlight}
-                onPathDoubleClick={handlePathDoubleClick}
-                onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
-                showDeleted={showDeleted}
-            />
-            {openedCollection.canRead && renderFileOperations()}
-        </div>
-    );
-
-    const renderTabUpload = () => (
-        <div data-testid="upload-view">
-            <UploadList
-                uploads={uploads}
-                enqueue={enqueue}
-            />
-            <div style={{marginTop: 12}}>
-                <Button
-                    data-testid="upload-button"
-                    color="primary"
-                    variant="contained"
-                    disabled={!uploads.find(upload => upload.status === UPLOAD_STATUS_INITIAL)}
-                    onClick={startAll}
-                >
-                    <Play /> Start uploading
-                </Button>
-            </div>
         </div>
     );
 
     return (
-        <>
-            <Tabs
-                data-testid="tabs"
-                value={currentTab}
-                onChange={(e, tab) => setCurrentTab(tab)}
-                style={{marginBottom: 8}}
+        <div data-testid="files-view" className={classes.container}>
+            <div
+                {...getRootProps()}
+                className={`${classes.dropzone} ${isDragActive && classes.activeStyle} ${isDragAccept && classes.acceptStyle} ${isDragReject && classes.rejectStyle}`}
             >
-                <Tab value={TAB_FILES} label="Files" />
-                {isWritingEnabled && (
-                    <Tab value={TAB_UPLOAD} label="Upload" data-testid="upload-tab" />
-                )}
-            </Tabs>
-            {(currentTab === TAB_FILES) ? renderTabFiles() : renderTabUpload()}
-        </>
+                <input {...getInputProps()} {...(isFolderUpload && {webkitdirectory: ""})} />
+                <FileList
+                    selectionEnabled={openedCollection.canRead}
+                    files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                    onPathCheckboxClick={path => selection.toggle(path.filename)}
+                    onPathHighlight={handlePathHighlight}
+                    onPathDoubleClick={handlePathDoubleClick}
+                    onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
+                    showDeleted={showDeleted}
+                />
+                {openedCollection.canRead && renderFileOperations()}
+            </div>
+            <div className={classes.uploadProgress}>
+                <UploadProgressComponent />
+            </div>
+            {showOverwriteConfirmation && (renderOverwriteConfirmation())}
+        </div>
     );
 };
 
@@ -180,4 +299,4 @@ const ContextualFileBrowser = ({openedPath, fileApi, showDeleted, ...props}) => 
     );
 };
 
-export default withRouter(ContextualFileBrowser);
+export default withRouter(withStyles(styles)(ContextualFileBrowser));
