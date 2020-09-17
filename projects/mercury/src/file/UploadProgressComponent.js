@@ -83,7 +83,7 @@ export const UploadProgressComponent = ({classes}) => {
     const renderFolderUploadName = (upload, folderName) => {
         const additionalFilesOrFolders = upload.files.filter(f => !f.path.startsWith(`${folderName}${PATH_SEPARATOR}`));
         return (
-            <Typography variant="body2" className={classes.wrapIcon}>
+            <Typography variant="body2" className={classes.wrapIcon} component="span">
                 <FolderOpen fontSize="small" />&nbsp;{upload.destinationPath}/{folderName}
                 {additionalFilesOrFolders.length > 0 && (
                     <em>&nbsp;and {additionalFilesOrFolders.length} other(s)</em>

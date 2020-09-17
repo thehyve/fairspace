@@ -192,7 +192,7 @@ export const FileBrowser = ({
     }
 
     const renderOverwriteConfirmationMessage = () => (
-        <Typography variant="body2">
+        <Typography variant="body2" component="span">
             {(overwriteFolderCandidateNames.length > 1) && (
                 <span>
                     Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist <br />
