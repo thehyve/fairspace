@@ -196,18 +196,23 @@ export const FileBrowser = ({
             {(overwriteFolderCandidateNames.length > 1) && (
                 <span>
                     Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist <br />
-                    and their content might be overwritten. <br />
+                    and their content might be overwritten.<br />
                 </span>
             )}
             {(overwriteFolderCandidateNames.length === 1) && (
                 <span>
-                    Folder <em>{overwriteFolderCandidateNames[0]}</em> already exists
-                    and its content might be overwritten. <br />
+                    Folder <em>{overwriteFolderCandidateNames[0]} </em>
+                    already exists and its content might be overwritten.<br />
                 </span>
             )}
             {(overwriteFileCandidateNames.length > 1) && (
                 <span>
                     Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.<br />
+                </span>
+            )}
+            {(overwriteFileCandidateNames.length === 1) && (
+                <span>
+                    File <em>{overwriteFileCandidateNames[0]}</em> already exists.<br />
                 </span>
             )}
             {(overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1) ? (
