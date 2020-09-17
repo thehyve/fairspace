@@ -191,44 +191,38 @@ export const FileBrowser = ({
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
-    const getOverwriteConfirmationMessage: string = () => {
-        const messages = [];
-        if (overwriteFolderCandidateNames.length > 1) {
-            messages.push(
-                `Folders: <em>${overwriteFolderCandidateNames.join(', ')}</em> already exist <br />and their content might be overwritten. <br />`
-            );
-        } else if (overwriteFolderCandidateNames.length === 1) {
-            messages.push(
-                `Folder <em>${overwriteFolderCandidateNames[0]}</em> already exists and its content might be overwritten. <br />`
-            );
-        }
-        if (overwriteFileCandidateNames.length > 1) {
-            messages.push(
-                `Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.<br />`
-            );
-        } else if (overwriteFileCandidateNames.length === 1) {
-            messages.push(
-                `File <em>${overwriteFileCandidateNames[0]}</em> already exists.<br />`
-            );
-        }
-        if (overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1) {
-            messages.push("Do you want to <b>overwrite</b> it?");
-        } else {
-            messages.push("Do you want to <b>overwrite</b> them?");
-        }
-        return messages.join("");
-    };
+    const renderOverwriteConfirmationMessage = () => (
+        <Typography variant="body2">
+            {(overwriteFolderCandidateNames.length > 1) && (
+                <span>
+                    Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist <br />
+                    and their content might be overwritten. <br />
+                </span>
+            )}
+            {(overwriteFolderCandidateNames.length === 1) && (
+                <span>
+                    Folder <em>{overwriteFolderCandidateNames[0]}</em> already exists
+                    and its content might be overwritten. <br />
+                </span>
+            )}
+            {(overwriteFileCandidateNames.length > 1) && (
+                <span>
+                    Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.<br />
+                </span>
+            )}
+            {(overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1) ? (
+                <span>Do you want to <b>overwrite</b> it?</span>
+            ) : (
+                <span>Do you want to <b>overwrite</b> them?</span>
+            )}
+        </Typography>
+    );
 
     const renderOverwriteConfirmation = () => (
         <ConfirmationDialog
             open
             title="Warning"
-            content={(
-                <Typography variant="body2">
-                    {/* eslint-disable-next-line react/no-danger */}
-                    <span dangerouslySetInnerHTML={{__html: getOverwriteConfirmationMessage()}} />
-                </Typography>
-            )}
+            content={renderOverwriteConfirmationMessage()}
             dangerous
             agreeButtonText="Overwrite"
             onAgree={() => {
