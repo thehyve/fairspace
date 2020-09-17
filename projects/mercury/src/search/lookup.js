@@ -21,17 +21,18 @@ WHERE {
 }
 `);
 
-export const fileSearch = (query, parentIri) => {
-    const regex = "(^|\\s|\\.||\\-|\\,|\\;)" + escapeStringRegexp(query);
+export const searchFiles = (query, parentIri) => {
+    const regex = "(^|\\\\s|\\\\.|\\\\-|\\\\,|\\\\;)" + escapeStringRegexp(query);
     return search(`
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX fs: <http://fairspace.io/ontology#>
 
 SELECT ?id ?label ?comment ?type
 WHERE { 
-    ${parentIri ? '<' + parentIri + '> fs:contains* ?id >' : '?some fs:contains ?id'} .
+    ${parentIri ? ('<' + parentIri + '> fs:contains* ?id .') : ''}
     ?id rdfs:label ?label ;
         a ?type .
+    FILTER (?type in (fs:File, fs:Directory, fs:Collection))    
     OPTIONAL { ?id rdfs:comment ?comment }
     FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }
     FILTER (regex(?label, "${regex}", "i") || regex(?comment, "${regex}", "i"))

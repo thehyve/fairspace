@@ -4,15 +4,14 @@ import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, Table
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
 import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
-import {getSearchQueryFromString, handleSearchError, renderSearchResultProperty} from "../search/searchUtils";
-import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
-import SearchResultHighlights from "../search/SearchResultHighlights";
+import {getSearchContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
 import SearchBar from "../search/SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {getParentPath} from '../file/fileUtils';
+import {searchFiles} from "../search/lookup";
 
 const styles = {
     tableRoot: {
@@ -30,8 +29,6 @@ const styles = {
     }
 };
 
-const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
-
 const CollectionSearchResultList = ({classes, items, total, loading, error, history}) => {
     const pathForIri = (iri: string) => {
         const path = decodeURIComponent(new URL(iri).pathname);
@@ -39,12 +36,9 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
     };
 
     const renderType = (item) => {
-        if (!item.type && item.type.length === 0) {
-            return null;
-        }
         let avatar;
         let typeLabel;
-        switch (item.type[0]) {
+        switch (item.type) {
             case COLLECTION_URI:
                 avatar = <Folder />;
                 typeLabel = "Collection";
@@ -74,8 +68,8 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
     };
 
     const link = (item) => {
-        const path = pathForIri(item.iri);
-        if (item.type && item.type.length > 0 && item.type[0] === FILE_URI) {
+        const path = pathForIri(item.id);
+        if (item.type && item.type === FILE_URI) {
             const parentPath = getParentPath(path);
             return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
         }
@@ -110,7 +104,6 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                         <TableCell />
                         <TableCell />
                         <TableCell>Path</TableCell>
-                        <TableCell>Match</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -121,13 +114,11 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                                 key={item.id}
                                 onDoubleClick={() => handleResultDoubleClick(item)}
                             >
-                                <TableCell width={30}>
-                                    {renderType(item)}
-                                </TableCell>
+                                <TableCell>{renderType(item)}</TableCell>
                                 <TableCell>
                                     <ListItemText
-                                        primary={renderSearchResultProperty(item, 'label')}
-                                        secondary={renderSearchResultProperty(item, 'comment')}
+                                        primary={item.label}
+                                        secondary={item.comment}
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -137,13 +128,8 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                                         color="inherit"
                                         underline="hover"
                                     >
-                                        {pathForIri(item.iri)}
+                                        {pathForIri(item.id)}
                                     </Link>
-                                </TableCell>
-                                <TableCell>
-                                    <SearchResultHighlights
-                                        highlights={item.highlights}
-                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -155,13 +141,12 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const CollectionSearchResultListContainer = ({
-    location: {search}, query = getSearchQueryFromString(search),
-    classes, history, searchFunction = SearchAPI.search
+    location: {search}, query = getSearchQueryFromString(search), context = getSearchContextFromString(search),
+    classes, history, searchFunction = searchFiles
 }) => {
-    const {data, loading, error} = useAsync(() => searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
-        .catch(handleSearchError), [search, query, searchFunction]);
-    const items = data ? data.items : [];
-    const total = data ? data.total : 0;
+    const {data, loading, error} = useAsync(() => searchFunction(query, context).catch(handleSearchError), [search, query, searchFunction]);
+    const items = data || [];
+    const total = items.length;
     const handleSearch = (value) => {
         handleCollectionSearchRedirect(history, value);
     };

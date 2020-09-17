@@ -24,7 +24,13 @@ export const isCollectionPage = () => {
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 
 export const handleCollectionSearchRedirect = (history, value) => {
-    const searchUrl = value ? buildSearchUrl(value) : '';
+    const href = window.location.href.toString();
+    let iri = href.replace('/collections/', '/api/v1/webdav/');
+    if (iri === href) {
+        // search across all collections
+        iri = '';
+    }
+    const searchUrl = value ? buildSearchUrl(value, iri) : '';
     history.push(`/collections${searchUrl}`);
 };
 
