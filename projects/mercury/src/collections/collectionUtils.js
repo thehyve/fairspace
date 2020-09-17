@@ -23,15 +23,19 @@ export const isCollectionPage = () => {
 
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 
-export const handleCollectionSearchRedirect = (history, value) => {
-    const href = window.location.href.toString();
-    let iri = href.replace('/collections/', '/api/v1/webdav/');
-    if (iri === href) {
-        // search across all collections
-        iri = '';
+export const pathForIri = (iri: string) => {
+    const path = decodeURIComponent(new URL(iri).pathname);
+    return path.replace('/api/v1/webdav/', '');
+};
+
+export const handleCollectionSearchRedirect = (history, value, context = '') => {
+    if (value) {
+        const searchParam = buildSearchUrl(value);
+        const contextParam = context ? `&context=${encodeURIComponent(context)}` : '';
+        history.push(`/collections${searchParam}${contextParam}`);
+    } else {
+        history.push(`/collections/${context ? pathForIri(context) : ''}`);
     }
-    const searchUrl = value ? buildSearchUrl(value, iri) : '';
-    history.push(`/collections${searchUrl}`);
 };
 
 const permissionLevel = p => accessLevels.indexOf(p.access);

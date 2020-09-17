@@ -45,7 +45,9 @@ export const FilesPage = ({
     const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
 
     const handleSearch = (value) => {
-        handleCollectionSearchRedirect(history, value);
+        const collectionIri: string = collection.iri;
+        const collectionRoot = collectionIri.substring(0, collectionIri.lastIndexOf('/'));
+        handleCollectionSearchRedirect(history, value, collectionRoot + openedPath);
     };
 
     useEffect(() => {

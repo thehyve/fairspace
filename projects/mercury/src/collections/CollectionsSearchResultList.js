@@ -3,7 +3,7 @@ import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, Table
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
+import {getCollectionAbsolutePath, handleCollectionSearchRedirect, pathForIri} from './collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
 import {getSearchContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
@@ -12,6 +12,8 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {getParentPath} from '../file/fileUtils';
 import {searchFiles} from "../search/lookup";
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
+import BreadCrumbs from '../common/components/BreadCrumbs';
 
 const styles = {
     tableRoot: {
@@ -26,15 +28,14 @@ const styles = {
     search: {
         width: '80%',
         margin: 10
+    },
+    title: {
+        margin: 10,
+        marginTop: 16
     }
 };
 
 const CollectionSearchResultList = ({classes, items, total, loading, error, history}) => {
-    const pathForIri = (iri: string) => {
-        const path = decodeURIComponent(new URL(iri).pathname);
-        return path.replace('/api/v1/webdav/', '');
-    };
-
     const renderType = (item) => {
         let avatar;
         let typeLabel;
@@ -142,23 +143,46 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const CollectionSearchResultListContainer = ({
     location: {search}, query = getSearchQueryFromString(search), context = getSearchContextFromString(search),
-    classes, history, searchFunction = searchFiles
+    classes, history
 }) => {
-    const {data, loading, error} = useAsync(() => searchFunction(query, context).catch(handleSearchError), [search, query, searchFunction]);
+    const {data, loading, error} = useAsync(() => searchFiles(query, context).catch(handleSearchError), [search, query]);
     const items = data || [];
     const total = items.length;
     const handleSearch = (value) => {
         handleCollectionSearchRedirect(history, value);
     };
 
+    const pathSegments = () => {
+        const segments = ((context && pathForIri(context)) || '').split('/');
+        if (segments[0] === '') {
+            return [];
+        }
+        const result = [];
+        let href = '/collections';
+        segments.forEach(segment => {
+            href += '/' + segment;
+            result.push({label: segment, href});
+        });
+        return result;
+    };
+
     return (
-        <div>
+        <BreadcrumbsContext.Provider value={{segments: [
+            {
+                label: 'Collections',
+                icon: <Folder />,
+                href: '/collections'
+            }
+        ]}}
+        >
+            <BreadCrumbs additionalSegments={pathSegments()} />
             <SearchBar
                 placeholder="Search"
                 disableUnderline={false}
                 onSearchChange={handleSearch}
                 query={query}
             />
+            <Typography variant="h6" className={classes.title}>Search results</Typography>
             <CollectionSearchResultList
                 items={items}
                 total={total}
@@ -167,7 +191,7 @@ export const CollectionSearchResultListContainer = ({
                 classes={classes}
                 history={history}
             />
-        </div>
+        </BreadcrumbsContext.Provider>
     );
 };
 
