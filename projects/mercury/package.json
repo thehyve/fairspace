@@ -28,6 +28,7 @@
     "date-fns": "2.1.0",
     "deepmerge": "^4.2.2",
     "elasticsearch": "^16.5.0",
+    "escape-string-regexp": "^4.0.0",
     "filesize": "^6.0.1",
     "http-proxy-middleware": "^0.20.0",
     "jsonld": "^1.8.1",
