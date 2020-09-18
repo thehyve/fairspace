@@ -164,6 +164,7 @@ export const CollectionSearchResultListContainer = ({
             href += '/' + segment;
             result.push({label: segment, href});
         });
+        result.push({label: 'Search results', href: ''});
         return result;
     };
 
@@ -183,7 +184,6 @@ export const CollectionSearchResultListContainer = ({
                 onSearchChange={handleSearch}
                 query={query}
             />
-            <Typography variant="h6" className={classes.title}>Search results</Typography>
             <CollectionSearchResultList
                 items={items}
                 total={total}
