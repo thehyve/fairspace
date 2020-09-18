@@ -21,7 +21,8 @@ WHERE {
 `);
 
 export const searchFiles = (query, parentIri) => {
-    const regex = "(^|\\\\s|\\\\.|\\\\-|\\\\,|\\\\;|\\\\(|\\\\[|\\\\{|\\\\?|\\\\!|\\\\\\\\|\\\\/)" + escapeStringRegexp(query);
+    const regex = ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/)" + escapeStringRegexp(query))
+        .replace(/\\/g, "\\\\");
     return search(`
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX fs: <http://fairspace.io/ontology#>
