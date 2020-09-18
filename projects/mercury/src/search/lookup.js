@@ -7,7 +7,6 @@ const search = (sparql) => axios.post('/api/v1/rdf/query', sparql,
     {headers: SPARQL_SELECT_HEADERS})
     .catch(handleHttpError("Error while performing search"))
     .then(extractSparqlSelectResults);
-    // .then(results => results.map(({id, label}) => ({id, label})));
 
 export const lookup = (query, types) => search(`
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -22,7 +21,7 @@ WHERE {
 `);
 
 export const searchFiles = (query, parentIri) => {
-    const regex = "(^|\\\\s|\\\\.|\\\\-|\\\\,|\\\\;)" + escapeStringRegexp(query);
+    const regex = "(^|\\\\s|\\\\.|\\\\-|\\\\,|\\\\;|\\\\(|\\\\[|\\\\{|\\\\?|\\\\!|\\\\\\\\|\\\\/)" + escapeStringRegexp(query);
     return search(`
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX fs: <http://fairspace.io/ontology#>
