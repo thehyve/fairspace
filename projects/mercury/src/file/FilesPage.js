@@ -127,15 +127,15 @@ export const FilesPage = ({
 };
 
 const ParentAwareFilesPage = (props) => {
-    const {data, error, loading} = useAsync(
+    const {data, error, loading, refresh} = useAsync(
         () => (FileAPI.stat(props.openedPath, true)),
         [props.openedPath]
     );
 
-    // Parse stat data
-    const parentFileProps = data && data.props;
-    const isFileDeleted = parentFileProps && parentFileProps.dateDeleted;
-    const isOpenedPathDeleted = props.collection.dateDeleted || isFileDeleted;
+    useEffect(() => {refresh();}, [props.collection.dateDeleted, refresh]);
+
+    const isParentFolderDeleted = data && data.props && data.props.dateDeleted;
+    const isOpenedPathDeleted = props.collection.dateDeleted || isParentFolderDeleted;
 
     return (
         <FilesPage

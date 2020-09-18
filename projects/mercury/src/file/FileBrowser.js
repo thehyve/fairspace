@@ -59,7 +59,7 @@ const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
 
 export const FileBrowser = ({
     history,
-    openedCollection,
+    openedCollection = {},
     collectionsLoading = false,
     collectionsError = false,
     openedPath,
@@ -131,6 +131,8 @@ export const FileBrowser = ({
 
     // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
     useEffect(() => open(), [isFolderUpload, open]);
+
+    useEffect(() => {refreshFiles();}, [openedCollection.dateDeleted, refreshFiles]);
 
     const uploadFolder = () => {
         if (isFolderUpload) {
