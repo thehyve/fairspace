@@ -217,7 +217,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     public Set<Status> availableStatuses() {
-        if (!canManage()) {
+        if (!canManage() || getStatus() == Status.Deleted) {
             return EnumSet.of(getStatus());
         }
 
@@ -225,7 +225,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             return EnumSet.of(Status.Archived);
         }
 
-        return EnumSet.allOf(Status.class);
+        return EnumSet.of(Status.Active, Status.Closed, Status.Archived);
     }
 
     /**
@@ -287,6 +287,11 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
         if (!availableStatuses().contains(status)) {
             throw new ConflictException(this);
+        }
+        if (status == Status.Deleted) {
+            throw new ConflictException(this, "Cannot set 'Deleted' status using 'set_status' action. " +
+                    "Use resource deletion instead."
+            );
         }
         subject.removeAll(FS.status).addProperty(FS.status, status.name());
     }
@@ -386,7 +391,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!canDelete()) {
             throw new ConflictException(this);
         }
+        if (!purge) {
+            subject.removeAll(FS.status).addProperty(FS.status, Status.Deleted.name());
+        }
         super.delete(purge);
+    }
+
+    @Override
+    protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
+        super.undelete();
+        subject.removeAll(FS.status).addProperty(FS.status, Status.Closed.name());
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {
