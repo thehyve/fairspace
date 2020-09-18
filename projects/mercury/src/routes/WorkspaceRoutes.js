@@ -40,7 +40,7 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/collections/search"
+                path="/collections-search"
                 render={(props) => (
                     <LinkedDataMetadataProvider>
                         <CollectionSearchResultList {...props} />

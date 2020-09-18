@@ -8,12 +8,12 @@ import Iri from '../common/components/Iri';
  * @param query
  * @returns {string}
  */
-export const buildSearchUrl = (query, context) => {
+export const buildSearchUrl = (query) => {
     if (!query) {
         return '/search';
     }
 
-    const searchString = queryString.stringify({q: query, context});
+    const searchString = queryString.stringify({q: query});
     return `/search?${searchString}`;
 };
 

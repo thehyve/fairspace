@@ -37,6 +37,6 @@ WHERE {
     FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }
     FILTER (regex(?label, "${regex}", "i") || regex(?comment, "${regex}", "i"))
 }
-# LIMIT 10000
+LIMIT 10000
 `);
 };

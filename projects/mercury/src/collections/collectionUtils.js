@@ -1,4 +1,3 @@
-import {buildSearchUrl} from "../search/searchUtils";
 import {COMMENT_URI, LABEL_URI} from "../constants";
 import type {
     AccessLevel,
@@ -11,6 +10,7 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
+import queryString from "query-string";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -30,9 +30,7 @@ export const pathForIri = (iri: string) => {
 
 export const handleCollectionSearchRedirect = (history, value, context = '') => {
     if (value) {
-        const searchParam = buildSearchUrl(value);
-        const contextParam = context ? `&context=${encodeURIComponent(context)}` : '';
-        history.push(`/collections${searchParam}${contextParam}`);
+        history.push('/collections-search/?' + queryString.stringify({q: value, context}));
     } else {
         history.push(`/collections/${context ? pathForIri(context) : ''}`);
     }

@@ -14,6 +14,7 @@ import {getParentPath} from '../file/fileUtils';
 import {searchFiles} from "../search/lookup";
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import BreadCrumbs from '../common/components/BreadCrumbs';
+import queryString from "query-string";
 
 const styles = {
     tableRoot: {
@@ -149,7 +150,7 @@ export const CollectionSearchResultListContainer = ({
     const items = data || [];
     const total = items.length;
     const handleSearch = (value) => {
-        handleCollectionSearchRedirect(history, value);
+        handleCollectionSearchRedirect(history, value, queryString.parse(window.location.search).context || '');
     };
 
     const pathSegments = () => {
