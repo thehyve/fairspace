@@ -18,6 +18,7 @@ export const buildSearchUrl = (query) => {
 };
 
 export const getSearchQueryFromString = (searchString) => queryString.parse(searchString).q || '';
+export const getSearchContextFromString = (searchString) => queryString.parse(searchString).context || '';
 
 /**
  * Error handler for search queries. Handles HTTP statuses 400 and 401 separately
@@ -44,7 +45,7 @@ export const handleSearchError = (e) => {
  */
 export const renderSearchResultProperty = (item, property) => {
     // eslint-disable-next-line no-unused-vars
-    const highlights = item.highlights.find(([key, value]) => key === property);
+    const highlights = item.highlights && item.highlights.find(([key, value]) => key === property);
     if (!highlights) {
         const value = item[property] && item[property][0];
         if (property === 'label') {

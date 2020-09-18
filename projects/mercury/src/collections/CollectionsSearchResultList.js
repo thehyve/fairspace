@@ -1,20 +1,19 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, withStyles} from '@material-ui/core';
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {getCollectionAbsolutePath, handleCollectionSearchRedirect} from './collectionUtils';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI, SEARCH_MAX_SIZE} from "../constants";
-import VocabularyContext, {VocabularyProvider} from '../metadata/vocabulary/VocabularyContext';
-import {getLabelForType, typeShapeWithProperties} from '../metadata/common/vocabularyUtils';
+import {getCollectionAbsolutePath, handleCollectionSearchRedirect, pathForIri} from './collectionUtils';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
-import {getSearchQueryFromString, handleSearchError, renderSearchResultProperty} from "../search/searchUtils";
-import SearchAPI, {SORT_DATE_CREATED} from "../search/SearchAPI";
-import SearchResultHighlights from "../search/SearchResultHighlights";
+import {getSearchContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
 import SearchBar from "../search/SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {getParentPath} from '../file/fileUtils';
+import {searchFiles} from "../search/lookup";
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
+import BreadCrumbs from '../common/components/BreadCrumbs';
 
 const styles = {
     tableRoot: {
@@ -29,32 +28,29 @@ const styles = {
     search: {
         width: '80%',
         margin: 10
+    },
+    title: {
+        margin: 10,
+        marginTop: 16
     }
 };
 
-const COLLECTION_DIRECTORIES_FILES = [DIRECTORY_URI, FILE_URI, COLLECTION_URI];
-
-const CollectionSearchResultList = ({classes, items, total, loading, error, history, vocabulary}) => {
-    const pathForIri = (iri: string) => {
-        const path = decodeURIComponent(new URL(iri).pathname);
-        return path.replace('/api/v1/webdav/', '');
-    };
-
+const CollectionSearchResultList = ({classes, items, total, loading, error, history}) => {
     const renderType = (item) => {
-        if (!item.type && item.type.length === 0) {
-            return null;
-        }
-        const typeLabel = getLabelForType(vocabulary, item.type[0]);
         let avatar;
-        switch (typeLabel) {
-            case 'Collection':
+        let typeLabel;
+        switch (item.type) {
+            case COLLECTION_URI:
                 avatar = <Folder />;
+                typeLabel = "Collection";
                 break;
-            case 'Directory':
+            case DIRECTORY_URI:
                 avatar = <FolderOpenOutlined />;
+                typeLabel = "Directory";
                 break;
-            case 'File':
+            case FILE_URI:
                 avatar = <InsertDriveFileOutlined />;
+                typeLabel = "File";
                 break;
             default:
                 avatar = null;
@@ -73,8 +69,8 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
     };
 
     const link = (item) => {
-        const path = pathForIri(item.iri);
-        if (item.type && item.type.length > 0 && item.type[0] === FILE_URI) {
+        const path = pathForIri(item.id);
+        if (item.type && item.type === FILE_URI) {
             const parentPath = getParentPath(path);
             return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
         }
@@ -109,7 +105,6 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                         <TableCell />
                         <TableCell />
                         <TableCell>Path</TableCell>
-                        <TableCell>Match</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -120,13 +115,11 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                                 key={item.id}
                                 onDoubleClick={() => handleResultDoubleClick(item)}
                             >
-                                <TableCell width={30}>
-                                    {renderType(item)}
-                                </TableCell>
+                                <TableCell>{renderType(item)}</TableCell>
                                 <TableCell>
                                     <ListItemText
-                                        primary={renderSearchResultProperty(item, 'label')}
-                                        secondary={renderSearchResultProperty(item, 'comment')}
+                                        primary={item.label}
+                                        secondary={item.comment}
                                     />
                                 </TableCell>
                                 <TableCell>
@@ -136,14 +129,8 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                                         color="inherit"
                                         underline="hover"
                                     >
-                                        {pathForIri(item.iri)}
+                                        {pathForIri(item.id)}
                                     </Link>
-                                </TableCell>
-                                <TableCell>
-                                    <SearchResultHighlights
-                                        highlights={item.highlights}
-                                        typeShape={typeShapeWithProperties(vocabulary, item.type)}
-                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -155,52 +142,57 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const CollectionSearchResultListContainer = ({
-    location: {search}, query = getSearchQueryFromString(search),
-    vocabulary, vocabularyLoading, vocabularyError,
-    classes, history, searchFunction = SearchAPI.search
+    location: {search}, query = getSearchQueryFromString(search), context = getSearchContextFromString(search),
+    classes, history
 }) => {
-    const {data, loading, error} = useAsync(() => searchFunction(({query, types: COLLECTION_DIRECTORIES_FILES, size: SEARCH_MAX_SIZE, sort: SORT_DATE_CREATED}))
-        .catch(handleSearchError), [search, query, searchFunction]);
-    const items = data ? data.items : [];
-    const total = data ? data.total : 0;
+    const {data, loading, error} = useAsync(() => searchFiles(query, context).catch(handleSearchError), [search, query]);
+    const items = data || [];
+    const total = items.length;
     const handleSearch = (value) => {
-        handleCollectionSearchRedirect(history, value);
+        handleCollectionSearchRedirect(history, value, context);
+    };
+
+    const pathSegments = () => {
+        const segments = ((context && pathForIri(context)) || '').split('/');
+        if (segments[0] === '') {
+            return [];
+        }
+        const result = [];
+        let href = '/collections';
+        segments.forEach(segment => {
+            href += '/' + segment;
+            result.push({label: segment, href});
+        });
+        return result;
     };
 
     return (
-        <div>
+        <BreadcrumbsContext.Provider value={{segments: [
+            {
+                label: 'Collections',
+                icon: <Folder />,
+                href: '/collections'
+            }
+        ]}}
+        >
+            <BreadCrumbs additionalSegments={pathSegments()} />
             <SearchBar
                 placeholder="Search"
                 disableUnderline={false}
                 onSearchChange={handleSearch}
                 query={query}
             />
+            <Typography variant="h6" className={classes.title}>Search results</Typography>
             <CollectionSearchResultList
                 items={items}
                 total={total}
-                loading={loading || vocabularyLoading}
-                error={vocabularyError || error}
+                loading={loading}
+                error={error}
                 classes={classes}
                 history={history}
-                vocabulary={vocabulary}
             />
-        </div>
+        </BreadcrumbsContext.Provider>
     );
 };
 
-const CollectionSearchResultListWithVocabulary = (props) => {
-    const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
-
-    return (
-        <VocabularyProvider>
-            <CollectionSearchResultListContainer
-                {...props}
-                vocabulary={vocabulary}
-                vocabularyLoading={vocabularyLoading}
-                vocabularyError={vocabularyError}
-            />
-        </VocabularyProvider>
-    );
-};
-
-export default withStyles(styles)(CollectionSearchResultListWithVocabulary);
+export default withStyles(styles)(CollectionSearchResultListContainer);

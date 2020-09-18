@@ -1,4 +1,3 @@
-import {buildSearchUrl} from "../search/searchUtils";
 import {COMMENT_URI, LABEL_URI} from "../constants";
 import type {
     AccessLevel,
@@ -11,6 +10,7 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
+import queryString from "query-string";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -23,9 +23,17 @@ export const isCollectionPage = () => {
 
 export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
 
-export const handleCollectionSearchRedirect = (history, value) => {
-    const searchUrl = value ? buildSearchUrl(value) : '';
-    history.push(`/collections${searchUrl}`);
+export const pathForIri = (iri: string) => {
+    const path = decodeURIComponent(new URL(iri).pathname);
+    return path.replace('/api/v1/webdav/', '');
+};
+
+export const handleCollectionSearchRedirect = (history, value, context = '') => {
+    if (value) {
+        history.push('/collections-search/?' + queryString.stringify({q: value, context}));
+    } else {
+        history.push(`/collections/${context ? pathForIri(context) : ''}`);
+    }
 };
 
 const permissionLevel = p => accessLevels.indexOf(p.access);
