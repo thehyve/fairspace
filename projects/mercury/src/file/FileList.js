@@ -162,7 +162,7 @@ const FileList = ({
                                     {file.basename}
                                 </TableCell>
                                 <TableCell align="right">
-                                    {file.type === 'file' ? filesize(file.size) : ''}
+                                    {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}
                                 </TableCell>
                                 <TableCell align="right">
                                     {file.lastmod ? formatDateTime(file.lastmod) : null}
