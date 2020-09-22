@@ -265,14 +265,3 @@ export const valuesContainsValueOrId = (values, value, id) => {
  * @returns {boolean}
  */
 export const hasValue = values => !!(values && Array.isArray(values) && values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
-
-/**
- * Returns true if the given entry can be deleted for the property specified
- * @param property
- * @param entry
- * @returns {boolean}
- */
-export const canDelete = (property, entry) => {
-    const isSystemProperty = property.systemProperties && property.systemProperties.includes(entry.id);
-    return property.isEditable && !isSystemProperty;
-};

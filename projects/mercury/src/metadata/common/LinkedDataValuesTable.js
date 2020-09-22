@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import {IconButton, Table, TableBody, TableCell, TableFooter, TableHead, TableRow, Typography, withStyles} from '@material-ui/core';
 import {Clear} from '@material-ui/icons';
 
-import {canDelete} from "./metadataUtils";
 import {LABEL_URI, STRING_URI} from '../../constants';
 
 const styles = {
@@ -36,7 +35,7 @@ export const LinkedDataValuesTable = (
     const maxValuesReached = (property.maxValuesCount && (values.length >= property.maxValuesCount)) || false;
 
     // Delete button is enabled, if given entry can be deleted for the property specified and the entry can be edited
-    const isDeleteButtonEnabled = (entry) => canDelete(property, entry) && canEdit;
+    const isDeleteButtonEnabled = () => property.isEditable && canEdit;
     const isAddButtonEnabled = canEdit && !maxValuesReached && AddComponent;
 
     return (

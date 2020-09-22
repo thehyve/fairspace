@@ -8,7 +8,6 @@ import {
     getMaxCount,
     getNamespaces,
     getProperties,
-    getSystemProperties,
     isGenericIriResource,
     isRdfList,
     isRelationShape, typeShapeWithProperties,
@@ -111,20 +110,6 @@ describe('isGenericResourceIri', () => {
     it('should return true if the given shape represents a generic iri resource', () => expect(isGenericIriResource(genericResourceShape)).toBe(true));
     it('should return false if the given shape does not represent a generic iri resource', () => expect(isGenericIriResource(nonGenericResourceShape)).toBe(false));
     it('should return false on an empty shape', () => expect(isGenericIriResource({})).toBe(false));
-});
-
-describe('getSystemProperties', () => {
-    const emptyShape = {};
-    const emptyList = {
-        [constants.SYSTEM_PROPERTIES_URI]: []
-    };
-    const systemPropertiesList = {
-        [constants.SYSTEM_PROPERTIES_URI]: [{'@id': 'http://a'}, {'@id': 'http://b'}]
-    };
-
-    it('should return an empty list if no system properties are present', () => expect(getSystemProperties(emptyShape)).toEqual([]));
-    it('should return an empty list if the system properties list is empty', () => expect(getSystemProperties(emptyList)).toEqual([]));
-    it('should return a list with iris if no system properties are present', () => expect(getSystemProperties(systemPropertiesList)).toEqual(['http://a', 'http://b']));
 });
 
 describe('isRelationShape', () => {
