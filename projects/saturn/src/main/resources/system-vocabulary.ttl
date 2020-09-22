@@ -151,7 +151,6 @@ fs:File a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Keywords" ;
-        sh:description "Keywords." ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
@@ -310,7 +309,6 @@ fs:Directory a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Keywords" ;
-        sh:description "Keywords." ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
@@ -475,7 +473,6 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Keywords" ;
-        sh:description "Keywords." ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
@@ -649,7 +646,6 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Keywords" ;
-        sh:description "Keywords." ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
