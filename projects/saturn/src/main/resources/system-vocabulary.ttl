@@ -9,7 +9,6 @@
 @prefix dash: <http://datashapes.org/dash#> .
 
 
-fs:systemProperties a rdf:Property .
 fs:fixedShape a rdf:Property .
 fs:machineOnly a rdf:Property .
 fs:importantProperty a rdf:Property .
@@ -38,66 +37,6 @@ fs:File a rdfs:Class, sh:NodeShape ;
     sh:name "File" ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:movedTo fs:versions fs:currentVersion) ;
-    fs:systemProperties
-    [
-        sh:name "Created by" ;
-        sh:description "User that created this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:createdBy
-    ],
-    [
-        sh:name "Created" ;
-        sh:description "Date created." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateCreated
-    ],
-    [
-        sh:name "Deleted by" ;
-        sh:description "User that deleted this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:deletedBy
-    ],
-    [
-        sh:name "Deleted" ;
-        sh:description "Date deleted." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateDeleted
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique file name." ;
-        sh:datatype xsd:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ],
-    [
-        sh:name "Content type" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:contentType
-    ];
     sh:property
     [
         sh:name "Created by" ;
@@ -165,74 +104,6 @@ fs:Directory a rdfs:Class, sh:NodeShape ;
     sh:name "Directory" ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs fs:contains fs:movedTo) ;
-    fs:systemProperties
-    [
-        sh:name "Created by" ;
-        sh:description "User that created this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:createdBy
-    ],
-    [
-        sh:name "Created" ;
-        sh:description "Date created." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateCreated
-    ],
-    [
-        sh:name "Last modified by" ;
-        sh:description "User that last modified this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:modifiedBy
-    ],
-    [
-        sh:name "Modified" ;
-        sh:description "Date modified." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ; ;
-        sh:path fs:dateModified
-    ],
-    [
-         sh:name "Deleted by" ;
-         sh:description "User that deleted this resource." ;
-         sh:class fs:User ;
-         sh:maxCount 1 ;
-         fs:machineOnly true ;
-         sh:path fs:deletedBy
-    ],
-    [
-        sh:name "Deleted" ;
-        sh:description "Date deleted." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateDeleted
-    ],
-    [
-         sh:name "Label" ;
-         sh:description "Unique directory name." ;
-         sh:datatype xsd:string ;
-         sh:minCount 1 ;
-         sh:maxCount 1 ;
-         fs:machineOnly true ;
-         dash:singleLine true ;
-         fs:importantProperty true ;
-         sh:path rdfs:label;
-         sh:order 0
-    ],
-    [
-         sh:name "Description" ;
-         sh:description "" ;
-         sh:datatype xsd:string ;
-         sh:maxCount 1 ;
-         sh:path rdfs:comment
-    ] ;
     sh:property
     [
         sh:name "Created by" ;
@@ -305,82 +176,6 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
     sh:name "Collection" ;
     fs:machineOnly true ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    fs:systemProperties
-    [
-        sh:name "Owned by" ;
-        sh:description "Owner workspace." ;
-        sh:class fs:Workspace ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:ownedBy
-    ],
-    [
-        sh:name "Created by" ;
-        sh:description "User that created this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:createdBy
-    ],
-    [
-        sh:name "Created" ;
-        sh:description "Date created." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateCreated
-    ],
-    [
-        sh:name "Last modified by" ;
-        sh:description "User that last modified this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:modifiedBy
-    ],
-    [
-        sh:name "Modified" ;
-        sh:description "Date modified." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateModified
-    ],
-    [
-        sh:name "Deleted by" ;
-        sh:description "User that deleted this resource." ;
-        sh:class fs:User ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:deletedBy
-    ],
-    [
-        sh:name "Deleted" ;
-        sh:description "Date deleted." ;
-        sh:datatype xsd:dateTime ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        sh:path fs:dateDeleted
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique collection label." ;
-        sh:datatype xsd:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        fs:machineOnly true ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ] ;
     sh:property
     [
         sh:name "Owned by" ;

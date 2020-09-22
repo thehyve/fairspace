@@ -50,11 +50,6 @@ export const getMaxCount = propertyShape => (isRdfList(propertyShape) ? 0 : getF
 const isExternalLink = propertyShape => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
 
 /**
- * Returns a list of system properties defined for the given shape
- */
-export const getSystemProperties = classShape => (classShape && classShape[constants.SYSTEM_PROPERTIES_URI] && classShape[constants.SYSTEM_PROPERTIES_URI].map(entry => entry['@id'])) || [];
-
-/**
  * Returns a list of classes marked as fairspace entities.
  *
  * This is a list of entities that is not marked as machine-only, but does contain a targetClass predicate.
