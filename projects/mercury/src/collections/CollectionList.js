@@ -5,6 +5,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TablePagination,
     TableRow,
@@ -100,97 +101,100 @@ const CollectionList = ({
 
     return (
         <Paper className={classes.root}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {
-                            Object.entries(columns).map(([key, column]) => (
-                                <TableCell key={key}>
+            <TableContainer>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {
+                                Object.entries(columns).map(([key, column]) => (
+                                    <TableCell key={key}>
+                                        <TableSortLabel
+                                            active={orderBy === key}
+                                            direction={orderAscending ? 'asc' : 'desc'}
+                                            onClick={() => toggleSort(key)}
+                                        >
+                                            {column.label}
+                                        </TableSortLabel>
+                                    </TableCell>
+                                ))
+                            }
+                            {showDeleted && (
+                                <TableCell key="dateDeleted">
                                     <TableSortLabel
-                                        active={orderBy === key}
+                                        active={orderBy === 'dateDeleted'}
                                         direction={orderAscending ? 'asc' : 'desc'}
-                                        onClick={() => toggleSort(key)}
+                                        onClick={() => toggleSort('dateDeleted')}
                                     >
-                                        {column.label}
+                                    Deleted
                                     </TableSortLabel>
                                 </TableCell>
-                            ))
-                        }
-                        {showDeleted && (
-                            <TableCell key="dateDeleted">
-                                <TableSortLabel
-                                    active={orderBy === 'dateDeleted'}
-                                    direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('dateDeleted')}
-                                >
-                                    Deleted
-                                </TableSortLabel>
-                            </TableCell>
-                        )}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {pagedCollections.map((collection) => {
-                        const selected = isSelected(collection);
+                            )}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {pagedCollections.map((collection) => {
+                            const selected = isSelected(collection);
 
-                        return (
-                            <TableRow
-                                key={collection.iri}
-                                hover
-                                onClick={() => onCollectionClick(collection)}
-                                onDoubleClick={() => onCollectionDoubleClick(collection)}
-                                selected={selected}
-                                className={collection.dateDeleted && classes.deletedCollectionRow}
-                            >
-                                <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
-                                    <ListItemText
-                                        style={{margin: 0}}
-                                        primary={collection.name}
-                                        secondary={collection.description}
-                                    />
-                                </TableCell>
-                                { currentWorkspace() ? null : (
-                                    <TableCell style={{
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                        maxWidth: 160
-                                    }}
-                                    >
-                                        {collection.workspaceName}
+                            return (
+                                <TableRow
+                                    key={collection.iri}
+                                    hover
+                                    onClick={() => onCollectionClick(collection)}
+                                    onDoubleClick={() => onCollectionDoubleClick(collection)}
+                                    selected={selected}
+                                    className={collection.dateDeleted && classes.deletedCollectionRow}
+                                >
+                                    <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
+                                        <ListItemText
+                                            style={{margin: 0}}
+                                            primary={collection.name}
+                                            secondary={collection.description}
+                                        />
                                     </TableCell>
-                                ) }
-                                <TableCell>
-                                    {collection.status}
-                                </TableCell>
-                                <TableCell>
-                                    {camelCaseToWords(collection.accessMode)}
-                                </TableCell>
-                                <TableCell>
-                                    {formatDateTime(collection.dateCreated)}
-                                </TableCell>
-                                <TableCell>
-                                    {getDisplayName(collection.creatorObj)}
-                                </TableCell>
-                                {showDeleted && (
+                                    { currentWorkspace() ? null : (
+                                        <TableCell style={{
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                            maxWidth: 160
+                                        }}
+                                        >
+                                            {collection.workspaceName}
+                                        </TableCell>
+                                    ) }
                                     <TableCell>
-                                        {formatDateTime(collection.dateDeleted)}
+                                        {collection.status}
                                     </TableCell>
-                                )}
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={collections.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={(e, p) => setPage(p)}
-                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-            />
+                                    <TableCell>
+                                        {camelCaseToWords(collection.accessMode)}
+                                    </TableCell>
+                                    <TableCell>
+                                        {formatDateTime(collection.dateCreated)}
+                                    </TableCell>
+                                    <TableCell>
+                                        {getDisplayName(collection.creatorObj)}
+                                    </TableCell>
+                                    {showDeleted && (
+                                        <TableCell>
+                                            {formatDateTime(collection.dateDeleted)}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={collections.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={(e, p) => setPage(p)}
+                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    style={{overflowX: "hidden"}}
+                />
+            </TableContainer>
         </Paper>
     );
 };

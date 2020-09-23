@@ -12,6 +12,7 @@ import {
     withStyles,
 } from "@material-ui/core";
 
+import TableContainer from "@material-ui/core/TableContainer";
 import styles from './LinkedDataList.styles';
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import IriTooltip from "../../common/components/IriTooltip";
@@ -84,31 +85,34 @@ const LinkedDataList = ({
 
     return (
         <Paper className={classes.root}>
-            <Table className={classes.table}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Entity</TableCell>
-                        <TableCell>Type</TableCell>
-                        {hasHighlights && <TableCell>Match</TableCell>}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {entities.map(renderRow)}
-                </TableBody>
-                <TableFooter>
-                    <TableRow>
-                        <TablePagination
-                            rowsPerPageOptions={ROWS_PER_PAGE}
-                            rowsPerPage={ROWS_PER_PAGE.includes(size) ? size : ROWS_PER_PAGE[0]}
-                            colSpan={hasHighlights ? 4 : 3}
-                            count={total}
-                            page={page}
-                            onChangePage={(_, p) => setPage(p)}
-                            onChangeRowsPerPage={(e) => setSize(e.target.value)}
-                        />
-                    </TableRow>
-                </TableFooter>
-            </Table>
+            <TableContainer>
+                <Table className={classes.table}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Entity</TableCell>
+                            <TableCell>Type</TableCell>
+                            {hasHighlights && <TableCell>Match</TableCell>}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {entities.map(renderRow)}
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                rowsPerPageOptions={ROWS_PER_PAGE}
+                                rowsPerPage={ROWS_PER_PAGE.includes(size) ? size : ROWS_PER_PAGE[0]}
+                                colSpan={hasHighlights ? 4 : 3}
+                                count={total}
+                                page={page}
+                                onChangePage={(_, p) => setPage(p)}
+                                onChangeRowsPerPage={(e) => setSize(e.target.value)}
+                                style={{overflowX: "hidden"}}
+                            />
+                        </TableRow>
+                    </TableFooter>
+                </Table>
+            </TableContainer>
         </Paper>
     );
 };

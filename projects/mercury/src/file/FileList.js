@@ -6,6 +6,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TablePagination,
     TableRow,
@@ -79,113 +80,116 @@ const FileList = ({
 
     return (
         <Paper className={classes.root}>
-            <Table size="small">
-                <TableHead>
-                    <TableRow>
-                        {checkboxHeader}
-                        <TableCell padding="none" />
-                        <TableCell>
-                            <TableSortLabel
-                                active={orderBy === 'name'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('name')}
-                            >
-                                Name
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell align="right">
-                            <TableSortLabel
-                                active={orderBy === 'size'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('size')}
-                            >
-                                Size
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell align="right">
-                            <TableSortLabel
-                                active={orderBy === 'lastmodified'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('lastmodified')}
-                            >
-                                Last modified
-                            </TableSortLabel>
-                        </TableCell>
-                        {showDeleted && (
-                            <TableCell align="right">
+            <TableContainer>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            {checkboxHeader}
+                            <TableCell padding="none" />
+                            <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'dateDeleted'}
+                                    active={orderBy === 'name'}
                                     direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('dateDeleted')}
+                                    onClick={() => toggleSort('name')}
                                 >
-                                    Deleted
+                                Name
                                 </TableSortLabel>
                             </TableCell>
-                        )}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {pagedItems.map((file) => {
-                        const checkboxVisibility = hoveredFileName === file.filename || file.selected ? 'visible' : 'hidden';
-
-                        return (
-                            <TableRow
-                                hover
-                                key={file.filename}
-                                selected={selectionEnabled && file.selected}
-                                onClick={() => onPathHighlight(file)}
-                                onDoubleClick={() => onPathDoubleClick(file)}
-                                onMouseEnter={() => setHoveredFileName(file.filename)}
-                                onMouseLeave={() => setHoveredFileName('')}
-                                className={file.dateDeleted && classes.deletedFileRow}
-                            >
-                                {
-                                    selectionEnabled ? (
-                                        <TableCell
-                                            data-testid="checkbox-cell"
-                                            padding="none"
-                                            onDoubleClick={(e) => e.stopPropagation()}
-                                            onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(file);}}
-                                        >
-                                            <Checkbox
-                                                style={{visibility: checkboxVisibility}}
-                                                checked={file.selected}
-                                            />
-                                        </TableCell>
-                                    ) : null
-                                }
-
-                                <TableCell style={{padding: 5}} align="left">
-                                    {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
-                                </TableCell>
-                                <TableCell>
-                                    {file.basename}
-                                </TableCell>
+                            <TableCell align="right">
+                                <TableSortLabel
+                                    active={orderBy === 'size'}
+                                    direction={orderAscending ? 'asc' : 'desc'}
+                                    onClick={() => toggleSort('size')}
+                                >
+                                Size
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell align="right">
+                                <TableSortLabel
+                                    active={orderBy === 'lastmodified'}
+                                    direction={orderAscending ? 'asc' : 'desc'}
+                                    onClick={() => toggleSort('lastmodified')}
+                                >
+                                Last modified
+                                </TableSortLabel>
+                            </TableCell>
+                            {showDeleted && (
                                 <TableCell align="right">
-                                    {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}
+                                    <TableSortLabel
+                                        active={orderBy === 'dateDeleted'}
+                                        direction={orderAscending ? 'asc' : 'desc'}
+                                        onClick={() => toggleSort('dateDeleted')}
+                                    >
+                                    Deleted
+                                    </TableSortLabel>
                                 </TableCell>
-                                <TableCell align="right">
-                                    {file.lastmod ? formatDateTime(file.lastmod) : null}
-                                </TableCell>
-                                {showDeleted && (
-                                    <TableCell align="right">
-                                        {file.dateDeleted ? formatDateTime(file.dateDeleted) : null}
+                            )}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {pagedItems.map((file) => {
+                            const checkboxVisibility = hoveredFileName === file.filename || file.selected ? 'visible' : 'hidden';
+
+                            return (
+                                <TableRow
+                                    hover
+                                    key={file.filename}
+                                    selected={selectionEnabled && file.selected}
+                                    onClick={() => onPathHighlight(file)}
+                                    onDoubleClick={() => onPathDoubleClick(file)}
+                                    onMouseEnter={() => setHoveredFileName(file.filename)}
+                                    onMouseLeave={() => setHoveredFileName('')}
+                                    className={file.dateDeleted && classes.deletedFileRow}
+                                >
+                                    {
+                                        selectionEnabled ? (
+                                            <TableCell
+                                                data-testid="checkbox-cell"
+                                                padding="none"
+                                                onDoubleClick={(e) => e.stopPropagation()}
+                                                onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(file);}}
+                                            >
+                                                <Checkbox
+                                                    style={{visibility: checkboxVisibility}}
+                                                    checked={file.selected}
+                                                />
+                                            </TableCell>
+                                        ) : null
+                                    }
+
+                                    <TableCell style={{padding: 5}} align="left">
+                                        {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                     </TableCell>
-                                )}
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={files.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={(e, p) => setPage(p)}
-                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-            />
+                                    <TableCell>
+                                        {file.basename}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        {file.lastmod ? formatDateTime(file.lastmod) : null}
+                                    </TableCell>
+                                    {showDeleted && (
+                                        <TableCell align="right">
+                                            {file.dateDeleted ? formatDateTime(file.dateDeleted) : null}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={files.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={(e, p) => setPage(p)}
+                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    style={{overflowX: "hidden"}}
+                />
+            </TableContainer>
         </Paper>
     );
 };

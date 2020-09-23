@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import {Lock} from "@material-ui/icons";
 
+import TableContainer from "@material-ui/core/TableContainer";
 import type {Workspace} from './WorkspacesAPI';
 import MessageDisplay from "../common/components/MessageDisplay";
 import useSorting from "../common/hooks/UseSorting";
@@ -91,69 +92,72 @@ const WorkspaceList = (props: WorkspaceListProps) => {
 
     return (
         <>
-            <Paper style={{width: '100%', overflowX: 'auto'}}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            {
-                                Object.entries(columns).map(([key, column]) => (
-                                    <TableCell key={key} align={column.align ? column.align : 'inherit'}>
-                                        <TableSortLabel
-                                            active={orderBy === key}
-                                            direction={orderAscending ? 'asc' : 'desc'}
-                                            onClick={() => toggleSort(key)}
-                                        >
-                                            {column.label}
-                                        </TableSortLabel>
-                                    </TableCell>
-                                ))
-                            }
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {pagedItems.map((workspace: Workspace) => (
-                            <TableRow
-                                key={workspace.iri}
-                                hover
-                                onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
-                            >
-                                <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
-                                    {!workspace.canCollaborate && (<Lock />)}
-                                </TableCell>
-                                <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="name">
-                                    <ListItemText
-                                        style={{margin: 0}}
-                                        primary={workspace.name}
-                                        secondary={workspace.comment}
-                                    />
-                                </TableCell>
-                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
-                                    {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
-                                </TableCell>
-                                <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
-                                    {workspace.summary ? workspace.summary.memberCount : ''}
-                                </TableCell>
-                                <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
-                                    {workspace.managers ? workspace.managers.map(m => (
-                                        <EmailChip key={m.iri} email={m.email} label={m.name} />
-                                    )) : ''}
-                                </TableCell>
-                                <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
-                                    { isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} /> }
-                                </TableCell>
+            <Paper style={{width: '100%'}}>
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {
+                                    Object.entries(columns).map(([key, column]) => (
+                                        <TableCell key={key} align={column.align ? column.align : 'inherit'}>
+                                            <TableSortLabel
+                                                active={orderBy === key}
+                                                direction={orderAscending ? 'asc' : 'desc'}
+                                                onClick={() => toggleSort(key)}
+                                            >
+                                                {column.label}
+                                            </TableSortLabel>
+                                        </TableCell>
+                                    ))
+                                }
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 100]}
-                    component="div"
-                    count={props.workspaces.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={(e, p) => setPage(p)}
-                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-                />
+                        </TableHead>
+                        <TableBody>
+                            {pagedItems.map((workspace: Workspace) => (
+                                <TableRow
+                                    key={workspace.iri}
+                                    hover
+                                    onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
+                                >
+                                    <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
+                                        {!workspace.canCollaborate && (<Lock />)}
+                                    </TableCell>
+                                    <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="name">
+                                        <ListItemText
+                                            style={{margin: 0}}
+                                            primary={workspace.name}
+                                            secondary={workspace.comment}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
+                                        {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
+                                    </TableCell>
+                                    <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
+                                        {workspace.summary ? workspace.summary.memberCount : ''}
+                                    </TableCell>
+                                    <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
+                                        {workspace.managers ? workspace.managers.map(m => (
+                                            <EmailChip key={m.iri} email={m.email} label={m.name} />
+                                        )) : ''}
+                                    </TableCell>
+                                    <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
+                                        { isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} /> }
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25, 100]}
+                        component="div"
+                        count={props.workspaces.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onChangePage={(e, p) => setPage(p)}
+                        onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                        style={{overflowX: "hidden"}}
+                    />
+                </TableContainer>
             </Paper>
         </>
     );
