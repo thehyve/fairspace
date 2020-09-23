@@ -7,6 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
 @prefix dash: <http://datashapes.org/dash#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
 
 
 fs:systemProperties a rdf:Property .
@@ -154,7 +155,7 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
-        sh:path fs:keyword;
+        sh:path dcat:keyword;
         sh:order 2
     ],
     [
@@ -312,7 +313,7 @@ fs:Directory a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
-        sh:path fs:keyword;
+        sh:path dcat:keyword;
         sh:order 2
     ] .
 
@@ -476,7 +477,7 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
-        sh:path fs:keyword;
+        sh:path dcat:keyword;
         sh:order 2
     ].
 
@@ -649,6 +650,6 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         fs:importantProperty true ;
-        sh:path fs:keyword;
+        sh:path dcat:keyword;
         sh:order 3
     ].
