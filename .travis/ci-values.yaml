@@ -29,7 +29,7 @@ fairspace:
       pullPolicy: Always
 
 services:
-  jupyterhub: https://jupyter.fairspace.ci.fairway.app
+  jupyterhub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
 # Specific settings for Saturn subchart
 saturn:

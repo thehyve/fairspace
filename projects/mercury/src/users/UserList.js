@@ -38,6 +38,10 @@ const columns = {
         valueExtractor: 'name',
         label: 'Name'
     },
+    username: {
+        valueExtractor: 'username',
+        label: 'Username'
+    },
     email: {
         valueExtractor: 'email',
         label: 'Email'
@@ -160,6 +164,9 @@ const UserList = (props: UserListProps) => {
                         >
                             <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                 {u.name}
+                            </TableCell>
+                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
+                                {u.username}
                             </TableCell>
                             <TableCell style={{maxWidth: 160}} component="th" scope="row">
                                 {u.email}

@@ -11,6 +11,7 @@ const PermissionCandidateSelect = ({filter = () => true, permissionCandidates = 
         .map(permission => (
             {
                 label: getDisplayName(permission),
+                description: permission.username,
                 ...permission
             }
         ));

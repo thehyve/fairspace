@@ -8,6 +8,7 @@ export type User = {
     id: string;
     name: string;
     email?: string;
+    username: string;
     access: string;
     isSuperadmin: boolean;
     isAdmin: boolean;

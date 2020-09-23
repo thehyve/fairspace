@@ -108,9 +108,12 @@ public class UserService {
                                 ? (ku.getFirstName() + " " + ku.getLastName()).trim()
                                 : ku.getUsername();
 
-                        if (!Objects.equals(user.getName(), name) || !Objects.equals(user.getEmail(), ku.getEmail())) {
+                        if (!Objects.equals(user.getName(), name)
+                                || !Objects.equals(user.getEmail(), ku.getEmail())
+                                || !Objects.equals(user.getUsername(), ku.getUsername())) {
                             user.setEmail(ku.getEmail());
                             user.setName(name);
+                            user.setUsername(ku.getUsername());
                             updated.add(user);
                         }
 
