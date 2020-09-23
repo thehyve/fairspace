@@ -7,6 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
 @prefix dash: <http://datashapes.org/dash#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
 
 
 fs:fixedShape a rdf:Property .
@@ -89,6 +90,14 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
+        sh:name "Keywords" ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path dcat:keyword;
+        sh:order 2
+    ],
+    [
         sh:name "Content type" ;
         sh:description "" ;
         sh:datatype xsd:string ;
@@ -169,6 +178,14 @@ fs:Directory a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
+    ],
+    [
+        sh:name "Keywords" ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path dcat:keyword;
+        sh:order 2
     ] .
 
 fs:Collection a rdfs:Class, sh:NodeShape ;
@@ -249,7 +266,15 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-    ] .
+    ],
+    [
+        sh:name "Keywords" ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path dcat:keyword;
+        sh:order 2
+    ].
 
 fs:email a rdf:Property .
 fs:canList a rdf:Property .
@@ -414,4 +439,12 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
         sh:order 2
-    ] .
+    ],
+    [
+        sh:name "Keywords" ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path dcat:keyword;
+        sh:order 3
+    ].
