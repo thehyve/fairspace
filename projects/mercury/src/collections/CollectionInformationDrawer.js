@@ -101,7 +101,7 @@ const generateTemplate = (vocabulary) => {
     const doc = uniqueProps.map(ps => [
         '# ',
         getFirstPredicateValue(ps, SHACL_NAME),
-        getFirstPredicateValue(ps, SHACL_DESCRIPTION),
+        getFirstPredicateValue(ps, SHACL_DESCRIPTION, ""),
         typename(ps),
         cardinality(ps),
         getFirstPredicateId(ps, SHACL_PATH)
