@@ -1,18 +1,14 @@
-import React, {useContext, useRef} from 'react';
+import React, {useRef} from 'react';
 import {PropTypes} from 'prop-types';
 
 import {valuesContainsValueOrId} from "./metadataUtils";
 import Dropdown from './values/Dropdown';
-import LinkedDataContext from "../LinkedDataContext";
-import {getDescendants} from './vocabularyUtils';
-import MessageDisplay from "../../common/components/MessageDisplay";
-import LoadingInlay from "../../common/components/LoadingInlay";
 import {lookup} from "../../search/lookup";
 
-export const LinkedDataDropdown = ({property, currentValues, fetchItems, types, debounce, ...otherProps}) => {
+export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);
 
-    const search = query => fetchItems({types, query});
+    const search = query => fetchItems({type, query});
 
     const debouncedSearch = (query) => {
         if (fetchRequest.current) {
@@ -50,28 +46,13 @@ LinkedDataDropdown.propTypes = {
 };
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({types, query}) => lookup(query, types),
+    fetchItems: ({type, query}) => lookup(query, type),
     debounce: 300
 };
 
-export default props => {
-    const {shapes, shapesLoading, shapesError} = useContext(LinkedDataContext);
-
-    if (shapesError) {
-        return <MessageDisplay withIcon={false} message="Unable to fetch options" />;
-    }
-
-    if (shapesLoading) {
-        return <LoadingInlay />;
-    }
-
-    const {className} = props.property;
-    const types = [className, ...getDescendants(shapes, className)];
-
-    return (
-        <LinkedDataDropdown
-            types={types}
-            {...props}
-        />
-    );
-};
+export default props => (
+    <LinkedDataDropdown
+        type={props.property.className}
+        {...props}
+    />
+);

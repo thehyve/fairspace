@@ -15,6 +15,7 @@ import WorkspacesPage from "../workspaces/WorkspacesPage";
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
+import {ENABLE_METADATA_PAGE} from "../constants";
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
@@ -57,20 +58,22 @@ const WorkspaceRoutes = () => {
                 )}
             />
 
-            <Route
-                path="/metadata"
-                exact
-                render={() => {
-                    const subject = getSubject();
+            {ENABLE_METADATA_PAGE && (
+                <Route
+                    path="/metadata"
+                    exact
+                    render={() => {
+                        const subject = getSubject();
 
-                    return (currentUser.canViewPublicMetadata && (
-                        <MetadataWrapper>
-                            {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
-                                : <MetadataOverviewPage />}
-                        </MetadataWrapper>
-                    ));
-                }}
-            />
+                        return (currentUser.canViewPublicMetadata && (
+                            <MetadataWrapper>
+                                {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
+                                    : <MetadataOverviewPage />}
+                            </MetadataWrapper>
+                        ));
+                    }}
+                />
+            )}
 
             <Route
                 path="/search"

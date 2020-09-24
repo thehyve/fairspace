@@ -1,15 +1,11 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.auth.SaturnSecurityHandler;
-import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.rdf.search.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.eclipse.jetty.proxy.ProxyServlet;
 import org.eclipse.jetty.server.session.SessionHandler;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;

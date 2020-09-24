@@ -5,6 +5,7 @@ import {Assignment, Folder, OpenInNew, VerifiedUser, Widgets} from "@material-ui
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
+import {ENABLE_METADATA_PAGE} from "../constants";
 
 export default () => {
     const {pathname} = window.location;
@@ -36,7 +37,7 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
-                {currentUser.canViewPublicMetadata && (
+                {ENABLE_METADATA_PAGE && currentUser.canViewPublicMetadata && (
                     <ListItem
                         key="metadata"
                         component={NavLink}

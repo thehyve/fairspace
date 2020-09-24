@@ -10,7 +10,7 @@ external:
     serviceAccount:
       password: fairspace123
   elasticsearch:
-    enabled: true
+    enabled: false
     transport:
       host: fairspace-ci-elasticsearch-discovery.fairspace-ci.svc.cluster.local
     rest:

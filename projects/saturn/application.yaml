@@ -38,7 +38,7 @@ jena:
   bulkTransactions: true
   elasticSearch:
     # Enables ElasticSearch integration
-    enabled: true
+    enabled: false
     # Makes availability of ElasticSearch mandatory
     required: false
     settings:

@@ -11,7 +11,7 @@ describe('LinkedDataDropdown', () => {
         const wrapper = shallow(<LinkedDataDropdown
             property={{}}
             debounce={0}
-            types={['http://workspace.ci.fairway.app/vocabulary/PersonConsent']}
+            type="http://workspace.ci.fairway.app/vocabulary/PersonConsent"
             fetchItems={mockFetchItems}
         />);
 
