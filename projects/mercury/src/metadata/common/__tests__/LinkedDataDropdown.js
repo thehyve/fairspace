@@ -22,7 +22,7 @@ describe('LinkedDataDropdown', () => {
                 expect(mockFetchItems).toHaveBeenCalledTimes(1);
                 expect(mockFetchItems)
                     .toHaveBeenCalledWith(expect.objectContaining({
-                        types: ['http://workspace.ci.fairway.app/vocabulary/PersonConsent']
+                        type: 'http://workspace.ci.fairway.app/vocabulary/PersonConsent'
                     }));
             });
     });
