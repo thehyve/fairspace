@@ -98,10 +98,10 @@ const UserRolesPage = () => {
                                 key={u.iri}
                                 hover
                             >
-                                <TableCell style={{maxWidth: 220}} component="th" scope="row">
+                                <TableCell style={{minWidth: 220}} component="th" scope="row">
                                     {u.name}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 120}} component="th" scope="row">
+                                <TableCell style={{minWidth: 160}} component="th" scope="row">
                                     {u.username}
                                 </TableCell>
                                 <TableCell style={{maxWidth: 180}} component="th" scope="row">
