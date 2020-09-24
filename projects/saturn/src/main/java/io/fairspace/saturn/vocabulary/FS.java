@@ -70,6 +70,9 @@ public class FS {
     public static final String EMAIL_URI = NS + "email";
     public static final Property email = createProperty(EMAIL_URI);
 
+    public static final String USERNAME_URI = NS + "username";
+    public static final Property username = createProperty(USERNAME_URI);
+
     public static final String HAS_ROLE_URI = NS + "hasRole";
     public static final Property hasRole = createProperty(HAS_ROLE_URI);
 

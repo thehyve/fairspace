@@ -4,6 +4,7 @@ import {TextField} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import useIsMounted from 'react-is-mounted-hook';
 import {compareBy} from "../../../common/utils/genericUtils";
+import ListItemText from "@material-ui/core/ListItemText";
 
 const Dropdown = ({
     options = null, clearTextOnSelection = true, placeholder,
@@ -65,6 +66,9 @@ const Dropdown = ({
                     inputRef={inputRef}
                     label={label}
                 />
+            )}
+            renderOption={(option) => (
+                <ListItemText primary={option.label} secondary={option.description}/>
             )}
         />
     );
