@@ -101,7 +101,7 @@ const generateTemplate = (vocabulary) => {
     const doc = uniqueProps.map(ps => [
         '# ',
         getFirstPredicateValue(ps, SHACL_NAME),
-        getFirstPredicateValue(ps, SHACL_DESCRIPTION),
+        getFirstPredicateValue(ps, SHACL_DESCRIPTION, ""),
         typename(ps),
         cardinality(ps),
         getFirstPredicateId(ps, SHACL_PATH)
@@ -118,7 +118,7 @@ const generateTemplate = (vocabulary) => {
         + '<PUT YOUR DATA HERE>\n';
 };
 
-const MetadataCard = React.forwardRef((props, ref) => {
+const MetadataCard = (props) => {
     const {title, avatar, children, forceExpand, metadataUploadPath} = props;
     const [expandedManually, setExpandedManually] = useState(null); // true | false | null
     const expanded = (expandedManually != null) ? expandedManually : forceExpand;
@@ -217,7 +217,7 @@ const MetadataCard = React.forwardRef((props, ref) => {
             </Collapse>
         </Card>
     );
-});
+};
 
 const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
     const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
