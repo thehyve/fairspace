@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Folder, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
+import {Assignment, Folder, Grain, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
@@ -40,6 +40,20 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
+                {currentUser.canViewPublicMetadata && [{id: 'Samples', icon: <Grain />}].map(view => (
+                    <ListItem
+                        key={`views-${view.id}`}
+                        component={NavLink}
+                        to={`/views/${view.id}`}
+                        button
+                        selected={pathname.startsWith(`/views/${view.id}`)}
+                    >
+                        <ListItemIcon>
+                            {view.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={view.id} />
+                    </ListItem>
+                ))}
                 {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
                     <ListItem
                         key="metadata"

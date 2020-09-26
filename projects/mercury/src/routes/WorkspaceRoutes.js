@@ -16,6 +16,8 @@ import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
 import FeaturesContext from "../common/contexts/FeaturesContext";
+import MetadataView from '../metadata/MetadataView';
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
@@ -58,6 +60,21 @@ const WorkspaceRoutes = () => {
                     </LinkedDataMetadataProvider>
                 )}
             />
+
+            { [{id: 'Samples'}].map(view => (
+                <Route
+                    key={view.id}
+                    path={`/views/${view.id}`}
+                    exact
+                    render={() => (
+                        <BreadcrumbsContext.Provider value={{segments: []}}>
+                            <LinkedDataMetadataProvider>
+                                <MetadataView view={view.id} />
+                            </LinkedDataMetadataProvider>
+                        </BreadcrumbsContext.Provider>
+                    )}
+                />
+            ))}
 
             <Route
                 path="/metadata"
