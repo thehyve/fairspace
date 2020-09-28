@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {
     ListItemText,
     Paper,
@@ -15,8 +15,6 @@ import {
 
 import styles from './CollectionList.styles';
 import {getDisplayName} from "../users/userUtils";
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
@@ -29,7 +27,7 @@ const baseColumns = {
         label: 'Name'
     },
     workspace: {
-        valueExtractor: 'workspaceName',
+        valueExtractor: 'ownerWorkspaceName',
         label: 'Workspace'
     },
     status: {
@@ -79,7 +77,6 @@ const CollectionList = ({
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, allColumns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const {workspaces, workspacesLoading} = useContext(WorkspaceContext);
 
     if (!collections || collections.length === 0) {
         return (
@@ -92,12 +89,6 @@ const CollectionList = ({
             />
         );
     }
-
-    if (workspacesLoading) {
-        return (<LoadingInlay />);
-    }
-
-    const pagedCollections = pagedItems.map(c => ({...c, workspaceName: workspaces.find(ws => ws.iri === c.ownerWorkspace).name}));
 
     return (
         <Paper className={classes.root}>
@@ -132,7 +123,7 @@ const CollectionList = ({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {pagedCollections.map((collection) => {
+                        {pagedItems.map((collection) => {
                             const selected = isSelected(collection);
 
                             return (
@@ -159,7 +150,7 @@ const CollectionList = ({
                                             maxWidth: 160
                                         }}
                                         >
-                                            {collection.workspaceName}
+                                            {collection.ownerWorkspaceName}
                                         </TableCell>
                                     ) }
                                     <TableCell>

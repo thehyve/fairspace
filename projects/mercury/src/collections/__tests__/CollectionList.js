@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/extend-expect';
 import {render} from '@testing-library/react';
 
 import CollectionList from "../CollectionList";
-import WorkspaceContext from "../../workspaces/WorkspaceContext";
 
 describe('CollectionList', () => {
     it('shows warning message when no collections available', () => {
@@ -19,13 +18,12 @@ describe('CollectionList', () => {
             },
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
-            ownerWorkspace: 'http://example.com/ws1'
+            ownerWorkspace: 'http://example.com/ws1',
+            ownerWorkspaceName: 'ws1'
         }];
 
         const {queryByText} = render(
-            <WorkspaceContext.Provider value={{workspaces: [{iri: 'http://example.com/ws1', name: 'ws1'}]}}>
-                <CollectionList collections={collections} showDeleted={false} />
-            </WorkspaceContext.Provider>
+            <CollectionList collections={collections} showDeleted={false} />
         );
 
         expect(queryByText('Name')).toBeInTheDocument();
@@ -47,13 +45,12 @@ describe('CollectionList', () => {
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',
+            ownerWorkspaceName: 'ws1',
             dateDeleted: new Date().toUTCString()
         }];
 
         const {getByText} = render(
-            <WorkspaceContext.Provider value={{workspaces: [{iri: 'http://example.com/ws1', name: 'ws1'}]}}>
-                <CollectionList collections={collections} showDeleted />
-            </WorkspaceContext.Provider>
+            <CollectionList collections={collections} showDeleted />
         );
 
         expect(getByText('Name')).toBeInTheDocument();
