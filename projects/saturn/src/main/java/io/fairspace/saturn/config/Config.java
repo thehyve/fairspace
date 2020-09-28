@@ -1,10 +1,13 @@
 package io.fairspace.saturn.config;
 
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -18,9 +21,7 @@ import org.apache.jena.tdb2.params.StoreParamsCodec;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
@@ -42,6 +43,10 @@ public class Config {
 
     public Properties mail = new Properties();
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    public final Set<Feature> features = new HashSet<>();
+
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
     public static class Jena {
@@ -58,7 +63,6 @@ public class Config {
         public ElasticSearch elasticSearch = new ElasticSearch();
 
         public static class ElasticSearch {
-            public boolean enabled = false;
             public boolean required = false;
             public ESSettings settings = new ESSettings.Builder()
                     .clusterName("fairspace")

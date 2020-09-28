@@ -27,7 +27,7 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config) {
+    public static Dataset connect(Config.Jena config, boolean enableEs) {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
@@ -35,14 +35,12 @@ public class SaturnDatasetFactory {
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
-        if (config.elasticSearch.enabled) {
+        if (enableEs) {
             try {
                 dsg = new IndexedDatasetGraph(dsg, config.elasticSearch.settings, config.elasticSearch.advancedSettings, new IndexDispatcher(dsg.getContext()), restoreNeeded);
             } catch (Exception e) {
                 log.error("Error connecting to ElasticSearch", e);
-                if (config.elasticSearch.required) {
-                    throw e; // Terminates Saturn
-                }
+                throw e; // Terminates Saturn
             }
         }
 

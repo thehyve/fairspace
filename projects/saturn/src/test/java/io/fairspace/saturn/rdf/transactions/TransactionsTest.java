@@ -22,17 +22,14 @@ import static org.apache.jena.query.ReadWrite.WRITE;
 public class TransactionsTest {
     private Config.Jena config = new Config.Jena();
     private Dataset ds;
-    private Transactions txn;
 
 
     @Before
-    public void before() throws IOException {
-        config.elasticSearch.enabled = false;
+    public void before() {
         config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
         config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
-        ds = SaturnDatasetFactory.connect(config);
-        txn = new BulkTransactions(ds);
+        ds = SaturnDatasetFactory.connect(config, false);
     }
 
     @After

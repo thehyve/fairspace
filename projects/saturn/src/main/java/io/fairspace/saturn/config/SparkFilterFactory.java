@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.services.features.FeaturesApp;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
@@ -18,6 +19,7 @@ public class SparkFilterFactory {
                 new VocabularyApp(apiPathPrefix + "/vocabulary"),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),
+                new FeaturesApp(apiPathPrefix + "/features", config.features),
                 new HealthApp(apiPathPrefix + "/health"),
                 new StaticFilesApp());
     }

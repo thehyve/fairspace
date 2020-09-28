@@ -5,11 +5,13 @@ import {Assignment, Folder, OpenInNew, VerifiedUser, Widgets} from "@material-ui
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
+import FeaturesContext from "../common/contexts/FeaturesContext";
 
 export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
+    const {isFeatureEnabled} = useContext(FeaturesContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
@@ -38,7 +40,7 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
-                {currentUser.canViewPublicMetadata && (
+                {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
                     <ListItem
                         key="metadata"
                         component={NavLink}

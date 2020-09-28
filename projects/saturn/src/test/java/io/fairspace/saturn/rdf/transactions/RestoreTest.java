@@ -29,7 +29,6 @@ public class RestoreTest {
     @Before
     public void before() {
         config = new Config.Jena();
-        config.elasticSearch.enabled = false;
         config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
         config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
     }
@@ -78,6 +77,6 @@ public class RestoreTest {
     }
 
     private Transactions newDataset() throws IOException {
-        return new BulkTransactions(SaturnDatasetFactory.connect(config));
+        return new BulkTransactions(SaturnDatasetFactory.connect(config, false));
     }
 }
