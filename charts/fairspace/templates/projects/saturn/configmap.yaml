@@ -20,8 +20,6 @@ data:
       transactionLogPath: "/data/saturn/files/log"
       bulkTransactions: {{ .Values.saturn.bulkTransactions }}
       elasticSearch:
-        enabled: {{ .Values.external.elasticsearch.enabled }}
-        required: true
         settings:
           hostToPortMapping:
             {{ .Values.external.elasticsearch.transport.host }}: {{ .Values.external.elasticsearch.transport.port }}
