@@ -6,6 +6,7 @@ import {Router} from 'react-router-dom';
 import {createMemoryHistory} from 'history';
 import LinkedDataLink from "../LinkedDataLink";
 import {METADATA_PATH} from "../../../constants";
+import UserContext from '../../../users/UserContext';
 
 describe('LinkedDataLink', () => {
     it('should render internal link for any uri', () => {
@@ -13,13 +14,15 @@ describe('LinkedDataLink', () => {
         history.push = jest.fn();
 
         const wrapper = mount(
-            <Router history={history}>
-                <LinkedDataLink uri="http://google.nl/some-path?search#hash">Go</LinkedDataLink>
-            </Router>
+            <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
+                <Router history={history}>
+                    <LinkedDataLink uri="http://google.nl/some-path?search#hash">Go</LinkedDataLink>
+                </Router>
+            </UserContext.Provider>
         );
 
+        expect(wrapper.find('a').isEmpty()).toBeFalsy();
         const anchor = wrapper.find('a').first();
-        expect(anchor).toBeTruthy();
         const expectedLocation = `${METADATA_PATH}?iri=${encodeURIComponent("http://google.nl/some-path?search#hash")}`;
         expect(anchor.prop('href')).toEqual(expectedLocation);
         expect(anchor.text()).toEqual('Go');
@@ -33,19 +36,37 @@ describe('LinkedDataLink', () => {
         });
     });
 
+    it('should display child elements for users without access to public metadata', () => {
+        const history: History = createMemoryHistory();
+        history.push = jest.fn();
+
+        const wrapper = mount(
+            <UserContext.Provider value={{currentUser: {canViewPublicMetadata: false}}}>
+                <Router history={history}>
+                    <LinkedDataLink uri="http://google.nl/some-path?search#hash">Go</LinkedDataLink>
+                </Router>
+            </UserContext.Provider>
+        );
+
+        expect(wrapper.find('a').isEmpty()).toBeTruthy();
+        expect(wrapper.text()).toEqual('Go');
+    });
+
     it('should not break on an invalid url (return children only)', () => {
         const uri = `some-invalid-url`;
         const history: History = createMemoryHistory();
         history.push = jest.fn();
 
         const wrapper = mount(
-            <Router history={history}>
-                <LinkedDataLink uri={uri}>something</LinkedDataLink>
-            </Router>
+            <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
+                <Router history={history}>
+                    <LinkedDataLink uri={uri}>something</LinkedDataLink>
+                </Router>
+            </UserContext.Provider>
         );
 
+        expect(wrapper.find('a').isEmpty()).toBeFalsy();
         const anchor = wrapper.find('a').first();
-        expect(anchor).toBeTruthy();
         const expectedLocation = `${METADATA_PATH}?iri=${encodeURIComponent(uri)}`;
         expect(anchor.prop('href')).toEqual(expectedLocation);
         expect(anchor.text()).toEqual('something');

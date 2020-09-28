@@ -13,9 +13,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
@@ -86,8 +84,15 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Property
+    public String getOwnedByName() {
+        return Optional.ofNullable(subject.getPropertyResourceValue(FS.ownedBy))
+                .map(workspace -> getStringProperty(workspace, RDFS.label))
+                .orElse(null);
+    }
+
+    @Property
     public String getOwnedBy() {
-        return subject.listProperties(FS.ownedBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
+        return Optional.ofNullable(subject.getPropertyResourceValue(FS.ownedBy)).map(Resource::getURI).orElse(null);
     }
 
     public void setOwnedBy(Resource owner) throws NotAuthorizedException, BadRequestException {

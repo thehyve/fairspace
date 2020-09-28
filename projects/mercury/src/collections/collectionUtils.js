@@ -100,6 +100,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,
     name: properties.displayname,
     ownerWorkspace: properties.ownedBy,
+    ownerWorkspaceName: properties.ownedByName,
     location: properties.basename,
     description: properties.comment,
     dateCreated: properties.creationdate,
