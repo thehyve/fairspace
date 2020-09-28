@@ -3,9 +3,9 @@
   "version": "0.0.0-RELEASEVERSION",
   "private": true,
   "scripts": {
-    "dev": "yarn build && concurrently \"yarn keycloak\" \"yarn saturn\" \"yarn start\"",
+    "dev": "yarn build && concurrently \"yarn keycloak\" \"yarn saturn\" \"yarn elasticsearch\" \"yarn start\"",
     "keycloak": "cd ../../local-development && docker-compose up",
-    "saturn": "wait-on http://localhost:5100 && cd ../saturn/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew run",
+    "saturn": "wait-on http://localhost:5100 && wait-on http://localhost:9200/ && cd ../saturn/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew run",
     "elasticsearch": "./start-elasticsearch",
     "start": "react-scripts start",
     "build": "react-scripts build",

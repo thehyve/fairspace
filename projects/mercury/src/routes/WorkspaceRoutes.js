@@ -15,7 +15,7 @@ import WorkspacesPage from "../workspaces/WorkspacesPage";
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
-import {ENABLE_METADATA_PAGE} from "../constants";
+import FeaturesContext from "../common/contexts/FeaturesContext";
 
 const getSubject = () => (
     document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
@@ -23,6 +23,7 @@ const getSubject = () => (
 
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
+    const {isFeatureEnabled} = useContext(FeaturesContext);
 
     return (
         <Switch>
@@ -58,7 +59,7 @@ const WorkspaceRoutes = () => {
                 )}
             />
 
-            {ENABLE_METADATA_PAGE && (
+            {isFeatureEnabled('MetadataEditing') && (
                 <Route
                     path="/metadata"
                     exact

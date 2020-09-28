@@ -1,6 +1,7 @@
 package io.fairspace.saturn;
 
 import io.fairspace.saturn.auth.SaturnSecurityHandler;
+import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -14,20 +15,21 @@ import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 public class App {
     public static final String API_PREFIX = "/api/v1";
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, CONFIG.features.contains(Feature.MetadataEditing));
 
         var svc = new Services(API_PREFIX, CONFIG, ds);
 
-        var server = FusekiServer.create()
+        var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addServlet(API_PREFIX + "/search/*", svc.getSearchProxyServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
-                .port(CONFIG.port)
+                .port(CONFIG.port);
+        var server = serverBuilder
                 .build();
 
         server.getJettyServer().insertHandler(new SessionHandler());

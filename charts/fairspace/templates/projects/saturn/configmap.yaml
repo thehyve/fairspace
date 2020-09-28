@@ -39,6 +39,8 @@ data:
     services:
       {{ if ( and .Values.services .Values.services.jupyterhub  ) }}"jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
       {{ if ( and .Values.services .Values.services.cbioportal  ) }}"cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
+    features:
+{{ toYaml .Values.fairspace.features | indent 6 }}
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
   vocabulary.ttl: |

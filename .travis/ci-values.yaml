@@ -25,6 +25,8 @@ fairspace:
       password: keycloak-ci-123
       configurationScriptsTag: 0.1.9-SNAPSHOT
       pullPolicy: Always
+  features:
+    - MetadataEditing
 
 services:
   "JupyterHub Server": https://jupyter.fairspace.ci.fairway.app/user/${username}/lab

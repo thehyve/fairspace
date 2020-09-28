@@ -37,10 +37,6 @@ jena:
   transactionLogPath: "data/log"
   bulkTransactions: true
   elasticSearch:
-    # Enables ElasticSearch integration
-    enabled: false
-    # Makes availability of ElasticSearch mandatory
-    required: false
     settings:
       # Map of hosts and ports. The host could also be an IP Address
       hostToPortMapping:
@@ -74,4 +70,6 @@ services:
   jupyterhub: https://jupyter.org/hub#
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
+features:
+  - MetadataEditing
 

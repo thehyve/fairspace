@@ -10,6 +10,7 @@ import {ServicesProvider} from '../common/contexts/ServicesContext';
 import Layout from "./Layout";
 import TopBar from "./TopBar";
 import {UsersProvider} from "../users/UsersContext";
+import {FeaturesProvider} from "../common/contexts/FeaturesContext";
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
@@ -23,11 +24,13 @@ const WorkspaceLayoutInner = () => {
             <VocabularyProvider>
                 <CollectionsProvider>
                     <ServicesProvider>
-                        <Layout
-                            renderMenu={() => <MainMenu />}
-                            renderMain={() => <WorkspaceRoutes />}
-                            renderTopbar={() => <TopBar title={title} />}
-                        />
+                        <FeaturesProvider>
+                            <Layout
+                                renderMenu={() => <MainMenu />}
+                                renderMain={() => <WorkspaceRoutes />}
+                                renderTopbar={() => <TopBar title={title} />}
+                            />
+                        </FeaturesProvider>
                     </ServicesProvider>
                 </CollectionsProvider>
             </VocabularyProvider>
