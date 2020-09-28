@@ -1,6 +1,5 @@
 import React, {useContext} from 'react';
 import {
-    Paper,
     Table,
     TableBody,
     TableCell,
@@ -11,6 +10,8 @@ import {
 } from "@material-ui/core";
 
 import Checkbox from "@material-ui/core/Checkbox";
+import TableContainer from "@material-ui/core/TableContainer";
+import Paper from "@material-ui/core/Paper";
 import UsersContext from "./UsersContext";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
@@ -23,6 +24,10 @@ const columns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
+    },
+    username: {
+        valueExtractor: 'username',
+        label: 'Username'
     },
     email: {
         valueExtractor: 'email',
@@ -67,84 +72,90 @@ const UserRolesPage = () => {
 
     return (
         <Paper style={{marginTop: 16}}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {
-                            Object.entries(columns).map(([key, column]) => (
-                                <TableCell key={key}>
-                                    <TableSortLabel
-                                        active={orderBy === key}
-                                        direction={orderAscending ? 'asc' : 'desc'}
-                                        onClick={() => toggleSort(key)}
-                                    >
-                                        {column.label}
-                                    </TableSortLabel>
-                                </TableCell>
-                            ))
-                        }
-                        <TableCell />
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {pagedItems.map((u) => (
-                        <TableRow
-                            key={u.iri}
-                            hover
-                        >
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                {u.name}
-                            </TableCell>
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                {u.email}
-                            </TableCell>
-                            <TableCell style={{width: 120}}>
-                                <Checkbox
-                                    checked={u.isSuperadmin}
-                                    disabled
-                                />
-                            </TableCell>
-                            <TableCell style={{width: 120}}>
-                                <Checkbox
-                                    checked={u.isAdmin}
-                                    onChange={(e) => toggleRole(u.id, 'isAdmin', e.target.checked)}
-                                    disabled={u.isSuperadmin}
-                                />
-                            </TableCell>
-                            <TableCell style={{width: 120}}>
-                                <Checkbox
-                                    checked={u.canViewPublicData}
-                                    onChange={(e) => toggleRole(u.id, 'canViewPublicData', e.target.checked)}
-                                    disabled={u.isAdmin}
-                                />
-                            </TableCell>
-                            <TableCell style={{width: 120}}>
-                                <Checkbox
-                                    checked={u.canViewPublicMetadata}
-                                    onChange={(e) => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
-                                    disabled={u.canViewPublicData}
-                                />
-                            </TableCell>
-                            <TableCell style={{width: 120}}>
-                                <Checkbox
-                                    checked={u.canAddSharedMetadata}
-                                    onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
-                                    disabled={u.isSuperadmin}
-                                />
-                            </TableCell>
+            <TableContainer>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {
+                                Object.entries(columns).map(([key, column]) => (
+                                    <TableCell key={key}>
+                                        <TableSortLabel
+                                            active={orderBy === key}
+                                            direction={orderAscending ? 'asc' : 'desc'}
+                                            onClick={() => toggleSort(key)}
+                                        >
+                                            {column.label}
+                                        </TableSortLabel>
+                                    </TableCell>
+                                ))
+                            }
+                            <TableCell />
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={users.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={(e, p) => setPage(p)}
-                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-            />
+                    </TableHead>
+                    <TableBody>
+                        {pagedItems.map((u) => (
+                            <TableRow
+                                key={u.iri}
+                                hover
+                            >
+                                <TableCell style={{minWidth: 220}} component="th" scope="row">
+                                    {u.name}
+                                </TableCell>
+                                <TableCell style={{minWidth: 160}} component="th" scope="row">
+                                    {u.username}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 180}} component="th" scope="row">
+                                    {u.email}
+                                </TableCell>
+                                <TableCell style={{width: 80}}>
+                                    <Checkbox
+                                        checked={u.isSuperadmin}
+                                        disabled
+                                    />
+                                </TableCell>
+                                <TableCell style={{width: 80}}>
+                                    <Checkbox
+                                        checked={u.isAdmin}
+                                        onChange={(e) => toggleRole(u.id, 'isAdmin', e.target.checked)}
+                                        disabled={u.isSuperadmin}
+                                    />
+                                </TableCell>
+                                <TableCell style={{width: 80}}>
+                                    <Checkbox
+                                        checked={u.canViewPublicData}
+                                        onChange={(e) => toggleRole(u.id, 'canViewPublicData', e.target.checked)}
+                                        disabled={u.isAdmin}
+                                    />
+                                </TableCell>
+                                <TableCell style={{width: 80}}>
+                                    <Checkbox
+                                        checked={u.canViewPublicMetadata}
+                                        onChange={(e) => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
+                                        disabled={u.canViewPublicData}
+                                    />
+                                </TableCell>
+                                <TableCell style={{width: 80}}>
+                                    <Checkbox
+                                        checked={u.canAddSharedMetadata}
+                                        onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
+                                        disabled={u.isSuperadmin}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={users.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={(e, p) => setPage(p)}
+                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    style={{overflowX: "hidden"}}
+                />
+            </TableContainer>
         </Paper>
     );
 };

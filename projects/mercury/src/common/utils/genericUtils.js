@@ -88,7 +88,7 @@ export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value
 //* DATE - TIME (PS: We should utilize the already used date-fns library for a more reliable code)
 //* *********************************
 
-const defaultLocale = 'en-GB';
+const defaultLocale = new Intl.Locale('en-GB');
 
 const dateFormatter = new Intl.DateTimeFormat(defaultLocale, {
     year: 'numeric',

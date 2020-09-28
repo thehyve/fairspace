@@ -22,8 +22,6 @@ external:
   # - ...
   keycloak:
     baseUrl:
-    username:
-    password:
     loginRealm: master
     realm:
     clientSecret:
@@ -133,7 +131,9 @@ fairspace:
     # Scripts for setting up keycloak for a fairspace
     configurationScripts:
       keycloak:
-        enabled: true
+        enabled: false
+        username: keycloak
+        password:
         dockerRepository: eu.gcr.io
         image: fairspace-207108/keycloak-configuration
         configurationScriptsTag: 0.1.8
@@ -145,8 +145,6 @@ fairspace:
             limits:
                 cpu: "500m"
                 memory: "2048Mi"
-
-    enableExperimentalFeatures: false
 
 # Generic settings for tracing
 tracing:

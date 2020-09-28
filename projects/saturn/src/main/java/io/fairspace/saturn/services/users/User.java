@@ -26,6 +26,9 @@ public class User extends PersistentEntity {
     @RDFProperty(EMAIL_URI)
     private String email;
 
+    @RDFProperty(USERNAME_URI)
+    private String username;
+
     @RDFProperty(FS.IS_SUPERADMIN_URI)
     @JsonProperty("isSuperadmin")
     private boolean superadmin;

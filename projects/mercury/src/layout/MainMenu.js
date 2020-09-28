@@ -11,6 +11,8 @@ export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
+    // eslint-disable-next-line no-template-curly-in-string
+    const interpolate = s => s.replace('${username}', currentUser.username);
     return (
         <>
             <List>
@@ -71,7 +73,7 @@ export default () => {
                 <List>
                     {
                         Object.keys(services).map(key => (
-                            <ListItem button component="a" href={services[key]} key={'service-' + key}>
+                            <ListItem button component="a" href={interpolate(services[key])} key={'service-' + key}>
                                 <ListItemIcon>
                                     <OpenInNew />
                                 </ListItemIcon>

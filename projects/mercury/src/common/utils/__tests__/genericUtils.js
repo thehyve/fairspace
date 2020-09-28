@@ -113,7 +113,7 @@ describe('formatDateTime', () => {
     it('should show date when it is not today', () => {
         const dateValue = '2008-09-15T15:53:00';
         const formatted = formatDateTime(dateValue);
-        expect(formatted).toEqual('Sep 15, 2008');
+        expect(formatted).toEqual('15 Sep 2008');
     });
 
     it('should show time when it is today', () => {
@@ -121,7 +121,6 @@ describe('formatDateTime', () => {
         const formatted = formatDateTime(dateValue);
         expect(formatted).not.toContain(',');
         expect(formatted).toContain(':');
-        expect(formatted).toContain('M');
     });
 
     it('should return the given value for invalid dates', () => {

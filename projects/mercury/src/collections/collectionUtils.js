@@ -1,3 +1,4 @@
+import queryString from "query-string";
 import {COMMENT_URI, LABEL_URI} from "../constants";
 import type {
     AccessLevel,
@@ -10,7 +11,6 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
-import queryString from "query-string";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);

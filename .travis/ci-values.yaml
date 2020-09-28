@@ -2,13 +2,9 @@
 external:
   keycloak:
     baseUrl: https://keycloak.ci.fairway.app
-    username: keycloak
-    password: keycloak-ci-123
     realm: ci
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-    serviceAccount:
-      password: fairspace123
   elasticsearch:
     enabled: false
     transport:
@@ -22,14 +18,16 @@ fairspace:
   description: "CI Fairspace"
   ingress:
     domain: fairspace.ci.fairway.app
-  enableExperimentalFeatures: false
   configurationScripts:
     keycloak:
+      enabled: true
+      username: keycloak
+      password: keycloak-ci-123
       configurationScriptsTag: 0.1.9-SNAPSHOT
       pullPolicy: Always
 
 services:
-  jupyterhub: https://jupyter.fairspace.ci.fairway.app
+  "JupyterHub Server": https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
 # Specific settings for Saturn subchart
 saturn:

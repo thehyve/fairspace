@@ -18,6 +18,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Checkbox from "@material-ui/core/Checkbox";
+import TableContainer from "@material-ui/core/TableContainer";
 import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User} from "./UsersAPI";
@@ -37,6 +38,10 @@ const columns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
+    },
+    username: {
+        valueExtractor: 'username',
+        label: 'Username'
     },
     email: {
         valueExtractor: 'email',
@@ -133,75 +138,81 @@ const UserList = (props: UserListProps) => {
 
     const renderUserList = () => (
         <Paper style={{marginTop: 16}}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {
-                            Object.entries(columns).map(([key, column]) => (
-                                <TableCell key={key}>
-                                    <TableSortLabel
-                                        active={orderBy === key}
-                                        direction={orderAscending ? 'asc' : 'desc'}
-                                        onClick={() => toggleSort(key)}
-                                    >
-                                        {column.label}
-                                    </TableSortLabel>
-                                </TableCell>
-                            ))
-                        }
-                        <TableCell />
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {pagedItems.map((u) => (
-                        <TableRow
-                            key={u.iri}
-                            hover
-                        >
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                {u.name}
-                            </TableCell>
-                            <TableCell style={{maxWidth: 160}} component="th" scope="row">
-                                {u.email}
-                            </TableCell>
-                            <TableCell style={{width: 120}}>
-                                <Checkbox
-                                    checked={u.role === 'Manager'}
-                                    onChange={(event) => (
-                                        event.target.checked
-                                            ? grantUserRole(u.iri, "Manager")
-                                            : grantUserRole(u.iri, "Member")
-                                    )}
-                                    disabled={!canAlterPermission(canManage, u, currentUser)}
-                                    disableRipple
-                                />
-                            </TableCell>
-                            <TableCell style={{width: 32}}>
-                                <ConfirmationButton
-                                    onClick={() => grantUserRole(u.iri, 'None')}
-                                    disabled={!canAlterPermission(canManage, u, currentUser)}
-                                    message="Are you sure you want to remove this user from the workspace?"
-                                    agreeButtonText="Remove user"
-                                    dangerous
-                                >
-                                    <IconButton disabled={!canManage}>
-                                        <HighlightOffSharp />
-                                    </IconButton>
-                                </ConfirmationButton>
-                            </TableCell>
+            <TableContainer>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {
+                                Object.entries(columns).map(([key, column]) => (
+                                    <TableCell key={key}>
+                                        <TableSortLabel
+                                            active={orderBy === key}
+                                            direction={orderAscending ? 'asc' : 'desc'}
+                                            onClick={() => toggleSort(key)}
+                                        >
+                                            {column.label}
+                                        </TableSortLabel>
+                                    </TableCell>
+                                ))
+                            }
+                            <TableCell />
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={workspaceUsersWithRoles.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={(e, p) => setPage(p)}
-                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-            />
+                    </TableHead>
+                    <TableBody>
+                        {pagedItems.map((u) => (
+                            <TableRow
+                                key={u.iri}
+                                hover
+                            >
+                                <TableCell style={{maxWidth: 220}} component="th" scope="row">
+                                    {u.name}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 120}} component="th" scope="row">
+                                    {u.username}
+                                </TableCell>
+                                <TableCell style={{maxWidth: 180}} component="th" scope="row">
+                                    {u.email}
+                                </TableCell>
+                                <TableCell style={{width: 120}}>
+                                    <Checkbox
+                                        checked={u.role === 'Manager'}
+                                        onChange={(event) => (
+                                            event.target.checked
+                                                ? grantUserRole(u.iri, "Manager")
+                                                : grantUserRole(u.iri, "Member")
+                                        )}
+                                        disabled={!canAlterPermission(canManage, u, currentUser)}
+                                        disableRipple
+                                    />
+                                </TableCell>
+                                <TableCell style={{width: 32}}>
+                                    <ConfirmationButton
+                                        onClick={() => grantUserRole(u.iri, 'None')}
+                                        disabled={!canAlterPermission(canManage, u, currentUser)}
+                                        message="Are you sure you want to remove this user from the workspace?"
+                                        agreeButtonText="Remove user"
+                                        dangerous
+                                    >
+                                        <IconButton disabled={!canManage}>
+                                            <HighlightOffSharp />
+                                        </IconButton>
+                                    </ConfirmationButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={workspaceUsersWithRoles.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={(e, p) => setPage(p)}
+                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    style={{overflowX: "hidden"}}
+                />
+            </TableContainer>
         </Paper>
     );
 

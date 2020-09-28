@@ -71,6 +71,7 @@ mail:
   mail.smtp.port: 587
   mail.smtp.starttls.enable: true
 services:
-  jupyterhub: https://jupyter.org/hub
+  jupyterhub: https://jupyter.org/hub#
   cbioportal: https://www.cbioportal.org
+  "test username": http://google.com?q=${username}
 
