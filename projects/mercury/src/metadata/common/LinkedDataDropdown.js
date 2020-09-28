@@ -41,7 +41,7 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, d
 LinkedDataDropdown.propTypes = {
     fetchItems: PropTypes.func,
     property: PropTypes.object.isRequired,
-    types: PropTypes.arrayOf(PropTypes.string).isRequired,
+    type: PropTypes.string.isRequired,
     debounce: PropTypes.number
 };
 
