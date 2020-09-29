@@ -71,20 +71,22 @@ const LinkedDataEntityHeader = ({
                         filePath={values[FILE_PATH_URI]}
                     />
 
-                    <Tooltip
-                        title={(
-                            <Typography
-                                variant="caption"
-                                color="inherit"
-                                style={{whiteSpace: 'pre-line'}}
-                            >
-                                {typeInfo.description}
-                            </Typography>
-                        )}
-                        aria-label={typeInfo.description}
-                    >
-                        <Chip label={typeInfo.label || '........'} />
-                    </Tooltip>
+                    {typeInfo.description ? (
+                        <Tooltip
+                            title={(
+                                <Typography
+                                    variant="caption"
+                                    color="inherit"
+                                    style={{whiteSpace: 'pre-line'}}
+                                >
+                                    {typeInfo.description}
+                                </Typography>
+                            )}
+                            aria-label={typeInfo.description}
+                        >
+                            <Chip label={typeInfo.label || '........'} />
+                        </Tooltip>
+                    ) : <Chip label={typeInfo.label || '........'} />}
                 </Grid>
             </Grid>
 
