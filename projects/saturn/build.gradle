@@ -1,7 +1,7 @@
 buildscript {
     ext {
         jena_version = '3.16.0'
-        milton_version = '2.8.0.1'
+        milton_version = '2.8.0.3'
         mockitoVersion = '3.2.4'
         jacksonVersion = '2.10.1' // check what version is used by Jena
     }
@@ -42,27 +42,24 @@ dependencies {
     implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
     implementation "org.apache.jena:jena-text:${jena_version}"
     implementation "org.apache.jena:jena-text-es:${jena_version}"
-    implementation('org.elasticsearch.client:transport:6.4.2')
     implementation "io.milton:milton-server-ce:${milton_version}"
-    implementation 'com.nimbusds:nimbus-jose-jwt:7.1'
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    implementation "com.sparkjava:spark-core:2.9.0"
+    implementation "com.sparkjava:spark-core:2.9.2"
     implementation 'com.pivovarit:throwing-function:1.5.0'
     implementation 'com.google.guava:guava:27.1-jre'
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.11.1'
     implementation('com.io-informatics.oss:jackson-jsonld:0.1.1') {
         exclude group: 'com.github.jsonld-java'
     }
-    implementation('org.bouncycastle:bcprov-jdk15on:1.64')
-    implementation 'com.nimbusds:nimbus-jose-jwt:7.1'
+    implementation('org.bouncycastle:bcprov-jdk15on:1.65')
 
     implementation 'net.logstash.log4j:jsonevent-layout:1.7'
 
     implementation 'org.eclipse.jetty:jetty-proxy:9.4.15.v20190215'
 
-    implementation 'org.keycloak:keycloak-jetty94-adapter:9.0.0'
-    implementation 'org.keycloak:keycloak-admin-client:9.0.0'
+    implementation 'org.keycloak:keycloak-jetty94-adapter:11.0.2'
+    implementation 'org.keycloak:keycloak-admin-client:11.0.2'
 
     runtime 'org.slf4j:slf4j-jdk14:1.7.30'
 
