@@ -88,6 +88,7 @@ jacocoTestReport {
 
 dependencyCheck {
     failBuildOnCVSS=9
+    suppressionFile='suppressions.xml'
 }
 
 // Plugin disabled for Java 13 - not compatible
