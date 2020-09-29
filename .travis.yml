@@ -22,8 +22,8 @@ env:
      - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
      - SNAPSHOT_CLUSTER_NAME="fairspacecicluster"
      - SNAPSHOT_CLUSTER_ZONE="europe-west1-b"
-     - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacedemocluster"
-     - RELEASE_CLUSTER_NAME="fairspacedemocluster"
+     - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
+     - RELEASE_CLUSTER_NAME="fairspacecicluster"
      - RELEASE_CLUSTER_ZONE="europe-west1-b"
      - GIT_TAG_FILES_OVERRIDE="charts/fairspace/Chart.yaml charts/fairspace/values.yaml projects/"
 
@@ -46,7 +46,7 @@ before_install:
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE" ; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE" ; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE" ; fi'
   - export INFRASTRUCTURE_PLATFORM="${DEPLOY_PLATFORM:-NONE}"
   - source ./ci/setup_env.sh
   - 'if [[ "$SHOULD_RELEASE" ]]; then export OIDC_AUTH_VERSION=$VERSION; fi'
