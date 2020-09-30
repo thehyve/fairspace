@@ -19,6 +19,7 @@ data:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}
       transactionLogPath: "/data/saturn/files/log"
       bulkTransactions: {{ .Values.saturn.bulkTransactions }}
+{{ if .Values.external.elasticsearch.enabled }}
       elasticSearch:
         settings:
           hostToPortMapping:
@@ -26,6 +27,7 @@ data:
           clusterName: "elasticsearch"
           shards: 1
           replicas: 1
+{{ end }}
     auth:
       authServerUrl: {{ .Values.external.keycloak.baseUrl }}/auth/
       realm: {{ .Values.external.keycloak.realm }}
