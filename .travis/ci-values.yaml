@@ -6,7 +6,7 @@ external:
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
   elasticsearch:
-    enabled: false
+    enabled: true
     transport:
       host: fairspace-ci-elasticsearch-discovery.fairspace-ci.svc.cluster.local
     rest:
