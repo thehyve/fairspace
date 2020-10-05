@@ -41,11 +41,11 @@ const UserMenu = ({classes}) => {
         return '...';
     }
 
-    if (currentUserError) {
+    if (currentUserError || !currentUser) {
         return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
-    return currentUser && (
+    return (
         <>
             <Button
                 aria-owns={anchorEl ? 'user-menu' : null}

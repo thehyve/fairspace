@@ -41,8 +41,8 @@ class WorkspacesAPI {
         return axios.get(workspacesUrl, {
             headers: {Accept: 'application/json'},
         })
-            .catch(handleHttpError("Failure when retrieving a list of workspaces"))
-            .then(extractJsonData);
+            .then(extractJsonData)
+            .catch(handleHttpError("Failure when retrieving a list of workspaces"));
     }
 
     createWorkspace(workspace: WorkspaceProperties): Promise<WorkspaceProperties> {
