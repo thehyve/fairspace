@@ -27,6 +27,7 @@ export default ({title, subject}) => {
                 />
                 <LinkedDataEntityFormContainer
                     subject={subject}
+                    typeInfo={typeInfo}
                     fullpage
                     properties={properties}
                     values={values}

@@ -13,7 +13,7 @@ import {DATE_DELETED_URI} from "../../constants";
 import ConfirmationDialog from "../../common/components/ConfirmationDialog";
 
 const LinkedDataEntityFormContainer = ({
-    subject, hasEditRight = true, showEditButtons = false, fullpage = false,
+    subject, typeInfo, hasEditRight = true, showEditButtons = false, fullpage = false,
     contextMenu = null,
     properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
 }) => {
@@ -50,7 +50,7 @@ const LinkedDataEntityFormContainer = ({
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
 
-        if (!hasErrors) submitForm();
+        if (!hasErrors) submitForm(typeInfo.label);
     };
 
     const formId = `entity-form-${subject}`;
@@ -142,11 +142,12 @@ LinkedDataEntityFormContainer.propTypes = {
 export const LinkedDataEntityFormWithLinkedData = (
     {subject, hasEditRight, setHasCollectionMetadataUpdates}
 ) => {
-    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
+    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
     return (
         <LinkedDataEntityFormContainer
             subject={subject}
+            typeInfo={typeInfo}
             hasEditRight={hasEditRight}
             properties={properties}
             values={values}

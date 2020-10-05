@@ -19,8 +19,15 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
         predicate: toNamespaced(error.predicate)
     });
 
-    const onFormSubmissionError = (error) => {
+    const onFormSubmissionError = (entityType: string) => (error) => {
         if (error.details) {
+            if (error.details.length === 1 && error.details[0].message === 'Duplicate label') {
+                errorDialog.showError(
+                    `${entityType} label must be unique`,
+                    `${entityType} label is already in use. Please choose a unique label.`
+                );
+                return;
+            }
             const partitionedErrors = partitionErrors(error.details, subject);
             const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
             const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
@@ -31,11 +38,11 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
         }
     };
 
-    const submitForm = () => {
+    const submitForm = (entityType: string) => {
         setUpdating(true);
 
         submitFunc()
-            .catch(onFormSubmissionError)
+            .catch(onFormSubmissionError(entityType))
             .then(() => isMounted() && setUpdating(false));
     };
 
