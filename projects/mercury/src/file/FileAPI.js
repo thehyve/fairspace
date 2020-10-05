@@ -125,7 +125,7 @@ class FileAPI {
     uploadMulti(destinationPath, files, onUploadProgress = () => {}) {
         const formData = new FormData();
         formData.append('action', 'upload_files');
-        files.forEach(f => formData.append(f.path, f));
+        files.forEach(f => formData.append(encodeURIComponent(f.path), f));
         const requestOptions = {
             method: "POST",
             headers: {
