@@ -161,7 +161,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     }
 
     private void uploadFile(String path, FileItem file) throws NotAuthorizedException, BadRequestException, ConflictException {
-        path = normalizePath(path);
+        path = normalizePath(URLDecoder.decode(path, StandardCharsets.UTF_8));
         if (path.contains("/")) {
             var segments = splitPath(path);
             var child = child(segments[0]);
