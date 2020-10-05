@@ -152,6 +152,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
+        if (!((DirectoryResource) toCollection).access.canWrite()) {
+            throw new NotAuthorizedException(this);
+        }
         var existing = toCollection.child(name);
         if (existing != null) {
             throw new ConflictException(existing);
