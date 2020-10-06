@@ -33,10 +33,10 @@ class LinkedDataAPI {
         const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
 
         return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
-            .catch(handleHttpError("Failure when retrieving metadata"))
             .then(extractJsonData)
             .then(expand)
-            .then(normalizeTypes);
+            .then(normalizeTypes)
+            .catch(handleHttpError("Failure when retrieving metadata"));
     }
 }
 

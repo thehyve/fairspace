@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react';
-import {extractJsonData} from "../utils/httpUtils";
+import {extractJsonData, handleHttpError} from "../utils/httpUtils";
 import useAsync from "../hooks/UseAsync";
 
 export type Feature = 'MetadataEditing'; // more to come
@@ -8,7 +8,9 @@ export type Feature = 'MetadataEditing'; // more to come
 const FeaturesContext = React.createContext({});
 
 export const FeaturesProvider = ({children}) => {
-    const {data = []} = useAsync(() => axios.get('/api/v1/features/').then(extractJsonData));
+    const {data = []} = useAsync(() => axios.get('/api/v1/features/')
+        .then(extractJsonData)
+        .catch(handleHttpError('Connection error.')));
 
     return (
         <FeaturesContext.Provider
