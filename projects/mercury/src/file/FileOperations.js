@@ -153,7 +153,7 @@ export const FileOperations = ({
 
     const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while deleting file or directory", err,() => handleDelete());
+            ErrorDialog.showError("An error occurred while deleting file or directory", err, () => handleDelete());
         });
 
     const getDeletionConfirmationMessage = () => {
@@ -170,7 +170,7 @@ export const FileOperations = ({
 
     const handleUndelete = () => fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while undeleting file or directory", err,() => handleUndelete());
+            ErrorDialog.showError("An error occurred while undeleting file or directory", err, () => handleUndelete());
         });
 
     return (
