@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.dao.*;
 import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.mail.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.*;
@@ -46,8 +45,6 @@ public class SparqlQueryServiceTest {
     @Mock
     UserService userService;
     @Mock
-    MailService mailService;
-    @Mock
     private MetadataPermissions permissions;
     WorkspaceService workspaceService;
     MetadataService api;
@@ -78,11 +75,11 @@ public class SparqlQueryServiceTest {
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
 
-        workspaceService = new WorkspaceService(tx, userService, mailService);
+        workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
 
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
         ds.getContext().set(FS_ROOT, davFactory.root);
 
         queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, ds, davFactory);

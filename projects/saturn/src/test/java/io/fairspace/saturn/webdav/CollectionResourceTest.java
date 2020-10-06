@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -43,8 +42,6 @@ public class CollectionResourceTest {
     @Mock
     UserService userService;
     @Mock
-    MailService mailService;
-    @Mock
     MetadataService metadataService;
 
     Context context = new Context();
@@ -58,7 +55,7 @@ public class CollectionResourceTest {
                 .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1);
 
         context.set(METADATA_SERVICE, metadataService);
-        var factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        var factory = new DavFactory(model.createResource(baseUri), store, userService, context);
         resource = new CollectionResource(factory, COLLECTION_1, Access.Manage);
 
         setupRequestContext();

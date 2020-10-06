@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -43,8 +42,6 @@ public class DirectoryResourceTest {
     @Mock
     UserService userService;
     @Mock
-    MailService mailService;
-    @Mock
     MetadataService metadataService;
     @Mock
     FileItem file;
@@ -58,7 +55,7 @@ public class DirectoryResourceTest {
     @Before
     public void before() {
         context.set(METADATA_SERVICE, metadataService);
-        var factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        var factory = new DavFactory(model.createResource(baseUri), store, userService, context);
         dir = new DirectoryResource(factory, model.createResource(baseUri + "/coll/dir"), Access.Manage);
         dir.subject.addProperty(RDF.type, FS.Directory);
 
