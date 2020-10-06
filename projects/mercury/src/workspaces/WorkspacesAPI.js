@@ -81,7 +81,10 @@ class WorkspacesAPI {
         return axios.patch(`${workspacesUrl}users/`, JSON.stringify({workspace, user, role}), {
             headers: {'Content-type': 'application/json', 'Accept': 'application/json'}
         })
-            .catch(handleHttpError("Failure while updating a workspace role"));
+            .catch(e => {
+                console.error('Failure while updating a workspace role.', e);
+                throw new Error('Failure while updating a workspace role.');
+            });
     }
 }
 
