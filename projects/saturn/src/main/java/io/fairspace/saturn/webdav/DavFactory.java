@@ -93,7 +93,7 @@ public class DavFactory implements ResourceFactory {
         }
 
         if (deleted) {
-            if (!showDeleted() || !access.canWrite()) {
+            if (!showDeleted()) {
                 return Access.None;
             } else {
                 access = min(access, Access.List);
