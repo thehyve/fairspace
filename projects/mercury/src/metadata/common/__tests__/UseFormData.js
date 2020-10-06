@@ -74,12 +74,26 @@ describe('useFormData', () => {
         it('should allow deleting added values', () => {
             act(() => {
                 formData.addValue(propertyA, {value: 'added'});
-                formData.deleteValue(propertyA, 2);
+            });
+            act(() => {
+                formData.addValue(propertyA, {value: 'another added'});
+            });
+            act(() => {
+                formData.deleteValue(propertyA, 3);
             });
 
             expect(formData.updates).toEqual({
-                'http://a': [{value: 'text'}, {value: 'something'}]
+                'http://a': [{value: 'text'}, {value: 'something'}, {value: 'added'}]
             });
+        });
+
+        it('should reset the form after deleting all added values', () => {
+            act(() => {
+                formData.addValue(propertyA, {value: 'added'});
+                formData.deleteValue(propertyA, 2);
+            });
+
+            expect(formData.updates).toEqual({});
         });
     });
 
