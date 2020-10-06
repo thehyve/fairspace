@@ -81,11 +81,11 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 400:
-                            throw new Error("Unable to create the given directory. Please check that the name does not contain special characters.");
+                            throw new Error("Unable to create the given directory. \nPlease check that the name does not contain special characters.");
                         case 403:
-                            throw new Error("You do not have authorization to create a directory in this collection.");
+                            throw new Error("You do not have authorization to create a directory \nin this collection.");
                         case 405:
-                            throw new Error("A directory or file with this name already exists. Please choose another name");
+                            throw new Error("A directory or file with this name already exists. \nPlease choose another name");
                     }
                 }
 
@@ -114,7 +114,7 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("You do not have authorization to add files to this collection.");
+                            throw new Error("You do not have authorization to add files \nto this collection.");
                     }
                 }
 
@@ -268,11 +268,11 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                            throw new Error("Could not copy one or more files. \nDo you have write permission to the destination collection?");
                         case 409:
-                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                            throw new Error("Could not copy one or more files. \nThe destination can not be copied to.");
                         case 412:
-                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                            throw new Error("Could not copy one or more files. \nThe destination file already exists.");
                     }
                 }
 
@@ -305,11 +305,11 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                            throw new Error("Could not copy one or more files. \nDo you have write permission to the destination collection?");
                         case 409:
-                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                            throw new Error("Could not copy one or more files. \nThe destination can not be copied to.");
                         case 412:
-                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                            throw new Error("Could not copy one or more files. \nThe destination file already exists.");
                     }
                 }
 

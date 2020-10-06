@@ -59,7 +59,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
-            case GET -> access.canRead();
+            case GET, COPY -> access.canRead();
             default -> super.authorise(request, method, auth);
         };
     }
