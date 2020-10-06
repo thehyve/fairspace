@@ -32,7 +32,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> canDelete();
-            case POST -> canManage() || canUndelete();
+            case POST -> canWrite() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
     }
@@ -248,6 +248,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return access.canManage()
                 || getGrantedPermission(subject, currentUser) == Access.Manage
                 || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy));
+    }
+
+    private boolean canWrite() {
+        if (subject.hasProperty(FS.dateDeleted)) {
+            return false;
+        }
+        return access.canWrite();
     }
 
     private String getPermissions(Resource principalType) {
