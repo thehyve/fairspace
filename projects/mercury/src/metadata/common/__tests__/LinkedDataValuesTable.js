@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow} from "enzyme";
+import {mount, shallow} from "enzyme";
 import {TableBody, TableCell, TableFooter, TableHead, TableRow} from '@material-ui/core';
 
 import {STRING_URI} from "../../../constants";
@@ -63,14 +63,14 @@ describe('LinkedDataValuesTable elements', () => {
     });
 
     it('should show an add input field when adding is allowed', () => {
-        const wrapper = shallow(<LinkedDataValuesTable property={defaultProperty} values={defaultValues} canAdd addComponent={StringValue} />);
+        const wrapper = mount(<LinkedDataValuesTable property={defaultProperty} values={defaultValues} canAdd addComponent={StringValue} />);
         expect(wrapper.find(TableFooter).find(TableCell).length).toEqual(2);
         expect(wrapper.find(TableFooter).find(TableCell).first().find(StringValue).length).toEqual(1);
     });
 
     it('should not show an add input field when maxValueCount reached', () => {
         const property = {...defaultProperty, maxValuesCount: 3};
-        const wrapper = shallow(<LinkedDataValuesTable property={property} values={defaultValues} canAdd addComponent={StringValue} />);
+        const wrapper = mount(<LinkedDataValuesTable property={property} values={defaultValues} canAdd addComponent={StringValue} />);
         expect(wrapper.find(TableFooter).find(TableCell).length).toEqual(0);
         expect(wrapper.find(TableFooter).find(TableCell).first().find(StringValue).length).toEqual(0);
     });

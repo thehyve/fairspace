@@ -1,5 +1,6 @@
 import {useState} from "react";
 import useDeepCompareEffect from "use-deep-compare-effect";
+import _ from 'lodash';
 import useValidation from "./UseValidation";
 import {first} from "../../common/utils/genericUtils";
 import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from "../../constants";
@@ -49,7 +50,22 @@ const useFormData = (values, initialProperties = []) => {
 
     let updatesToReturn = updates;
 
-    const save = (property, newValue) => {
+    const deleteUpdate = (propertyKey) => {
+        const newUpdates = {...updates};
+        delete newUpdates[propertyKey];
+        setUpdates(newUpdates);
+    };
+
+    const save = (property, newValue: any[]) => {
+        const equalToInitialValue = ((!initialFormValues[property.key]) && newValue.length === 0)
+            || _.isEqual(newValue, initialFormValues[property.key]);
+        if (equalToInitialValue) {
+            // Remove property from updated values if the current value equals its initial value.
+            updatesToReturn = {...updates};
+            delete updatesToReturn[property.key];
+            deleteUpdate(property.key);
+            return;
+        }
         // Store a separate list of current updates apart from the state. This enables
         // submission of the updates before the form is re-rendered.
         updatesToReturn = {
@@ -71,12 +87,6 @@ const useFormData = (values, initialProperties = []) => {
         save(property, newValue);
     };
 
-    const deleteUpdate = (propertyKey) => {
-        const newUpdates = {...updates};
-        delete newUpdates[propertyKey];
-        setUpdates(newUpdates);
-    };
-
     const updateValue = (property, value, index) => {
         if (!first(initialFormValues[property.key]) || first(initialFormValues[property.key]).value !== value.value) {
             const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
@@ -91,11 +101,11 @@ const useFormData = (values, initialProperties = []) => {
             if (DEFAULTABLE_DATATYPES.includes(property.datatype)) {
                 updateValue(property, {value: ""}, index);
             } else {
-                deleteUpdate(property.key);
+                save(property, []);
             }
         } else {
-            const newValue = current(property.key).filter((el, idx) => idx !== index);
-            save(property, newValue);
+            const newValues = current(property.key).filter((el, idx) => idx !== index);
+            save(property, newValues);
         }
     };
 
