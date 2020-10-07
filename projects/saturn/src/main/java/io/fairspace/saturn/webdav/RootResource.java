@@ -72,6 +72,9 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
      */
     @Override
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
+        if (newName != null) {
+            newName = newName.trim();
+        }
         validateCollectionName(newName);
 
         var existing = findExistingCollectionWithNameIgnoreCase(newName);

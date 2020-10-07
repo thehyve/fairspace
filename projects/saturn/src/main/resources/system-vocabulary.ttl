@@ -416,6 +416,7 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:description "Unique workspace label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        sh:minCount 1 ;
         dash:singleLine true ;
         fs:importantProperty true ;
         sh:path rdfs:label ;
