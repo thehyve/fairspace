@@ -72,16 +72,18 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
      */
     @Override
     public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
-        var trimmedName = newName.trim();
-        validateCollectionName(trimmedName);
+        if (newName != null) {
+            newName = newName.trim();
+        }
+        validateCollectionName(newName);
 
-        var existing = findExistingCollectionWithNameIgnoreCase(trimmedName);
+        var existing = findExistingCollectionWithNameIgnoreCase(newName);
         if (existing != null) {
             log.warn("Collection already exists with that name (modulo case): {}", existing.getName());
             return null;
         }
 
-        var subj = childSubject(factory.rootSubject, trimmedName);
+        var subj = childSubject(factory.rootSubject, newName);
 
         if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {
             throw new ConflictException();
@@ -92,7 +94,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         var user = factory.currentUserResource();
 
         subj.addProperty(RDF.type, FS.Collection)
-                .addProperty(RDFS.label, trimmedName)
+                .addProperty(RDFS.label, newName)
                 .addProperty(RDFS.comment, "")
                 .addProperty(FS.createdBy, user)
                 .addProperty(FS.dateCreated, timestampLiteral())

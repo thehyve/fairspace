@@ -314,10 +314,10 @@ public class ModelUtils {
         }
     }
 
-    public static void trimPropertyValues(Model model, Property property) {
-        model.listSubjectsWithProperty(property)
+    public static void trimLabels(Model model) {
+        model.listSubjectsWithProperty(RDFS.label)
                 .forEachRemaining(s -> {
-                    var label = model.getProperty(s, property);
+                    var label = model.getProperty(s, RDFS.label);
                     model
                             .removeAll(s, RDFS.label, null)
                             .add(s, RDFS.label, label.getString().trim());

@@ -158,7 +158,7 @@ public class MetadataService {
 
     private Set<Resource> update(Model modelToRemove, Model modelToAdd) {
         return transactions.calculateWrite(before -> {
-            trimPropertyValues(modelToAdd, RDFS.label);
+            trimLabels(modelToAdd);
             var after = updatedView(before, modelToRemove, modelToAdd);
 
             validate(before, after, modelToRemove, modelToAdd, vocabulary);
