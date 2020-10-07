@@ -313,4 +313,14 @@ public class ModelUtils {
             from.listProperties(p).forEachRemaining(s -> to.addProperty(p, s.getObject()));
         }
     }
+
+    public static void trimPropertyValues(Model model, Property property) {
+        model.listSubjectsWithProperty(property)
+                .forEachRemaining(s -> {
+                    var label = model.getProperty(s, property);
+                    model
+                            .removeAll(s, RDFS.label, null)
+                            .add(s, RDFS.label, label.getString().trim());
+                });
+    }
 }

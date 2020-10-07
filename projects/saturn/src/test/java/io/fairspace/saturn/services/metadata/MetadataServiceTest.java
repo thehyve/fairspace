@@ -26,8 +26,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceTest {
@@ -166,7 +165,19 @@ public class MetadataServiceTest {
                 .add(S2, RDFS.label, "Test 2")
         );
 
-        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral("Test 2"))));
+        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral("Test 2 "))));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void patchDuplicateLabelWithWhitespaceFails() {
+        txn.executeWrite(m -> m
+                .add(S1, RDF.type, FS.Workspace)
+                .add(S1, RDFS.label, "Test 1")
+                .add(S2, RDF.type, FS.Workspace)
+                .add(S2, RDFS.label, "Test 2")
+        );
+
+        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral(" Test 2  "))));
     }
 
     @Test
@@ -179,6 +190,25 @@ public class MetadataServiceTest {
                 createStatement(S2, RDF.type, createResource(NS + "Sample")),
                 createStatement(S2, RDFS.label, createStringLiteral("Test"))
         ));
+    }
+
+    @Test
+    public void putLabelTrimmed() {
+        api.put(modelOf(
+                createStatement(S1, RDF.type, FS.Workspace),
+                createStatement(S1, RDFS.label, createStringLiteral(" Label with whitespace  "))
+        ));
+        assertNotEquals(" Label with whitespace  ", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
+        assertEquals("Label with whitespace", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
+    }
+
+    @Test
+    public void patchLabelTrimmed() {
+        txn.executeWrite(m -> m.add(S1, RDFS.label, createStringLiteral("Label 1")));
+
+        api.patch(createDefaultModel().add(S1, RDFS.label, createStringLiteral("Label 2 ")));
+
+        assertEquals("Label 2", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
     }
 
     @Test
