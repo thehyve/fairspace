@@ -53,6 +53,15 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
     }
 
+    private void setLabel(String l) throws NotAuthorizedException, ConflictException {
+        if (!canManage()) {
+            throw new NotAuthorizedException(this);
+        }
+        var trimmedLabel = l.trim();
+        ensureNameIsAvailable(trimmedLabel);
+        setDisplayName(trimmedLabel);
+    }
+
     private void validateTargetName(String name) throws ConflictException, BadRequestException {
         validateCollectionName(name);
         var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
@@ -294,6 +303,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case "set_status" -> setStatus(getEnumParameter(parameters, "status", Status.class));
             case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
             case "set_owned_by" -> setOwnedBy(getResourceParameter(parameters, "owner"));
+            case "set_label" -> setLabel(parameters.get("label"));
             case "unpublish" -> unpublish();
             default -> super.performAction(action, parameters, files);
         }

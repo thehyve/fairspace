@@ -255,6 +255,7 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
         sh:description "Unique collection label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        fs:machineOnly true ;
         dash:singleLine true ;
         fs:importantProperty true ;
         sh:path rdfs:label;
