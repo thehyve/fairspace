@@ -54,6 +54,9 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
 
     @Override
     public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+        if (!canManage()) {
+            throw new NotAuthorizedException(this);
+        }
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
