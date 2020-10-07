@@ -32,7 +32,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> canDelete();
-            case POST -> canWrite() || canUndelete();
+            case POST -> canManage() || canWrite() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
     }
@@ -159,18 +159,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
      *
      * Returns only the current access mode when:
      * - the current user does not have manage permission; or
-     * - the status is {@link Status#Closed} (which forbids changing its access mode); or
+     * - the collection is deleted; or
      * - the access mode is {@link AccessMode#DataPublished}, which is terminal;
      * returns all access modes except that {@link AccessMode#DataPublished} is only
-     * included when in status {@link Status#Archived} and {@link AccessMode#Restricted} is
-     * excluded when in status {@link Status#Archived}.
+     * included when in status {@link Status#Archived}.
      */
     public Set<AccessMode> availableAccessModes() {
         if (!canManage()) {
-            return EnumSet.of(getAccessMode());
-        }
-
-        if (getStatus() == Status.Closed) {
             return EnumSet.of(getAccessMode());
         }
 
