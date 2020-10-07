@@ -36,6 +36,10 @@ export const convertToSafeDirectoryName = (name: string) => {
     return safeName.length <= MAX_LOCATION_LENGTH ? safeName : safeName.substring(0, MAX_LOCATION_LENGTH);
 };
 
+const isNameValid = (name: string) => !!name && name.trim().length > 0
+
+const isLocationValid = (location: string) => !!location && !location.match(NON_SAFE_CHARACTERS_REGEX);
+
 /**
  * Checks whether the input is valid. Check whether the name and location are given
  * and that the location does not contain any unsafe characters.
@@ -44,7 +48,7 @@ export const convertToSafeDirectoryName = (name: string) => {
  * location. This will be checked when actually submitting the form.
  * @returns {boolean}
  */
-export const isInputValid = (properties: CollectionProperties) => !!properties.name && !!properties.location && !properties.location.match(NON_SAFE_CHARACTERS_REGEX);
+export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name) && isLocationValid(properties.location);
 
 type PathParam = {
     path: string;
@@ -257,6 +261,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         fullWidth
                         required
                         disabled={!this.editNameEnabled}
+                        error={!isNameValid(this.state.properties.name)}
                     />
                     <TextField
                         margin="dense"
@@ -281,6 +286,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         fullWidth
                         required
                         disabled={!this.editLocationEnabled}
+                        error={!isLocationValid(this.state.properties.location)}
                     />
 
                 </DialogContent>
