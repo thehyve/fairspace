@@ -32,7 +32,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> canDelete();
-            case POST -> canWrite() || canUndelete();
+            case POST -> canManage() || canWrite() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
     }
