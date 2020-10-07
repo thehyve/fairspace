@@ -53,13 +53,16 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
     }
 
-    private void setLabel(String l) throws NotAuthorizedException, ConflictException {
+    private void setLabel(String label) throws NotAuthorizedException, ConflictException {
         if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
-        var trimmedLabel = l.trim();
-        ensureNameIsAvailable(trimmedLabel);
-        setDisplayName(trimmedLabel);
+        if (label == null || label.trim().equals("")) {
+            throw new ConflictException(this);
+        }
+        label = label.trim();
+        ensureNameIsAvailable(label);
+        setDisplayName(label);
     }
 
     private void validateTargetName(String name) throws ConflictException, BadRequestException {

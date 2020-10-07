@@ -1,5 +1,4 @@
 import queryString from "query-string";
-import {COMMENT_URI, LABEL_URI} from "../constants";
 import type {
     AccessLevel,
     AccessMode,
@@ -85,11 +84,6 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
             return "";
     }
 };
-
-export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({
-    [LABEL_URI]: [{value: name}],
-    [COMMENT_URI]: [{value: description}]
-});
 
 const parsePermissions = (value) => ((typeof value !== 'string')
     ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
