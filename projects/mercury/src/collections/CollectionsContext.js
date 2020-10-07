@@ -23,6 +23,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh);
     const unpublish = (collection: CollectionProperties) => collectionApi.unpublish(collection).then(refresh);
     const relocateCollection = (oldLocation: string, newLocation: string) => collectionApi.relocateCollection(oldLocation, newLocation).then(refresh);
+    const setLabel = (location: string, label: string) => collectionApi.setLabel(location, label).then(refresh);
     const setPermission = (location: string, principal: string, access: AccessLevel) => collectionApi.setPermission(location, principal, access).then(refresh);
     const setAccessMode = (location: string, mode: AccessMode) => collectionApi.setAccessMode(location, mode).then(refresh);
     const setStatus = (location: string, status: Status) => collectionApi.setStatus(location, status).then(refresh);
@@ -41,6 +42,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 unpublish,
                 updateCollection,
                 relocateCollection,
+                setLabel,
                 setPermission,
                 setAccessMode,
                 setStatus,

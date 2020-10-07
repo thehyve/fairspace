@@ -55,6 +55,7 @@ type CollectionEditorProps = {
     updateExisting: boolean,
     addCollection: (CollectionProperties) => Promise<void>,
     updateCollection: (Collection) => Promise<void>,
+    setCollectionLabel: (Collection) => Promise<void>,
     relocateCollection: (Collection) => Promise<void>,
     onClose: () => void,
     setBusy: (boolean) => void,
@@ -142,11 +143,29 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             });
     };
 
+    handleCollectionLabelChange = (newLabel: string) => {
+        const {collection, setCollectionLabel} = this.props;
+        return setCollectionLabel(collection.location, newLabel)
+            .then(() => {
+                this.onSaveComplete();
+                this.close();
+            })
+            .catch(err => {
+                this.onSaveComplete();
+                ErrorDialog.showError("An error occurred while changing a collection label", err);
+            });
+    };
+
     handleUpdateCollection = (properties: CollectionProperties) => {
         const {collection, updateCollection} = this.props;
         this.onSaveStart();
 
         return updateCollection((({iri: collection.iri, ...properties}: any): Collection))
+            .then(() => {
+                if (collection.name !== properties.name) {
+                    this.handleCollectionLabelChange(properties.name);
+                }
+            })
             .then(() => {
                 if (collection.location !== properties.location) {
                     this.handleCollectionLocationChange(properties.location);
@@ -196,7 +215,10 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         }
     };
 
-    editLocationEnabled = (!this.props.collection) || this.props.collection.accessMode !== 'DataPublished';
+    editLocationEnabled = (!this.props.collection) || (
+        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
+
+    editNameEnabled = !this.props.collection || (this.props.collection && this.props.collection.canManage);
 
     /**
      * Determines whether the location should be updated when the name changes.
@@ -234,6 +256,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         onChange={(event) => this.handleNameChange(event)}
                         fullWidth
                         required
+                        disabled={!this.editNameEnabled}
                     />
                     <TextField
                         margin="dense"
@@ -272,7 +295,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
 
 const ContextualCollectionEditor = (props) => {
     const history = useHistory();
-    const {addCollection, updateCollection, relocateCollection} = useContext(CollectionsContext);
+    const {addCollection, updateCollection, setLabel, relocateCollection} = useContext(CollectionsContext);
 
     return (
         <CollectionEditor
@@ -280,6 +303,7 @@ const ContextualCollectionEditor = (props) => {
             history={history}
             addCollection={addCollection}
             updateCollection={updateCollection}
+            setCollectionLabel={setLabel}
             relocateCollection={relocateCollection}
         />
     );

@@ -1,9 +1,10 @@
 // @flow
 // eslint-disable-next-line import/no-cycle
-import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
+import {mapFilePropertiesToCollection} from "./collectionUtils";
 import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import MetadataAPI from "../metadata/common/MetadataAPI";
+import {COMMENT_URI} from "../constants";
 
 const rootUrl = '';
 
@@ -114,9 +115,15 @@ class CollectionAPI {
     }
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
-        const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
+        const metadataProperties = {
+            [COMMENT_URI]: [{value: collection.description}]
+        };
         return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
             .catch(handleHttpError("Failure while updating a collection"));
+    }
+
+    setLabel(location: string, label: string): Promise<void> {
+        return FileAPI.post(location, {action: 'set_label', label});
     }
 
     setAccessMode(location: string, mode: AccessMode): Promise<void> {

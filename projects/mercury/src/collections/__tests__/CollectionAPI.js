@@ -53,7 +53,6 @@ describe('CollectionAPI', () => {
             expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
                 'c_iri',
                 {
-                    [RDFS_NS + 'label']: [{value: 'name1'}],
                     [RDFS_NS + 'comment']: [{value: 'description1'}]
                 },
                 {}
@@ -75,7 +74,6 @@ describe('CollectionAPI', () => {
             expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
                 'c1',
                 {
-                    [RDFS_NS + 'label']: [{value: 'name1'}],
                     [RDFS_NS + 'comment']: [{value: 'description1'}]
                 },
                 {}
