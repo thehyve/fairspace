@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
+import static io.fairspace.saturn.webdav.PathUtils.generateCollectionName;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
@@ -62,6 +63,24 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .orElse(null);
     }
 
+    protected void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
+        validateCollectionName(name);
+        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
+        if (existing != null) {
+            throw new ConflictException(existing, "Target collection already exists.");
+        }
+    }
+
+    protected void validateTargetCollectionLabel(String label) throws ConflictException, BadRequestException {
+        if (label == null || label.isEmpty()) {
+            throw new BadRequestException("The collection label is empty.");
+        }
+        var existing = factory.root.findExistingCollectionWithLabel(label);
+        if (existing != null) {
+            throw new ConflictException(existing, "Target collection with this label already exists.");
+        }
+    }
+
     /**
      * Creates a new collection resource, sets the owner workspaces and assigns
      * manage permission on the collection to the current user.
@@ -69,29 +88,26 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
      * which is interpreted as a failure by {@link io.milton.http.webdav.MkColHandler},
      * resulting in a 405 (Method Not Allowed) response.
      *
-     * @param name the name (identifier) of the new collection, which needs to be a valid collection name.
+     * @param label the collection label, which needs to be unique.
      *
      * @return the collection resource if it was successfully created; null if
-     *         a collection with the name already exists (ignoring case);
+     *         a collection with the label already exists (ignoring case);
      * @throws NotAuthorizedException if the user does not have write permission on the owner workspace.
      * @throws ConflictException if the IRI is already is use by a resource that is not deleted.
-     * @throws BadRequestException if the name is invalid (@see {@link PathUtils#validateCollectionName}).
+     * @throws BadRequestException if the label is invalid (@see {@link #validateTargetCollectionLabel(String)})
+     *         or the generated name is invalid (@see {@link #validateTargetCollectionName(String)}).
      */
     @Override
-    public io.milton.resource.CollectionResource createCollection(String name) throws NotAuthorizedException, ConflictException, BadRequestException {
-        if (name != null) {
-            name = name.trim();
+    public io.milton.resource.CollectionResource createCollection(String label) throws NotAuthorizedException, ConflictException, BadRequestException {
+        if (label != null) {
+            label = label.trim();
         }
-        validateCollectionName(name);
+        validateTargetCollectionLabel(label);
 
-        var existing = findExistingCollectionWithNameIgnoreCase(name);
-        if (existing != null) {
-            log.warn("Collection already exists with that name (modulo case): {}", existing.getName());
-            return null;
-        }
+        var name = generateCollectionName(label);
+        validateTargetCollectionName(name);
 
         var subj = childSubject(factory.rootSubject, name);
-
         if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {
             throw new ConflictException();
         }
@@ -101,7 +117,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         var user = factory.currentUserResource();
 
         subj.addProperty(RDF.type, FS.Collection)
-                .addProperty(RDFS.label, name)
+                .addProperty(RDFS.label, label)
                 .addProperty(RDFS.comment, "")
                 .addProperty(FS.createdBy, user)
                 .addProperty(FS.dateCreated, timestampLiteral())

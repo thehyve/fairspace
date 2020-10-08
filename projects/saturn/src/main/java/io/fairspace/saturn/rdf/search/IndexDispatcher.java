@@ -14,8 +14,8 @@ import static io.fairspace.saturn.config.Services.USER_SERVICE;
 
 // TODO: Use Permissions service instead of WebDAV
 public class IndexDispatcher {
+    public static final String COLLECTION_PREFIX = "collection_";
     private static final String[] ALL_INDEXES = {"_all"};
-    private static final String COLLECTION_PREFIX = "collection_";
     private static final String SHARED_INDEX = "shared";
 
     // TODO: Inject via context?
