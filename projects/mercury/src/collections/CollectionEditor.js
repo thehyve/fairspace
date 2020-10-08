@@ -272,9 +272,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="location"
                         label="Collection identifier"
-                        helperText={this.editLocationEnabled
-                            ? 'This identifier does not allow special characters and has to be unique.'
-                            : 'Published collections cannot be moved.'}
+                        helperText={this.editLocationEnabled && 'This identifier does not allow special characters and has to be unique.'}
                         value={this.state.properties.location}
                         name="location"
                         onChange={(event) => this.handleInputChange('location', event.target.value)}
