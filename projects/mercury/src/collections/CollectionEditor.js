@@ -143,7 +143,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             })
             .catch(err => {
                 this.onSaveComplete();
-                ErrorDialog.showError("Collection name must be unique", err);
+                ErrorDialog.showError("Collection identifier must be unique", err);
             });
     };
 
@@ -151,7 +151,9 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         const {collection, setCollectionLabel} = this.props;
         return setCollectionLabel(collection.location, newLabel)
             .catch(err => {
-                ErrorDialog.showError("Collection label must be unique", err);
+                this.onSaveComplete();
+                ErrorDialog.showError("Collection name must be unique", err);
+                throw Error(err);
             });
     };
 
@@ -162,8 +164,9 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         return updateCollection((({iri: collection.iri, ...properties}: any): Collection))
             .then(() => {
                 if (collection.name !== properties.name) {
-                    this.handleCollectionLabelChange(properties.name);
+                    return this.handleCollectionLabelChange(properties.name);
                 }
+                return Promise.resolve();
             })
             .then(() => {
                 if (collection.location !== properties.location) {
@@ -173,10 +176,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     this.close();
                 }
             })
-            .catch((err) => {
-                this.onSaveComplete();
-                this.handleCollectionUpdateError(err);
-            });
+            .catch(() => {});
     };
 
     handleSave = () => {
