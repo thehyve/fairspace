@@ -4,6 +4,7 @@ import io.fairspace.saturn.services.users.UserService;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
+import org.apache.commons.codec.binary.*;
 import org.apache.jena.sparql.util.Context;
 
 import java.util.stream.*;
@@ -28,6 +29,9 @@ public class IndexDispatcher {
         this.context = context;
     }
 
+    public static String indexNameForCollection(String name) {
+        return new Base32().encodeAsString(name.getBytes()).toLowerCase();
+    }
 
     public String getIndex(String uri) {
         if (uri.startsWith(collectionPrefix)) {
@@ -36,7 +40,7 @@ public class IndexDispatcher {
             if (pos > 0) {
                 collection = collection.substring(0, pos);
             }
-            return COLLECTION_PREFIX + collection.toLowerCase();
+            return COLLECTION_PREFIX + indexNameForCollection(collection);
         }
 
         return SHARED_INDEX;
@@ -59,7 +63,7 @@ public class IndexDispatcher {
             return Stream.concat(
                     shared,
                     collectionsRoot.getChildren().stream()
-                            .map(c -> COLLECTION_PREFIX + c.getName().toLowerCase())
+                            .map(c -> COLLECTION_PREFIX + indexNameForCollection(c.getName()))
             ).toArray(String[]::new);
         } catch (NotAuthorizedException | BadRequestException e) {
             throw new RuntimeException(e);
