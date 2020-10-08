@@ -61,7 +61,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             throw new BadRequestException(this, "The collection label is empty.");
         }
         label = label.trim();
-        ensureLabelIsAvailable(label);
+        validateTargetLabel(label);
         setDisplayName(label);
     }
 
@@ -70,6 +70,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
         if (existing != null) {
             throw new ConflictException(existing, "Target already exists (modulo case).");
+        }
+    }
+
+    private void validateTargetLabel(String label) throws ConflictException {
+        var existing = factory.root.findExistingCollectionWithLabel(label);
+        if (existing != null) {
+            throw new ConflictException(existing, "Target with this label already exists.");
         }
     }
 
@@ -104,13 +111,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
         validateTargetName(name);
         super.copyTo(toCollection, name);
-    }
-
-    private void ensureLabelIsAvailable(String label) throws ConflictException {
-        var existing = factory.root.findExistingCollectionWithLabel(label);
-        if (existing != null) {
-            throw new ConflictException(existing, "Target with this label already exists.");
-        }
     }
 
     @Property
