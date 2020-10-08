@@ -33,7 +33,7 @@ export const CollectionBrowser = ({
     };
 
     const handleCollectionDoubleClick = (collection) => {
-        history.push(getCollectionAbsolutePath(collection.location));
+        history.push(getCollectionAbsolutePath(collection.name));
     };
 
     const handleCancelAddCollection = () => setAddingNewCollection(false);

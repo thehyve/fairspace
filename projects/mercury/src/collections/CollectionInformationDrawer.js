@@ -297,7 +297,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
                 title={`Metadata for ${collection.name}`}
                 avatar={<Folder />}
                 forceExpand={paths.length === 0}
-                metadataUploadPath={hasEditRight && paths.length === 0 && collection.location}
+                metadataUploadPath={hasEditRight && paths.length === 0 && collection.name}
             >
                 <LinkedDataEntityFormWithLinkedData
                     subject={collection.iri}

@@ -9,7 +9,6 @@ describe('CollectionInformationDrawer', () => {
     const collection = {
         name: 'My collection',
         description: 'description',
-        location: 'location1',
         iri: ''
     };
 
@@ -28,6 +27,6 @@ describe('CollectionInformationDrawer', () => {
         />);
 
         const collectionDetailsProps = wrapper.find(CollectionDetails).first().props();
-        expect(collectionDetailsProps.collection.location).toBe('location1');
+        expect(collectionDetailsProps.collection.name).toBe('My collection');
     });
 });

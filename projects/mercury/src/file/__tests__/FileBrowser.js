@@ -18,7 +18,6 @@ const openedCollection = {
     deletedBy: null,
     name: "asd",
     description: "",
-    location: "asd",
     access: "Manage",
     canRead: true,
     canWrite: true,

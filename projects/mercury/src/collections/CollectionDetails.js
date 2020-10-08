@@ -15,7 +15,7 @@ import {
     Typography
 } from '@material-ui/core';
 import {CloudDownload, Folder, MoreVert} from '@material-ui/icons';
-import {Link as RouterLink, useHistory, withRouter} from 'react-router-dom';
+import {useHistory, withRouter} from 'react-router-dom';
 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource, Status} from './CollectionAPI';
@@ -56,8 +56,8 @@ type CollectionDetailsProps = {
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
     unpublish: (Resource) => Promise<void>;
-    setStatus: (location: string, status: Status) => Promise<void>;
-    setOwnedBy: (location: string, owner: string) => Promise<void>;
+    setStatus: (name: string, status: Status) => Promise<void>;
+    setOwnedBy: (name: string, owner: string) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
 };
@@ -202,7 +202,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {setOwnedBy, onChangeOwner, history} = this.props;
         this.handleCloseChangingOwner();
         onChangeOwner();
-        setOwnedBy(collection.location, selectedOwner.iri)
+        setOwnedBy(collection.name, selectedOwner.iri)
             .then(() => {
                 if (!selectedOwner.canCollaborate) {
                     history.push('/collections');
@@ -375,15 +375,6 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         )}
                         titleTypographyProps={{variant: 'h6'}}
                         title={collection.name}
-                        subheader={(
-                            <Link
-                                component={RouterLink}
-                                color="inherit"
-                                to={`/collections/${collection.location}`}
-                            >
-                                {collection.location}
-                            </Link>
-                        )}
                         avatar={ICONS[iconName]}
                         style={{wordBreak: 'break-word'}}
                     />

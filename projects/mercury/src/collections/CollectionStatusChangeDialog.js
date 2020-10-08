@@ -43,7 +43,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
     const handleSubmit = () => {
         if (selectedValue) {
             setOpenDialog(false);
-            setValue(collection.location, selectedValue);
+            setValue(collection.name, selectedValue);
             onClose();
         }
     };

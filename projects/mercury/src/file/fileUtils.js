@@ -58,7 +58,7 @@ export const decodePath = (path) => path.split(PATH_SEPARATOR).map(decodeURIComp
 
 export const getPathInfoFromParams = ({collection, path}) => (
     {
-        collectionLocation: collection,
+        collectionName: collection,
         openedPath: `/${collection || ''}${path ? `/${decodePath(path)}` : ''}`
     }
 );
