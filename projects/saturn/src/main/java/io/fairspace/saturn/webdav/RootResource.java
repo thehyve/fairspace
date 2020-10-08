@@ -55,6 +55,13 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .orElse(null);
     }
 
+    public Resource findExistingCollectionWithLabel(String label) {
+        return getChildren().stream()
+                .filter(collection -> ((io.fairspace.saturn.webdav.CollectionResource)collection).getDisplayName().equals(label))
+                .findAny()
+                .orElse(null);
+    }
+
     /**
      * Creates a new collection resource, sets the owner workspaces and assigns
      * manage permission on the collection to the current user.
