@@ -15,7 +15,7 @@ import {
     Typography
 } from '@material-ui/core';
 import {CloudDownload, Folder, MoreVert} from '@material-ui/icons';
-import {useHistory, withRouter} from 'react-router-dom';
+import {Link as RouterLink, useHistory, withRouter} from 'react-router-dom';
 
 import CollectionEditor from "./CollectionEditor";
 import type {Collection, Resource, Status} from './CollectionAPI';
@@ -375,6 +375,15 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         )}
                         titleTypographyProps={{variant: 'h6'}}
                         title={collection.name}
+                        subheader={(
+                            <Link
+                                component={RouterLink}
+                                color="inherit"
+                                to={`/collections/${collection.location}`}
+                            >
+                                {collection.location}
+                            </Link>
+                        )}
                         avatar={ICONS[iconName]}
                         style={{wordBreak: 'break-word'}}
                     />
