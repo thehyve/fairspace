@@ -62,7 +62,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
      * which is interpreted as a failure by {@link io.milton.http.webdav.MkColHandler},
      * resulting in a 405 (Method Not Allowed) response.
      *
-     * @param newName the name (identifier) of the new collection, which needs to be a valid collection name.
+     * @param name the name (identifier) of the new collection, which needs to be a valid collection name.
      *
      * @return the collection resource if it was successfully created; null if
      *         a collection with the name already exists (ignoring case);
@@ -71,19 +71,19 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
      * @throws BadRequestException if the name is invalid (@see {@link PathUtils#validateCollectionName}).
      */
     @Override
-    public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
-        if (newName != null) {
-            newName = newName.trim();
+    public io.milton.resource.CollectionResource createCollection(String name) throws NotAuthorizedException, ConflictException, BadRequestException {
+        if (name != null) {
+            name = name.trim();
         }
-        validateCollectionName(newName);
+        validateCollectionName(name);
 
-        var existing = findExistingCollectionWithNameIgnoreCase(newName);
+        var existing = findExistingCollectionWithNameIgnoreCase(name);
         if (existing != null) {
             log.warn("Collection already exists with that name (modulo case): {}", existing.getName());
             return null;
         }
 
-        var subj = childSubject(factory.rootSubject, newName);
+        var subj = childSubject(factory.rootSubject, name);
 
         if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {
             throw new ConflictException();
@@ -94,7 +94,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         var user = factory.currentUserResource();
 
         subj.addProperty(RDF.type, FS.Collection)
-                .addProperty(RDFS.label, newName)
+                .addProperty(RDFS.label, name)
                 .addProperty(RDFS.comment, "")
                 .addProperty(FS.createdBy, user)
                 .addProperty(FS.dateCreated, timestampLiteral())
