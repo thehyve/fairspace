@@ -65,7 +65,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     protected void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
         validateCollectionName(name);
-        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
+        var existing = findExistingCollectionWithNameIgnoreCase(name);
         if (existing != null) {
             throw new ConflictException(existing, "Target collection already exists.");
         }
@@ -75,7 +75,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         if (label == null || label.isEmpty()) {
             throw new BadRequestException("The collection label is empty.");
         }
-        var existing = factory.root.findExistingCollectionWithLabel(label);
+        var existing = findExistingCollectionWithLabel(label);
         if (existing != null) {
             throw new ConflictException(existing, "Target collection with this label already exists.");
         }
