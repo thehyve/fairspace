@@ -20,6 +20,7 @@ import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
 import static io.fairspace.saturn.webdav.PathUtils.name;
+import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static java.util.stream.Collectors.joining;
 
 class CollectionResource extends DirectoryResource implements DisplayNameResource {
@@ -52,6 +53,14 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
     }
 
+    private void validateTargetName(String name) throws ConflictException, BadRequestException {
+        validateCollectionName(name);
+        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
+        if (existing != null) {
+            throw new ConflictException(existing, "Target already exists (modulo case).");
+        }
+    }
+
     @Override
     public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
         if (!(rDest instanceof RootResource)) {
@@ -60,7 +69,10 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (getAccessMode() == AccessMode.DataPublished) {
             throw new BadRequestException(this, "Cannot move a published collection.");
         }
-        ensureNameIsAvailable(name);
+        if (name != null) {
+            name = name.trim();
+        }
+        validateTargetName(name);
         var oldName = getStringProperty(subject, RDFS.label);
         super.moveTo(rDest, name);
         var newSubject = childSubject(factory.rootSubject, name);
@@ -72,15 +84,11 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(toCollection instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot copy a collection to a non-root folder.");
         }
-        ensureNameIsAvailable(name);
-        super.copyTo(toCollection, name);
-    }
-
-    private void ensureNameIsAvailable(String name) throws ConflictException {
-        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
-        if (existing != null) {
-            throw new ConflictException(existing, "Target already exists (modulo case).");
+        if (name != null) {
+            name = name.trim();
         }
+        validateTargetName(name);
+        super.copyTo(toCollection, name);
     }
 
     @Property
