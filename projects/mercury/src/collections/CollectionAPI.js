@@ -111,7 +111,7 @@ class CollectionAPI {
 
     relocateCollection(oldLocation: string, newLocation: string): Promise<void> {
         return FileAPI.move(oldLocation, newLocation)
-            .catch(handleHttpError("Failure while relocating collection"));
+            .catch(handleHttpError("Collection name is already in use. Please choose a unique name."));
     }
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
@@ -123,7 +123,8 @@ class CollectionAPI {
     }
 
     setLabel(location: string, label: string): Promise<void> {
-        return FileAPI.post(location, {action: 'set_label', label});
+        return FileAPI.post(location, {action: 'set_label', label})
+            .catch(handleHttpError("Collection label is already in use. Please choose a unique label."));
     }
 
     setAccessMode(location: string, mode: AccessMode): Promise<void> {

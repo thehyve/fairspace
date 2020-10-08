@@ -143,20 +143,15 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             })
             .catch(err => {
                 this.onSaveComplete();
-                ErrorDialog.showError("An error occurred while renaming a collection", err);
+                ErrorDialog.showError("Collection name must be unique", err);
             });
     };
 
     handleCollectionLabelChange = (newLabel: string) => {
         const {collection, setCollectionLabel} = this.props;
         return setCollectionLabel(collection.location, newLabel)
-            .then(() => {
-                this.onSaveComplete();
-                this.close();
-            })
             .catch(err => {
-                this.onSaveComplete();
-                ErrorDialog.showError("An error occurred while changing a collection label", err);
+                ErrorDialog.showError("Collection label must be unique", err);
             });
     };
 
