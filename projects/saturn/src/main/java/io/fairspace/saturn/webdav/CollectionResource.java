@@ -53,15 +53,15 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
     }
 
-    private void setLabel(String label) throws NotAuthorizedException, ConflictException {
+    private void setLabel(String label) throws NotAuthorizedException, ConflictException, BadRequestException {
         if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
         if (label == null || label.trim().equals("")) {
-            throw new ConflictException(this);
+            throw new BadRequestException(this, "The collection label is empty.");
         }
         label = label.trim();
-        ensureNameIsAvailable(label);
+        ensureLabelIsAvailable(label);
         setDisplayName(label);
     }
 
@@ -104,6 +104,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         }
         validateTargetName(name);
         super.copyTo(toCollection, name);
+    }
+
+    private void ensureLabelIsAvailable(String label) throws ConflictException {
+        var existing = factory.root.findExistingCollectionWithLabel(label);
+        if (existing != null) {
+            throw new ConflictException(existing, "Target with this label already exists.");
+        }
     }
 
     @Property
