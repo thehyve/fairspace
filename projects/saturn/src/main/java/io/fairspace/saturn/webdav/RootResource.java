@@ -49,10 +49,11 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     }
 
     public Resource findExistingCollectionWithName(String name) {
-        return getChildren().stream()
-                .filter(collection -> collection.getName().equals(name))
-                .findAny()
-                .orElse(null);
+        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
+                .mapWith(child -> factory.getResourceByType(child, Access.List))
+                .filterDrop(Objects::isNull)
+                .filterKeep(collection -> collection.getName().equals(name))
+                .next();
     }
 
     protected void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
