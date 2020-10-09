@@ -85,6 +85,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
         <Dialog
             open={openDialog}
             data-testid="property-change-dialog"
+            onClose={handleCancel}
         >
             <DialogTitle id="property-change-dialog-title">Change collection status</DialogTitle>
             <DialogContent>
