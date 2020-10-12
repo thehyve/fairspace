@@ -229,6 +229,9 @@ export const url2iri = (iri) => {
 export const getNamespacedIri = (iri, namespaces) => {
     if (!iri) return '';
 
+    // eslint-disable-next-line no-param-reassign
+    iri = decodeURI(iri);
+
     if (!namespaces) return iri;
 
     const namespace = namespaces.find(n => iri.startsWith(n.namespace));

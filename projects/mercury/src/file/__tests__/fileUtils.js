@@ -87,7 +87,7 @@ describe('getPathInfoFromParams', () => {
         });
 
         expect(getPathInfoFromParams({collection: undefined, path: undefined})).toEqual({
-            collectionName: undefined,
+            collectionName: '',
             openedPath: '/'
         });
 

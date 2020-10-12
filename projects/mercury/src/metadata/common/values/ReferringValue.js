@@ -21,7 +21,7 @@ export const ReferringValue = ({property, entry}) => {
         }
     }
 
-    const displayValue = property.isGenericIriResource ? entry.id : extractDisplayValue(entry);
+    const displayValue = property.isGenericIriResource ? decodeURI(entry.id) : extractDisplayValue(entry);
 
     if (entry.id) {
         // External links should be represented by a direct link to the URI itself

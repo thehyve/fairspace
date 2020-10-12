@@ -28,7 +28,6 @@ public class DavFactory implements ResourceFactory {
     private final String baseUri;
     public final RootResource root = new RootResource(this);
 
-
     public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, MailService mailService, Context context) {
         this.rootSubject = rootSubject;
         this.store = store;

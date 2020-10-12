@@ -38,7 +38,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             return localPart;
         }
 
-        return namespace.value + localPart;
+        return encodeURI(namespace.value + localPart);
     };
 
     const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);

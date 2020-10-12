@@ -221,22 +221,22 @@ const MetadataCard = (props) => {
 
 const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
     const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
-    // Parse stat data
-    const fileProps = data && data.props;
-    const subject = fileProps && fileProps.iri;
-    const isDirectory = fileProps && fileProps.iscollection && (fileProps.iscollection.toLowerCase() === 'true');
+
     let body;
+    let isDirectory;
     let avatar = <FolderOpenOutlined />;
     if (error) {
         body = <MessageDisplay message="An error occurred while determining metadata subject" />;
     } else if (loading) {
         body = <div>Loading...</div>;
-    } else if (!subject || !fileProps) {
+    } else if (!data || !data.iri) {
         body = <div>No metadata found</div>;
     } else {
+        const {iri, iscollection} = data;
+        isDirectory = iscollection && (iscollection.toLowerCase() === 'true');
         body = (
             <LinkedDataEntityFormWithLinkedData
-                subject={fileProps.iri}
+                subject={iri}
                 hasEditRight={hasEditRight}
             />
         );
