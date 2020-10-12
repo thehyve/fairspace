@@ -22,7 +22,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Base64;
 import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
@@ -58,10 +57,6 @@ public class DavFactoryTest {
     private ResourceFactory factory;
     private Model model = createTxnMem().getDefaultModel();
 
-    private String base64UrlEncode(String value) {
-        return Base64.getUrlEncoder().encodeToString(value.getBytes());
-    }
-
     @Before
     public void before() {
         factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
@@ -86,7 +81,7 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = root.createCollection("coll");
 
-        var collName = base64UrlEncode("coll") ;
+        var collName = "coll";
         assertTrue(coll instanceof FolderResource);
         assertEquals(collName, coll.getName());
         assertNotNull(root.child(collName));
@@ -99,7 +94,7 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = root.createCollection("-coll");
 
-        var collName = base64UrlEncode("-coll") ;
+        var collName = "-coll";
         assertTrue(coll instanceof FolderResource);
         assertEquals(collName, coll.getName());
         assertNotNull(root.child(collName));
@@ -114,14 +109,14 @@ public class DavFactoryTest {
             root.createCollection("");
             fail("Empty collection labe; should be rejected.");
         } catch (BadRequestException e) {
-            assertEquals("The collection label is empty.", e.getReason());
+            assertEquals("The collection name is empty.", e.getReason());
         }
         var tooLongName = "test123_56".repeat(20);
         try {
             root.createCollection(tooLongName);
             fail("Collection name should be rejected as too long.");
         } catch (BadRequestException e) {
-            assertEquals("The collection name exceeds maximum length 244.", e.getReason());
+            assertEquals("The collection name exceeds maximum length 127.", e.getReason());
         }
     }
 
@@ -135,7 +130,7 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        var collName = base64UrlEncode("coll") ;
+        var collName = "coll";
         model.removeAll(null, FS.canManage, model.createResource(baseUri + "/" + collName));
 
         assertTrue(root.getChildren().isEmpty());
@@ -181,7 +176,7 @@ public class DavFactoryTest {
 
         verifyNoInteractions(input, store);
 
-        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/file", base64UrlEncode("coll"))));
+        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/file", "coll")));
 
         assertTrue(file instanceof GetableResource);
         assertEquals("file", file.getName());
@@ -198,7 +193,7 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        var collName = base64UrlEncode("coll");
+        var collName = "coll";
         model.removeAll(null, FS.canManage, model.createResource(baseUri + "/" + collName))
                 .add(createResource(baseUri + "/" + collName), FS.canRead, model.createResource(baseUri + "/" + collName));
 
@@ -375,8 +370,8 @@ public class DavFactoryTest {
         assertNull(coll.child("old"));
         assertNotNull(coll.child("new"));
 
-        assertNull(factory.getResource(null, BASE_PATH + format("/%s/old/file", base64UrlEncode("coll"))));
-        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/new/file", base64UrlEncode("coll"))));
+        assertNull(factory.getResource(null, BASE_PATH + "/coll/old/file"));
+        assertNotNull(factory.getResource(null, BASE_PATH + "/coll/new/file"));
     }
 
     @Test
@@ -390,11 +385,11 @@ public class DavFactoryTest {
         coll.moveTo(root, "new");
 
         assertNull(factory.getResource(null, BASE_PATH + "/old"));
-        assertNotNull(factory.getResource(null, BASE_PATH + "/" + base64UrlEncode("new")));
+        assertNotNull(factory.getResource(null, BASE_PATH + "/new"));
         assertNull(factory.getResource(null, BASE_PATH + "/old/dir"));
-        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/dir", base64UrlEncode("new"))));
+        assertNotNull(factory.getResource(null, BASE_PATH + "/new/dir"));
         assertNull(factory.getResource(null, BASE_PATH + "/old/dir/file"));
-        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/dir/file", base64UrlEncode("new"))));
+        assertNotNull(factory.getResource(null, BASE_PATH + "/new/dir/file"));
     }
 
     @Test(expected = ConflictException.class)
@@ -424,9 +419,9 @@ public class DavFactoryTest {
 
         ((MoveableResource) subdir).moveTo(dir2, "new");
 
-        assertNull(factory.getResource(null, BASE_PATH + format("/%s/dir1/old", base64UrlEncode("c1"))));
-        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/dir2/new", base64UrlEncode("c2"))));
-        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/dir2/new/file", base64UrlEncode("c2"))));
+        assertNull(factory.getResource(null, BASE_PATH + "/c1/dir1/old"));
+        assertNotNull(factory.getResource(null, BASE_PATH + "/c2/dir2/new"));
+        assertNotNull(factory.getResource(null, BASE_PATH + "/c2/dir2/new/file"));
     }
 
     @Test(expected = ConflictException.class)

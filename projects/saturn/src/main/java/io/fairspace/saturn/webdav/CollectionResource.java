@@ -17,9 +17,7 @@ import java.util.*;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
-import static io.fairspace.saturn.webdav.PathUtils.generateCollectionName;
 import static io.fairspace.saturn.webdav.PathUtils.name;
 import static java.util.stream.Collectors.joining;
 
@@ -54,7 +52,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     }
 
     @Override
-    public void moveTo(io.milton.resource.CollectionResource rDest, String label) throws ConflictException, NotAuthorizedException, BadRequestException {
+    public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
         if (!canManage()) {
             throw new NotAuthorizedException(this);
         }
@@ -64,17 +62,11 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (getAccessMode() == AccessMode.DataPublished) {
             throw new BadRequestException(this, "Cannot move a published collection.");
         }
-        if (label != null) {
-            label = label.trim();
+        if (name != null) {
+            name = name.trim();
         }
-        factory.root.validateTargetCollectionLabel(label);
-        var newName = generateCollectionName(label);
-        factory.root.validateTargetCollectionName(newName);
-
-        var oldLabel = getStringProperty(subject, RDFS.label);
-        super.moveTo(rDest, newName);
-        var newSubject = childSubject(factory.rootSubject, newName);
-        newSubject.removeAll(RDFS.label).addProperty(RDFS.label, oldLabel);
+        factory.root.validateTargetCollectionName(name);
+        super.moveTo(rDest, name);
     }
 
     @Override

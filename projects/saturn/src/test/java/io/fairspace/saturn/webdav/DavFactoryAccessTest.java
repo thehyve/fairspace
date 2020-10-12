@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
-import java.util.Base64;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -95,7 +94,7 @@ public class DavFactoryAccessTest {
             throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
-        var resource = model.createResource(baseUri + "/" + Base64.getUrlEncoder().encodeToString("coll".getBytes()));
+        var resource = model.createResource(baseUri + "/coll");
         var user = ((DavFactory) factory).currentUserResource();
         model.removeAll(null, FS.canManage, resource);
 
