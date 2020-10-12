@@ -10,7 +10,7 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {encodePath, splitPathIntoArray} from "./fileUtils";
 import UploadProgressComponent from "./UploadProgressComponent";
-import UploadsContext from "./UploadsContext";
+import UploadsContext, {showCannotOverwriteDeletedError} from "./UploadsContext";
 import {generateUuid} from "../metadata/common/metadataUtils";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 
@@ -79,8 +79,14 @@ export const FileBrowser = ({
     const existingFileNames = files ? files.filter(file => file.type === "file").map(file => file.basename) : [];
     const existingFolderNames = files ? files.filter(file => file.type === "directory").map(file => file.basename) : [];
 
+    const isOverwriteCandidateDeleted = (filenames: string[]) => {
+        const fileCandidates = files ? files.filter(file => filenames.some(name => name === file.basename)) : [];
+        return fileCandidates.length > 0 && fileCandidates.some(f => f.dateDeleted);
+    };
+
     const {startUpload} = useContext(UploadsContext);
     const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
+    const [showCannotOverwriteWarning, setShowCannotOverwriteWarning] = useState(false);
     const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
@@ -107,9 +113,13 @@ export const FileBrowser = ({
             const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
 
             if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
-                setCurrentUpload(newUpload);
                 setOverwriteFileCandidateNames(newOverwriteFileCandidates);
                 setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
+                if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
+                    setShowCannotOverwriteWarning(true);
+                    return;
+                }
+                setCurrentUpload(newUpload);
                 setShowOverwriteConfirmation(true);
             } else {
                 startUpload(newUpload).then(refreshFiles);
@@ -191,6 +201,11 @@ export const FileBrowser = ({
 
     if (error || collectionsError) {
         return (<MessageDisplay message="An error occurred while loading files" />);
+    }
+
+    if (showCannotOverwriteWarning) {
+        setShowCannotOverwriteWarning(false);
+        showCannotOverwriteDeletedError([...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length);
     }
 
     const renderOverwriteConfirmationMessage = () => (
