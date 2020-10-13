@@ -19,6 +19,7 @@ import org.apache.jena.vocabulary.RDFS;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
@@ -48,12 +49,12 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
                 .toList();
     }
 
-    public Resource findExistingCollectionWithName(String name) {
+    public Optional<Resource> findCollectionWithName(String name) {
         return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(child -> factory.getResourceByType(child, Access.List))
                 .filterDrop(Objects::isNull)
                 .filterKeep(collection -> collection.getName().equals(name))
-                .next();
+                .nextOptional();
     }
 
     protected void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
@@ -61,9 +62,9 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             throw new BadRequestException("The collection name is empty.");
         }
         validateCollectionName(name);
-        var existing = findExistingCollectionWithName(name);
-        if (existing != null) {
-            throw new ConflictException(existing, "Target collection with this name already exists.");
+        var existing = findCollectionWithName(name);
+        if (existing.isPresent()) {
+            throw new ConflictException(existing.get(), "Target collection with this name already exists.");
         }
     }
 
