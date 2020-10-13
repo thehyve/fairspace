@@ -144,6 +144,13 @@ export const FileBrowser = ({
 
     useEffect(() => {refreshFiles();}, [openedCollection.dateDeleted, refreshFiles]);
 
+    useEffect(() => {
+        if (showCannotOverwriteWarning) {
+            setShowCannotOverwriteWarning(false);
+            showCannotOverwriteDeletedError([...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length);
+        }
+    }, [overwriteFileCandidateNames, overwriteFolderCandidateNames, showCannotOverwriteWarning]);
+
     const uploadFolder = () => {
         if (isFolderUpload) {
             open();
@@ -201,11 +208,6 @@ export const FileBrowser = ({
 
     if (error || collectionsError) {
         return (<MessageDisplay message="An error occurred while loading files" />);
-    }
-
-    if (showCannotOverwriteWarning) {
-        setShowCannotOverwriteWarning(false);
-        showCannotOverwriteDeletedError([...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length);
     }
 
     const renderOverwriteConfirmationMessage = () => (

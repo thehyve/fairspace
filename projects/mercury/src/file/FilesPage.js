@@ -134,8 +134,8 @@ const ParentAwareFilesPage = (props) => {
 
     useEffect(() => {refresh();}, [props.collection.dateDeleted, refresh]);
 
-    const isParentFolderDeleted = data && data.props && data.props.dateDeleted;
-    const isOpenedPathDeleted = props.collection.dateDeleted || isParentFolderDeleted;
+    const isParentFolderDeleted = data && data.props && !!data.props.dateDeleted;
+    const isOpenedPathDeleted = !!props.collection.dateDeleted || isParentFolderDeleted;
 
     return (
         <FilesPage
