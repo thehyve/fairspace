@@ -62,9 +62,9 @@ export const FilesPage = ({
     const breadcrumbSegments = collection.name
         ? pathSegments.map((segment, idx) => ({
             label: idx === 0 ? collection.name : segment,
-            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
+            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
         }))
-        : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + openedPath}];
+        : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + encodeURI(openedPath)}];
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
