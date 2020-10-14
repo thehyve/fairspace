@@ -49,7 +49,6 @@ public class DavFactory implements ResourceFactory {
         }
 
         if (!subject.getModel().containsResource(subject)
-                || subject.hasProperty(FS.dateDeleted) && !showDeleted()
                 || subject.hasProperty(FS.movedTo)) {
             return null;
         }
@@ -129,6 +128,10 @@ public class DavFactory implements ResourceFactory {
         if (subject.hasProperty(FS.movedTo)) {
             return null;
         }
+        return getResourceByType(subject, access);
+    }
+
+    Resource getResourceByType(org.apache.jena.rdf.model.Resource subject, Access access) {
         if (subject.hasProperty(RDF.type, FS.File)) {
             return new FileResource(this, subject, access);
         }

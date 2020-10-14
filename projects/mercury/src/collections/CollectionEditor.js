@@ -102,7 +102,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             })
             .catch((err: Error) => {
                 this.onSaveComplete();
-                if (err.message.includes('name already exists')) {
+                if (err.message.includes('name already exists') || err.message.includes('status code 409')) {
                     ErrorDialog.showError(
                         'Collection name must be unique',
                         'Collection name is already in use. Please choose a unique name.'
