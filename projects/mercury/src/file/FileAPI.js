@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
-import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
+import {decodeHTMLEntities, generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 import {handleHttpError} from "../common/utils/httpUtils";
 
 // Ensure that the client passes along the credentials
@@ -238,7 +238,6 @@ class FileAPI {
                         case 403:
                             throw new Error("Could not move one or more files. Only admins can move files.");
                         case 409:
-                            throw new Error("Could not move one or more files. The destination can not be copied to.");
                         case 412:
                             throw new Error("Could not move one or more files. The destination file already exists.");
                     }
@@ -398,7 +397,18 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
+    mapToFile = (fileObject) => {
+        const properties = {...fileObject, ...(fileObject.props || {})};
+        delete properties.props;
+        return Object.fromEntries(Object.entries(properties).map(
+            ([key, value]) => {
+                // The WebDAV client does not properly decode the XML response,
+                // so we need to do that here
+                const decodedValue = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
+                return [key, decodedValue];
+            }
+        ));
+    }
 }
 
 export default new FileAPI();

@@ -7,7 +7,6 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
@@ -18,10 +17,9 @@ import java.util.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
-import static io.fairspace.saturn.webdav.PathUtils.name;
 import static java.util.stream.Collectors.joining;
 
-class CollectionResource extends DirectoryResource implements DisplayNameResource {
+class CollectionResource extends DirectoryResource {
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -34,21 +32,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case POST -> canManage() || canWrite() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
-    }
-
-    @Override
-    public String getName() {
-        return name(subject.getURI());
-    }
-
-    @Override
-    public String getDisplayName() {
-        return getStringProperty(subject, RDFS.label);
-    }
-
-    @Override
-    public void setDisplayName(String s) {
-        subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
     }
 
     @Override

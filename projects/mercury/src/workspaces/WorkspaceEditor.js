@@ -15,6 +15,7 @@ export default ({onSubmit, onClose, creating, workspaces, title,
     const fields = [
         {
             control: nameControl,
+            autoFocus: true,
             required: true,
             id: "name",
             label: "Name",
