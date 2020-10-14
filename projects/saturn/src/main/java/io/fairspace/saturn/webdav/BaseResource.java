@@ -104,6 +104,10 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (name == null || name.isEmpty()) {
             throw new BadRequestException("The name is empty.");
         }
+        if (name.contains("\\")) {
+            throw new BadRequestException(
+                    "The name contains an illegal character (\\)");
+        }
         var existing = parent.child(name);
         if (existing != null) {
             throw new ConflictException(existing);

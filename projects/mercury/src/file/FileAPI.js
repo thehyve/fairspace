@@ -400,14 +400,13 @@ class FileAPI {
     mapToFile = (fileObject) => {
         const properties = {...fileObject, ...(fileObject.props || {})};
         delete properties.props;
-        return Object.fromEntries(Object.entries(properties).map(
-            ([key, value]) => {
-                // The WebDAV client does not properly decode the XML response,
-                // so we need to do that here
-                const decodedValue = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
-                return [key, decodedValue];
-            }
-        ));
+        Object.keys(properties).forEach(key => {
+            // The WebDAV client does not properly decode the XML response,
+            // so we need to do that here
+            const value = properties[key];
+            properties[key] = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
+        });
+        return properties;
     }
 }
 

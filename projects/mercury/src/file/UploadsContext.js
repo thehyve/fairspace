@@ -1,15 +1,25 @@
 import React, {useState} from 'react';
 import FileAPI from "./FileAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
+import {isValidFileName} from './fileUtils';
+import {PATH_SEPARATOR} from '../constants';
 
 export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
 export const UPLOAD_STATUS_ERROR = 'ERROR';
 export const UPLOAD_STATUS_FINISHED = 'FINISHED';
 
+export type File = {
+    name: string;
+    path?: string;
+    lastModified: number;
+    type: string;
+    size: number;
+}
+
 export type FileUpload = {
     id: string,
-    files: any[],
+    files: File[],
     destinationPath: string
 }
 
@@ -65,6 +75,28 @@ export const UploadsProvider = ({children, fileApi = FileAPI}) => {
     const startUpload = (upload: FileUpload) => {
         const newUpload = {...upload, status: UPLOAD_STATUS_INITIAL, progress: 0};
         enqueueUploads(newUpload);
+        const invalidFilenames = upload.files
+            .map(file => {
+                const parts = file.path.split(PATH_SEPARATOR);
+                // eslint-disable-next-line no-restricted-syntax
+                for (const part of parts) {
+                    if (!isValidFileName(part)) {
+                        return part;
+                    }
+                }
+                return null;
+            })
+            .filter(fileName => !!fileName);
+        if (invalidFilenames.length > 0) {
+            ErrorDialog.showError(
+                'Invalid file name',
+                <span>
+                    Invalid file {invalidFilenames.length === 1 ? 'name' : 'names'}: <em>{invalidFilenames.join(', ')}</em>.<br />
+                </span>
+            );
+            setStateForUpload(upload, UPLOAD_STATUS_ERROR);
+            return Promise.resolve();
+        }
         const onUploadProgress = progressEvent => updateSpecificUpload(
             newUpload,
             u => ({...u, progress: (progressEvent.loaded * 100) / progressEvent.total})
