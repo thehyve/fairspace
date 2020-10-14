@@ -36,7 +36,7 @@ import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
 
 abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected final DavFactory factory;
-    protected final org.apache.jena.rdf.model.Resource subject;
+    protected final Resource subject;
     protected final Access access;
 
     BaseResource(DavFactory factory, Resource subject, Access access) {
@@ -99,16 +99,28 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         }
     }
 
-    @Override
-    public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
-        var existing = rDest.child(name);
+    private void validateTarget(io.milton.resource.CollectionResource parent, String name)
+            throws BadRequestException, ConflictException, NotAuthorizedException {
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException("The name is empty.");
+        }
+        var existing = parent.child(name);
         if (existing != null) {
             throw new ConflictException(existing);
         }
-        move(subject, (rDest instanceof DirectoryResource) ? ((DirectoryResource) rDest).subject : null, name);
     }
 
-    private void move(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name) {
+    @Override
+    public void moveTo(io.milton.resource.CollectionResource parent, String name)
+            throws ConflictException, NotAuthorizedException, BadRequestException {
+        if (name != null) {
+            name = name.trim();
+        }
+        validateTarget(parent, name);
+        move(subject, (parent instanceof DirectoryResource) ? ((DirectoryResource) parent).subject : null, name);
+    }
+
+    private void move(Resource subject, Resource parent, String name) {
         var newSubject = childSubject(parent != null ? parent : factory.rootSubject, name);
         newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
@@ -150,18 +162,18 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     @Override
-    public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
-        if (!((DirectoryResource) toCollection).access.canWrite()) {
+    public void copyTo(io.milton.resource.CollectionResource parent, String name)
+            throws NotAuthorizedException, BadRequestException, ConflictException {
+        if (!((DirectoryResource) parent).access.canWrite()) {
             throw new NotAuthorizedException(this);
         }
-        var existing = toCollection.child(name);
-        if (existing != null) {
-            throw new ConflictException(existing);
+        if (name != null) {
+            name = name.trim();
         }
-        copy(subject, ((DirectoryResource) toCollection).subject, name, factory.currentUserResource(), timestampLiteral());
+        copy(subject, ((DirectoryResource) parent).subject, name, factory.currentUserResource(), timestampLiteral());
     }
 
-    private void copy(org.apache.jena.rdf.model.Resource subject, org.apache.jena.rdf.model.Resource parent, String name, org.apache.jena.rdf.model.Resource user, Literal date) {
+    private void copy(Resource subject, Resource parent, String name, Resource user, Literal date) {
         var newSubject = childSubject(parent, name);
         newSubject.removeProperties();
         parent.addProperty(FS.contains, newSubject);
@@ -262,7 +274,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         return subject.getURI().substring(factory.rootSubject.getURI().length());
     }
 
-    protected org.apache.jena.rdf.model.Resource newVersion(BlobInfo blob) {
+    protected Resource newVersion(BlobInfo blob) {
         return subject.getModel()
                 .createResource()
                 .addProperty(RDF.type, FS.FileVersion)
@@ -273,7 +285,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addProperty(FS.modifiedBy, factory.currentUserResource());
     }
 
-    protected static Date parseDate(org.apache.jena.rdf.model.Resource s, org.apache.jena.rdf.model.Property p) {
+    protected static Date parseDate(Resource s, org.apache.jena.rdf.model.Property p) {
         if (!s.hasProperty(p)) {
             return null;
         }
@@ -313,7 +325,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         undelete(subject, date, user);
     }
 
-    private void undelete(org.apache.jena.rdf.model.Resource resource, Literal date, org.apache.jena.rdf.model.Resource user) {
+    private void undelete(Resource resource, Literal date, Resource user) {
         if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
             resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
 
