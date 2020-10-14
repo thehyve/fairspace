@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;

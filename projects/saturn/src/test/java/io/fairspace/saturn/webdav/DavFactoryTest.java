@@ -31,6 +31,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static java.lang.String.format;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DavFactoryTest {
@@ -79,10 +80,12 @@ public class DavFactoryTest {
     public void testCreateCollection() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = root.createCollection("coll");
+
+        var collName = "coll";
         assertTrue(coll instanceof FolderResource);
-        assertEquals("coll", coll.getName());
-        assertNotNull(root.child("coll"));
-        assertNotNull(factory.getResource(null,"/api/v1/webdav/coll/"));
+        assertEquals(collName, coll.getName());
+        assertNotNull(root.child(collName));
+        assertNotNull(factory.getResource(null, format("/api/v1/webdav/%s/", collName)));
         assertEquals(1, root.getChildren().size());
     }
 
@@ -90,40 +93,30 @@ public class DavFactoryTest {
     public void testCreateCollectionStartingWithDash() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = root.createCollection("-coll");
+
+        var collName = "-coll";
         assertTrue(coll instanceof FolderResource);
-        assertEquals("-coll", coll.getName());
-        assertNotNull(root.child("-coll"));
-        assertNotNull(factory.getResource(null,"/api/v1/webdav/-coll/"));
+        assertEquals(collName, coll.getName());
+        assertNotNull(root.child(collName));
+        assertNotNull(factory.getResource(null,format("/api/v1/webdav/%s/", collName)));
         assertEquals(1, root.getChildren().size());
     }
 
     @Test
-    public void testCreateCollectionWithInvalidName() throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void testCreateCollectionWithTooLongName() throws NotAuthorizedException, ConflictException, BadRequestException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         try {
             root.createCollection("");
-            fail("Empty collection name should be rejected.");
+            fail("Empty collection labe; should be rejected.");
         } catch (BadRequestException e) {
             assertEquals("The collection name is empty.", e.getReason());
         }
-        var tooLongName = "test123_56".repeat(13); // 130 characters
+        var tooLongName = "test123_56".repeat(20);
         try {
             root.createCollection(tooLongName);
             fail("Collection name should be rejected as too long.");
         } catch (BadRequestException e) {
             assertEquals("The collection name exceeds maximum length 127.", e.getReason());
-        }
-        String[] invalidNames = {".", "..", ".test", "%test%", "!", "\"", "#", "$test", "a test"};
-        for (var invalidName: invalidNames) {
-            try {
-                root.createCollection(invalidName);
-                fail("Collection name should be rejected as invalid: " + invalidName);
-            } catch (BadRequestException e) {
-                assertEquals(
-                        "The collection name should only contain letters a-z and A-Z, " +
-                                "numbers 0-9, and the characters `-` and `_`.",
-                        e.getReason());
-            }
         }
     }
 
@@ -137,17 +130,18 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"));
+        var collName = "coll";
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/" + collName));
 
         assertTrue(root.getChildren().isEmpty());
 
-        var coll = root.child("coll");
+        var coll = root.child(collName);
         for (var method: Request.Method.values()) {
             assertFalse("Shouldn't be able to " + method, coll.authorise(null, method, null));
         }
     }
 
-    @Test
+    @Test(expected = ConflictException.class)
     public void testCreateCollectionTwiceFails() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         assertNotNull(root.createCollection("coll"));
@@ -156,11 +150,11 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testCreateCollectionWithSameNameButDifferentCaseFails() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testCreateCollectionWithSameNameButDifferentCaseDoesNotFail() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         assertNotNull(root.createCollection("coll"));
-        assertNull(root.createCollection("COLL"));
-        assertEquals(1, root.getChildren().size());
+        assertNotNull(root.createCollection("COLL"));
+        assertEquals(2, root.getChildren().size());
     }
 
     @Test
@@ -182,7 +176,7 @@ public class DavFactoryTest {
 
         verifyNoInteractions(input, store);
 
-        assertNotNull(factory.getResource(null, BASE_PATH + "/coll/file"));
+        assertNotNull(factory.getResource(null, BASE_PATH + format("/%s/file", "coll")));
 
         assertTrue(file instanceof GetableResource);
         assertEquals("file", file.getName());
@@ -199,10 +193,11 @@ public class DavFactoryTest {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         root.createCollection("coll");
 
-        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/coll"))
-                .add(createResource(baseUri + "/coll"), FS.canRead, model.createResource(baseUri + "/coll"));
+        var collName = "coll";
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/" + collName))
+                .add(createResource(baseUri + "/" + collName), FS.canRead, model.createResource(baseUri + "/" + collName));
 
-        assertFalse(root.child("coll").authorise(null, Request.Method.PUT, null));
+        assertFalse(root.child(collName).authorise(null, Request.Method.PUT, null));
     }
 
     @Test
@@ -406,7 +401,7 @@ public class DavFactoryTest {
         var dir = coll2.createCollection("dir");
         ((FolderResource) dir).createNew("file", input, FILE_SIZE, "text/abc");
 
-        coll2.moveTo(root, "COLL1");
+        coll2.moveTo(root, "coll1");
     }
 
     @Test
@@ -438,7 +433,7 @@ public class DavFactoryTest {
         var dir = coll2.createCollection("dir");
         ((FolderResource) dir).createNew("file", input, FILE_SIZE, "text/abc");
 
-        coll2.copyTo(root, "COLL1");
+        coll2.copyTo(root, "coll1");
     }
 
 }

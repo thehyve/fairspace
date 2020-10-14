@@ -1,9 +1,10 @@
 // @flow
 // eslint-disable-next-line import/no-cycle
-import {mapCollectionNameAndDescriptionToMetadata, mapFilePropertiesToCollection} from "./collectionUtils";
+import {mapFilePropertiesToCollection} from "./collectionUtils";
 import {handleHttpError} from '../common/utils/httpUtils';
 import FileAPI from "../file/FileAPI";
 import MetadataAPI from "../metadata/common/MetadataAPI";
+import {COMMENT_URI} from "../constants";
 
 const rootUrl = '';
 
@@ -29,7 +30,6 @@ export type PrincipalPermission = Permission & Principal;
 export type CollectionProperties = {|
     name: string;
     description: string;
-    location: string;
     ownerWorkspace: string;
 |};
 
@@ -86,8 +86,8 @@ class CollectionAPI {
             },
             withCredentials: true
         };
-        return FileAPI.createDirectory(collection.location, options)
-            .then(() => this.getCollectionProperties(collection.location))
+        return FileAPI.createDirectory(collection.name, options)
+            .then(() => this.getCollectionProperties(collection.name))
             .then((properties) => {
                 collection.iri = properties.iri;
                 return this.updateCollection(collection, vocabulary);
@@ -95,44 +95,45 @@ class CollectionAPI {
     }
 
     deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
-        return FileAPI.delete(collection.location, showDeleted)
+        return FileAPI.delete(collection.name, showDeleted)
             .catch(handleHttpError("Failure while deleting collection"));
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
-        return FileAPI.undelete(collection.location)
+        return FileAPI.undelete(collection.name)
             .catch(handleHttpError("Failure while undeleting collection"));
     }
 
     unpublish(collection: CollectionProperties): Promise<void> {
-        return FileAPI.post(collection.location, {action: 'unpublish'});
+        return FileAPI.post(collection.name, {action: 'unpublish'});
     }
 
-    relocateCollection(oldLocation: string, newLocation: string): Promise<void> {
-        return FileAPI.move(oldLocation, newLocation)
-            .catch(handleHttpError("Failure while relocating collection"));
+    renameCollection(name: string, target: string): Promise<void> {
+        return FileAPI.move(name, target);
     }
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
-        const metadataProperties = mapCollectionNameAndDescriptionToMetadata(collection.name, collection.description);
+        const metadataProperties = {
+            [COMMENT_URI]: [{value: collection.description}]
+        };
         return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
             .catch(handleHttpError("Failure while updating a collection"));
     }
 
-    setAccessMode(location: string, mode: AccessMode): Promise<void> {
-        return FileAPI.post(location, {action: 'set_access_mode', mode});
+    setAccessMode(name: string, mode: AccessMode): Promise<void> {
+        return FileAPI.post(name, {action: 'set_access_mode', mode});
     }
 
-    setStatus(location: string, status: Status): Promise<void> {
-        return FileAPI.post(location, {action: 'set_status', status});
+    setStatus(name: string, status: Status): Promise<void> {
+        return FileAPI.post(name, {action: 'set_status', status});
     }
 
-    setPermission(location: string, principal: string, access: AccessLevel): Promise<void> {
-        return FileAPI.post(location, {action: 'set_permission', principal, access});
+    setPermission(name: string, principal: string, access: AccessLevel): Promise<void> {
+        return FileAPI.post(name, {action: 'set_permission', principal, access});
     }
 
-    setOwnedBy(location: string, owner: string): Promise<void> {
-        return FileAPI.post(location, {action: 'set_owned_by', owner});
+    setOwnedBy(name: string, owner: string): Promise<void> {
+        return FileAPI.post(name, {action: 'set_owned_by', owner});
     }
 }
 

@@ -12,7 +12,7 @@ describe('CollectionStatusChangeDialog', () => {
 
     const mockCollection = {
         iri: 'http://localhost/iri/c1',
-        location: 'c1',
+        name: 'c1',
         availableStatuses: statuses,
         status: 'Active'
     };

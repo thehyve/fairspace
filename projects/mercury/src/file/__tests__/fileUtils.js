@@ -82,17 +82,17 @@ describe('getFileName', () => {
 describe('getPathInfoFromParams', () => {
     it('gets path info properly', () => {
         expect(getPathInfoFromParams({collection: '', path: ''})).toEqual({
-            collectionLocation: '',
+            collectionName: '',
             openedPath: '/'
         });
 
         expect(getPathInfoFromParams({collection: undefined, path: undefined})).toEqual({
-            collectionLocation: undefined,
+            collectionName: '',
             openedPath: '/'
         });
 
         expect(getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})).toEqual({
-            collectionLocation: 'collectionX',
+            collectionName: 'collectionX',
             openedPath: '/collectionX/something/something'
         });
     });

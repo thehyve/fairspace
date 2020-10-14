@@ -44,10 +44,6 @@ describe('<CollectionBrowser />', () => {
         nameField.simulate('focus');
         nameField.simulate('change', {target: {value: 'New collection'}});
 
-        const locationField = wrapper.find('input#location').first();
-        locationField.simulate('focus');
-        locationField.simulate('change', {target: {value: 'new-collection'}});
-
         const saveButton = wrapper.find('button[aria-label="Save"]').first();
 
         jest.useFakeTimers();

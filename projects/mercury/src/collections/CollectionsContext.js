@@ -22,11 +22,11 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const deleteCollection = (collection: CollectionProperties) => collectionApi.deleteCollection(collection, showDeleted).then(refresh);
     const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh);
     const unpublish = (collection: CollectionProperties) => collectionApi.unpublish(collection).then(refresh);
-    const relocateCollection = (oldLocation: string, newLocation: string) => collectionApi.relocateCollection(oldLocation, newLocation).then(refresh);
-    const setPermission = (location: string, principal: string, access: AccessLevel) => collectionApi.setPermission(location, principal, access).then(refresh);
-    const setAccessMode = (location: string, mode: AccessMode) => collectionApi.setAccessMode(location, mode).then(refresh);
-    const setStatus = (location: string, status: Status) => collectionApi.setStatus(location, status).then(refresh);
-    const setOwnedBy = (location: string, owner: string) => collectionApi.setOwnedBy(location, owner).then(refresh);
+    const renameCollection = (name: string, target: string) => collectionApi.renameCollection(name, target).then(refresh);
+    const setPermission = (name: string, principal: string, access: AccessLevel) => collectionApi.setPermission(name, principal, access).then(refresh);
+    const setAccessMode = (name: string, mode: AccessMode) => collectionApi.setAccessMode(name, mode).then(refresh);
+    const setStatus = (name: string, status: Status) => collectionApi.setStatus(name, status).then(refresh);
+    const setOwnedBy = (name: string, owner: string) => collectionApi.setOwnedBy(name, owner).then(refresh);
 
     return (
         <CollectionsContext.Provider
@@ -40,7 +40,7 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
                 undeleteCollection,
                 unpublish,
                 updateCollection,
-                relocateCollection,
+                renameCollection,
                 setPermission,
                 setAccessMode,
                 setStatus,

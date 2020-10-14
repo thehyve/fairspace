@@ -14,7 +14,7 @@ import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from "../common/components/ErrorDialog";
 
-const fields = ['name', 'description', 'location', 'ownerWorkspace'];
+const fields = ['name', 'description', 'ownerWorkspace'];
 
 const copyProperties = (properties: CollectionProperties): CollectionProperties => ((fields
     .reduce((copy, field) => { copy[field] = properties ? properties[field] || '' : ''; return copy; }, {}): any): CollectionProperties);
@@ -22,29 +22,18 @@ const copyProperties = (properties: CollectionProperties): CollectionProperties 
 const havePropertiesChanged = (collection: CollectionProperties, properties: CollectionProperties) => !collection
     || fields.some(field => collection[field] !== properties[field]);
 
-const NON_SAFE_CHARACTERS_REGEX = /[^a-z0-9_-]+/gi;
-
 const MAX_LOCATION_LENGTH = 127;
 
-/**
- * Converts the given collection name to a safe directory name
- * @param name
- * @returns {string}
- */
-export const convertToSafeDirectoryName = (name: string) => {
-    const safeName = name.replace(NON_SAFE_CHARACTERS_REGEX, '_');
-    return safeName.length <= MAX_LOCATION_LENGTH ? safeName : safeName.substring(0, MAX_LOCATION_LENGTH);
-};
+const isNameValid = (name: string) => !!name && name.trim().length > 0 && name.trim().length <= MAX_LOCATION_LENGTH;
 
 /**
- * Checks whether the input is valid. Check whether the name and location are given
- * and that the location does not contain any unsafe characters.
+ * Checks whether the input is valid. Check whether the name is not empty.
  *
- * Please note that the location may still be invalid, if another collection uses the same
- * location. This will be checked when actually submitting the form.
+ * Please note that the name may still be invalid, if another collection uses the same
+ * name. This will be checked when actually submitting the form.
  * @returns {boolean}
  */
-export const isInputValid = (properties: CollectionProperties) => !!properties.name && !!properties.location && !properties.location.match(NON_SAFE_CHARACTERS_REGEX);
+export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
 type PathParam = {
     path: string;
@@ -55,7 +44,7 @@ type CollectionEditorProps = {
     updateExisting: boolean,
     addCollection: (CollectionProperties) => Promise<void>,
     updateCollection: (Collection) => Promise<void>,
-    relocateCollection: (Collection) => Promise<void>,
+    renameCollection: (Collection) => Promise<void>,
     onClose: () => void,
     setBusy: (boolean) => void,
     match: Match<PathParam>,
@@ -80,20 +69,13 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         saveInProgress: false,
         properties: this.props.collection
             ? copyProperties(this.props.collection)
-            : {name: '', description: '', location: '', ownerWorkspace: this.props.workspaceIri}
+            : {name: '', description: '', ownerWorkspace: this.props.workspaceIri}
     };
 
     unmounting = false;
 
     componentWillUnmount() {
         this.unmounting = true;
-    }
-
-    handleCollectionUpdateError(err) {
-        const msg = (err && err.message && err.message.includes('Duplicate label'))
-            ? "A collection with that name already exists. Collection names must be unique."
-            : err;
-        ErrorDialog.showError("An error occurred while updating a collection", msg);
     }
 
     onSaveStart = () => {
@@ -115,30 +97,51 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         this.onSaveStart();
         return addCollection(properties)
             .then(() => {
+                this.onSaveComplete();
                 this.close();
             })
-            .catch(this.handleCollectionUpdateError)
-            .finally(() => {
+            .catch((err: Error) => {
                 this.onSaveComplete();
+                if (err.message.includes('name already exists') || err.message.includes('status code 409')) {
+                    ErrorDialog.showError(
+                        'Collection name must be unique',
+                        'Collection name is already in use. Please choose a unique name.'
+                    );
+                    return;
+                }
+                ErrorDialog.showError(
+                    'Could not create collection',
+                    err.message
+                );
             });
     };
 
-    handleCollectionLocationChange = (newLocation: string) => {
-        const {collection, relocateCollection} = this.props;
-        return relocateCollection(collection.location, newLocation)
+    handleCollectionRename = (target: string) => {
+        const {collection, renameCollection} = this.props;
+        return renameCollection(collection.name, target)
             .then(() => {
                 this.onSaveComplete();
                 if (isCollectionPage()) {
                     // If the collection location changes, the URI for the current page should change as well
                     const {history, match: {params: {path}}} = this.props;
-                    history.push(`${getCollectionAbsolutePath(newLocation)}/${path || ''}`);
+                    history.push(`${getCollectionAbsolutePath(target)}/${path || ''}`);
                 } else {
                     this.close();
                 }
             })
-            .catch(err => {
+            .catch((err: Error) => {
                 this.onSaveComplete();
-                ErrorDialog.showError("An error occurred while renaming a collection", err);
+                if (err.message.includes('destination file already exists')) {
+                    ErrorDialog.showError(
+                        'Collection name must be unique',
+                        'Collection name is already in use. Please choose a unique name.'
+                    );
+                    return;
+                }
+                ErrorDialog.showError(
+                    'Could not rename collection',
+                    err.message
+                );
             });
     };
 
@@ -148,17 +151,14 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
 
         return updateCollection((({iri: collection.iri, ...properties}: any): Collection))
             .then(() => {
-                if (collection.location !== properties.location) {
-                    this.handleCollectionLocationChange(properties.location);
+                if (collection.name.trim() !== properties.name.trim()) {
+                    this.handleCollectionRename(properties.name.trim());
                 } else {
                     this.onSaveComplete();
                     this.close();
                 }
             })
-            .catch((err) => {
-                this.onSaveComplete();
-                this.handleCollectionUpdateError(err);
-            });
+            .catch(() => {});
     };
 
     handleSave = () => {
@@ -185,27 +185,8 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         this.setState(state);
     };
 
-    handleNameChange = (event: Event) => {
-        const shouldUpdateLocation = this.shouldUpdateLocationOnNameChange();
-        const newName = (event.target: any).value;
-
-        this.handleInputChange('name', newName);
-
-        if (shouldUpdateLocation) {
-            this.handleInputChange('location', convertToSafeDirectoryName(newName));
-        }
-    };
-
-    editLocationEnabled = (!this.props.collection) || this.props.collection.accessMode !== 'DataPublished';
-
-    /**
-     * Determines whether the location should be updated when the name changes.
-     *
-     * Returns true if the user has not changed the location manually
-     * and if location change is allowed (i.e., the collection has not been published yet).
-     * @type {function}
-     */
-    shouldUpdateLocationOnNameChange = () => this.editLocationEnabled && convertToSafeDirectoryName(this.state.properties.name) === this.state.properties.location;
+    editNameEnabled = (!this.props.collection) || (
+        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
 
     isSaveEnabled = () => (!this.state.saveInProgress)
         && isInputValid(this.state.properties)
@@ -228,12 +209,15 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         margin="dense"
                         id="name"
                         label="Name"
-                        helperText="Unique collection name"
+                        helperText={'Unique collection name'
+                        + (this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `. Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
                         value={this.state.properties.name}
                         name="name"
-                        onChange={(event) => this.handleNameChange(event)}
+                        onChange={(event) => this.handleInputChange('name', event.target.value)}
                         fullWidth
                         required
+                        disabled={!this.editNameEnabled}
+                        error={!isNameValid(this.state.properties.name)}
                     />
                     <TextField
                         margin="dense"
@@ -245,21 +229,6 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         onChange={(event) => this.handleInputChange('description', event.target.value)}
                         fullWidth
                     />
-                    <TextField
-                        margin="dense"
-                        id="location"
-                        label="Collection identifier"
-                        helperText={this.editLocationEnabled
-                            ? 'This identifier does not allow special characters and has to be unique.'
-                            : 'Published collections cannot be moved.'}
-                        value={this.state.properties.location}
-                        name="location"
-                        onChange={(event) => this.handleInputChange('location', event.target.value)}
-                        fullWidth
-                        required
-                        disabled={!this.editLocationEnabled}
-                    />
-
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleSave} disabled={!this.isSaveEnabled()} aria-label="Save" color="primary">Save</Button>
@@ -272,7 +241,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
 
 const ContextualCollectionEditor = (props) => {
     const history = useHistory();
-    const {addCollection, updateCollection, relocateCollection} = useContext(CollectionsContext);
+    const {addCollection, updateCollection, renameCollection} = useContext(CollectionsContext);
 
     return (
         <CollectionEditor
@@ -280,7 +249,7 @@ const ContextualCollectionEditor = (props) => {
             history={history}
             addCollection={addCollection}
             updateCollection={updateCollection}
-            relocateCollection={relocateCollection}
+            renameCollection={renameCollection}
         />
     );
 };
