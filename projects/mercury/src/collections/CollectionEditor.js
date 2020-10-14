@@ -93,6 +93,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     };
 
     handleAddCollection = (properties: CollectionProperties) => {
+        properties.name = properties.name.trim();
         const {addCollection} = this.props;
         this.onSaveStart();
         return addCollection(properties)
