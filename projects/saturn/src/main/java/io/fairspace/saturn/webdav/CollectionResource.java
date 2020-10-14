@@ -7,7 +7,6 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
@@ -17,13 +16,10 @@ import java.util.*;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
-import static io.fairspace.saturn.webdav.PathUtils.name;
-import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static java.util.stream.Collectors.joining;
 
-class CollectionResource extends DirectoryResource implements DisplayNameResource {
+class CollectionResource extends DirectoryResource {
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -36,48 +32,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case POST -> canManage() || canWrite() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
-    }
-
-    @Override
-    public String getName() {
-        return name(subject.getURI());
-    }
-
-    @Override
-    public String getDisplayName() {
-        return getStringProperty(subject, RDFS.label);
-    }
-
-    @Override
-    public void setDisplayName(String s) {
-        subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
-    }
-
-    private void setLabel(String label) throws NotAuthorizedException, ConflictException, BadRequestException {
-        if (!canManage()) {
-            throw new NotAuthorizedException(this);
-        }
-        if (label == null || label.trim().equals("")) {
-            throw new BadRequestException(this, "The collection label is empty.");
-        }
-        label = label.trim();
-        validateTargetLabel(label);
-        setDisplayName(label);
-    }
-
-    private void validateTargetName(String name) throws ConflictException, BadRequestException {
-        validateCollectionName(name);
-        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
-        if (existing != null) {
-            throw new ConflictException(existing, "Target already exists (modulo case).");
-        }
-    }
-
-    private void validateTargetLabel(String label) throws ConflictException {
-        var existing = factory.root.findExistingCollectionWithLabel(label);
-        if (existing != null) {
-            throw new ConflictException(existing, "Target with this label already exists.");
-        }
     }
 
     @Override
@@ -94,11 +48,8 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (name != null) {
             name = name.trim();
         }
-        validateTargetName(name);
-        var oldName = getStringProperty(subject, RDFS.label);
+        factory.root.validateTargetCollectionName(name);
         super.moveTo(rDest, name);
-        var newSubject = childSubject(factory.rootSubject, name);
-        newSubject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
     }
 
     @Override
@@ -109,7 +60,7 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (name != null) {
             name = name.trim();
         }
-        validateTargetName(name);
+        factory.root.validateTargetCollectionName(name);
         super.copyTo(toCollection, name);
     }
 
@@ -313,7 +264,6 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
             case "set_status" -> setStatus(getEnumParameter(parameters, "status", Status.class));
             case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
             case "set_owned_by" -> setOwnedBy(getResourceParameter(parameters, "owner"));
-            case "set_label" -> setLabel(parameters.get("label"));
             case "unpublish" -> unpublish();
             default -> super.performAction(action, parameters, files);
         }

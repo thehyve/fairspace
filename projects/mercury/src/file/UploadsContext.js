@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import FileAPI from "./FileAPI";
+import ErrorDialog from "../common/components/ErrorDialog";
 
 export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
@@ -11,6 +12,22 @@ export type FileUpload = {
     files: any[],
     destinationPath: string
 }
+
+export const showCannotOverwriteDeletedError = (filesLength: number) => {
+    const errorMessage = filesLength === 1 ? (
+        "File or folder with this name already exists and was marked as deleted.\n"
+        + "Please delete the existing one permanently, undelete it first\n"
+        + "to be able to overwrite it or choose a unique name."
+    ) : (
+        "Some of the uploaded files or folders already exist and were marked as deleted.\n"
+        + "Please delete the existing ones permanently, undelete them first \n"
+        + "to be able to overwrite them or choose unique names."
+    );
+    ErrorDialog.showError(
+        "Cannot overwrite deleted file or folder",
+        errorMessage
+    );
+};
 
 export const UploadsContext = React.createContext({});
 
@@ -58,7 +75,10 @@ export const UploadsProvider = ({children, fileApi = FileAPI}) => {
                 setStateForUpload(newUpload, UPLOAD_STATUS_FINISHED);
                 setTimeout(() => removeUpload(newUpload), 5000);
             })
-            .catch(() => {
+            .catch((err) => {
+                if (err && err.message && err.message.includes("Conflict")) {
+                    showCannotOverwriteDeletedError(newUpload.files.length);
+                }
                 setStateForUpload(newUpload, UPLOAD_STATUS_ERROR);
             });
     };

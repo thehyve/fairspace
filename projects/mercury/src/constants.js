@@ -93,7 +93,6 @@ export const USABLE_IN_METADATA_URI = FAIRSPACE_NS + 'usableInMetadata';
 export const DOMAIN_INCLUDES_URI = FAIRSPACE_NS + 'domainIncludes';
 export const WORKSPACE_URI = FAIRSPACE_NS + 'Workspace';
 export const WORKSPACE_STATUS_URI = FAIRSPACE_NS + 'status';
-export const LOCATION_URI = FAIRSPACE_NS + 'location';
 export const OWNED_BY_URI = FAIRSPACE_NS + 'ownedBy';
 export const CAN_LIST_URI = FAIRSPACE_NS + 'canList';
 export const CAN_READ_URI = FAIRSPACE_NS + 'canRead';

@@ -20,7 +20,7 @@ export const isCollectionPage = () => {
     return (parts.length > 1 && parts[0] === 'collections');
 };
 
-export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
+export const getCollectionAbsolutePath = (name: string) => `/collections/${name}`;
 
 export const pathForIri = (iri: string) => {
     const path = decodeURIComponent(new URL(iri).pathname);
@@ -92,10 +92,9 @@ const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(',
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,
-    name: properties.displayname,
+    name: properties.basename,
     ownerWorkspace: properties.ownedBy,
     ownerWorkspaceName: properties.ownedByName,
-    location: properties.basename,
     description: properties.comment,
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,

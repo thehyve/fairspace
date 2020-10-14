@@ -12,6 +12,7 @@ import FileAPI from "./FileAPI";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import {formatDateTime} from '../common/utils/genericUtils';
 
 const styles = (theme) => ({
     fileVersionDialog: {
@@ -57,17 +58,19 @@ const columns = [
     {
         width: 70,
         label: 'Version',
-        dataKey: 'version',
+        dataKey: 'version'
     },
     {
         width: 300,
         label: 'Modified',
-        dataKey: 'lastmod'
+        dataKey: 'lastmod',
+        renderValue: (value) => (value ? formatDateTime(value) : '')
     },
     {
         width: 100,
         label: 'Size',
         dataKey: 'size',
+        renderValue: (value) => (value ? filesize(value, {base: 10}) : '')
     }
 ];
 
@@ -124,15 +127,13 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
         );
     };
 
-    const formatCellData = (cellData, dataKey) => (cellData && dataKey === "size" ? filesize(cellData) : cellData);
-
-    const renderCell = (cellData, rowIndex, dataKey) => (
+    const renderCell = (cellData, column) => (
         <TableCell
             component="div"
             variant="body"
             className={classes.tableCell}
         >
-            {formatCellData(cellData, dataKey)}
+            {column.renderValue ? column.renderValue(cellData) : cellData}
         </TableCell>
     );
 
@@ -225,7 +226,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                         dataKey={col.dataKey}
                                         headerRenderer={renderHeader}
                                         className={classes.flexContainer}
-                                        cellRenderer={({cellData, rowIndex}) => renderCell(cellData, rowIndex, col.dataKey)}
+                                        cellRenderer={({cellData}) => renderCell(cellData, col)}
                                         width={col.width}
                                         align="left"
                                     />

@@ -11,7 +11,7 @@ describe('CollectionOwnerChangeDialog', () => {
 
     const mockCollection = {
         iri: 'http://localhost/iri/c1',
-        location: 'c1',
+        name: 'c1',
         ownerWorkspace: 'http://localhost/iri/w1'
     };
 

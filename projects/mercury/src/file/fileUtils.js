@@ -56,10 +56,16 @@ export const encodePath = (path) => path.split(PATH_SEPARATOR).map(encodeURIComp
 
 export const decodePath = (path) => path.split(PATH_SEPARATOR).map(decodeURIComponent).join(PATH_SEPARATOR);
 
+export const decodeHTMLEntities = (htmlSource: string) => {
+    const element = document.createElement('textarea');
+    element.innerHTML = htmlSource;
+    return element.textContent;
+};
+
 export const getPathInfoFromParams = ({collection, path}) => (
     {
-        collectionLocation: collection,
-        openedPath: `/${collection || ''}${path ? `/${decodePath(path)}` : ''}`
+        collectionName: decodeURIComponent(collection || ''),
+        openedPath: `/${decodeURIComponent(collection || '')}${path ? `/${decodePath(path)}` : ''}`
     }
 );
 

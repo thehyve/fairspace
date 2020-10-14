@@ -77,13 +77,13 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
     };
 
     const removePermission = (permission: Permission) => {
-        setPermission(collection.location, permission.iri, 'None')
+        setPermission(collection.name, permission.iri, 'None')
             .catch(err => ErrorDialog.showError('Error removing permission.', err))
             .finally(handleCloseConfirmDeleteDialog);
     };
 
     const changePermission = (permission: Permission) => {
-        setPermission(collection.location, permission.iri, permission.access)
+        setPermission(collection.name, permission.iri, permission.access)
             .catch(err => ErrorDialog.showError('Error changing permissions.', err))
             .finally(handleCloseConfirmChangeDialog);
     };

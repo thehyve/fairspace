@@ -30,7 +30,6 @@ export type PrincipalPermission = Permission & Principal;
 export type CollectionProperties = {|
     name: string;
     description: string;
-    location: string;
     ownerWorkspace: string;
 |};
 
@@ -87,8 +86,8 @@ class CollectionAPI {
             },
             withCredentials: true
         };
-        return FileAPI.createDirectory(collection.location, options)
-            .then(() => this.getCollectionProperties(collection.location))
+        return FileAPI.createDirectory(collection.name, options)
+            .then(() => this.getCollectionProperties(collection.name))
             .then((properties) => {
                 collection.iri = properties.iri;
                 return this.updateCollection(collection, vocabulary);
@@ -96,22 +95,21 @@ class CollectionAPI {
     }
 
     deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
-        return FileAPI.delete(collection.location, showDeleted)
+        return FileAPI.delete(collection.name, showDeleted)
             .catch(handleHttpError("Failure while deleting collection"));
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
-        return FileAPI.undelete(collection.location)
+        return FileAPI.undelete(collection.name)
             .catch(handleHttpError("Failure while undeleting collection"));
     }
 
     unpublish(collection: CollectionProperties): Promise<void> {
-        return FileAPI.post(collection.location, {action: 'unpublish'});
+        return FileAPI.post(collection.name, {action: 'unpublish'});
     }
 
-    relocateCollection(oldLocation: string, newLocation: string): Promise<void> {
-        return FileAPI.move(oldLocation, newLocation)
-            .catch(handleHttpError("Collection identifier is already in use. Please choose a unique identifier."));
+    renameCollection(name: string, target: string): Promise<void> {
+        return FileAPI.move(name, target);
     }
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
@@ -122,25 +120,20 @@ class CollectionAPI {
             .catch(handleHttpError("Failure while updating a collection"));
     }
 
-    setLabel(location: string, label: string): Promise<void> {
-        return FileAPI.post(location, {action: 'set_label', label})
-            .catch(handleHttpError("Collection name is already in use. Please choose a unique name."));
+    setAccessMode(name: string, mode: AccessMode): Promise<void> {
+        return FileAPI.post(name, {action: 'set_access_mode', mode});
     }
 
-    setAccessMode(location: string, mode: AccessMode): Promise<void> {
-        return FileAPI.post(location, {action: 'set_access_mode', mode});
+    setStatus(name: string, status: Status): Promise<void> {
+        return FileAPI.post(name, {action: 'set_status', status});
     }
 
-    setStatus(location: string, status: Status): Promise<void> {
-        return FileAPI.post(location, {action: 'set_status', status});
+    setPermission(name: string, principal: string, access: AccessLevel): Promise<void> {
+        return FileAPI.post(name, {action: 'set_permission', principal, access});
     }
 
-    setPermission(location: string, principal: string, access: AccessLevel): Promise<void> {
-        return FileAPI.post(location, {action: 'set_permission', principal, access});
-    }
-
-    setOwnedBy(location: string, owner: string): Promise<void> {
-        return FileAPI.post(location, {action: 'set_owned_by', owner});
+    setOwnedBy(name: string, owner: string): Promise<void> {
+        return FileAPI.post(name, {action: 'set_owned_by', owner});
     }
 }
 

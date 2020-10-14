@@ -100,7 +100,7 @@ class ErrorDialog extends React.Component {
                 <DialogContent>
                     {(typeof message) === 'string'
                         ? (
-                            <DialogContentText>
+                            <DialogContentText component="div">
                                 <Typography component="pre">{message}</Typography>
                             </DialogContentText>
                         )
