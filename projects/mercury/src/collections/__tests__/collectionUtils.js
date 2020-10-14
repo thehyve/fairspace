@@ -3,9 +3,9 @@ import {canAlterPermission, getCollectionAbsolutePath, sortPermissions} from "..
 describe('Collection Utils', () => {
     describe('getCollectionAbsolutePath', () => {
         it('should return valid collection absolute path', () => {
-            const name = "Jan_Smit_s_collection-500";
-
-            expect(getCollectionAbsolutePath(name)).toBe('/collections/Jan_Smit_s_collection-500');
+            expect(getCollectionAbsolutePath("Jan_Smit_s_collection-500")).toBe('/collections/Jan_Smit_s_collection-500');
+            expect(getCollectionAbsolutePath("Jan_Smit_s_collection?1#1")).toBe('/collections/Jan_Smit_s_collection%3F1%231');
+            expect(getCollectionAbsolutePath("%c/Jan_Smit_s_collection?1#1")).toBe('/collections/%25c/Jan_Smit_s_collection%3F1%231');
         });
     });
     describe('sortPermissions', () => {
