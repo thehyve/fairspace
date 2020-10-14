@@ -206,7 +206,7 @@ public class WorkspaceService {
             var userResource = m.wrapAsResource(user);
             validateResource(workspaceResource, FS.Workspace);
             validateResource(userResource, FS.User);
-            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || userService.currentUser().isAdmin();
+            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.isManagerOf, workspaceResource) || userService.currentUser().isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
             }

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {cleanup, fireEvent, render} from '@testing-library/react';
+import {cleanup, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import {FileBrowser} from '../FileBrowser';
@@ -18,7 +18,6 @@ const openedCollection = {
     deletedBy: null,
     name: "asd",
     description: "",
-    location: "asd",
     access: "Manage",
     canRead: true,
     canWrite: true,

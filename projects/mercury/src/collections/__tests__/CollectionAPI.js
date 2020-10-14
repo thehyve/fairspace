@@ -40,20 +40,18 @@ describe('CollectionAPI', () => {
         it('makes the proper calls to add a collection', async () => {
             await CollectionAPI.addCollection({
                 name: 'name1',
-                description: 'description1',
-                location: 'location1'
+                description: 'description1'
             }, {});
 
             expect(FileAPI.createDirectory).toHaveBeenCalledTimes(1);
 
             expect(FileAPI.stat).toHaveBeenCalledTimes(1);
-            expect(FileAPI.stat).toHaveBeenCalledWith('location1');
+            expect(FileAPI.stat).toHaveBeenCalledWith('name1');
 
             expect(MetadataAPI.updateEntity).toHaveBeenCalledTimes(1);
             expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
                 'c_iri',
                 {
-                    [RDFS_NS + 'label']: [{value: 'name1'}],
                     [RDFS_NS + 'comment']: [{value: 'description1'}]
                 },
                 {}
@@ -75,7 +73,6 @@ describe('CollectionAPI', () => {
             expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
                 'c1',
                 {
-                    [RDFS_NS + 'label']: [{value: 'name1'}],
                     [RDFS_NS + 'comment']: [{value: 'description1'}]
                 },
                 {}
@@ -88,14 +85,13 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to undelete a collection', async () => {
             await CollectionAPI.undeleteCollection({
-                location: 'name1',
                 name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             }, {});
 
             expect(FileAPI.undelete).toHaveBeenCalledTimes(1);
-            expect(FileAPI.undelete).toHaveBeenCalledWith('name1');
+            expect(FileAPI.undelete).toHaveBeenCalledWith('name 1');
         });
     });
 
@@ -104,26 +100,24 @@ describe('CollectionAPI', () => {
 
         it('makes a proper call to delete a collection', async () => {
             await CollectionAPI.deleteCollection({
-                location: 'name1',
                 name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             });
 
             expect(FileAPI.delete).toHaveBeenCalledTimes(1);
-            expect(FileAPI.delete).toHaveBeenCalledWith('name1', false);
+            expect(FileAPI.delete).toHaveBeenCalledWith('name 1', false);
         });
 
         it('makes a proper call to delete a collection permanently', async () => {
             await CollectionAPI.deleteCollection({
-                location: 'name1',
                 name: 'name 1',
                 description: 'description1',
                 iri: 'c1'
             }, true);
 
             expect(FileAPI.delete).toHaveBeenCalledTimes(1);
-            expect(FileAPI.delete).toHaveBeenCalledWith('name1', true);
+            expect(FileAPI.delete).toHaveBeenCalledWith('name 1', true);
         });
     });
 });

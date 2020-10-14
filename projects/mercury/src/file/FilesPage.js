@@ -62,9 +62,9 @@ export const FilesPage = ({
     const breadcrumbSegments = collection.name
         ? pathSegments.map((segment, idx) => ({
             label: idx === 0 ? collection.name : segment,
-            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).join(consts.PATH_SEPARATOR)
+            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
         }))
-        : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + openedPath}];
+        : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + encodeURI(openedPath)}];
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
@@ -134,8 +134,8 @@ const ParentAwareFilesPage = (props) => {
 
     useEffect(() => {refresh();}, [props.collection.dateDeleted, refresh]);
 
-    const isParentFolderDeleted = data && data.props && data.props.dateDeleted;
-    const isOpenedPathDeleted = props.collection.dateDeleted || isParentFolderDeleted;
+    const isParentFolderDeleted = data && data.props && !!data.props.dateDeleted;
+    const isOpenedPathDeleted = !!props.collection.dateDeleted || isParentFolderDeleted;
 
     return (
         <FilesPage
@@ -150,8 +150,8 @@ const ParentAwareFilesPage = (props) => {
 const ContextualFilesPage = (props) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
     const {params} = props.match;
-    const {collectionLocation, openedPath} = getPathInfoFromParams(params);
-    const collection = collections.find(c => c.location === collectionLocation) || {};
+    const {collectionName, openedPath} = getPathInfoFromParams(params);
+    const collection = collections.find(c => c.name === collectionName) || {};
 
     return showDeleted ? (
         <ParentAwareFilesPage

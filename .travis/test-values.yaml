@@ -2,34 +2,35 @@
 external:
   keycloak:
     baseUrl: https://keycloak.ci.fairway.app
+    username: keycloak
+    password: keycloak-ci-123
     realm: ci
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+    serviceAccount:
+      password: fairspace123
   elasticsearch:
     enabled: true
     transport:
-      host: fairspace-ci-elasticsearch-discovery.fairspace-ci.svc.cluster.local
+      host: fairspace-test-elasticsearch-discovery.fairspace-test.svc.cluster.local
     rest:
-      host: fairspace-ci-elasticsearch-client.fairspace-ci.svc.cluster.local
+      host: fairspace-test-elasticsearch-client.fairspace-test.svc.cluster.local
 
 # Settings for the fairspace
 fairspace:
-  name: "CI Fairspace"
-  description: "CI Fairspace"
+  name: "test Fairspace"
+  description: "test Fairspace"
   ingress:
-    domain: fairspace.ci.fairway.app
+    domain: fairspace.test.fairway.app
+  enableExperimentalFeatures: false
   configurationScripts:
     keycloak:
-      enabled: true
-      username: keycloak
-      password: keycloak-ci-123
+      enabled: false
       configurationScriptsTag: 0.1.9-SNAPSHOT
       pullPolicy: Always
-  features:
-    - MetadataEditing
 
 services:
-  "JupyterHub Server": https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
+  jupyterhub: https://jupyter.fairspace.test.fairway.app
 
 # Specific settings for Saturn subchart
 saturn:

@@ -15,7 +15,8 @@ const labelForKey = (key, typeShape) => {
     return property ? property[SHACL_NAME][0]['@value'] : _.upperFirst(key);
 };
 
-const filterProperties = ([key, _]) => !['iri', 'type', 'contains', 'label', 'comment'].includes(key);
+// eslint-disable-next-line no-unused-vars
+const filterProperties = ([key, value]) => !['iri', 'type', 'contains', 'label', 'comment'].includes(key);
 
 /**
  * Renders the highlighted matches for the given hit

@@ -106,6 +106,14 @@ export const FileOperations = ({
 
     const handleCreateDirectory = name => fileOperation(Operations.MKDIR, fileActions.createDirectory(joinPaths(openedPath, name)))
         .catch((err) => {
+            if (err.message.includes('status code 409')) {
+                ErrorDialog.showError(
+                    'Directory name must be unique',
+                    'Directory with this name already exists and was marked as deleted.\n'
+                    + 'Please delete the existing directory permanently or choose a unique name.'
+                );
+                return true;
+            }
             ErrorDialog.showError("An error occurred while creating directory", err, () => handleCreateDirectory(name));
             return true;
         });
@@ -153,7 +161,7 @@ export const FileOperations = ({
 
     const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while deleting file or directory", err,() => handleDelete());
+            ErrorDialog.showError("An error occurred while deleting file or directory", err, () => handleDelete());
         });
 
     const getDeletionConfirmationMessage = () => {
@@ -170,7 +178,7 @@ export const FileOperations = ({
 
     const handleUndelete = () => fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while undeleting file or directory", err,() => handleUndelete());
+            ErrorDialog.showError("An error occurred while undeleting file or directory", err, () => handleUndelete());
         });
 
     return (

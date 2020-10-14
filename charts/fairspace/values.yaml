@@ -30,7 +30,7 @@ external:
       password:
 
   elasticsearch:
-    enabled: false
+    enabled: true
     rest:
       scheme: http
       host:
@@ -43,7 +43,7 @@ external:
 # Specific settings for ElasticSearch
 #####################################################################
 elasticsearch:
-  enabled: false
+  enabled: true
   persistence:
     enabled: true
     size: 20Gi

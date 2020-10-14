@@ -28,7 +28,6 @@ public class DavFactory implements ResourceFactory {
     private final String baseUri;
     public final RootResource root = new RootResource(this);
 
-
     public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, MailService mailService, Context context) {
         this.rootSubject = rootSubject;
         this.store = store;
@@ -50,7 +49,6 @@ public class DavFactory implements ResourceFactory {
         }
 
         if (!subject.getModel().containsResource(subject)
-                || subject.hasProperty(FS.dateDeleted) && !showDeleted()
                 || subject.hasProperty(FS.movedTo)) {
             return null;
         }
@@ -93,7 +91,7 @@ public class DavFactory implements ResourceFactory {
         }
 
         if (deleted) {
-            if (!showDeleted() || !access.canWrite()) {
+            if (!showDeleted()) {
                 return Access.None;
             } else {
                 access = min(access, Access.List);
@@ -130,6 +128,10 @@ public class DavFactory implements ResourceFactory {
         if (subject.hasProperty(FS.movedTo)) {
             return null;
         }
+        return getResourceByType(subject, access);
+    }
+
+    Resource getResourceByType(org.apache.jena.rdf.model.Resource subject, Access access) {
         if (subject.hasProperty(RDF.type, FS.File)) {
             return new FileResource(this, subject, access);
         }

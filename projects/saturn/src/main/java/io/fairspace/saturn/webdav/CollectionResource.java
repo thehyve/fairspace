@@ -7,7 +7,6 @@ import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.DisplayNameResource;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
@@ -17,12 +16,10 @@ import java.util.*;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
-import static io.fairspace.saturn.webdav.PathUtils.name;
 import static java.util.stream.Collectors.joining;
 
-class CollectionResource extends DirectoryResource implements DisplayNameResource {
+class CollectionResource extends DirectoryResource {
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -32,39 +29,27 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> canDelete();
-            case POST -> canManage() || canUndelete();
+            case POST -> canManage() || canWrite() || canUndelete();
             default -> super.authorise(request, method, auth);
         };
     }
 
     @Override
-    public String getName() {
-        return name(subject.getURI());
-    }
-
-    @Override
-    public String getDisplayName() {
-        return getStringProperty(subject, RDFS.label);
-    }
-
-    @Override
-    public void setDisplayName(String s) {
-        subject.removeAll(RDFS.label).addProperty(RDFS.label, s);
-    }
-
-    @Override
     public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+        if (!canManage()) {
+            throw new NotAuthorizedException(this);
+        }
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
         if (getAccessMode() == AccessMode.DataPublished) {
             throw new BadRequestException(this, "Cannot move a published collection.");
         }
-        ensureNameIsAvailable(name);
-        var oldName = getStringProperty(subject, RDFS.label);
+        if (name != null) {
+            name = name.trim();
+        }
+        factory.root.validateTargetCollectionName(name);
         super.moveTo(rDest, name);
-        var newSubject = childSubject(factory.rootSubject, name);
-        newSubject.removeAll(RDFS.label).addProperty(RDFS.label, oldName);
     }
 
     @Override
@@ -72,15 +57,11 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         if (!(toCollection instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot copy a collection to a non-root folder.");
         }
-        ensureNameIsAvailable(name);
-        super.copyTo(toCollection, name);
-    }
-
-    private void ensureNameIsAvailable(String name) throws ConflictException {
-        var existing = factory.root.findExistingCollectionWithNameIgnoreCase(name);
-        if (existing != null) {
-            throw new ConflictException(existing, "Target already exists (modulo case).");
+        if (name != null) {
+            name = name.trim();
         }
+        factory.root.validateTargetCollectionName(name);
+        super.copyTo(toCollection, name);
     }
 
     @Property
@@ -159,18 +140,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
      *
      * Returns only the current access mode when:
      * - the current user does not have manage permission; or
-     * - the status is {@link Status#Closed} (which forbids changing its access mode); or
+     * - the collection is deleted; or
      * - the access mode is {@link AccessMode#DataPublished}, which is terminal;
      * returns all access modes except that {@link AccessMode#DataPublished} is only
-     * included when in status {@link Status#Archived} and {@link AccessMode#Restricted} is
-     * excluded when in status {@link Status#Archived}.
+     * included when in status {@link Status#Archived}.
      */
     public Set<AccessMode> availableAccessModes() {
         if (!canManage()) {
-            return EnumSet.of(getAccessMode());
-        }
-
-        if (getStatus() == Status.Closed) {
             return EnumSet.of(getAccessMode());
         }
 
@@ -248,6 +224,13 @@ class CollectionResource extends DirectoryResource implements DisplayNameResourc
         return access.canManage()
                 || getGrantedPermission(subject, currentUser) == Access.Manage
                 || currentUser.hasProperty(FS.isManagerOf, subject.getPropertyResourceValue(FS.ownedBy));
+    }
+
+    private boolean canWrite() {
+        if (subject.hasProperty(FS.dateDeleted)) {
+            return false;
+        }
+        return access.canWrite();
     }
 
     private String getPermissions(Resource principalType) {

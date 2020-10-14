@@ -1,5 +1,4 @@
 import queryString from "query-string";
-import {COMMENT_URI, LABEL_URI} from "../constants";
 import type {
     AccessLevel,
     AccessMode,
@@ -11,6 +10,7 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
+import {PATH_SEPARATOR} from "../constants";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -21,7 +21,9 @@ export const isCollectionPage = () => {
     return (parts.length > 1 && parts[0] === 'collections');
 };
 
-export const getCollectionAbsolutePath = (location) => `/collections/${location}`;
+export const getCollectionAbsolutePath = (path: string) => (
+    `/collections/${path.split(PATH_SEPARATOR).map(part => encodeURIComponent(part)).join(PATH_SEPARATOR)}`
+);
 
 export const pathForIri = (iri: string) => {
     const path = decodeURIComponent(new URL(iri).pathname);
@@ -86,11 +88,6 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
     }
 };
 
-export const mapCollectionNameAndDescriptionToMetadata = (name, description) => ({
-    [LABEL_URI]: [{value: name}],
-    [COMMENT_URI]: [{value: description}]
-});
-
 const parsePermissions = (value) => ((typeof value !== 'string')
     ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
 
@@ -98,10 +95,9 @@ const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(',
 
 export const mapFilePropertiesToCollection: Collection = (properties) => ({
     iri: properties.iri,
-    name: properties.displayname,
+    name: properties.basename,
     ownerWorkspace: properties.ownedBy,
     ownerWorkspaceName: properties.ownedByName,
-    location: properties.basename,
     description: properties.comment,
     dateCreated: properties.creationdate,
     createdBy: properties.createdBy,

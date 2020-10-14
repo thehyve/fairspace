@@ -56,8 +56,8 @@ type CollectionDetailsProps = {
     deleteCollection: (Resource) => Promise<void>;
     undeleteCollection: (Resource) => Promise<void>;
     unpublish: (Resource) => Promise<void>;
-    setStatus: (location: string, status: Status) => Promise<void>;
-    setOwnedBy: (location: string, owner: string) => Promise<void>;
+    setStatus: (name: string, status: Status) => Promise<void>;
+    setOwnedBy: (name: string, owner: string) => Promise<void>;
     setBusy: (boolean) => void;
     history: History;
 };
@@ -202,7 +202,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {setOwnedBy, onChangeOwner, history} = this.props;
         this.handleCloseChangingOwner();
         onChangeOwner();
-        setOwnedBy(collection.location, selectedOwner.iri)
+        setOwnedBy(collection.name, selectedOwner.iri)
             .then(() => {
                 if (!selectedOwner.canCollaborate) {
                     history.push('/collections');

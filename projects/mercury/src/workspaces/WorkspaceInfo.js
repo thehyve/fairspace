@@ -24,7 +24,7 @@ type WorkspaceInfoProps = {
 const WorkspaceInfo = (props: WorkspaceInfoProps) => {
     const {workspace} = props;
     const {iri} = workspace;
-    const {properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
+    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
     const {currentUser} = useContext(UserContext);
     const {refreshWorkspaces} = useContext(WorkspaceContext);
 
@@ -41,6 +41,7 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
                 {workspace.canManage ? (
                     <LinkedDataEntityFormContainer
                         subject={iri}
+                        typeInfo={typeInfo}
                         properties={properties}
                         values={values}
                         isMetaDataEditable

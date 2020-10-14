@@ -41,16 +41,13 @@ const LinkedDataOverviewPage = ({history, title, resultsComponent: ResultsCompon
         <ResultsComponent
             selectedTypes={selectedTypes}
             availableTypes={availableTypes}
-
             query={query}
             size={size}
             setSize={setSize}
             page={page}
             setPage={setPage}
-
             shapesLoading={shapesLoading}
             shapesError={shapesError}
-
             onOpen={(id) => history.push(getEntityRelativeUrl(id))}
         />
     );

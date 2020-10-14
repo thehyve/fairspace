@@ -18,7 +18,7 @@ import UserRolesPage from "../users/UserRolesPage";
 import FeaturesContext from "../common/contexts/FeaturesContext";
 
 const getSubject = () => (
-    document.location.search ? decodeURIComponent(queryString.parse(document.location.search).iri) : null
+    document.location.search ? queryString.parse(document.location.search).iri : null
 );
 
 const WorkspaceRoutes = () => {
@@ -59,22 +59,20 @@ const WorkspaceRoutes = () => {
                 )}
             />
 
-            {isFeatureEnabled('MetadataEditing') && (
-                <Route
-                    path="/metadata"
-                    exact
-                    render={() => {
-                        const subject = getSubject();
+            <Route
+                path="/metadata"
+                exact
+                render={() => {
+                    const subject = getSubject();
 
-                        return (currentUser.canViewPublicMetadata && (
-                            <MetadataWrapper>
-                                {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
-                                    : <MetadataOverviewPage />}
-                            </MetadataWrapper>
-                        ));
-                    }}
-                />
-            )}
+                    return (isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
+                        <MetadataWrapper>
+                            {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
+                                : <MetadataOverviewPage />}
+                        </MetadataWrapper>
+                    ));
+                }}
+            />
 
             <Route
                 path="/search"

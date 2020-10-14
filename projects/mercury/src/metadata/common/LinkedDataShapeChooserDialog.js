@@ -29,7 +29,7 @@ const LinkedDataShapeChooserDialog = props => {
             onClose={closeDialog}
             aria-labelledby="form-dialog-title"
         >
-            <DialogTitle id="form-dialog-title">Type</DialogTitle>
+            <DialogTitle id="form-dialog-title">Create new entity of type</DialogTitle>
             <DialogContent>
                 {
                     props.shapes && props.shapes.length

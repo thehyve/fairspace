@@ -1,7 +1,7 @@
 import {createClient} from "webdav";
 import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
-import {generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
+import {decodeHTMLEntities, generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 import {handleHttpError} from "../common/utils/httpUtils";
 
 // Ensure that the client passes along the credentials
@@ -81,11 +81,11 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 400:
-                            throw new Error("Unable to create the given directory. Please check that the name does not contain special characters.");
+                            throw new Error("Unable to create the given directory. \nPlease check that the name does not contain special characters.");
                         case 403:
-                            throw new Error("You do not have authorization to create a directory in this collection.");
+                            throw new Error("You do not have authorization to create a directory \nin this collection.");
                         case 405:
-                            throw new Error("A directory or file with this name already exists. Please choose another name");
+                            throw new Error("A directory or file with this name already exists. \nPlease choose another name");
                     }
                 }
 
@@ -114,7 +114,7 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("You do not have authorization to add files to this collection.");
+                            throw new Error("You do not have authorization to add files \nto this collection.");
                     }
                 }
 
@@ -125,7 +125,7 @@ class FileAPI {
     uploadMulti(destinationPath, files, onUploadProgress = () => {}) {
         const formData = new FormData();
         formData.append('action', 'upload_files');
-        files.forEach(f => formData.append(f.path, f));
+        files.forEach(f => formData.append(encodeURIComponent(f.path), f));
         const requestOptions = {
             method: "POST",
             headers: {
@@ -238,7 +238,6 @@ class FileAPI {
                         case 403:
                             throw new Error("Could not move one or more files. Only admins can move files.");
                         case 409:
-                            throw new Error("Could not move one or more files. The destination can not be copied to.");
                         case 412:
                             throw new Error("Could not move one or more files. The destination file already exists.");
                     }
@@ -268,11 +267,11 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                            throw new Error("Could not copy one or more files. \nDo you have write permission to the destination collection?");
                         case 409:
-                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                            throw new Error("Could not copy one or more files. \nThe destination can not be copied to.");
                         case 412:
-                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                            throw new Error("Could not copy one or more files. \nThe destination file already exists.");
                     }
                 }
 
@@ -305,11 +304,11 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not copy one or more files. Do you have write permission to the destination collection?");
+                            throw new Error("Could not copy one or more files. \nDo you have write permission to the destination collection?");
                         case 409:
-                            throw new Error("Could not copy one or more files. The destination can not be copied to.");
+                            throw new Error("Could not copy one or more files. \nThe destination can not be copied to.");
                         case 412:
-                            throw new Error("Could not copy one or more files. The destination file already exists.");
+                            throw new Error("Could not copy one or more files. \nThe destination file already exists.");
                     }
                 }
 
@@ -398,7 +397,18 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile = (fileObject) => ({...fileObject, ...(fileObject.props || {})});
+    mapToFile = (fileObject) => {
+        const properties = {...fileObject, ...(fileObject.props || {})};
+        delete properties.props;
+        return Object.fromEntries(Object.entries(properties).map(
+            ([key, value]) => {
+                // The WebDAV client does not properly decode the XML response,
+                // so we need to do that here
+                const decodedValue = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
+                return [key, decodedValue];
+            }
+        ));
+    }
 }
 
 export default new FileAPI();

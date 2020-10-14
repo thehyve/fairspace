@@ -11,15 +11,14 @@ const collections = [
     {
         iri: 'http://test',
         name: 'My collection',
-        description: 'description',
-        location: 'location1'
+        description: 'description'
     }
 ];
 
 function shallowRender(history, path, locationSearch = '') {
     const match = {
         params: {
-            collection: 'location1',
+            collection: 'My collection',
             path
         }
     };
@@ -49,8 +48,8 @@ describe('FilesPage', () => {
         });
 
         const fileBrowserProps = wrapper.find(FileBrowser).first().props();
-        expect(fileBrowserProps.openedPath).toBe('/location1');
-        expect(fileBrowserProps.openedCollection.location).toBe('location1');
+        expect(fileBrowserProps.openedPath).toBe('/My collection');
+        expect(fileBrowserProps.openedCollection.name).toBe('My collection');
         const informationDrawerProps = wrapper.find(CollectionInformationDrawer).first().props();
         expect(informationDrawerProps.selectedCollectionIri).toBe('http://test');
     });
@@ -63,8 +62,8 @@ describe('FilesPage', () => {
         });
 
         const fileBrowserProps = wrapper.find(FileBrowser).first().props();
-        expect(fileBrowserProps.openedPath).toBe('/location1/music/jazz');
-        expect(fileBrowserProps.openedCollection.location).toBe('location1');
+        expect(fileBrowserProps.openedPath).toBe('/My collection/music/jazz');
+        expect(fileBrowserProps.openedCollection.name).toBe('My collection');
         const informationDrawerProps = wrapper.find(CollectionInformationDrawer).first().props();
         expect(informationDrawerProps.selectedCollectionIri).toBe('http://test');
     });

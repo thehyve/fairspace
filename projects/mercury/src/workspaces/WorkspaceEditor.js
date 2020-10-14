@@ -6,7 +6,7 @@ import LoadingOverlay from "../common/components/LoadingOverlay";
 export default ({onSubmit, onClose, creating, workspaces, title,
     workspace: {name = ''} = {}}) => {
     const isWorkspaceNameUnique = (workspaceName) => !workspaces.some(workspace => workspace.name === workspaceName);
-    const nameControl = useFormField(name, value => !!value && isWorkspaceNameUnique(value));
+    const nameControl = useFormField(name, value => !!value && !!value.trim() && isWorkspaceNameUnique(value.trim()));
 
     const allControls = [nameControl];
 
@@ -15,6 +15,7 @@ export default ({onSubmit, onClose, creating, workspaces, title,
     const fields = [
         {
             control: nameControl,
+            autoFocus: true,
             required: true,
             id: "name",
             label: "Name",
@@ -25,7 +26,7 @@ export default ({onSubmit, onClose, creating, workspaces, title,
 
     const validateAndSubmit = () => formValid && onSubmit(
         {
-            name: nameControl.value,
+            name: nameControl.value.trim(),
         }
     );
     return (

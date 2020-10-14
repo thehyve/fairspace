@@ -59,7 +59,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
-            case GET -> access.canRead();
+            case GET, COPY -> access.canRead();
             default -> super.authorise(request, method, auth);
         };
     }
@@ -90,6 +90,11 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     }
 
     void replaceContent(BlobInfo blobInfo) throws BadRequestException, ConflictException, NotAuthorizedException {
+        if (subject.hasProperty(FS.dateDeleted)) {
+            throw new ConflictException(this, "Target file with this name already exists and is marked as deleted. " +
+                    "Deleted file cannot be overwritten.");
+        }
+
         var versions = getListProperty(subject, FS.versions).cons(newVersion(blobInfo));
         var current = subject.getRequiredProperty(FS.currentVersion).getInt() + 1;
 

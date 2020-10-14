@@ -46,6 +46,14 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     }
 
     @Override
+    public boolean authorise(Request request, Request.Method method, Auth auth) {
+        return switch (method) {
+            case COPY -> access.canRead();
+            default -> super.authorise(request, method, auth);
+        };
+    }
+
+    @Override
     public Date getModifiedDate() {
         return null;
     }
@@ -58,12 +66,12 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     }
 
     @Override
-    public Resource createNew(String newName, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
-        return createNew(newName, getBlob(), contentType);
+    public Resource createNew(String name, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
+        return createNew(name, getBlob(), contentType);
     }
 
-    private Resource createNew(String newName, BlobInfo blob, String contentType) throws NotAuthorizedException, ConflictException, BadRequestException {
-        var subj = createResource(newName)
+    private Resource createNew(String name, BlobInfo blob, String contentType) throws NotAuthorizedException, ConflictException, BadRequestException {
+        var subj = createResource(name)
                 .addProperty(RDF.type, FS.File)
                 .addLiteral(FS.currentVersion, 1)
                 .addProperty(FS.versions, subject.getModel().createList(newVersion(blob)));
@@ -75,17 +83,24 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         return factory.getResource(subj, access);
     }
 
-    private org.apache.jena.rdf.model.Resource createResource(String newName) throws ConflictException, NotAuthorizedException, BadRequestException {
-        var existing = child(newName);
+    private org.apache.jena.rdf.model.Resource createResource(String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+        if (name != null) {
+            name = name.trim();
+        }
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException("The name is empty.");
+        }
+
+        var existing = factory.getResourceByType(childSubject(subject, name), access);
         if (existing != null) {
             throw new ConflictException(existing);
         }
 
-        var subj = childSubject(subject, newName);
+        var subj = childSubject(subject, name);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         var t = WebDAVServlet.timestampLiteral();
 
-        subj.addProperty(RDFS.label, newName)
+        subj.addProperty(RDFS.label, name)
                 .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
@@ -161,7 +176,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     }
 
     private void uploadFile(String path, FileItem file) throws NotAuthorizedException, BadRequestException, ConflictException {
-        path = normalizePath(path);
+        path = normalizePath(URLDecoder.decode(path, StandardCharsets.UTF_8));
         if (path.contains("/")) {
             var segments = splitPath(path);
             var child = child(segments[0]);

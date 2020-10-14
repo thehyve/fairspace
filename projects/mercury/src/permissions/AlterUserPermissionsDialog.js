@@ -85,7 +85,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
 
     const handleSubmit = () => {
         if (selectedPermissions.length > 0) {
-            selectedPermissions.forEach(p => setPermission(collection.location, p.iri, p.access));
+            selectedPermissions.forEach(p => setPermission(collection.name, p.iri, p.access));
             handleClose();
         }
     };
