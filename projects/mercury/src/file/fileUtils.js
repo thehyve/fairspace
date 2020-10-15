@@ -62,10 +62,23 @@ export const decodeHTMLEntities = (htmlSource: string) => {
     return element.textContent;
 };
 
+/**
+ * Workaround for a bug in 'history', see
+ * FileBrowser#handlePathDoubleClick.
+ */
+const decodeIfPossible = segment => {
+    try {
+        return decodeURIComponent(segment);
+    } catch (e) {
+        return segment;
+    }
+};
+
 export const getPathInfoFromParams = ({collection, path}) => (
     {
-        collectionName: decodeURIComponent(collection || ''),
-        openedPath: `/${decodeURIComponent(collection || '')}${path ? `/${decodePath(path)}` : ''}`
+        collectionName: decodeIfPossible(collection || ''),
+        openedPath: `/${decodeIfPossible(collection || '')}${path
+            ? `/${path.split(PATH_SEPARATOR).map(decodeIfPossible).join(PATH_SEPARATOR)}` : ''}`
     }
 );
 
