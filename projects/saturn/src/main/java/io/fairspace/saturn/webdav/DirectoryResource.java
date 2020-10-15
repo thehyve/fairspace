@@ -90,6 +90,10 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         if (name == null || name.isEmpty()) {
             throw new BadRequestException("The name is empty.");
         }
+        if (name.contains("\\")) {
+            throw new BadRequestException(
+                    "The name contains an illegal character (\\)");
+        }
 
         var existing = factory.getResourceByType(childSubject(subject, name), access);
         if (existing != null) {

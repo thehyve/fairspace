@@ -13,6 +13,11 @@ import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from "../common/components/ErrorDialog";
+import {
+    fileNameContainsInvalidCharacter,
+    isUnsafeFileName,
+    isValidFileName
+} from '../file/fileUtils';
 
 const fields = ['name', 'description', 'ownerWorkspace'];
 
@@ -24,7 +29,9 @@ const havePropertiesChanged = (collection: CollectionProperties, properties: Col
 
 const MAX_LOCATION_LENGTH = 127;
 
-const isNameValid = (name: string) => !!name && name.trim().length > 0 && name.trim().length <= MAX_LOCATION_LENGTH;
+const isNameValid = (name: string) => (
+    !!name && isValidFileName(name) && name.trim().length <= MAX_LOCATION_LENGTH
+);
 
 /**
  * Checks whether the input is valid. Check whether the name is not empty.
@@ -211,6 +218,8 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         id="name"
                         label="Name"
                         helperText={'Unique collection name'
+                        + (isUnsafeFileName(this.state.properties.name.trim()) ? ". Name cannot equal '.' or '..'" : '')
+                        + (fileNameContainsInvalidCharacter(this.state.properties.name) ? ". Name cannot contain '/' or '\\'." : '')
                         + (this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `. Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
                         value={this.state.properties.name}
                         name="name"

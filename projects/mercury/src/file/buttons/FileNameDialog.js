@@ -22,7 +22,7 @@ export default ({onClose, onSubmit, submitDisabled, title, control}) => (
                     required
                     fullWidth
                     control={control}
-                    helperText="Value cannot equal '.' or '..' and cannot contain '/'."
+                    helperText="Value cannot equal '.' or '..' and cannot contain '/' or '\'."
                     inputProps={{
                         'data-testid': "Name",
                         'aria-label': "Name",

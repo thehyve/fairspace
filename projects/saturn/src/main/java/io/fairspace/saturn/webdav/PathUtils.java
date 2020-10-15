@@ -25,9 +25,16 @@ public class PathUtils {
     }
 
     public static void validateCollectionName(String name) throws BadRequestException {
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException("The collection name is empty.");
+        }
         if (name.length() > MAX_COLLECTION_NAME_LENGTH) {
             throw new BadRequestException(
                     "The collection name exceeds maximum length " + MAX_COLLECTION_NAME_LENGTH + ".");
+        }
+        if (name.contains("\\")) {
+            throw new BadRequestException(
+                    "The collection name contains an illegal character (\\)");
         }
     }
 }

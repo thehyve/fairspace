@@ -10,7 +10,7 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
-import {PATH_SEPARATOR} from "../constants";
+import {encodePath} from '../file/fileUtils';
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -22,7 +22,7 @@ export const isCollectionPage = () => {
 };
 
 export const getCollectionAbsolutePath = (path: string) => (
-    `/collections/${path.split(PATH_SEPARATOR).map(part => encodeURIComponent(part)).join(PATH_SEPARATOR)}`
+    `/collections/${encodePath(path)}`
 );
 
 export const pathForIri = (iri: string) => {

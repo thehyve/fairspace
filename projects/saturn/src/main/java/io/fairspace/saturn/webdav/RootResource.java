@@ -58,9 +58,6 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     }
 
     protected void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
-        if (name == null || name.isEmpty()) {
-            throw new BadRequestException("The collection name is empty.");
-        }
         validateCollectionName(name);
         var existing = findCollectionWithName(name);
         if (existing.isPresent()) {
