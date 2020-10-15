@@ -1,4 +1,5 @@
 import {isValid} from "date-fns";
+import {enGB} from "date-fns/locale";
 
 //* *********************************
 //* ARRAYS
@@ -84,11 +85,12 @@ export const stableSort = (array, cmp, ascending = true) => array.map((el, index
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
 
-//* *********************************
-//* DATE - TIME (PS: We should utilize the already used date-fns library for a more reliable code)
-//* *********************************
-
-const defaultLocale = new Intl.Locale('en-GB');
+let defaultLocale;
+try {
+    defaultLocale = new Intl.Locale('en-GB');
+} catch (e) {
+    defaultLocale = enGB;
+}
 
 const dateFormatter = new Intl.DateTimeFormat(defaultLocale, {
     year: 'numeric',
