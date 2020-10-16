@@ -11,6 +11,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Link from "@material-ui/core/Link";
 import table from "text-table";
 import {SnackbarProvider, useSnackbar} from "notistack";
+import {flatMap} from 'lodash';
 import CollectionDetails from "./CollectionDetails";
 import CollectionsContext from "./CollectionsContext";
 import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
@@ -78,9 +79,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const generateTemplate = (vocabulary) => {
-    const userProps = [FILE_URI, DIRECTORY_URI, COLLECTION_URI]
-        .flatMap(uri => determinePropertyShapesForTypes(vocabulary, [uri]))
-        .filter(ps => !getFirstPredicateValue(ps, MACHINE_ONLY_URI));
+    const userProps = flatMap(
+        [FILE_URI, DIRECTORY_URI, COLLECTION_URI]
+            .map(uri => determinePropertyShapesForTypes(vocabulary, [uri]))
+    ).filter(ps => !getFirstPredicateValue(ps, MACHINE_ONLY_URI));
 
     const uniqueProps = [...new Set(userProps.map(ps => getFirstPredicateId(ps, SHACL_PATH)))
         .values()]

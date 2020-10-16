@@ -32,7 +32,7 @@ describe('UploadsProvider', () => {
         context = getContext();
         expect(context.uploads.length).toEqual(0);
 
-        const upload = {files: ['first.txt', 'second.txt'], id: "upload1", destinationPath: "/"};
+        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: "upload1", destinationPath: "/"};
         const uploadPromise = act(() => context.startUpload(upload));
 
         context = getContext();
@@ -52,7 +52,7 @@ describe('UploadsProvider', () => {
         let context;
 
         context = getContext();
-        const upload = {files: ['first.txt', 'second.txt'], id: 'upload2', destinationPath: '/'};
+        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: 'upload2', destinationPath: '/'};
         const uploadPromise = act(() => context.startUpload(upload));
 
         // Refresh context to get new state
@@ -72,7 +72,7 @@ describe('UploadsProvider', () => {
         let context;
 
         context = getContext();
-        const upload = {files: ['error.txt'], id: 'upload2', destinationPath: '/'};
+        const upload = {files: [{path: 'error.txt'}], id: 'upload2', destinationPath: '/'};
         const uploadPromise = act(() => context.startUpload(upload));
 
         // Check that the upload remains after failing
@@ -105,7 +105,7 @@ describe('UploadsProvider', () => {
 
         context = getContext();
 
-        const upload = {files: ['first.txt', 'second.txt'], id: 'upload2', destinationPath: '/'};
+        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: 'upload2', destinationPath: '/'};
         const uploadPromise = act(() => context.startUpload(upload));
 
         // Refresh context to get new state
