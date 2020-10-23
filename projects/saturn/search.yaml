@@ -1,0 +1,125 @@
+views:
+  - name: Subject
+    types:
+      - https://institut-curie.org/ontology#Subject
+    columns:
+      - name: label
+        source: http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: gender
+        source: https://institut-curie.org/ontology#isOfGender http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: species
+        source: https://institut-curie.org/ontology#isOfSpecies http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: ageAtLastNews
+        source: https://institut-curie.org/ontology#ageAtLastNews
+        type: number
+      - name: ageAtDeath
+        source: https://institut-curie.org/ontology#ageAtDeath
+        type: number
+
+  - name: TumorPathologyEvent
+    types:
+      - https://institut-curie.org/ontology#TumorPathologyEvent
+    columns:
+      - name: topography
+        source: https://institut-curie.org/ontology#topography http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: morphology
+        source: https://institut-curie.org/ontology#tumorMorphology http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: laterality
+        source: https://institut-curie.org/ontology#tumorLaterality http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: eventType
+        source: https://institut-curie.org/ontology#eventType http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: ageAtDiagnosis
+        source: https://institut-curie.org/ontology#ageAtDiagnosis
+        type: number
+    join:
+      - view: Subject
+        on: https://institut-curie.org/ontology#eventSubject
+        include:
+          - label
+          - gender
+          - ageAtDeath
+
+  - name: Sample
+    types:
+      - https://institut-curie.org/ontology#BiologicalSample
+    columns:
+      - name: label
+        source: http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: tumorCellularity
+        source: https://institut-curie.org/ontology#tumorCellularity
+        type: number
+      - name: topography
+        source: https://institut-curie.org/ontology#topography http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: nature
+        source: https://institut-curie.org/ontology#isOfNature http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: origin
+        source: https://institut-curie.org/ontology#hasOrigin http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+    join:
+      - view: Subject
+        on: https://institut-curie.org/ontology#subject
+        include:
+          - label
+          - species
+          - gender
+          - ageAtDeath
+      - view: TumorPathologyEvent
+        on: https://institut-curie.org/ontology#diagnosis
+        include:
+          - topography
+          - morphology
+          - laterality
+          - eventType
+          - ageAtDiagnosis
+
+  - name: Collection
+    types:
+      - http://fairspace.io/ontology#Collection
+      - http://fairspace.io/ontology#Directory
+      - http://fairspace.io/ontology#File
+    columns:
+      - name: type
+        source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: label
+        source: http://www.w3.org/2000/01/rdf-schema#label
+        type: text
+      - name: analysisType
+        source: https://institut-curie.org/ontology#analysisType http://www.w3.org/2000/01/rdf-schema#label
+        type: set
+      - name: keywords
+        source: http://www.w3.org/ns/dcat#keyword
+        type: set
+    join:
+      - view: Subject
+        on: https://institut-curie.org/ontology#aboutSubject
+        include:
+          - label
+          - species
+          - gender
+      - view: Sample
+        on: https://institut-curie.org/ontology#sample
+        include:
+          - label
+          - tumorCellularity
+          - topography
+          - nature
+          - origin
+      - view: TumorPathologyEvent
+        on: https://institut-curie.org/ontology#aboutEvent
+        include:
+          - topography
+          - morphology
+          - laterality
+          - eventType
+          - ageAtDiagnosis

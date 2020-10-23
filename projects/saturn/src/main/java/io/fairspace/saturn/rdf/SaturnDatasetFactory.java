@@ -1,11 +1,9 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.search.IndexDispatcher;
-import io.fairspace.saturn.rdf.search.IndexedDatasetGraph;
-import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
-import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.rdf.search.*;
+import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.views.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
@@ -25,9 +23,9 @@ public class SaturnDatasetFactory {
      * We're playing Russian dolls here.
      * The original TDB2 dataset graph, which in fact consists of a number of wrappers itself (Jena uses wrappers everywhere),
      * is wrapped with a number of wrapper classes, each adding a new feature.
-     * Currently it adds transaction logging, ElasticSearch indexing (if enabled) and applies default vocabulary if needed.
+     * Currently it adds transaction logging, indexing (if enabled) and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, boolean enableEs) {
+    public static Dataset connect(Config.Jena config, boolean enableEs, ViewStoreClient viewStoreClient) {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
@@ -42,6 +40,9 @@ public class SaturnDatasetFactory {
                 log.error("Error connecting to ElasticSearch", e);
                 throw e; // Terminates Saturn
             }
+        }
+        if (viewStoreClient != null) {
+            dsg = new TxnIndexDatasetGraph(dsg, viewStoreClient);
         }
 
         if (restoreNeeded) {

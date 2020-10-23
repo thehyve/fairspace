@@ -71,5 +71,5 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
-  - MetadataEditing
-
+#  - MetadataEditing
+  - Views
