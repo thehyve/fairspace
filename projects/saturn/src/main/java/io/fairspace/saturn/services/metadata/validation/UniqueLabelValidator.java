@@ -7,7 +7,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 public class UniqueLabelValidator implements MetadataRequestValidator {
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         added.listSubjectsWithProperty(RDFS.label)
                 .forEachRemaining(subject -> {
                     var resource = subject.inModel(after);

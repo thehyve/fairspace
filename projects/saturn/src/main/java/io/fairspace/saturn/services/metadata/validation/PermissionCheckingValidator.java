@@ -9,7 +9,7 @@ public class PermissionCheckingValidator implements MetadataRequestValidator {
     private final MetadataPermissions permissions;
 
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         added.listSubjects()
                 .andThen(removed.listSubjects())
                 .filterDrop(r -> permissions.canWriteMetadata(r.inModel(before)))

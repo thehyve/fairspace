@@ -29,7 +29,6 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
@@ -79,11 +78,11 @@ public class MetadataServiceValidationTest {
 
     private void produceValidationError() {
         doAnswer(invocation -> {
-            ViolationHandler handler = invocation.getArgument(5);
+            ViolationHandler handler = invocation.getArgument(4);
             handler.onViolation("ERROR", createResource(), null, null);
 
             return null;
-        }).when(validator).validate(any(), any(), any(), any(), any(), any());
+        }).when(validator).validate(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -150,7 +149,6 @@ public class MetadataServiceValidationTest {
                         resource1, property1, createTypedLiteral(1))),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                eq(VOCABULARY),
                 any());
     }
 
@@ -172,7 +170,6 @@ public class MetadataServiceValidationTest {
                         resource1, property1, resource2)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                eq(VOCABULARY),
                 any());
     }
 
@@ -206,7 +203,6 @@ public class MetadataServiceValidationTest {
                 isomorphic(modelWithList.union(toAdd)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                eq(VOCABULARY),
                 any());
     }
 }

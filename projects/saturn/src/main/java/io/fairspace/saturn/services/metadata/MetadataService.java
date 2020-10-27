@@ -6,10 +6,12 @@ import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -176,7 +178,7 @@ public class MetadataService {
     private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
         var violations = new LinkedHashSet<Violation>();
         validator.validate(before, after, modelToRemove, modelToAdd,
-                vocabularyModel, (message, subject, predicate, object) ->
+                (message, subject, predicate, object) ->
                         violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
 
         if (!violations.isEmpty()) {

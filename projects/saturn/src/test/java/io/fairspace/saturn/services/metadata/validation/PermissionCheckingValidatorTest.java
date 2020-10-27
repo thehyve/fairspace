@@ -37,7 +37,7 @@ public class PermissionCheckingValidatorTest {
 
     @Test
     public void noChecksShouldBePerformedOnAnEmptyModel() {
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, null, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
 
         verifyNoInteractions(permissions);
         verifyNoMoreInteractions(violationHandler);
@@ -47,7 +47,7 @@ public class PermissionCheckingValidatorTest {
     public void noWritePermissionCausesAFailure() {
         var model = modelOf(STATEMENT);
         when(permissions.canWriteMetadata(any())).thenReturn(false);
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
         verify(violationHandler).onViolation("Cannot modify resource", STATEMENT.getSubject(), null, null);
     }
 
@@ -57,7 +57,7 @@ public class PermissionCheckingValidatorTest {
 
         var model = modelOf(STATEMENT);
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         verifyNoInteractions(violationHandler);
         verify(permissions).canWriteMetadata(eq(STATEMENT.getSubject()));
@@ -70,7 +70,7 @@ public class PermissionCheckingValidatorTest {
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         var model = modelOf(STATEMENT);
 
-        validator.validate(EMPTY_MODEL, model, model, EMPTY_MODEL, null, violationHandler);
+        validator.validate(EMPTY_MODEL, model, model, EMPTY_MODEL, violationHandler);
 
         verifyNoInteractions(violationHandler);
         verify(permissions).canWriteMetadata(STATEMENT.getSubject());
