@@ -37,7 +37,7 @@ public class App {
                 viewStoreClient
         );
 
-        var svc = new Services(API_PREFIX, CONFIG, ds);
+        var svc = new Services(API_PREFIX, CONFIG, ds, viewStoreClient);
 
         var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))

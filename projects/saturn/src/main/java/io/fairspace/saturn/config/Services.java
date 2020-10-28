@@ -10,6 +10,7 @@ import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -42,13 +43,14 @@ public class Services {
     private final MailService mailService;
     private final MetadataPermissions metadataPermissions;
     private final MetadataService metadataService;
+    private final ViewService viewService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final FilteredDatasetGraph filteredDatasetGraph;
     private final SearchProxyServlet searchProxyServlet;
 
-    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull Dataset dataset) {
+    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull Dataset dataset, ViewStoreClient viewStoreClient) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -75,6 +77,8 @@ public class Services {
 
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
+
+        viewService = viewStoreClient == null ? null : new ViewService(viewStoreClient);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
 
