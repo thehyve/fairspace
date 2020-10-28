@@ -12,7 +12,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.mockito.Mockito.verify;
@@ -40,7 +39,7 @@ public class DeletionValidatorTest {
 
         var toAdd = modelOf(resource1, RDFS.comment,  createTypedLiteral(123));
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, VOCABULARY, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
         verify(violationHandler).onViolation(
                 "Cannot modify deleted resource",

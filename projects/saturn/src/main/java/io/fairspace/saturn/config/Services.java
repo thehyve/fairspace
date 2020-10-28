@@ -1,6 +1,7 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.rdf.search.*;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.rdf.search.IndexDispatcher;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -65,12 +66,12 @@ public class Services {
         metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
 
         var metadataValidator = new ComposedValidator(
-                new MachineOnlyClassesValidator(),
-                new ProtectMachineOnlyPredicatesValidator(),
+                new MachineOnlyClassesValidator(VOCABULARY),
+                new ProtectMachineOnlyPredicatesValidator(VOCABULARY),
                 new PermissionCheckingValidator(metadataPermissions),
                 new DeletionValidator(),
                 new UniqueLabelValidator(),
-                new ShaclValidator());
+                new ShaclValidator(VOCABULARY));
 
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
         dataset.getContext().set(METADATA_SERVICE, metadataService);

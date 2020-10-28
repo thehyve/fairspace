@@ -20,10 +20,14 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
  * This validator checks whether the requested action will modify any machine-only
  * predicates. If so, the request will not validate
  */
-public class ProtectMachineOnlyPredicatesValidator implements MetadataRequestValidator {
+public class ProtectMachineOnlyPredicatesValidator extends VocabularyAwareValidator {
+
+    public ProtectMachineOnlyPredicatesValidator(Model vocabulary) {
+        super(vocabulary);
+    }
 
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         validateModelAgainstMachineOnlyPredicates(removed, before, vocabulary, violationHandler);
         validateModelAgainstMachineOnlyPredicates(added, after, vocabulary, violationHandler);
 

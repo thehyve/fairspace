@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 
 public class DeletionValidator implements MetadataRequestValidator {
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         removed.listSubjects()
                 .andThen(added.listSubjects())
                 .filterKeep(Resource::isURIResource)

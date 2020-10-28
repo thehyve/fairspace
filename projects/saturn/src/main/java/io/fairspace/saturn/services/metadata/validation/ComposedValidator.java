@@ -17,10 +17,10 @@ public class ComposedValidator implements MetadataRequestValidator {
      * Executes each validator and returns the composed result
      */
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         var violationHandlerWrapper = new ViolationHandlerWrapper(violationHandler);
         for (var validator: validators) {
-            validator.validate(before, after, removed, added, vocabulary, violationHandlerWrapper);
+            validator.validate(before, after, removed, added, violationHandlerWrapper);
             if (violationHandlerWrapper.hasViolations) {
                 break;
             }

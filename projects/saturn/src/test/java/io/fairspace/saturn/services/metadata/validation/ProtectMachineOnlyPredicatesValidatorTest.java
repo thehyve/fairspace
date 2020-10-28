@@ -26,7 +26,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
 
 
-    private final ProtectMachineOnlyPredicatesValidator validator = new ProtectMachineOnlyPredicatesValidator();
+    private final ProtectMachineOnlyPredicatesValidator validator = new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY);
 
     @Mock
     private ViolationHandler violationHandler;
@@ -43,7 +43,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S1, P2, S2,
         S2, P2, S1);
 
-        validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
+        validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 
@@ -62,7 +62,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S1, P2, S3,
         S3, P2, S2);
 
-        validator.validate(EMPTY_MODEL, testModel, EMPTY_MODEL, testModel, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, testModel, EMPTY_MODEL, testModel, violationHandler);
 
         verify(violationHandler).onViolation("The given model contains a machine-only predicate",
                 createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
@@ -70,7 +70,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
 
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, SYSTEM_VOCABULARY, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 
