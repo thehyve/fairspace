@@ -1,5 +1,7 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.rdf.*;
+import io.fairspace.saturn.services.users.*;
 import org.apache.jena.rdf.model.Model;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
@@ -32,21 +34,35 @@ public class TestUtils {
         return argThat(a -> a.containsAll(m));
     }
 
-    public static void setupRequestContext() {
-        var request = mock(Request.class);
-        setCurrentRequest(request);
+    public static Authentication.User mockAuthentication(String username) {
         var auth = mock(Authentication.User.class);
-        when(request.getAuthentication()).thenReturn(auth);
         var identity = mock(UserIdentity.class, withSettings().lenient());
         when(auth.getUserIdentity()).thenReturn(identity);
         var principal = mock(KeycloakPrincipal.class, withSettings().lenient());
         when(identity.getUserPrincipal()).thenReturn(principal);
-        when(principal.getName()).thenReturn("userid");
+        when(principal.getName()).thenReturn(username);
         var context = mock(KeycloakSecurityContext.class, withSettings().lenient());
         when(principal.getKeycloakSecurityContext()).thenReturn(context);
         var token = mock(AccessToken.class, withSettings().lenient());
         when(context.getToken()).thenReturn(token);
-        when(token.getSubject()).thenReturn("userid");
+        when(token.getSubject()).thenReturn(username);
         when(token.getName()).thenReturn("fullname");
+        return auth;
+    }
+
+    public static User createTestUser(String username, boolean isAdmin) {
+        User user = new User();
+        user.setId(username);
+        user.setName(username);
+        user.setIri(SparqlUtils.generateMetadataIri(username));
+        user.setAdmin(isAdmin);
+        return user;
+    }
+
+    public static void setupRequestContext() {
+        var request = mock(Request.class);
+        setCurrentRequest(request);
+        var auth = mockAuthentication("userid");
+        when(request.getAuthentication()).thenReturn(auth);
     }
 }
