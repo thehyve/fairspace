@@ -49,6 +49,8 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
+    public Search search;
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
 
@@ -83,6 +85,39 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
+    }
+
+
+    public static class Search {
+        public List<Facet> facets;
+        public List<View> views;
+
+        public static class Facet {
+            public String name;
+            public String title;
+            public String query;
+            public ValueType type;
+        }
+
+        public static class View {
+            public String name;
+            public String title;
+            public String query;
+            public List<Column> columns;
+        }
+
+        public static class Column {
+            public String name;
+            public String title;
+            public ValueType type;
+        }
+
+        public enum ValueType {
+            id,
+            text,
+            number,
+            date
+        }
     }
 
     @Override

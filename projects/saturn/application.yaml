@@ -72,4 +72,38 @@ services:
   "test username": http://google.com?q=${username}
 features:
   - MetadataEditing
+search:
+  facets:
+    - name: tumorCellularity
+      title: Tumor Cellularity
+      type: number
+      query:
+  views:
+    - name: samples
+      title: Samples
+      columns:
+        - name: sample
+          title: Sample
+          type: id
+        - name: tumorCellularity
+          title: Tumor Cellularity
+          type: number
+        - name: description
+          title: Description
+          type: text
+      query: |
+        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        PREFIX fs:    <http://fairspace.io/ontology#>
+
+        SELECT DISTINCT ?sample ?description ?tumorCellularity
+        WHERE {
+          ?sample a curie:BiologicalSample .
+
+          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
+          OPTIONAL { ?sample rdfs:comment ?description }
+
+          FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDelted }
+        }
+
 
