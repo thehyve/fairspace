@@ -1,17 +1,22 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.rdf.dao.*;
+import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.MakeCollectionableResource;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.util.Context;
+import org.eclipse.jetty.server.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,11 +24,11 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.TestUtils.*;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(Parameterized.class)
 public class DavFactoryAccessTest {
@@ -32,9 +37,19 @@ public class DavFactoryAccessTest {
     BlobStore store = mock(BlobStore.class);
     UserService userService = mock(UserService.class);
     MailService mailService = mock(MailService.class);
-    User user = new User();
+    WorkspaceService workspaceService;
+
+    User user;
+    Authentication.User userAuthentication;
+    User admin;
+    Authentication.User adminAuthentication;
+
+    private org.eclipse.jetty.server.Request request;
+
     private ResourceFactory factory;
-    private Model model = createTxnMem().getDefaultModel();
+    private Dataset ds = createTxnMem();
+    private Transactions tx = new SimpleTransactions(ds);
+    private Model model = ds.getDefaultModel();
 
     private Access grantedAccess;
     private Status status;
@@ -80,13 +95,38 @@ public class DavFactoryAccessTest {
         });
     }
 
+    private void selectRegularUser() {
+        lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
+        lenient().when(userService.currentUser()).thenReturn(user);
+    }
+
+    private void selectAdmin() {
+        lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
+        lenient().when(userService.currentUser()).thenReturn(admin);
+    }
+
     @Before
     public void before() {
+        workspaceService = new WorkspaceService(tx, userService, mailService);
+        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+
         setupRequestContext();
+        request = getCurrentRequest();
+        userAuthentication = mockAuthentication("user");
+        user = createTestUser("user", false);
         user.setCanViewPublicData(true);
         user.setCanViewPublicMetadata(true);
-        when(userService.currentUser()).thenReturn(user);
-        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        new DAO(model).write(user);
+        adminAuthentication = mockAuthentication("admin");
+        admin = createTestUser("admin", true);
+        new DAO(model).write(admin);
+
+        selectAdmin();
+        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
+
+        selectRegularUser();
+        when(request.getHeader("Owner")).thenReturn(workspace.getIri().getURI());
     }
 
     @Test

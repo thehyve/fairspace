@@ -1,9 +1,12 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.rdf.dao.*;
+import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
@@ -11,8 +14,10 @@ import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.*;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.Context;
+import org.eclipse.jetty.server.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,14 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import static io.fairspace.saturn.TestUtils.setupRequestContext;
+import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static java.lang.String.format;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DavFactoryTest {
@@ -49,24 +53,64 @@ public class DavFactoryTest {
     MailService mailService;
     @Mock
     MetadataService metadataService;
+    WorkspaceService workspaceService;
 
     Context context = new Context();
-    User user = new User();
+    User user;
+    Authentication.User userAuthentication;
+    User workspaceManager;
+    Authentication.User workspaceManagerAuthentication;
+    User admin;
+    Authentication.User adminAuthentication;
     private org.eclipse.jetty.server.Request request;
 
     private ResourceFactory factory;
-    private Model model = createTxnMem().getDefaultModel();
+    private Dataset ds = createTxnMem();
+    private Transactions tx = new SimpleTransactions(ds);
+    private Model model = ds.getDefaultModel();
+
+    private void selectRegularUser() {
+        lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
+        lenient().when(userService.currentUser()).thenReturn(user);
+    }
+
+    private void selectWorkspaceManager() {
+        lenient().when(request.getAuthentication()).thenReturn(workspaceManagerAuthentication);
+        lenient().when(userService.currentUser()).thenReturn(workspaceManager);
+    }
+
+    private void selectAdmin() {
+        lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
+        lenient().when(userService.currentUser()).thenReturn(admin);
+    }
 
     @Before
     public void before() {
+        workspaceService = new WorkspaceService(tx, userService, mailService);
         factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+
+        userAuthentication = mockAuthentication("user");
+        user = createTestUser("user", false);
+        new DAO(model).write(user);
+        workspaceManager = createTestUser("workspace-admin", false);
+        new DAO(model).write(workspaceManager);
+        workspaceManagerAuthentication = mockAuthentication("workspace-admin");
+        adminAuthentication = mockAuthentication("admin");
+        admin = createTestUser("admin", true);
+        new DAO(model).write(admin);
 
         setupRequestContext();
         request = getCurrentRequest();
-        when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 3, "md5"));
-        when(userService.currentUser()).thenReturn(user);
-    }
 
+        selectAdmin();
+        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
+        workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
+
+        selectRegularUser();
+        when(request.getHeader("Owner")).thenReturn(workspace.getIri().getURI());
+        when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 3, "md5"));
+    }
 
     @Test
     public void testRoot() throws NotAuthorizedException, BadRequestException {
@@ -139,6 +183,23 @@ public class DavFactoryTest {
         for (var method: Request.Method.values()) {
             assertFalse("Shouldn't be able to " + method, coll.authorise(null, method, null));
         }
+    }
+
+    @Test
+    public void testAdminAccess() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        root.createCollection("coll");
+
+        var collName = "coll";
+        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/" + collName));
+
+        selectAdmin();
+
+        assertEquals(1, root.getChildren().size());
+
+        selectWorkspaceManager();
+
+        assertEquals(1, root.getChildren().size());
     }
 
     @Test(expected = ConflictException.class)
