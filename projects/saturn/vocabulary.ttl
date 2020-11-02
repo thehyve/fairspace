@@ -260,6 +260,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Topography" ;
         sh:description "The topography of the tumor." ;
+        sh:maxCount 1 ;
         sh:class curie:Topography ;
         sh:path curie:tumorTopography
     ],
@@ -332,7 +333,8 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path curie:tnmN
-    ],    [
+    ],
+    [
         sh:name "TNM_M" ;
         sh:description "Distant metastasis." ;
         sh:datatype xsd:string ;
@@ -451,6 +453,7 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Topography" ;
         sh:description "The topography of the sample." ;
+        sh:maxCount 1 ;
         sh:class curie:Topography ;
         sh:path curie:sampleTopography
     ],
