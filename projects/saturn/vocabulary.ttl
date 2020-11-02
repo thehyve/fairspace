@@ -83,7 +83,6 @@ curie:Species a rdfs:Class, sh:NodeShape ;
 
 curie:ageAtLastNews a rdf:Property .
 curie:ageAtDeath a rdf:Property .
-curie:hasEvent a rdf:Property .
 curie:isOfGender a rdf:Property .
 curie:isOfSpecies a rdf:Property .
 
@@ -120,12 +119,6 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:integer ;
         sh:maxCount 1 ;
         sh:path curie:ageAtDeath
-    ],
-    [
-        sh:name "Event" ;
-        sh:description "Tumor pathology events for this patient." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:path curie:hasEvent
     ],
     [
         sh:name "Gave consent" ;
@@ -431,7 +424,8 @@ curie:tumorCellularity a rdf:Property .
 curie:sampleTopography a rdf:Property .
 curie:isOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
-curie:sampleAnalysisType a rdf:Property .
+curie:associatedSubject a rdf:Property .
+curie:diagosis a rdf:Property .
 curie:isChildOf a rdf:Property .
 
 curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
@@ -475,10 +469,18 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:path curie:hasOrigin ;
     ],
     [
-        sh:name "Type of analysis" ;
-        sh:description "Type of analysis associated to this sample" ;
-        sh:class curie:AnalysisType ;
-        sh:path curie:sampleAnalysisType
+        sh:name "Associated subject" ;
+        sh:description "The subject associated with this sample." ;
+        sh:class curie:Subject ;
+        sh:maxCount 1 ;
+        sh:path curie:associatedSubject
+    ],
+    [
+        sh:name "Diagnosis" ;
+        sh:description "The diagnosing tumor pathology event." ;
+        sh:class curie:TumorPathologyEvent ;
+        sh:maxCount 1 ;
+        sh:path curie:diagnosis
     ],
     [
         sh:name "Sample is child sample of" ;
