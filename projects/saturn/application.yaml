@@ -94,6 +94,26 @@ search:
       type: number
       query:
   views:
+    - name: collections
+      title: Collections
+      columns:
+        - name: collection
+          title: Collection
+          type: id
+      query: |
+        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        PREFIX fs:    <http://fairspace.io/ontology#>
+
+        SELECT DISTINCT ?collection
+        WHERE {
+          ?collection a fs:Collection .
+
+          OPTIONAL { ?collection fs:contains*/curie:aboutMaterial ?sample }
+          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
+
+          FILTER NOT EXISTS { ?collection fs:dateDeleted ?anyDateDeleted }
+        }
     - name: samples
       title: Samples
       columns:

@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryCancelledException;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
@@ -13,6 +14,7 @@ import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.expr.aggregate.AggCount;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.vocabulary.RDFS;
 
 import java.util.HashMap;
@@ -55,10 +57,12 @@ public class ViewService {
         query.setOffset((page - 1) * size);
 
         if (!(query.getQueryPattern() instanceof ElementGroup)) {
-            throw new RuntimeException("Cannot apply filter constraints");
+            var group = new ElementGroup();
+            group.addElement(query.getQueryPattern());
+            query.setQueryPattern(group);
         }
 
-        var queryPattern = (ElementGroup) query.getQueryPattern();
+        var queryPatternGroup = (ElementGroup) query.getQueryPattern();
 
         request.filters.forEach(filter -> {
             var facet = config.facets
@@ -70,16 +74,16 @@ public class ViewService {
             var variable = new ExprVar(filter.field);
             if (!filter.values.isEmpty()) {
                 if (filter.getValues().size() == 1) {
-                    queryPattern.addElementFilter(new ElementFilter(new E_Equals(variable, toNodeValue(filter.values.get(0), facet.type))));
+                    queryPatternGroup.addElementFilter(new ElementFilter(new E_Equals(variable, toNodeValue(filter.values.get(0), facet.type))));
                 } else {
-                    queryPattern.addElementFilter(new ElementFilter(new E_OneOf(variable, new ExprList(filter.values.stream().map(o -> toNodeValue(o, facet.type)).collect(toList())))));
+                    queryPatternGroup.addElementFilter(new ElementFilter(new E_OneOf(variable, new ExprList(filter.values.stream().map(o -> toNodeValue(o, facet.type)).collect(toList())))));
                 }
             }
             if (filter.rangeStart != null) {
-                queryPattern.addElementFilter(new ElementFilter(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type))));
+                queryPatternGroup.addElementFilter(new ElementFilter(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type))));
             }
             if (filter.rangeEnd != null) {
-                queryPattern.addElementFilter(new ElementFilter(new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type))));
+                queryPatternGroup.addElementFilter(new ElementFilter(new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type))));
             }
         });
 
@@ -120,24 +124,26 @@ public class ViewService {
             result.size((int) query.getLimit());
             result.page((int) (query.getOffset() / query.getLimit()) + 1);
 
-            var project = query.getProject();
-            project.clear();
-
-            var aggregatorExpr = query.allocAggregate(new AggCount());
-            project.add(Var.alloc("total"), aggregatorExpr);
-
             query.setLimit(MAX_RESULTS);
             query.setOffset(0);
 
-            log.debug("Querying the total number of matches: \n{}", query);
+            var queryTotal  = new Query();
+            queryTotal.setQuerySelectType();
+            var project = queryTotal.getProject();
+
+            var aggregatorExpr = queryTotal.allocAggregate(new AggCount());
+            project.add(Var.alloc("total"), aggregatorExpr);
+            queryTotal.setQueryPattern(new ElementSubQuery(query));
+
+            log.debug("Querying the total number of matches: \n{}", queryTotal);
 
             var total = (int) query.getLimit();
 
-            try (var execution = QueryExecutionFactory.create(query, m)) {
-                execution.setTimeout(QUERY_EXECUTION_TIMEOUT);
+            try (var execution = QueryExecutionFactory.create(queryTotal, m)) {
+                execution.setTimeout(QUERY_EXECUTION_TIMEOUT, TimeUnit.SECONDS);
                 total = execution.execSelect().next().get("total").asLiteral().getInt();
             } catch (QueryCancelledException e) {
-                log.error("Query has been cancelled due to timeout: \n{}", query);
+                log.error("Query has been cancelled due to timeout: \n{}", queryTotal);
             }
 
             return result
