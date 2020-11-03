@@ -49,6 +49,22 @@ fs:File sh:property
 
 ## User class Shapes
 
+curie:AnalysisType a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The type of analysis." ;
+    sh:name "Analysis type" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique analysis type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
 curie:Gender a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
     sh:description "The gender of the subject." ;
@@ -234,6 +250,86 @@ curie:Laterality a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:label
     ] .
 
+curie:EventType a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The type of tumor pathology event." ;
+    sh:name "Event type" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique event type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:TnmType a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The type of TNM." ;
+    sh:name "TNM type" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique TNM type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:TnmT a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The primary tumor size." ;
+    sh:name "TNM_T" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique TNM_T label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:TnmN a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description " The regional lymph nodes." ;
+    sh:name "TNM_N" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique TNM_N label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:TnmM a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description " Distant metastasis." ;
+    sh:name "TNM_M" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique TNM_M label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
 curie:eventType a rdf:Property .
 curie:tumorTopography a rdf:Property .
 curie:tumorMorphology a rdf:Property .
@@ -281,8 +377,8 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Event type" ;
         sh:description "The type of tumor pathology event." ;
-        sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        sh:class curie:EventType ;
         sh:path curie:eventType
     ],
     [
@@ -323,22 +419,22 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "TNM_T" ;
         sh:description "The primary tumor size." ;
-        sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        sh:class curie:TnmT ;
         sh:path curie:tnmT
     ],
     [
         sh:name "TNM_N" ;
         sh:description " The regional lymph nodes." ;
-        sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        sh:class curie:tnmN ;
         sh:path curie:tnmN
     ],
     [
         sh:name "TNM_M" ;
         sh:description "Distant metastasis." ;
-        sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        sh:class curie:tnmM ;
         sh:path curie:tnmM
     ],
     [
@@ -398,22 +494,6 @@ curie:SampleOrigin a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Label" ;
         sh:description "Unique sample origin label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:AnalysisType a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The type of analysis." ;
-    sh:name "Analysis type" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique analysis type label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
