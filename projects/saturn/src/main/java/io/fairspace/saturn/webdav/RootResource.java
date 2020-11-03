@@ -109,21 +109,21 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         user.addProperty(FS.canManage, subj);
 
         var ownerWorkspace = owner();
-        if (ownerWorkspace != null) {
-            var ws = subj.getModel().createResource(ownerWorkspace);
-            if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
-                throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
-            }
-
-            if (!factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
-                    && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
-                    && !factory.userService.currentUser().isAdmin()) {
-                throw new NotAuthorizedException();
-            }
-
-            subj.addProperty(FS.ownedBy, ws);
+        if (ownerWorkspace == null) {
+            throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Workspace IRI is missing");
+        }
+        var ws = subj.getModel().createResource(ownerWorkspace);
+        if (!ws.hasProperty(RDF.type, FS.Workspace) || ws.hasProperty(FS.dateDeleted)) {
+            throw new PropertySource.PropertySetException(Response.Status.SC_BAD_REQUEST, "Invalid workspace IRI");
         }
 
+        if (!factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
+                && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
+                && !factory.userService.currentUser().isAdmin()) {
+            throw new NotAuthorizedException();
+        }
+
+        subj.addProperty(FS.ownedBy, ws);
 
         return (CollectionResource) factory.getResource(subj, Access.Manage);
     }
