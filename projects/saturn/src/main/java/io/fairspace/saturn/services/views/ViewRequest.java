@@ -12,7 +12,7 @@ public class ViewRequest {
         @NotBlank
         String field;
         @Singular
-        List<Object> values;
+        List<Object> values = new ArrayList<>();
         Object rangeStart;
         Object rangeEnd;
     }
