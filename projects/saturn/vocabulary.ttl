@@ -6,7 +6,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix schema: <http://www.schema.org/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix fhir: <http://hl7.org/fhir/STU3/> .
 @prefix dash: <http://datashapes.org/dash#> .
 @prefix curie: <https://institut-curie.org/ontology#> .
 
@@ -17,7 +16,7 @@
 curie:aboutSubject a rdf:Property .
 curie:aboutMaterial a rdf:Property .
 curie:aboutEvent a rdf:Property .
-curie:associatedAnalysisType a rdf:Property .
+curie:analysisType a rdf:Property .
 
 ## Augmented system class shapes
 fs:File sh:property
@@ -43,7 +42,7 @@ fs:File sh:property
         sh:name "Type of analysis" ;
         sh:description "Type of analysis associated to this collection" ;
         sh:class curie:AnalysisType ;
-        sh:path curie:associatedAnalysisType
+        sh:path curie:analysisType
     ] .
 
 
@@ -506,7 +505,7 @@ curie:tumorCellularity a rdf:Property .
 curie:sampleTopography a rdf:Property .
 curie:isOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
-curie:associatedSubject a rdf:Property .
+curie:subject a rdf:Property .
 curie:diagosis a rdf:Property .
 curie:isChildOf a rdf:Property .
 
@@ -552,11 +551,11 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:path curie:hasOrigin ;
     ],
     [
-        sh:name "Associated subject" ;
+        sh:name "Subject" ;
         sh:description "The subject associated with this sample." ;
         sh:class curie:Subject ;
         sh:maxCount 1 ;
-        sh:path curie:associatedSubject
+        sh:path curie:subject
     ],
     [
         sh:name "Diagnosis" ;
