@@ -424,7 +424,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "TNM_N" ;
-        sh:description " The regional lymph nodes." ;
+        sh:description "The regional lymph nodes." ;
         sh:maxCount 1 ;
         sh:class curie:tnmN ;
         sh:path curie:tnmN
