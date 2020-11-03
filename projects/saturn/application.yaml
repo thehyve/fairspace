@@ -74,6 +74,21 @@ features:
   - MetadataEditing
 search:
   facets:
+    - name: collection
+      title: Collection
+      type: id
+      query: |
+        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        PREFIX fs:    <http://fairspace.io/ontology#>
+
+        SELECT DISTINCT ?value ?label
+        WHERE {
+          ?value a fs:Collection ;
+                 rdfs:label ?label .
+          FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
+        }
+        ORDER BY ?label
     - name: tumorCellularity
       title: Tumor Cellularity
       type: number
@@ -102,8 +117,7 @@ search:
 
           OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
           OPTIONAL { ?sample rdfs:comment ?description }
+          OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
 
-          FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDelted }
+          FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
         }
-
-
