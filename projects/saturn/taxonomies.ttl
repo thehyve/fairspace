@@ -3076,43 +3076,43 @@
   <http://www.w3.org/2000/01/rdf-schema#label> "Metagenome" .
 <https://bioportal.bioontology.org/ontologies/NCBITAXON/5833> a <https://institut-curie.org/ontology#Species> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Plasmodium falciparum" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0005767> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12434> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Blood" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0032105> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C13356> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Plasma" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0033684> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C17021> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Protein" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0035668> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C812> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "RNA" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0012854> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C449> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "DNA" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C1321301> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12954> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Peripheral Blood Mononuclear Cell" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0085983> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C20313> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Tumor Cell Line" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C1548793> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C70717> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Frozen Specimen" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C1519524> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C19597> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Paraffin Embedded Tissue (FFPE)" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0042036> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C13283> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Urine" .
 <https://institut-curie.org/ontology#normal> a <https://institut-curie.org/ontology#SampleOrigin> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Normal" .
 <https://institut-curie.org/ontology#tumoral> a <https://institut-curie.org/ontology#SampleOrigin> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Tumoral" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0375111> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C3262> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Neoplasm" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=CL107025> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C36263> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Metastatic Malignant Neoplasm" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0521158> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C4798> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Recurrent tumor" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0677930> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C8509> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Primary tumor" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0238767> a <https://institut-curie.org/ontology#Laterality> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C13332> a <https://institut-curie.org/ontology#Laterality> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Bilateral" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0205091> a <https://institut-curie.org/ontology#Laterality> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25229> a <https://institut-curie.org/ontology#Laterality> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Left" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0205090> a <https://institut-curie.org/ontology#Laterality> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25228> a <https://institut-curie.org/ontology#Laterality> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Right" .
 <https://institut-curie.org/ontology#c> a <https://institut-curie.org/ontology#TnmType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Clinique" .

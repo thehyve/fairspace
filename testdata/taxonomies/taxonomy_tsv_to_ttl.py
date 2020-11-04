@@ -7,7 +7,7 @@ RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#"
 RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 CURIE_NS = "https://institut-curie.org/ontology#"
 FHIR_NS = "http://hl7.org/fhir/"
-NCIM_NS = "https://ncim.nci.nih.gov/"
+NCI_NS = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"
 NCBI_NS = "https://bioportal.bioontology.org/ontologies/NCBITAXON/"
 ICDO3T_NS = "https://bioportal.bioontology.org/ontologies/ICD-O-3-T/"
 ICDO3M_NS = "https://bioportal.bioontology.org/ontologies/ICD-O-3-M/"
@@ -82,16 +82,16 @@ def get_species_iri(row):
     return "{}{}".format(NCBI_NS, row[ID_COLUMN_NAME].replace('NCBI:txid', ''))
 
 def get_sample_nature_iri(row):
-    return "{}ncimbrowser/ConceptReport.jsp?code={}".format(NCIM_NS, row[ID_COLUMN_NAME].rsplit(':', 1)[1])
+    return "{}{}".format(NCI_NS, row[UPDATED_ID_COLUMN_NAME].rsplit(':', 1)[1])
 
 def get_sample_origin_iri(row):
     return "{}{}".format(CURIE_NS, row[LABEL_COLUMN_NAME].lower())
 
 def get_event_type_iri(row):
-    return "{}ncimbrowser/ConceptReport.jsp?code={}".format(NCIM_NS, row[UPDATED_ID_COLUMN_NAME].rsplit(':', 1)[1])
+    return "{}{}".format(NCI_NS, row[UPDATED_ID_COLUMN_NAME].rsplit(':', 1)[1])
 
 def get_laterality_iri(row):
-    return "{}ncimbrowser/ConceptReport.jsp?code={}".format(NCIM_NS, row[UPDATED_ID_COLUMN_NAME].rsplit(':', 1)[1])
+    return "{}{}".format(NCI_NS, row[UPDATED_ID_COLUMN_NAME].rsplit(':', 1)[1])
 
 def get_tnm_iri(row):
     return "{}{}".format(CURIE_NS, row[ID_COLUMN_NAME].lower())
