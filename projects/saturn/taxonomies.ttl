@@ -3076,37 +3076,101 @@
   <http://www.w3.org/2000/01/rdf-schema#label> "Metagenome" .
 <https://bioportal.bioontology.org/ontologies/NCBITAXON/5833> a <https://institut-curie.org/ontology#Species> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Plasmodium falciparum" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0005767> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12434> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Blood" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0032105> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C13356> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Plasma" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0033684> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C17021> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Protein" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0035668> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C812> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "RNA" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0012854> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C449> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "DNA" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C1321301> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12954> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Peripheral Blood Mononuclear Cell" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0085983> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C20313> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Tumor Cell Line" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C1548793> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C70717> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Frozen Specimen" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C1519524> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C19597> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Paraffin Embedded Tissue (FFPE)" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0042036> a <https://institut-curie.org/ontology#SampleNature> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C13283> a <https://institut-curie.org/ontology#SampleNature> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Urine" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0375111> a <https://institut-curie.org/ontology#EventType> ;
+<https://institut-curie.org/ontology#normal> a <https://institut-curie.org/ontology#SampleOrigin> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Normal" .
+<https://institut-curie.org/ontology#tumoral> a <https://institut-curie.org/ontology#SampleOrigin> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Tumoral" .
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C3262> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Neoplasm" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=CL107025> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C36263> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Metastatic Malignant Neoplasm" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0521158> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C4798> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Recurrent tumor" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0677930> a <https://institut-curie.org/ontology#EventType> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C8509> a <https://institut-curie.org/ontology#EventType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Primary tumor" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0238767> a <https://institut-curie.org/ontology#Laterality> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C13332> a <https://institut-curie.org/ontology#Laterality> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Bilateral" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0205091> a <https://institut-curie.org/ontology#Laterality> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25229> a <https://institut-curie.org/ontology#Laterality> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Left" .
-<https://ncim.nci.nih.gov/ncimbrowser/ConceptReport.jsp?code=C0205090> a <https://institut-curie.org/ontology#Laterality> ;
+<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C25228> a <https://institut-curie.org/ontology#Laterality> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Right" .
+<https://institut-curie.org/ontology#c> a <https://institut-curie.org/ontology#TnmType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Clinique" .
+<https://institut-curie.org/ontology#p> a <https://institut-curie.org/ontology#TnmType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Pathologique" .
+<https://institut-curie.org/ontology#y> a <https://institut-curie.org/ontology#TnmType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Après traitement neoadjuvant" .
+<https://institut-curie.org/ontology#u> a <https://institut-curie.org/ontology#TnmType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Radiologique" .
+<https://institut-curie.org/ontology#tx> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Tx" .
+<https://institut-curie.org/ontology#t0> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T0" .
+<https://institut-curie.org/ontology#t1> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T1" .
+<https://institut-curie.org/ontology#t1a> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T1a" .
+<https://institut-curie.org/ontology#t1b> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T1b" .
+<https://institut-curie.org/ontology#t1c> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T1c" .
+<https://institut-curie.org/ontology#t2> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T2" .
+<https://institut-curie.org/ontology#t3> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T3" .
+<https://institut-curie.org/ontology#t4> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T4" .
+<https://institut-curie.org/ontology#t4a> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T4a" .
+<https://institut-curie.org/ontology#t4b> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T4b" .
+<https://institut-curie.org/ontology#t4c> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T4c" .
+<https://institut-curie.org/ontology#t4d> a <https://institut-curie.org/ontology#TnmT> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "T4d" .
+<https://institut-curie.org/ontology#nx> a <https://institut-curie.org/ontology#TnmN> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Nx" .
+<https://institut-curie.org/ontology#n0> a <https://institut-curie.org/ontology#TnmN> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "N0" .
+<https://institut-curie.org/ontology#n1mi> a <https://institut-curie.org/ontology#TnmN> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "N1mi" .
+<https://institut-curie.org/ontology#n1> a <https://institut-curie.org/ontology#TnmN> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "N1" .
+<https://institut-curie.org/ontology#n2> a <https://institut-curie.org/ontology#TnmN> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "N2" .
+<https://institut-curie.org/ontology#n3> a <https://institut-curie.org/ontology#TnmN> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "N3" .
+<https://institut-curie.org/ontology#mx> a <https://institut-curie.org/ontology#TnmM> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Mx" .
+<https://institut-curie.org/ontology#m0> a <https://institut-curie.org/ontology#TnmM> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "M0" .
+<https://institut-curie.org/ontology#m1> a <https://institut-curie.org/ontology#TnmM> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "M1" .
+<https://institut-curie.org/ontology#biology> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Biology" .
+<https://institut-curie.org/ontology#imaging> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Imaging" .
+<https://institut-curie.org/ontology#omic> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Omic" .
+<https://institut-curie.org/ontology#pathology> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Pathology" .

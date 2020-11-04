@@ -14,8 +14,8 @@
 ########################
 
 curie:aboutSubject a rdf:Property .
-curie:aboutMaterial a rdf:Property .
 curie:aboutEvent a rdf:Property .
+curie:sample a rdf:Property .
 curie:analysisType a rdf:Property .
 
 ## Augmented system class shapes
@@ -28,9 +28,9 @@ fs:File sh:property
     ],
     [
         sh:name "Is about biological sample" ;
-        sh:description "Materials that are featured in this collection." ;
+        sh:description "Biological samples that are featured in this collection." ;
         sh:class curie:BiologicalSample ;
-        sh:path curie:aboutMaterial
+        sh:path curie:sample
     ],
     [
         sh:name "Is about tumor pathology event" ;
