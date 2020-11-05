@@ -89,7 +89,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     protected void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
         if (purge) {
-            if(!factory.userService.currentUser().isAdmin()) {
+            if (!factory.userService.currentUser().isAdmin()) {
                 throw new NotAuthorizedException();
             }
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
@@ -128,12 +128,12 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         var newSubject = childSubject(parent != null ? parent : factory.rootSubject, name);
         newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
-            parent.addProperty(FS.contains, newSubject);
+            newSubject.addProperty(FS.ownedBy, parent);
         }
 
         subject.listProperties()
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
-                .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
+                .filterDrop(stmt -> stmt.getPredicate().equals(FS.ownedBy))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.versions))
                 .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
@@ -147,11 +147,11 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             newSubject.addProperty(FS.versions, newVersions);
         }
 
-        getResourceProperties(subject, FS.contains)
-                .forEach(r -> move(r, newSubject, getStringProperty(r, RDFS.label)));
+        subject.getModel().listSubjectsWithProperty(FS.ownedBy, subject)
+                .forEachRemaining(r -> move(r, newSubject, getStringProperty(r, RDFS.label)));
 
         subject.getModel().listStatements(null, null, subject)
-                .filterDrop(stmt -> stmt.getPredicate().equals(FS.contains))
+                .filterDrop(stmt -> stmt.getPredicate().equals(FS.ownedBy))
                 .forEachRemaining(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
@@ -180,7 +180,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     private void copy(Resource subject, Resource parent, String name, Resource user, Literal date) {
         var newSubject = childSubject(parent, name);
         newSubject.removeProperties();
-        parent.addProperty(FS.contains, newSubject);
+        newSubject.addProperty(FS.ownedBy, parent);
         newSubject.addProperty(RDFS.label, name)
                 .addProperty(FS.dateCreated, date)
                 .addProperty(FS.createdBy, user);
@@ -200,8 +200,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             newSubject.addLiteral(FS.currentVersion, 1)
                     .addProperty(FS.versions, newSubject.getModel().createList(ver));
         }
-        getResourceProperties(subject, FS.contains)
-                .forEach(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
+        subject.getModel()
+                .listSubjectsWithProperty(FS.ownedBy, subject)
+                .forEachRemaining(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
     }
 
     @Override
@@ -333,8 +334,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         if (resource.hasProperty(FS.deletedBy, user) && resource.hasProperty(FS.dateDeleted, date)) {
             resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
 
-            resource.listProperties(FS.contains)
-                    .forEachRemaining(statement -> undelete(statement.getResource(), date, user));
+            resource.getModel()
+                    .listSubjectsWithProperty(FS.ownedBy, resource)
+                    .forEachRemaining(r -> undelete(r, date, user));
         }
     }
 }

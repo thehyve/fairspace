@@ -76,9 +76,6 @@ public class FS {
     public static final String HAS_ROLE_URI = NS + "hasRole";
     public static final Property hasRole = createProperty(HAS_ROLE_URI);
 
-    public static final String CONTAINS_URI = NS + "contains";
-    public static final Property contains = createProperty(CONTAINS_URI);
-
     public static final String FILE_SIZE_URI = NS + "fileSize";
     public static final Property fileSize = createProperty(FILE_SIZE_URI);
 
