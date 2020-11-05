@@ -439,7 +439,6 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:description "Detailed description, only visible for workspace members. Uses Markdown format." ;
         sh:datatype fs:markdown ;
         sh:maxCount 1 ;
-        sh:minCount 1 ;
         sh:order 2
     ],
     [

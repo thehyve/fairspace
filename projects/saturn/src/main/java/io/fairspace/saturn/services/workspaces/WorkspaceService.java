@@ -103,9 +103,6 @@ public class WorkspaceService {
         }
         validate(ws.getIri() == null, "IRI must be empty");
         validate(!isNullOrEmpty(ws.getName()), "Please specify workspace name");
-        if (ws.getDescription() == null) {
-            ws.setDescription("");
-        }
 
         var created = tx.calculateWrite(m -> {
             var conflictingWorkspace = findExistingWorkspace(m, ws.getName());
@@ -151,10 +148,6 @@ public class WorkspaceService {
 
             if (patch.getComment() != null && !patch.getComment().equals(workspace.getComment())) {
                 workspace.setComment(patch.getComment());
-            }
-
-            if (patch.getDescription() != null && !patch.getDescription().equals(workspace.getDescription())) {
-                workspace.setDescription(patch.getDescription());
             }
 
             return dao.write(workspace);
