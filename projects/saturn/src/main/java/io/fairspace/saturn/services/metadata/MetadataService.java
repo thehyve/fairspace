@@ -163,7 +163,7 @@ public class MetadataService {
             trimLabels(modelToAdd);
             var after = updatedView(before, modelToRemove, modelToAdd);
 
-            validate(before, after, modelToRemove, modelToAdd, vocabulary);
+            validate(before, after, modelToRemove, modelToAdd);
 
             persist(modelToRemove, modelToAdd);
 
@@ -175,7 +175,7 @@ public class MetadataService {
         updatedResources.forEach(resource -> audit("METADATA_UPDATED", "iri", resource.getURI()));
     }
 
-    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
+    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd) {
         var violations = new LinkedHashSet<Violation>();
         validator.validate(before, after, modelToRemove, modelToAdd,
                 (message, subject, predicate, object) ->
