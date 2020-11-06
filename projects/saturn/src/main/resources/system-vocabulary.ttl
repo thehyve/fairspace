@@ -15,6 +15,7 @@ fs:machineOnly a rdf:Property .
 fs:importantProperty a rdf:Property .
 
 fs:ownedBy a rdf:Property .
+fs:belongsTo a rdf:Property .
 fs:createdBy a rdf:Property .
 fs:dateCreated a rdf:Property .
 fs:modifiedBy a rdf:Property .
@@ -37,7 +38,7 @@ fs:File a rdfs:Class, sh:NodeShape ;
     sh:description "A single file." ;
     sh:name "File" ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:ownedBy fs:movedTo fs:versions fs:currentVersion) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:belongsTo fs:movedTo fs:versions fs:currentVersion) ;
     sh:property
     [
         sh:name "Created by" ;
@@ -111,7 +112,7 @@ fs:Directory a rdfs:Class, sh:NodeShape ;
     sh:description "A directory containing multiple files." ;
     sh:name "Directory" ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs fs:ownedBy fs:movedTo) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:belongsTo fs:movedTo) ;
     sh:property
     [
         sh:name "Created by" ;
@@ -191,7 +192,7 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
     sh:description "Collection of files with associated metadata and access rules." ;
     sh:name "Collection" ;
     fs:machineOnly true ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:ignoredProperties ( rdf:type owl:sameAs fs:belongsTo) ;
     sh:property
     [
         sh:name "Owned by" ;

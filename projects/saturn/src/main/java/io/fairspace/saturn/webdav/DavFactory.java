@@ -20,6 +20,7 @@ import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
 public class DavFactory implements ResourceFactory {
+    // Represents the root URI, not stored in the database
     final org.apache.jena.rdf.model.Resource rootSubject;
     final BlobStore store;
     final UserService userService;

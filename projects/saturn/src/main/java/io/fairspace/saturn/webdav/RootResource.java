@@ -123,7 +123,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
             throw new NotAuthorizedException();
         }
 
-        subj.addProperty(FS.ownedBy, ws);
+        subj.addProperty(FS.ownedBy, ws).addProperty(FS.belongsTo, ws);
 
         return (CollectionResource) factory.getResource(subj, Access.Manage);
     }

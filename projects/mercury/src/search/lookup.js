@@ -32,7 +32,7 @@ PREFIX fs: <http://fairspace.io/ontology#>
 
 SELECT ?id ?label ?comment ?type
 WHERE { 
-    ${parentIri ? ('?id fs:ownedBy* <' + parentIri + '> .') : ''}
+    ${parentIri ? ('?id fs:belongsTo* <' + parentIri + '> .') : ''}
     ?id rdfs:label ?label ;
         a ?type .
     FILTER (?type in (fs:File, fs:Directory, fs:Collection))    

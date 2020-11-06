@@ -128,12 +128,12 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         var newSubject = childSubject(parent != null ? parent : factory.rootSubject, name);
         newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
-            newSubject.addProperty(FS.ownedBy, parent);
+            newSubject.addProperty(FS.belongsTo, parent);
         }
 
         subject.listProperties()
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
-                .filterDrop(stmt -> stmt.getPredicate().equals(FS.ownedBy))
+                .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.versions))
                 .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
@@ -147,11 +147,11 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             newSubject.addProperty(FS.versions, newVersions);
         }
 
-        subject.getModel().listSubjectsWithProperty(FS.ownedBy, subject)
+        subject.getModel().listSubjectsWithProperty(FS.belongsTo, subject)
                 .forEachRemaining(r -> move(r, newSubject, getStringProperty(r, RDFS.label)));
 
         subject.getModel().listStatements(null, null, subject)
-                .filterDrop(stmt -> stmt.getPredicate().equals(FS.ownedBy))
+                .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
                 .forEachRemaining(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
@@ -180,7 +180,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     private void copy(Resource subject, Resource parent, String name, Resource user, Literal date) {
         var newSubject = childSubject(parent, name);
         newSubject.removeProperties();
-        newSubject.addProperty(FS.ownedBy, parent);
+        newSubject.addProperty(FS.belongsTo, parent);
         newSubject.addProperty(RDFS.label, name)
                 .addProperty(FS.dateCreated, date)
                 .addProperty(FS.createdBy, user);
@@ -201,7 +201,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                     .addProperty(FS.versions, newSubject.getModel().createList(ver));
         }
         subject.getModel()
-                .listSubjectsWithProperty(FS.ownedBy, subject)
+                .listSubjectsWithProperty(FS.belongsTo, subject)
                 .forEachRemaining(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
     }
 
@@ -335,7 +335,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             resource.removeAll(FS.dateDeleted).removeAll(FS.deletedBy);
 
             resource.getModel()
-                    .listSubjectsWithProperty(FS.ownedBy, resource)
+                    .listSubjectsWithProperty(FS.belongsTo, resource)
                     .forEachRemaining(r -> undelete(r, date, user));
         }
     }

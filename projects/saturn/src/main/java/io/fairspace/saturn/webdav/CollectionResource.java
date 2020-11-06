@@ -12,7 +12,10 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
@@ -86,7 +89,10 @@ class CollectionResource extends DirectoryResource {
 
         var old = subject.getPropertyResourceValue(FS.ownedBy);
 
-        subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, owner);
+        subject.removeAll(FS.ownedBy)
+                .addProperty(FS.ownedBy, owner)
+                .removeAll(FS.belongsTo)
+                .addProperty(FS.belongsTo, owner);
 
         if (old != null) {
             subject.getModel().listResourcesWithProperty(FS.isMemberOf, old)
@@ -137,7 +143,7 @@ class CollectionResource extends DirectoryResource {
     /**
      * Compute available access modes for the collection, given its current status
      * and the user's permissions.
-     *
+     * <p>
      * Returns only the current access mode when:
      * - the current user does not have manage permission; or
      * - the collection is deleted; or

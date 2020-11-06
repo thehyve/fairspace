@@ -33,6 +33,9 @@ public class FS {
     public static final String OWNED_BY_URI = NS + "ownedBy";
     public static final Property ownedBy = createProperty(OWNED_BY_URI);
 
+    public static final String BELONGS_TO_URI = NS + "belongsTo";
+    public static final Property belongsTo = createProperty(BELONGS_TO_URI);
+
     public static final String CREATED_BY_URI = NS + "createdBy";
     public static final Property createdBy = createProperty(CREATED_BY_URI);
 
