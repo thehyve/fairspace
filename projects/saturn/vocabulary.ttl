@@ -381,7 +381,7 @@ curie:TnmM a rdfs:Class, sh:NodeShape ;
     ] .
 
 curie:eventType a rdf:Property .
-curie:tumorTopography a rdf:Property .
+curie:topography a rdf:Property .
 curie:tumorMorphology a rdf:Property .
 curie:tumorLaterality a rdf:Property .
 curie:diagnosisDate a rdf:Property .
@@ -408,7 +408,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:description "The topography of the tumor." ;
         sh:maxCount 1 ;
         sh:class curie:Topography ;
-        sh:path curie:tumorTopography
+        sh:path curie:topography
     ],
     [
         sh:name "Morphology" ;
@@ -553,7 +553,6 @@ curie:SampleOrigin a rdfs:Class, sh:NodeShape ;
 
 curie:collectDate a rdf:Property .
 curie:tumorCellularity a rdf:Property .
-curie:sampleTopography a rdf:Property .
 curie:isOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
 curie:subject a rdf:Property .
@@ -585,7 +584,7 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:description "The topography of the sample." ;
         sh:maxCount 1 ;
         sh:class curie:Topography ;
-        sh:path curie:sampleTopography
+        sh:path curie:topography
     ],
     [
         sh:name "Sample nature" ;
