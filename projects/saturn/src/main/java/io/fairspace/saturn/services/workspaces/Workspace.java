@@ -24,9 +24,6 @@ public class Workspace extends LifecycleAwarePersistentEntity {
     @RDFProperty(value = RDFS.uri + "comment")
     private String comment;
 
-    @RDFProperty(value = "http://fairspace.io/ontology#workspaceDescription")
-    private String description;
-
     private List<User> managers;
     private WorkspaceSummary summary;
     private boolean canCollaborate;
