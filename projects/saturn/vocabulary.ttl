@@ -71,7 +71,7 @@ fs:Directory sh:property
             sh:path curie:analysisType
         ] .
 
-fs:CollectionShape sh:property
+fs:Collection sh:property
         [
             sh:name "Is about subject" ;
             sh:description "Subjects that are featured in this collection." ;
