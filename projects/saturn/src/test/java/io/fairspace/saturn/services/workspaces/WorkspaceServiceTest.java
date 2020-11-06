@@ -57,6 +57,7 @@ public class WorkspaceServiceTest {
                 .add(EMPTY_WORKSPACE, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
                 .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1)
+                .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1)
                 .add(WORKSPACE_1, PROPERTY_1, RESOURCE_1)
                 .add(EMPTY_WORKSPACE, PROPERTY_2, RESOURCE_2)
         );

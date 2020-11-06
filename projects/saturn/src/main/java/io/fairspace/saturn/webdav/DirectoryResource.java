@@ -108,7 +108,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
-        subject.addProperty(FS.contains, subj);
+        subj.addProperty(FS.belongsTo, subject);
         return subj;
     }
 
@@ -119,8 +119,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public List<? extends Resource> getChildren() {
-        return subject.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
+        return subject.getModel()
+                .listSubjectsWithProperty(FS.belongsTo, subject)
                 .mapWith(r -> factory.getResource(r, access))
                 .filterDrop(Objects::isNull)
                 .toList();
