@@ -18,6 +18,7 @@ import UserRolesPage from "../users/UserRolesPage";
 import FeaturesContext from "../common/contexts/FeaturesContext";
 import MetadataView from '../metadata/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
+import MetadataViewContext from "../metadata/MetadataViewContext";
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
@@ -26,6 +27,7 @@ const getSubject = () => (
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
+    const {views} = useContext(MetadataViewContext);
 
     return (
         <Switch>
@@ -61,15 +63,15 @@ const WorkspaceRoutes = () => {
                 )}
             />
 
-            { [{id: 'Samples'}].map(view => (
+            {views.filter(v => v.name !== "collections").map(view => (
                 <Route
-                    key={view.id}
-                    path={`/views/${view.id}`}
+                    key={view.name}
+                    path={`/views/${view.name}`}
                     exact
                     render={() => (
                         <BreadcrumbsContext.Provider value={{segments: []}}>
                             <LinkedDataMetadataProvider>
-                                <MetadataView view={view.id} />
+                                <MetadataView view={view.name} />
                             </LinkedDataMetadataProvider>
                         </BreadcrumbsContext.Provider>
                     )}

@@ -1,19 +1,75 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Chip, Grid, Paper, Typography} from '@material-ui/core';
+import {Grain} from '@material-ui/icons';
 import MetadataViewTable from './MetadataViewTable';
 import MetadataViewFacet from './MetadataViewFacet';
+import MetadataViewAPI from './MetadataViewAPI';
 import BreadCrumbs from '../common/components/BreadCrumbs';
 import {usePalette} from '../common/palette';
-import {Grain} from '@material-ui/icons';
+import useAsync from "../common/hooks/UseAsync";
+import MetadataViewContext from "./MetadataViewContext";
+import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
+import type {MetadataViewFilter} from "./MetadataViewAPI";
+
+
+const getFacetValuesByName = (name) => {
+    switch (name) {
+        case "samples":
+            return [
+                {
+                    label: 'Blood',
+                    iri: 'http://example.com/sampleType#blood'
+                },
+                {
+                    label: 'Tissue',
+                    iri: 'http://example.com/sampleType#tissue'
+                }
+            ];
+        case "patients":
+            return [
+                {
+                    label: 'Patient A',
+                    iri: 'http://example.com/patients#A'
+                },
+                {
+                    label: 'Patient B',
+                    iri: 'http://example.com/patients#B'
+                }
+            ];
+        case "collection":
+            return [
+                {
+                    label: 'Collection A',
+                    iri: 'http://example.com/collection#A'
+                },
+                {
+                    label: 'Collection B',
+                    iri: 'http://example.com/collection#B'
+                }
+            ];
+        default: return [];
+    }
+};
+
+const mockFacetValues = (facets: MetadataViewFacet[], borderColors, backgroundColors) => facets.map(
+    facet => ({
+        ...facet,
+        values: getFacetValuesByName(facet.name),
+        borderColor: borderColors[1],
+        backgroundColors: backgroundColors[1]
+    })
+);
 
 type MetadataViewProperties = {
     view: string;
 }
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {view} = props;
-    const palette = usePalette();
+    const {view: currentView} = props;
+    const {views} = useContext(MetadataViewContext);
+    const currentViewOptions = views.find(v => v.name === currentView) || {};
 
+    const palette = usePalette();
     const borderColors = [
         palette.orangeBorder,
         palette.purpleBorder,
@@ -41,88 +97,26 @@ export const MetadataView = (props: MetadataViewProperties) => {
         palette.lightBlue,
     ];
 
-    const columns = [
-        {
-            field: 'iri',
-            label: 'Id'
-        },
-        {
-            field: 'label',
-            label: 'Sample'
-        },
-        {
-            field: 'sampleType',
-            label: 'Type'
-        },
-        {
-            field: 'patient',
-            label: 'Patient'
+    const {data: facets = [], error: facetsError, loading: facetsLoading} = useAsync(
+        () => MetadataViewAPI.getFacets()
+            .then(res => mockFacetValues(res, borderColors, backgroundColors))
+    );
+
+    const [filters: MetadataViewFilter[], setFilters] = useState([]);
+
+    const setFilterValues = (facetName: string, values: any[]) => {
+        if (filters.find(f => f.field === facetName)) {
+            const updatedFilters = [...filters];
+            updatedFilters.find(f => (f.field === facetName)).values = values;
+            setFilters(updatedFilters);
+        } else {
+            const newFilter: MetadataViewFilter = {
+                field: facetName,
+                values
+            };
+            setFilters([...filters, newFilter]);
         }
-    ];
-    const sampleTypes = [
-        {
-            label: 'Blood',
-            iri: 'http://example.com/sampleType#blood'
-        },
-        {
-            label: 'Tissue',
-            iri: 'http://example.com/sampleType#tissue'
-        }
-    ];
-    const patients = [
-        {
-            label: 'Patient A',
-            iri: 'http://example.com/patients#A'
-        },
-        {
-            label: 'Patient B',
-            iri: 'http://example.com/patients#B'
-        }
-    ];
-    const facets = [
-        {
-            name: 'Patients',
-            fieldName: 'patient',
-            values: patients,
-            borderColor: borderColors[0],
-            backgroundColor: backgroundColors[0]
-        },
-        {
-            name: 'Types',
-            fieldName: 'sampleType',
-            values: sampleTypes,
-            borderColor: borderColors[1],
-            backgroundColor: backgroundColors[1]
-        }
-    ];
-    const facetByFieldName = Object.fromEntries(facets.map(facet => [facet.fieldName, facet]));
-    const [filters, setFilters] = useState(Object.fromEntries(facets.map(facet => [facet.fieldName, []])));
-    const data = [
-        {
-            iri: 'http://example.com/samples#123',
-            label: 'Sample 123',
-            sampleType: {
-                iri: 'http://example.com/sampleType#tissue',
-                label: 'Tissue'
-            },
-            patient: {
-                iri: 'http://example.com/patients#A',
-                label: 'Patient B'
-            }
-        },
-        {
-            iri: 'http://example.com/samples#456',
-            label: 'Sample 456',
-            sampleType: {
-                iri: 'http://example.com/sampleType#blood',
-                label: 'Blood'
-            },
-            patient: {
-                iri: 'http://example.com/patients#B',
-                label: 'Patient B'
-            }
-        }
-    ];
+    };
 
     const renderFacets = () => (
         <Grid
@@ -135,14 +129,12 @@ export const MetadataView = (props: MetadataViewProperties) => {
         >
             {
                 facets.map(facet => (
-                    <Grid key={facet.fieldName} item>
+                    <Grid key={facet.name} item>
                         <MetadataViewFacet
                             multiple
-                            title={facet.name}
+                            title={facet.title}
                             options={facet.values}
-                            onChange={(values) => {
-                                setFilters({...filters, [facet.fieldName]: values});
-                            }}
+                            onChange={(values) => setFilterValues(facet.name, values)}
                             extraClasses={facet.borderColor}
                         />
                     </Grid>
@@ -161,16 +153,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
             spacing={1}
         >
             {
-                filters && Object.entries(filters).map(([fieldName, selectedValues]) => {
-                    if (!selectedValues || selectedValues.length === 0) {
+                filters && filters.map(filter => {
+                    if (!filter.values || filter.values.length === 0) {
                         return null;
                     }
-                    const facet = facetByFieldName[fieldName];
+                    const facet = facets.find(f => f.name === filter.field);
                     return (
-                        <Grid key={fieldName} item>
+                        <Grid key={filter.field} item>
                             <Typography variant="overline" component="span">{facet.name}</Typography>
                             {
-                                selectedValues.map(valueIri => {
+                                filter.values.map(valueIri => {
                                     const value = facet.values.find(val => val.iri === valueIri);
                                     return (
                                         value && (
@@ -192,15 +184,17 @@ export const MetadataView = (props: MetadataViewProperties) => {
     );
 
     return (
-        <>
-            <BreadCrumbs additionalSegments={[
+        <BreadcrumbsContext.Provider value={{
+            segments: [
                 {
-                    label: view,
-                    href: `/views/${view}`,
+                    label: currentView,
+                    href: `/views/${currentView}`,
                     icon: <Grain />
                 }
-            ]}
-            />
+            ]
+        }}
+        >
+            <BreadCrumbs />
             <Grid
                 container
                 direction="column"
@@ -210,9 +204,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 {renderActiveFilters()}
             </Grid>
             <Paper style={{marginTop: 10, overflowX: 'auto'}}>
-                <MetadataViewTable columns={columns} data={data} />
+                <MetadataViewTable columns={currentViewOptions.columns} view={currentView} filters={filters} />
             </Paper>
-        </>
+        </BreadcrumbsContext.Provider>
     );
 };
 
