@@ -1,17 +1,19 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Folder, Grain, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
+import {Assignment, Folder, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
 import FeaturesContext from "../common/contexts/FeaturesContext";
+import MetadataViewContext from "../metadata/MetadataViewContext";
 
 export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
+    const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
@@ -40,18 +42,19 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
-                {currentUser.canViewPublicMetadata && [{id: 'Samples', icon: <Grain />}].map(view => (
+                {currentUser.canViewPublicMetadata
+                && views.filter(v => v.name !== "collections").map(view => (
                     <ListItem
-                        key={`views-${view.id}`}
+                        key={`views-${view.name}`}
                         component={NavLink}
-                        to={`/views/${view.id}`}
+                        to={`/views/${view.name}`}
                         button
-                        selected={pathname.startsWith(`/views/${view.id}`)}
+                        selected={pathname.startsWith(`/views/${view.name}`)}
                     >
                         <ListItemIcon>
                             {view.icon}
                         </ListItemIcon>
-                        <ListItemText primary={view.id} />
+                        <ListItemText primary={view.title} />
                     </ListItem>
                 ))}
                 {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (

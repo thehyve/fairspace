@@ -80,7 +80,7 @@ const SelectMultiple = (props: SelectProperties) => {
 };
 
 const MetadataViewFacet = (props: MetadataViewFacetProperties) => {
-    const {title, options, multiple = false, onChange = () => {}, extraClasses = ''} = props;
+    const {title, options = [], multiple = false, onChange = () => {}, extraClasses = ''} = props;
     const classes = useStyles();
 
     return (
