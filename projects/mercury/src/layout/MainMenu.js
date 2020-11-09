@@ -42,7 +42,7 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
-                {currentUser.canViewPublicMetadata
+                {currentUser && currentUser.canViewPublicMetadata
                 && views.filter(v => v.name !== "collections").map(view => (
                     <ListItem
                         key={`views-${view.name}`}

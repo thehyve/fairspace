@@ -1,6 +1,7 @@
 import axios from "axios";
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 import {applyViewIcons} from "./metadataViewUtils";
+import {mockGetFacets, mockGetViewData, mockGetViews} from "./__mocks__/MetadataViewAPI";
 
 const metadataViewUrl = "/api/v1/views/";
 
@@ -39,35 +40,37 @@ export type MetadataViewData = {
     rows: Map<string, any>[]
 };
 
-
 class MetadataViewAPI {
     getViews(): Promise<MetadataViewOptions[]> {
-        return axios.get(metadataViewUrl, {
-            headers: {Accept: 'application/json'},
-        })
-            .then(extractJsonData)
+        // return axios.get(metadataViewUrl, {
+        //     headers: {Accept: 'application/json'},
+        // })
+        //     .then(extractJsonData)
+        return mockGetViews()
             .then(applyViewIcons)
             .catch(handleHttpError("Failure when retrieving metadata views configuration."));
     }
 
-    getFacets(): Promise<MetadataViewFacet[]> {
-        return axios.get(`${metadataViewUrl}/facets`, {
-            headers: {Accept: 'application/json'},
-        })
-            .then(extractJsonData)
+    getFacets(viewName: string): Promise<MetadataViewFacet[]> {
+        // return axios.get(`${metadataViewUrl}/facets`, {
+        //     headers: {Accept: 'application/json'},
+        // })
+        //     .then(extractJsonData)
+        return mockGetFacets(viewName)
             .catch(handleHttpError("Failure when retrieving facets."));
     }
 
-    getViewData(view, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
-        const viewRequest = {
-            view,
-            filters,
-            page,
-            size
-        };
-        return axios.post(metadataViewUrl, viewRequest,
-            {headers: {Accept: 'application/json'}})
-            .then(extractJsonData)
+    getViewData(viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
+        // const viewRequest = {
+        //     view: viewName,
+        //     filters,
+        //     page,
+        //     size
+        // };
+        // return axios.post(metadataViewUrl, viewRequest,
+        //     {headers: {Accept: 'application/json'}})
+        //     .then(extractJsonData)
+        return mockGetViewData(viewName)
             .catch(handleHttpError("Error while fetching view data."));
     }
 }
