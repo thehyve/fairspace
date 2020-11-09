@@ -10,53 +10,14 @@ import useAsync from "../common/hooks/UseAsync";
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import type {MetadataViewFilter} from "./MetadataViewAPI";
-
-
-const getFacetValuesByName = (name) => {
-    switch (name) {
-        case "samples":
-            return [
-                {
-                    label: 'Blood',
-                    iri: 'http://example.com/sampleType#blood'
-                },
-                {
-                    label: 'Tissue',
-                    iri: 'http://example.com/sampleType#tissue'
-                }
-            ];
-        case "patients":
-            return [
-                {
-                    label: 'Patient A',
-                    iri: 'http://example.com/patients#A'
-                },
-                {
-                    label: 'Patient B',
-                    iri: 'http://example.com/patients#B'
-                }
-            ];
-        case "collection":
-            return [
-                {
-                    label: 'Collection A',
-                    iri: 'http://example.com/collection#A'
-                },
-                {
-                    label: 'Collection B',
-                    iri: 'http://example.com/collection#B'
-                }
-            ];
-        default: return [];
-    }
-};
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
 
 const mockFacetValues = (facets: MetadataViewFacet[], borderColors, backgroundColors) => facets.map(
     facet => ({
         ...facet,
-        values: getFacetValuesByName(facet.name),
-        borderColor: borderColors[1],
-        backgroundColors: backgroundColors[1]
+        borderColor: borderColors[Math.floor(Math.random() * borderColors.length)],
+        backgroundColors: backgroundColors[Math.floor(Math.random() * backgroundColors.length)]
     })
 );
 
@@ -98,7 +59,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     ];
 
     const {data: facets = [], error: facetsError, loading: facetsLoading} = useAsync(
-        () => MetadataViewAPI.getFacets()
+        () => MetadataViewAPI.getFacets(currentView)
             .then(res => mockFacetValues(res, borderColors, backgroundColors))
     );
 
@@ -118,30 +79,39 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
     };
 
-    const renderFacets = () => (
-        <Grid
-            container
-            item
-            direction="row"
-            justify="flex-start"
-            alignItems="stretch"
-            spacing={1}
-        >
-            {
-                facets.map(facet => (
-                    <Grid key={facet.name} item>
-                        <MetadataViewFacet
-                            multiple
-                            title={facet.title}
-                            options={facet.values}
-                            onChange={(values) => setFilterValues(facet.name, values)}
-                            extraClasses={facet.borderColor}
-                        />
-                    </Grid>
-                ))
-            }
-        </Grid>
-    );
+    const renderFacets = () => {
+        if (facetsLoading) {
+            return <LoadingInlay />;
+        }
+
+        if (!facetsLoading && facetsError && facetsError.message) {
+            return <MessageDisplay message={facetsError.message} />;
+        }
+        return (
+            <Grid
+                container
+                item
+                direction="row"
+                justify="flex-start"
+                alignItems="stretch"
+                spacing={1}
+            >
+                {
+                    facets.map(facet => (
+                        <Grid key={facet.name} item>
+                            <MetadataViewFacet
+                                multiple
+                                title={facet.title}
+                                options={facet.values}
+                                onChange={(values) => setFilterValues(facet.name, values)}
+                                extraClasses={facet.borderColor}
+                            />
+                        </Grid>
+                    ))
+                }
+            </Grid>
+        );
+    };
 
     const renderActiveFilters = () => (
         <Grid

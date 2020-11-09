@@ -18,31 +18,6 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 
 
-const mockedRows = [
-    {
-        'sample': 'http://example.com/sampleType#tissue01',
-        'sample.label': 'Tissue 001',
-        'tumorCellularity': 4
-    },
-    {
-        'sample': 'http://example.com/sampleType#tissue02',
-        'sample.label': 'Tissue 002',
-        'tumorCellularity': 3,
-        'description': "Test description"
-    },
-    {
-        'sample': 'http://example.com/sampleType#tissue03',
-        'sample.label': 'Tissue 003',
-        'tumorCellularity': 1,
-        'description': "Test description 2"
-    },
-];
-const mockRows = (data: MetadataViewData) => ({
-    ...data,
-    rows: mockedRows
-});
-
-
 type MetadataViewTableProperties = {
     columns: MetadataViewColumn[];
     filters: MetadataViewFilter[];
@@ -56,8 +31,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const {data = [], error, loading} = useAsync(
-        () => MetadataViewAPI.getViewData(props.view, page, rowsPerPage, props.filters)
-            .then(res => mockRows(res)),
+        () => MetadataViewAPI.getViewData(props.view, page, rowsPerPage, props.filters),
         [page, rowsPerPage, props.view]
     );
 
