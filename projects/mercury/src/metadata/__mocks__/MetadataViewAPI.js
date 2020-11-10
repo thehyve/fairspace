@@ -17,6 +17,10 @@ export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
                 {
                     name: "species",
                     title: "Species"
+                },
+                {
+                    name: "birthDate",
+                    title: "Birth date"
                 }
             ]
         },
@@ -59,7 +63,7 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         name: 'sampleType',
                         title: 'Sample type',
                         query: "",
-                        type: "",
+                        type: "text",
                         values: [
                             {
                                 label: 'Blood',
@@ -75,7 +79,7 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         name: 'topography',
                         title: 'Topography',
                         query: "",
-                        type: "",
+                        type: "text",
                         values: [
                             {
                                 label: 'Lip',
@@ -92,10 +96,18 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         ]
                     },
                     {
+                        name: 'tumorCellularity',
+                        title: 'Tumor cellularity',
+                        query: "",
+                        type: "number",
+                        rangeStart: 2,
+                        rangeEnd: 8
+                    },
+                    {
                         name: 'sampleNature',
                         title: 'Nature',
                         query: "",
-                        type: "",
+                        type: "text",
                         values: [
                             {
                                 label: 'Protein',
@@ -119,7 +131,7 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         name: 'sampleOrigin',
                         title: 'Origin',
                         query: "",
-                        type: "",
+                        type: "text",
                         values: [
                             {
                                 label: 'Normal',
@@ -139,7 +151,7 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         name: 'gender',
                         title: 'Gender',
                         query: "",
-                        type: "",
+                        type: "text",
                         values: [
                             {
                                 label: 'Male',
@@ -159,7 +171,7 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         name: 'species',
                         title: 'Species',
                         query: "",
-                        type: "",
+                        type: "text",
                         values: [
                             {
                                 label: 'Homo sapiens',
@@ -174,6 +186,14 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                                 iri: 'http://example.com/species#bs'
                             }
                         ]
+                    },
+                    {
+                        name: 'birthDate',
+                        title: 'Birth date',
+                        query: "",
+                        type: "date",
+                        rangeStart: new Date(1995, 11, 25, 18, 33),
+                        rangeEnd: new Date(1995, 11, 25, 18, 33)
                     }
                 ]);
                 break;
@@ -217,7 +237,8 @@ const mockRows = (viewName) => {
                     'gender': 'http://example.com/sampleType#male',
                     'gender.label': 'Male',
                     'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens'
+                    'species.label': 'Homo Sapiens',
+                    'birthDate': new Date(1995, 11, 25, 18, 33).toLocaleString()
                 },
                 {
                     'label': 'P02',

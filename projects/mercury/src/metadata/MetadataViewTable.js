@@ -10,7 +10,7 @@ import {
     TableRow,
     withStyles
 } from '@material-ui/core';
-import type {MetadataViewColumn, MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
+import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import styles from "../file/FileList.styles";
 import useAsync from "../common/hooks/UseAsync";
 import MetadataViewAPI from "./MetadataViewAPI";

@@ -19,7 +19,9 @@ export type MetadataViewFacet = {
     title: string;
     query: string;
     type: ValueType;
-    values: string[]; // TODO - other types
+    values: string[];
+    rangeStart: any;
+    rangeEnd: any;
 };
 
 export type MetadataViewColumn = {
