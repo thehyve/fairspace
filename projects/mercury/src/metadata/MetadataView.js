@@ -2,14 +2,14 @@ import React, {useContext, useState} from 'react';
 import {Chip, Grid, Paper, Typography} from '@material-ui/core';
 import {Grain} from '@material-ui/icons';
 import MetadataViewTable from './MetadataViewTable';
-import MetadataViewFacet from './MetadataViewFacet';
+import Facet from './MetadataViewFacetFactory';
 import MetadataViewAPI from './MetadataViewAPI';
 import BreadCrumbs from '../common/components/BreadCrumbs';
 import {usePalette} from '../common/palette';
 import useAsync from "../common/hooks/UseAsync";
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
-import type {MetadataViewFilter} from "./MetadataViewAPI";
+import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 
@@ -99,10 +99,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 {
                     facets.map(facet => (
                         <Grid key={facet.name} item>
-                            <MetadataViewFacet
+                            <Facet
                                 multiple
+                                type={facet.type}
                                 title={facet.title}
-                                options={facet.values}
+                                options={facet.values || [facet.rangeStart, facet.rangeEnd]}
                                 onChange={(values) => setFilterValues(facet.name, values)}
                                 extraClasses={facet.borderColor}
                             />
@@ -111,6 +112,34 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 }
             </Grid>
         );
+    };
+
+    const renderActiveFilterValues = (facet, filter) => {
+        if (facet.type === 'number' || facet.type === 'date') {
+            return (
+                filter.values && (
+                    <Chip
+                        className={facet.backgroundColor}
+                        key={`chip-${facet.name}`}
+                        label={`${filter.values[0]} - ${filter.values[1]}`}
+                        style={{marginLeft: 5}}
+                    />
+                )
+            );
+        }
+        return filter.values.map(valueIri => {
+            const value = facet.values.find(val => val.iri === valueIri);
+            return (
+                value && (
+                    <Chip
+                        className={facet.backgroundColor}
+                        key={value.iri}
+                        label={value.label}
+                        style={{marginLeft: 5}}
+                    />
+                )
+            );
+        });
     };
 
     const renderActiveFilters = () => (
@@ -130,22 +159,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     const facet = facets.find(f => f.name === filter.field);
                     return (
                         <Grid key={filter.field} item>
-                            <Typography variant="overline" component="span">{facet.name}</Typography>
-                            {
-                                filter.values.map(valueIri => {
-                                    const value = facet.values.find(val => val.iri === valueIri);
-                                    return (
-                                        value && (
-                                            <Chip
-                                                className={facet.backgroundColor}
-                                                key={value.iri}
-                                                label={value.label}
-                                                style={{marginLeft: 5}}
-                                            />
-                                        )
-                                    );
-                                })
-                            }
+                            <Typography variant="overline" component="span">{facet.title}</Typography>
+                            {renderActiveFilterValues(facet, filter)}
                         </Grid>
                     );
                 })

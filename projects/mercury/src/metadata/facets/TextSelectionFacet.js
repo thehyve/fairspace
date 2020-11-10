@@ -1,32 +1,13 @@
 import React, {useState} from 'react';
-import {Card, CardContent, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core/styles';
+import {Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@material-ui/core";
+import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
-type Option = {
-    label: string;
-    iri: string;
-}
 
-type MetadataViewFacetProperties = {
-    title: string;
-    options: Option[];
-    multiple?: boolean;
-    onChange: (string[]) => void;
-    extraClasses: string;
-};
 type SelectProperties = {
     options: Option[];
     onChange: (string[]) => void;
 }
 
-const useStyles = makeStyles({
-    root: {
-        width: 275
-    },
-    title: {
-        size: 'h3'
-    }
-});
 
 const SelectSingle = (props: SelectProperties) => {
     const {options, onChange} = props;
@@ -79,22 +60,17 @@ const SelectMultiple = (props: SelectProperties) => {
     );
 };
 
-const MetadataViewFacet = (props: MetadataViewFacetProperties) => {
-    const {title, options = [], multiple = false, onChange = () => {}, extraClasses = ''} = props;
-    const classes = useStyles();
+const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
+    const {title, options = [], multiple = false, onChange = () => {}, classes, extraClasses = ''} = props;
 
     return (
-        <Card className={`${classes.root} ${extraClasses}`} variant="outlined">
-            <CardContent>
-                <FormControl component="fieldset">
-                    <FormLabel className={`${classes.title} ${extraClasses}`} component="legend">{title}</FormLabel>
-                    {multiple
-                        ? <SelectMultiple options={options} onChange={onChange} />
-                        : <SelectSingle options={options} onChange={onChange} />}
-                </FormControl>
-            </CardContent>
-        </Card>
+        <FormControl component="fieldset">
+            <FormLabel className={`${classes.title} ${extraClasses}`} component="legend">{title}</FormLabel>
+            {multiple
+                ? <SelectMultiple options={options} onChange={onChange} />
+                : <SelectSingle options={options} onChange={onChange} />}
+        </FormControl>
     );
 };
 
-export default MetadataViewFacet;
+export default TextSelectionFacet;
