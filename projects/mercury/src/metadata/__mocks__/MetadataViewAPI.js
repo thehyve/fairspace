@@ -3,12 +3,12 @@ import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions, ValueType
 export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
     new Promise(resolve => resolve([
         {
-            name: "patients",
-            title: "Patients",
+            name: "subjects",
+            title: "Subjects",
             columns: [
                 {
                     name: "label",
-                    title: "Patient label"
+                    title: "Subject label"
                 },
                 {
                     name: "gender",
@@ -145,7 +145,7 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                     }
                 ]);
                 break;
-            case "patients":
+            case "subjects":
                 resolve([
                     {
                         name: 'gender',
@@ -230,7 +230,7 @@ const mockRows = (viewName) => {
                     'sampleOrigin.label': 'Tumoral',
                 },
             ];
-        case "patients":
+        case "subjects":
             return [
                 {
                     'label': 'P01',

@@ -1,6 +1,5 @@
 import React, {useContext, useState} from 'react';
 import {Chip, Grid, Paper, Typography} from '@material-ui/core';
-import {Grain} from '@material-ui/icons';
 import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
 import MetadataViewAPI from './MetadataViewAPI';
@@ -174,7 +173,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 {
                     label: currentView,
                     href: `/views/${currentView}`,
-                    icon: <Grain />
+                    icon: currentViewOptions.icon
                 }
             ]
         }}
