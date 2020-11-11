@@ -1,81 +1,85 @@
-import React, {useContext, useState} from 'react';
-import {Chip, Grid, Paper, Typography} from '@material-ui/core';
+import React, {useContext, useEffect, useState} from 'react';
+import {Grid, Paper, withStyles} from '@material-ui/core';
 import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
+import type {MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
 import MetadataViewAPI from './MetadataViewAPI';
 import BreadCrumbs from '../common/components/BreadCrumbs';
-import {usePalette} from '../common/palette';
 import useAsync from "../common/hooks/UseAsync";
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
-import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
+import {getSearchPathSegments} from "../collections/collectionUtils";
+import {getSearchContextFromString} from "../search/searchUtils";
+import {isCollectionView, LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
+import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 
-const mockFacetValues = (facets: MetadataViewFacet[], borderColors, backgroundColors) => facets.map(
-    facet => ({
-        ...facet,
-        borderColor: borderColors[Math.floor(Math.random() * borderColors.length)],
-        backgroundColors: backgroundColors[Math.floor(Math.random() * backgroundColors.length)]
-    })
-);
 
 type MetadataViewProperties = {
     view: string;
+    classes: any;
 }
 
+const styles = (theme) => ({
+    facet: {
+        borderColor: theme.palette.info.light,
+        borderWidth: 2,
+        borderRadius: 6
+    }
+});
+
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {view: currentView} = props;
+    const {view: currentView, classes} = props;
     const {views} = useContext(MetadataViewContext);
     const currentViewOptions = views.find(v => v.name === currentView) || {};
-
-    const palette = usePalette();
-    const borderColors = [
-        palette.orangeBorder,
-        palette.purpleBorder,
-        palette.blueBorder,
-        palette.amberBorder,
-        palette.greenBorder,
-        palette.indigoBorder,
-        palette.lightGreenBorder,
-        palette.blueGreyBorder,
-        palette.tealBorder,
-        palette.pinkBorder,
-        palette.lightBlueBorder,
-    ];
-    const backgroundColors = [
-        palette.orange,
-        palette.purple,
-        palette.blue,
-        palette.amber,
-        palette.green,
-        palette.indigo,
-        palette.lightGreen,
-        palette.blueGrey,
-        palette.teal,
-        palette.pink,
-        palette.lightBlue,
-    ];
+    const locationContext = getSearchContextFromString(window.location.search);
 
     const {data: facets = [], error: facetsError, loading: facetsLoading} = useAsync(
         () => MetadataViewAPI.getFacets(currentView)
-            .then(res => mockFacetValues(res, borderColors, backgroundColors))
     );
 
     const [filters: MetadataViewFilter[], setFilters] = useState([]);
 
-    const setFilterValues = (facetName: string, values: any[]) => {
-        if (filters.find(f => f.field === facetName)) {
-            const updatedFilters = [...filters];
-            updatedFilters.find(f => (f.field === facetName)).values = values;
-            setFilters(updatedFilters);
-        } else {
+    useEffect(() => {
+        if (isCollectionView(currentView)) {
             const newFilter: MetadataViewFilter = {
-                field: facetName,
-                values
+                field: LOCATION_FILTER_FIELD,
+                values: [locationContext]
             };
             setFilters([...filters, newFilter]);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentView, locationContext]);
+
+    const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
+        if (ofRangeValueType(type)) {
+            [filter.rangeStart, filter.rangeEnd] = values;
+        } else {
+            filter.values = values;
+        }
+    };
+
+    const updateFilters = (facet: MetadataViewFacet, values: any[]) => {
+        if (filters.find(f => f.field === facet.name)) {
+            const updatedFilters = [...filters];
+            const filter = updatedFilters.find(f => (f.field === facet.name));
+            setFilterValues(facet.type, filter, values);
+            setFilters(updatedFilters);
+        } else {
+            const newFilter: MetadataViewFilter = {
+                field: facet.name
+            };
+            setFilterValues(facet.type, newFilter, values);
+            setFilters([...filters, newFilter]);
+        }
+    };
+
+    const getPathSegments = () => {
+        if (isCollectionView(currentView)) {
+            return getSearchPathSegments(locationContext);
+        }
+        return [];
     };
 
     const renderFacets = () => {
@@ -103,8 +107,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 type={facet.type}
                                 title={facet.title}
                                 options={facet.values || [facet.rangeStart, facet.rangeEnd]}
-                                onChange={(values) => setFilterValues(facet.name, values)}
-                                extraClasses={facet.borderColor}
+                                onChange={(values) => updateFilters(facet, values)}
+                                extraClasses={classes.facet}
                             />
                         </Grid>
                     ))
@@ -113,85 +117,38 @@ export const MetadataView = (props: MetadataViewProperties) => {
         );
     };
 
-    const renderActiveFilterValues = (facet, filter) => {
-        if (facet.type === 'number' || facet.type === 'date') {
-            return (
-                filter.values && (
-                    <Chip
-                        className={facet.backgroundColor}
-                        key={`chip-${facet.name}`}
-                        label={`${filter.values[0]} - ${filter.values[1]}`}
-                        style={{marginLeft: 5}}
-                    />
-                )
-            );
+    const getBreadcrumbSegmentPath = () => {
+        if (isCollectionView(currentView)) {
+            return `/${currentView}`;
         }
-        return filter.values.map(valueIri => {
-            const value = facet.values.find(val => val.iri === valueIri);
-            return (
-                value && (
-                    <Chip
-                        className={facet.backgroundColor}
-                        key={value.iri}
-                        label={value.label}
-                        style={{marginLeft: 5}}
-                    />
-                )
-            );
-        });
+        return `/views/${currentView}`;
     };
-
-    const renderActiveFilters = () => (
-        <Grid
-            container
-            item
-            direction="row"
-            justify="flex-start"
-            alignItems="stretch"
-            spacing={1}
-        >
-            {
-                filters && filters.map(filter => {
-                    if (!filter.values || filter.values.length === 0) {
-                        return null;
-                    }
-                    const facet = facets.find(f => f.name === filter.field);
-                    return (
-                        <Grid key={filter.field} item>
-                            <Typography variant="overline" component="span">{facet.title}</Typography>
-                            {renderActiveFilterValues(facet, filter)}
-                        </Grid>
-                    );
-                })
-            }
-        </Grid>
-    );
 
     return (
         <BreadcrumbsContext.Provider value={{
             segments: [
                 {
-                    label: currentView,
-                    href: `/views/${currentView}`,
+                    label: currentViewOptions.title,
+                    href: getBreadcrumbSegmentPath(),
                     icon: currentViewOptions.icon
                 }
             ]
         }}
         >
-            <BreadCrumbs />
+            <BreadCrumbs additionalSegments={getPathSegments()} />
             <Grid
                 container
                 direction="column"
                 spacing={1}
             >
                 {renderFacets()}
-                {renderActiveFilters()}
+                <MetadataViewActiveFilters facets={facets} filters={filters} />
             </Grid>
             <Paper style={{marginTop: 10, overflowX: 'auto'}}>
-                <MetadataViewTable columns={currentViewOptions.columns} view={currentView} filters={filters} />
+                <MetadataViewTable columns={currentViewOptions.columns} view={currentView} filters={filters} locationContext={locationContext} />
             </Paper>
         </BreadcrumbsContext.Provider>
     );
 };
 
-export default MetadataView;
+export default withStyles(styles)(MetadataView);

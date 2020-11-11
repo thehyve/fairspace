@@ -63,7 +63,7 @@ const WorkspaceRoutes = () => {
                 )}
             />
 
-            {views.filter(v => v.name !== "collections").map(view => (
+            {views.map(view => (
                 <Route
                     key={view.name}
                     path={`/views/${view.name}`}
