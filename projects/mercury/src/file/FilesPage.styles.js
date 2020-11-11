@@ -12,6 +12,9 @@ const styles = () => ({
     topBarSwitch: {
         textAlign: "right"
     },
+    advancedSearchButton: {
+        textAlign: "center"
+    },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT

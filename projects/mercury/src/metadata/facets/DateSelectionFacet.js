@@ -9,6 +9,7 @@ import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {title, options = [], onChange = () => {}, classes} = props;
     const [value, setValue] = React.useState(options.map(o => o.toLocaleString()));
+    const [minDate, maxDate] = options;
 
     const handleChange = (newValue) => {
         setValue(newValue);
@@ -23,7 +24,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         handleChange([value[0], newValue.toLocaleString()]);
     };
 
-    const renderDatePicker = (selectedDate, handleDateChange, label) => (
+    const renderDatePicker = (selectedDate, handleDateChange, label, min, max) => (
         <KeyboardDatePicker
             disableToolbar
             variant="inline"
@@ -34,6 +35,8 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
             value={selectedDate}
             onChange={handleDateChange}
             autoOk
+            minDate={min}
+            maxDate={max}
             KeyboardButtonProps={{
                 'aria-label': 'change date',
             }}
@@ -47,10 +50,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
             </Typography>
             <Grid container>
                 <Grid item>
-                    {renderDatePicker(value[0], handleMinDateChange, "Start date")}
+                    {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1])}
                 </Grid>
                 <Grid item>
-                    {renderDatePicker(value[1], handleMaxDateChange, "End date")}
+                    {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate)}
                 </Grid>
             </Grid>
         </div>

@@ -10,18 +10,13 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
         []
     );
 
-    const getFacets = () => metadataViewApi.getFacets();
-    const getViewData = () => metadataViewApi.getViewData();
-
     return (
         <MetadataViewContext.Provider
             value={{
                 views,
                 error,
                 loading,
-                refresh,
-                getFacets,
-                getViewData
+                refresh
             }}
         >
             {children}

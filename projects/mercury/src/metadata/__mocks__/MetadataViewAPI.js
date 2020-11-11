@@ -21,6 +21,10 @@ export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
                 {
                     name: "birthDate",
                     title: "Birth date"
+                },
+                {
+                    name: "files",
+                    title: "Files"
                 }
             ]
         },
@@ -48,6 +52,23 @@ export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
                     name: "sampleOrigin",
                     title: "Origin"
                 },
+                {
+                    name: "files",
+                    title: "Files"
+                }
+            ]
+        },
+        {
+            name: "collections",
+            title: "Collections",
+            columns: [
+                {
+                    name: "label",
+                    title: "Collection label"
+                }, {
+                    name: "analysisType",
+                    title: "Analysis type"
+                }
             ]
         }
     ]))
@@ -124,6 +145,22 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                             {
                                 label: 'Tumor Cell Line',
                                 iri: 'http://example.com/sampleNature#tcl'
+                            },
+                            {
+                                label: 'Peripheral Blood Mononuclear Cell',
+                                iri: 'http://example.com/sampleNature#pbmc'
+                            },
+                            {
+                                label: 'Frozen Specimen',
+                                iri: 'http://example.com/sampleNature#fs'
+                            },
+                            {
+                                label: 'Paraffin Embedded Tissue (FFPE)',
+                                iri: 'http://example.com/sampleNature#ffpe'
+                            },
+                            {
+                                label: 'Urine',
+                                iri: 'http://example.com/sampleNature#urine'
                             }
                         ]
                     },
@@ -192,8 +229,36 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
                         title: 'Birth date',
                         query: "",
                         type: "date",
-                        rangeStart: new Date(1995, 11, 25, 18, 33),
-                        rangeEnd: new Date(1995, 11, 25, 18, 33)
+                        rangeStart: new Date(2010, 11, 25, 18, 33),
+                        rangeEnd: new Date(2020, 1, 4, 18, 33)
+                    }
+                ]);
+                break;
+            case "collections":
+                resolve([
+                    {
+                        name: 'analysisType',
+                        title: 'Analysis type',
+                        query: "",
+                        type: "text",
+                        values: [
+                            {
+                                label: 'Biology',
+                                iri: 'http://example.com/analysisType#biology'
+                            },
+                            {
+                                label: 'Imaging',
+                                iri: 'http://example.com/analysisType#imaging'
+                            },
+                            {
+                                label: 'Omic',
+                                iri: 'http://example.com/analysisType#omic'
+                            },
+                            {
+                                label: 'Pathology',
+                                iri: 'http://example.com/analysisType#pathology'
+                            }
+                        ]
                     }
                 ]);
                 break;
@@ -217,6 +282,7 @@ const mockRows = (viewName) => {
                     'sampleNature.label': 'DNA',
                     'sampleOrigin': 'http://example.com/sampleType#normal',
                     'sampleOrigin.label': 'Normal',
+                    'files': ['http://localhost:8080/api/v1/webdav/c01', 'http://localhost:8080/api/v1/webdav/c01']
                 },
                 {
                     'label': 'S02',
@@ -238,7 +304,8 @@ const mockRows = (viewName) => {
                     'gender.label': 'Male',
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens',
-                    'birthDate': new Date(1995, 11, 25, 18, 33).toLocaleString()
+                    'birthDate': new Date(2010, 11, 25, 18, 33).toLocaleString(),
+                    'files': ['http://localhost:8080/api/v1/webdav/c01', 'http://localhost:8080/api/v1/webdav/c01']
                 },
                 {
                     'label': 'P02',
@@ -252,7 +319,8 @@ const mockRows = (viewName) => {
                     'gender': 'http://example.com/sampleType#female',
                     'gender.label': 'Female',
                     'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens'
+                    'species.label': 'Homo Sapiens',
+                    'files': ['http://localhost:8080/api/v1/webdav/c01']
                 },
                 {
                     'label': 'P04',
@@ -268,6 +336,15 @@ const mockRows = (viewName) => {
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens'
                 },
+            ];
+        case "collections":
+            return [
+                {
+                    'label': 'http://localhost:8080/api/v1/webdav/c01',
+                    'label.label': 'C01',
+                    'analysisType': 'http://example.com/analysisType#biology',
+                    'analysisType.label': 'Biology'
+                }
             ];
         default:
             return [];

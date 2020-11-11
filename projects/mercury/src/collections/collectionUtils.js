@@ -30,7 +30,23 @@ export const pathForIri = (iri: string) => {
     return path.replace('/api/v1/webdav/', '');
 };
 
-export const handleCollectionSearchRedirect = (history, value, context = '') => {
+export const getSearchPathSegments = (context) => {
+    const segments = ((context && pathForIri(context)) || '').split('/');
+    const result = [];
+    if (segments[0] === '') {
+        result.push({label: 'Search results', href: ''});
+        return result;
+    }
+    let href = '/collections';
+    segments.forEach(segment => {
+        href += '/' + segment;
+        result.push({label: segment, href});
+    });
+    result.push({label: 'Search results', href: ''});
+    return result;
+};
+
+export const handleCollectionTextSearchRedirect = (history, value, context = '') => {
     if (value) {
         history.push('/collections-search/?' + queryString.stringify({q: value, context}));
     } else {
