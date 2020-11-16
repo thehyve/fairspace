@@ -45,7 +45,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     return (
         <div>
-            <Typography id="range-slider" gutterBottom>
+            <Typography color="textSecondary" id="date-selection" gutterBottom className={classes.title}>
                 {title}
             </Typography>
             <Grid container>

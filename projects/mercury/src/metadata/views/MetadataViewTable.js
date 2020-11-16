@@ -12,37 +12,38 @@ import {
 } from '@material-ui/core';
 import {useHistory} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
-import styles from "../file/FileList.styles";
-import useAsync from "../common/hooks/UseAsync";
 import MetadataViewAPI from "./MetadataViewAPI";
-import LoadingInlay from "../common/components/LoadingInlay";
-import MessageDisplay from "../common/components/MessageDisplay";
-import IriTooltip from "../common/components/IriTooltip";
-import {TOOLTIP_ENTER_DELAY} from "../constants";
-import Iri from "../common/components/Iri";
-import {getCollectionAbsolutePath, pathForIri} from "../collections/collectionUtils";
-import {isCollectionView, LINKED_FILES_COLUMN_NAME} from "./metadataViewUtils";
-import {getParentPath} from "../file/fileUtils";
+import styles from "../../file/FileList.styles";
+import useAsync from "../../common/hooks/UseAsync";
+import LoadingInlay from "../../common/components/LoadingInlay";
+import MessageDisplay from "../../common/components/MessageDisplay";
+import IriTooltip from "../../common/components/IriTooltip";
+import {TOOLTIP_ENTER_DELAY} from "../../constants";
+import Iri from "../../common/components/Iri";
+import {isCollectionView, LINKED_FILES_COLUMN_NAME, getContextualFileLink} from "./metadataViewUtils";
+import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 
 
 type MetadataViewTableProperties = {
     columns: MetadataViewColumn[];
     filters: MetadataViewFilter[];
+    toggleRow: () => {};
     view: string;
     locationContext: string;
+    selected: MetadataViewEntityWithLinkedFiles,
     classes: any
 };
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns = [], locationContext} = props;
+    const {columns = [], locationContext, toggleRow, view, filters, selected} = props;
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
     const isCollectionViewTable = isCollectionView(props.view);
 
     const {data = [], error, loading} = useAsync(
-        () => MetadataViewAPI.getViewData(props.view, page, rowsPerPage, props.filters),
-        [page, rowsPerPage, props.view]
+        () => MetadataViewAPI.getViewData(view, page, rowsPerPage, filters),
+        [page, rowsPerPage, view]
     );
 
     if (loading) {
@@ -53,18 +54,13 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         return <MessageDisplay message={error.message} />;
     }
 
-    const link = (item) => {
-        const path = pathForIri(item);
-        if (locationContext && locationContext !== "") {
-            const parentPath = getParentPath(path);
-            return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
-        }
-        return getCollectionAbsolutePath(path);
+    const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
+        toggleRow({label: itemLabel, iri: itemIri, linkedFiles: linkedFiles || []});
     };
 
-    const handleResultDoubleClick = (item) => {
+    const handleResultDoubleClick = (itemIri) => {
         if (isCollectionViewTable) {
-            history.push(link(item));
+            history.push(getContextualFileLink(itemIri, locationContext));
         }
     };
 
@@ -110,6 +106,12 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                                 <TableRow
                                     key={`${row[columns[0].name]}`}
                                     hover={isCollectionViewTable}
+                                    selected={selected && selected.iri === row[columns[0].name]}
+                                    onClick={() => handleResultSingleClick(
+                                        row[columns[0].name],
+                                        row[`${columns[0].name}.label`],
+                                        row[LINKED_FILES_COLUMN_NAME]
+                                    )}
                                     onDoubleClick={() => handleResultDoubleClick(row[columns[0].name])}
                                 >
                                     {columns.map(column => renderTableCell(row, column))}

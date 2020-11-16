@@ -16,9 +16,9 @@ import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
 import FeaturesContext from "../common/contexts/FeaturesContext";
-import MetadataView from '../metadata/MetadataView';
+import MetadataView from '../metadata/views/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
-import MetadataViewContext from "../metadata/MetadataViewContext";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null

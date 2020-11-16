@@ -1,4 +1,4 @@
-import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions, ValueType} from "../MetadataViewAPI";
+import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions, ValueType} from "../views/MetadataViewAPI";
 
 export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
     new Promise(resolve => resolve([
@@ -273,7 +273,8 @@ const mockRows = (viewName) => {
         case "samples":
             return [
                 {
-                    'label': 'S01',
+                    'label': 'http://example.com/sampleType/s01',
+                    'label.label': 'S01',
                     'sampleType': 'http://example.com/sampleType#tissue',
                     'sampleType.label': 'Tissue',
                     'topography': 'http://example.com/sampleType#lip',
@@ -282,10 +283,14 @@ const mockRows = (viewName) => {
                     'sampleNature.label': 'DNA',
                     'sampleOrigin': 'http://example.com/sampleType#normal',
                     'sampleOrigin.label': 'Normal',
-                    'files': ['http://localhost:8080/api/v1/webdav/c01', 'http://localhost:8080/api/v1/webdav/c01']
+                    'files': [
+                        {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
+                        {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
+                    ]
                 },
                 {
-                    'label': 'S02',
+                    'label': 'http://example.com/sampleType/s02',
+                    'label.label': 'S02',
                     'sampleType': 'http://example.com/sampleType#tissue',
                     'sampleType.label': 'Tissue',
                     'topography': 'http://example.com/sampleType#tongue',
@@ -299,38 +304,48 @@ const mockRows = (viewName) => {
         case "subjects":
             return [
                 {
-                    'label': 'P01',
+                    'label': 'http://example.com/sampleType/p01',
+                    'label.label': 'P01',
                     'gender': 'http://example.com/sampleType#male',
                     'gender.label': 'Male',
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens',
                     'birthDate': new Date(2010, 11, 25, 18, 33).toLocaleString(),
-                    'files': ['http://localhost:8080/api/v1/webdav/c01', 'http://localhost:8080/api/v1/webdav/c01']
+                    'files': [
+                        {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
+                        {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
+                    ]
                 },
                 {
-                    'label': 'P02',
+                    'label': 'http://example.com/sampleType/p02',
+                    'label.label': 'P02',
                     'gender': 'http://example.com/sampleType#male',
                     'gender.label': 'Male',
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens'
                 },
                 {
-                    'label': 'P03',
+                    'label': 'http://example.com/sampleType/p03',
+                    'label.label': 'P03',
                     'gender': 'http://example.com/sampleType#female',
                     'gender.label': 'Female',
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens',
-                    'files': ['http://localhost:8080/api/v1/webdav/c01']
+                    'files': [
+                        {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'}
+                    ]
                 },
                 {
-                    'label': 'P04',
+                    'label': 'http://example.com/sampleType/p04',
+                    'label.label': 'P04',
                     'gender': 'http://example.com/sampleType#male',
                     'gender.label': 'Male',
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens'
                 },
                 {
-                    'label': 'P05',
+                    'label': 'http://example.com/sampleType/p05',
+                    'label.label': 'P05',
                     'gender': 'http://example.com/sampleType#female',
                     'gender.label': 'Female',
                     'species': 'http://example.com/sampleType#hs',
