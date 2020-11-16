@@ -6,7 +6,7 @@ import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
 import FeaturesContext from "../common/contexts/FeaturesContext";
-import MetadataViewContext from "../metadata/MetadataViewContext";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 export default () => {
     const {pathname} = window.location;

@@ -1,7 +1,7 @@
 import axios from "axios";
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
+import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
 import {applyViewIcons} from "./metadataViewUtils";
-import {mockGetFacets, mockGetViewData, mockGetViews} from "./__mocks__/MetadataViewAPI";
+import {mockGetFacets, mockGetViewData, mockGetViews} from "../__mocks__/MetadataViewAPI";
 
 const metadataViewUrl = "/api/v1/views/";
 

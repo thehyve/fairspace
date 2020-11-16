@@ -2,18 +2,21 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Grid, Paper, withStyles} from '@material-ui/core';
 import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewEntity, MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
 import MetadataViewAPI from './MetadataViewAPI';
-import BreadCrumbs from '../common/components/BreadCrumbs';
-import useAsync from "../common/hooks/UseAsync";
+import BreadCrumbs from '../../common/components/BreadCrumbs';
+import useAsync from "../../common/hooks/UseAsync";
 import MetadataViewContext from "./MetadataViewContext";
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
-import LoadingInlay from "../common/components/LoadingInlay";
-import MessageDisplay from "../common/components/MessageDisplay";
-import {getSearchPathSegments} from "../collections/collectionUtils";
-import {getSearchContextFromString} from "../search/searchUtils";
+import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
+import LoadingInlay from "../../common/components/LoadingInlay";
+import MessageDisplay from "../../common/components/MessageDisplay";
+import {getSearchPathSegments} from "../../collections/collectionUtils";
+import {getSearchContextFromString} from "../../search/searchUtils";
 import {isCollectionView, LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
+import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
+import {useSingleSelection} from "../../file/UseSelection";
+import * as consts from "../../constants";
 
 
 type MetadataViewProperties = {
@@ -26,7 +29,14 @@ const styles = (theme) => ({
         borderColor: theme.palette.info.light,
         borderWidth: 2,
         borderRadius: 6
-    }
+    },
+    centralPanel: {
+        width: consts.MAIN_CONTENT_WIDTH,
+        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT
+    },
+    sidePanel: {
+        width: consts.SIDE_PANEL_WIDTH
+    },
 });
 
 export const MetadataView = (props: MetadataViewProperties) => {
@@ -34,6 +44,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {views} = useContext(MetadataViewContext);
     const currentViewOptions = views.find(v => v.name === currentView) || {};
     const locationContext = getSearchContextFromString(window.location.search);
+    const {toggle, selected} = useSingleSelection();
 
     const {data: facets = [], error: facetsError, loading: facetsLoading} = useAsync(
         () => MetadataViewAPI.getFacets(currentView)
@@ -74,6 +85,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
             setFilters([...filters, newFilter]);
         }
     };
+
+    const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
 
     const getPathSegments = () => {
         if (isCollectionView(currentView)) {
@@ -144,9 +157,29 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 {renderFacets()}
                 <MetadataViewActiveFilters facets={facets} filters={filters} />
             </Grid>
-            <Paper style={{marginTop: 10, overflowX: 'auto'}}>
-                <MetadataViewTable columns={currentViewOptions.columns} view={currentView} filters={filters} locationContext={locationContext} />
-            </Paper>
+            <Grid container spacing={1}>
+                <Grid item className={classes.centralPanel}>
+                    <Paper style={{marginTop: 10, overflowX: 'auto'}}>
+                        <MetadataViewTable
+                            columns={currentViewOptions.columns}
+                            view={currentView}
+                            filters={filters}
+                            locationContext={locationContext}
+                            selected={selected}
+                            toggleRow={toggleRow}
+                        />
+                    </Paper>
+                </Grid>
+                <Grid item className={classes.sidePanel}>
+                    <MetadataViewInformationDrawer
+                        forceExpand
+                        showLinkedFiles={!isCollectionView(currentView)}
+                        entity={selected}
+                        viewIcon={currentViewOptions.icon}
+                        locationContext={locationContext}
+                    />
+                </Grid>
+            </Grid>
         </BreadcrumbsContext.Provider>
     );
 };

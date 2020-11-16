@@ -69,7 +69,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     return (
         <div>
-            <Typography id="range-slider" gutterBottom>
+            <Typography id="range-slider" color="textSecondary" gutterBottom>
                 {title}
             </Typography>
             <Grid container spacing={2} alignItems="center">

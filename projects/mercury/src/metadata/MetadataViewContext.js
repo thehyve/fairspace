@@ -1,5 +1,5 @@
 import React from 'react';
-import useAsync from "../common/hooks/UseAsync";
+import useAsync from "../../common/hooks/UseAsync";
 import MetadataViewAPI from "./MetadataViewAPI";
 
 const MetadataViewContext = React.createContext({});

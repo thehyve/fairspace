@@ -11,7 +11,7 @@ import Layout from "./Layout";
 import TopBar from "./TopBar";
 import {UsersProvider} from "../users/UsersContext";
 import {FeaturesProvider} from "../common/contexts/FeaturesContext";
-import {MetadataViewProvider} from "../metadata/MetadataViewContext";
+import {MetadataViewProvider} from "../metadata/views/MetadataViewContext";
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
