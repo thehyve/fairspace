@@ -16,6 +16,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
@@ -27,6 +28,8 @@ import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceTest {
@@ -43,11 +46,15 @@ public class MetadataServiceTest {
 
     private Transactions txn = new SimpleTransactions(ds);
     private MetadataService api;
+    @Mock
+    private MetadataPermissions permissions;
 
     @Before
     public void setUp() {
         setupRequestContext();
-        api = new MetadataService(txn, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()));
+        when(permissions.canReadMetadata(any())).thenReturn(true);
+        when(permissions.canWriteMetadata(any())).thenReturn(true);
+        api = new MetadataService(txn, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
     }
 
     @Test
@@ -56,8 +63,8 @@ public class MetadataServiceTest {
 
         api.put(delta);
 
-        Model result = api.get(null, false);
-        assertTrue(result.contains(STMT1) && result.contains(STMT2));
+        assertTrue(api.get(S1.getURI(), false).contains(STMT1));
+        assertTrue(api.get(S2.getURI(), false).contains(STMT2));
     }
 
     @Test
