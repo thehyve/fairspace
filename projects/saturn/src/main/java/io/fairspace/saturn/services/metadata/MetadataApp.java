@@ -80,7 +80,7 @@ public class MetadataApp extends BaseApp {
             res.body(errorBody(SC_BAD_REQUEST, "Validation Error", e.getViolations()));
         });
         exception(AccessDeniedException.class, (e, req, res) -> {
-            log.error("401 Access denied {} {} {}", e.getCause(), req.requestMethod(), req.uri());
+            log.error("401 Access denied {} {} {}", e.getMessage(), req.requestMethod(), req.uri());
 
             res.type(APPLICATION_JSON.asString());
             res.status(SC_FORBIDDEN);
