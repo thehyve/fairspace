@@ -2,6 +2,7 @@ import React from 'react';
 import {Chip, Grid, Typography} from '@material-ui/core';
 import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import {LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
+import {formatDateTime} from "../../common/utils/genericUtils";
 
 
 type MetadataViewActiveFiltersProperties = {
@@ -14,16 +15,22 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
 
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
-            return (
-                (filter.rangeStart || filter.rangeEnd) && (
+            if (filter.rangeStart && filter.rangeEnd) {
+                let label;
+                if (facet.type === 'date') {
+                    label = `${formatDateTime(filter.rangeStart)} - ${formatDateTime(filter.rangeEnd)}`;
+                } else {
+                    label = `${filter.rangeStart} - ${filter.rangeEnd}`;
+                }
+                return (
                     <Chip
                         className={facet.backgroundColor}
                         key={`chip-${facet.name}`}
-                        label={`${filter.rangeStart} - ${filter.rangeEnd}`}
+                        label={label}
                         style={{marginLeft: 5}}
                     />
-                )
-            );
+                );
+            }
         }
         return filter.values.map(valueIri => {
             const value = facet.values.find(val => val.iri === valueIri);
