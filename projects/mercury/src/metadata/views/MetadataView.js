@@ -27,8 +27,9 @@ type MetadataViewProperties = {
 const styles = (theme) => ({
     facet: {
         borderColor: theme.palette.info.light,
-        borderWidth: 2,
-        borderRadius: 6
+        borderWidth: 1.5,
+        borderRadius: 6,
+        marginBottom: 5
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
