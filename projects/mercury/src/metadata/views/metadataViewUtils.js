@@ -14,7 +14,6 @@ export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
 |}
 
 export const LOCATION_FILTER_FIELD = 'belongsTo';
-export const LINKED_FILES_COLUMN_NAME = 'files';
 
 export const applyViewIcons = (views: MetadataViewOptions[]): MetadataViewOptions[] => views.map(view => {
     let icon = <Assignment />;

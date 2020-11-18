@@ -5,7 +5,7 @@ import {mockGetFacets, mockGetViewData, mockGetViews} from "./__mocks__/Metadata
 
 const metadataViewUrl = "/api/v1/views/";
 
-export type ValueType = 'id' | 'text' | 'number' | 'date';
+export type ValueType = 'id' | 'text' | 'number' | 'date' | 'dataLink';
 
 export type MetadataViewFilter = {
     field: string;

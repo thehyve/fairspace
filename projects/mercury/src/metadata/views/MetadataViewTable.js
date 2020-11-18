@@ -20,8 +20,8 @@ import MessageDisplay from "../../common/components/MessageDisplay";
 import IriTooltip from "../../common/components/IriTooltip";
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import Iri from "../../common/components/Iri";
-import {isCollectionView, LINKED_FILES_COLUMN_NAME, getContextualFileLink} from "./metadataViewUtils";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
+import {getContextualFileLink, isCollectionView} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
 
 
@@ -48,6 +48,8 @@ type MetadataViewTableProperties = {
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {columns, data, locationContext, toggleRow, selected, view, history} = props;
     const isCollectionViewTable = isCollectionView(view);
+    const idColumn = columns.find(c => c.type === 'id');
+    const dataLinkColumn = columns.find(c => c.type === 'dataLink');
 
     const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
         toggleRow({label: itemLabel, iri: itemIri, linkedFiles: linkedFiles || []});
@@ -62,7 +64,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const renderTableCell = (row, column) => {
         const value = row[column.name];
         let displayValue;
-        if (column.name === LINKED_FILES_COLUMN_NAME) {
+        if (column.type === 'dataLink') {
             displayValue = !value ? 0 : value.length;
         } else if (column.type === 'date') {
             displayValue = formatDateTime(value);
@@ -96,17 +98,17 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {data.rows.map(row => (
+                {idColumn && data.rows.map(row => (
                     <TableRow
-                        key={`${row[columns[0].name]}`}
+                        key={row[idColumn.name]}
                         hover={isCollectionViewTable}
-                        selected={selected && selected.iri === row[columns[0].name]}
+                        selected={selected && selected.iri === row[idColumn.name]}
                         onClick={() => handleResultSingleClick(
-                            row[columns[0].name],
-                            row[`${columns[0].name}.label`],
-                            row[LINKED_FILES_COLUMN_NAME]
+                            row[idColumn.name],
+                            row[`${idColumn.name}.label`],
+                            dataLinkColumn ? row[dataLinkColumn.name] : []
                         )}
-                        onDoubleClick={() => handleResultDoubleClick(row[columns[0].name])}
+                        onDoubleClick={() => handleResultDoubleClick(row[idColumn.name])}
                     >
                         {columns.map(column => renderTableCell(row, column))}
                     </TableRow>
