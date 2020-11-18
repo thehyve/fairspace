@@ -8,7 +8,7 @@ export const mockViews: MetadataViewOptions[] = () => [
             {
                 name: "label",
                 title: "Subject label",
-                type: "iri"
+                type: "id"
             },
             {
                 name: "gender",
@@ -39,7 +39,7 @@ export const mockViews: MetadataViewOptions[] = () => [
             {
                 name: "label",
                 title: "Sample label",
-                type: "iri"
+                type: "id"
             },
             {
                 name: "sampleType",
@@ -80,7 +80,7 @@ export const mockViews: MetadataViewOptions[] = () => [
             {
                 name: "label",
                 title: "Collection label",
-                type: "iri"
+                type: "id"
             }, {
                 name: "analysisType",
                 title: "Analysis type",
