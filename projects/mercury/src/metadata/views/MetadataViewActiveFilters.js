@@ -56,12 +56,15 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
                         return null;
                     }
                     const facet = facets.find(f => f.name === filter.field);
-                    return (
-                        <Grid key={filter.field} item>
-                            <Typography variant="overline" component="span">{facet.title}</Typography>
-                            {renderActiveFilterValues(facet, filter)}
-                        </Grid>
-                    );
+                    if (facet) {
+                        return (
+                            <Grid key={filter.field} item>
+                                <Typography variant="overline" component="span">{facet.title}</Typography>
+                                {renderActiveFilterValues(facet, filter)}
+                            </Grid>
+                        );
+                    }
+                    return <></>;
                 })
             }
         </Grid>

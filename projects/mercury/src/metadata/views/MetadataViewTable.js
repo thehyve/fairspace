@@ -11,7 +11,7 @@ import {
     withStyles
 } from '@material-ui/core';
 import {useHistory} from "react-router-dom";
-import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
+import type {MetadataViewColumn, MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
 import MetadataViewAPI from "./MetadataViewAPI";
 import styles from "../../file/FileList.styles";
 import useAsync from "../../common/hooks/UseAsync";
@@ -24,35 +24,29 @@ import {isCollectionView, LINKED_FILES_COLUMN_NAME, getContextualFileLink} from 
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 
 
-type MetadataViewTableProperties = {
+type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
     filters: MetadataViewFilter[];
     toggleRow: () => {};
     view: string;
     locationContext: string;
-    selected: MetadataViewEntityWithLinkedFiles,
-    classes: any
+    selected: MetadataViewEntityWithLinkedFiles;
+    classes: any;
+};
+
+type MetadataViewTableProperties = {
+    data: MetadataViewData;
+    columns: MetadataViewColumn[];
+    toggleRow: () => {};
+    view: string;
+    locationContext: string;
+    history: any;
+    selected?: MetadataViewEntityWithLinkedFiles;
 };
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns = [], locationContext, toggleRow, view, filters, selected} = props;
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const history = useHistory();
-    const isCollectionViewTable = isCollectionView(props.view);
-
-    const {data = [], error, loading} = useAsync(
-        () => MetadataViewAPI.getViewData(view, page, rowsPerPage, filters),
-        [page, rowsPerPage, view]
-    );
-
-    if (loading) {
-        return <LoadingInlay />;
-    }
-
-    if (!loading && error && error.message) {
-        return <MessageDisplay message={error.message} />;
-    }
+    const {columns, data, locationContext, toggleRow, selected, view, history} = props;
+    const isCollectionViewTable = isCollectionView(view);
 
     const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
         toggleRow({label: itemLabel, iri: itemIri, linkedFiles: linkedFiles || []});
@@ -90,35 +84,67 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     return (
+        <Table data-testid="results-table">
+            <TableHead>
+                <TableRow>
+                    {columns.map(column => (
+                        <TableCell key={column.name}>{column.title}</TableCell>
+                    ))}
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {data.rows.map(row => (
+                    <TableRow
+                        key={`${row[columns[0].name]}`}
+                        hover={isCollectionViewTable}
+                        selected={selected && selected.iri === row[columns[0].name]}
+                        onClick={() => handleResultSingleClick(
+                            row[columns[0].name],
+                            row[`${columns[0].name}.label`],
+                            row[LINKED_FILES_COLUMN_NAME]
+                        )}
+                        onDoubleClick={() => handleResultDoubleClick(row[columns[0].name])}
+                    >
+                        {columns.map(column => renderTableCell(row, column))}
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    );
+};
+
+export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
+    const {view, filters} = props;
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const history = useHistory();
+
+    const {data = [], error, loading} = useAsync(
+        () => MetadataViewAPI.getViewData(view, page, rowsPerPage, filters),
+        [page, rowsPerPage, view]
+    );
+
+    if (loading) {
+        return <LoadingInlay />;
+    }
+
+    if (!loading && error && error.message) {
+        return <MessageDisplay message={error.message} />;
+    }
+
+    if (!data || data.length) {
+        return <MessageDisplay message="No results found." />;
+    }
+
+    return (
         <Paper className={props.classes.root}>
             {data && data.rows && (
                 <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                {columns.map(column => (
-                                    <TableCell key={column.name}>{column.title}</TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.rows.map(row => (
-                                <TableRow
-                                    key={`${row[columns[0].name]}`}
-                                    hover={isCollectionViewTable}
-                                    selected={selected && selected.iri === row[columns[0].name]}
-                                    onClick={() => handleResultSingleClick(
-                                        row[columns[0].name],
-                                        row[`${columns[0].name}.label`],
-                                        row[LINKED_FILES_COLUMN_NAME]
-                                    )}
-                                    onDoubleClick={() => handleResultDoubleClick(row[columns[0].name])}
-                                >
-                                    {columns.map(column => renderTableCell(row, column))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                    <MetadataViewTable
+                        {...props}
+                        data={data}
+                        history={history}
+                    />
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
                         component="div"
@@ -135,4 +161,4 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     );
 };
 
-export default withStyles(styles)(MetadataViewTable);
+export default withStyles(styles)(MetadataViewTableContainer);

@@ -2,14 +2,15 @@ import React from 'react';
 
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
-import {KeyboardDatePicker} from "@material-ui/pickers";
+import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {title, options = [], onChange = () => {}, classes} = props;
     const [value, setValue] = React.useState(options.map(o => o.toLocaleString()));
-    const [minDate, maxDate] = options;
+    const [minDate, maxDate] = options.map(o => o.toLocaleString());
 
     const handleChange = (newValue) => {
         setValue(newValue);
@@ -25,22 +26,24 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const renderDatePicker = (selectedDate, handleDateChange, label, min, max) => (
-        <KeyboardDatePicker
-            disableToolbar
-            variant="inline"
-            format="dd/MM/yyyy"
-            margin="normal"
-            id="date-picker-inline"
-            label={label}
-            value={selectedDate}
-            onChange={handleDateChange}
-            autoOk
-            minDate={min}
-            maxDate={max}
-            KeyboardButtonProps={{
-                'aria-label': 'change date',
-            }}
-        />
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                format="dd/MM/yyyy"
+                margin="normal"
+                id={`date-picker-${label}`}
+                label={label}
+                value={selectedDate}
+                onChange={handleDateChange}
+                autoOk
+                minDate={min}
+                maxDate={max}
+                KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                }}
+            />
+        </MuiPickersUtilsProvider>
     );
 
     return (
