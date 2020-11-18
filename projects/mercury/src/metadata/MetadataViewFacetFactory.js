@@ -19,7 +19,7 @@ export type MetadataViewFacetProperties = {
     type: ValueType;
     multiple?: boolean;
     onChange: (string[]) => void;
-    extraClasses: string;
+    extraClasses?: string;
     classes?: any;
 };
 

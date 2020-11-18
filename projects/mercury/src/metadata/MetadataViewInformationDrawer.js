@@ -84,7 +84,7 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
                             <List dense>
                                 {entity.linkedFiles && entity.linkedFiles.length > 0 ? (
                                     entity.linkedFiles.map(file => (
-                                        <ListItem button component="a" href={getContextualFileLink(file.iri, locationContext)}>
+                                        <ListItem key={file.iri} button component="a" href={getContextualFileLink(file.iri, locationContext)}>
                                             <ListItemText
                                                 primary={file.label}
                                             />

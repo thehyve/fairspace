@@ -44,7 +44,7 @@ public class ViewStoreClientFactory {
     public ViewStoreClientFactory(SearchConfig searchConfig) throws SQLException {
         log.debug("Initializing the PostgreSQL connection");
         var config = new HikariConfig();
-        String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 9433, "fairspace");
+        String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 9432, "fairspace");
         config.setJdbcUrl(url);
         config.setUsername("fairspace");
         config.setPassword("fairspace");
