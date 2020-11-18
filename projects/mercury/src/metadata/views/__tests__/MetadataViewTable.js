@@ -40,8 +40,6 @@ describe('MetadataViewTable', () => {
         expect(queryAllByText('DNA').length).toBe(2);
         expect(queryByText('Lip')).toBeInTheDocument();
         expect(queryByText('Tongue')).toBeInTheDocument();
-        expect(queryByText('2')).toBeInTheDocument();
-        expect(queryByText('0')).toBeInTheDocument();
     });
 
     it('should redirect when opening collection entry', () => {

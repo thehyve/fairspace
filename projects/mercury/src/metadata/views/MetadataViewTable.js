@@ -22,6 +22,7 @@ import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import Iri from "../../common/components/Iri";
 import {isCollectionView, LINKED_FILES_COLUMN_NAME, getContextualFileLink} from "./metadataViewUtils";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
+import {formatDateTime} from "../../common/utils/genericUtils";
 
 
 type MetadataViewTableContainerProperties = {
@@ -63,6 +64,8 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         let displayValue;
         if (column.name === LINKED_FILES_COLUMN_NAME) {
             displayValue = !value ? 0 : value.length;
+        } else if (column.type === 'date') {
+            displayValue = formatDateTime(value);
         } else {
             displayValue = row[`${column.name}.label`] || value;
         }

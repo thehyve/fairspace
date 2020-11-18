@@ -5,12 +5,13 @@ import Grid from "@material-ui/core/Grid";
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import {DATE_FORMAT} from "../../../constants";
 
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {title, options = [], onChange = () => {}, classes} = props;
-    const [value, setValue] = React.useState(options.map(o => o.toLocaleString()));
-    const [minDate, maxDate] = options.map(o => o.toLocaleString());
+    const [value, setValue] = React.useState(options);
+    const [minDate, maxDate] = options;
 
     const handleChange = (newValue) => {
         setValue(newValue);
@@ -18,11 +19,11 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const handleMinDateChange = (newValue) => {
-        handleChange([newValue.toLocaleString(), value[1]]);
+        handleChange([newValue, value[1]]);
     };
 
     const handleMaxDateChange = (newValue) => {
-        handleChange([value[0], newValue.toLocaleString()]);
+        handleChange([value[0], newValue]);
     };
 
     const renderDatePicker = (selectedDate, handleDateChange, label, min, max) => (
@@ -30,7 +31,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
             <KeyboardDatePicker
                 disableToolbar
                 variant="inline"
-                format="dd/MM/yyyy"
+                format={`${DATE_FORMAT} hh:mm a`}
                 margin="normal"
                 id={`date-picker-${label}`}
                 label={label}

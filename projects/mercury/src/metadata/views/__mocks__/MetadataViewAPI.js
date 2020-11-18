@@ -7,23 +7,28 @@ export const mockViews: MetadataViewOptions[] = () => [
         columns: [
             {
                 name: "label",
-                title: "Subject label"
+                title: "Subject label",
+                type: "iri"
             },
             {
                 name: "gender",
-                title: "Gender"
+                title: "Gender",
+                type: "text"
             },
             {
                 name: "species",
-                title: "Species"
+                title: "Species",
+                type: "text"
             },
             {
                 name: "birthDate",
-                title: "Birth date"
+                title: "Birth date",
+                type: "date"
             },
             {
                 name: "files",
-                title: "Files"
+                title: "Files",
+                type: "dataLink"
             }
         ]
     },
@@ -33,27 +38,38 @@ export const mockViews: MetadataViewOptions[] = () => [
         columns: [
             {
                 name: "label",
-                title: "Sample label"
+                title: "Sample label",
+                type: "iri"
             },
             {
                 name: "sampleType",
-                title: "Sample type"
+                title: "Sample type",
+                type: "text"
             },
             {
                 name: "topography",
-                title: "Topography"
+                title: "Topography",
+                type: "text"
+            },
+            {
+                name: "tumorCellularity",
+                title: "Tumor cellularity",
+                type: "number"
             },
             {
                 name: "sampleNature",
-                title: "Nature"
+                title: "Nature",
+                type: "text"
             },
             {
                 name: "sampleOrigin",
-                title: "Origin"
+                title: "Origin",
+                type: "text"
             },
             {
                 name: "files",
-                title: "Files"
+                title: "Files",
+                type: "dataLink"
             }
         ]
     },
@@ -63,10 +79,12 @@ export const mockViews: MetadataViewOptions[] = () => [
         columns: [
             {
                 name: "label",
-                title: "Collection label"
+                title: "Collection label",
+                type: "iri"
             }, {
                 name: "analysisType",
-                title: "Analysis type"
+                title: "Analysis type",
+                type: "text"
             }
         ]
     }
@@ -279,6 +297,7 @@ export const mockRows = (viewName) => {
                     'sampleType.label': 'Tissue',
                     'topography': 'http://example.com/sampleType#lip',
                     'topography.label': 'Lip',
+                    'tumorCellularity': '2',
                     'sampleNature': 'http://example.com/sampleType#dna',
                     'sampleNature.label': 'DNA',
                     'sampleOrigin': 'http://example.com/sampleType#normal',
@@ -295,6 +314,7 @@ export const mockRows = (viewName) => {
                     'sampleType.label': 'Tissue',
                     'topography': 'http://example.com/sampleType#tongue',
                     'topography.label': 'Tongue',
+                    'tumorCellularity': '4',
                     'sampleNature': 'http://example.com/sampleType#dna',
                     'sampleNature.label': 'DNA',
                     'sampleOrigin': 'http://example.com/sampleType#tumoral',

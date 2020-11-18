@@ -94,11 +94,11 @@ describe('MetadataViewFacetFactory', () => {
 
         const facetValues = wrapper.find(KeyboardDatePicker);
         expect(facetValues.length).toEqual(2);
-        expect(facetValues.at(0).prop('value')).toEqual(mockFacet.rangeStart.toLocaleString());
-        expect(facetValues.at(1).prop('value')).toEqual(mockFacet.rangeEnd.toLocaleString());
-        expect(facetValues.at(0).prop('minDate')).toEqual(mockFacet.rangeStart.toLocaleString());
-        expect(facetValues.at(0).prop('maxDate')).toEqual(mockFacet.rangeEnd.toLocaleString());
-        expect(facetValues.at(1).prop('minDate')).toEqual(mockFacet.rangeStart.toLocaleString());
-        expect(facetValues.at(1).prop('maxDate')).toEqual(mockFacet.rangeEnd.toLocaleString());
+        expect(facetValues.at(0).prop('value')).toEqual(mockFacet.rangeStart);
+        expect(facetValues.at(1).prop('value')).toEqual(mockFacet.rangeEnd);
+        expect(facetValues.at(0).prop('minDate')).toEqual(mockFacet.rangeStart);
+        expect(facetValues.at(0).prop('maxDate')).toEqual(mockFacet.rangeEnd);
+        expect(facetValues.at(1).prop('minDate')).toEqual(mockFacet.rangeStart);
+        expect(facetValues.at(1).prop('maxDate')).toEqual(mockFacet.rangeEnd);
     });
 });
