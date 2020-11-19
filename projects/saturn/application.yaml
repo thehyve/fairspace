@@ -74,6 +74,78 @@ features:
   - MetadataEditing
 search:
   facets:
+    - name: topography
+      title: Topography
+      type: id
+      query:
+    - name: sampleNature
+      title: Sample Nature
+      type: id
+      query:
+    - name: sampleOrigin
+      title: Sample Origin
+      type: id
+      query:
+    - name: tumorCellularity
+      title: Tumor Cellularity
+      type: number
+      query:
+    - name: Event Type
+      title: eventType
+      type: id
+      query:
+    - name: Morphology
+      title: Morphology
+      type: id
+      query:
+    - name: Laterality
+      title: Laterality
+      type: id
+      query:
+    - name: tumorGradeType
+      title: Tumor Grade Type
+      type: id
+      query:
+    - name: tumorGradeValue
+      title: Tumor Grade Value
+      type: id
+      query:
+    - name: tnmType
+      title: TNM Type
+      type: id
+      query:
+    - name: tnmT
+      title: The primary tumor size
+      type: id
+      query:
+    - name: tnmN
+      title: The regional lymph nodes
+      type: id
+      query:
+    - name: tnmM
+      title: Distant metastasis
+      type: id
+      query:
+    - name: ageAtDiagnosis
+      title: Age at Diagnosis
+      type: number
+      query:
+    - name: species
+      title: Species
+      type: id
+      query:
+    - name: gender
+      title: Gender
+      type: id
+      query:
+    - name: ageAtLastNews
+      title: Age at Last News
+      type: number
+      query:
+    - name: ageAtDeath
+      title: Age at Death
+      type: number
+      query:
     - name: collection
       title: Collection
       type: id
@@ -89,55 +161,257 @@ search:
           FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
         }
         ORDER BY ?label
-    - name: tumorCellularity
-      title: Tumor Cellularity
-      type: number
-      query:
   views:
-    - name: collections
-      title: Collections
-      columns:
-        - name: collection
-          title: Collection
-          type: id
-      query: |
-        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-        PREFIX curie: <https://institut-curie.org/ontology#>
-        PREFIX fs:    <http://fairspace.io/ontology#>
-
-        SELECT DISTINCT ?collection
-        WHERE {
-          ?collection a fs:Collection .
-
-          OPTIONAL { ?collection fs:contains*/curie:aboutMaterial ?sample }
-          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
-
-          FILTER NOT EXISTS { ?collection fs:dateDeleted ?anyDateDeleted }
-        }
     - name: samples
       title: Samples
       columns:
         - name: sample
           title: Sample
           type: id
+        - name: topography
+          title: Topography
+          type: id
+        - name: sampleNature
+          title: Sample Nature
+          type: id
+        - name: sampleOrigin
+          title: Sample Origin
+          type: id
         - name: tumorCellularity
           title: Tumor Cellularity
           type: number
-        - name: description
-          title: Description
-          type: text
+        - name: event
+          title: Tumor Pathology Event
+          type: id
+        - name: Event Type
+          title: eventType
+          type: id
+        - name: Morphology
+          title: Morphology
+          type: id
+        - name: Laterality
+          title: Laterality
+          type: id
+        - name: tumorGradeType
+          title: Tumor Grade Type
+          type: id
+        - name: tumorGradeValue
+          title: Tumor Grade Value
+          type: id
+        - name: tnmType
+          title: TNM Type
+          type: id
+        - name: tnmT
+          title: The primary tumor size
+          type: id
+        - name: tnmN
+          title: The regional lymph nodes
+          type: id
+        - name: tnmM
+          title: Distant metastasis
+          type: id
+        - name: ageAtDiagnosis
+          title: Age at Diagnosis
+          type: number
+        - name: subject
+          title: Subject
+          type: id
+        - name: species
+          title: Species
+          type: id
+        - name: gender
+          title: Gender
+          type: id
+        - name: ageAtLastNews
+          title: Age at Last News
+          type: number
+        - name: ageAtDeath
+          title: Age at Death
+          type: number
       query: |
         PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX curie: <https://institut-curie.org/ontology#>
         PREFIX fs:    <http://fairspace.io/ontology#>
 
-        SELECT DISTINCT ?sample ?description ?tumorCellularity
+        SELECT DISTINCT
+          ?sample ?topography ?sampleNature ?sampleOrigin ?tumorCellularity
+          ?event ?morphology ?eventType ?laterality ?ageAtDiagnosis
+          ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
         WHERE {
           ?sample a curie:BiologicalSample .
 
+          OPTIONAL { ?sample curie:diagnosis?/curie:topography ?topography }
+          OPTIONAL { ?sample curie:isOfNature ?sampleNature }
+          OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
           OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
-          OPTIONAL { ?sample rdfs:comment ?description }
+
+          OPTIONAL { ?sample curie:diagnosis ?event }
+          OPTIONAL { ?event curie:tumorMorphology ?morphology }
+          OPTIONAL { ?event curie:eventType ?eventType }
+          OPTIONAL { ?event curie:tumorLaterality ?laterality }
+          OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
+          OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
+          OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
+          OPTIONAL { ?event curie:tnmType ?tnmType }
+          OPTIONAL { ?event curie:tnmT ?tnmT }
+          OPTIONAL { ?event curie:tnmN ?tnmN }
+          OPTIONAL { ?event curie:tnmM ?tnmM }
+
+          OPTIONAL { ?sample curie:diagnosis?/curie:subject ?subject }
+          OPTIONAL { ?subject curie:gender ?gender }
+          OPTIONAL { ?subject curie:isOfSpecies ?species }
+          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews }
+          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath }
+
           OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
 
           FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+        }
+    - name: events
+      title: Tumor Pathology Events
+      columns:
+        - name: event
+          title: Tumor Pathology Event
+          type: id
+        - name: Event Type
+          title: eventType
+          type: id
+        - name: topography
+          title: Topography
+          type: id
+        - name: Morphology
+          title: Morphology
+          type: id
+        - name: Laterality
+          title: Laterality
+          type: id
+        - name: ageAtDiagnosis
+          title: Age at Diagnosis
+          type: number
+        - name: tumorGradeType
+          title: Tumor Grade Type
+          type: id
+        - name: tumorGradeValue
+          title: Tumor Grade Value
+          type: id
+        - name: tnmType
+          title: TNM Type
+          type: id
+        - name: tnmT
+          title: The primary tumor size
+          type: id
+        - name: tnmN
+          title: The regional lymph nodes
+          type: id
+        - name: tnmM
+          title: Distant metastasis
+          type: id
+        - name: subject
+          title: Subject
+          type: id
+        - name: species
+          title: Species
+          type: id
+        - name: gender
+          title: Gender
+          type: id
+        - name: ageAtLastNews
+          title: Age at Last News
+          type: number
+        - name: ageAtDeath
+          title: Age at Death
+          type: number
+      query: |
+        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        PREFIX fs:    <http://fairspace.io/ontology#>
+
+        SELECT DISTINCT
+          ?event ?eventType ?morphology ?topography ?laterality ?ageAtDiagnosis
+          ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
+        WHERE {
+          ?sample a curie:BiologicalSample .
+
+          OPTIONAL { ?sample curie:diagnosis?/curie:topography ?topography }
+          OPTIONAL { ?sample curie:isOfNature ?sampleNature }
+          OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
+          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
+
+          OPTIONAL { ?sample curie:diagnosis ?event }
+          OPTIONAL { ?event curie:tumorMorphology ?morphology }
+          OPTIONAL { ?event curie:eventType ?eventType }
+          OPTIONAL { ?event curie:tumorLaterality ?laterality }
+          OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
+          OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
+          OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
+          OPTIONAL { ?event curie:tnmType ?tnmType }
+          OPTIONAL { ?event curie:tnmT ?tnmT }
+          OPTIONAL { ?event curie:tnmN ?tnmN }
+          OPTIONAL { ?event curie:tnmM ?tnmM }
+
+          OPTIONAL { ?sample curie:diagnosis?/curie:subject ?subject }
+          OPTIONAL { ?subject curie:gender ?gender }
+          OPTIONAL { ?subject curie:isOfSpecies ?species }
+          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews }
+          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath }
+
+          OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
+
+          FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+        }
+    - name: subjects
+      title: Subjects
+      columns:
+        - name: subject
+          title: Subject
+          type: id
+        - name: species
+          title: Species
+          type: id
+        - name: gender
+          title: Gender
+          type: id
+        - name: ageAtLastNews
+          title: Age at Last News
+          type: number
+        - name: ageAtDeath
+          title: Age at Death
+          type: number
+      query: |
+        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        PREFIX fs:    <http://fairspace.io/ontology#>
+
+        SELECT DISTINCT
+          ?subject ?species ?gender ?ageAtLastNews ?ageAtDeath
+        WHERE {
+          ?subject a curie:Subject .
+
+          OPTIONAL { ?sample curie:diagnosis?/curie:subject ?subject }
+
+          OPTIONAL { ?sample curie:diagnosis?/curie:topography ?topography }
+          OPTIONAL { ?sample curie:isOfNature ?sampleNature }
+          OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
+          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
+
+          OPTIONAL { ?event curie:subject ?subject }
+          OPTIONAL { ?event curie:tumorMorphology ?morphology }
+          OPTIONAL { ?event curie:eventType ?eventType }
+          OPTIONAL { ?event curie:tumorLaterality ?laterality }
+          OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
+          OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
+          OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
+          OPTIONAL { ?event curie:tnmType ?tnmType }
+          OPTIONAL { ?event curie:tnmT ?tnmT }
+          OPTIONAL { ?event curie:tnmN ?tnmN }
+          OPTIONAL { ?event curie:tnmM ?tnmM }
+
+          OPTIONAL { ?subject curie:gender ?gender }
+          OPTIONAL { ?subject curie:isOfSpecies ?species }
+          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews }
+          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath }
+
+          OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
+
+          FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
         }
