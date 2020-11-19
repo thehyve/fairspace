@@ -235,7 +235,7 @@ search:
 
         SELECT DISTINCT
           ?sample ?topography ?sampleNature ?sampleOrigin ?tumorCellularity
-          ?event ?morphology ?eventType ?laterality ?ageAtDiagnosis
+          ?event ?morphology ?eventType ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis
           ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
         WHERE {
           ?sample a curie:BiologicalSample .
@@ -327,7 +327,7 @@ search:
         PREFIX fs:    <http://fairspace.io/ontology#>
 
         SELECT DISTINCT
-          ?event ?eventType ?morphology ?topography ?laterality ?ageAtDiagnosis
+          ?event ?eventType ?morphology ?topography ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis
           ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
         WHERE {
           ?sample a curie:BiologicalSample .
