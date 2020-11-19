@@ -124,7 +124,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
 
-    const {data = [], error, loading} = useAsync(
+    const {data = {}, error, loading} = useAsync(
         () => MetadataViewAPI.getViewData(view, page, rowsPerPage, filters),
         [page, rowsPerPage, view]
     );
@@ -137,9 +137,22 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return <MessageDisplay message={error.message} />;
     }
 
-    if (!data || data.length) {
+    if (!data || !data.rows.length) {
         return <MessageDisplay message="No results found." />;
     }
+
+    const getTotalCount = () => {
+        if (data) {
+            if (data.totalCount && data.totalCount >= 0) {
+                return data.totalCount;
+            }
+            if (data.rows.length <= rowsPerPage) {
+                return data.rows.length;
+            }
+            return -1;
+        }
+        return 0;
+    };
 
     return (
         <Paper className={props.classes.root}>
@@ -153,7 +166,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
                         component="div"
-                        count={data.rows.length}
+                        count={getTotalCount()}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onChangePage={(e, p) => setPage(p)}

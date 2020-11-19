@@ -1,4 +1,5 @@
 import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions} from "../MetadataViewAPI";
+import {isCollectionView} from "../metadataViewUtils";
 
 export const mockViews: MetadataViewOptions[] = () => [
     {
@@ -371,6 +372,14 @@ export const mockRows = (viewName) => {
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens'
                 },
+                {
+                    'label': 'http://example.com/sampleType/p06',
+                    'label.label': 'P06',
+                    'gender': 'http://example.com/sampleType#female',
+                    'gender.label': 'Female',
+                    'species': 'http://example.com/sampleType#hs',
+                    'species.label': 'Homo Sapiens'
+                },
             ];
         case "collections":
             return [
@@ -386,9 +395,11 @@ export const mockRows = (viewName) => {
     }
 };
 
-export const mockGetViewData: Promise<MetadataViewData> = (viewName) => (
-    new Promise(resolve => resolve({
+export const mockGetViewData: Promise<MetadataViewData> = (viewName) => {
+    const rows = mockRows(viewName);
+    return new Promise(resolve => resolve({
         page: 0,
-        rows: mockRows(viewName)
-    }))
-);
+        rows,
+        totalCount: !isCollectionView(rows) && rows.length
+    }));
+};
