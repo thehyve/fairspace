@@ -54,7 +54,8 @@ public class CollectionResourceTest {
         model.add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(WORKSPACE_2, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
-                .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1);
+                .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1)
+                .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1);
 
         context.set(METADATA_SERVICE, metadataService);
         var factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
@@ -80,6 +81,9 @@ public class CollectionResourceTest {
 
         assertFalse(model.contains(COLLECTION_1, FS.ownedBy, WORKSPACE_1));
         assertTrue(model.contains(COLLECTION_1, FS.ownedBy, WORKSPACE_2));
+
+        assertFalse(model.contains(COLLECTION_1, FS.belongsTo, WORKSPACE_1));
+        assertTrue(model.contains(COLLECTION_1, FS.belongsTo, WORKSPACE_2));
 
         // User 1 - manager of workspace 1
         assertFalse(model.contains(USER_1, FS.canManage, COLLECTION_1));

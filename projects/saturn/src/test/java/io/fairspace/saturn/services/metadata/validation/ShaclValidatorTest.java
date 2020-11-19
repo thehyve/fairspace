@@ -92,13 +92,12 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceMissingRequiredProperty() {
         var model = modelOf(
-                resource1, RDF.type, FS.Workspace,
-                resource1, RDFS.label, createStringLiteral("Test")
+                resource1, RDF.type, FS.Workspace
         );
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
-        expect(resource1, FS.workspaceDescription, null);
+        expect(resource1, RDFS.label, null);
 
         verifyNoMoreInteractions(violationHandler);
     }

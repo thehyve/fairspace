@@ -3166,11 +3166,45 @@
   <http://www.w3.org/2000/01/rdf-schema#label> "M0" .
 <https://institut-curie.org/ontology#m1> a <https://institut-curie.org/ontology#TnmM> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "M1" .
-<https://institut-curie.org/ontology#biology> a <https://institut-curie.org/ontology#AnalysisType> ;
+<https://institut-curie.org/analysis#C37-1> a <https://institut-curie.org/ontology#AnalysisType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Biology" .
-<https://institut-curie.org/ontology#imaging> a <https://institut-curie.org/ontology#AnalysisType> ;
+<https://institut-curie.org/analysis#C37-2> a <https://institut-curie.org/ontology#AnalysisType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Imaging" .
-<https://institut-curie.org/ontology#omic> a <https://institut-curie.org/ontology#AnalysisType> ;
+<https://institut-curie.org/analysis#C37-3> a <https://institut-curie.org/ontology#AnalysisType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Omic" .
-<https://institut-curie.org/ontology#pathology> a <https://institut-curie.org/ontology#AnalysisType> ;
+<https://institut-curie.org/analysis#C37-4> a <https://institut-curie.org/ontology#AnalysisType> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Pathology" .
+<https://institut-curie.org/analysis#O6-1> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "ChIP-on-Chip" .
+<https://institut-curie.org/analysis#O6-2> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "ChIP-seq" .
+<https://institut-curie.org/analysis#O6-3> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "DNA microarray" .
+<https://institut-curie.org/analysis#O6-4> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "DNA targeted panel sequencing" .
+<https://institut-curie.org/analysis#O6-5> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Exome sequencing" .
+<https://institut-curie.org/analysis#O6-6> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Mass spectrometry" .
+<https://institut-curie.org/analysis#O6-7> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "MeDIP-Chip" .
+<https://institut-curie.org/analysis#O6-8> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "MeDIP-seq" .
+<https://institut-curie.org/analysis#O6-9> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Methylation microarray" .
+<https://institut-curie.org/analysis#O6-10> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "RNA microarray" .
+<https://institut-curie.org/analysis#O6-11> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "RNA targeted panel sequencing" .
+<https://institut-curie.org/analysis#O6-12> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "RNA-seq" .
+<https://institut-curie.org/analysis#O6-13> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "RPPA" .
+<https://institut-curie.org/analysis#O6-14> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Whole genome bisulfite sequencing" .
+<https://institut-curie.org/analysis#O6-15> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Whole genome sequencing" .
+<https://institut-curie.org/analysis#O6-16> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "miRNA microarray" .
+<https://institut-curie.org/analysis#O6-OTH> a <https://institut-curie.org/ontology#AnalysisType> ;
+  <http://www.w3.org/2000/01/rdf-schema#label> "Other" .

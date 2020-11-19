@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import csv
 
 input_filename = "taxonomies.tsv"
@@ -6,6 +7,7 @@ output_filename = "taxonomies.ttl"
 RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#"
 RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 CURIE_NS = "https://institut-curie.org/ontology#"
+ANALYSIS_NS = "https://institut-curie.org/analysis#"
 FHIR_NS = "http://hl7.org/fhir/"
 NCI_NS = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"
 NCBI_NS = "https://bioportal.bioontology.org/ontologies/NCBITAXON/"
@@ -32,6 +34,7 @@ TNM_T_DOMAIN = "OSIRIS:T_TNM"
 TNM_N_DOMAIN = "OSIRIS:N_TNM"
 TNM_M_DOMAIN = "OSIRIS:M_TNM"
 ANALYSIS_TYPE_DOMAIN = "OSIRIS:AnalysisType"
+TECHNICAL_PROTOCOL_DOMAIN = "OSIRIS:TechnicalProtocol"
 
 LABEL_URI = RDFS_NS + "label"
 GENDER_URI = CURIE_NS + "Gender"
@@ -60,8 +63,8 @@ def write_triples(row, entity_type_uri, get_entity_iri):
 def read_entity(entity, entity_type_uri, get_entity_iri):
     file.seek(0)
     for row in reader:
-    	if row[TYPE_COLUMN_NAME] == entity:
-        	write_triples(row, entity_type_uri, get_entity_iri)
+        if row[TYPE_COLUMN_NAME] == entity:
+            write_triples(row, entity_type_uri, get_entity_iri)
 
 def save_to_file(*triples):
     with open(output_filename, mode='wt', encoding='utf-8') as output_file:
@@ -97,7 +100,7 @@ def get_tnm_iri(row):
     return "{}{}".format(CURIE_NS, row[ID_COLUMN_NAME].lower())
 
 def get_analysis_type_iri(row):
-    return "{}{}".format(CURIE_NS, row[LABEL_COLUMN_NAME].lower())
+    return "{}{}".format(ANALYSIS_NS, row[ID_COLUMN_NAME].rsplit(':', 1)[1])
 
 
 results = []
@@ -118,6 +121,7 @@ read_entity(TNM_T_DOMAIN, TNM_T_URI, get_tnm_iri)
 read_entity(TNM_N_DOMAIN, TNM_N_URI, get_tnm_iri)
 read_entity(TNM_M_DOMAIN, TNM_M_URI, get_tnm_iri)
 read_entity(ANALYSIS_TYPE_DOMAIN, ANALYSIS_TYPE_URI, get_analysis_type_iri)
+read_entity(TECHNICAL_PROTOCOL_DOMAIN, ANALYSIS_TYPE_URI, get_analysis_type_iri)
 
 save_to_file(results)
 

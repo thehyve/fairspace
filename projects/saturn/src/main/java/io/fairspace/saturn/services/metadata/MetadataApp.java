@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.BaseApp;
 import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
@@ -14,8 +15,7 @@ import static io.fairspace.saturn.services.metadata.Serialization.deserialize;
 import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -78,6 +78,13 @@ public class MetadataApp extends BaseApp {
             res.type(APPLICATION_JSON.asString());
             res.status(SC_BAD_REQUEST);
             res.body(errorBody(SC_BAD_REQUEST, "Validation Error", e.getViolations()));
+        });
+        exception(AccessDeniedException.class, (e, req, res) -> {
+            log.error("401 Access denied {} {} {}", e.getMessage(), req.requestMethod(), req.uri());
+
+            res.type(APPLICATION_JSON.asString());
+            res.status(SC_FORBIDDEN);
+            res.body(errorBody(SC_FORBIDDEN, "Access denied", e.getMessage()));
         });
     }
 

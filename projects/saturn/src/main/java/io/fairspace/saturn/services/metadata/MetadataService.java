@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
@@ -34,11 +35,13 @@ public class MetadataService {
     private final Transactions transactions;
     private final Model vocabulary;
     private final MetadataRequestValidator validator;
+    private final MetadataPermissions permissions;
 
-    public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator) {
+    public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator, MetadataPermissions permissions) {
         this.transactions = transactions;
         this.vocabulary = vocabulary;
         this.validator = validator;
+        this.permissions = permissions;
     }
 
     /**
@@ -55,22 +58,27 @@ public class MetadataService {
     public Model get(String subject, boolean withObjectProperties) {
         var model = createDefaultModel();
 
-        transactions.executeRead(m -> m
-                .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)
-                .forEachRemaining(stmt -> {
-                    model.add(stmt);
-                    if (withObjectProperties && stmt.getObject().isResource()) {
-                        getPropertyShapesForResource(stmt.getResource(), vocabulary)
-                                .forEach(shape -> {
-                                    if (shape.hasLiteral(FS.importantProperty, true)) {
-                                        var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
-                                        stmt.getResource()
-                                                .listProperties(property)
-                                                .forEachRemaining(model::add);
-                                    }
-                                });
-                    }
-                }));
+        transactions.executeRead(m -> {
+            var resource = m.createResource(subject);
+            if (!permissions.canReadMetadata(resource)) {
+                throw new AccessDeniedException(subject);
+            }
+            resource.listProperties()
+                    .forEachRemaining(stmt -> {
+                        model.add(stmt);
+                        if (withObjectProperties && stmt.getObject().isResource()) {
+                            getPropertyShapesForResource(stmt.getResource(), vocabulary)
+                                    .forEach(shape -> {
+                                        if (shape.hasLiteral(FS.importantProperty, true)) {
+                                            var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
+                                            stmt.getResource()
+                                                    .listProperties(property)
+                                                    .forEachRemaining(model::add);
+                                        }
+                                    });
+                        }
+                    });
+        });
 
         return model;
     }
@@ -95,7 +103,9 @@ public class MetadataService {
     public boolean softDelete(Resource subject) {
         var success = transactions.calculateWrite(model -> {
             var resource = subject.inModel(model);
-
+            if (!permissions.canWriteMetadata(resource)) {
+                throw new AccessDeniedException(resource.getURI());
+            }
             var machineOnly = resource.listProperties(RDF.type)
                     .mapWith(Statement::getObject)
                     .filterKeep(SYSTEM_VOCABULARY::containsResource)
@@ -163,7 +173,7 @@ public class MetadataService {
             trimLabels(modelToAdd);
             var after = updatedView(before, modelToRemove, modelToAdd);
 
-            validate(before, after, modelToRemove, modelToAdd, vocabulary);
+            validate(before, after, modelToRemove, modelToAdd);
 
             persist(modelToRemove, modelToAdd);
 
@@ -175,7 +185,14 @@ public class MetadataService {
         updatedResources.forEach(resource -> audit("METADATA_UPDATED", "iri", resource.getURI()));
     }
 
-    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
+    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd) {
+        modelToAdd.listSubjects()
+                .andThen(modelToRemove.listSubjects())
+                .filterDrop(permissions::canWriteMetadata)
+                .forEachRemaining(s -> {
+                    throw new AccessDeniedException(s.getURI());
+                });
+
         var violations = new LinkedHashSet<Violation>();
         validator.validate(before, after, modelToRemove, modelToAdd,
                 (message, subject, predicate, object) ->

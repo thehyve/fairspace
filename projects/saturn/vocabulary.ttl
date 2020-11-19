@@ -45,6 +45,57 @@ fs:File sh:property
         sh:path curie:analysisType
     ] .
 
+fs:Directory sh:property
+        [
+            sh:name "Is about subject" ;
+            sh:description "Subjects that are featured in this collection." ;
+            sh:class curie:Subject ;
+            sh:path curie:aboutSubject
+        ],
+        [
+            sh:name "Is about biological sample" ;
+            sh:description "Biological samples that are featured in this collection." ;
+            sh:class curie:BiologicalSample ;
+            sh:path curie:sample
+        ],
+        [
+            sh:name "Is about tumor pathology event" ;
+            sh:description "Events that are featured in this collection." ;
+            sh:class curie:TumorPathologyEvent ;
+            sh:path curie:aboutEvent
+        ],
+        [
+            sh:name "Type of analysis" ;
+            sh:description "Type of analysis associated to this collection" ;
+            sh:class curie:AnalysisType ;
+            sh:path curie:analysisType
+        ] .
+
+fs:Collection sh:property
+        [
+            sh:name "Is about subject" ;
+            sh:description "Subjects that are featured in this collection." ;
+            sh:class curie:Subject ;
+            sh:path curie:aboutSubject
+        ],
+        [
+            sh:name "Is about biological sample" ;
+            sh:description "Biological samples that are featured in this collection." ;
+            sh:class curie:BiologicalSample ;
+            sh:path curie:sample
+        ],
+        [
+            sh:name "Is about tumor pathology event" ;
+            sh:description "Events that are featured in this collection." ;
+            sh:class curie:TumorPathologyEvent ;
+            sh:path curie:aboutEvent
+        ],
+        [
+            sh:name "Type of analysis" ;
+            sh:description "Type of analysis associated to this collection" ;
+            sh:class curie:AnalysisType ;
+            sh:path curie:analysisType
+        ] .
 
 ## User class Shapes
 
@@ -330,7 +381,7 @@ curie:TnmM a rdfs:Class, sh:NodeShape ;
     ] .
 
 curie:eventType a rdf:Property .
-curie:tumorTopography a rdf:Property .
+curie:topography a rdf:Property .
 curie:tumorMorphology a rdf:Property .
 curie:tumorLaterality a rdf:Property .
 curie:diagnosisDate a rdf:Property .
@@ -357,7 +408,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:description "The topography of the tumor." ;
         sh:maxCount 1 ;
         sh:class curie:Topography ;
-        sh:path curie:tumorTopography
+        sh:path curie:topography
     ],
     [
         sh:name "Morphology" ;
@@ -502,7 +553,6 @@ curie:SampleOrigin a rdfs:Class, sh:NodeShape ;
 
 curie:collectDate a rdf:Property .
 curie:tumorCellularity a rdf:Property .
-curie:sampleTopography a rdf:Property .
 curie:isOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
 curie:subject a rdf:Property .
@@ -534,7 +584,7 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:description "The topography of the sample." ;
         sh:maxCount 1 ;
         sh:class curie:Topography ;
-        sh:path curie:sampleTopography
+        sh:path curie:topography
     ],
     [
         sh:name "Sample nature" ;
