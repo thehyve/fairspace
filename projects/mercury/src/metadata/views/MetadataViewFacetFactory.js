@@ -25,7 +25,7 @@ export type MetadataViewFacetProperties = {
 
 const useStyles = makeStyles({
     root: {
-        width: 275,
+        width: 250,
         height: 215,
         maxHeight: 215,
         overflowY: 'auto',

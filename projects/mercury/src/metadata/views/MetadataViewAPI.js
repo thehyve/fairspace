@@ -1,8 +1,8 @@
+/* eslint-disable no-unused-vars */
 import axios from "axios";
 import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
-import {applyViewIcons} from "./metadataViewUtils";
+import {applyViewIcons, isCollectionView} from "./metadataViewUtils";
 import {mockGetFacets, mockGetViewData, mockGetViews} from "./__mocks__/MetadataViewAPI";
-
 const metadataViewUrl = "/api/v1/views/";
 
 export type ValueType = 'id' | 'text' | 'number' | 'date' | 'dataLink';
@@ -34,12 +34,21 @@ export type MetadataViewOptions = {
     name: string;
     title: string;
     icon: Object;
-    columns: MetadataViewColumn[]
+    columns: MetadataViewColumn[];
 };
 
 export type MetadataViewData = {
     page: number;
-    rows: Map<string, any>[]
+    rows: Map<string, any>[];
+    totalCount?: number;
+};
+
+type MetadataViewDataRequest = {
+    view: string;
+    filters: MetadataViewFilter[];
+    page: number;
+    size: number;
+    includeCounts: boolean;
 };
 
 class MetadataViewAPI {
@@ -63,11 +72,12 @@ class MetadataViewAPI {
     }
 
     getViewData(viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
-        // const viewRequest = {
+        // const viewRequest: MetadataViewDataRequest = {
         //     view: viewName,
         //     filters,
         //     page,
-        //     size
+        //     size: size + 1,
+        //     includeCounts: !isCollectionView(viewName)
         // };
         // return axios.post(metadataViewUrl, viewRequest,
         //     {headers: {Accept: 'application/json'}})
