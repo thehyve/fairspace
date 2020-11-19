@@ -68,12 +68,11 @@ public class Services {
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(VOCABULARY),
                 new ProtectMachineOnlyPredicatesValidator(VOCABULARY),
-                new PermissionCheckingValidator(metadataPermissions),
                 new DeletionValidator(),
                 new UniqueLabelValidator(),
                 new ShaclValidator(VOCABULARY));
 
-        metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
+        metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
