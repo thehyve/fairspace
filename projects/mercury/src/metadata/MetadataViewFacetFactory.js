@@ -33,6 +33,11 @@ const useStyles = makeStyles({
     },
     title: {
         marginBottom: 0
+    },
+    content: {
+        "&:last-child": {
+            paddingBottom: 0
+        }
     }
 });
 
@@ -53,7 +58,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
     const classes = useStyles();
     return (
         <Card className={`${classes.root} ${props.extraClasses}`} variant="outlined">
-            <CardContent>
+            <CardContent className={classes.content}>
                 {getFacet({...props, classes})}
             </CardContent>
         </Card>

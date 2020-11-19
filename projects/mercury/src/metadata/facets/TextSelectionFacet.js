@@ -1,5 +1,9 @@
 import React, {useState} from 'react';
 import {Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@material-ui/core";
+import {Clear, Search} from "@material-ui/icons";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import TextField from "@material-ui/core/TextField";
+import IconButton from "@material-ui/core/IconButton";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 
@@ -31,6 +35,8 @@ const SelectSingle = (props: SelectProperties) => {
 const SelectMultiple = (props: SelectProperties) => {
     const {options, onChange} = props;
     const [state, setState] = useState(Object.fromEntries(options.map(option => [option.iri, false])));
+    const [textFilterValue, setTextFilterValue] = useState("");
+    const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -41,22 +47,55 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
+    const renderCheckboxList = () => options
+        .filter(o => textFilterValue.trim() === "" || o.label.toLowerCase().includes(textFilterValue.toLowerCase()))
+        .map(option => (
+            <FormControlLabel
+                key={option.iri}
+                control={(
+                    <Checkbox
+                        checked={state[option.iri]}
+                        onChange={handleChange}
+                        name={option.iri}
+                    />
+                )}
+                label={option.label}
+            />
+        ));
+
+    const renderTextFilter = () => (
+        <TextField
+            id="textFilter"
+            value={textFilterValue}
+            onChange={e => setTextFilterValue(e.target.value)}
+            InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <Search fontSize="small" />
+                    </InputAdornment>
+                ),
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <IconButton
+                            onClick={() => setTextFilterValue("")}
+                            disabled={!textFilterValue}
+                            style={{order: 1}}
+                        >
+                            <Clear color="disabled" fontSize="small" />
+                        </IconButton>
+                    </InputAdornment>
+                ),
+            }}
+        />
+    );
+
     return (
-        <FormGroup>
-            {options.map(option => (
-                <FormControlLabel
-                    key={option.iri}
-                    control={(
-                        <Checkbox
-                            checked={state[option.iri]}
-                            onChange={handleChange}
-                            name={option.iri}
-                        />
-                    )}
-                    label={option.label}
-                />
-            ))}
-        </FormGroup>
+        <>
+            {showFilter && renderTextFilter()}
+            <FormGroup>
+                {renderCheckboxList()}
+            </FormGroup>
+        </>
     );
 };
 
