@@ -74,9 +74,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const updateFilters = (facet: MetadataViewFacet, values: any[]) => {
         if (filters.find(f => f.field === facet.name)) {
-            const updatedFilters = [...filters];
-            const filter = updatedFilters.find(f => (f.field === facet.name));
-            setFilterValues(facet.type, filter, values);
+            let updatedFilters;
+            if (values && values.length > 0 && !values.every(v => !v)) {
+                updatedFilters = [...filters];
+                const filter = updatedFilters.find(f => (f.field === facet.name));
+                setFilterValues(facet.type, filter, values);
+            } else {
+                updatedFilters = [...filters.filter(f => f.field !== facet.name)];
+            }
             setFilters(updatedFilters);
         } else {
             const newFilter: MetadataViewFilter = {

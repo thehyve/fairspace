@@ -15,22 +15,31 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
 
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
-            if (filter.rangeStart && filter.rangeEnd) {
-                let label;
-                if (facet.type === 'date') {
-                    label = `${formatDateTime(filter.rangeStart)} - ${formatDateTime(filter.rangeEnd)}`;
-                } else {
-                    label = `${filter.rangeStart} - ${filter.rangeEnd}`;
-                }
-                return (
-                    <Chip
-                        className={facet.backgroundColor}
-                        key={`chip-${facet.name}`}
-                        label={label}
-                        style={{marginLeft: 5}}
-                    />
-                );
+            let rangeStart; let rangeEnd; let label;
+            if (facet.type === 'date') {
+                rangeStart = formatDateTime(filter.rangeStart);
+                rangeEnd = formatDateTime(filter.rangeEnd);
+            } else {
+                rangeStart = filter.rangeStart;
+                rangeEnd = filter.rangeEnd;
             }
+            if (rangeStart && rangeEnd) {
+                label = `${rangeStart} - ${rangeEnd}`;
+            } else if (rangeStart) {
+                label = `from: ${rangeStart}`;
+            } else if (rangeEnd) {
+                label = `to: ${rangeEnd}`;
+            } else {
+                return <></>;
+            }
+            return (
+                <Chip
+                    className={facet.backgroundColor}
+                    key={`chip-${facet.name}`}
+                    label={label}
+                    style={{marginLeft: 5}}
+                />
+            );
         }
         return filter.values.map(valueIri => {
             const value = facet.values.find(val => val.iri === valueIri);

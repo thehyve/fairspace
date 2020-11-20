@@ -126,7 +126,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const {data = {}, error, loading} = useAsync(
         () => MetadataViewAPI.getViewData(view, page, rowsPerPage, filters),
-        [page, rowsPerPage, view]
+        [page, rowsPerPage, view, filters]
     );
 
     if (loading) {

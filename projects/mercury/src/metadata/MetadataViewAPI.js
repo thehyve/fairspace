@@ -72,6 +72,8 @@ class MetadataViewAPI {
     }
 
     getViewData(viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
+        // eslint-disable-next-line no-console
+        console.log(`Query: ${filters.map(f => JSON.stringify(f)).join(", ")}`);
         // const viewRequest: MetadataViewDataRequest = {
         //     view: viewName,
         //     filters,

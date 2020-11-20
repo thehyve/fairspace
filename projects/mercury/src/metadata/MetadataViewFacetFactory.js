@@ -38,6 +38,9 @@ const useStyles = makeStyles({
         "&:last-child": {
             paddingBottom: 0
         }
+    },
+    input: {
+        fontSize: 'small'
     }
 });
 

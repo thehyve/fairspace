@@ -3,18 +3,19 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import Slider from "@material-ui/core/Slider";
+import {max, min} from "lodash/math";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {title, options = [], onChange = () => {}} = props;
-    const min = options[0];
-    const max = options[1];
-    const [value, setValue] = React.useState(options);
+    const minValue = min(options);
+    const maxValue = max(options);
+    const [value, setValue] = React.useState([null, null]);
 
     const handleChange = (newValue) => {
-        setValue(newValue);
-        onChange(newValue);
+        setValue([min(newValue), max(newValue)]);
+        onChange([min(newValue), max(newValue)]);
     };
 
     const handleSliderChange = (event, newValue) => {
@@ -32,38 +33,39 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const handleBlur = () => {
-        if (value[0] < min) {
-            handleChange([min, value[1]]);
-        } else if (value[1] > max) {
-            handleChange([value[0], max]);
+        if (value[0] && value[0] < minValue) {
+            handleChange([minValue, value[1]]);
+        } else if (value[1] && value[1] > maxValue) {
+            handleChange([value[0], maxValue]);
         }
     };
 
-    const renderInput = (inputValue, handleInputChange) => (
+    const renderInput = (inputValue, handleInputChange, placeholder) => (
         <Input
-            value={inputValue}
+            value={inputValue === null ? '' : inputValue}
             margin="dense"
             onChange={handleInputChange}
             onBlur={handleBlur}
             inputProps={{
                 'step': 1,
-                min,
-                max,
+                'min': minValue,
+                'max': maxValue,
                 'type': 'number',
                 'aria-labelledby': 'input-slider',
+                'placeholder': placeholder
             }}
         />
     );
 
     const renderSlider = () => (
         <Slider
-            value={value}
+            value={[value[0] || minValue, value[1] || maxValue]}
             onChange={handleSliderChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
             getAriaValueText={() => value}
-            min={options[0]}
-            max={options[1]}
+            min={minValue}
+            max={maxValue}
         />
     );
 
@@ -74,13 +76,13 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
             </Typography>
             <Grid container spacing={2} alignItems="center">
                 <Grid item>
-                    {renderInput(value[0], handleMinValueInputChange)}
+                    {renderInput(value[0], handleMinValueInputChange, minValue)}
                 </Grid>
                 <Grid item xs>
                     {renderSlider()}
                 </Grid>
                 <Grid item>
-                    {renderInput(value[1], handleMaxValueInputChange)}
+                    {renderInput(value[1], handleMaxValueInputChange, maxValue)}
                 </Grid>
             </Grid>
         </div>

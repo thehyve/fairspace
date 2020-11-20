@@ -247,8 +247,8 @@ export const mockFacets = (name) => {
                     title: 'Birth date',
                     query: "",
                     type: "date",
-                    rangeStart: new Date(2010, 11, 25, 18, 33),
-                    rangeEnd: new Date(2020, 1, 4, 18, 33)
+                    rangeStart: new Date(2010, 11, 25),
+                    rangeEnd: new Date(2020, 1, 4)
                 }
             ];
         case "collections":
@@ -331,7 +331,7 @@ export const mockRows = (viewName) => {
                     'gender.label': 'Male',
                     'species': 'http://example.com/sampleType#hs',
                     'species.label': 'Homo Sapiens',
-                    'birthDate': new Date(2010, 11, 25, 18, 33).toLocaleString(),
+                    'birthDate': new Date(2010, 11, 25).toLocaleString(),
                     'files': [
                         {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
                         {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}

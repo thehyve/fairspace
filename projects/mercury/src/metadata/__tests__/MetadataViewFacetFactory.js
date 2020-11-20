@@ -11,6 +11,7 @@ import TextSelectionFacet from "../facets/TextSelectionFacet";
 import {mockFacets} from "../__mocks__/MetadataViewAPI";
 import NumericalRangeSelectionFacet from "../facets/NumericalRangeSelectionFacet";
 import DateSelectionFacet from "../facets/DateSelectionFacet";
+import {formatDateTime} from "../../../common/utils/genericUtils";
 
 describe('MetadataViewFacetFactory', () => {
     it('should properly handle invalid facet type', () => {
@@ -68,8 +69,8 @@ describe('MetadataViewFacetFactory', () => {
 
         const facetValues = wrapper.find(Input);
         expect(facetValues.length).toEqual(2);
-        expect(facetValues.at(0).prop('value')).toEqual(mockFacet.rangeStart);
-        expect(facetValues.at(1).prop('value')).toEqual(mockFacet.rangeEnd);
+        expect(facetValues.at(0).prop('inputProps').placeholder).toEqual(mockFacet.rangeStart);
+        expect(facetValues.at(1).prop('inputProps').placeholder).toEqual(mockFacet.rangeEnd);
 
         const slider = wrapper.find(Slider);
         expect(slider.length).toEqual(1);
@@ -94,8 +95,8 @@ describe('MetadataViewFacetFactory', () => {
 
         const facetValues = wrapper.find(KeyboardDatePicker);
         expect(facetValues.length).toEqual(2);
-        expect(facetValues.at(0).prop('value')).toEqual(mockFacet.rangeStart);
-        expect(facetValues.at(1).prop('value')).toEqual(mockFacet.rangeEnd);
+        expect(facetValues.at(0).prop('placeholder')).toEqual(formatDateTime(mockFacet.rangeStart));
+        expect(facetValues.at(1).prop('placeholder')).toEqual(formatDateTime(mockFacet.rangeEnd));
         expect(facetValues.at(0).prop('minDate')).toEqual(mockFacet.rangeStart);
         expect(facetValues.at(0).prop('maxDate')).toEqual(mockFacet.rangeEnd);
         expect(facetValues.at(1).prop('minDate')).toEqual(mockFacet.rangeStart);
