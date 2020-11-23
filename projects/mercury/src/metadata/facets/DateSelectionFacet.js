@@ -41,6 +41,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 autoOk
                 minDate={min || minDate}
                 maxDate={max || maxDate}
+                initialFocusedDate={placeholderDate}
                 placeholder={formatDateTime(placeholderDate)}
                 KeyboardButtonProps={{
                     'aria-label': 'change date',
