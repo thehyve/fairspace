@@ -34,7 +34,7 @@ public class ViewService {
     }
 
     public ViewPageDto retrieveViewPage(ViewRequest request) {
-        var query = getBaseQuery(request.getView(), request.filters);
+        var query = getBaseQuery(request.getView(), request.getFilters());
         var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         var size = (request.getPage() != null && request.getPage() >= 1) ? request.getSize() : 20;
         query.setLimit(size + 1);
@@ -142,7 +142,7 @@ public class ViewService {
     }
 
     CountDTO getCount(CountRequest request) {
-        var innerQuery = getBaseQuery(request.view, request.filters);
+        var innerQuery = getBaseQuery(request.getView(), request.getFilters());
         var query  = toCountQuery(innerQuery);
 
         log.debug("Querying the total number of matches: \n{}", query);
