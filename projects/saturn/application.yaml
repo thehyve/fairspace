@@ -79,11 +79,23 @@ search:
     - name: topography
       title: Topography
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?topography
+        WHERE {
+           ?topography a curie:Topography .
+           FILTER EXISTS { ?x curie:topography ?topography }
+        }
     - name: sampleNature
       title: Sample Nature
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?nature
+        WHERE {
+           ?nature a curie:SampleNature .
+           FILTER EXISTS { ?x curie:isOfNature ?nature }
+        }
     - name: sampleOrigin
       title: Sample Origin
       type: id
@@ -103,7 +115,13 @@ search:
     - name: Laterality
       title: Laterality
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?laterality
+        WHERE {
+           ?laterality a curie:TumorLaterality .
+           FILTER EXISTS { ?x curie:laterality ?laterality }
+        }
     - name: tumorGradeType
       title: Tumor Grade Type
       type: id
@@ -152,17 +170,13 @@ search:
       title: Collection
       type: id
       query: |
-        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-        PREFIX curie: <https://institut-curie.org/ontology#>
         PREFIX fs:    <http://fairspace.io/ontology#>
 
-        SELECT DISTINCT ?value ?label
+        SELECT ?collection
         WHERE {
-          ?value a fs:Collection ;
-                 rdfs:label ?label .
-          FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
+          ?collection a fs:Collection ;
+          FILTER NOT EXISTS { ?collection fs:dateDeleted ?anyDateDeleted }
         }
-        ORDER BY ?label
   views:
     - name: samples
       title: Samples
@@ -389,24 +403,25 @@ search:
         WHERE {
           ?subject a curie:Subject .
 
-          OPTIONAL { ?sample curie:diagnosis?/curie:subject ?subject }
+          OPTIONAL { ?sample curie:subject ?subject .
+            OPTIONAL { ?sample curie:topography ?topography }
+            OPTIONAL { ?sample curie:isOfNature ?sampleNature }
+            OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
+            OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
+          }
 
-          OPTIONAL { ?sample curie:diagnosis?/curie:topography ?topography }
-          OPTIONAL { ?sample curie:isOfNature ?sampleNature }
-          OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
-          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
-
-          OPTIONAL { ?event curie:subject ?subject }
-          OPTIONAL { ?event curie:tumorMorphology ?morphology }
-          OPTIONAL { ?event curie:eventType ?eventType }
-          OPTIONAL { ?event curie:tumorLaterality ?laterality }
-          OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
-          OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
-          OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
-          OPTIONAL { ?event curie:tnmType ?tnmType }
-          OPTIONAL { ?event curie:tnmT ?tnmT }
-          OPTIONAL { ?event curie:tnmN ?tnmN }
-          OPTIONAL { ?event curie:tnmM ?tnmM }
+          OPTIONAL { ?event curie:subject ?subject ;
+            OPTIONAL { ?event curie:tumorMorphology ?morphology }
+            OPTIONAL { ?event curie:eventType ?eventType }
+            OPTIONAL { ?event curie:tumorLaterality ?laterality }
+            OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
+            OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
+            OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
+            OPTIONAL { ?event curie:tnmType ?tnmType }
+            OPTIONAL { ?event curie:tnmT ?tnmT }
+            OPTIONAL { ?event curie:tnmN ?tnmN }
+            OPTIONAL { ?event curie:tnmM ?tnmM }
+          }
 
           OPTIONAL { ?subject curie:gender ?gender }
           OPTIONAL { ?subject curie:isOfSpecies ?species }

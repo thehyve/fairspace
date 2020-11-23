@@ -14,10 +14,7 @@ import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static java.time.Instant.ofEpochMilli;
@@ -173,10 +170,25 @@ public class ViewService {
     }
 
     List<FacetDTO> getFacets() {
-        return config.facets
-                .stream()
-                .map(f -> new FacetDTO(f.name, f.title, f.type))
-                .collect(toList());
+        return Txn.calculateRead(ds, () ->
+            config.facets
+                    .stream()
+                    .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query)))
+                    .collect(toList()));
+    }
+
+    private Map<String, String> getValues(String query) {
+        if (query == null || query.isEmpty()) {
+            return null;
+        }
+        var result = new TreeMap<String, String>();
+        try (var execution = QueryExecutionFactory.create(query, ds)) {
+            execution.execSelect().forEachRemaining(row -> {
+                var resource = row.getResource(row.varNames().next());
+                result.put(getStringProperty(resource, RDFS.label), resource.getURI());
+            });
+        }
+        return result;
     }
 
     List<ViewDTO> getViews() {
