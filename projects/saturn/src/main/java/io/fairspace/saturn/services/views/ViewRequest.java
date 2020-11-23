@@ -1,17 +1,16 @@
 package io.fairspace.saturn.services.views;
-
 import lombok.Data;
 import lombok.Value;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
-@Value
+@Data
 public class ViewRequest extends CountRequest {
     @NotBlank
-    String view;
+    private String view;
     @Min(1)
-    Integer page;
+    private Integer page;
     @Min(1)
-    Integer size;
+    private Integer size;
 }

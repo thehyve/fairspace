@@ -6,6 +6,6 @@ import java.util.List;
 
 @Value
 public class ViewsDTO {
-    final List<FacetDTO> facets;
-    final List<ViewDTO> views;
+    List<FacetDTO> facets;
+    List<ViewDTO> views;
 }
