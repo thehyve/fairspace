@@ -1,11 +1,11 @@
 package io.fairspace.saturn.rdf.search;
 
-import io.fairspace.saturn.vocabulary.*;
+import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.text.EntityDefinition;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * An entity definition with reasonable defaults

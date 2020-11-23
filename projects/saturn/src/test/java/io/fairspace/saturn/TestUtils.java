@@ -1,7 +1,7 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.rdf.*;
-import io.fairspace.saturn.services.users.*;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.services.users.User;
 import org.apache.jena.rdf.model.Model;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;

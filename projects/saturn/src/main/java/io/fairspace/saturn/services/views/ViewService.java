@@ -1,25 +1,23 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryCancelledException;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.*;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.expr.aggregate.AggCount;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementSubQuery;
+import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static java.time.Instant.ofEpochMilli;
@@ -27,73 +25,30 @@ import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public class ViewService {
-    private static final long FIRST_RESULT_TIMEOUT = 30;
-    private static final long QUERY_EXECUTION_TIMEOUT = 60;
-    private static final int MAX_RESULTS = 100_000;
-
-    private final Transactions transactions;
-
     private final Config.Search config;
+    private final Dataset ds;
 
-    public ViewService(Config.Search config, Transactions transactions) {
+    public ViewService(Config.Search config, Dataset ds) {
         this.config = config;
-        this.transactions = transactions;
+        this.ds = ds;
     }
 
-    public ViewPage retrieveViewPage(ViewRequest request) {
-        var view = config.views
-                .stream()
-                .filter(v -> v.name.equals(request.view))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + request.view));
-
-        var query = QueryFactory.create(view.query);
-
-        log.debug("Original query: \n{}", query);
-
-        var page = (request.page != null && request.page >= 1) ? request.page : 1;
-        var size = (request.size != null && request.size >= 1) ? request.size : 20;
-        query.setLimit(size);
+    public ViewPageDto retrieveViewPage(ViewRequest request) {
+        var query = getBaseQuery(request.getView(), request.filters);
+        var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
+        var size = (request.getPage() != null && request.getPage() >= 1) ? request.getSize() : 20;
+        query.setLimit(size + 1);
         query.setOffset((page - 1) * size);
-
-        if (!(query.getQueryPattern() instanceof ElementGroup)) {
-            var group = new ElementGroup();
-            group.addElement(query.getQueryPattern());
-            query.setQueryPattern(group);
-        }
-
-        var queryPatternGroup = (ElementGroup) query.getQueryPattern();
-
-        request.filters.forEach(filter -> {
-            var facet = config.facets
-                    .stream()
-                    .filter(f -> f.name.equals(filter.field))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Unknown facet: " + filter.field));
-
-            var variable = new ExprVar(filter.field);
-            if (!filter.values.isEmpty()) {
-                if (filter.getValues().size() == 1) {
-                    queryPatternGroup.addElementFilter(new ElementFilter(new E_Equals(variable, toNodeValue(filter.values.get(0), facet.type))));
-                } else {
-                    queryPatternGroup.addElementFilter(new ElementFilter(new E_OneOf(variable, new ExprList(filter.values.stream().map(o -> toNodeValue(o, facet.type)).collect(toList())))));
-                }
-            }
-            if (filter.rangeStart != null) {
-                queryPatternGroup.addElementFilter(new ElementFilter(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type))));
-            }
-            if (filter.rangeEnd != null) {
-                queryPatternGroup.addElementFilter(new ElementFilter(new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type))));
-            }
-        });
 
         log.debug("Query with filters and pagination applied: \n{}", query);
 
-        return transactions.calculateRead(m -> {
-            var result = ViewPage.builder();
+        return Txn.calculateRead(ds, () -> {
+            var rows = new ArrayList<Map<String, Object>>();
+            var timeout = false;
+            var hasNext = false;
 
-            try (var execution = QueryExecutionFactory.create(query, m)) {
-                execution.setTimeout(FIRST_RESULT_TIMEOUT, TimeUnit.SECONDS, QUERY_EXECUTION_TIMEOUT, TimeUnit.SECONDS);
+            try (var execution = QueryExecutionFactory.create(query, ds)) {
+                execution.setTimeout(config.pageRequestTimeout);
                 execution.execSelect()
                         .forEachRemaining(row -> {
                             var map = new HashMap<String, Object>();
@@ -115,43 +70,65 @@ public class ViewService {
                                     map.put(name, null);
                                 }
                             });
-                            result.row(map);
+                            rows.add(map);
                         });
             } catch (QueryCancelledException e) {
-                log.error("Query has been cancelled due to timeout: \n{}", query);
+                timeout = true;
+                log.warn("Query has been cancelled due to timeout: \n{}", query);
             }
 
-            result.size((int) query.getLimit());
-            result.page((int) (query.getOffset() / query.getLimit()) + 1);
-
-            query.setLimit(MAX_RESULTS);
-            query.setOffset(0);
-
-            var queryTotal  = new Query();
-            queryTotal.setQuerySelectType();
-            var project = queryTotal.getProject();
-
-            var aggregatorExpr = queryTotal.allocAggregate(new AggCount());
-            project.add(Var.alloc("total"), aggregatorExpr);
-            queryTotal.setQueryPattern(new ElementSubQuery(query));
-
-            log.debug("Querying the total number of matches: \n{}", queryTotal);
-
-            var total = (int) query.getLimit();
-
-            try (var execution = QueryExecutionFactory.create(queryTotal, m)) {
-                execution.setTimeout(QUERY_EXECUTION_TIMEOUT, TimeUnit.SECONDS);
-                total = execution.execSelect().next().get("total").asLiteral().getInt();
-            } catch (QueryCancelledException e) {
-                log.error("Query has been cancelled due to timeout: \n{}", queryTotal);
+            while (rows.size() > size) {
+                rows.remove(rows.size() - 1);
+                hasNext = true;
             }
 
-            return result
-                    .page(page)
-                    .size(size)
-                    .totalElements(total)
-                    .totalPages((total / size) + ((total % size > 0) ? 1 : 0))
-                    .build();
+            return new ViewPageDto(rows, hasNext, timeout);
+        });
+    }
+
+    private Query getBaseQuery(String viewName, List<ViewFilter> filters) {
+        var view = getView(viewName);
+        var query = QueryFactory.create(view.query);
+        applyFilters(query, filters);
+        return query;
+    }
+
+    private Config.Search.View getView(String viewName) {
+        return config.views
+                .stream()
+                .filter(v -> v.name.equals(viewName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
+    }
+
+    private void applyFilters(Query query, List<ViewFilter> filters) {
+        if (!(query.getQueryPattern() instanceof ElementGroup)) {
+            var group = new ElementGroup();
+            group.addElement(query.getQueryPattern());
+            query.setQueryPattern(group);
+        }
+
+        var queryPatternGroup = (ElementGroup) query.getQueryPattern();
+        filters.forEach(filter -> {
+            var facet = config.facets
+                    .stream()
+                    .filter(f -> f.name.equals(filter.field))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown facet: " + filter.field));
+
+            var variable = new ExprVar(filter.field);
+            if (!filter.values.isEmpty()) {
+                List<Expr> values = filter.values.stream()
+                        .map(o -> toNodeValue(o, facet.type))
+                        .collect(toList());
+                queryPatternGroup.addElementFilter(new ElementFilter(new E_OneOf(variable, new ExprList(values))));
+            }
+            if (filter.rangeStart != null) {
+                queryPatternGroup.addElementFilter(new ElementFilter(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type))));
+            }
+            if (filter.rangeEnd != null) {
+                queryPatternGroup.addElementFilter(new ElementFilter(new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type))));
+            }
         });
     }
 
@@ -164,14 +141,45 @@ public class ViewService {
         };
     }
 
-    public List<FacetDTO> getFacets() {
+    CountDTO getCount(CountRequest request) {
+        var innerQuery = getBaseQuery(request.view, request.filters);
+        var query  = toCountQuery(innerQuery);
+
+        log.debug("Querying the total number of matches: \n{}", query);
+
+        return Txn.calculateRead(ds, () -> {
+            var total = 0L;
+            var timeout = false;
+            try (var execution = QueryExecutionFactory.create(query, ds)) {
+                execution.setTimeout(config.countRequestTimeout);
+                total = execution.execSelect().next().get("total").asLiteral().getInt();
+            } catch (QueryCancelledException e) {
+                timeout = true;
+                log.warn("Query has been cancelled due to timeout: \n{}", query);
+            }
+            return new CountDTO(total, timeout);
+        });
+    }
+
+    private Query toCountQuery(Query query) {
+        var queryTotal  = new Query();
+        queryTotal.setQuerySelectType();
+        var project = queryTotal.getProject();
+
+        var aggregatorExpr = queryTotal.allocAggregate(new AggCount());
+        project.add(Var.alloc("total"), aggregatorExpr);
+        queryTotal.setQueryPattern(new ElementSubQuery(query));
+        return queryTotal;
+    }
+
+    List<FacetDTO> getFacets() {
         return config.facets
                 .stream()
                 .map(f -> new FacetDTO(f.name, f.title, f.type))
                 .collect(toList());
     }
 
-    public List<ViewDTO> getViews() {
+    List<ViewDTO> getViews() {
         return config.views
                 .stream()
                 .map(v -> new ViewDTO(v.name, v.title,

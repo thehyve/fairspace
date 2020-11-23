@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -91,6 +90,8 @@ public class Config {
     public static class Search {
         public List<Facet> facets;
         public List<View> views;
+        public long pageRequestTimeout;
+        public long countRequestTimeout;
 
         public static class Facet {
             public String name;

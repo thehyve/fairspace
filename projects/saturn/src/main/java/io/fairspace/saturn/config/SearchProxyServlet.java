@@ -1,12 +1,13 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.rdf.search.*;
-import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.*;
-import org.eclipse.jetty.proxy.*;
+import io.fairspace.saturn.rdf.search.IndexDispatcher;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
+import org.eclipse.jetty.proxy.ProxyServlet;
 
-import javax.servlet.http.*;
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SearchProxyServlet extends ProxyServlet {
     final String apiPrefix;

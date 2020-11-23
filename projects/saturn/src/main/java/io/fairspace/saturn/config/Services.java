@@ -80,9 +80,7 @@ public class Services {
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
-        var filteredTransactions = config.jena.bulkTransactions ? new BulkTransactions(filteredDataset) : new SimpleTransactions(filteredDataset);
-        viewService = new ViewService(config.search, filteredTransactions);
-
+        viewService = new ViewService(config.search, filteredDataset);
                 searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,
                 CONFIG.elasticsearchUrl,

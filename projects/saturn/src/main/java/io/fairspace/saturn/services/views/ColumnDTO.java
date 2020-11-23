@@ -1,11 +1,9 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.Config;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 public class ColumnDTO {
     String name;
     String title;

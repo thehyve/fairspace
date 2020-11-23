@@ -5,8 +5,7 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ViewDTO {
-    String name;
-    String title;
-    List<ColumnDTO> columns;
+public class ViewsDTO {
+    final List<FacetDTO> facets;
+    final List<ViewDTO> views;
 }

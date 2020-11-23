@@ -73,6 +73,8 @@ services:
 features:
   - MetadataEditing
 search:
+  pageRequestTimeout: 3000
+  countRequestTimeout: 30000
   facets:
     - name: topography
       title: Topography

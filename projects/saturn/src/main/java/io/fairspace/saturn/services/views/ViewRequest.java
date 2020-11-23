@@ -1,27 +1,17 @@
 package io.fairspace.saturn.services.views;
 
-import lombok.*;
+import lombok.Data;
+import lombok.Value;
 
-import javax.validation.constraints.*;
-import java.util.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
-@Data
-public class ViewRequest {
-    @Data
-    public static class Filter {
-        @NotBlank
-        String field;
-        @Singular
-        List<Object> values = new ArrayList<>();
-        Object rangeStart;
-        Object rangeEnd;
-    }
-
+@Value
+public class ViewRequest extends CountRequest {
     @NotBlank
     String view;
     @Min(1)
     Integer page;
     @Min(1)
     Integer size;
-    List<Filter> filters;
 }

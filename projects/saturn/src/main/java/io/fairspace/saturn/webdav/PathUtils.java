@@ -1,6 +1,7 @@
 package io.fairspace.saturn.webdav;
 
 import io.milton.http.exceptions.BadRequestException;
+
 import static org.apache.commons.lang3.StringUtils.strip;
 import static org.apache.http.client.utils.URLEncodedUtils.formatSegments;
 
