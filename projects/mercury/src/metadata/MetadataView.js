@@ -28,16 +28,30 @@ const styles = (theme) => ({
     facet: {
         borderColor: theme.palette.info.light,
         borderWidth: 1.5,
-        borderRadius: 6,
-        marginBottom: 5
+        borderRadius: 6
+    },
+    facets: {
+        marginTop: 10,
+        minWidth: 265,
+        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
+        overflowY: 'auto'
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT
+        overflowX: 'auto',
+        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT - 10
+    },
+    centralPanelFullWidth: {
+        width: '100%'
     },
     sidePanel: {
         width: consts.SIDE_PANEL_WIDTH
     },
+    metadataViewTable: {
+        marginTop: 10,
+        overflowX: 'auto',
+        width: '100%'
+    }
 });
 
 export const MetadataView = (props: MetadataViewProperties) => {
@@ -113,9 +127,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
             <Grid
                 container
                 item
-                direction="row"
+                direction="column"
                 justify="flex-start"
-                alignItems="stretch"
                 spacing={1}
             >
                 {
@@ -155,28 +168,28 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments()} />
-            <Grid
-                container
-                direction="column"
-                spacing={1}
-            >
-                {renderFacets()}
-                <MetadataViewActiveFilters facets={facets} filters={filters} />
-            </Grid>
-            <Grid container spacing={1}>
-                <Grid item className={classes.centralPanel}>
-                    <Paper style={{marginTop: 10, overflowX: 'auto'}}>
-                        <MetadataViewTable
-                            columns={currentViewOptions.columns}
-                            view={currentView}
-                            filters={filters}
-                            locationContext={locationContext}
-                            selected={selected}
-                            toggleRow={toggleRow}
-                        />
-                    </Paper>
+            <MetadataViewActiveFilters facets={facets} filters={filters} />
+            <Grid container direction="row" spacing={1} wrap="nowrap">
+                <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
+                    <Grid container direction="row" spacing={1} wrap="nowrap">
+                        <Grid item className={classes.facets}>
+                            {renderFacets()}
+                        </Grid>
+                        <Grid item className={classes.metadataViewTable}>
+                            <Paper>
+                                <MetadataViewTable
+                                    columns={currentViewOptions.columns}
+                                    view={currentView}
+                                    filters={filters}
+                                    locationContext={locationContext}
+                                    selected={selected}
+                                    toggleRow={toggleRow}
+                                />
+                            </Paper>
+                        </Grid>
+                    </Grid>
                 </Grid>
-                <Grid item className={classes.sidePanel}>
+                <Grid item className={classes.sidePanel} hidden={!selected}>
                     <MetadataViewInformationDrawer
                         forceExpand
                         showLinkedFiles={!isCollectionView(currentView)}

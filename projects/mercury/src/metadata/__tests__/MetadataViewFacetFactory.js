@@ -37,10 +37,6 @@ describe('MetadataViewFacetFactory', () => {
             onChange={() => {}}
         />);
 
-        const content = wrapper.find(FormLabel);
-        expect(content.length).toEqual(1);
-        expect(content.prop('children')).toBe(title);
-
         const textSelectionFacet = wrapper.find(TextSelectionFacet);
         expect(textSelectionFacet.length).toEqual(1);
         expect(textSelectionFacet.prop('title')).toEqual(title);

@@ -52,7 +52,11 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
 
     const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
-        toggleRow({label: itemLabel, iri: itemIri, linkedFiles: linkedFiles || []});
+        if (selected && selected.iri === itemIri) {
+            toggleRow();
+        } else {
+            toggleRow({label: itemLabel, iri: itemIri, linkedFiles: linkedFiles || []});
+        }
     };
 
     const handleResultDoubleClick = (itemIri) => {

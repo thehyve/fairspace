@@ -1,5 +1,4 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import Slider from "@material-ui/core/Slider";
@@ -8,7 +7,7 @@ import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {title, options = [], onChange = () => {}} = props;
+    const {options = [], onChange = () => {}} = props;
     const minValue = min(options);
     const maxValue = max(options);
     const [value, setValue] = React.useState([null, null]);
@@ -70,22 +69,17 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     );
 
     return (
-        <div>
-            <Typography id="range-slider" color="textSecondary" gutterBottom>
-                {title}
-            </Typography>
-            <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                    {renderInput(value[0], handleMinValueInputChange, minValue)}
-                </Grid>
-                <Grid item xs>
-                    {renderSlider()}
-                </Grid>
-                <Grid item>
-                    {renderInput(value[1], handleMaxValueInputChange, maxValue)}
-                </Grid>
+        <Grid container spacing={2} alignItems="center">
+            <Grid item>
+                {renderInput(value[0], handleMinValueInputChange, minValue)}
             </Grid>
-        </div>
+            <Grid item xs>
+                {renderSlider()}
+            </Grid>
+            <Grid item>
+                {renderInput(value[1], handleMaxValueInputChange, maxValue)}
+            </Grid>
+        </Grid>
     );
 };
 

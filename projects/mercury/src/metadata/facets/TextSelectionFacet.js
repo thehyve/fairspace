@@ -1,20 +1,26 @@
 import React, {useState} from 'react';
-import {Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Radio, RadioGroup} from "@material-ui/core";
+import {Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup} from "@material-ui/core";
 import {Clear, Search} from "@material-ui/icons";
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 
 type SelectProperties = {
     options: Option[];
     onChange: (string[]) => void;
+    textFilterValue: string;
 }
 
+const filterByText = (options, textFilterValue) => options
+    .filter(o => textFilterValue.trim() === "" || o.label.toLowerCase().includes(textFilterValue.toLowerCase()));
 
 const SelectSingle = (props: SelectProperties) => {
-    const {options, onChange} = props;
+    const {options, onChange, textFilterValue} = props;
     const [value, setValue] = useState(null);
 
     const handleChange = (event) => {
@@ -25,18 +31,16 @@ const SelectSingle = (props: SelectProperties) => {
 
     return (
         <RadioGroup value={value} onChange={handleChange}>
-            {options.map(option => (
-                <FormControlLabel value={option.iri} control={<Radio />} label={option.label} />
+            {filterByText(options, textFilterValue).map(option => (
+                <FormControlLabel value={option.iri} control={<Radio fontSize="small" />} label={option.label} />
             ))}
         </RadioGroup>
     );
 };
 
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange} = props;
+    const {options, onChange, textFilterValue} = props;
     const [state, setState] = useState(Object.fromEntries(options.map(option => [option.iri, false])));
-    const [textFilterValue, setTextFilterValue] = useState("");
-    const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -47,8 +51,7 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
-    const renderCheckboxList = () => options
-        .filter(o => textFilterValue.trim() === "" || o.label.toLowerCase().includes(textFilterValue.toLowerCase()))
+    const renderCheckboxList = () => filterByText(options, textFilterValue)
         .map(option => (
             <FormControlLabel
                 key={option.iri}
@@ -57,11 +60,25 @@ const SelectMultiple = (props: SelectProperties) => {
                         checked={state[option.iri]}
                         onChange={handleChange}
                         name={option.iri}
+                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                        checkedIcon={<CheckBoxIcon fontSize="small" />}
                     />
                 )}
-                label={option.label}
+                label={<Typography variant="body2">{option.label}</Typography>}
             />
         ));
+
+    return (
+        <FormGroup>
+            {renderCheckboxList()}
+        </FormGroup>
+    );
+};
+
+const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
+    const {options = [], multiple = false, onChange = () => {}, classes} = props;
+    const [textFilterValue, setTextFilterValue] = useState("");
+    const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
 
     const renderTextFilter = () => (
         <TextField
@@ -92,23 +109,14 @@ const SelectMultiple = (props: SelectProperties) => {
     return (
         <>
             {showFilter && renderTextFilter()}
-            <FormGroup>
-                {renderCheckboxList()}
-            </FormGroup>
+            <div className={classes.textContent}>
+                <FormControl component="fieldset">
+                    {multiple
+                        ? <SelectMultiple options={options} onChange={onChange} classes={classes} textFilterValue={textFilterValue} />
+                        : <SelectSingle options={options} onChange={onChange} textFilterValue={textFilterValue} />}
+                </FormControl>
+            </div>
         </>
-    );
-};
-
-const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {title, options = [], multiple = false, onChange = () => {}, classes, extraClasses = ''} = props;
-
-    return (
-        <FormControl component="fieldset">
-            <FormLabel className={`${classes.title} ${extraClasses}`} component="legend">{title}</FormLabel>
-            {multiple
-                ? <SelectMultiple options={options} onChange={onChange} />
-                : <SelectSingle options={options} onChange={onChange} />}
-        </FormControl>
     );
 };
 

@@ -1,6 +1,4 @@
 import React from 'react';
-
-import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
@@ -10,7 +8,7 @@ import {formatDateTime} from "../../../common/utils/genericUtils";
 
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {title, options = [], onChange = () => {}, classes} = props;
+    const {options = [], onChange = () => {}, classes} = props;
     const [value, setValue] = React.useState([null, null]);
     const [minDate, maxDate] = options;
 
@@ -57,19 +55,15 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     );
 
     return (
-        <div>
-            <Typography color="textSecondary" id="date-selection" gutterBottom className={classes.title}>
-                {title}
-            </Typography>
-            <Grid container>
-                <Grid item>
-                    {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1], minDate)}
-                </Grid>
-                <Grid item>
-                    {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate, maxDate)}
-                </Grid>
+        <Grid container>
+            <Grid item>
+                {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1], minDate)}
             </Grid>
-        </div>
+            <Grid item>
+                {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate, maxDate)}
+            </Grid>
+        </Grid>
+
     );
 };
 
