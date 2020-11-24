@@ -79,7 +79,7 @@ public class Services {
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
-        filteredDatasetGraph = dataset.asDatasetGraph(); //new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
+        filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
         viewService = new ViewService(config.search, filteredDataset);
                 searchProxyServlet = new SearchProxyServlet(
