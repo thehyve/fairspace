@@ -140,8 +140,8 @@ export const mockFacets = (name) => {
                     title: 'Tumor cellularity',
                     query: "",
                     type: "number",
-                    rangeStart: 2,
-                    rangeEnd: 8
+                    min: 2,
+                    max: 8
                 },
                 {
                     name: 'sampleNature',
@@ -247,8 +247,8 @@ export const mockFacets = (name) => {
                     title: 'Birth date',
                     query: "",
                     type: "date",
-                    rangeStart: new Date(2010, 11, 25),
-                    rangeEnd: new Date(2020, 1, 4)
+                    min: new Date(2010, 11, 25),
+                    max: new Date(2020, 1, 4)
                 }
             ];
         case "collections":

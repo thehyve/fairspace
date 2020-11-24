@@ -1,6 +1,6 @@
 import {Grain, AssignmentInd, Assignment, Folder} from "@material-ui/icons";
 import React from "react";
-import type {MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewOptions, MetadataViews, ValueType} from "./MetadataViewAPI";
 import {getCollectionAbsolutePath, pathForIri} from "../../collections/collectionUtils";
 import {getParentPath} from "../../file/fileUtils";
 
@@ -15,7 +15,7 @@ export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
 
 export const LOCATION_FILTER_FIELD = 'belongsTo';
 
-export const applyViewIcons = (views: MetadataViewOptions[]): MetadataViewOptions[] => views.map(view => {
+export const applyViewIcons = (viewsOptions: MetadataViewOptions[]): MetadataViewOptions[] => viewsOptions.map(view => {
     let icon = <Assignment />;
     if (view.name === 'subjects') {
         icon = <AssignmentInd />;
@@ -26,6 +26,11 @@ export const applyViewIcons = (views: MetadataViewOptions[]): MetadataViewOption
     }
     return {...view, icon};
 });
+
+export const mapMetadataViews = (views: MetadataViews): MetadataViews => {
+    views.views = applyViewIcons(views.views);
+    return views;
+};
 
 export const getContextualFileLink = (item, locationContext) => {
     const path = pathForIri(item);

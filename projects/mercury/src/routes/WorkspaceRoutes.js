@@ -27,7 +27,7 @@ const getSubject = () => (
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
-    const {views} = useContext(MetadataViewContext);
+    const {views = []} = useContext(MetadataViewContext);
 
     return (
         <Switch>

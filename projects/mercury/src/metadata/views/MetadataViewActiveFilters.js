@@ -15,20 +15,20 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
 
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
-            let rangeStart; let rangeEnd; let label;
+            let min; let max; let label;
             if (facet.type === 'date') {
-                rangeStart = formatDateTime(filter.rangeStart);
-                rangeEnd = formatDateTime(filter.rangeEnd);
+                min = formatDateTime(filter.min);
+                max = formatDateTime(filter.max);
             } else {
-                rangeStart = filter.rangeStart;
-                rangeEnd = filter.rangeEnd;
+                min = filter.min;
+                max = filter.max;
             }
-            if (rangeStart && rangeEnd) {
-                label = `${rangeStart} - ${rangeEnd}`;
-            } else if (rangeStart) {
-                label = `from: ${rangeStart}`;
-            } else if (rangeEnd) {
-                label = `to: ${rangeEnd}`;
+            if (min && max) {
+                label = `${min} - ${max}`;
+            } else if (min) {
+                label = `from: ${min}`;
+            } else if (max) {
+                label = `to: ${max}`;
             } else {
                 return <></>;
             }
@@ -42,12 +42,12 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
             );
         }
         return filter.values.map(valueIri => {
-            const value = facet.values.find(val => val.iri === valueIri);
+            const value = facet.values.find(val => val.value === valueIri);
             return (
                 value && (
                     <Chip
                         className={facet.backgroundColor}
-                        key={value.iri}
+                        key={value.value}
                         label={value.label}
                         style={{marginLeft: 5}}
                     />
@@ -67,7 +67,7 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
         >
             {
                 filters && filters.map(filter => {
-                    if ((!filter.rangeStart && !filter.rangeEnd && (!filter.values || filter.values.length === 0))
+                    if ((!filter.min && !filter.max && (!filter.values || filter.values.length === 0))
                         || filter.field === LOCATION_FILTER_FIELD) {
                         return null;
                     }

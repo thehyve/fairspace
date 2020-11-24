@@ -13,7 +13,7 @@ export default () => {
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
-    const {views} = useContext(MetadataViewContext);
+    const {views = []} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
@@ -54,7 +54,7 @@ export default () => {
                         <ListItemIcon>
                             {view.icon}
                         </ListItemIcon>
-                        <ListItemText primary={view.title} />
+                        <ListItemText style={{whiteSpace: 'normal'}} primary={view.title} />
                     </ListItem>
                 ))}
                 {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (

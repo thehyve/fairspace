@@ -8,6 +8,7 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import MessageDisplay from "../../../common/components/MessageDisplay";
 
 
 type SelectProperties = {
@@ -33,7 +34,7 @@ const SelectSingle = (props: SelectProperties) => {
     return (
         <RadioGroup value={value} onChange={handleChange}>
             {filterByText(options, textFilterValue).map(option => (
-                <FormControlLabel value={option.iri} control={<Radio fontSize="small" />} label={option.label} />
+                <FormControlLabel value={option.value} control={<Radio fontSize="small" />} label={option.label} />
             ))}
         </RadioGroup>
     );
@@ -42,11 +43,11 @@ const SelectSingle = (props: SelectProperties) => {
 const SelectMultiple = (props: SelectProperties) => {
     const {options, onChange, textFilterValue, preselected} = props;
     const [state, setState] = useState(Object.fromEntries(
-        options.map(option => [option.iri, preselected.some(s => s === option.iri)])
+        options.map(option => [option.value, preselected.some(s => s === option.value)])
     ));
 
     useEffect(() => setState(Object.fromEntries(
-        options.map(option => [option.iri, preselected.some(s => s === option.iri)])
+        options.map(option => [option.value, preselected.some(s => s === option.value)])
     )), [options, preselected]);
 
     const handleChange = (event) => {
@@ -61,12 +62,12 @@ const SelectMultiple = (props: SelectProperties) => {
     const renderCheckboxList = () => filterByText(options, textFilterValue)
         .map(option => (
             <FormControlLabel
-                key={option.iri}
+                key={option.value}
                 control={(
                     <Checkbox
-                        checked={state[option.iri]}
+                        checked={state[option.value]}
                         onChange={handleChange}
-                        name={option.iri}
+                        name={option.value}
                         icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                         checkedIcon={<CheckBoxIcon fontSize="small" />}
                     />
@@ -86,6 +87,14 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], multiple = false, onChange = () => {}, preselected = [], classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
     const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
+
+    if (!options || options.length === 0) {
+        return (
+            <Typography variant="body2">
+                No filter available.
+            </Typography>
+        );
+    }
 
     const renderTextFilter = () => (
         <TextField

@@ -8,8 +8,8 @@ import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, preselected} = props;
-    const minValue = min(options);
-    const maxValue = max(options);
+    const minValue = min(options) != null ? min(options) : -1;
+    const maxValue = max(options) != null ? max(options) : -1;
     const [value, setValue] = useState([null, null]);
 
     useEffect(() => setValue([null, null]), [preselected]);

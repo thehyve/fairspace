@@ -3,21 +3,17 @@ import {Button, Grid, Paper, withStyles} from '@material-ui/core';
 import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
-import MetadataViewAPI from './MetadataViewAPI';
 import BreadCrumbs from '../../common/components/BreadCrumbs';
-import useAsync from "../../common/hooks/UseAsync";
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
 import {getSearchPathSegments} from "../../collections/collectionUtils";
 import {getSearchContextFromString} from "../../search/searchUtils";
+import type {MetadataViewEntity} from "./metadataViewUtils";
 import {isCollectionView, LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
 import * as consts from "../../constants";
-import type {MetadataViewEntity} from "./metadataViewUtils";
 
 
 type MetadataViewProperties = {
@@ -33,14 +29,13 @@ const styles = (theme) => ({
     },
     facets: {
         marginTop: 10,
-        minWidth: 265,
+        minWidth: 280,
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
         overflowY: 'auto'
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
         overflowX: 'auto',
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT - 10
     },
     centralPanelFullWidth: {
         width: '100%'
@@ -51,20 +46,17 @@ const styles = (theme) => ({
     metadataViewTable: {
         marginTop: 10,
         overflowX: 'auto',
-        width: '100%'
+        width: '100%',
+        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
     }
 });
 
 export const MetadataView = (props: MetadataViewProperties) => {
     const {view: currentView, classes} = props;
-    const {views} = useContext(MetadataViewContext);
+    const {views = [], facets = []} = useContext(MetadataViewContext);
     const currentViewOptions = views.find(v => v.name === currentView) || {};
     const locationContext = getSearchContextFromString(window.location.search);
     const {toggle, selected} = useSingleSelection();
-
-    const {data: facets = [], error: facetsError, loading: facetsLoading} = useAsync(
-        () => MetadataViewAPI.getFacets(currentView)
-    );
 
     const [filters: MetadataViewFilter[], setFilters] = useState([]);
     const [preselected: string[], setPreselected] = useState([]); // TODO use for preselection of values per facet
@@ -87,7 +79,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
-            [filter.rangeStart, filter.rangeEnd] = values;
+            [filter.min, filter.max] = values;
         } else {
             filter.values = values;
         }
@@ -122,40 +114,28 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return [];
     };
 
-    const renderFacets = () => {
-        if (facetsLoading) {
-            return <LoadingInlay />;
-        }
-
-        if (!facetsLoading && facetsError && facetsError.message) {
-            return <MessageDisplay message={facetsError.message} />;
-        }
-        return (
-            <Grid
-                container
-                item
-                direction="column"
-                justify="flex-start"
-                spacing={1}
-            >
-                {
-                    facets.map(facet => (
+    const renderFacets = () => (
+        <Grid container item direction="column" justify="flex-start" spacing={1}>
+            {
+                facets.map(facet => {
+                    const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
+                    return facetOptions && facetOptions.length > 0 && !facetOptions.every(o => o == null) && (
                         <Grid key={facet.name} item>
                             <Facet
                                 multiple
                                 type={facet.type}
                                 title={facet.title}
-                                options={facet.values || [facet.rangeStart, facet.rangeEnd]}
+                                options={facetOptions || []}
                                 onChange={(values) => updateFilters(facet, values)}
                                 extraClasses={classes.facet}
                                 preselected={preselected}
                             />
                         </Grid>
-                    ))
-                }
-            </Grid>
-        );
-    };
+                    );
+                })
+            }
+        </Grid>
+    );
 
     const getBreadcrumbSegmentPath = () => {
         if (isCollectionView(currentView)) {

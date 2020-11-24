@@ -1,11 +1,11 @@
 import React from 'react';
-import useAsync from "../../common/hooks/UseAsync";
 import MetadataViewAPI from "./MetadataViewAPI";
+import useAsync from "../../common/hooks/UseAsync";
 
 const MetadataViewContext = React.createContext({});
 
 export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAPI}) => {
-    const {data: views = [], error, loading, refresh} = useAsync(
+    const {data = {}, error, loading, refresh} = useAsync(
         () => metadataViewApi.getViews(),
         []
     );
@@ -13,7 +13,8 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
     return (
         <MetadataViewContext.Provider
             value={{
-                views,
+                views: data.views,
+                facets: data.facets,
                 error,
                 loading,
                 refresh

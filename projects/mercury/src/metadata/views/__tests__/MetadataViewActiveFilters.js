@@ -60,8 +60,8 @@ describe('MetadataViewActiveFilters', () => {
             filters={[
                 {
                     field: 'tumorCellularity',
-                    rangeStart: 2,
-                    rangeEnd: 3
+                    min: 2,
+                    max: 3
                 }
             ]}
         />);

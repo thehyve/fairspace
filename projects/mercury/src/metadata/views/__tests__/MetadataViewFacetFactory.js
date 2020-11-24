@@ -53,7 +53,7 @@ describe('MetadataViewFacetFactory', () => {
         const mockFacet = mockFacets("samples").find(v => v.title === title);
         const wrapper = mount(<Facet
             title={title}
-            options={[mockFacet.rangeStart, mockFacet.rangeEnd]}
+            options={[mockFacet.min, mockFacet.max]}
             type="number"
             multiple
             onChange={() => {}}
@@ -65,13 +65,13 @@ describe('MetadataViewFacetFactory', () => {
 
         const facetValues = wrapper.find(Input);
         expect(facetValues.length).toEqual(2);
-        expect(facetValues.at(0).prop('inputProps').placeholder).toEqual(mockFacet.rangeStart);
-        expect(facetValues.at(1).prop('inputProps').placeholder).toEqual(mockFacet.rangeEnd);
+        expect(facetValues.at(0).prop('inputProps').placeholder).toEqual(mockFacet.min);
+        expect(facetValues.at(1).prop('inputProps').placeholder).toEqual(mockFacet.max);
 
         const slider = wrapper.find(Slider);
         expect(slider.length).toEqual(1);
-        expect(slider.prop('min')).toEqual(mockFacet.rangeStart);
-        expect(slider.prop('max')).toEqual(mockFacet.rangeEnd);
+        expect(slider.prop('min')).toEqual(mockFacet.min);
+        expect(slider.prop('max')).toEqual(mockFacet.max);
     });
 
     it('should render a date selection facet', () => {
@@ -79,7 +79,7 @@ describe('MetadataViewFacetFactory', () => {
         const mockFacet = mockFacets("subjects").find(v => v.title === title);
         const wrapper = mount(<Facet
             title={title}
-            options={[mockFacet.rangeStart, mockFacet.rangeEnd]}
+            options={[mockFacet.min, mockFacet.max]}
             type="date"
             multiple
             onChange={() => {}}
@@ -91,11 +91,11 @@ describe('MetadataViewFacetFactory', () => {
 
         const facetValues = wrapper.find(KeyboardDatePicker);
         expect(facetValues.length).toEqual(2);
-        expect(facetValues.at(0).prop('placeholder')).toEqual(formatDateTime(mockFacet.rangeStart));
-        expect(facetValues.at(1).prop('placeholder')).toEqual(formatDateTime(mockFacet.rangeEnd));
-        expect(facetValues.at(0).prop('minDate')).toEqual(mockFacet.rangeStart);
-        expect(facetValues.at(0).prop('maxDate')).toEqual(mockFacet.rangeEnd);
-        expect(facetValues.at(1).prop('minDate')).toEqual(mockFacet.rangeStart);
-        expect(facetValues.at(1).prop('maxDate')).toEqual(mockFacet.rangeEnd);
+        expect(facetValues.at(0).prop('placeholder')).toEqual(formatDateTime(mockFacet.min));
+        expect(facetValues.at(1).prop('placeholder')).toEqual(formatDateTime(mockFacet.max));
+        expect(facetValues.at(0).prop('minDate')).toEqual(mockFacet.min);
+        expect(facetValues.at(0).prop('maxDate')).toEqual(mockFacet.max);
+        expect(facetValues.at(1).prop('minDate')).toEqual(mockFacet.min);
+        expect(facetValues.at(1).prop('maxDate')).toEqual(mockFacet.max);
     });
 });
