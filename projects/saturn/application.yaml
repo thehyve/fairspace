@@ -73,8 +73,8 @@ services:
 features:
   - MetadataEditing
 search:
-  pageRequestTimeout: 3000
-  countRequestTimeout: 30000
+  pageRequestTimeout: 10000
+  countRequestTimeout: 60000
   facets:
     - name: topography
       group: event
@@ -422,32 +422,38 @@ search:
         WHERE {
           ?subject a curie:Subject .
 
-          OPTIONAL { ?subject curie:isOfSpecies ?species } ## speciesFilter
-          OPTIONAL { ?subject curie:gender ?gender } ## genderFilter
-          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews } ## ageAtLastNewsFilter
-          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath } ## ageAtDeathFilter
+          <#if topography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
+          { ?sample curie:subject ?subject .
+            <#if topography??>       { ?sample curie:topography ?topography ${topography} } </#if>
+            <#if sampleNature??>     { ?sample curie:isOfNature ?sampleNature ${sampleNature} } </#if>
+            <#if sampleOrigin??>     { ?sample curie:hasOrigin ?sampleOrigin ${sampleOrigin} } </#if>
+            <#if tumorCellularity??> { ?sample curie:tumorCellularity ?tumorCellularity ${tumorCellularity} } </#if>
+          }
+          </#if>
+        
+          <#if morphology?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
+          { ?event curie:subject ?subject ;
+            <#if morphology??>      { ?event curie:tumorMorphology ?morphology ${morphology} } </#if>
+            <#if eventType??>       { ?event curie:eventType ?eventType ${eventType} } </#if>
+            <#if laterality??>      { ?event curie:tumorLaterality ?laterality ${laterality} } </#if>
+            <#if ageAtDiagnosis??>  { ?event curie:ageAtDiagnosis ?ageAtDiagnosis ${ageAtDiagnosis} } </#if>
+            <#if tumorGradeType??>  { ?event curie:tumorGradeType ?tumorGradeType ${tumorGradeType} } </#if>
+            <#if tumorGradeValue??> { ?event curie:tumorGradeValue ?tumorGradeValue ${tumorGradeValue} } </#if>
+            <#if tnmType??>         { ?event curie:tnmType ?tnmType ${tnmType} } </#if>
+            <#if tnmT??>            { ?event curie:tnmT ?tnmT ${tnmT} } </#if>
+            <#if tnmN??>            { ?event curie:tnmN ?tnmN ${tnmN} } </#if>
+            <#if tnmM??>            { ?event curie:tnmM ?tnmM ${tnmM} } </#if>
+          }
+          </#if>
+        
+          <#if collection??>
+            { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject ${collection} }
+          </#if>
 
-          ## sample { ?sample curie:subject ?subject .
-            ## topography       { ?sample curie:topography ?topography ## topographyFilter }
-            ## sampleNature     { ?sample curie:isOfNature ?sampleNature ## sampleNatureFilter }
-            ## sampleOrigin     { ?sample curie:hasOrigin ?sampleOrigin ## sampleOriginFilter }
-            ## tumorCellularity { ?sample curie:tumorCellularity ?tumorCellularity ilter ##tumorCellularityF}
-          ## sample }
-
-          ## event { ?event curie:subject ?subject ;
-            ## morphology      { ?event curie:tumorMorphology ?morphology ## morphologyFilter }
-            ## eventType       { ?event curie:eventType ?eventType ## eventTypeFilter }
-            ## laterality      { ?event curie:tumorLaterality ?laterality ## lateralityFilter }
-            ## ageAtDiagnosis  { ?event curie:ageAtDiagnosis ?ageAtDiagnosis ## ageAtDiagnosisFilter }
-            ## tumorGradeType  { ?event curie:tumorGradeType ?tumorGradeType ## tumorGradeTypeFilter }
-            ## tumorGradeValue { ?event curie:tumorGradeValue ?tumorGradeValue ##tumorGradeValueFilter }
-            ## tnmType         { ?event curie:tnmType ?tnmType ##tnmTypeFilter }
-            ## tnmT            { ?event curie:tnmT ?tnmT ## tnmTFilter }
-            ## tnmN            { ?event curie:tnmN ?tnmN ##tnmNFilter }
-            ## tnmM            { ?event curie:tnmM ?tnmM ##tnmMFilter }
-          ## event }
-
-          ## collection { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject ## collectionFilter }
+          OPTIONAL { ?subject curie:isOfSpecies ?species } ${species!}
+          OPTIONAL { ?subject curie:gender ?gender } ${gender!}
+          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews } ${ageAtLastNews!}
+          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath } ${ageAtDeath!}
 
           FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
         }

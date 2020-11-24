@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.views;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.fairspace.saturn.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -13,6 +15,9 @@ import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.*;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
@@ -94,7 +99,14 @@ public class ViewService {
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }
 
-    private String applyFilters(String query, List<ViewFilter> filters) {
+    private String applyFilters(String queryTemplate, List<ViewFilter> filters) {
+        Template template;
+        try {
+            template = new Template(null, new StringReader(queryTemplate), null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        var model = new HashMap<String, String>();
         for (var filter : filters) {
             var facet = config.facets
                     .stream()
@@ -112,15 +124,16 @@ public class ViewService {
                         .collect(toList());
                 expr = new E_OneOf(variable, new ExprList(values));
             }
-            if (facet.group != null) {
-                query = query.replaceFirst("## " + facet.group + " ", "");
-            }
-            query = query
-                    .replaceFirst("## " + filter.field + " ", "")
-                    .replaceFirst("## " + filter.field + "Filter", new ElementFilter(expr).toString());
 
+            model.put(filter.field, new ElementFilter(expr).toString());
         }
-        return query;
+        var out = new StringWriter();
+        try {
+            template.process(model, out);
+        } catch (TemplateException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return out.toString();
     }
 
     private static NodeValue toNodeValue(Object o, Config.Search.ValueType type) {
