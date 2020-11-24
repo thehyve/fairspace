@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Grid from "@material-ui/core/Grid";
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
@@ -8,9 +8,11 @@ import {formatDateTime} from "../../../common/utils/genericUtils";
 
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, classes} = props;
-    const [value, setValue] = React.useState([null, null]);
+    const {options = [], onChange = () => {}, preselected, classes} = props;
+    const [value, setValue] = useState([null, null]);
     const [minDate, maxDate] = options;
+
+    useEffect(() => setValue([null, null]), [preselected]);
 
     const handleChange = (newValue) => {
         setValue(newValue);

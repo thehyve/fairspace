@@ -1,8 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Grid, Paper, withStyles} from '@material-ui/core';
+import {Button, Grid, Paper, withStyles} from '@material-ui/core';
 import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewEntity, MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
 import MetadataViewAPI from './MetadataViewAPI';
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import useAsync from "../../common/hooks/UseAsync";
@@ -17,6 +17,7 @@ import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
 import * as consts from "../../constants";
+import type {MetadataViewEntity} from "./metadataViewUtils";
 
 
 type MetadataViewProperties = {
@@ -66,6 +67,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     );
 
     const [filters: MetadataViewFilter[], setFilters] = useState([]);
+    const [preselected: string[], setPreselected] = useState([]); // TODO use for preselection of values per facet
 
     useEffect(() => {
         if (isCollectionView(currentView)) {
@@ -77,6 +79,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentView, locationContext]);
+
+    const clearFilters = () => {
+        setFilters([]);
+        setPreselected([]);
+    };
 
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
@@ -141,6 +148,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 options={facet.values || [facet.rangeStart, facet.rangeEnd]}
                                 onChange={(values) => updateFilters(facet, values)}
                                 extraClasses={classes.facet}
+                                preselected={preselected}
                             />
                         </Grid>
                     ))
@@ -168,7 +176,12 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments()} />
-            <MetadataViewActiveFilters facets={facets} filters={filters} />
+            {filters && filters.length > 0 && (
+                <Grid container direction="row" spacing={1}>
+                    <Grid item><Button onClick={() => clearFilters()} color="primary">Clear all</Button></Grid>
+                    <Grid item><MetadataViewActiveFilters facets={facets} filters={filters} /></Grid>
+                </Grid>
+            )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
                 <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">

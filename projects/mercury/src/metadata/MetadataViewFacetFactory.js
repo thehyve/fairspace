@@ -21,6 +21,7 @@ export type MetadataViewFacetProperties = {
     onChange: (string[]) => void;
     extraClasses?: string;
     classes?: any;
+    preselected?: string[];
 };
 
 const useStyles = makeStyles((theme) => ({

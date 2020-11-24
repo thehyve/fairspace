@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import Slider from "@material-ui/core/Slider";
@@ -7,10 +7,12 @@ import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}} = props;
+    const {options = [], onChange = () => {}, preselected} = props;
     const minValue = min(options);
     const maxValue = max(options);
-    const [value, setValue] = React.useState([null, null]);
+    const [value, setValue] = useState([null, null]);
+
+    useEffect(() => setValue([null, null]), [preselected]);
 
     const handleChange = (newValue) => {
         setValue([min(newValue), max(newValue)]);

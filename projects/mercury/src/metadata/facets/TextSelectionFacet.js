@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup} from "@material-ui/core";
 import {Clear, Search} from "@material-ui/icons";
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
@@ -14,6 +14,7 @@ type SelectProperties = {
     options: Option[];
     onChange: (string[]) => void;
     textFilterValue: string;
+    preselected?: string[];
 }
 
 const filterByText = (options, textFilterValue) => options
@@ -39,8 +40,14 @@ const SelectSingle = (props: SelectProperties) => {
 };
 
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue} = props;
-    const [state, setState] = useState(Object.fromEntries(options.map(option => [option.iri, false])));
+    const {options, onChange, textFilterValue, preselected} = props;
+    const [state, setState] = useState(Object.fromEntries(
+        options.map(option => [option.iri, preselected.some(s => s === option.iri)])
+    ));
+
+    useEffect(() => setState(Object.fromEntries(
+        options.map(option => [option.iri, preselected.some(s => s === option.iri)])
+    )), [options, preselected]);
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -76,7 +83,7 @@ const SelectMultiple = (props: SelectProperties) => {
 };
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], multiple = false, onChange = () => {}, classes} = props;
+    const {options = [], multiple = false, onChange = () => {}, preselected = [], classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
     const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
 
@@ -111,9 +118,15 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
             {showFilter && renderTextFilter()}
             <div className={classes.textContent}>
                 <FormControl component="fieldset">
-                    {multiple
-                        ? <SelectMultiple options={options} onChange={onChange} classes={classes} textFilterValue={textFilterValue} />
-                        : <SelectSingle options={options} onChange={onChange} textFilterValue={textFilterValue} />}
+                    {multiple ? (
+                        <SelectMultiple
+                            preselected={preselected}
+                            options={options}
+                            onChange={onChange}
+                            classes={classes}
+                            textFilterValue={textFilterValue}
+                        />
+                    ) : (<SelectSingle options={options} onChange={onChange} textFilterValue={textFilterValue} />)}
                 </FormControl>
             </div>
         </>
