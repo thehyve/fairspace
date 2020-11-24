@@ -88,21 +88,9 @@ public class ViewService {
     }
 
     private Query getBaseQuery(String viewName, List<ViewFilter> filters) {
-        return QueryFactory.create(applyFilters(getView(viewName).query, filters));
-    }
-
-    private Config.Search.View getView(String viewName) {
-        return config.views
-                .stream()
-                .filter(v -> v.name.equals(viewName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
-    }
-
-    private String applyFilters(String queryTemplate, List<ViewFilter> filters) {
         Template template;
         try {
-            template = new Template(null, new StringReader(queryTemplate), null);
+            template = new Template(viewName, new StringReader(getView(viewName).query), null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -133,7 +121,15 @@ public class ViewService {
         } catch (TemplateException | IOException e) {
             throw new RuntimeException(e);
         }
-        return out.toString();
+        return QueryFactory.create(out.toString());
+    }
+
+    private Config.Search.View getView(String viewName) {
+        return config.views
+                .stream()
+                .filter(v -> v.name.equals(viewName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }
 
     private static NodeValue toNodeValue(Object o, Config.Search.ValueType type) {
