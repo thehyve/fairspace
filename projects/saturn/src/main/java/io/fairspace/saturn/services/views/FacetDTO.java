@@ -11,5 +11,6 @@ public class FacetDTO {
     String title;
     Config.Search.ValueType type;
     Map<String, String> values;
-    //TODO: values & counts
+    Long min;
+    Long max;
 }

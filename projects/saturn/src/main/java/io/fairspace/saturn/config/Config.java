@@ -98,6 +98,8 @@ public class Config {
             public String title;
             public String query;
             public ValueType type;
+            public Long min;
+            public Long max;
         }
 
         public static class View {

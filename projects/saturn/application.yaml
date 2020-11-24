@@ -103,7 +103,8 @@ search:
     - name: tumorCellularity
       title: Tumor Cellularity
       type: number
-      query:
+      min: 0
+      max: 100
     - name: Event Type
       title: eventType
       type: id

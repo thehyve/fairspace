@@ -173,7 +173,7 @@ public class ViewService {
         return Txn.calculateRead(ds, () ->
             config.facets
                     .stream()
-                    .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query)))
+                    .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query), f.min, f.max))
                     .collect(toList()));
     }
 
