@@ -9,7 +9,6 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.expr.aggregate.AggCount;
 import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
@@ -84,10 +83,7 @@ public class ViewService {
     }
 
     private Query getBaseQuery(String viewName, List<ViewFilter> filters) {
-        var view = getView(viewName);
-        var query = QueryFactory.create(view.query);
-        applyFilters(query, filters);
-        return query;
+        return QueryFactory.create(applyFilters(getView(viewName).query, filters));
     }
 
     private Config.Search.View getView(String viewName) {
@@ -98,15 +94,8 @@ public class ViewService {
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }
 
-    private void applyFilters(Query query, List<ViewFilter> filters) {
-        if (!(query.getQueryPattern() instanceof ElementGroup)) {
-            var group = new ElementGroup();
-            group.addElement(query.getQueryPattern());
-            query.setQueryPattern(group);
-        }
-
-        var queryPatternGroup = (ElementGroup) query.getQueryPattern();
-        filters.forEach(filter -> {
+    private String applyFilters(String query, List<ViewFilter> filters) {
+        for (var filter : filters) {
             var facet = config.facets
                     .stream()
                     .filter(f -> f.name.equals(filter.field))
@@ -114,19 +103,24 @@ public class ViewService {
                     .orElseThrow(() -> new IllegalArgumentException("Unknown facet: " + filter.field));
 
             var variable = new ExprVar(filter.field);
-            if (!filter.values.isEmpty()) {
+            Expr expr;
+            if (filter.rangeStart != null && filter.rangeEnd != null) {
+                expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type)));
+            } else {
                 List<Expr> values = filter.values.stream()
                         .map(o -> toNodeValue(o, facet.type))
                         .collect(toList());
-                queryPatternGroup.addElementFilter(new ElementFilter(new E_OneOf(variable, new ExprList(values))));
+                expr = new E_OneOf(variable, new ExprList(values));
             }
-            if (filter.rangeStart != null) {
-                queryPatternGroup.addElementFilter(new ElementFilter(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type))));
+            if (facet.group != null) {
+                query = query.replaceFirst("## " + facet.group + " ", "");
             }
-            if (filter.rangeEnd != null) {
-                queryPatternGroup.addElementFilter(new ElementFilter(new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type))));
-            }
-        });
+            query = query
+                    .replaceFirst("## " + filter.field + " ", "")
+                    .replaceFirst("## " + filter.field + "Filter", new ElementFilter(expr).toString());
+
+        }
+        return query;
     }
 
     private static NodeValue toNodeValue(Object o, Config.Search.ValueType type) {
@@ -140,7 +134,7 @@ public class ViewService {
 
     CountDTO getCount(CountRequest request) {
         var innerQuery = getBaseQuery(request.getView(), request.getFilters());
-        var query  = toCountQuery(innerQuery);
+        var query = toCountQuery(innerQuery);
 
         log.debug("Querying the total number of matches: \n{}", query);
 
@@ -159,7 +153,7 @@ public class ViewService {
     }
 
     private Query toCountQuery(Query query) {
-        var queryTotal  = new Query();
+        var queryTotal = new Query();
         queryTotal.setQuerySelectType();
         var project = queryTotal.getProject();
 
@@ -171,10 +165,10 @@ public class ViewService {
 
     List<FacetDTO> getFacets() {
         return Txn.calculateRead(ds, () ->
-            config.facets
-                    .stream()
-                    .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query), f.min, f.max))
-                    .collect(toList()));
+                config.facets
+                        .stream()
+                        .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query), f.min, f.max))
+                        .collect(toList()));
     }
 
     private Map<String, String> getValues(String query) {

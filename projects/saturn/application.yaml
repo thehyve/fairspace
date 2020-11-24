@@ -77,6 +77,7 @@ search:
   countRequestTimeout: 30000
   facets:
     - name: topography
+      group: event
       title: Topography
       type: id
       query: |
@@ -87,6 +88,7 @@ search:
            FILTER EXISTS { ?x curie:topography ?topography }
         }
     - name: sampleNature
+      group: sample
       title: Sample Nature
       type: id
       query: |
@@ -97,23 +99,28 @@ search:
            FILTER EXISTS { ?x curie:isOfNature ?nature }
         }
     - name: sampleOrigin
+      group: sample
       title: Sample Origin
       type: id
       query:
     - name: tumorCellularity
+      group: sample
       title: Tumor Cellularity
       type: number
       min: 0
       max: 100
-    - name: Event Type
-      title: eventType
+    - name: eventType
+      group: event
+      title: Event Type
       type: id
       query:
-    - name: Morphology
+    - name: morphology
+      group: event
       title: Morphology
       type: id
       query:
-    - name: Laterality
+    - name: laterality
+      group: event
       title: Laterality
       type: id
       query: |
@@ -124,46 +131,57 @@ search:
            FILTER EXISTS { ?x curie:laterality ?laterality }
         }
     - name: tumorGradeType
+      group: event
       title: Tumor Grade Type
       type: id
       query:
     - name: tumorGradeValue
+      group: event
       title: Tumor Grade Value
       type: id
       query:
     - name: tnmType
+      group: event
       title: TNM Type
       type: id
       query:
     - name: tnmT
+      group: event
       title: The primary tumor size
       type: id
       query:
     - name: tnmN
+      group: event
       title: The regional lymph nodes
       type: id
       query:
     - name: tnmM
+      group: event
       title: Distant metastasis
       type: id
       query:
     - name: ageAtDiagnosis
+      group: event
       title: Age at Diagnosis
       type: number
       query:
     - name: species
+      group: subject
       title: Species
       type: id
       query:
     - name: gender
+      group: subject
       title: Gender
       type: id
       query:
     - name: ageAtLastNews
+      group: subject
       title: Age at Last News
       type: number
       query:
     - name: ageAtDeath
+      group: subject
       title: Age at Death
       type: number
       query:
@@ -404,32 +422,32 @@ search:
         WHERE {
           ?subject a curie:Subject .
 
-          OPTIONAL { ?sample curie:subject ?subject .
-            OPTIONAL { ?sample curie:topography ?topography }
-            OPTIONAL { ?sample curie:isOfNature ?sampleNature }
-            OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
-            OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
-          }
+          OPTIONAL { ?subject curie:isOfSpecies ?species } ## speciesFilter
+          OPTIONAL { ?subject curie:gender ?gender } ## genderFilter
+          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews } ## ageAtLastNewsFilter
+          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath } ## ageAtDeathFilter
 
-          OPTIONAL { ?event curie:subject ?subject ;
-            OPTIONAL { ?event curie:tumorMorphology ?morphology }
-            OPTIONAL { ?event curie:eventType ?eventType }
-            OPTIONAL { ?event curie:tumorLaterality ?laterality }
-            OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
-            OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
-            OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
-            OPTIONAL { ?event curie:tnmType ?tnmType }
-            OPTIONAL { ?event curie:tnmT ?tnmT }
-            OPTIONAL { ?event curie:tnmN ?tnmN }
-            OPTIONAL { ?event curie:tnmM ?tnmM }
-          }
+          ## sample { ?sample curie:subject ?subject .
+            ## topography       { ?sample curie:topography ?topography ## topographyFilter }
+            ## sampleNature     { ?sample curie:isOfNature ?sampleNature ## sampleNatureFilter }
+            ## sampleOrigin     { ?sample curie:hasOrigin ?sampleOrigin ## sampleOriginFilter }
+            ## tumorCellularity { ?sample curie:tumorCellularity ?tumorCellularity ilter ##tumorCellularityF}
+          ## sample }
 
-          OPTIONAL { ?subject curie:gender ?gender }
-          OPTIONAL { ?subject curie:isOfSpecies ?species }
-          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews }
-          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath }
+          ## event { ?event curie:subject ?subject ;
+            ## morphology      { ?event curie:tumorMorphology ?morphology ## morphologyFilter }
+            ## eventType       { ?event curie:eventType ?eventType ## eventTypeFilter }
+            ## laterality      { ?event curie:tumorLaterality ?laterality ## lateralityFilter }
+            ## ageAtDiagnosis  { ?event curie:ageAtDiagnosis ?ageAtDiagnosis ## ageAtDiagnosisFilter }
+            ## tumorGradeType  { ?event curie:tumorGradeType ?tumorGradeType ## tumorGradeTypeFilter }
+            ## tumorGradeValue { ?event curie:tumorGradeValue ?tumorGradeValue ##tumorGradeValueFilter }
+            ## tnmType         { ?event curie:tnmType ?tnmType ##tnmTypeFilter }
+            ## tnmT            { ?event curie:tnmT ?tnmT ## tnmTFilter }
+            ## tnmN            { ?event curie:tnmN ?tnmN ##tnmNFilter }
+            ## tnmM            { ?event curie:tnmM ?tnmM ##tnmMFilter }
+          ## event }
 
-          OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
+          ## collection { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject ## collectionFilter }
 
           FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
         }

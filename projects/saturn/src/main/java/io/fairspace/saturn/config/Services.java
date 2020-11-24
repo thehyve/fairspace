@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
 
@@ -47,7 +48,7 @@ public class Services {
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
-    private final FilteredDatasetGraph filteredDatasetGraph;
+    private final DatasetGraph filteredDatasetGraph;
     private final SearchProxyServlet searchProxyServlet;
     private final ViewService viewService;
 
@@ -78,7 +79,7 @@ public class Services {
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
-        filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
+        filteredDatasetGraph = dataset.asDatasetGraph(); //new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
         viewService = new ViewService(config.search, filteredDataset);
                 searchProxyServlet = new SearchProxyServlet(
