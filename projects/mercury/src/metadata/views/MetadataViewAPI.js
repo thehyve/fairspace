@@ -53,12 +53,20 @@ export type MetadataViewData = {
     timeout: boolean;
 };
 
-type MetadataViewDataRequest = {
+export type MetadataViewDataCount = {
+    count: number;
+    timeout: boolean;
+};
+
+type MetadataViewCountRequest = {
     view: string;
     filters: MetadataViewFilter[];
+};
+
+type MetadataViewDataRequest = MetadataViewCountRequest & {|
     page: number;
     size: number;
-};
+|};
 
 class MetadataViewAPI {
     getViews(): Promise<MetadataViews> {
@@ -75,12 +83,23 @@ class MetadataViewAPI {
             view: viewName,
             filters,
             page,
-            size: size + 1
+            size
         };
         return axios.post(metadataViewUrl, viewRequest,
             {headers: {Accept: 'application/json'}})
             .then(extractJsonData)
             .catch(handleHttpError("Error while fetching view data."));
+    }
+
+    getCount(viewName: string, filters: MetadataViewFilter[] = []): Promise<MetadataViewDataCount> {
+        const viewRequest: MetadataViewCountRequest = {
+            view: viewName,
+            filters
+        };
+        return axios.post(`${metadataViewUrl}/count`, viewRequest,
+            {headers: {Accept: 'application/json'}})
+            .then(extractJsonData)
+            .catch(handleHttpError("Error while fetching view count."));
     }
 }
 

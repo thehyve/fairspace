@@ -8,7 +8,6 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
-import MessageDisplay from "../../../common/components/MessageDisplay";
 
 
 type SelectProperties = {

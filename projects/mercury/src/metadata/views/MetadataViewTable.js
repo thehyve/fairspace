@@ -12,9 +12,7 @@ import {
 } from '@material-ui/core';
 import {useHistory} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
-import MetadataViewAPI from "./MetadataViewAPI";
 import styles from "../../file/FileList.styles";
-import useAsync from "../../common/hooks/UseAsync";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import IriTooltip from "../../common/components/IriTooltip";
@@ -23,6 +21,7 @@ import Iri from "../../common/components/Iri";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink, isCollectionView} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
+import useViewData from "./UseViewData";
 
 
 type MetadataViewTableContainerProperties = {
@@ -128,35 +127,19 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
 
-    const {data = {}, error, loading} = useAsync(
-        () => MetadataViewAPI.getViewData(view, page, rowsPerPage, filters),
-        [page, rowsPerPage, view, filters]
-    );
+    const {data, count, error, loading} = useViewData(view, filters, page, rowsPerPage);
 
     if (loading) {
         return <LoadingInlay />;
     }
 
-    if (!loading && error && error.message) {
+    if (error && error.message) {
         return <MessageDisplay message={error.message} />;
     }
 
-    if (!data || !data.rows.length) {
+    if (!data || !data.rows || !data.rows.length) {
         return <MessageDisplay message="No results found." />;
     }
-
-    const getTotalCount = () => {
-        if (data) {
-            if (data.totalCount && data.totalCount >= 0) {
-                return data.totalCount;
-            }
-            if (data.rows.length <= rowsPerPage) {
-                return data.rows.length;
-            }
-            return -1;
-        }
-        return 0;
-    };
 
     return (
         <Paper className={props.classes.root}>
@@ -170,7 +153,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
                         component="div"
-                        count={getTotalCount()}
+                        count={count}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onChangePage={(e, p) => setPage(p)}
