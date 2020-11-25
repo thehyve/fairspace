@@ -417,37 +417,38 @@ search:
         PREFIX curie: <https://institut-curie.org/ontology#>
         PREFIX fs:    <http://fairspace.io/ontology#>
 
-        SELECT DISTINCT
-          ?subject ?species ?gender ?ageAtLastNews ?ageAtDeath
+        SELECT ?subject ?species ?gender ?ageAtLastNews ?ageAtDeath
         WHERE {
           ?subject a curie:Subject .
 
           <#if topography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
-          { ?sample curie:subject ?subject .
-            <#if topography??>       { ?sample curie:topography ?topography ${topography} } </#if>
-            <#if sampleNature??>     { ?sample curie:isOfNature ?sampleNature ${sampleNature} } </#if>
-            <#if sampleOrigin??>     { ?sample curie:hasOrigin ?sampleOrigin ${sampleOrigin} } </#if>
-            <#if tumorCellularity??> { ?sample curie:tumorCellularity ?tumorCellularity ${tumorCellularity} } </#if>
+          FILTER EXISTS {
+            ?sample curie:subject ?subject .
+            <#if topography??>       ?sample curie:topography ?topography . ${topography} </#if>
+            <#if sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature} </#if>
+            <#if sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin} </#if>
+            <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
           }
           </#if>
         
           <#if morphology?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
-          { ?event curie:subject ?subject ;
-            <#if morphology??>      { ?event curie:tumorMorphology ?morphology ${morphology} } </#if>
-            <#if eventType??>       { ?event curie:eventType ?eventType ${eventType} } </#if>
-            <#if laterality??>      { ?event curie:tumorLaterality ?laterality ${laterality} } </#if>
-            <#if ageAtDiagnosis??>  { ?event curie:ageAtDiagnosis ?ageAtDiagnosis ${ageAtDiagnosis} } </#if>
-            <#if tumorGradeType??>  { ?event curie:tumorGradeType ?tumorGradeType ${tumorGradeType} } </#if>
-            <#if tumorGradeValue??> { ?event curie:tumorGradeValue ?tumorGradeValue ${tumorGradeValue} } </#if>
-            <#if tnmType??>         { ?event curie:tnmType ?tnmType ${tnmType} } </#if>
-            <#if tnmT??>            { ?event curie:tnmT ?tnmT ${tnmT} } </#if>
-            <#if tnmN??>            { ?event curie:tnmN ?tnmN ${tnmN} } </#if>
-            <#if tnmM??>            { ?event curie:tnmM ?tnmM ${tnmM} } </#if>
+          FILTER EXISTS {
+            ?event curie:subject ?subject .
+            <#if morphology??>      ?event curie:tumorMorphology ?morphology . ${morphology} </#if>
+            <#if eventType??>       ?event curie:eventType ?eventType . ${eventType} </#if>
+            <#if laterality??>      ?event curie:tumorLaterality ?laterality . ${laterality} </#if>
+            <#if ageAtDiagnosis??>  ?event curie:ageAtDiagnosis ?ageAtDiagnosis . ${ageAtDiagnosis} </#if>
+            <#if tumorGradeType??>  ?event curie:tumorGradeType ?tumorGradeType . ${tumorGradeType} </#if>
+            <#if tumorGradeValue??> ?event curie:tumorGradeValue ?tumorGradeValue . ${tumorGradeValue} </#if>
+            <#if tnmType??>         ?event curie:tnmType ?tnmType . ${tnmType} </#if>
+            <#if tnmT??>            ?event curie:tnmT ?tnmT . ${tnmT} </#if>
+            <#if tnmN??>            ?event curie:tnmN ?tnmN . ${tnmN} </#if>
+            <#if tnmM??>            ?event curie:tnmM ?tnmM . ${tnmM} </#if>
           }
           </#if>
         
           <#if collection??>
-            { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject ${collection} }
+            FILTER EXISTS { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject . ${collection} }
           </#if>
 
           OPTIONAL { ?subject curie:isOfSpecies ?species } ${species!}
