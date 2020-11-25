@@ -104,6 +104,10 @@ public class ViewService {
             Expr expr;
             if (filter.rangeStart != null && filter.rangeEnd != null) {
                 expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type)));
+            } else if (filter.rangeStart != null) {
+                expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type));
+            } else if (filter.rangeEnd != null) {
+                expr = new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type));
             } else {
                 List<Expr> values = filter.values.stream()
                         .map(o -> toNodeValue(o, facet.type))
