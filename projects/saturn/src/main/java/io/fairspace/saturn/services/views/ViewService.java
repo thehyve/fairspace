@@ -89,9 +89,19 @@ public class ViewService {
         try {
             var template = new Template(viewName, new StringReader(getView(viewName).query), null);
             var out = new StringWriter();
-            template.process(getFiltersModel(fetch, filters), out);
-            return QueryFactory.create(out.toString());
-        } catch (TemplateException | IOException e) {
+            try {
+                template.process(getFiltersModel(fetch, filters), out);
+            } catch (TemplateException e) {
+                throw new RuntimeException("Error interpolating template: \n " + template, e);
+            }
+            var sparql = out.toString();
+            try {
+                return QueryFactory.create(sparql);
+            } catch (QueryException e) {
+                log.error("Error parsing query:\n {}", sparql);
+                throw new RuntimeException("Error parsing query:\n" + sparql, e);
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
