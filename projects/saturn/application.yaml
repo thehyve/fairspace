@@ -378,7 +378,7 @@ search:
             OPTIONAL {?sample curie:diagnosis ?event}
 
             <#if fetch || morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology!} </#if>
-            <#if fetch || eventType??>       OPTIONAL { ?event curie:eventType OPTIONAL { ?eventType } ${eventType!} </#if>
+            <#if fetch || eventType??>       OPTIONAL { ?event curie:eventType ?eventType } ${eventType!} </#if>
             <#if fetch || tumorTopography??> OPTIONAL { ?event curie:topography ?tumorTopography } ${tumorTopography!} </#if>
             <#if fetch || laterality??>      OPTIONAL { ?event curie:tumorLaterality ?laterality } ${laterality!} </#if>
             <#if fetch || ageAtDiagnosis??>  OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis } ${ageAtDiagnosis!} </#if>
