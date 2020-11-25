@@ -76,15 +76,25 @@ search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
   facets:
-    - name: topography
-      title: Topography
+    - name: tumorTopography
+      title: Tunor Topography
       type: id
       query: |
         PREFIX curie: <https://institut-curie.org/ontology#>
         SELECT ?topography
         WHERE {
            ?topography a curie:Topography .
-           FILTER EXISTS { ?x curie:topography ?topography }
+           FILTER EXISTS { ?sample curie:topography ?topography ; a curie:TumorPathologyEvent . }
+        }
+    - name: sampleTopography
+      title: Sample Topography
+      type: id
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?topography
+        WHERE {
+           ?topography a curie:Topography .
+           FILTER EXISTS { ?sample curie:topography ?topography ; a curie:BiologicalSample . }
         }
     - name: sampleNature
       title: Sample Nature
@@ -174,6 +184,7 @@ search:
         PREFIX curie: <https://institut-curie.org/ontology#>
         SELECT ?analysis
         WHERE {
+           ?analysis a curie:AnalysisType .
            FILTER EXISTS { ?x curie:analysisType ?analysis }
         }
     - name: collection
@@ -194,8 +205,8 @@ search:
         - name: sample
           title: Sample
           type: id
-        - name: topography
-          title: Topography
+        - name: sampleTopography
+          title: Sanple Topography
           type: id
         - name: sampleNature
           title: Sample Nature
@@ -209,6 +220,10 @@ search:
         - name: event
           title: Tumor Pathology Event
           type: id
+        - name: tumorTopography
+          title: Tumor Topography
+          type: id
+        - name: sampleNature
         - name: Event Type
           title: eventType
           type: id
@@ -259,37 +274,65 @@ search:
         PREFIX curie: <https://institut-curie.org/ontology#>
         PREFIX fs:    <http://fairspace.io/ontology#>
 
-        SELECT DISTINCT
-          ?sample ?topography ?sampleNature ?sampleOrigin ?tumorCellularity
-          ?event ?morphology ?eventType ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis
-          ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
+        <#if fetch>
+        SELECT ?sample ?samplTtopography ?sampleNature ?sampleOrigin ?tumorCellularity ?event ?tumorTopography ?morphology ?eventType
+          ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis ?subject ?gender
+          ?species ?ageAtLastNews ?ageAtDeath
+        <#else>
+        SELECT (COUNT(?sample) AS ?count)
+        </#if>
         WHERE {
           ?sample a curie:BiologicalSample .
 
-          OPTIONAL { ?sample curie:diagnosis?/curie:topography ?topography }
-          OPTIONAL { ?sample curie:isOfNature ?sampleNature }
-          OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
-          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
+          <#if fetch || sampleTopography??> ?sample curie:topography ?sampleTopography . ${sampleTopography!} </#if>
+          <#if fetch || sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature!} </#if>
+          <#if fetch || sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin!} </#if>
+          <#if fetch || tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity!} </#if>
 
-          OPTIONAL { ?sample curie:diagnosis ?event }
-          OPTIONAL { ?event curie:tumorMorphology ?morphology }
-          OPTIONAL { ?event curie:eventType ?eventType }
-          OPTIONAL { ?event curie:tumorLaterality ?laterality }
-          OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
-          OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
-          OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
-          OPTIONAL { ?event curie:tnmType ?tnmType }
-          OPTIONAL { ?event curie:tnmT ?tnmT }
-          OPTIONAL { ?event curie:tnmN ?tnmN }
-          OPTIONAL { ?event curie:tnmM ?tnmM }
+          <#if fetch || species || gender || ageAtLastNews || ageAtDeath>
+            ?sample curie:subject ?subject .
+            <#if fetch || species??>
+            OPTIONAL {?sample curie:isOfSpecies ?species} ${species!}
+            </#if>
+            <#if fetch || gender??>
+            OPTIONAL {?sample curie:gender ?gender} ${gender!}
+            </#if>
+            <#if fetch || ageAtLastNews??>
+            OPTIONAL {?sample curie:ageAtLastNews ?ageAtLastNews} ${ageAtLastNews!}
+            </#if>
+            <#if fetch || ageAtDeath??>
+            OPTIONAL {?sample curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}
+           </#if>
+         </#if>
 
-          OPTIONAL { ?sample curie:diagnosis?/curie:subject ?subject }
-          OPTIONAL { ?subject curie:gender ?gender }
-          OPTIONAL { ?subject curie:isOfSpecies ?species }
-          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews }
-          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath }
+          <#if fetch || morphology?? || tumorTopograhy?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmM??>
+            OPTIONAL {?sample curie:diagnosis ?event}
 
-          OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
+            <#if fetch || morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology!} </#if>
+            <#if fetch || eventType??>       OPTIONAL { ?event curie:eventType OPTIONAL { ?eventType } ${eventType!} </#if>
+            <#if fetch || tumorTopography??> OPTIONAL { ?event curie:topography ?tumorTopography } ${tumorTopography!} </#if>
+            <#if fetch || laterality??>      OPTIONAL { ?event curie:tumorLaterality ?laterality } ${laterality!} </#if>
+            <#if fetch || ageAtDiagnosis??>  OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis } ${ageAtDiagnosis!} </#if>
+            <#if fetch || tumorGradeType??>  OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType } ${tumorGradeType!} </#if>
+            <#if fetch || tumorGradeValue??> OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue } ${tumorGradeValue!} </#if>
+            <#if fetch || tnmType??>         OPTIONAL { ?event curie:tnmType ?tnmType } ${tnmType!} </#if>
+            <#if fetch || tnmT??>            OPTIONAL { ?event curie:tnmT ?tnmT } ${tnmT!} </#if>
+            <#if fetch || tnmN??>            OPTIONAL { ?event curie:tnmN ?tnmN } ${tnmN!} </#if>
+            <#if fetch || tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM!} </#if>
+          </#if>
+
+          <#if collection??>
+            <#if analysisType??>
+              FILTER EXISTS {
+                  ?file curie:aboutSample ?sample ; carie:analysisType ?analysisType . ${analysisType}
+                  ?collection a fs:Collection ; fs:contains* ?file . ${collection}
+              }
+            <#else>
+              FILTER EXISTS { ?collection a fs:Collection ; fs:contains*/curie:aboutSample ?subject . ${collection} }
+            </#if>
+          <#elseif analysisType??>
+            FILTER EXISTS { ?file curie:aboutSample ?sample ; curie:analysisType ?analysisType . ${analysisType} }
+          </#if>
 
           FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
         }
@@ -302,8 +345,11 @@ search:
         - name: Event Type
           title: eventType
           type: id
-        - name: topography
-          title: Topography
+        - name: tumorTopography
+          title: Tumor Topography
+          type: id
+        - name: sampleTopography
+          title: Sample Topography
           type: id
         - name: Morphology
           title: Morphology
@@ -352,38 +398,18 @@ search:
         PREFIX curie: <https://institut-curie.org/ontology#>
         PREFIX fs:    <http://fairspace.io/ontology#>
 
-        SELECT DISTINCT
-          ?event ?eventType ?morphology ?topography ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis
-          ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
+        <#if fetch>
+        SELECT ?event ?eventType ?morphology ?topography ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT
+               ?tnmN ?tnmM ?ageAtDiagnosis ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
+        <#else>
+        SELECT (COUNT(?event) AS ?count)
+        </#if>
         WHERE {
-          ?sample a curie:BiologicalSample .
+          ?event a curie:TumorPathologyEvent .
 
-          OPTIONAL { ?sample curie:diagnosis?/curie:topography ?topography }
-          OPTIONAL { ?sample curie:isOfNature ?sampleNature }
-          OPTIONAL { ?sample curie:hasOrigin ?sampleOrigin }
-          OPTIONAL { ?sample curie:tumorCellularity ?tumorCellularity }
 
-          OPTIONAL { ?sample curie:diagnosis ?event }
-          OPTIONAL { ?event curie:tumorMorphology ?morphology }
-          OPTIONAL { ?event curie:eventType ?eventType }
-          OPTIONAL { ?event curie:tumorLaterality ?laterality }
-          OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
-          OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
-          OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
-          OPTIONAL { ?event curie:tnmType ?tnmType }
-          OPTIONAL { ?event curie:tnmT ?tnmT }
-          OPTIONAL { ?event curie:tnmN ?tnmN }
-          OPTIONAL { ?event curie:tnmM ?tnmM }
 
-          OPTIONAL { ?sample curie:diagnosis?/curie:subject ?subject }
-          OPTIONAL { ?subject curie:gender ?gender }
-          OPTIONAL { ?subject curie:isOfSpecies ?species }
-          OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews }
-          OPTIONAL { ?subject curie:ageAtDeath ?ageAtDeath }
-
-          OPTIONAL { ?collection a fs:Collection ; fs:contains*/curie:aboutMaterial ?sample }
-
-          FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+          FILTER NOT EXISTS { ?event fs:dateDeleted ?anyDateDeleted }
         }
     - name: subjects
       title: Subjects
@@ -416,21 +442,22 @@ search:
         WHERE {
           ?subject a curie:Subject .
 
-          <#if topography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
+          <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
           FILTER EXISTS {
             ?sample curie:subject ?subject .
-            <#if topography??>       ?sample curie:topography ?topography . ${topography} </#if>
+            <#if sampleTopography??> ?sample curie:topography ?sampleTopography . ${sampleTopography} </#if>
             <#if sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature} </#if>
             <#if sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin} </#if>
             <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
           }
           </#if>
         
-          <#if morphology?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
+          <#if morphology?? || eventType?? || tumorTopography?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
           FILTER EXISTS {
             ?event curie:subject ?subject .
             <#if morphology??>      ?event curie:tumorMorphology ?morphology . ${morphology} </#if>
             <#if eventType??>       ?event curie:eventType ?eventType . ${eventType} </#if>
+            <#if tumorTopography??> ?event curie:topography ?tumorTopography . ${tumorTopography} </#if>
             <#if laterality??>      ?event curie:tumorLaterality ?laterality . ${laterality} </#if>
             <#if ageAtDiagnosis??>  ?event curie:ageAtDiagnosis ?ageAtDiagnosis . ${ageAtDiagnosis} </#if>
             <#if tumorGradeType??>  ?event curie:tumorGradeType ?tumorGradeType . ${tumorGradeType} </#if>
