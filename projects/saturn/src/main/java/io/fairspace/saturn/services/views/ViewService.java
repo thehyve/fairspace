@@ -7,11 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.*;
-import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.*;
-import org.apache.jena.sparql.expr.aggregate.AggCount;
 import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -35,7 +32,7 @@ public class ViewService {
     }
 
     public ViewPageDto retrieveViewPage(ViewRequest request) {
-        var query = getBaseQuery(request.getView(), request.getFilters());
+        var query = getBaseQuery(request.getView(), true, request.getFilters());
         var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         var size = (request.getPage() != null && request.getPage() >= 1) ? request.getSize() : 20;
         query.setLimit(size + 1);
@@ -87,14 +84,15 @@ public class ViewService {
         });
     }
 
-    private Query getBaseQuery(String viewName, List<ViewFilter> filters) {
+    private Query getBaseQuery(String viewName, boolean fetch, List<ViewFilter> filters) {
         Template template;
         try {
             template = new Template(viewName, new StringReader(getView(viewName).query), null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        var model = new HashMap<String, String>();
+        var model = new HashMap<String, Object>();
+        model.put("fetch", fetch);
         for (var filter : filters) {
             var facet = config.facets
                     .stream()
@@ -142,8 +140,7 @@ public class ViewService {
     }
 
     CountDTO getCount(CountRequest request) {
-        var innerQuery = getBaseQuery(request.getView(), request.getFilters());
-        var query = toCountQuery(innerQuery);
+        var query = getBaseQuery(request.getView(), false, request.getFilters());
 
         log.debug("Querying the total number of matches: \n{}", query);
 
@@ -152,24 +149,13 @@ public class ViewService {
             var timeout = false;
             try (var execution = QueryExecutionFactory.create(query, ds)) {
                 execution.setTimeout(config.countRequestTimeout);
-                total = execution.execSelect().next().get("total").asLiteral().getInt();
+                total = execution.execSelect().next().get("count").asLiteral().getLong();
             } catch (QueryCancelledException e) {
                 timeout = true;
                 log.warn("Query has been cancelled due to timeout: \n{}", query);
             }
             return new CountDTO(total, timeout);
         });
-    }
-
-    private Query toCountQuery(Query query) {
-        var queryTotal = new Query();
-        queryTotal.setQuerySelectType();
-        var project = queryTotal.getProject();
-
-        var aggregatorExpr = queryTotal.allocAggregate(new AggCount());
-        project.add(Var.alloc("total"), aggregatorExpr);
-        queryTotal.setQueryPattern(new ElementSubQuery(query));
-        return queryTotal;
     }
 
     List<FacetDTO> getFacets() {
