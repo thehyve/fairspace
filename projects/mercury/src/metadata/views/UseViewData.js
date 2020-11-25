@@ -5,6 +5,7 @@ import MetadataViewAPI from "./MetadataViewAPI";
 const useViewData = (view, filters, page, rowsPerPage) => {
     const [data = {}, setData] = useState();
     const [count, setCount] = useState(-1);
+    const [countTimeout, setCountTimeout] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
@@ -15,7 +16,15 @@ const useViewData = (view, filters, page, rowsPerPage) => {
             if (d && !d.hasNext) {
                 setCount(d.rows.length + (page * rowsPerPage));
             } else {
-                MetadataViewAPI.getCount(view, filters).then(res => setCount(res.count));
+                MetadataViewAPI.getCount(view, filters)
+                    .then(res => {
+                        if (res) {
+                            if (res.count != null) {
+                                setCount(res.count);
+                            }
+                            setCountTimeout(res.timeout);
+                        }
+                    });
             }
             setError(undefined);
         })
@@ -31,6 +40,7 @@ const useViewData = (view, filters, page, rowsPerPage) => {
     return {
         data,
         count,
+        countTimeout,
         loading,
         error,
         refresh

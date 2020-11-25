@@ -7,7 +7,7 @@ import {
     TableContainer,
     TableHead,
     TablePagination,
-    TableRow,
+    TableRow, Typography,
     withStyles
 } from '@material-ui/core';
 import {useHistory} from "react-router-dom";
@@ -124,10 +124,11 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters} = props;
     const [page, setPage] = useState(0);
+    const [warning, setWarning] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
 
-    const {data, count, error, loading} = useViewData(view, filters, page, rowsPerPage);
+    const {data, count, countTimeout, error, loading} = useViewData(view, filters, page, rowsPerPage);
 
     if (loading) {
         return <LoadingInlay />;
@@ -141,27 +142,32 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return <MessageDisplay message="No results found." />;
     }
 
+    if (data.timeout) {
+        setWarning("Results shown below are incomplete. Fetching of data for the current page took too long.");
+    } else if (countTimeout) {
+        setWarning("Fetching total count of results took too long. The count will not be shown.");
+    }
+
     return (
         <Paper className={props.classes.root}>
-            {data && data.rows && (
-                <TableContainer>
-                    <MetadataViewTable
-                        {...props}
-                        data={data}
-                        history={history}
-                    />
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25, 100]}
-                        component="div"
-                        count={count}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onChangePage={(e, p) => setPage(p)}
-                        onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-                        style={{overflowX: "hidden"}}
-                    />
-                </TableContainer>
-            )}
+            {warning && (<Typography variant="body2" color="error" align="center">{warning}</Typography>)}
+            <TableContainer>
+                <MetadataViewTable
+                    {...props}
+                    data={data}
+                    history={history}
+                />
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={count}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={(e, p) => setPage(p)}
+                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    style={{overflowX: "hidden"}}
+                />
+            </TableContainer>
         </Paper>
     );
 };
