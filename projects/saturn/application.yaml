@@ -109,7 +109,13 @@ search:
     - name: sampleOrigin
       title: Sample Origin
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:SampleOrigin .
+           FILTER EXISTS { ?x curie:hasOrigin ?t }
+        }
     - name: tumorCellularity
       title: Tumor Cellularity
       type: number
@@ -118,11 +124,23 @@ search:
     - name: eventType
       title: Event Type
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:EventType .
+           FILTER EXISTS { ?x curie:eventType ?t }
+        }
     - name: morphology
       title: Morphology
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?morphology
+        WHERE {
+           ?morphology a curie:TumorMorphology .
+           FILTER EXISTS { ?x curie:tumorMorphology ?morphology }
+        }
     - name: laterality
       title: Laterality
       type: id
@@ -136,47 +154,98 @@ search:
     - name: tumorGradeType
       title: Tumor Grade Type
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?tgt
+        WHERE {
+           ?tgt a curie:TumorGradeType.
+           FILTER EXISTS { ?x curie:tumorGradeType ?tgt }
+        }
     - name: tumorGradeValue
       title: Tumor Grade Value
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?tgv
+        WHERE {
+           ?tgv a curie:TumorGradeValue.
+           FILTER EXISTS { ?x curie:tumorGradeValue ?tgv }
+        }
     - name: tnmType
       title: TNM Type
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:TnmType.
+           FILTER EXISTS { ?x curie:tnmType ?t }
+        }
     - name: tnmT
       title: The primary tumor size
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:TnmT.
+           FILTER EXISTS { ?x curie:tnmT ?t }
+        }
     - name: tnmN
       title: The regional lymph nodes
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:TnmN.
+           FILTER EXISTS { ?x curie:tnmN ?t }
+        }
     - name: tnmM
       title: Distant metastasis
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:TnmM.
+           FILTER EXISTS { ?x curie:tnmM ?t }
+        }
     - name: ageAtDiagnosis
       title: Age at Diagnosis
       type: number
-      query:
+      min: 0
+      max: 150
     - name: species
       title: Species
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?t
+        WHERE {
+           ?t a curie:Species.
+           FILTER EXISTS { ?x curie:isOfSpecies ?t }
+        }
     - name: gender
       title: Gender
       type: id
-      query:
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?g
+        WHERE {
+           ?g a curie:Gender .
+           FILTER EXISTS { ?x curie:gender ?g }
+        }
     - name: ageAtLastNews
       title: Age at Last News
       type: number
-      query:
+      min: 0
+      max: 150
     - name: ageAtDeath
       title: Age at Death
       type: number
-      query:
+      min: 0
+      max: 150
     - name: analysisType
       title: Type of analysis
       type: id
@@ -191,7 +260,7 @@ search:
       title: Collection
       type: id
       query: |
-        PREFIX fs:    <http://fairspace.io/ontology#>
+        PREFIX fs: <http://fairspace.io/ontology#>
 
         SELECT ?collection
         WHERE {
