@@ -382,17 +382,12 @@ search:
             <#if fetch || tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM!} </#if>
           </#if>
 
-          <#if collection??>
-            <#if analysisType??>
-              FILTER EXISTS {
-                  ?file curie:aboutSample ?sample ; carie:analysisType ?analysisType . ${analysisType}
-                  ?collection a fs:Collection ; fs:contains* ?file . ${collection}
-              }
-            <#else>
-              FILTER EXISTS { ?collection a fs:Collection ; fs:contains*/curie:aboutSample ?subject . ${collection} }
-            </#if>
-          <#elseif analysisType??>
-            FILTER EXISTS { ?file curie:aboutSample ?sample ; curie:analysisType ?analysisType . ${analysisType} }
+          <#if collection?? || analysisType??>
+          FILTER EXISTS {
+             ?file curie:aboutSample ?sample .
+             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+          }
           </#if>
 
           FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
@@ -468,7 +463,44 @@ search:
         WHERE {
           ?event a curie:TumorPathologyEvent .
 
+          <#if fetch || morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology!} </#if>
+          <#if fetch || eventType??>       OPTIONAL { ?event curie:eventType ?eventType } ${eventType!} </#if>
+          <#if fetch || tumorTopography??> OPTIONAL { ?event curie:topography ?tumorTopography } ${tumorTopography!} </#if>
+          <#if fetch || laterality??>      OPTIONAL { ?event curie:tumorLaterality ?laterality } ${laterality!} </#if>
+          <#if fetch || ageAtDiagnosis??>  OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis } ${ageAtDiagnosis!} </#if>
+          <#if fetch || tumorGradeType??>  OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType } ${tumorGradeType!} </#if>
+          <#if fetch || tumorGradeValue??> OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue } ${tumorGradeValue!} </#if>
+          <#if fetch || tnmType??>         OPTIONAL { ?event curie:tnmType ?tnmType } ${tnmType!} </#if>
+          <#if fetch || tnmT??>            OPTIONAL { ?event curie:tnmT ?tnmT } ${tnmT!} </#if>
+          <#if fetch || tnmN??>            OPTIONAL { ?event curie:tnmN ?tnmN } ${tnmN!} </#if>
+          <#if fetch || tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM!} </#if>
 
+        <#if fetch || species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
+           ?event curie:eventSubject ?subject .
+           <#if fetch || species??>OPTIONAL {?subject curie:isOfSpecies ?species} ${species!}</#if>
+           <#if fetch || gender??> OPTIONAL {?subject curie:gender ?gender} ${gender!}</#if>
+           <#if fetch || ageAtLastNews??>OPTIONAL {?subject curie:ageAtLastNews ?ageAtLastNews} ${ageAtLastNews!}</#if>
+           <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
+        </#if>
+
+        <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
+        FILTER EXISTS {
+          ?sample curie:diagnosis ?event .
+          <#if sampleTopography??> ?sample curie:topography ?sampleTopography . ${sampleTopography} </#if>
+          <#if sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature} </#if>
+          <#if sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin} </#if>
+          <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
+        }
+        </#if>
+
+        <#if collection?? || analysisType??>
+        FILTER EXISTS {
+           ?smpl curie:diagnosis ?event .
+           ?file curie:aboutSample ?smpl .
+           <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+           <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+        }
+        </#if>
 
           FILTER NOT EXISTS { ?event fs:dateDeleted ?anyDateDeleted }
         }
@@ -515,7 +547,7 @@ search:
         
           <#if morphology?? || eventType?? || tumorTopography?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
           FILTER EXISTS {
-            ?event curie:subject ?subject .
+            ?event curie:eventSubject ?subject .
             <#if morphology??>      ?event curie:tumorMorphology ?morphology . ${morphology} </#if>
             <#if eventType??>       ?event curie:eventType ?eventType . ${eventType} </#if>
             <#if tumorTopography??> ?event curie:topography ?tumorTopography . ${tumorTopography} </#if>
@@ -529,18 +561,13 @@ search:
             <#if tnmM??>            ?event curie:tnmM ?tnmM . ${tnmM} </#if>
           }
           </#if>
-        
-          <#if collection??>
-            <#if analysisType??>
-              FILTER EXISTS {
-                  ?file curie:aboutSubject ?subject ; carie:analysisType ?analysisType . ${analysisType}
-                  ?collection a fs:Collection ; fs:contains* ?file . ${collection}
-              }
-            <#else>
-              FILTER EXISTS { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject . ${collection} }
-            </#if>
-          <#elseif analysisType??>
-            FILTER EXISTS { ?file curie:aboutSubject ?subject ; curie:analysisType ?analysisType . ${analysisType} }
+
+          <#if collection?? || analysisType??>
+          FILTER EXISTS {
+             ?file curie:aboutSubject ?subject .
+             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+          }
           </#if>
 
           <#if fetch || species??>
