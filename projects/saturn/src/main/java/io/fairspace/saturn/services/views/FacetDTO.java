@@ -3,14 +3,14 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.Config;
 import lombok.Value;
 
-import java.util.Map;
+import java.util.List;
 
 @Value
 public class FacetDTO {
     String name;
     String title;
     Config.Search.ValueType type;
-    Map<String, String> values;
+    List<ValueDTO> values;
     Long min;
     Long max;
 }

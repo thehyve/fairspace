@@ -180,18 +180,21 @@ public class ViewService {
                         .collect(toList()));
     }
 
-    private Map<String, String> getValues(String query) {
+    private List<ValueDTO> getValues(String query) {
         if (query == null || query.isEmpty()) {
             return null;
         }
-        var result = new TreeMap<String, String>();
+        var map = new TreeMap<String, String>();
         try (var execution = QueryExecutionFactory.create(query, ds)) {
             execution.execSelect().forEachRemaining(row -> {
                 var resource = row.getResource(row.varNames().next());
-                result.put(getStringProperty(resource, RDFS.label), resource.getURI());
+                map.put(getStringProperty(resource, RDFS.label), resource.getURI());
             });
         }
-        return result;
+        return map.entrySet()
+                .stream()
+                .map(e -> new ValueDTO(e.getKey(), e.getValue()))
+                .collect(toList());
     }
 
     List<ViewDTO> getViews() {
