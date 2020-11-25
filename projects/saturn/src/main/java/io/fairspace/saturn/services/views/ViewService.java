@@ -32,7 +32,7 @@ public class ViewService {
     }
 
     public ViewPageDto retrieveViewPage(ViewRequest request) {
-        var query = getBaseQuery(request.getView(), true, request.getFilters());
+        var query = getQuery(request.getView(), true, request.getFilters());
         var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         var size = (request.getPage() != null && request.getPage() >= 1) ? request.getSize() : 20;
         query.setLimit(size + 1);
@@ -47,29 +47,7 @@ public class ViewService {
 
             try (var execution = QueryExecutionFactory.create(query, ds)) {
                 execution.setTimeout(config.pageRequestTimeout);
-                execution.execSelect()
-                        .forEachRemaining(row -> {
-                            var map = new HashMap<String, Object>();
-                            row.varNames().forEachRemaining(name -> {
-                                var value = row.get(name);
-                                if (value.isURIResource()) {
-                                    map.put(name, value.asResource().getURI());
-                                    var label = getStringProperty(value.asResource(), RDFS.label);
-                                    if (label != null) {
-                                        map.put(name + ".label", label);
-                                    }
-                                } else if (value.isLiteral()) {
-                                    var literal = value.asLiteral().getValue();
-                                    if (literal instanceof XSDDateTime) {
-                                        literal = ofEpochMilli(((XSDDateTime) literal).asCalendar().getTimeInMillis());
-                                    }
-                                    map.put(name, literal);
-                                } else {
-                                    map.put(name, null);
-                                }
-                            });
-                            rows.add(map);
-                        });
+                execution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
             } catch (QueryCancelledException e) {
                 timeout = true;
                 log.warn("Query has been cancelled due to timeout: \n{}", query);
@@ -84,46 +62,76 @@ public class ViewService {
         });
     }
 
-    private Query getBaseQuery(String viewName, boolean fetch, List<ViewFilter> filters) {
-        Template template;
-        try {
-            template = new Template(viewName, new StringReader(getView(viewName).query), null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        var model = new HashMap<String, Object>();
-        model.put("fetch", fetch);
-        for (var filter : filters) {
-            var facet = config.facets
-                    .stream()
-                    .filter(f -> f.name.equals(filter.field))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Unknown facet: " + filter.field));
-
-            var variable = new ExprVar(filter.field);
-            Expr expr;
-            if (filter.rangeStart != null && filter.rangeEnd != null) {
-                expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type)));
-            } else if (filter.rangeStart != null) {
-                expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type));
-            } else if (filter.rangeEnd != null) {
-                expr = new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type));
+    private Map<String, Object> rowToMap(QuerySolution row) {
+        var map = new HashMap<String, Object>();
+        row.varNames().forEachRemaining(name -> {
+            var value = row.get(name);
+            if (value.isURIResource()) {
+                map.put(name, value.asResource().getURI());
+                var label = getStringProperty(value.asResource(), RDFS.label);
+                if (label != null) {
+                    map.put(name + ".label", label);
+                }
+            } else if (value.isLiteral()) {
+                var literal = value.asLiteral().getValue();
+                if (literal instanceof XSDDateTime) {
+                    literal = ofEpochMilli(((XSDDateTime) literal).asCalendar().getTimeInMillis());
+                }
+                map.put(name, literal);
             } else {
-                List<Expr> values = filter.values.stream()
-                        .map(o -> toNodeValue(o, facet.type))
-                        .collect(toList());
-                expr = new E_OneOf(variable, new ExprList(values));
+                map.put(name, null);
             }
+        });
+        return map;
+    }
 
-            model.put(filter.field, new ElementFilter(expr).toString());
-        }
-        var out = new StringWriter();
+    private Query getQuery(String viewName, boolean fetch, List<ViewFilter> filters) {
         try {
-            template.process(model, out);
+            var template = new Template(viewName, new StringReader(getView(viewName).query), null);
+            var out = new StringWriter();
+            template.process(getFiltersModel(fetch, filters), out);
+            return QueryFactory.create(out.toString());
         } catch (TemplateException | IOException e) {
             throw new RuntimeException(e);
         }
-        return QueryFactory.create(out.toString());
+    }
+
+    private Map<String, Object> getFiltersModel(boolean fetch, List<ViewFilter> filters) {
+        var model = new HashMap<String, Object>();
+        model.put("fetch", fetch);
+        for (var filter : filters) {
+            model.put(filter.field, toFilterString(filter));
+        }
+        return model;
+    }
+
+    private String toFilterString(ViewFilter filter) {
+        var facet = getFacet(filter.field);
+
+        var variable = new ExprVar(filter.field);
+        Expr expr;
+        if (filter.rangeStart != null && filter.rangeEnd != null) {
+            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type)));
+        } else if (filter.rangeStart != null) {
+            expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type));
+        } else if (filter.rangeEnd != null) {
+            expr = new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type));
+        } else {
+            List<Expr> values = filter.values.stream()
+                    .map(o -> toNodeValue(o, facet.type))
+                    .collect(toList());
+            expr = new E_OneOf(variable, new ExprList(values));
+        }
+
+        return new ElementFilter(expr).toString();
+    }
+
+    private Config.Search.Facet getFacet(String name) {
+        return config.facets
+                .stream()
+                .filter(f -> f.name.equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown facet: " + name));
     }
 
     private Config.Search.View getView(String viewName) {
@@ -144,7 +152,7 @@ public class ViewService {
     }
 
     CountDTO getCount(CountRequest request) {
-        var query = getBaseQuery(request.getView(), false, request.getFilters());
+        var query = getQuery(request.getView(), false, request.getFilters());
 
         log.debug("Querying the total number of matches: \n{}", query);
 
