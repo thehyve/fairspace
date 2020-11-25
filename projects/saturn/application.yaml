@@ -167,6 +167,15 @@ search:
       title: Age at Death
       type: number
       query:
+    - name: analysisType
+      title: Type of analysis
+      type: id
+      query: |
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        SELECT ?analysis
+        WHERE {
+           FILTER EXISTS { ?x curie:analysisType ?analysis }
+        }
     - name: collection
       title: Collection
       type: id
@@ -434,7 +443,16 @@ search:
           </#if>
         
           <#if collection??>
-            FILTER EXISTS { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject . ${collection} }
+            <#if analysisType??>
+              FILTER EXISTS {
+                  ?file curie:aboutSubject ?subject ; carie:analysisType ?analysisType . ${analysisType}
+                  ?collection a fs:Collection ; fs:contains* ?file . ${collection}
+              }
+            <#else>
+              FILTER EXISTS { ?collection a fs:Collection ; fs:contains*/curie:aboutSubject ?subject . ${collection} }
+            </#if>
+          <#elseif analysisType??>
+            FILTER EXISTS { ?file curie:aboutSubject ?subject ; curie:analysisType ?analysisType . ${analysisType} }
           </#if>
 
           <#if fetch || species??>
