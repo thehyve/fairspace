@@ -95,7 +95,6 @@ public class Config {
 
         public static class Facet {
             public String name;
-            public String group;
             public String title;
             public String query;
             public ValueType type;

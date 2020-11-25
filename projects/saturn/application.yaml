@@ -77,7 +77,6 @@ search:
   countRequestTimeout: 60000
   facets:
     - name: topography
-      group: event
       title: Topography
       type: id
       query: |
@@ -88,7 +87,6 @@ search:
            FILTER EXISTS { ?x curie:topography ?topography }
         }
     - name: sampleNature
-      group: sample
       title: Sample Nature
       type: id
       query: |
@@ -99,28 +97,23 @@ search:
            FILTER EXISTS { ?x curie:isOfNature ?nature }
         }
     - name: sampleOrigin
-      group: sample
       title: Sample Origin
       type: id
       query:
     - name: tumorCellularity
-      group: sample
       title: Tumor Cellularity
       type: number
       min: 0
       max: 100
     - name: eventType
-      group: event
       title: Event Type
       type: id
       query:
     - name: morphology
-      group: event
       title: Morphology
       type: id
       query:
     - name: laterality
-      group: event
       title: Laterality
       type: id
       query: |
@@ -131,57 +124,46 @@ search:
            FILTER EXISTS { ?x curie:laterality ?laterality }
         }
     - name: tumorGradeType
-      group: event
       title: Tumor Grade Type
       type: id
       query:
     - name: tumorGradeValue
-      group: event
       title: Tumor Grade Value
       type: id
       query:
     - name: tnmType
-      group: event
       title: TNM Type
       type: id
       query:
     - name: tnmT
-      group: event
       title: The primary tumor size
       type: id
       query:
     - name: tnmN
-      group: event
       title: The regional lymph nodes
       type: id
       query:
     - name: tnmM
-      group: event
       title: Distant metastasis
       type: id
       query:
     - name: ageAtDiagnosis
-      group: event
       title: Age at Diagnosis
       type: number
       query:
     - name: species
-      group: subject
       title: Species
       type: id
       query:
     - name: gender
-      group: subject
       title: Gender
       type: id
       query:
     - name: ageAtLastNews
-      group: subject
       title: Age at Last News
       type: number
       query:
     - name: ageAtDeath
-      group: subject
       title: Age at Death
       type: number
       query:
