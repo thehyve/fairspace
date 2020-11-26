@@ -275,7 +275,7 @@ search:
           title: Sample
           type: id
         - name: sampleTopography
-          title: Sanple Topography
+          title: Sample Topography
           type: id
         - name: sampleNature
           title: Sample Nature
