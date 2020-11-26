@@ -294,7 +294,8 @@ search:
           type: id
         - name: sampleNature
         - name: Event Type
-          title: eventType
+          name: eventType
+          title: Event Type
           type: id
         - name: Morphology
           title: Morphology
