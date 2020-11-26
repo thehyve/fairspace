@@ -128,7 +128,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
 
-    const {data, count, countTimeout, error, loading} = useViewData(view, filters, page, rowsPerPage);
+    const {data, count, countTimeout, error, loading, refreshDataOnly} = useViewData(view, filters, page, rowsPerPage);
 
     if (loading) {
         return <LoadingInlay />;
@@ -148,6 +148,16 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         setWarning("Fetching total count of results took too long. The count will not be shown.");
     }
 
+    const handleChangePage = (e, p) => {
+        setPage(p);
+        refreshDataOnly(p, rowsPerPage);
+    };
+
+    const handleChangeRowsPerPage = (e) => {
+        setRowsPerPage(e.target.value);
+        refreshDataOnly(page, e.target.value);
+    };
+
     return (
         <Paper className={props.classes.root}>
             {warning && (<Typography variant="body2" color="error" align="center">{warning}</Typography>)}
@@ -163,8 +173,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     count={count}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onChangePage={(e, p) => setPage(p)}
-                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
                     style={{overflowX: "hidden"}}
                 />
             </TableContainer>

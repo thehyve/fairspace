@@ -96,7 +96,7 @@ class MetadataViewAPI {
             view: viewName,
             filters
         };
-        return axios.post(`${metadataViewUrl}/count`, viewRequest,
+        return axios.post(`${metadataViewUrl}count`, viewRequest,
             {headers: {Accept: 'application/json'}})
             .then(extractJsonData)
             .catch(handleHttpError("Error while fetching view count."));
