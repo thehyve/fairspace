@@ -8,6 +8,8 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import Tooltip from "@material-ui/core/Tooltip";
+import Iri from "../../../common/components/Iri";
 
 
 type SelectProperties = {
@@ -71,7 +73,13 @@ const SelectMultiple = (props: SelectProperties) => {
                         checkedIcon={<CheckBoxIcon fontSize="small" />}
                     />
                 )}
-                label={<Typography variant="body2">{option.label}</Typography>}
+                label={(
+                    <Tooltip title={<Iri iri={option.value} />} interactive>
+                        <Typography variant="body2">
+                            {option.label}
+                        </Typography>
+                    </Tooltip>
+                )}
             />
         ));
 
