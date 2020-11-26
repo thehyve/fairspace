@@ -119,21 +119,30 @@ public class ViewService {
         var facet = getFacet(filter.field);
 
         var variable = new ExprVar(filter.field);
-        Expr expr;
-        if (filter.rangeStart != null && filter.rangeEnd != null) {
-            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type)));
-        } else if (filter.rangeStart != null) {
-            expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.rangeStart, facet.type));
-        } else if (filter.rangeEnd != null) {
-            expr = new E_LessThanOrEqual(variable, toNodeValue(filter.rangeEnd, facet.type));
-        } else {
+        Expr expr = null;
+        if (filter.min != null && filter.max != null && !same(filter.min, facet.min) && !same(filter.max, facet.max)) {
+            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, facet.type)));
+        } else if (filter.min != null && !same(filter.min, facet.min)) {
+            expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, facet.type));
+        } else if (filter.max != null && !same(filter.max, facet.max)) {
+            expr = new E_LessThanOrEqual(variable, toNodeValue(filter.max, facet.type));
+        } else if (filter.values != null && !filter.values.isEmpty()) {
             List<Expr> values = filter.values.stream()
                     .map(o -> toNodeValue(o, facet.type))
                     .collect(toList());
             expr = new E_OneOf(variable, new ExprList(values));
+        } else {
+            return null;
         }
 
         return new ElementFilter(expr).toString();
+    }
+
+    private static boolean same(Object x, Object y) {
+        if (x instanceof Number && y instanceof Number) {
+            return ((Number) x).doubleValue() == ((Number) y).doubleValue();
+        }
+        return Objects.equals(x, y);
     }
 
     private Config.Search.Facet getFacet(String name) {
@@ -185,6 +194,7 @@ public class ViewService {
                 config.facets
                         .stream()
                         .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query), f.min, f.max))
+                        .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
                         .collect(toList()));
     }
 
