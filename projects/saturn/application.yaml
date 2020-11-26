@@ -292,9 +292,7 @@ search:
         - name: tumorTopography
           title: Tumor Topography
           type: id
-        - name: sampleNature
-        - name: Event Type
-          name: eventType
+        - name: eventType
           title: Event Type
           type: id
         - name: Morphology
