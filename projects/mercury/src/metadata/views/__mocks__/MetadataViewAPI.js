@@ -103,15 +103,15 @@ export const mockFacets = (name) => {
                     name: 'sampleType',
                     title: 'Sample type',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Blood',
-                            iri: 'http://example.com/sampleType#blood'
+                            value: 'http://example.com/sampleType#blood'
                         },
                         {
                             label: 'Tissue',
-                            iri: 'http://example.com/sampleType#tissue'
+                            value: 'http://example.com/sampleType#tissue'
                         }
                     ]
                 },
@@ -119,19 +119,19 @@ export const mockFacets = (name) => {
                     name: 'topography',
                     title: 'Topography',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Lip',
-                            iri: 'http://example.com/topography#lip'
+                            value: 'http://example.com/topography#lip'
                         },
                         {
                             label: 'Gum',
-                            iri: 'http://example.com/topography#gum'
+                            value: 'http://example.com/topography#gum'
                         },
                         {
                             label: 'Tongue',
-                            iri: 'http://example.com/topography#tongue'
+                            value: 'http://example.com/topography#tongue'
                         }
                     ]
                 },
@@ -147,39 +147,39 @@ export const mockFacets = (name) => {
                     name: 'sampleNature',
                     title: 'Nature',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Protein',
-                            iri: 'http://example.com/sampleNature#protein'
+                            value: 'http://example.com/sampleNature#protein'
                         },
                         {
                             label: 'RNA',
-                            iri: 'http://example.com/sampleNature#rna'
+                            value: 'http://example.com/sampleNature#rna'
                         },
                         {
                             label: 'DNA',
-                            iri: 'http://example.com/sampleNature#dna'
+                            value: 'http://example.com/sampleNature#dna'
                         },
                         {
                             label: 'Tumor Cell Line',
-                            iri: 'http://example.com/sampleNature#tcl'
+                            value: 'http://example.com/sampleNature#tcl'
                         },
                         {
                             label: 'Peripheral Blood Mononuclear Cell',
-                            iri: 'http://example.com/sampleNature#pbmc'
+                            value: 'http://example.com/sampleNature#pbmc'
                         },
                         {
                             label: 'Frozen Specimen',
-                            iri: 'http://example.com/sampleNature#fs'
+                            value: 'http://example.com/sampleNature#fs'
                         },
                         {
                             label: 'Paraffin Embedded Tissue (FFPE)',
-                            iri: 'http://example.com/sampleNature#ffpe'
+                            value: 'http://example.com/sampleNature#ffpe'
                         },
                         {
                             label: 'Urine',
-                            iri: 'http://example.com/sampleNature#urine'
+                            value: 'http://example.com/sampleNature#urine'
                         }
                     ]
                 },
@@ -187,15 +187,15 @@ export const mockFacets = (name) => {
                     name: 'sampleOrigin',
                     title: 'Origin',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Normal',
-                            iri: 'http://example.com/sampleOrigin#normal'
+                            value: 'http://example.com/sampleOrigin#normal'
                         },
                         {
                             label: 'Tumoral',
-                            iri: 'http://example.com/sampleOrigin#tumoral'
+                            value: 'http://example.com/sampleOrigin#tumoral'
                         }
                     ]
                 }
@@ -206,19 +206,19 @@ export const mockFacets = (name) => {
                     name: 'gender',
                     title: 'Gender',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Male',
-                            iri: 'http://example.com/gender#male'
+                            value: 'http://example.com/gender#male'
                         },
                         {
                             label: 'Female',
-                            iri: 'http://example.com/gender#female'
+                            value: 'http://example.com/gender#female'
                         },
                         {
                             label: 'Undifferentiated',
-                            iri: 'http://example.com/gender#undifferentiated'
+                            value: 'http://example.com/gender#undifferentiated'
                         }
                     ]
                 },
@@ -226,19 +226,19 @@ export const mockFacets = (name) => {
                     name: 'species',
                     title: 'Species',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Homo sapiens',
-                            iri: 'http://example.com/species#hs'
+                            value: 'http://example.com/species#hs'
                         },
                         {
                             label: 'Escherichia coli',
-                            iri: 'http://example.com/species#ec'
+                            value: 'http://example.com/species#ec'
                         },
                         {
                             label: 'Bacillus subtilis',
-                            iri: 'http://example.com/species#bs'
+                            value: 'http://example.com/species#bs'
                         }
                     ]
                 },
@@ -257,23 +257,23 @@ export const mockFacets = (name) => {
                     name: 'analysisType',
                     title: 'Analysis type',
                     query: "",
-                    type: "text",
+                    type: "id",
                     values: [
                         {
                             label: 'Biology',
-                            iri: 'http://example.com/analysisType#biology'
+                            value: 'http://example.com/analysisType#biology'
                         },
                         {
                             label: 'Imaging',
-                            iri: 'http://example.com/analysisType#imaging'
+                            value: 'http://example.com/analysisType#imaging'
                         },
                         {
                             label: 'Omic',
-                            iri: 'http://example.com/analysisType#omic'
+                            value: 'http://example.com/analysisType#omic'
                         },
                         {
                             label: 'Pathology',
-                            iri: 'http://example.com/analysisType#pathology'
+                            value: 'http://example.com/analysisType#pathology'
                         }
                     ]
                 }

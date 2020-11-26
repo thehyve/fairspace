@@ -47,7 +47,7 @@ type MetadataViewTableProperties = {
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {columns, data, locationContext, toggleRow, selected, view, history} = props;
     const isCollectionViewTable = isCollectionView(view);
-    const idColumn = columns.find(c => c.type === 'id');
+    const idColumn = columns.find(c => c.type === 'id'); // first column of id type
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
 
     const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
