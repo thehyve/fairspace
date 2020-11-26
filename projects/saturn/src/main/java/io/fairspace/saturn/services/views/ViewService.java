@@ -34,7 +34,7 @@ public class ViewService {
     public ViewPageDto retrieveViewPage(ViewRequest request) {
         var query = getQuery(request.getView(), true, request.getFilters());
         var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
-        var size = (request.getPage() != null && request.getPage() >= 1) ? request.getSize() : 20;
+        var size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
         query.setLimit(size + 1);
         query.setOffset((page - 1) * size);
 
