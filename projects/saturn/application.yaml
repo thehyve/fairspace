@@ -77,7 +77,7 @@ search:
   countRequestTimeout: 60000
   facets:
     - name: tumorTopography
-      title: Tunor Topography
+      title: Tumor Topography
       type: id
       query: |
         PREFIX curie: <https://institut-curie.org/ontology#>
