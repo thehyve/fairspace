@@ -343,7 +343,7 @@ search:
         PREFIX fs:    <http://fairspace.io/ontology#>
 
         <#if fetch>
-        SELECT ?sample ?samplTtopography ?sampleNature ?sampleOrigin ?tumorCellularity ?event ?tumorTopography ?morphology ?eventType
+        SELECT ?sample ?sampleTopography ?sampleNature ?sampleOrigin ?tumorCellularity ?event ?tumorTopography ?morphology ?eventType
           ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis ?subject ?gender
           ?species ?ageAtLastNews ?ageAtDeath
         <#else>
