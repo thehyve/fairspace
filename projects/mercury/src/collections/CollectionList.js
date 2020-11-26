@@ -9,7 +9,7 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TableSortLabel,
+    TableSortLabel, Typography,
     withStyles,
 } from "@material-ui/core";
 

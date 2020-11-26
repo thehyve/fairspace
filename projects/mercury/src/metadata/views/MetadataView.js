@@ -72,6 +72,22 @@ export const MetadataView = (props: MetadataViewProperties) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentView, locationContext]);
 
+    const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
+
+    const getPathSegments = () => {
+        if (isCollectionView(currentView)) {
+            return getSearchPathSegments(locationContext);
+        }
+        return [];
+    };
+
+    const getBreadcrumbSegmentPath = () => {
+        if (isCollectionView(currentView)) {
+            return `/${currentView}`;
+        }
+        return `/views/${currentView}`;
+    };
+
     const clearFilters = () => {
         setFilters([]);
         setPreselected([]);
@@ -105,21 +121,12 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
     };
 
-    const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
-
-    const getPathSegments = () => {
-        if (isCollectionView(currentView)) {
-            return getSearchPathSegments(locationContext);
-        }
-        return [];
-    };
-
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
             {
                 facets.map(facet => {
                     const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
-                    return facetOptions && facetOptions.length > 0 && !facetOptions.every(o => o == null) && (
+                    return facetOptions && facetOptions.length > 0 && (
                         <Grid key={facet.name} item>
                             <Facet
                                 multiple
@@ -136,13 +143,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
             }
         </Grid>
     );
-
-    const getBreadcrumbSegmentPath = () => {
-        if (isCollectionView(currentView)) {
-            return `/${currentView}`;
-        }
-        return `/views/${currentView}`;
-    };
 
     return (
         <BreadcrumbsContext.Provider value={{
