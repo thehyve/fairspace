@@ -371,20 +371,36 @@ search:
             <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
          </#if>
 
-          <#if fetch || morphology?? || tumorTopograhy?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmM??>
-            OPTIONAL {?sample curie:diagnosis ?event}
+          <#if morphology?? || tumorTopograhy?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmM??>
+            ?sample curie:diagnosis ?event .
 
-            <#if fetch || morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology!} </#if>
-            <#if fetch || eventType??>       OPTIONAL { ?event curie:eventType ?eventType } ${eventType!} </#if>
-            <#if fetch || tumorTopography??> OPTIONAL { ?event curie:topography ?tumorTopography } ${tumorTopography!} </#if>
-            <#if fetch || laterality??>      OPTIONAL { ?event curie:tumorLaterality ?laterality } ${laterality!} </#if>
-            <#if fetch || ageAtDiagnosis??>  OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis } ${ageAtDiagnosis!} </#if>
-            <#if fetch || tumorGradeType??>  OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType } ${tumorGradeType!} </#if>
-            <#if fetch || tumorGradeValue??> OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue } ${tumorGradeValue!} </#if>
-            <#if fetch || tnmType??>         OPTIONAL { ?event curie:tnmType ?tnmType } ${tnmType!} </#if>
-            <#if fetch || tnmT??>            OPTIONAL { ?event curie:tnmT ?tnmT } ${tnmT!} </#if>
-            <#if fetch || tnmN??>            OPTIONAL { ?event curie:tnmN ?tnmN } ${tnmN!} </#if>
-            <#if fetch || tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM!} </#if>
+            <#if morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology} </#if>
+            <#if eventType??>       OPTIONAL { ?event curie:eventType ?eventType } ${eventType} </#if>
+            <#if tumorTopography??> OPTIONAL { ?event curie:topography ?tumorTopography } ${tumorTopography} </#if>
+            <#if laterality??>      OPTIONAL { ?event curie:tumorLaterality ?laterality } ${laterality} </#if>
+            <#if ageAtDiagnosis??>  OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis } ${ageAtDiagnosis} </#if>
+            <#if tumorGradeType??>  OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType } ${tumorGradeType} </#if>
+            <#if tumorGradeValue??> OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue } ${tumorGradeValue} </#if>
+            <#if tnmType??>         OPTIONAL { ?event curie:tnmType ?tnmType } ${tnmType} </#if>
+            <#if tnmT??>            OPTIONAL { ?event curie:tnmT ?tnmT } ${tnmT} </#if>
+            <#if tnmN??>            OPTIONAL { ?event curie:tnmN ?tnmN } ${tnmN} </#if>
+            <#if tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM} </#if>
+          <#elseif fetch>   
+            OPTIONAL {
+              ?sample curie:diagnosis ?event .
+  
+              OPTIONAL { ?event curie:tumorMorphology ?morphology }
+              OPTIONAL { ?event curie:eventType ?eventType }
+              OPTIONAL { ?event curie:topography ?tumorTopography }
+              OPTIONAL { ?event curie:tumorLaterality ?laterality }
+              OPTIONAL { ?event curie:ageAtDiagnosis ?ageAtDiagnosis }
+              OPTIONAL { ?event curie:tumorGradeType ?tumorGradeType }
+              OPTIONAL { ?event curie:tumorGradeValue ?tumorGradeValue }
+              OPTIONAL { ?event curie:tnmType ?tnmType }
+              OPTIONAL { ?event curie:tnmT ?tnmT }
+              OPTIONAL { ?event curie:tnmN ?tnmN }
+              OPTIONAL { ?event curie:tnmM ?tnmM }  
+            }
           </#if>
 
           ?sample a curie:BiologicalSample .
