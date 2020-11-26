@@ -350,7 +350,13 @@ search:
         SELECT (COUNT(?sample) AS ?count)
         </#if>
         WHERE {
-          ?sample a curie:BiologicalSample .
+          <#if collection?? || analysisType??>
+          FILTER EXISTS {
+             ?file curie:sample ?sample .
+             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+          }
+          </#if>
 
           <#if fetch || sampleTopography??> OPTIONAL {?sample curie:topography ?sampleTopography } ${sampleTopography!} </#if>
           <#if fetch || sampleNature??>     OPTIONAL {?sample curie:isOfNature ?sampleNature } ${sampleNature!} </#if>
@@ -381,14 +387,7 @@ search:
             <#if fetch || tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM!} </#if>
           </#if>
 
-          <#if collection?? || analysisType??>
-          FILTER EXISTS {
-             ?file curie:aboutSample ?sample .
-             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
-          }
-          </#if>
-
+          ?sample a curie:BiologicalSample .
           FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
         }
     - name: events
@@ -494,8 +493,7 @@ search:
 
         <#if collection?? || analysisType??>
         FILTER EXISTS {
-           ?smpl curie:diagnosis ?event .
-           ?file curie:aboutSample ?smpl .
+           ?file curie:aboutEvent ?event .
            <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
            <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
         }

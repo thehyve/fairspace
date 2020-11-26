@@ -119,7 +119,7 @@ public class ViewService {
         var facet = getFacet(filter.field);
 
         var variable = new ExprVar(filter.field);
-        Expr expr = null;
+        Expr expr;
         if (filter.min != null && filter.max != null && !same(filter.min, facet.min) && !same(filter.max, facet.max)) {
             expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, facet.type)));
         } else if (filter.min != null && !same(filter.min, facet.min)) {
