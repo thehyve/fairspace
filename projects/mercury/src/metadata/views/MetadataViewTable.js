@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Paper,
     Table,
@@ -128,7 +128,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
 
-    const {data, count, countTimeout, error, loading, refreshDataOnly} = useViewData(view, filters, page, rowsPerPage);
+    const {data, count, countTimeout, error, loading, refreshDataOnly} = useViewData(view, filters, rowsPerPage);
+
+    useEffect(() => {setPage(0);}, [filters]);
 
     if (loading) {
         return <LoadingInlay />;
@@ -155,7 +157,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const handleChangeRowsPerPage = (e) => {
         setRowsPerPage(e.target.value);
-        refreshDataOnly(page, e.target.value);
+        setPage(0);
+        refreshDataOnly(0, e.target.value);
     };
 
     return (

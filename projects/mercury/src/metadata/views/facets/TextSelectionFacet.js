@@ -105,7 +105,6 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     const renderTextFilter = () => (
         <TextField
-            id="textFilter"
             value={textFilterValue}
             onChange={e => setTextFilterValue(e.target.value)}
             InputProps={{

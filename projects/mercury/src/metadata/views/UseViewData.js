@@ -3,7 +3,7 @@ import {useCallback, useEffect, useState} from "react";
 import MetadataViewAPI from "./MetadataViewAPI";
 
 
-const useViewData = (view, filters, page, rowsPerPage) => {
+const useViewData = (view, filters, rowsPerPage) => {
     const [data = {}, setData] = useState();
     const [count, setCount] = useState(-1);
     const [countTimeout, setCountTimeout] = useState(false);
@@ -11,11 +11,11 @@ const useViewData = (view, filters, page, rowsPerPage) => {
     const [error, setError] = useState();
 
     const refreshAll = useCallback(() => (
-        MetadataViewAPI.getViewData(view, page, rowsPerPage, filters))
+        MetadataViewAPI.getViewData(view, 0, rowsPerPage, filters))
         .then(d => {
             setData(d);
             if (d && !d.hasNext) {
-                setCount(d.rows.length + (page * rowsPerPage));
+                setCount(d.rows.length);
             } else {
                 MetadataViewAPI.getCount(view, filters).then(res => {
                     if (res) {
