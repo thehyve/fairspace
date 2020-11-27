@@ -5,18 +5,23 @@ import Slider from "@material-ui/core/Slider";
 import {max, min} from "lodash/math";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 
+const INPUT_CHANGE_DELAY = 250; // in milliseconds
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, preselected} = props;
     const minValue = min(options) != null ? min(options) : -1;
     const maxValue = max(options) != null ? max(options) : -1;
     const [value, setValue] = useState([null, null]);
+    const [timeoutId, setTimeoutId] = useState();
 
     useEffect(() => setValue([null, null]), [preselected]);
 
+    const triggerChange = () => onChange([min(value), max(value)]);
+
     const handleChange = (newValue) => {
+        clearTimeout(timeoutId);
         setValue([min(newValue), max(newValue)]);
-        onChange([min(newValue), max(newValue)]);
+        setTimeoutId(setTimeout(triggerChange, INPUT_CHANGE_DELAY));
     };
 
     const handleSliderChange = (event, newValue) => {
@@ -61,7 +66,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const renderSlider = () => (
         <Slider
             value={[value[0] || minValue, value[1] || maxValue]}
-            onChange={handleSliderChange}
+            onChangeCommitted={handleSliderChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
             getAriaValueText={() => value}
