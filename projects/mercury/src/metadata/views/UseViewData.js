@@ -22,6 +22,7 @@ const useViewData = (view, filters, rowsPerPage) => {
                         if (res.count != null) {
                             setCount(res.count);
                         }
+                        setCount(-1);
                         setCountTimeout(res.timeout);
                     }
                 });

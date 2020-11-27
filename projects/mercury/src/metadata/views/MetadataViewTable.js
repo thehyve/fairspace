@@ -124,7 +124,6 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters} = props;
     const [page, setPage] = useState(0);
-    const [warning, setWarning] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const history = useHistory();
 
@@ -144,12 +143,6 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return <MessageDisplay message="No results found." />;
     }
 
-    if (data.timeout) {
-        setWarning("Results shown below are incomplete. Fetching of data for the current page took too long.");
-    } else if (countTimeout) {
-        setWarning("Fetching total count of results took too long. The count will not be shown.");
-    }
-
     const handleChangePage = (e, p) => {
         setPage(p);
         refreshDataOnly(p, rowsPerPage);
@@ -161,9 +154,19 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         refreshDataOnly(0, e.target.value);
     };
 
+    const renderWarning = () => {
+        let warning = "";
+        if (data.timeout) {
+            warning = "Results shown below are incomplete. Fetching of data for the current page took too long.";
+        } else if (countTimeout) {
+            warning = "Fetching total count of results took too long. The count will not be shown.";
+        }
+        return warning && <Typography variant="body2" color="error" align="center">{warning}</Typography>;
+    };
+
     return (
         <Paper className={props.classes.root}>
-            {warning && (<Typography variant="body2" color="error" align="center">{warning}</Typography>)}
+            {renderWarning()}
             <TableContainer>
                 <MetadataViewTable
                     {...props}
