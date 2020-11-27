@@ -7,8 +7,8 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import Tooltip from "@material-ui/core/Tooltip";
+import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
 
 
@@ -74,7 +74,7 @@ const SelectMultiple = (props: SelectProperties) => {
                     />
                 )}
                 label={(
-                    <Tooltip title={<Iri iri={option.value} />} interactive>
+                    <Tooltip title={<Iri iri={option.value} />}>
                         <Typography variant="body2">
                             {option.label}
                         </Typography>

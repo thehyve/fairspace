@@ -21,6 +21,9 @@ type MetadataViewProperties = {
     classes: any;
 }
 
+export const CENTRAL_PANEL_WIDTH = '70%';
+export const RIGHT_PANEL_WIDTH = '30%';
+
 const styles = (theme) => ({
     facet: {
         borderColor: theme.palette.info.light,
@@ -34,14 +37,14 @@ const styles = (theme) => ({
         overflowY: 'auto'
     },
     centralPanel: {
-        width: consts.MAIN_CONTENT_WIDTH,
+        width: CENTRAL_PANEL_WIDTH,
         overflowX: 'auto',
     },
     centralPanelFullWidth: {
         width: '100%'
     },
     sidePanel: {
-        width: consts.SIDE_PANEL_WIDTH
+        width: RIGHT_PANEL_WIDTH
     },
     metadataViewTable: {
         marginTop: 10,
