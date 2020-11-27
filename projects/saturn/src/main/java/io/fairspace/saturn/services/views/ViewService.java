@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static java.time.Instant.ofEpochMilli;
@@ -31,7 +32,7 @@ public class ViewService {
         this.ds = ds;
     }
 
-    public ViewPageDto retrieveViewPage(ViewRequest request) {
+    public Cancellable<ViewPageDto> retrieveViewPage(ViewRequest request) {
         var query = getQuery(request.getView(), true, request.getFilters());
         var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         var size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
@@ -40,26 +41,38 @@ public class ViewService {
 
         log.debug("Query with filters and pagination applied: \n{}", query);
 
-        return Txn.calculateRead(ds, () -> {
-            var rows = new ArrayList<Map<String, Object>>();
-            var timeout = false;
-            var hasNext = false;
 
-            try (var execution = QueryExecutionFactory.create(query, ds)) {
-                execution.setTimeout(config.pageRequestTimeout);
-                execution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
-            } catch (QueryCancelledException e) {
-                timeout = true;
-                log.warn("Query has been cancelled due to timeout: \n{}", query);
+        var execution = QueryExecutionFactory.create(query, ds);
+        execution.setTimeout(config.pageRequestTimeout);
+
+        return new Cancellable<>() {
+            @Override
+            public void cancel() {
+                if (!execution.isClosed()) {
+                    execution.abort();
+                }
             }
 
-            while (rows.size() > size) {
-                rows.remove(rows.size() - 1);
-                hasNext = true;
-            }
+            @Override
+            public ViewPageDto get() throws CancellationException {
+                return Txn.calculateRead(ds, () -> {
+                    var rows = new ArrayList<Map<String, Object>>();
+                    var timeout = false;
+                    var hasNext = false;
+                    try (execution) {
+                        execution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
+                    } catch (QueryCancelledException e) {
+                        timeout = true;
+                    }
+                    while (rows.size() > size) {
+                        rows.remove(rows.size() - 1);
+                        hasNext = true;
+                    }
 
-            return new ViewPageDto(rows, hasNext, timeout);
-        });
+                    return new ViewPageDto(rows, hasNext, timeout);
+                });
+            }
+        };
     }
 
     private Map<String, Object> rowToMap(QuerySolution row) {
@@ -170,23 +183,31 @@ public class ViewService {
         };
     }
 
-    CountDTO getCount(CountRequest request) {
+    Cancellable<Long> getCount(CountRequest request) {
         var query = getQuery(request.getView(), false, request.getFilters());
 
         log.debug("Querying the total number of matches: \n{}", query);
 
-        return Txn.calculateRead(ds, () -> {
-            var total = 0L;
-            var timeout = false;
-            try (var execution = QueryExecutionFactory.create(query, ds)) {
-                execution.setTimeout(config.countRequestTimeout);
-                total = execution.execSelect().next().get("count").asLiteral().getLong();
-            } catch (QueryCancelledException e) {
-                timeout = true;
-                log.warn("Query has been cancelled due to timeout: \n{}", query);
+        var execution = QueryExecutionFactory.create(query, ds);
+        execution.setTimeout(config.countRequestTimeout);
+
+        return new Cancellable<>() {
+            @Override
+            public void cancel() {
+                if (!execution.isClosed()) {
+                    execution.abort();
+                }
             }
-            return new CountDTO(total, timeout);
-        });
+
+            @Override
+            public Long get() throws CancellationException {
+                return Txn.calculateRead(ds, () -> {
+                    try (execution) {
+                        return execution.execSelect().next().get("count").asLiteral().getLong();
+                    }
+                });
+            }
+        };
     }
 
     List<FacetDTO> getFacets() {
@@ -224,5 +245,11 @@ public class ViewService {
                                 .map(c -> new ColumnDTO(c.name, c.title, c.type))
                                 .collect(toList())))
                 .collect(toList());
+    }
+
+    interface Cancellable<T> {
+        void cancel();
+
+        T get() throws QueryCancelledException;
     }
 }
