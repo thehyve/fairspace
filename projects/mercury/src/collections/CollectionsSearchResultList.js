@@ -3,7 +3,12 @@ import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, Table
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {getCollectionAbsolutePath, handleCollectionSearchRedirect, pathForIri} from './collectionUtils';
+import {
+    getSearchPathSegments,
+    getCollectionAbsolutePath,
+    handleCollectionTextSearchRedirect,
+    pathForIri
+} from './collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
 import {getSearchContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
@@ -149,22 +154,7 @@ export const CollectionSearchResultListContainer = ({
     const items = data || [];
     const total = items.length;
     const handleSearch = (value) => {
-        handleCollectionSearchRedirect(history, value, context);
-    };
-
-    const pathSegments = () => {
-        const segments = ((context && pathForIri(context)) || '').split('/');
-        if (segments[0] === '') {
-            return [];
-        }
-        const result = [];
-        let href = '/collections';
-        segments.forEach(segment => {
-            href += '/' + segment;
-            result.push({label: segment, href});
-        });
-        result.push({label: 'Search results', href: ''});
-        return result;
+        handleCollectionTextSearchRedirect(history, value, context);
     };
 
     return (
@@ -176,7 +166,7 @@ export const CollectionSearchResultListContainer = ({
             }
         ]}}
         >
-            <BreadCrumbs additionalSegments={pathSegments()} />
+            <BreadCrumbs additionalSegments={getSearchPathSegments(context)} />
             <SearchBar
                 placeholder="Search"
                 disableUnderline={false}
