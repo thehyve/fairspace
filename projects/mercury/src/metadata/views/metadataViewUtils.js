@@ -15,23 +15,6 @@ export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
 
 export const LOCATION_FILTER_FIELD = 'belongsTo';
 
-export const applyViewIcons = (viewsOptions: MetadataViewOptions[]): MetadataViewOptions[] => viewsOptions.map(view => {
-    let icon = <Assignment />;
-    if (view.name === 'subjects') {
-        icon = <AssignmentInd />;
-    } else if (view.name === 'samples') {
-        icon = <Grain />;
-    } else if (view.name === 'collections') {
-        icon = <Folder />;
-    }
-    return {...view, icon};
-});
-
-export const mapMetadataViews = (views: MetadataViews): MetadataViews => {
-    views.views = applyViewIcons(views.views);
-    return views;
-};
-
 export const getContextualFileLink = (item, locationContext) => {
     const path = pathForIri(item);
     if (locationContext && locationContext !== "") {

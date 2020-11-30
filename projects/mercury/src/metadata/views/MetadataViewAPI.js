@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
-import axios, {CancelToken, CancelTokenSource} from "axios";
+import axios, {CancelTokenSource} from "axios";
 import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
-import {mapMetadataViews} from "./metadataViewUtils";
 
 export type ValueType = 'id' | 'text' | 'number' | 'date' | 'dataLink';
 
@@ -35,7 +34,6 @@ export type MetadataViewColumn = {
 export type MetadataViewOptions = {
     name: string;
     title: string;
-    icon: Object;
     columns: MetadataViewColumn[];
 };
 
@@ -76,7 +74,6 @@ class MetadataViewAPI {
     getViews(): Promise<MetadataViews> {
         return axios.get(metadataViewUrl, defaultRequestOptions)
             .then(extractJsonData)
-            .then(mapMetadataViews)
             .catch(handleHttpError("Failure when retrieving metadata views configuration."));
     }
 
