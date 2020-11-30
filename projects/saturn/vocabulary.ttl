@@ -448,21 +448,21 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Tumor grade type" ;
         sh:description "The type of tumor grading classification." ;
-        sh:datatype xsd:string ;
+        sh:class curie:tumorGradeType ;
         sh:maxCount 1 ;
         sh:path curie:tumorGradeType
     ],
     [
         sh:name "Tumor grade value" ;
         sh:description "The tumor grading value." ;
-        sh:datatype xsd:string ;
+        sh:class curie:tumorGradeValue ;
         sh:maxCount 1 ;
         sh:path curie:tumorGradeValue
     ],
     [
         sh:name "TNM type" ;
         sh:description "The type of TNM." ;
-        sh:datatype xsd:string ;
+        sh:class curie:TnmType ;
         sh:maxCount 1 ;
         sh:path curie:tnmType
     ],

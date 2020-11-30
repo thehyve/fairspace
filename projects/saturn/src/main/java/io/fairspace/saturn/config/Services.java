@@ -10,6 +10,7 @@ import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -19,6 +20,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
 
 import javax.servlet.http.HttpServlet;
@@ -45,8 +48,9 @@ public class Services {
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
-    private final FilteredDatasetGraph filteredDatasetGraph;
+    private final DatasetGraph filteredDatasetGraph;
     private final SearchProxyServlet searchProxyServlet;
+    private final ViewService viewService;
 
     public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull Dataset dataset) {
         this.config = config;
@@ -76,8 +80,9 @@ public class Services {
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
-
-        searchProxyServlet = new SearchProxyServlet(
+        var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
+        viewService = new ViewService(config.search, filteredDataset);
+                searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,
                 CONFIG.elasticsearchUrl,
                 transactions,

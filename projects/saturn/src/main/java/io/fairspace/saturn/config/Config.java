@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -49,6 +48,8 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
+    public Search search;
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
 
@@ -83,6 +84,43 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
+    }
+
+
+    public static class Search {
+        public List<Facet> facets;
+        public List<View> views;
+        public long pageRequestTimeout;
+        public long countRequestTimeout;
+
+        public static class Facet {
+            public String name;
+            public String title;
+            public String query;
+            public ValueType type;
+            public Long min;
+            public Long max;
+        }
+
+        public static class View {
+            public String name;
+            public String title;
+            public String query;
+            public List<Column> columns;
+        }
+
+        public static class Column {
+            public String name;
+            public String title;
+            public ValueType type;
+        }
+
+        public enum ValueType {
+            id,
+            text,
+            number,
+            date
+        }
     }
 
     @Override

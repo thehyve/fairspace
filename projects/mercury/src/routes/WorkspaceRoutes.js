@@ -16,6 +16,9 @@ import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
 import FeaturesContext from "../common/contexts/FeaturesContext";
+import MetadataView from '../metadata/views/MetadataView';
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
@@ -24,6 +27,7 @@ const getSubject = () => (
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
+    const {views = []} = useContext(MetadataViewContext);
 
     return (
         <Switch>
@@ -58,6 +62,21 @@ const WorkspaceRoutes = () => {
                     </LinkedDataMetadataProvider>
                 )}
             />
+
+            {views.map(view => (
+                <Route
+                    key={view.name}
+                    path={`/views/${view.name}`}
+                    exact
+                    render={() => (
+                        <BreadcrumbsContext.Provider value={{segments: []}}>
+                            <LinkedDataMetadataProvider>
+                                <MetadataView view={view.name} />
+                            </LinkedDataMetadataProvider>
+                        </BreadcrumbsContext.Provider>
+                    )}
+                />
+            ))}
 
             <Route
                 path="/metadata"

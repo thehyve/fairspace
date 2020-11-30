@@ -1,18 +1,20 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.rdf.search.*;
-import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.*;
-import org.junit.*;
-import org.junit.runner.*;
-import org.mockito.*;
-import org.mockito.junit.*;
+import io.fairspace.saturn.rdf.search.IndexDispatcher;
+import io.fairspace.saturn.rdf.transactions.BulkTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
 
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SearchProxyServletTest {

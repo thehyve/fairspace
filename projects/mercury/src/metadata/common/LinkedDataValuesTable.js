@@ -108,7 +108,7 @@ export const LinkedDataValuesTable = (
                             <TableCell className={classes.valueColumn} key={columnDef.id}>
                                 {
                                     columnDef.id === LABEL_URI
-                                        ? <Typography variant="h4">{columnDef.getValue(entry, idx)}</Typography>
+                                        ? <Typography variant="h6">{columnDef.getValue(entry, idx)}</Typography>
                                         : columnDef.getValue(entry, idx)
                                 }
                             </TableCell>
