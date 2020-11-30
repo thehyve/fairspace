@@ -84,7 +84,7 @@ class MetadataViewAPI {
         const viewRequest: MetadataViewDataRequest = {
             view: viewName,
             filters,
-            page,
+            page: page + 1, // API endpoint expects 1-base page number
             size
         };
         const requestOptions = cancelToken ? {...defaultRequestOptions, cancelToken: cancelToken.token} : defaultRequestOptions;
