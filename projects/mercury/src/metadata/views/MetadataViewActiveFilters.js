@@ -23,11 +23,11 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
                 min = filter.min;
                 max = filter.max;
             }
-            if (min && max) {
+            if (min != null && max != null) {
                 label = `${min} - ${max}`;
-            } else if (min) {
+            } else if (min != null) {
                 label = `from: ${min}`;
-            } else if (max) {
+            } else if (max != null) {
                 label = `to: ${max}`;
             } else {
                 return <></>;
@@ -67,7 +67,7 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
         >
             {
                 filters && filters.map(filter => {
-                    if ((!filter.min && !filter.max && (!filter.values || filter.values.length === 0))
+                    if ((filter.min == null && filter.max == null && (!filter.values || filter.values.length === 0))
                         || filter.field === LOCATION_FILTER_FIELD) {
                         return null;
                     }

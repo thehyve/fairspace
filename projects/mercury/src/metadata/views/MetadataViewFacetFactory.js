@@ -85,7 +85,6 @@ const Facet = (props: MetadataViewFacetProperties) => {
             onClick={toggleExpand}
             aria-expanded={expanded}
             aria-label="Show more"
-            title="Access"
         >
             <ExpandMore />
         </IconButton>

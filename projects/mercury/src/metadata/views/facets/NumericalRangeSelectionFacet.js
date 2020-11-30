@@ -16,16 +16,14 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     useEffect(() => setValue([null, null]), [preselected]);
 
-    const triggerChange = () => onChange([min(value), max(value)]);
-
-    const handleChange = (newValue) => {
+    const handleChange = (val: number[]) => {
         clearTimeout(timeoutId);
-        setValue([min(newValue), max(newValue)]);
-        setTimeoutId(setTimeout(triggerChange, INPUT_CHANGE_DELAY));
+        setValue([min(val), max(val)]);
+        setTimeoutId(setTimeout(() => onChange([min(val), max(val)]), INPUT_CHANGE_DELAY));
     };
 
-    const handleSliderChange = (event, newValue) => {
-        handleChange(newValue);
+    const handleSliderChange = (event, val) => {
+        handleChange(val);
     };
 
     const handleMinValueInputChange = (event) => {

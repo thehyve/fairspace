@@ -55,12 +55,12 @@ describe('MetadataViewActiveFilters', () => {
     it('should render range filters properly', () => {
         const view = 'samples';
         const facets = mockFacets(view);
-        const wrapper = shallow(<MetadataViewActiveFilters
+        let wrapper = shallow(<MetadataViewActiveFilters
             facets={facets}
             filters={[
                 {
                     field: 'tumorCellularity',
-                    min: 2,
+                    min: 0,
                     max: 3
                 }
             ]}
@@ -69,8 +69,36 @@ describe('MetadataViewActiveFilters', () => {
         const activeFilters = wrapper.find(Typography);
         expect(activeFilters.length).toEqual(1);
         expect(activeFilters.at(0).prop('children')).toBe('Tumor cellularity');
-        const activeFilterValues = wrapper.find(Chip);
+        let activeFilterValues = wrapper.find(Chip);
         expect(activeFilterValues.length).toEqual(1);
-        expect(activeFilterValues.first().prop('label')).toBe('2 - 3');
+        expect(activeFilterValues.first().prop('label')).toBe('0 - 3');
+
+        // partial filter: min only
+        wrapper = shallow(<MetadataViewActiveFilters
+            facets={facets}
+            filters={[
+                {
+                    field: 'tumorCellularity',
+                    min: 2
+                }
+            ]}
+        />);
+        activeFilterValues = wrapper.find(Chip);
+        expect(activeFilterValues.length).toEqual(1);
+        expect(activeFilterValues.first().prop('label')).toBe('from: 2');
+
+        // partial filter: max only
+        wrapper = shallow(<MetadataViewActiveFilters
+            facets={facets}
+            filters={[
+                {
+                    field: 'tumorCellularity',
+                    max: 3
+                }
+            ]}
+        />);
+        activeFilterValues = wrapper.find(Chip);
+        expect(activeFilterValues.length).toEqual(1);
+        expect(activeFilterValues.first().prop('label')).toBe('to: 3');
     });
 });
