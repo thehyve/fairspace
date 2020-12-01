@@ -27,7 +27,7 @@ export const handleAuthError = (status) => {
 
 export function handleHttpError(defaultMessage) {
     return (e: Error|AxiosError) => {
-        if (axios.isCancel(e)) {
+        if (e && axios.isCancel(e)) {
             return;
         }
         if (!e || !e.response) {
