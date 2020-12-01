@@ -1,22 +1,42 @@
 package io.fairspace.saturn.services.views;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import io.fairspace.saturn.services.BaseApp;
 import lombok.SneakyThrows;
 import org.apache.jena.query.QueryCancelledException;
 import org.eclipse.jetty.server.HttpOutput;
 import spark.Response;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 public class ViewApp extends BaseApp {
-
     private final ViewService viewService;
-    private final ScheduledExecutorService checker = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService checker = newSingleThreadScheduledExecutor();
+    private final ListeningExecutorService refresher = listeningDecorator(newSingleThreadExecutor());
+    private final LoadingCache<Boolean, ViewsDTO> viewsCache = CacheBuilder.newBuilder()
+            .refreshAfterWrite(30, TimeUnit.SECONDS)
+            .build(new CacheLoader<>() {
+                @Override
+                public ViewsDTO load(Boolean key) {
+                    return new ViewsDTO(viewService.getFacets(), viewService.getViews());
+                }
+
+                @Override
+                public ListenableFuture<ViewsDTO> reload(Boolean key, ViewsDTO oldValue) {
+                    return refresher.submit(() -> load(false));
+                }
+            });
 
     public ViewApp(String basePath, ViewService viewService) {
         super(basePath);
@@ -27,7 +47,7 @@ public class ViewApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(new ViewsDTO(viewService.getFacets(), viewService.getViews()));
+            return mapper.writeValueAsString(viewsCache.get(false));
         });
 
         post("/", (req, res) -> {

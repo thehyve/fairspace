@@ -26,10 +26,19 @@ import static java.util.stream.Collectors.toList;
 public class ViewService {
     private final Config.Search config;
     private final Dataset ds;
+    private final List<ViewDTO> views;
 
     public ViewService(Config.Search config, Dataset ds) {
         this.config = config;
         this.ds = ds;
+        this.views = config.views
+                .stream()
+                .map(v -> new ViewDTO(v.name, v.title,
+                        v.columns
+                                .stream()
+                                .map(c -> new ColumnDTO(c.name, c.title, c.type))
+                                .collect(toList())))
+                .collect(toList());
     }
 
     public Cancellable<ViewPageDto> retrieveViewPage(ViewRequest request) {
@@ -237,14 +246,7 @@ public class ViewService {
     }
 
     List<ViewDTO> getViews() {
-        return config.views
-                .stream()
-                .map(v -> new ViewDTO(v.name, v.title,
-                        v.columns
-                                .stream()
-                                .map(c -> new ColumnDTO(c.name, c.title, c.type))
-                                .collect(toList())))
-                .collect(toList());
+        return views;
     }
 
     interface Cancellable<T> {
