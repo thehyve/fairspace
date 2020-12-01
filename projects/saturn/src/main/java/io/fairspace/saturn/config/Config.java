@@ -48,7 +48,7 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
-    public Search search;
+    public Search search = new Search();
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
