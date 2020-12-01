@@ -107,7 +107,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         if (isCurrentViewCollectionView) {
             return `/${currentViewTab.title}`;
         }
-        return `/views`;
+        return `/metadata-views`;
     };
 
     const a11yProps = (index) => ({
@@ -241,8 +241,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], loading, error, facets = []} = useContext(MetadataViewContext);
+    const {views: availableViews = [], loading, error, facets = []} = useContext(MetadataViewContext);
     const locationContext = getSearchContextFromString(window.location.search);
+    const {view} = props;
 
     if (loading) {
         return <LoadingInlay />;
@@ -250,6 +251,15 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
     if (error && error.message) {
         return <MessageDisplay message={error.message} />;
     }
+    const views = [];
+    if (view) {
+        if (availableViews.find(v => v.name === view)) {
+            views.push(availableViews.find(v => v.name === view));
+        }
+    } else {
+        views.push(...availableViews);
+    }
+
     if (views.length < 1) {
         return <MessageDisplay message="No metadata view found." />;
     }

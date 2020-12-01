@@ -18,11 +18,14 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import styles from "./CollectionsPage.styles";
 import CollectionsContext from './CollectionsContext';
+import {isCollectionView} from "../metadata/views/metadataViewUtils";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
     usePageTitleUpdater("Collections");
 
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
+    const {views} = useContext(MetadataViewContext);
 
     const [busy, setBusy] = useState(false);
     const [showDeletedCollections, setShowDeletedCollections] = useState(false);
@@ -77,15 +80,17 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            <Link to="/views/collections">
-                                <Button
-                                    variant="text"
-                                    color="primary"
-                                    startIcon={<Search />}
-                                >
-                                    Advanced search
-                                </Button>
-                            </Link>
+                            {views && views.some(isCollectionView) && (
+                                <Link to="/collections-metadata-views">
+                                    <Button
+                                        variant="text"
+                                        color="primary"
+                                        startIcon={<Search />}
+                                    >
+                                        Advanced search
+                                    </Button>
+                                </Link>
+                            )}
                         </Grid>
                         <Grid item xs={3} className={classes.topBarSwitch}>
                             <FormControlLabel

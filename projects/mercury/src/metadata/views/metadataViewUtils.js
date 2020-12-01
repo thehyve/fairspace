@@ -1,6 +1,4 @@
-import {Grain, AssignmentInd, Assignment, Folder} from "@material-ui/icons";
-import React from "react";
-import type {MetadataViewOptions, MetadataViews, ValueType} from "./MetadataViewAPI";
+import type {ValueType} from "./MetadataViewAPI";
 import {getCollectionAbsolutePath, pathForIri} from "../../collections/collectionUtils";
 import {getParentPath} from "../../file/fileUtils";
 

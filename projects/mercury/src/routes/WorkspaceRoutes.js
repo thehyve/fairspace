@@ -44,15 +44,6 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/collections-search"
-                render={(props) => (
-                    <LinkedDataMetadataProvider>
-                        <CollectionSearchResultList {...props} />
-                    </LinkedDataMetadataProvider>
-                )}
-            />
-
-            <Route
                 path="/collections/:collection/:path(.*)?"
                 render={(props) => (
                     <LinkedDataMetadataProvider>
@@ -62,7 +53,27 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/views"
+                path="/collections-search"
+                render={(props) => (
+                    <LinkedDataMetadataProvider>
+                        <CollectionSearchResultList {...props} />
+                    </LinkedDataMetadataProvider>
+                )}
+            />
+
+            <Route
+                path="/collections-metadata-views"
+                render={() => (
+                    <BreadcrumbsContext.Provider value={{segments: []}}>
+                        <LinkedDataMetadataProvider>
+                            <MetadataView view="collections" />
+                        </LinkedDataMetadataProvider>
+                    </BreadcrumbsContext.Provider>
+                )}
+            />
+
+            <Route
+                path="/metadata-views"
                 render={() => (
                     <BreadcrumbsContext.Provider value={{segments: []}}>
                         <LinkedDataMetadataProvider>
