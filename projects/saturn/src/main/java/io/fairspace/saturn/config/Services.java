@@ -81,7 +81,7 @@ public class Services {
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
-        viewService = new ViewService(config.search, filteredDataset);
+        viewService = new ViewService(config.search, filteredDataset, davFactory);
                 searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,
                 CONFIG.elasticsearchUrl,
