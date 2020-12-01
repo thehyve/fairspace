@@ -48,7 +48,7 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
-    public Search search;
+    public Search search = new Search();
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
@@ -88,10 +88,12 @@ public class Config {
 
 
     public static class Search {
+        @JsonSetter(nulls = Nulls.AS_EMPTY)
         public List<Facet> facets;
+        @JsonSetter(nulls = Nulls.AS_EMPTY)
         public List<View> views;
-        public long pageRequestTimeout;
-        public long countRequestTimeout;
+        public long pageRequestTimeout = 10_000;
+        public long countRequestTimeout = 100_1000;
 
         public static class Facet {
             public String name;

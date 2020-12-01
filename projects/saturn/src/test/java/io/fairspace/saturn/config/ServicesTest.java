@@ -7,6 +7,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -19,8 +21,9 @@ public class ServicesTest {
     public final EnvironmentVariables environmentVariables
             = new EnvironmentVariables();
     @Before
-    public void before() throws Exception {
+    public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
+        config.search.views = List.of();
         svc = new Services("/api/v1", config, dataset);
     }
 
