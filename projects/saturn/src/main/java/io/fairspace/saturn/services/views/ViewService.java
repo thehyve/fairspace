@@ -123,6 +123,18 @@ public class ViewService {
         var model = new HashMap<String, Object>();
         model.put("fetch", fetch);
         for (var filter : filters) {
+            if (filter.getValues() != null) {
+                if (filter.getValues().isEmpty()) {
+                    continue;
+                }
+                var facetValues = getValues(filter.getField());
+                if (!filter.getValues().stream().allMatch(value -> facetValues.stream().anyMatch(fv -> fv.getValue().equals(value)))) {
+                    throw new IllegalArgumentException("Invalid value");
+                }
+                if (filter.getValues().size() == facetValues.size()) {
+                    continue;
+                }
+            }
             model.put(filter.field, toFilterString(filter));
         }
         return model;
