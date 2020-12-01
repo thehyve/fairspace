@@ -127,7 +127,7 @@ public class ViewService {
                 if (filter.getValues().isEmpty()) {
                     continue;
                 }
-                var facetValues = getValues(filter.getField());
+                var facetValues = getValues(getFacet(filter.getField()).query);
                 if (!filter.getValues().stream().allMatch(value -> facetValues.stream().anyMatch(fv -> fv.getValue().equals(value)))) {
                     throw new IllegalArgumentException("Invalid value");
                 }
@@ -236,12 +236,14 @@ public class ViewService {
             return null;
         }
         var map = new TreeMap<String, String>();
-        try (var execution = QueryExecutionFactory.create(query, ds)) {
-            execution.execSelect().forEachRemaining(row -> {
-                var resource = row.getResource(row.varNames().next());
-                map.put(getStringProperty(resource, RDFS.label), resource.getURI());
-            });
-        }
+        Txn.executeRead(ds, () -> {
+            try (var execution = QueryExecutionFactory.create(query, ds)) {
+                execution.execSelect().forEachRemaining(row -> {
+                    var resource = row.getResource(row.varNames().next());
+                    map.put(getStringProperty(resource, RDFS.label), resource.getURI());
+                });
+            }
+        });
         return map.entrySet()
                 .stream()
                 .map(e -> new ValueDTO(e.getKey(), e.getValue()))
