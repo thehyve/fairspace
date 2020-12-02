@@ -350,14 +350,17 @@ search:
         SELECT ?sample
         </#if>
         WHERE {
-          <#if fetch>VALUES ?sample { ${iris} }</#if>
-
-          <#if collection?? || analysisType??>
-          FILTER EXISTS {
-             ?file curie:sample ?sample .
-             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+          <#if fetch>
+          VALUES ?sample { ${iris} }
+          <#elseif collection?? || analysisType??>
+          {
+            SELECT DISTINCT ?smpl WHERE {
+               <#if collection??> ?collection a fs:Collection . ${collection}  ?file (fs:belongsTo)* ?collection . </#if>
+               ?file curie:sample ?smpl .
+               <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+            }
           }
+          BIND(?smpl AS ?sample)
           </#if>
 
           <#if fetch || sampleTopography??> OPTIONAL {?sample curie:topography ?sampleTopography } ${sampleTopography!} </#if>
@@ -464,14 +467,17 @@ search:
         SELECT ?event
         </#if>
         WHERE {
-          <#if fetch>VALUES ?event { ${iris} }</#if>
-
-          <#if collection?? || analysisType??>
-          FILTER EXISTS {
-             ?file curie:aboutEvent ?event .
-             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+          <#if fetch>
+          VALUES ?event { ${iris} }
+          <#elseif collection?? || analysisType??>
+          {
+            SELECT DISTINCT ?e WHERE {
+               <#if collection??> ?collection a fs:Collection . ${collection}  ?file (fs:belongsTo)* ?collection . </#if>
+               ?file curie:aboutEvent ?e .
+               <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+            }
           }
+          BIND(?e AS ?event)
           </#if>
 
           <#if fetch || morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology!} </#if>
@@ -537,7 +543,19 @@ search:
         SELECT ?subject
         </#if>
         WHERE {
-          <#if fetch>VALUES ?subject { ${iris} }</#if>
+          <#if fetch>
+          VALUES ?subject { ${iris} }
+          <#elseif collection?? || analysisType??>
+          {
+            SELECT DISTINCT ?s WHERE {
+               <#if collection??> ?collection a fs:Collection . ${collection}  ?file (fs:belongsTo)* ?collection . </#if>
+               ?file curie:aboutSubject ?s .
+               <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+            }
+          }
+          BIND(?s AS ?subject)
+          </#if>
+
           ?subject a curie:Subject .
 
           <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
@@ -564,14 +582,6 @@ search:
             <#if tnmT??>            ?event curie:tnmT ?tnmT . ${tnmT} </#if>
             <#if tnmN??>            ?event curie:tnmN ?tnmN . ${tnmN} </#if>
             <#if tnmM??>            ?event curie:tnmM ?tnmM . ${tnmM} </#if>
-          }
-          </#if>
-
-          <#if collection?? || analysisType??>
-          FILTER EXISTS {
-             ?file curie:aboutSubject ?subject .
-             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection . ${collection} ?collection fs:contains* ?file .  </#if>
           }
           </#if>
 
