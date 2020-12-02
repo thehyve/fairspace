@@ -600,3 +600,128 @@ search:
 
           FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
         }
+    - name: files
+      title: Files
+      columns:
+        - name: file
+          title: File
+          type: id
+        - name: kind
+          title: Kind
+          type: text
+        - name: collection
+          title: Collection
+          type: id
+        - name: workspace
+          title: Workspace
+          type: id
+        - name: analysisType
+          title: Analysis Type
+          type: id
+        - name: dateCreated
+          title: Created
+          type: date
+        - name: dateModified
+          title: Modified
+          type: date
+      query: |
+        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX curie: <https://institut-curie.org/ontology#>
+        PREFIX fs:    <http://fairspace.io/ontology#>
+
+        <#if fetch>
+        SELECT ?file ?kind ?collection ?workspace ?dateCreated ?dateModified
+        <#else>
+        SELECT ?file
+        </#if>
+        WHERE {
+          <#if fetch>
+          VALUES ?file { ${iris} }
+          <#elseif collection??>
+          {
+            SELECT ?f WHERE {
+               ?collection a fs:Collection . ${collection}  ?f (fs:belongsTo)* ?collection
+            }
+          }
+          BIND(?f AS ?file)
+          FILTER (EXISTS{?file a fs:File} || EXISTS{?file a fs:Directory} || EXISTS{?file a fs:Collection})
+          </#if>
+
+          <#if fetch || analysisType??> OPTIONAL { ?file curie:analysisType ?analysisType } ${analysisType!}</#if>
+
+          <#if fetch>
+            ?file (fs:belongsTo)* ?collection . ?collection fs:ownedBy ?workspace .
+            OPTIONAL {?file fs:dateCreated ?dateCreated}
+            OPTIONAL {?file fs:dateModified ?dateModified}
+          <#else>
+            <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
+              FILTER EXISTS {
+                ?file curie:sample ?sample .
+                <#if sampleTopography??> ?sample curie:topography ?sampleTopography . ${sampleTopography} </#if>
+                <#if sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature} </#if>
+                <#if sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin} </#if>
+                <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
+
+
+                <#if morphology?? || eventType?? || tumorTopography?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
+                  ?sample curie:diagnosis ?event .
+                  <#if morphology??>      ?event curie:tumorMorphology ?morphology . ${morphology} </#if>
+                  <#if eventType??>       ?event curie:eventType ?eventType . ${eventType} </#if>
+                  <#if tumorTopography??> ?event curie:topography ?tumorTopography . ${tumorTopography} </#if>
+                  <#if laterality??>      ?event curie:tumorLaterality ?laterality . ${laterality} </#if>
+                  <#if ageAtDiagnosis??>  ?event curie:ageAtDiagnosis ?ageAtDiagnosis . ${ageAtDiagnosis} </#if>
+                  <#if tumorGradeType??>  ?event curie:tumorGradeType ?tumorGradeType . ${tumorGradeType} </#if>
+                  <#if tumorGradeValue??> ?event curie:tumorGradeValue ?tumorGradeValue . ${tumorGradeValue} </#if>
+                  <#if tnmType??>         ?event curie:tnmType ?tnmType . ${tnmType} </#if>
+                  <#if tnmT??>            ?event curie:tnmT ?tnmT . ${tnmT} </#if>
+                  <#if tnmN??>            ?event curie:tnmN ?tnmN . ${tnmN} </#if>
+                  <#if tnmM??>            ?event curie:tnmM ?tnmM . ${tnmM} </#if>
+                </#if>
+
+                <#if species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
+                   ?sample curie:subject ?subject .
+                   <#if species??> ?subject curie:isOfSpecies ?species . ${species}</#if>
+                   <#if gender??> ?subject curie:gender ?gender . ${gender}</#if>
+                   <#if ageAtLastNews??> ?subject curie:ageAtLastNews ?ageAtLastNews . ${ageAtLastNews}</#if>
+                   <#if ageAtDeath??> ?subject curie:ageAtDeath ?ageAtDeath . ${ageAtDeath}</#if>
+                </#if>
+               }
+            <#elseif morphology?? || eventType?? || tumorTopography?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
+              FILTER EXISTS {
+                ?file curie:aboutEvent ?event .
+                <#if morphology??>      ?event curie:tumorMorphology ?morphology . ${morphology} </#if>
+                <#if eventType??>       ?event curie:eventType ?eventType . ${eventType} </#if>
+                <#if tumorTopography??> ?event curie:topography ?tumorTopography . ${tumorTopography} </#if>
+                <#if laterality??>      ?event curie:tumorLaterality ?laterality . ${laterality} </#if>
+                <#if ageAtDiagnosis??>  ?event curie:ageAtDiagnosis ?ageAtDiagnosis . ${ageAtDiagnosis} </#if>
+                <#if tumorGradeType??>  ?event curie:tumorGradeType ?tumorGradeType . ${tumorGradeType} </#if>
+                <#if tumorGradeValue??> ?event curie:tumorGradeValue ?tumorGradeValue . ${tumorGradeValue} </#if>
+                <#if tnmType??>         ?event curie:tnmType ?tnmType . ${tnmType} </#if>
+                <#if tnmT??>            ?event curie:tnmT ?tnmT . ${tnmT} </#if>
+                <#if tnmN??>            ?event curie:tnmN ?tnmN . ${tnmN} </#if>
+                <#if tnmM??>            ?event curie:tnmM ?tnmM . ${tnmM} </#if>
+
+                <#if species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
+                   ?event curie:eventSubject ?subject .
+                   <#if species??> ?subject curie:isOfSpecies ?species . ${species}</#if>
+                   <#if gender??> ?subject curie:gender ?gender . ${gender}</#if>
+                   <#if ageAtLastNews??> ?subject curie:ageAtLastNews ?ageAtLastNews . ${ageAtLastNews}</#if>
+                   <#if ageAtDeath??> ?subject curie:ageAtDeath ?ageAtDeath . ${ageAtDeath}</#if>
+                </#if>
+              }
+            <#elseif species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
+              FILTER EXISTS {
+                ?file curie:aboutSubject ?subject .
+                <#if species??> ?subject curie:isOfSpecies ?species . ${species}</#if>
+                <#if gender??> ?subject curie:gender ?gender . ${gender}</#if>
+                <#if ageAtLastNews??> ?subject curie:ageAtLastNews ?ageAtLastNews . ${ageAtLastNews}</#if>
+                <#if ageAtDeath??> ?subject curie:ageAtDeath ?ageAtDeath . ${ageAtDeath}</#if>
+              }
+            </#if>
+          </#if>
+
+          ?file a ?type .
+          <#if fetch>FILTER ((?type = fs:File) || (?type = fs:Directory) ||  (?type = fs:Collection))</#if>
+
+          BIND(IF(?type = fs:File, "File", IF(?type = fs:Collection, "Collection", "Workspace")) AS ?kind)
+        }
