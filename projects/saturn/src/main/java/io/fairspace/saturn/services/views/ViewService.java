@@ -53,7 +53,7 @@ public class ViewService {
         log.debug("Query with filters and pagination applied: \n{}", selectQuery);
 
         var selectExecution = QueryExecutionFactory.create(selectQuery, ds);
-        selectExecution.setTimeout(config.pageRequestTimeout);
+     //   selectExecution.setTimeout(config.pageRequestTimeout);
 
         return Txn.calculateRead(ds, () -> {
             var iris = new ArrayList<String>();
