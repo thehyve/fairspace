@@ -347,9 +347,11 @@ search:
           ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis ?subject ?gender
           ?species ?ageAtLastNews ?ageAtDeath
         <#else>
-        SELECT (COUNT(?sample) AS ?count)
+        SELECT ?sample
         </#if>
         WHERE {
+          <#if fetch>VALUES ?sample { ${iris} }</#if>
+
           <#if collection?? || analysisType??>
           FILTER EXISTS {
              ?file curie:sample ?sample .
@@ -371,7 +373,7 @@ search:
             <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
          </#if>
 
-         <#assign has_event_filter = morphology?? || tumorTopograhy?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmM??>
+         <#assign has_event_filter = morphology?? || tumorTopography?? || eventType?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmM??>
          <#if fetch || has_event_filter>
             <#if !has_event_filter>OPTIONAL {</#if>
               ?sample curie:diagnosis ?event .
@@ -459,10 +461,18 @@ search:
         SELECT ?event ?eventType ?morphology ?topography ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT
                ?tnmN ?tnmM ?ageAtDiagnosis ?subject ?gender ?species ?ageAtLastNews ?ageAtDeath
         <#else>
-        SELECT (COUNT(?event) AS ?count)
+        SELECT ?event
         </#if>
         WHERE {
-          ?event a curie:TumorPathologyEvent .
+          <#if fetch>VALUES ?event { ${iris} }</#if>
+
+          <#if collection?? || analysisType??>
+          FILTER EXISTS {
+             ?file curie:aboutEvent ?event .
+             <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
+             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+          }
+          </#if>
 
           <#if fetch || morphology??>      OPTIONAL { ?event curie:tumorMorphology ?morphology } ${morphology!} </#if>
           <#if fetch || eventType??>       OPTIONAL { ?event curie:eventType ?eventType } ${eventType!} </#if>
@@ -476,31 +486,25 @@ search:
           <#if fetch || tnmN??>            OPTIONAL { ?event curie:tnmN ?tnmN } ${tnmN!} </#if>
           <#if fetch || tnmM??>            OPTIONAL { ?event curie:tnmM ?tnmM } ${tnmM!} </#if>
 
-        <#if fetch || species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
-           ?event curie:eventSubject ?subject .
-           <#if fetch || species??>OPTIONAL {?subject curie:isOfSpecies ?species} ${species!}</#if>
-           <#if fetch || gender??> OPTIONAL {?subject curie:gender ?gender} ${gender!}</#if>
-           <#if fetch || ageAtLastNews??>OPTIONAL {?subject curie:ageAtLastNews ?ageAtLastNews} ${ageAtLastNews!}</#if>
-           <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
-        </#if>
+          ?event a curie:TumorPathologyEvent .
 
-        <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
-        FILTER EXISTS {
-          ?sample curie:diagnosis ?event .
-          <#if sampleTopography??> ?sample curie:topography ?sampleTopography . ${sampleTopography} </#if>
-          <#if sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature} </#if>
-          <#if sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin} </#if>
-          <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
-        }
-        </#if>
+          <#if fetch || species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
+             ?event curie:eventSubject ?subject .
+             <#if fetch || species??>OPTIONAL {?subject curie:isOfSpecies ?species} ${species!}</#if>
+             <#if fetch || gender??> OPTIONAL {?subject curie:gender ?gender} ${gender!}</#if>
+             <#if fetch || ageAtLastNews??>OPTIONAL {?subject curie:ageAtLastNews ?ageAtLastNews} ${ageAtLastNews!}</#if>
+             <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
+          </#if>
 
-        <#if collection?? || analysisType??>
-        FILTER EXISTS {
-           ?file curie:aboutEvent ?event .
-           <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-           <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
-        }
-        </#if>
+          <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
+          FILTER EXISTS {
+            ?sample curie:diagnosis ?event .
+            <#if sampleTopography??> ?sample curie:topography ?sampleTopography . ${sampleTopography} </#if>
+            <#if sampleNature??>     ?sample curie:isOfNature ?sampleNature . ${sampleNature} </#if>
+            <#if sampleOrigin??>     ?sample curie:hasOrigin ?sampleOrigin . ${sampleOrigin} </#if>
+            <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
+          }
+          </#if>
 
           FILTER NOT EXISTS { ?event fs:dateDeleted ?anyDateDeleted }
         }
@@ -530,9 +534,10 @@ search:
         <#if fetch>
         SELECT ?subject ?species ?gender ?ageAtLastNews ?ageAtDeath
         <#else>
-        SELECT (COUNT(?subject) AS ?count)
+        SELECT ?subject
         </#if>
         WHERE {
+          <#if fetch>VALUES ?subject { ${iris} }</#if>
           ?subject a curie:Subject .
 
           <#if sampleTopography?? || sampleNature?? || sampleOrigin?? || tumorCellularity??>
@@ -566,7 +571,7 @@ search:
           FILTER EXISTS {
              ?file curie:aboutSubject ?subject .
              <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+             <#if collection??> ?collection a fs:Collection . ${collection} ?collection fs:contains* ?file .  </#if>
           }
           </#if>
 

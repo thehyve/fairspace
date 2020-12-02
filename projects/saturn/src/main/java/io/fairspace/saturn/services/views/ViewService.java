@@ -5,7 +5,6 @@ import freemarker.template.TemplateException;
 import io.fairspace.saturn.config.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.syntax.ElementFilter;
@@ -16,63 +15,96 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.*;
-import java.util.concurrent.CancellationException;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static java.lang.String.join;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
+import static org.apache.jena.graph.NodeFactory.createURI;
+import static org.apache.jena.sparql.expr.NodeValue.*;
 
 @Slf4j
 public class ViewService {
     private final Config.Search config;
     private final Dataset ds;
+    private final Map<String, Template> templates = new HashMap<>();
 
     public ViewService(Config.Search config, Dataset ds) {
         this.config = config;
         this.ds = ds;
+
+        config.views.forEach(view -> {
+            try {
+                templates.put(view.name, new Template(view.name, new StringReader(view.query), null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    public Cancellable<ViewPageDto> retrieveViewPage(ViewRequest request) {
-        var query = getQuery(request.getView(), true, request.getFilters());
+    public ViewPageDto retrieveViewPage(ViewRequest request) {
+        var selectQuery = getQuery(request.getView(), getFiltersModel(request.getFilters()));
+
         var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         var size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
-        query.setLimit(size + 1);
-        query.setOffset((page - 1) * size);
+        selectQuery.setLimit(size + 1);
+        selectQuery.setOffset((page - 1) * size);
 
-        log.debug("Query with filters and pagination applied: \n{}", query);
+        log.debug("Query with filters and pagination applied: \n{}", selectQuery);
 
+        var selectExecution = QueryExecutionFactory.create(selectQuery, ds);
+        selectExecution.setTimeout(config.pageRequestTimeout);
 
-        var execution = QueryExecutionFactory.create(query, ds);
-        execution.setTimeout(config.pageRequestTimeout);
-
-        return new Cancellable<>() {
-            @Override
-            public void cancel() {
-                if (!execution.isClosed()) {
-                    execution.abort();
-                }
+        return Txn.calculateRead(ds, () -> {
+            var iris = new ArrayList<String>();
+            var rows = new ArrayList<Map<String, Object>>();
+            var timeout = false;
+            var hasNext = false;
+            try (selectExecution) {
+                var rs = selectExecution.execSelect();
+                var variable = rs.getResultVars().get(0);
+                rs.forEachRemaining(row -> iris.add("<" + row.getResource(variable).getURI() + ">"));
+            } catch (QueryCancelledException e) {
+                timeout = true;
+            }
+            while (iris.size() > size) {
+                iris.remove(iris.size() - 1);
+                hasNext = true;
             }
 
-            @Override
-            public ViewPageDto get() throws CancellationException {
-                return Txn.calculateRead(ds, () -> {
-                    var rows = new ArrayList<Map<String, Object>>();
-                    var timeout = false;
-                    var hasNext = false;
-                    try (execution) {
-                        execution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
-                    } catch (QueryCancelledException e) {
-                        timeout = true;
-                    }
-                    while (rows.size() > size) {
-                        rows.remove(rows.size() - 1);
-                        hasNext = true;
-                    }
+            var fetchQuery = getQuery(request.getView(), Map.of("fetch", true, "iris", join(" ", iris)));
 
-                    return new ViewPageDto(rows, hasNext, timeout);
-                });
+            // Non-cancellable but should be very fast
+            try (var fetchExecution = QueryExecutionFactory.create(fetchQuery, ds)) {
+                fetchExecution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
+            } catch (QueryCancelledException e) {
+                timeout = true;
             }
-        };
+
+            return new ViewPageDto(rows, hasNext, timeout);
+        });
+
+    }
+
+    private Query getQuery(String view, Object model) {
+        try {
+            var template = templates.get(view);
+            var out = new StringWriter();
+            try {
+                template.process(model, out);
+            } catch (TemplateException e) {
+                throw new RuntimeException("Error interpolating template: \n " + template, e);
+            }
+            var sparql = out.toString();
+            try {
+                return QueryFactory.create(sparql);
+            } catch (QueryException e) {
+                log.error("Error parsing query:\n {}", sparql);
+                throw new RuntimeException("Error parsing query:\n" + sparql, e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading query template for view " + view, e);
+        }
     }
 
     private Map<String, Object> rowToMap(QuerySolution row) {
@@ -98,30 +130,9 @@ public class ViewService {
         return map;
     }
 
-    private Query getQuery(String viewName, boolean fetch, List<ViewFilter> filters) {
-        try {
-            var template = new Template(viewName, new StringReader(getView(viewName).query), null);
-            var out = new StringWriter();
-            try {
-                template.process(getFiltersModel(fetch, filters), out);
-            } catch (TemplateException e) {
-                throw new RuntimeException("Error interpolating template: \n " + template, e);
-            }
-            var sparql = out.toString();
-            try {
-                return QueryFactory.create(sparql);
-            } catch (QueryException e) {
-                log.error("Error parsing query:\n {}", sparql);
-                throw new RuntimeException("Error parsing query:\n" + sparql, e);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Map<String, Object> getFiltersModel(boolean fetch, List<ViewFilter> filters) {
+    private Map<String, Object> getFiltersModel(List<ViewFilter> filters) {
         var model = new HashMap<String, Object>();
-        model.put("fetch", fetch);
+        model.put("fetch", false);
         for (var filter : filters) {
             model.put(filter.field, toFilterString(filter));
         }
@@ -176,38 +187,33 @@ public class ViewService {
 
     private static NodeValue toNodeValue(Object o, Config.Search.ValueType type) {
         return switch (type) {
-            case id -> NodeValue.makeNode(NodeFactory.createURI(o.toString()));
-            case text -> NodeValue.makeString(o.toString());
-            case number -> NodeValue.makeDecimal(o.toString());
-            case date -> NodeValue.makeDate(o.toString());
+            case id -> makeNode(createURI(o.toString()));
+            case text -> makeString(o.toString());
+            case number -> makeDecimal(o.toString());
+            case date -> makeDate(o.toString());
         };
     }
 
-    Cancellable<Long> getCount(CountRequest request) {
-        var query = getQuery(request.getView(), false, request.getFilters());
+    CountDTO getCount(CountRequest request) {
+        var query = getQuery(request.getView(), getFiltersModel(request.getFilters()));
 
         log.debug("Querying the total number of matches: \n{}", query);
 
         var execution = QueryExecutionFactory.create(query, ds);
         execution.setTimeout(config.countRequestTimeout);
-
-        return new Cancellable<>() {
-            @Override
-            public void cancel() {
-                if (!execution.isClosed()) {
-                    execution.abort();
-                }
-            }
-
-            @Override
-            public Long get() throws CancellationException {
-                return Txn.calculateRead(ds, () -> {
-                    try (execution) {
-                        return execution.execSelect().next().get("count").asLiteral().getLong();
+        try {
+            return Txn.calculateRead(ds, () -> {
+                try (execution) {
+                    long count = 0;
+                    for (var it = execution.execSelect(); it.hasNext(); it.next()) {
+                        count++;
                     }
-                });
-            }
-        };
+                    return new CountDTO(count, false);
+                }
+            });
+        } catch (QueryCancelledException e) {
+            return new CountDTO(0, true);
+        }
     }
 
     List<FacetDTO> getFacets() {
@@ -245,11 +251,5 @@ public class ViewService {
                                 .map(c -> new ColumnDTO(c.name, c.title, c.type))
                                 .collect(toList())))
                 .collect(toList());
-    }
-
-    interface Cancellable<T> {
-        void cancel();
-
-        T get() throws QueryCancelledException;
     }
 }
