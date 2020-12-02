@@ -8,7 +8,7 @@ import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
 
-import static org.apache.jena.shacl.validation.ValidationProc.simpleValidationNode;
+import static org.apache.jena.shacl.validation.ValidationProc.plainValidationNode;
 
 public class ShaclValidator extends VocabularyAwareValidator {
     private final Shapes shapes;
@@ -34,7 +34,7 @@ public class ShaclValidator extends VocabularyAwareValidator {
         var data = after.getGraph();
 
         affected.forEach(node ->
-                simpleValidationNode(shapes, data, node, false)
+                plainValidationNode(shapes, data, node)
                         .getEntries()
                         .forEach(entry -> {
                             if (entry.severity().level() == SHACL.Violation) {

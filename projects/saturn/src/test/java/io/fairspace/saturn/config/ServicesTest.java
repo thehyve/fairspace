@@ -21,7 +21,7 @@ public class ServicesTest {
     public final EnvironmentVariables environmentVariables
             = new EnvironmentVariables();
     @Before
-    public void before() throws Exception {
+    public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
         config.search.views = List.of();
         svc = new Services("/api/v1", config, dataset);
