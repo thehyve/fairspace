@@ -198,19 +198,18 @@ public class ViewService {
 
         var execution = QueryExecutionFactory.create(query, ds);
         execution.setTimeout(config.countRequestTimeout);
-        try {
-            return Txn.calculateRead(ds, () -> {
-                try (execution) {
-                    long count = 0;
-                    for (var it = execution.execSelect(); it.hasNext(); it.next()) {
-                        count++;
-                    }
-                    return new CountDTO(count, false);
+
+        return Txn.calculateRead(ds, () -> {
+            long count = 0;
+            try (execution) {
+                for (var it = execution.execSelect(); it.hasNext(); it.next()) {
+                    count++;
                 }
-            });
-        } catch (QueryCancelledException e) {
-            return new CountDTO(0, true);
-        }
+                return new CountDTO(count, false);
+            } catch (QueryCancelledException e) {
+                return new CountDTO(count, true);
+            }
+        });
     }
 
     List<FacetDTO> getFacets() {
