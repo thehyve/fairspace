@@ -356,7 +356,7 @@ search:
           FILTER EXISTS {
              ?file curie:sample ?sample .
              <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+             <#if collection??> ?file (fs:belongsTo)* ?collection . ${collection} </#if>
           }
           </#if>
 
@@ -470,7 +470,7 @@ search:
           FILTER EXISTS {
              ?file curie:aboutEvent ?event .
              <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection ; fs:contains* ?file . ${collection} </#if>
+             <#if collection??> ?file (fs:belongsTo)* ?collection . ${collection} </#if>
           }
           </#if>
 
@@ -571,7 +571,7 @@ search:
           FILTER EXISTS {
              ?file curie:aboutSubject ?subject .
              <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
-             <#if collection??> ?collection a fs:Collection . ${collection} ?collection fs:contains* ?file .  </#if>
+             <#if collection??> ?file (fs:belongsTo)* ?collection . ${collection} </#if>
           }
           </#if>
 
