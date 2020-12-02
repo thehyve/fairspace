@@ -16,15 +16,21 @@ type SelectProperties = {
     options: Option[];
     onChange: (string[]) => void;
     textFilterValue: string;
-    preselected?: string[];
+    active: boolean;
 }
 
 const filterByText = (options, textFilterValue) => options
     .filter(o => textFilterValue.trim() === "" || o.label.toLowerCase().includes(textFilterValue.toLowerCase()));
 
 const SelectSingle = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue} = props;
+    const {options, onChange, textFilterValue, active} = props;
     const [value, setValue] = useState(null);
+
+    useEffect(() => {
+        if (!active) {
+            setValue(null);
+        }
+    }, [active]);
 
     const handleChange = (event) => {
         const newValue = event.target.value;
@@ -42,14 +48,14 @@ const SelectSingle = (props: SelectProperties) => {
 };
 
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, preselected} = props;
-    const [state, setState] = useState(Object.fromEntries(
-        options.map(option => [option.value, preselected.some(s => s === option.value)])
-    ));
+    const {options, onChange, textFilterValue, active} = props;
+    const [state, setState] = useState(Object.fromEntries(options.map(option => [option.value, false])));
 
-    useEffect(() => setState(Object.fromEntries(
-        options.map(option => [option.value, preselected.some(s => s === option.value)])
-    )), [options, preselected]);
+    useEffect(() => {
+        if (!active) {
+            setState(Object.fromEntries(options.map(option => [option.value, false])));
+        }
+    }, [active, options]);
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -91,7 +97,7 @@ const SelectMultiple = (props: SelectProperties) => {
 };
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], multiple = false, onChange = () => {}, preselected = [], classes} = props;
+    const {options = [], multiple = false, onChange = () => {}, active, classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
     const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
 
@@ -107,6 +113,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         <TextField
             value={textFilterValue}
             onChange={e => setTextFilterValue(e.target.value)}
+            style={{marginBottom: 8}}
             InputProps={{
                 startAdornment: (
                     <InputAdornment position="start">
@@ -115,13 +122,15 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                 ),
                 endAdornment: (
                     <InputAdornment position="end">
-                        <IconButton
-                            onClick={() => setTextFilterValue("")}
-                            disabled={!textFilterValue}
-                            style={{order: 1}}
-                        >
-                            <Clear color="disabled" fontSize="small" />
-                        </IconButton>
+                        {textFilterValue && (
+                            <IconButton
+                                onClick={() => setTextFilterValue("")}
+                                disabled={!textFilterValue}
+                                style={{order: 1}}
+                            >
+                                <Clear color="disabled" fontSize="small" />
+                            </IconButton>
+                        )}
                     </InputAdornment>
                 ),
             }}
@@ -135,13 +144,13 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                 <FormControl component="fieldset">
                     {multiple ? (
                         <SelectMultiple
-                            preselected={preselected}
                             options={options}
                             onChange={onChange}
                             classes={classes}
                             textFilterValue={textFilterValue}
+                            active={active}
                         />
-                    ) : (<SelectSingle options={options} onChange={onChange} textFilterValue={textFilterValue} />)}
+                    ) : (<SelectSingle options={options} onChange={onChange} textFilterValue={textFilterValue} active={active} />)}
                 </FormControl>
             </div>
         </>

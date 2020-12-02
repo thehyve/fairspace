@@ -2,7 +2,7 @@ import React from 'react';
 import {Chip, Grid, Typography} from '@material-ui/core';
 import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import {LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
-import {formatDateTime} from "../../common/utils/genericUtils";
+import {formatDateTime, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 
 type MetadataViewActiveFiltersProperties = {
@@ -23,11 +23,11 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
                 min = filter.min;
                 max = filter.max;
             }
-            if (min != null && max != null) {
+            if (isNonEmptyValue(min) && isNonEmptyValue(max)) {
                 label = `${min} - ${max}`;
-            } else if (min != null) {
+            } else if (isNonEmptyValue(min)) {
                 label = `from: ${min}`;
-            } else if (max != null) {
+            } else if (isNonEmptyValue(max)) {
                 label = `to: ${max}`;
             } else {
                 return <></>;
@@ -67,7 +67,7 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
         >
             {
                 filters && filters.map(filter => {
-                    if ((filter.min == null && filter.max == null && (!filter.values || filter.values.length === 0))
+                    if ((!isNonEmptyValue(filter.min) && !isNonEmptyValue(filter.max) && (!filter.values || filter.values.length === 0))
                         || filter.field === LOCATION_FILTER_FIELD) {
                         return null;
                     }
