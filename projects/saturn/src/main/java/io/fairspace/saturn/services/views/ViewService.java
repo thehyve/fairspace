@@ -74,11 +74,8 @@ public class ViewService {
 
             var fetchQuery = getQuery(request.getView(), Map.of("fetch", true, "iris", join(" ", iris)));
 
-            // Non-cancellable but should be very fast
             try (var fetchExecution = QueryExecutionFactory.create(fetchQuery, ds)) {
                 fetchExecution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
-            } catch (QueryCancelledException e) {
-                timeout = true;
             }
 
             return new ViewPageDto(rows, hasNext, timeout);
