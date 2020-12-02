@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Button, Grid, withStyles} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -20,7 +20,6 @@ import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
-
 
 type MetadataViewProperties = {
     classes: any;
@@ -79,14 +78,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
 
-    const {filters, updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
+    const {filters, updateFilters, clearFilter, clearAllFilters, setLocationFilter} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
 
-    // TODO pass location filter to the API for files view
-    // useEffect(() => {
-    //     setLocationFilter(currentViewTab.name, locationContext);
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [currentViewTab.name, locationContext]);
+    // pass location filter to the API for files view
+    useEffect(() => {
+        setLocationFilter(currentViewName, locationContext);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentViewName, locationContext]);
 
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
 

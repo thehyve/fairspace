@@ -1,3 +1,8 @@
+<http://fairspace.io/ontology#File> <http://www.w3.org/2000/01/rdf-schema#label> "File" .
+<http://fairspace.io/ontology#Directory> <http://www.w3.org/2000/01/rdf-schema#label> "Directory" .
+<http://fairspace.io/ontology#Collection> <http://www.w3.org/2000/01/rdf-schema#label> "Collection" .
+<http://fairspace.io/ontology#Workspace> <http://www.w3.org/2000/01/rdf-schema#label> "Workspace" .
+
 <http://hl7.org/fhir/administrative-gender#male> a <https://institut-curie.org/ontology#Gender> ;
   <http://www.w3.org/2000/01/rdf-schema#label> "Male" .
 <http://hl7.org/fhir/administrative-gender#female> a <https://institut-curie.org/ontology#Gender> ;

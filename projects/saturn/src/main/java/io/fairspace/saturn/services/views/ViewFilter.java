@@ -1,16 +1,17 @@
 package io.fairspace.saturn.services.views;
 
-import lombok.Data;
+import lombok.*;
 
-import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.*;
+import java.util.*;
 
 @Data
+@Builder @NoArgsConstructor @AllArgsConstructor
 public class ViewFilter {
     @NotBlank
     String field;
-    List<Object> values = new ArrayList<>();
+    List<Object> values;
     Object min;
     Object max;
+    String prefix;
 }

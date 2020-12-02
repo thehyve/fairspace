@@ -29,11 +29,11 @@ describe('MetadataViewFacetFactory', () => {
 
     it('should render a text selection facet', () => {
         const title = "Gender";
-        const options = mockFacets("subjects").find(v => v.title === title).values;
+        const options = mockFacets("Subject").find(v => v.title === title).values;
         const wrapper = mount(<Facet
             title={title}
             options={options}
-            type="id"
+            type="Term"
             multiple
             onChange={() => {}}
             activeFilterValues={[]}
@@ -52,11 +52,11 @@ describe('MetadataViewFacetFactory', () => {
 
     it('should render a numerical range selection facet', () => {
         const title = "Tumor cellularity";
-        const mockFacet = mockFacets("samples").find(v => v.title === title);
+        const mockFacet = mockFacets("Sample").find(v => v.title === title);
         const wrapper = mount(<Facet
             title={title}
             options={[mockFacet.min, mockFacet.max]}
-            type="number"
+            type="Number"
             multiple
             onChange={() => {}}
             activeFilterValues={[]}
@@ -79,11 +79,11 @@ describe('MetadataViewFacetFactory', () => {
 
     it('should render a date selection facet', () => {
         const title = "Birth date";
-        const mockFacet = mockFacets("subjects").find(v => v.title === title);
+        const mockFacet = mockFacets("Subject").find(v => v.title === title);
         const wrapper = mount(<Facet
             title={title}
             options={[mockFacet.min, mockFacet.max]}
-            type="date"
+            type="Date"
             multiple
             onChange={() => {}}
             activeFilterValues={[]}

@@ -52,7 +52,7 @@ export const FilesPage = ({
     const getLocationContext = () => {
         const collectionIri: string = collection.iri || '';
         const collectionRoot = collectionIri.substring(0, collectionIri.lastIndexOf('/'));
-        return collectionRoot + openedPath;
+        return encodeURI(collectionRoot + openedPath);
     };
 
     const getAdvancedSearchRedirect = () => (

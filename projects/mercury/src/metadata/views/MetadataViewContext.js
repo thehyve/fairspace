@@ -56,13 +56,15 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
     };
 
     const setLocationFilter = (viewName: string, locationContext: string) => {
-        if (isFilesView(viewName)) {
-            const newFilter: MetadataViewFilter = {
-                field: LOCATION_FILTER_FIELD,
-                values: [locationContext]
-            };
-            setFilters([...filters, newFilter]);
+        if (!isFilesView(viewName) || !locationContext) {
+            clearFilter(LOCATION_FILTER_FIELD);
+            return;
         }
+        const newFilter: MetadataViewFilter = {
+            field: LOCATION_FILTER_FIELD,
+            prefix: locationContext
+        };
+        setFilters([...filters.filter(f => f.field !== LOCATION_FILTER_FIELD), newFilter]);
     };
 
     return (

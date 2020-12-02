@@ -16,7 +16,7 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
             let min; let max; let label;
-            if (facet.type === 'date') {
+            if (facet.type === 'Date') {
                 min = formatDateTime(filter.min);
                 max = formatDateTime(filter.max);
             } else {

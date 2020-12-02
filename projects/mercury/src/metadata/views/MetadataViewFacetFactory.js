@@ -68,11 +68,13 @@ const useStyles = makeStyles((theme) => ({
 
 const getFacet = (props: MetadataViewFacetProperties) => {
     switch (props.type) {
-        case "id":
+        case "Identifier":
+        case "Term":
+        case "TermSet":
             return <TextSelectionFacet {...props} />;
-        case "number":
+        case "Number":
             return <NumericalRangeSelectionFacet {...props} />;
-        case "date":
+        case "Date":
             return <DateSelectionFacet {...props} />;
         default:
             return <></>;

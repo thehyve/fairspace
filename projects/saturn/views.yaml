@@ -1,0 +1,478 @@
+views:
+  - name: Subject
+    title: Subjects
+    itemName: Subject
+    types:
+      - https://institut-curie.org/ontology#Subject
+    columns:
+      - name: gender
+        title: Gender
+        source: https://institut-curie.org/ontology#isOfGender
+        rdfType: https://institut-curie.org/ontology#Gender
+        type: term
+      - name: species
+        title: Species
+        source: https://institut-curie.org/ontology#isOfSpecies
+        rdfType: https://institut-curie.org/ontology#Species
+        type: term
+      - name: ageAtLastNews
+        title: Age at last news
+        source: https://institut-curie.org/ontology#ageAtLastNews
+        type: number
+        min: 0
+        max: 150
+      - name: ageAtDeath
+        title: Age at death
+        source: https://institut-curie.org/ontology#ageAtDeath
+        type: number
+        min: 0
+        max: 150
+    join:
+      - view: TumorPathologyEvent
+        on: https://institut-curie.org/ontology#eventSubject
+        reverse: true
+        include:
+          - topography
+          - morphology
+          - eventType
+          - ageAtDiagnosis
+      - view: Sample
+        on: https://institut-curie.org/ontology#subject
+        reverse: true
+        include:
+          - topography
+          - nature
+          - origin
+      - view: Collection
+        on: https://institut-curie.org/ontology#aboutSubject
+        reverse: true
+        include:
+          - collection
+          - analysisType
+    query: |
+      PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX curie: <https://institut-curie.org/ontology#>
+      PREFIX fs:    <http://fairspace.io/ontology#>
+
+      <#if fetch>
+      SELECT ?Subject ?Subject_species ?Subject_gender ?Subject_ageAtLastNews ?Subject_ageAtDeath
+      <#else>
+      SELECT ?Subject
+      </#if>
+      WHERE {
+        <#if fetch>
+        VALUES ?Subject { ${iris} }
+        <#elseif Collection_collection?? || Collection_analysisType??>
+        {
+          SELECT DISTINCT ?s WHERE {
+             <#if Collection_collection??> ?Collection_collection a fs:Collection . ${Collection_collection}  ?file (fs:belongsTo)* ?Collection_collection . </#if>
+             ?Collection curie:aboutSubject ?s .
+             <#if Collection_analysisType??> ?Collection curie:analysisType ?Collection_analysisType . ${Collection_analysisType}</#if>
+          }
+        }
+        BIND(?s AS ?Subject)
+        </#if>
+
+        ?Subject a curie:Subject .
+
+        <#if Sample_topography?? || Sample_nature?? || Sample_origin?? || Sample_tumorCellularity??>
+        FILTER EXISTS {
+          ?Sample curie:subject ?Subject .
+          <#if Sample_topography??> ?Sample curie:topography ?Sample_topography . ${Sample_topography} </#if>
+          <#if Sample_nature??>     ?Sample curie:isOfNature ?Sample_nature . ${Sample_nature} </#if>
+          <#if Sample_origin??>     ?Sample curie:hasOrigin ?Sample_origin . ${Sample_origin} </#if>
+          <#if Sample_tumorCellularity??> ?Sample curie:tumorCellularity ?Sample_tumorCellularity . ${Sample_tumorCellularity} </#if>
+        }
+        </#if>
+
+        <#if TumorPathologyEvent_morphology?? || TumorPathologyEvent_eventType?? || TumorPathologyEvent_topography?? || TumorPathologyEvent_laterality?? || TumorPathologyEvent_ageAtDiagnosis?? || TumorPathologyEvent_tumorGradeType?? || TumorPathologyEvent_tumorGradeValue?? || TumorPathologyEvent_tnmType?? || TumorPathologyEvent_tnmT?? || TumorPathologyEvent_tnmN?? || TumorPathologyEvent_tnmTM??>
+        FILTER EXISTS {
+          ?TumorPathologyEvent curie:eventSubject ?Subject .
+          <#if TumorPathologyEvent_morphology??>      ?TumorPathologyEvent curie:tumorMorphology ?TumorPathologyEvent_morphology . ${TumorPathologyEvent_morphology} </#if>
+          <#if TumorPathologyEvent_eventType??>       ?TumorPathologyEvent curie:eventType ?TumorPathologyEvent_eventType . ${TumorPathologyEvent_eventType} </#if>
+          <#if TumorPathologyEvent_topography??>      ?TumorPathologyEvent curie:topography ?TumorPathologyEvent_topography . ${TumorPathologyEvent_topography} </#if>
+          <#if TumorPathologyEvent_laterality??>      ?TumorPathologyEvent curie:tumorLaterality ?TumorPathologyEvent_laterality . ${TumorPathologyEvent_laterality} </#if>
+          <#if TumorPathologyEvent_ageAtDiagnosis??>  ?TumorPathologyEvent curie:ageAtDiagnosis ?TumorPathologyEvent_ageAtDiagnosis . ${TumorPathologyEvent_ageAtDiagnosis} </#if>
+          <#if TumorPathologyEvent_tumorGradeType??>  ?TumorPathologyEvent curie:tumorGradeType ?TumorPathologyEvent_tumorGradeType . ${TumorPathologyEvent_tumorGradeType} </#if>
+          <#if TumorPathologyEvent_tumorGradeValue??> ?TumorPathologyEvent curie:tumorGradeValue ?TumorPathologyEvent_tumorGradeValue . ${TumorPathologyEvent_tumorGradeValue} </#if>
+          <#if TumorPathologyEvent_tnmType??>         ?TumorPathologyEvent curie:tnmType ?TumorPathologyEvent_tnmType . ${TumorPathologyEvent_tnmType} </#if>
+          <#if TumorPathologyEvent_tnmT??>            ?TumorPathologyEvent curie:tnmT ?TumorPathologyEvent_tnmT . ${TumorPathologyEvent_tnmT} </#if>
+          <#if TumorPathologyEvent_tnmN??>            ?TumorPathologyEvent curie:tnmN ?TumorPathologyEvent_tnmN . ${TumorPathologyEvent_tnmN} </#if>
+          <#if TumorPathologyEvent_tnmM??>            ?TumorPathologyEvent curie:tnmM ?TumorPathologyEvent_tnmM . ${TumorPathologyEvent_tnmM} </#if>
+        }
+        </#if>
+
+        <#if fetch || Subject_species??>
+        OPTIONAL { ?Subject curie:isOfSpecies ?Subject_species } ${Subject_species!}
+        </#if>
+        <#if fetch || Subject_gender??>
+        OPTIONAL { ?Subject curie:isOfGender ?Subject_gender } ${Subject_gender!}
+        </#if>
+        <#if fetch || Subject_ageAtLastNews??>
+        OPTIONAL { ?Subject curie:ageAtLastNews ?Subject_ageAtLastNews } ${Subject_ageAtLastNews!}
+        </#if>
+        <#if fetch || Subject_ageAtDeath??>
+        OPTIONAL { ?Subject curie:ageAtDeath ?Subject_ageAtDeath } ${Subject_ageAtDeath!}
+        </#if>
+
+        FILTER NOT EXISTS { ?Subject fs:dateDeleted ?anyDateDeleted }
+      }
+
+  - name: TumorPathologyEvent
+    title: Tumor pathology events
+    itemName: Tumor pathology event
+    types:
+      - https://institut-curie.org/ontology#TumorPathologyEvent
+    columns:
+      - name: topography
+        title: Tumor topography
+        source: https://institut-curie.org/ontology#topography
+        rdfType: https://institut-curie.org/ontology#Topography
+        type: term
+      - name: morphology
+        title: Morphology
+        source: https://institut-curie.org/ontology#tumorMorphology
+        rdfType: https://institut-curie.org/ontology#Morphology
+        type: term
+      - name: laterality
+        title: Laterality
+        source: https://institut-curie.org/ontology#tumorLaterality
+        rdfType: https://institut-curie.org/ontology#Laterality
+        type: term
+      - name: eventType
+        title: Event type
+        source: https://institut-curie.org/ontology#eventType
+        rdfType: https://institut-curie.org/ontology#EventType
+        type: term
+      - name: ageAtDiagnosis
+        title: Age at diagnosis
+        source: https://institut-curie.org/ontology#ageAtDiagnosis
+        type: number
+        min: 0
+        max: 150
+    join:
+      - view: Subject
+        on: https://institut-curie.org/ontology#eventSubject
+        include:
+          - label
+          - gender
+          - ageAtDeath
+      - view: Collection
+        on: https://institut-curie.org/ontology#aboutSubject
+        reverse: true
+        include:
+          - collection
+          - analysisType
+    query: |
+      PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX curie: <https://institut-curie.org/ontology#>
+      PREFIX fs:    <http://fairspace.io/ontology#>
+
+      <#if fetch>
+      SELECT ?TumorPathologyEvent ?TumorPathologyEvent_eventType ?TumorPathologyEvent_morphology ?TumorPathologyEvent_topography
+      ?TumorPathologyEvent_laterality ?TumorPathologyEvent_tumorGradeType ?TumorPathologyEvent_tumorGradeValue ?TumorPathologyEvent_tnmType ?TumorPathologyEvent_tnmT
+      ?TumorPathologyEvent_tnmN ?TumorPathologyEvent_tnmM ?TumorPathologyEvent_ageAtDiagnosis
+      ?Subject ?Subject_gender ?Subject_species ?Subject_ageAtLastNews ?Subject_ageAtDeath
+      <#else>
+      SELECT ?TumorPathologyEvent
+      </#if>
+      WHERE {
+        <#if fetch>
+        VALUES ?TumorPathologyEvent { ${iris} }
+        <#elseif Collection_collection?? || Collection_analysisType??>
+        {
+          SELECT DISTINCT ?e WHERE {
+             <#if Collection_collection??> ?Collection_collection a fs:Collection . ${Collection_collection}  ?Collection (fs:belongsTo)* ?Collection_collection . </#if>
+             ?Collection curie:aboutEvent ?e .
+             <#if Collection_analysisType??> ?Collection curie:analysisType ?Collection_analysisType . ${Collection_analysisType}</#if>
+          }
+        }
+        BIND(?e AS ?TumorPathologyEvent)
+        </#if>
+
+        <#if fetch || TumorPathologyEvent_morphology??>      OPTIONAL { ?TumorPathologyEvent curie:tumorMorphology ?TumorPathologyEvent_morphology } ${TumorPathologyEvent_morphology!} </#if>
+        <#if fetch || TumorPathologyEvent_eventType??>       OPTIONAL { ?TumorPathologyEvent curie:eventType ?TumorPathologyEvent_eventType } ${TumorPathologyEvent_eventType!} </#if>
+        <#if fetch || TumorPathologyEvent_topography??>      OPTIONAL { ?TumorPathologyEvent curie:topography ?TumorPathologyEvent_topography } ${TumorPathologyEvent_topography!} </#if>
+        <#if fetch || TumorPathologyEvent_laterality??>      OPTIONAL { ?TumorPathologyEvent curie:tumorLaterality ?TumorPathologyEvent_laterality } ${TumorPathologyEvent_laterality!} </#if>
+        <#if fetch || TumorPathologyEvent_ageAtDiagnosis??>  OPTIONAL { ?TumorPathologyEvent curie:ageAtDiagnosis ?TumorPathologyEvent_ageAtDiagnosis } ${TumorPathologyEvent_ageAtDiagnosis!} </#if>
+        <#if fetch || TumorPathologyEvent_tumorGradeType??>  OPTIONAL { ?TumorPathologyEvent curie:tumorGradeType ?TumorPathologyEvent_tumorGradeType } ${TumorPathologyEvent_tumorGradeType!} </#if>
+        <#if fetch || TumorPathologyEvent_tumorGradeValue??> OPTIONAL { ?TumorPathologyEvent curie:tumorGradeValue ?TumorPathologyEvent_tumorGradeValue } ${TumorPathologyEvent_tumorGradeValue!} </#if>
+        <#if fetch || TumorPathologyEvent_tnmType??>         OPTIONAL { ?TumorPathologyEvent curie:tnmType ?TumorPathologyEvent_tnmType } ${TumorPathologyEvent_tnmType!} </#if>
+        <#if fetch || TumorPathologyEvent_tnmT??>            OPTIONAL { ?TumorPathologyEvent curie:tnmT ?TumorPathologyEvent_tnmT } ${TumorPathologyEvent_tnmT!} </#if>
+        <#if fetch || TumorPathologyEvent_tnmN??>            OPTIONAL { ?TumorPathologyEvent curie:tnmN ?TumorPathologyEvent_tnmN } ${TumorPathologyEvent_tnmN!} </#if>
+        <#if fetch || TumorPathologyEvent_tnmM??>            OPTIONAL { ?TumorPathologyEvent curie:tnmM ?TumorPathologyEvent_tnmM } ${TumorPathologyEvent_tnmM!} </#if>
+
+        ?TumorPathologyEvent a curie:TumorPathologyEvent .
+
+        <#assign has_Subject_filter = Subject_species?? || Subject_gender?? || Subject_ageAtLastNews?? || Subject_ageAtDeath??>
+        <#if fetch || has_Subject_filter>
+          <#if !has_Subject_filter>OPTIONAL {</#if>
+          ?TumorPathologyEvent curie:eventSubject ?Subject .
+          <#if fetch || Subject_species??>OPTIONAL {?Subject curie:isOfSpecies ?Subject_species} ${Subject_species!}</#if>
+          <#if fetch || Subject_gender??> OPTIONAL {?Subject curie:gender ?Subject_gender} ${Subject_gender!}</#if>
+          <#if fetch || Subject_ageAtLastNews??>OPTIONAL {?Subject curie:ageAtLastNews ?Subject_ageAtLastNews} ${Subject_ageAtLastNews!}</#if>
+          <#if fetch || Subject_ageAtDeath??>OPTIONAL {?Subject curie:ageAtDeath ?Subject_ageAtDeath} ${Subject_ageAtDeath!}</#if>
+          <#if !has_Subject_filter>}</#if>
+        </#if>
+
+        <#if Sample_topography?? || Sample_nature?? || Sample_origin?? || Sample_tumorCellularity??>
+        FILTER EXISTS {
+          ?Sample curie:diagnosis ?TumorPathologyEvent .
+          <#if Sample_topography??> ?Sample curie:topography ?Sample_topography . ${Sample_topography} </#if>
+          <#if Sample_nature??>     ?Sample curie:isOfNature ?Sample_nature . ${Sample_nature} </#if>
+          <#if Sample_origin??>     ?Sample curie:hasOrigin ?Sample_origin . ${Sample_origin} </#if>
+          <#if Sample_tumorCellularity??> ?Sample curie:tumorCellularity ?Sample_tumorCellularity . ${Sample_tumorCellularity} </#if>
+        }
+        </#if>
+
+        FILTER NOT EXISTS { ?TumorPathologyEvent fs:dateDeleted ?anyDateDeleted }
+      }
+
+  - name: Sample
+    title: Samples
+    itemName: Sample
+    types:
+      - https://institut-curie.org/ontology#BiologicalSample
+    columns:
+      - name: tumorCellularity
+        title: Tumor cellularity
+        source: https://institut-curie.org/ontology#tumorCellularity
+        type: number
+      - name: topography
+        title: Sample topography
+        source: https://institut-curie.org/ontology#topography
+        rdfType: https://institut-curie.org/ontology#Topography
+        type: term
+      - name: nature
+        title: Sample nature
+        source: https://institut-curie.org/ontology#isOfNature
+        rdfType: https://institut-curie.org/ontology#SampleNature
+        type: term
+      - name: origin
+        title: Sample origin
+        source: https://institut-curie.org/ontology#hasOrigin
+        rdfType: https://institut-curie.org/ontology#SampleOrigin
+        type: term
+    join:
+      - view: Subject
+        on: https://institut-curie.org/ontology#subject
+        include:
+          - label
+          - species
+          - gender
+          - ageAtDeath
+      - view: TumorPathologyEvent
+        on: https://institut-curie.org/ontology#diagnosis
+        include:
+          - topography
+          - morphology
+          - laterality
+          - eventType
+          - ageAtDiagnosis
+      - view: Collection
+        on: https://institut-curie.org/ontology#aboutEvent
+        reverse: true
+        include:
+          - collection
+          - analysisType
+    query: |
+      PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX curie: <https://institut-curie.org/ontology#>
+      PREFIX fs:    <http://fairspace.io/ontology#>
+
+      <#if fetch>
+      SELECT ?Sample ?Sample_topography ?Sample_nature ?Sample_origin ?Sample_tumorCellularity
+        ?TumorPathologyEvent ?TumorPathologyEvent_topography ?TumorPathologyEvent_morphology ?TumorPathologyEvent_eventType
+        ?TumorPathologyEvent_laterality ?TumorPathologyEvent_tumorGradeType ?TumorPathologyEvent_tumorGradeValue ?TumorPathologyEvent_tnmType ?TumorPathologyEvent_tnmT ?TumorPathologyEvent_tnmN ?TumorPathologyEvent_tnmM ?TumorPathologyEvent_ageAtDiagnosis
+        ?Subject ?Subject_gender ?Subject_species ?Subject_ageAtLastNews ?Subject_ageAtDeath
+      <#else>
+      SELECT ?Sample
+      </#if>
+      WHERE {
+        <#if fetch>
+        VALUES ?Sample { ${iris} }
+        <#elseif Collection_collection?? || Collection_analysisType??>
+        {
+          SELECT DISTINCT ?smpl WHERE {
+             <#if Collection_collection??> ?Collection_collection a fs:Collection . ${Collection_collection}  ?Collection (fs:belongsTo)* ?Collection_collection . </#if>
+             ?Collection curie:sample ?smpl .
+             <#if Collection_analysisType??> ?Collection curie:analysisType ?Collection_analysisType . ${Collection_analysisType}</#if>
+          }
+        }
+        BIND(?smpl AS ?Sample)
+        </#if>
+
+        <#if fetch || Sample_topography??> OPTIONAL {?Sample curie:topography ?Sample_topography } ${Sample_topography!} </#if>
+        <#if fetch || Sample_nature??>     OPTIONAL {?Sample curie:isOfNature ?Sample_nature } ${Sample_nature!} </#if>
+        <#if fetch || Sample_origin??>     OPTIONAL {?Sample curie:hasOrigin ?Sample_origin } ${Sample_origin!} </#if>
+        <#if fetch || Sample_tumorCellularity??> OPTIONAL {?Sample curie:tumorCellularity ?Sample_tumorCellularity } ${Sample_tumorCellularity!} </#if>
+
+       <#assign has_Subject_filter = Subject_species?? || Subject_gender?? || Subject_ageAtLastNews?? || Subject_ageAtDeath??>
+        <#if fetch || has_Subject_filter>
+          <#if !has_Subject_filter>OPTIONAL {</#if>
+            ?Sample curie:subject ?Subject .
+            <#if fetch || Subject_species??>OPTIONAL {?Subject curie:isOfSpecies ?Subject_species} ${Subject_species!}</#if>
+            <#if fetch || Subject_gender??> OPTIONAL {?Subject curie:gender ?Subject_gender} ${Subject_gender!}</#if>
+            <#if fetch || Subject_ageAtLastNews??>OPTIONAL {?Subject curie:ageAtLastNews ?Subject_ageAtLastNews} ${Subject_ageAtLastNews!}</#if>
+            <#if fetch || Subject_ageAtDeath??>OPTIONAL {?Subject curie:ageAtDeath ?Subject_ageAtDeath} ${Subject_ageAtDeath!}</#if>
+          <#if !has_Subject_filter>}</#if>
+       </#if>
+
+       <#assign has_event_filter = TumorPathologyEvent_morphology?? || TumorPathologyEvent_topography?? || TumorPathologyEvent_eventType?? || TumorPathologyEvent_laterality?? || TumorPathologyEvent_ageAtDiagnosis?? || TumorPathologyEvent_tumorGradeType?? || TumorPathologyEvent_tumorGradeValue?? || TumorPathologyEvent_tnmType?? || TumorPathologyEvent_tnmT?? || TumorPathologyEvent_tnmN?? || TumorPathologyEvent_tnmM??>
+       <#if fetch || has_event_filter>
+          <#if !has_event_filter>OPTIONAL {</#if>
+            ?Sample curie:diagnosis ?TumorPathologyEvent .
+
+            <#if fetch || TumorPathologyEvent_morphology??>      OPTIONAL { ?TumorPathologyEvent curie:tumorMorphology ?TumorPathologyEvent_morphology } ${TumorPathologyEvent_morphology!} </#if>
+            <#if fetch || TumorPathologyEvent_eventType??>       OPTIONAL { ?TumorPathologyEvent curie:eventType ?TumorPathologyEvent_eventType } ${TumorPathologyEvent_eventType!} </#if>
+            <#if fetch || TumorPathologyEvent_topography??>      OPTIONAL { ?TumorPathologyEvent curie:topography ?TumorPathologyEvent_topography } ${TumorPathologyEvent_topography!} </#if>
+            <#if fetch || TumorPathologyEvent_laterality??>      OPTIONAL { ?TumorPathologyEvent curie:tumorLaterality ?TumorPathologyEvent_laterality } ${TumorPathologyEvent_laterality!} </#if>
+            <#if fetch || TumorPathologyEvent_ageAtDiagnosis??>  OPTIONAL { ?TumorPathologyEvent curie:ageAtDiagnosis ?TumorPathologyEvent_ageAtDiagnosis } ${TumorPathologyEvent_ageAtDiagnosis!} </#if>
+            <#if fetch || TumorPathologyEvent_tumorGradeType??>  OPTIONAL { ?TumorPathologyEvent curie:tumorGradeType ?TumorPathologyEvent_tumorGradeType } ${TumorPathologyEvent_tumorGradeType!} </#if>
+            <#if fetch || TumorPathologyEvent_tumorGradeValue??> OPTIONAL { ?TumorPathologyEvent curie:tumorGradeValue ?TumorPathologyEvent_tumorGradeValue } ${TumorPathologyEvent_tumorGradeValue!} </#if>
+            <#if fetch || TumorPathologyEvent_tnmType??>         OPTIONAL { ?TumorPathologyEvent curie:tnmType ?TumorPathologyEvent_tnmType } ${TumorPathologyEvent_tnmType!} </#if>
+            <#if fetch || TumorPathologyEvent_tnmT??>            OPTIONAL { ?TumorPathologyEvent curie:tnmT ?TumorPathologyEvent_tnmT } ${TumorPathologyEvent_tnmT!} </#if>
+            <#if fetch || TumorPathologyEvent_tnmN??>            OPTIONAL { ?TumorPathologyEvent curie:tnmN ?TumorPathologyEvent_tnmN } ${TumorPathologyEvent_tnmN!} </#if>
+            <#if fetch || TumorPathologyEvent_tnmM??>            OPTIONAL { ?TumorPathologyEvent curie:tnmM ?TumorPathologyEvent_tnmM } ${TumorPathologyEvent_tnmM!} </#if>
+          <#if !has_event_filter>}</#if>
+        </#if>
+
+        ?Sample a curie:BiologicalSample .
+        FILTER NOT EXISTS { ?Sample fs:dateDeleted ?anyDateDeleted }
+      }
+
+  - name: Collection
+    title: Collections and files
+    itemName: Name
+    types:
+      - http://fairspace.io/ontology#Collection
+      - http://fairspace.io/ontology#Directory
+      - http://fairspace.io/ontology#File
+    columns:
+      - name: type
+        title: Type
+        source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+        type: term
+      - name: dateCreated
+        title: Created
+        source: http://fairspace.io/ontology#dateCreated
+        type: date
+      - name: dateModified
+        title: Modified
+        source: http://fairspace.io/ontology#dateModified
+        type: date
+      - name: analysisType
+        title: Analysis type
+        source: https://institut-curie.org/ontology#analysisType
+        rdfType: https://institut-curie.org/ontology#AnalysisType
+        type: termset
+      - name: keywords
+        title: Key words
+        source: http://www.w3.org/ns/dcat#keyword
+        type: set
+    join:
+      - view: Subject
+        on: https://institut-curie.org/ontology#aboutSubject
+        include:
+          - gender
+      - view: Sample
+        on: https://institut-curie.org/ontology#sample
+        include:
+          - topography
+          - nature
+      - view: TumorPathologyEvent
+        on: https://institut-curie.org/ontology#aboutEvent
+        include:
+          - eventType
+    query: |
+      PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX curie: <https://institut-curie.org/ontology#>
+      PREFIX fs:    <http://fairspace.io/ontology#>
+      <#if fetch>
+      SELECT DISTINCT ?Collection ?Collection_type ?Collection_collection ?Collection_workspace ?Collection_dateCreated ?Collection_dateModified ?Collection_analysisType
+      <#else>
+      SELECT DISTINCT ?Collection
+      </#if>
+      WHERE {
+        <#if fetch>
+        VALUES ?Collection { ${iris} }
+        <#elseif Collection_collection??>
+        {
+          SELECT ?f WHERE {
+             ?Collection_collection a fs:Collection . ${Collection_collection}  ?f (fs:belongsTo)* ?Collection_collection
+          }
+        }
+        BIND(?f AS ?Collection)
+        </#if>
+        ?Collection a ?Collection_type .
+        <#if !fetch>FILTER ((?Collection_type = fs:File) || (?Collection_type = fs:Directory) || (?Collection_type = fs:Collection))</#if>
+        <#if Collection??> ${Collection}</#if>
+        <#if Collection_type??> ${Collection_type}</#if>
+        <#if fetch || Collection_analysisType??> OPTIONAL { ?Collection curie:analysisType ?Collection_analysisType } ${Collection_analysisType!}</#if>
+        <#if fetch>
+          ?Collection (fs:belongsTo)* ?Collection_collection . ?Collection_collection fs:ownedBy ?Collection_workspace .
+          OPTIONAL {?Collection fs:dateCreated ?Collection_dateCreated}
+          OPTIONAL {?Collection fs:dateModified ?Collection_dateModified}
+        <#else>
+          <#if Sample_topography?? || Sample_nature?? || Sample_origin?? || Sample_tumorCellularity??>
+            FILTER EXISTS {
+              ?Collection curie:sample ?Sample .
+              <#if Sample_topography??> ?Sample curie:topography ?Sample_topography . ${Sample_topography} </#if>
+              <#if Sample_nature??>     ?Sample curie:isOfNature ?Sample_nature . ${Sample_nature} </#if>
+              <#if Sample_origin??>     ?Sample curie:hasOrigin ?Sample_origin . ${Sample_origin} </#if>
+              <#if Sample_tumorCellularity??> ?Sample curie:tumorCellularity ?Sample_tumorCellularity . ${Sample_tumorCellularity} </#if>
+              <#if TumorPathologyEvent_morphology?? || TumorPathologyEvent_eventType?? || TumorPathologyEvent_topography?? || TumorPathologyEvent_laterality?? || TumorPathologyEvent_ageAtDiagnosis?? || TumorPathologyEvent_tumorGradeType?? || TumorPathologyEvent_tumorGradeValue?? || TumorPathologyEvent_tnmType?? || TumorPathologyEvent_tnmT?? || TumorPathologyEvent_tnmN?? || TumorPathologyEvent_tnmTM??>
+                ?Sample curie:diagnosis ?TumorPathologyEvent .
+                <#if TumorPathologyEvent_morphology??>      ?TumorPathologyEvent curie:tumorMorphology ?TumorPathologyEvent_morphology . ${TumorPathologyEvent_morphology} </#if>
+                <#if TumorPathologyEvent_eventType??>       ?TumorPathologyEvent curie:eventType ?TumorPathologyEvent_eventType . ${TumorPathologyEvent_eventType} </#if>
+                <#if TumorPathologyEvent_tumorTopography??> ?TumorPathologyEvent curie:topography ?TumorPathologyEvent_tumorTopography . ${TumorPathologyEvent_tumorTopography} </#if>
+                <#if TumorPathologyEvent_laterality??>      ?TumorPathologyEvent curie:tumorLaterality ?TumorPathologyEvent_laterality . ${TumorPathologyEvent_laterality} </#if>
+                <#if TumorPathologyEvent_ageAtDiagnosis??>  ?TumorPathologyEvent curie:ageAtDiagnosis ?TumorPathologyEvent_ageAtDiagnosis . ${TumorPathologyEvent_ageAtDiagnosis} </#if>
+                <#if TumorPathologyEvent_tumorGradeType??>  ?TumorPathologyEvent curie:tumorGradeType ?TumorPathologyEvent_tumorGradeType . ${TumorPathologyEvent_tumorGradeType} </#if>
+                <#if TumorPathologyEvent_tumorGradeValue??> ?TumorPathologyEvent curie:tumorGradeValue ?TumorPathologyEvent_tumorGradeValue . ${TumorPathologyEvent_tumorGradeValue} </#if>
+                <#if TumorPathologyEvent_tnmType??>         ?TumorPathologyEvent curie:tnmType ?TumorPathologyEvent_tnmType . ${TumorPathologyEvent_tnmType} </#if>
+                <#if TumorPathologyEvent_tnmT??>            ?TumorPathologyEvent curie:tnmT ?TumorPathologyEvent_tnmT . ${TumorPathologyEvent_tnmT} </#if>
+                <#if TumorPathologyEvent_tnmN??>            ?TumorPathologyEvent curie:tnmN ?TumorPathologyEvent_tnmN . ${TumorPathologyEvent_tnmN} </#if>
+                <#if TumorPathologyEvent_tnmM??>            ?TumorPathologyEvent curie:tnmM ?TumorPathologyEvent_tnmM . ${TumorPathologyEvent_tnmM} </#if>
+              </#if>
+              <#if Subject_species?? || Subject_gender?? || Subject_ageAtLastNews?? || Subject_ageAtDeath??>
+                 ?Sample curie:subject ?Subject .
+                 <#if Subject_species??> ?Subject curie:isOfSpecies ?Subject_species . ${Subject_species}</#if>
+                 <#if Subject_gender??> ?Subject curie:isOfGender ?Subject_gender . ${Subject_gender}</#if>
+                 <#if Subject_ageAtLastNews??> ?Subject curie:ageAtLastNews ?Subject_ageAtLastNews . ${Subject_ageAtLastNews}</#if>
+                 <#if Subject_ageAtDeath??> ?Subject curie:ageAtDeath ?Subject_ageAtDeath . ${Subject_ageAtDeath}</#if>
+              </#if>
+             }
+          <#elseif TumorPathologyEvent_morphology?? || TumorPathologyEvent_eventType?? || TumorPathologyEvent_topography?? || TumorPathologyEvent_laterality?? || TumorPathologyEvent_ageAtDiagnosis?? || TumorPathologyEvent_tumorGradeType?? || TumorPathologyEvent_tumorGradeValue?? || TumorPathologyEvent_tnmType?? || TumorPathologyEvent_tnmT?? || TumorPathologyEvent_tnmN?? || TumorPathologyEvent_tnmTM??>
+            FILTER EXISTS {
+              ?Collection curie:aboutEvent ?TumorPathologyEvent .
+              <#if TumorPathologyEvent_morphology??>      ?TumorPathologyEvent curie:tumorMorphology ?TumorPathologyEvent_morphology . ${TumorPathologyEvent_morphology} </#if>
+              <#if TumorPathologyEvent_eventType??>       ?TumorPathologyEvent curie:eventType ?TumorPathologyEvent_eventType . ${TumorPathologyEvent_eventType} </#if>
+              <#if TumorPathologyEvent_topography??>      ?TumorPathologyEvent curie:topography ?TumorPathologyEvent_topography . ${TumorPathologyEvent_topography} </#if>
+              <#if TumorPathologyEvent_laterality??>      ?TumorPathologyEvent curie:tumorLaterality ?TumorPathologyEvent_laterality . ${TumorPathologyEvent_laterality} </#if>
+              <#if TumorPathologyEvent_ageAtDiagnosis??>  ?TumorPathologyEvent curie:ageAtDiagnosis ?TumorPathologyEvent_ageAtDiagnosis . ${TumorPathologyEvent_ageAtDiagnosis} </#if>
+              <#if TumorPathologyEvent_tumorGradeType??>  ?TumorPathologyEvent curie:tumorGradeType ?TumorPathologyEvent_tumorGradeType . ${TumorPathologyEvent_tumorGradeType} </#if>
+              <#if TumorPathologyEvent_tumorGradeValue??> ?TumorPathologyEvent curie:tumorGradeValue ?TumorPathologyEvent_tumorGradeValue . ${TumorPathologyEvent_tumorGradeValue} </#if>
+              <#if TumorPathologyEvent_tnmType??>         ?TumorPathologyEvent curie:tnmType ?TumorPathologyEvent_tnmType . ${TumorPathologyEvent_tnmType} </#if>
+              <#if TumorPathologyEvent_tnmT??>            ?TumorPathologyEvent curie:tnmT ?TumorPathologyEvent_tnmT . ${TumorPathologyEvent_tnmT} </#if>
+              <#if TumorPathologyEvent_tnmN??>            ?TumorPathologyEvent curie:tnmN ?TumorPathologyEvent_tnmN . ${TumorPathologyEvent_tnmN} </#if>
+              <#if TumorPathologyEvent_tnmM??>            ?TumorPathologyEvent curie:tnmM ?TumorPathologyEvent_tnmM . ${TumorPathologyEvent_tnmM} </#if>
+              <#if Subject_species?? || Subject_gender?? || Subject_ageAtLastNews?? || Subject_ageAtDeath??>
+                 ?event curie:eventSubject ?Subject .
+                 <#if Subject_species??> ?subject curie:isOfSpecies ?Subject_species . ${Subject_species}</#if>
+                 <#if Subject_gender??> ?subject curie:isOfGender ?Subject_gender . ${Subject_gender}</#if>
+                 <#if Subject_ageAtLastNews??> ?subject curie:ageAtLastNews ?Subject_ageAtLastNews . ${Subject_ageAtLastNews}</#if>
+                 <#if Subject_ageAtDeath??> ?subject curie:ageAtDeath ?Subject_ageAtDeath . ${Subject_ageAtDeath}</#if>
+              </#if>
+            }
+          <#elseif Subject_species?? || Subject_gender?? || Subject_ageAtLastNews?? || Subject_ageAtDeath??>
+            FILTER EXISTS {
+              ?Collection curie:aboutSubject ?Subject .
+              <#if Subject_species??> ?Subject curie:isOfSpecies ?Subject_species . ${Subject_species}</#if>
+              <#if Subject_gender??> ?Subject curie:isOfGender ?Subject_gender . ${Subject_gender}</#if>
+              <#if Subject_ageAtLastNews??> ?Subject curie:ageAtLastNews ?Subject_ageAtLastNews . ${Subject_ageAtLastNews}</#if>
+              <#if Subject_ageAtDeath??> ?Subject curie:ageAtDeath ?Subject_ageAtDeath . ${Subject_ageAtDeath}</#if>
+            }
+          </#if>
+        </#if>
+      }

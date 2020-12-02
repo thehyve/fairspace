@@ -14,7 +14,7 @@ describe('MetadataViewTable', () => {
     };
 
     it('renders correct header and values columns', () => {
-        const view = 'samples';
+        const view = 'Sample';
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const {queryByText, queryAllByText} = render(
@@ -30,7 +30,7 @@ describe('MetadataViewTable', () => {
             />
         );
 
-        expect(queryByText('Sample label')).toBeInTheDocument();
+        expect(queryByText('Sample')).toBeInTheDocument();
         expect(queryByText('Sample type')).toBeInTheDocument();
         expect(queryByText('Topography')).toBeInTheDocument();
         expect(queryByText('Nature')).toBeInTheDocument();
@@ -45,13 +45,13 @@ describe('MetadataViewTable', () => {
     });
 
     it('renders visible columns only', () => {
-        const view = 'samples';
+        const view = 'Sample';
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const {queryByText, queryAllByText} = render(
             <MetadataViewTable
                 columns={columns}
-                visibleColumnNames={['label', 'sampleType', 'origin']}
+                visibleColumnNames={['Sample', 'Sample_sampleType', 'Sample_origin']}
                 data={data}
                 view=""
                 locationContext=""
@@ -61,7 +61,7 @@ describe('MetadataViewTable', () => {
             />
         );
 
-        expect(queryByText('Sample label')).toBeInTheDocument();
+        expect(queryByText('Sample')).toBeInTheDocument();
         expect(queryByText('Sample type')).toBeInTheDocument();
         expect(queryByText('Lip')).not.toBeInTheDocument();
         expect(queryByText('S01')).toBeInTheDocument();
@@ -69,14 +69,14 @@ describe('MetadataViewTable', () => {
         expect(queryAllByText('Tissue').length).toBe(2);
         expect(queryByText('Topography')).not.toBeInTheDocument();
         expect(queryByText('Nature')).not.toBeInTheDocument();
-        expect(queryByText('Origin')).not.toBeInTheDocument();
+        expect(queryByText('Origin')).toBeInTheDocument();
         expect(queryByText('Files')).not.toBeInTheDocument();
         expect(queryByText('DNA')).not.toBeInTheDocument();
         expect(queryByText('Tongue')).not.toBeInTheDocument();
     });
 
     it('should redirect when opening collection entry', () => {
-        const view = 'files';
+        const view = 'Collection';
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const wrapper = shallow(<MetadataViewTable

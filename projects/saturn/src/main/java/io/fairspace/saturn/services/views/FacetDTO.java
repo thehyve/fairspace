@@ -1,6 +1,6 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.*;
 import lombok.Value;
 
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.List;
 public class FacetDTO {
     String name;
     String title;
-    Config.Search.ValueType type;
+    ViewsConfig.ColumnType type;
     List<ValueDTO> values;
-    Long min;
-    Long max;
+    Object min;
+    Object max;
 }
