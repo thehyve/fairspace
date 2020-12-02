@@ -8,13 +8,17 @@ import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 const INPUT_CHANGE_DELAY = 250; // in milliseconds
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, preselected} = props;
+    const {options = [], onChange = () => {}, active} = props;
     const minValue = min(options) != null ? min(options) : -1;
     const maxValue = max(options) != null ? max(options) : -1;
     const [value, setValue] = useState([null, null]);
     const [timeoutId, setTimeoutId] = useState();
 
-    useEffect(() => setValue([null, null]), [preselected]);
+    useEffect(() => {
+        if (!active) {
+            setValue([null, null]);
+        }
+    }, [active]);
 
     const handleChange = (val: number[]) => {
         clearTimeout(timeoutId);

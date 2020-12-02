@@ -74,14 +74,12 @@ const styles = (theme) => ({
 
 export const MetadataView = (props: MetadataViewProperties) => {
     const {views, facets, locationContext, classes} = props;
-    const {toggle, selected} = useSingleSelection();
 
+    const {toggle, selected} = useSingleSelection();
     const [selectedTab, setSelectedTab] = useState(0);
     const currentViewTab = views[selectedTab];
     const isCurrentViewCollectionView = isCollectionView(currentViewTab.name);
-
     const [filters: MetadataViewFilter[], setFilters] = useState([]);
-    const [preselected: string[], setPreselected] = useState([]); // TODO use for preselection of values per facet
 
     useEffect(() => {
         if (isCurrentViewCollectionView) {
@@ -119,11 +117,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
         setSelectedTab(tabIndex);
     };
 
-    const clearFilters = () => {
-        setFilters([]);
-        setPreselected([]);
-    };
-
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
             [filter.min, filter.max] = values;
@@ -152,6 +145,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
     };
 
+    const clearFilter = (facetName: string) => {
+        setFilters([...filters.filter(f => f.field !== facetName)]);
+    };
+
+    const clearFilters = () => {
+        setFilters([]);
+    };
+
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
             {facets.map(facet => {
@@ -165,7 +166,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             options={facetOptions || []}
                             onChange={(values) => updateFilters(facet, values)}
                             extraClasses={classes.facet}
-                            preselected={preselected}
+                            active={filters.some(filter => filter.field === facet.name)}
+                            clearFilter={() => clearFilter(facet.name)}
                         />
                     </Grid>
                 );

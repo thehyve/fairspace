@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Card, CardContent, CardHeader, Collapse, IconButton} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import classnames from "classnames";
-import {ExpandMore} from "@material-ui/icons";
+import {Clear, ExpandMore} from "@material-ui/icons";
 import type {ValueType} from "./MetadataViewAPI";
 import TextSelectionFacet from "./facets/TextSelectionFacet";
 import DateSelectionFacet from "./facets/DateSelectionFacet";
@@ -21,7 +21,8 @@ export type MetadataViewFacetProperties = {
     onChange: (string[]) => void;
     extraClasses?: string;
     classes?: any;
-    preselected?: string[];
+    active?: boolean;
+    clearFilter: () => {};
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -30,8 +31,12 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: "0px 1px 1px -1px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 1px 1px 0px rgba(0,0,0,0.12)"
     },
     title: {
-        paddingTop: 8,
-        paddingBottom: 8
+        "padding": 8,
+        "fontWidth": "bold",
+        "& .MuiCardHeader-action": {
+            alignSelf: "auto",
+            margin: 0
+        }
     },
     content: {
         "&:last-child": {
@@ -55,6 +60,9 @@ const useStyles = makeStyles((theme) => ({
     },
     expandOpen: {
         transform: "rotate(180deg)",
+    },
+    headerIcon: {
+        padding: 0
     }
 }));
 
@@ -72,6 +80,7 @@ const getFacet = (props: MetadataViewFacetProperties) => {
 };
 
 const Facet = (props: MetadataViewFacetProperties) => {
+    const {clearFilter, title, active, extraClasses} = props;
     const classes = useStyles();
     const [expanded, setExpanded] = useState(false);
 
@@ -81,7 +90,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
         <IconButton
             className={classnames(classes.expand, {
                 [classes.expandOpen]: expanded,
-            })}
+            }, classes.headerIcon)}
             onClick={toggleExpand}
             aria-expanded={expanded}
             aria-label="Show more"
@@ -90,13 +99,26 @@ const Facet = (props: MetadataViewFacetProperties) => {
         </IconButton>
     );
 
+    const clearFiltersAction = (
+        active && (
+            <IconButton
+                onClick={clearFilter}
+                aria-label="Clear"
+                className={classes.headerIcon}
+            >
+                <Clear fontSize="small" color="primary" />
+            </IconButton>
+        )
+    );
+
     return (
-        <Card className={`${classes.root} ${props.extraClasses}`} variant="outlined">
+        <Card className={`${classes.root} ${extraClasses}`} variant="outlined">
             <CardHeader
                 className={classes.title}
                 titleTypographyProps={{color: "textSecondary", variant: "body1"}}
-                title={props.title}
-                action={cardHeaderAction}
+                title={title}
+                avatar={cardHeaderAction}
+                action={clearFiltersAction}
             />
             <Collapse in={expanded} timeout="auto">
                 <CardContent className={classes.content}>
