@@ -20,6 +20,7 @@ import * as consts from "../../constants";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 
 type MetadataViewProperties = {
@@ -128,7 +129,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const updateFilters = (facet: MetadataViewFacet, values: any[]) => {
         if (filters.find(f => f.field === facet.name)) {
             let updatedFilters;
-            if (values && values.length > 0 && !values.every(v => !v)) {
+            if (values && values.length > 0 && values.some(isNonEmptyValue)) {
                 updatedFilters = [...filters];
                 const filter = updatedFilters.find(f => (f.field === facet.name));
                 setFilterValues(facet.type, filter, values);

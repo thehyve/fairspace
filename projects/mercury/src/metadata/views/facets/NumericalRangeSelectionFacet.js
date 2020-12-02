@@ -4,13 +4,14 @@ import Input from "@material-ui/core/Input";
 import Slider from "@material-ui/core/Slider";
 import {max, min} from "lodash/math";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import {isNonEmptyValue} from "../../../common/utils/genericUtils";
 
 const INPUT_CHANGE_DELAY = 250; // in milliseconds
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, active} = props;
-    const minValue = min(options) != null ? min(options) : -1;
-    const maxValue = max(options) != null ? max(options) : -1;
+    const minValue = isNonEmptyValue(min(options)) ? min(options) : -1;
+    const maxValue = isNonEmptyValue(max(options)) ? max(options) : -1;
     const [value, setValue] = useState([null, null]);
     const [timeoutId, setTimeoutId] = useState();
 
@@ -22,8 +23,9 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     const handleChange = (val: number[]) => {
         clearTimeout(timeoutId);
-        setValue([min(val), max(val)]);
-        setTimeoutId(setTimeout(() => onChange([min(val), max(val)]), INPUT_CHANGE_DELAY));
+        const newValue = isNonEmptyValue(val[0]) && isNonEmptyValue(val[1]) ? [min(val), max(val)] : val;
+        setValue(newValue);
+        setTimeoutId(setTimeout(() => onChange(newValue), INPUT_CHANGE_DELAY));
     };
 
     const handleSliderChange = (event, val) => {
@@ -31,12 +33,12 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const handleMinValueInputChange = (event) => {
-        const newMinValue = event.target.value === '' ? '' : Number(event.target.value);
+        const newMinValue = isNonEmptyValue(event.target.value) ? Number(event.target.value) : null;
         handleChange([newMinValue, value[1]]);
     };
 
     const handleMaxValueInputChange = (event) => {
-        const newMaxValue = event.target.value === '' ? '' : Number(event.target.value);
+        const newMaxValue = isNonEmptyValue(event.target.value) ? Number(event.target.value) : null;
         handleChange([value[0], newMaxValue]);
     };
 
@@ -50,7 +52,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     const renderInput = (inputValue, handleInputChange, placeholder) => (
         <Input
-            value={inputValue === null ? '' : inputValue}
+            value={isNonEmptyValue(inputValue) ? inputValue : ""}
             margin="dense"
             onChange={handleInputChange}
             onBlur={handleBlur}
