@@ -71,7 +71,7 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
-  - MetadataEditing
+#  - MetadataEditing
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
@@ -549,7 +549,7 @@ search:
             <#if tumorCellularity??> ?sample curie:tumorCellularity ?tumorCellularity . ${tumorCellularity} </#if>
           }
           </#if>
-        
+
           <#if morphology?? || eventType?? || tumorTopography?? || laterality?? || ageAtDiagnosis?? || tumorGradeType?? || tumorGradeValue?? || tnmType?? || tnmT?? || tnmN?? || tnmTM??>
           FILTER EXISTS {
             ?event curie:eventSubject ?subject .

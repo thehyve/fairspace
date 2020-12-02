@@ -13,7 +13,7 @@ export default () => {
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
-    const {views = []} = useContext(MetadataViewContext);
+    const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
@@ -42,21 +42,20 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
-                {currentUser && currentUser.canViewPublicMetadata
-                && views.filter(v => v.name !== "collections").map(view => (
+                {views && views.length > 0 && currentUser.canViewPublicMetadata && (
                     <ListItem
-                        key={`views-${view.name}`}
+                        key="metadata-views"
                         component={NavLink}
-                        to={`/views/${view.name}`}
+                        to="/metadata-views"
                         button
-                        selected={pathname.startsWith(`/views/${view.name}`)}
+                        selected={pathname.startsWith('/metadata-views')}
                     >
                         <ListItemIcon>
-                            {view.icon}
+                            <Assignment />
                         </ListItemIcon>
-                        <ListItemText style={{whiteSpace: 'normal'}} primary={view.title} />
+                        <ListItemText primary="Metadata views" />
                     </ListItem>
-                ))}
+                )}
                 {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
                     <ListItem
                         key="metadata"

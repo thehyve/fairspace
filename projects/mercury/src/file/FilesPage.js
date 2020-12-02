@@ -22,6 +22,8 @@ import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import styles from "./FilesPage.styles";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
+import {isCollectionView} from "../metadata/views/metadataViewUtils";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 export const FilesPage = ({
     location,
@@ -29,6 +31,7 @@ export const FilesPage = ({
     fileApi,
     collection,
     openedPath,
+    views,
     loading = false,
     error = false,
     showDeleted,
@@ -97,15 +100,17 @@ export const FilesPage = ({
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            <Link to={getAdvancedSearchRedirect()}>
-                                <Button
-                                    variant="text"
-                                    color="primary"
-                                    startIcon={<Search />}
-                                >
-                                    Advanced search
-                                </Button>
-                            </Link>
+                            {views && views.some(isCollectionView) && (
+                                <Link to={getAdvancedSearchRedirect()}>
+                                    <Button
+                                        variant="text"
+                                        color="primary"
+                                        startIcon={<Search />}
+                                    >
+                                        Advanced search
+                                    </Button>
+                                </Link>
+                            )}
                         </Grid>
                         <Grid item xs={3} className={classes.topBarSwitch}>
                             <FormControlLabel
@@ -174,6 +179,7 @@ const ParentAwareFilesPage = (props) => {
 
 const ContextualFilesPage = (props) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
+    const {views} = useContext(MetadataViewContext);
     const {params} = props.match;
     const {collectionName, openedPath} = getPathInfoFromParams(params);
     const collection = collections.find(c => c.name === collectionName) || {};
@@ -186,6 +192,7 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
+            views={views}
             {...props}
         />
     ) : (
@@ -196,6 +203,7 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
+            views={views}
             {...props}
         />
     );
