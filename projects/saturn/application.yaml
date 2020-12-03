@@ -652,7 +652,7 @@ search:
           <#if fetch || analysisType??> OPTIONAL { ?file curie:analysisType ?analysisType } ${analysisType!}</#if>
 
           <#if fetch>
-            BIND(IF(?type = fs:File, "File", IF(?type = fs:Collection, "Collection", "Workspace")) AS ?kind)
+            BIND(IF(?type = fs:File, "File", IF(?type = fs:Directory, "Directory", IF(?type = fs:Collection, "Collection", "Workspace"))) AS ?kind)
             ?file (fs:belongsTo)* ?collection . ?collection fs:ownedBy ?workspace .
             OPTIONAL {?file fs:dateCreated ?dateCreated}
             OPTIONAL {?file fs:dateModified ?dateModified}
