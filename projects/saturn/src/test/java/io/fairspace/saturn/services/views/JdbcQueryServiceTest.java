@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.dao.*;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
@@ -23,18 +22,18 @@ import org.mockito.*;
 import org.mockito.junit.*;
 
 import java.io.*;
+import java.sql.*;
 import java.util.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.config.Services.*;
-import static io.fairspace.saturn.vocabulary.Vocabularies.*;
+import static io.fairspace.saturn.config.Services.FS_ROOT;
+import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SparqlQueryServiceTest {
+public class JdbcQueryServiceTest {
     static final String BASE_PATH = "/api/webdav";
     static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;
     static final String SAMPLE_NATURE_BLOOD = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12434";
@@ -53,23 +52,15 @@ public class SparqlQueryServiceTest {
 
     User user;
     Authentication.User userAuthentication;
-    User user2;
-    Authentication.User user2Authentication;
     User workspaceManager;
     Authentication.User workspaceManagerAuthentication;
     User admin;
     Authentication.User adminAuthentication;
     private org.eclipse.jetty.server.Request request;
 
-
     private void selectRegularUser() {
         lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
         lenient().when(userService.currentUser()).thenReturn(user);
-    }
-
-    private void selectExternalUser() {
-        lenient().when(request.getAuthentication()).thenReturn(user2Authentication);
-        lenient().when(userService.currentUser()).thenReturn(user2);
     }
 
     private void selectAdmin() {
@@ -77,25 +68,17 @@ public class SparqlQueryServiceTest {
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
 
-    private void setupUsers(Model model) {
-        userAuthentication = mockAuthentication("user");
-        user = createTestUser("user", false);
-        user.setCanViewPublicMetadata(true);
-        new DAO(model).write(user);
-        user2Authentication = mockAuthentication("user2");
-        user2 = createTestUser("user2", false);
-        new DAO(model).write(user2);
-        workspaceManager = createTestUser("workspace-admin", false);
-        new DAO(model).write(workspaceManager);
-        workspaceManagerAuthentication = mockAuthentication("workspace-admin");
-        adminAuthentication = mockAuthentication("admin");
-        admin = createTestUser("admin", true);
-        new DAO(model).write(admin);
-    }
-
     @Before
-    public void before() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
-        var dsg = DatasetGraphFactory.createTxnMem();
+    public void before() throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        var viewDatabase = new Config.ViewDatabase();
+        viewDatabase.url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE";
+        viewDatabase.username = "sa";
+        viewDatabase.password = "";
+        ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
+        ViewStoreClientFactory.H2_DATABASE = true;
+        var viewStoreClient = ViewStoreClientFactory.build(config, viewDatabase);
+
+        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClient);
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
@@ -103,18 +86,24 @@ public class SparqlQueryServiceTest {
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
+
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
         ds.getContext().set(FS_ROOT, davFactory.root);
-        var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
-        var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
-        var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, filteredDataset);
+        queryService = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClient, tx, davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
-        setupUsers(model);
+        userAuthentication = mockAuthentication("user");
+        user = createTestUser("user", false);
+        new DAO(model).write(user);
+        workspaceManager = createTestUser("workspace-admin", false);
+        new DAO(model).write(workspaceManager);
+        workspaceManagerAuthentication = mockAuthentication("workspace-admin");
+        adminAuthentication = mockAuthentication("admin");
+        admin = createTestUser("admin", true);
+        new DAO(model).write(admin);
 
         setupRequestContext();
         request = getCurrentRequest();
@@ -139,7 +128,6 @@ public class SparqlQueryServiceTest {
 
         var coll2 = (PutableResource) root.createCollection("coll2");
         coll2.createNew("sample-s2-b-rna.fastq", null, 0L, "chemical/seq-na-fastq");
-        coll2.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
 
         var testdata = model.read("testdata.ttl");
         api.put(testdata);
@@ -147,39 +135,17 @@ public class SparqlQueryServiceTest {
 
     @Test
     public void testRetrieveSamplePage() {
-        var viewRequest = new ViewRequest();
-        viewRequest.setView("Sample");
-        viewRequest.setPage(1);
-        viewRequest.setSize(10);
-        var page = queryService.retrieveViewPage(viewRequest);
-        assertEquals(2, page.getRows().size());
-        // The implementation does not sort results. Probably deterministic,
-        // but no certain order is guaranteed.
-        var row = page.getRows().get(0).get("Sample").iterator().next().getValue().equals("http://example.com/samples#s1-a")
-                ? page.getRows().get(0) : page.getRows().get(1);
-        assertEquals("Sample A for subject 1", row.get("Sample").iterator().next().getLabel());
-        assertEquals(SAMPLE_NATURE_BLOOD, row.get("Sample_nature").iterator().next().getValue());
-        assertEquals("Blood", row.get("Sample_nature").iterator().next().getLabel());
-        assertEquals("Liver", row.get("Sample_topography").iterator().next().getLabel());
-        assertEquals(45.2f, ((Number) row.get("Sample_tumorCellularity").iterator().next().getValue()).floatValue(), 0.01);
-    }
-
-    @Test
-    public void testCountSamples() {
-        selectRegularUser();
-        var requestParams = new CountRequest();
-        requestParams.setView("Sample");
-        var result = queryService.count(requestParams);
-        assertEquals(2, result.getCount());
-    }
-
-    @Test
-    public void testCountSamplesWithoutViewAccess() {
-        selectExternalUser();
-        var countRequest = new CountRequest();
-        countRequest.setView("Sample");
-        var result = queryService.count(countRequest);
-        assertEquals(0, result.getCount());
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        var page = queryService.retrieveViewPage(request);
+        Assert.assertEquals(2, page.getRows().size());
+        var row = page.getRows().get(0);
+        Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(45.2f, ((Number)row.get("Sample_tumorCellularity").stream().findFirst().orElseThrow().getValue()).floatValue(), 0.01);
     }
 
     @Test
@@ -188,30 +154,14 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(List.of(
+        request.setFilters(Collections.singletonList(
                 ViewFilter.builder()
                         .field("Sample_nature")
-                        .values(List.of(SAMPLE_NATURE_BLOOD))
+                        .values(Collections.singletonList(SAMPLE_NATURE_BLOOD))
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);
-        assertEquals(1, page.getRows().size());
-    }
-
-    @Test
-    public void testRetrieveSamplePageUsingPrefixFilter() {
-        var request = new ViewRequest();
-        request.setView("Sample");
-        request.setPage(1);
-        request.setSize(10);
-        request.setFilters(List.of(
-                ViewFilter.builder()
-                        .field("Sample")
-                        .prefix("sample b")
-                        .build()
-        ));
-        var page = queryService.retrieveViewPage(request);
-        assertEquals(1, page.getRows().size());
+        Assert.assertEquals(1, page.getRows().size());
     }
 
     @Test
@@ -227,23 +177,7 @@ public class SparqlQueryServiceTest {
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);
-        assertEquals(1, page.getRows().size());
-    }
-
-    @Test
-    public void testRetrieveUniqueSamplesForLocation() {
-        var request = new ViewRequest();
-        request.setView("Sample");
-        request.setPage(1);
-        request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("location")
-                        .values(Collections.singletonList(baseUri + "/coll2"))
-                        .build()
-        ));
-        var page = queryService.retrieveViewPage(request);
-        assertEquals(1, page.getRows().size());
+        Assert.assertEquals(1, page.getRows().size());
     }
 
     @Test
@@ -252,13 +186,38 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(List.of(
+        request.setFilters(Collections.singletonList(
                 ViewFilter.builder()
                         .field("Resource_analysisType")
-                        .values(List.of(ANALYSIS_TYPE_IMAGING))
+                        .values(Collections.singletonList(ANALYSIS_TYPE_IMAGING))
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);
-        assertEquals(0, page.getRows().size());
+        Assert.assertEquals(0, page.getRows().size());
+    }
+
+    @Test
+    public void testRetrieveSamplePageIncludeJoin() {
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        request.setIncludeJoinedViews(true);
+        var page = queryService.retrieveViewPage(request);
+        Assert.assertEquals(2, page.getRows().size());
+        var row1 = page.getRows().get(0);
+        Assert.assertEquals("Sample A for subject 1", row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(1, row1.get("Subject").size());
+        var row2 = page.getRows().get(1);
+        Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(1, row2.get("Resource_analysisType").size());
+    }
+
+    @Test
+    public void testCountSamples() {
+        var request = new CountRequest();
+        request.setView("Sample");
+        var result = queryService.count(request);
+        Assert.assertEquals(2, result.getCount());
     }
 }

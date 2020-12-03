@@ -49,6 +49,8 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
+viewDatabase:
+  enabled: true
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000

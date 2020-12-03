@@ -278,7 +278,7 @@ public class SparqlQueryService implements QueryService {
                     .map(o -> toNodeValue(o, type))
                     .collect(toList());
             expr = new E_OneOf(variable, new ExprList(values));
-        } else if (filter.prefix != null && !filter.prefix.trim().isEmpty()) {
+        } else if (filter.prefix != null && !filter.prefix.isBlank()) {
             expr = new E_StrStartsWith(new E_StrLowerCase(variable), makeString(filter.prefix.trim().toLowerCase()));
         } else {
             return null;

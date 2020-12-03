@@ -22,7 +22,7 @@ public class ServicesTest {
     @Before
     public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        svc = new Services(config, viewsConfig, dataset);
+        svc = new Services(config, viewsConfig, dataset, null);
     }
 
     @Test

@@ -8,8 +8,13 @@ import java.util.Set;
 
 @Value @Builder
 public class ViewPageDTO {
+    /**
+     * The key of every row is `${view}_${column}`.
+     */
     @NonNull
     List<Map<String, Set<ValueDTO>>> rows;
     boolean hasNext;
     boolean timeout;
+    Long totalCount;
+    Long totalPages;
 }
