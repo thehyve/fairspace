@@ -13,5 +13,5 @@ public class ViewFilter {
     List<Object> values;
     Object min;
     Object max;
-    String prefix;
+    List<String> prefixes;
 }

@@ -9,9 +9,7 @@ import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.views.QueryService;
-import io.fairspace.saturn.services.views.SparqlQueryService;
-import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -54,7 +52,7 @@ public class Services {
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
 
-    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
+    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClient viewStoreClient) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -84,8 +82,14 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        viewService = new ViewService(viewsConfig, filteredDataset);
-        queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset);
+        queryService = viewStoreClient == null
+                ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
+                : new JdbcQueryService(config.search, viewStoreClient, transactions, davFactory.root);
+        ViewStoreReader viewStoreReader = null;
+        if (queryService instanceof JdbcQueryService) {
+            viewStoreReader = ((JdbcQueryService)queryService).getViewStoreReader();
+        }
+        viewService = new ViewService(viewsConfig, filteredDataset, viewStoreReader);
 
         searchService = new SearchService(filteredDataset);
     }

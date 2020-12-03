@@ -1,9 +1,8 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
-import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
-import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.views.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
@@ -25,13 +24,17 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config) {
+    public static Dataset connect(Config.Jena config, ViewStoreClient viewStoreClient) {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
         var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams).getDatasetGraph();
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+
+        if (viewStoreClient != null) {
+            dsg = new TxnIndexDatasetGraph(dsg, viewStoreClient);
+        }
 
         if (restoreNeeded) {
             restore(dsg, txnLog);
