@@ -63,6 +63,8 @@ services:
   "test username": http://google.com?q=${username}
 features:
 #  - MetadataEditing
+viewDatabase:
+  enabled: true
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000

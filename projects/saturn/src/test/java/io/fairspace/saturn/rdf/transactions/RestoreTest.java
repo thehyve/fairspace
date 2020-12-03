@@ -77,6 +77,6 @@ public class RestoreTest {
     }
 
     private Transactions newDataset() throws IOException {
-        return new BulkTransactions(SaturnDatasetFactory.connect(config, false));
+        return new BulkTransactions(SaturnDatasetFactory.connect(config, false, null));
     }
 }

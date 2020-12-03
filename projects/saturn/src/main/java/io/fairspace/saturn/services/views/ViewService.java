@@ -44,10 +44,12 @@ public class ViewService {
 
     private final ViewsConfig searchConfig;
     private final Dataset ds;
+    private final ViewStoreReader reader;
 
-    public ViewService(ViewsConfig viewsConfig, Dataset ds) {
+    public ViewService(ViewsConfig viewsConfig, Dataset ds, ViewStoreReader reader) {
         this.searchConfig = viewsConfig;
         this.ds = ds;
+        this.reader = reader;
     }
 
     private Object convertLiteralValue(Object value) {
@@ -55,6 +57,16 @@ public class ViewService {
             return ofEpochMilli(((XSDDateTime) value).asCalendar().getTimeInMillis());
         }
         return value;
+    }
+
+    Range getColumnRange(View view, View.Column column) {
+        if (reader == null) {
+            return null;
+        }
+        if (!EnumSet.of(ColumnType.Date, ColumnType.Number).contains(column.type)) {
+            return null;
+        }
+        return reader.aggregate(view.name, column.name);
     }
 
     private FacetDTO getFacetInfo(View view, View.Column column) {
@@ -82,13 +94,21 @@ public class ViewService {
                 }
             }
             case Number, Date -> {
-                var binding = new QuerySolutionMap();
-                binding.add("predicate", createResource(column.source));
+                if (reader != null) {
+                    var range = getColumnRange(view, column);
+                    if (range != null) {
+                        min = range.getStart();
+                        max = range.getEnd();
+                    }
+                } else {
+                    var binding = new QuerySolutionMap();
+                    binding.add("predicate", createResource(column.source));
 
-                try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
-                    var row = execution.execSelect().next();
-                    min = ofNullable(row.getLiteral("min")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
-                    max = ofNullable(row.getLiteral("max")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                    try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
+                        var row = execution.execSelect().next();
+                        min = ofNullable(row.getLiteral("min")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                        max = ofNullable(row.getLiteral("max")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                    }
                 }
             }
         }

@@ -52,7 +52,7 @@ public class Services {
     private final DatasetGraph filteredDatasetGraph;
     private final SearchProxyServlet searchProxyServlet;
 
-    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
+    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClient viewStoreClient) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -81,8 +81,14 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        viewService = new ViewService(viewsConfig, filteredDataset);
-        queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset, davFactory);
+        queryService = viewStoreClient == null
+                ? new SparqlQueryService(config.search, viewsConfig, filteredDataset, davFactory)
+                : new JdbcQueryService(config.search, viewStoreClient, transactions, davFactory.root);
+        ViewStoreReader viewStoreReader = null;
+        if (queryService instanceof JdbcQueryService) {
+            viewStoreReader = ((JdbcQueryService)queryService).getViewStoreReader();
+        }
+        viewService = new ViewService(viewsConfig, filteredDataset, viewStoreReader);
 
         searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,
