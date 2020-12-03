@@ -53,8 +53,27 @@ services:
         labels: application
         tag: fairspace-keycloak
 
+  fairspace-postgres:
+    image: postgres:11-alpine
+    container_name: fairspace-postgresql
+    environment:
+      POSTGRES_DB: fairspace
+      POSTGRES_USER: fairspace
+      POSTGRES_PASSWORD: fairspace
+    ports:
+      - ${POSTGRESQL_PORT:-9432}:5432
+    volumes:
+      - fairspace-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    logging:
+      driver: ${DOCKER_LOGGING_DRIVER:-journald}
+      options:
+        labels: application
+        tag: fairspace-postgres
+
 volumes:
   fairspace-keycloak-postgres-data:
+  fairspace-postgres-data:
 
 networks:
   fairspace-keycloak-db-network:

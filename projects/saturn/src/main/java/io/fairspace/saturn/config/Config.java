@@ -38,6 +38,8 @@ public class Config {
 
     public WebDAV webDAV = new WebDAV();
 
+    public ViewDatabase viewDatabase = new ViewDatabase();
+
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public final Set<Feature> features = new HashSet<>();
 
@@ -88,6 +90,13 @@ public class Config {
             }
             return rootDirectoryIri;
         }
+    }
+
+    public static class ViewDatabase {
+        public boolean enabled = false;
+        public String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 9432, "fairspace");
+        public String username = "fairspace";
+        public String password = "fairspace";
     }
 
     @Override
