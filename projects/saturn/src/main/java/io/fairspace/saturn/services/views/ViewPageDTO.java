@@ -12,4 +12,6 @@ public class ViewPageDTO {
     List<Map<String, Set<ValueDTO>>> rows;
     boolean hasNext;
     boolean timeout;
+    Long totalCount;
+    Long totalPages;
 }
