@@ -234,7 +234,7 @@ search:
         SELECT ?g
         WHERE {
            ?g a curie:Gender .
-           FILTER EXISTS { ?x curie:gender ?g }
+           FILTER EXISTS { ?x curie:isOfGender ?g }
         }
     - name: ageAtLastNews
       title: Age at Last News
@@ -371,7 +371,7 @@ search:
           <#if fetch || species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
             ?sample curie:subject ?subject .
             <#if fetch || species??>OPTIONAL {?subject curie:isOfSpecies ?species} ${species!}</#if>
-            <#if fetch || gender??> OPTIONAL {?subject curie:gender ?gender} ${gender!}</#if>
+            <#if fetch || gender??> OPTIONAL {?subject curie:isOfGender ?gender} ${gender!}</#if>
             <#if fetch || ageAtLastNews??>OPTIONAL {?subject curie:ageAtLastNews ?ageAtLastNews} ${ageAtLastNews!}</#if>
             <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
          </#if>
@@ -497,7 +497,7 @@ search:
           <#if fetch || species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
              ?event curie:eventSubject ?subject .
              <#if fetch || species??>OPTIONAL {?subject curie:isOfSpecies ?species} ${species!}</#if>
-             <#if fetch || gender??> OPTIONAL {?subject curie:gender ?gender} ${gender!}</#if>
+             <#if fetch || gender??> OPTIONAL {?subject curie:isOfGender ?gender} ${gender!}</#if>
              <#if fetch || ageAtLastNews??>OPTIONAL {?subject curie:ageAtLastNews ?ageAtLastNews} ${ageAtLastNews!}</#if>
              <#if fetch || ageAtDeath??>OPTIONAL {?subject curie:ageAtDeath ?ageAtDeath} ${ageAtDeath!}</#if>
           </#if>
@@ -589,7 +589,7 @@ search:
           OPTIONAL { ?subject curie:isOfSpecies ?species } ${species!}
           </#if>
           <#if fetch || gender??>
-          OPTIONAL { ?subject curie:gender ?gender } ${gender!}
+          OPTIONAL { ?subject curie:isOfGender ?gender } ${gender!}
           </#if>
           <#if fetch || ageAtLastNews??>
           OPTIONAL { ?subject curie:ageAtLastNews ?ageAtLastNews } ${ageAtLastNews!}
@@ -681,7 +681,7 @@ search:
                 <#if species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
                    ?sample curie:subject ?subject .
                    <#if species??> ?subject curie:isOfSpecies ?species . ${species}</#if>
-                   <#if gender??> ?subject curie:gender ?gender . ${gender}</#if>
+                   <#if gender??> ?subject curie:isOfGender ?gender . ${gender}</#if>
                    <#if ageAtLastNews??> ?subject curie:ageAtLastNews ?ageAtLastNews . ${ageAtLastNews}</#if>
                    <#if ageAtDeath??> ?subject curie:ageAtDeath ?ageAtDeath . ${ageAtDeath}</#if>
                 </#if>
@@ -704,7 +704,7 @@ search:
                 <#if species?? || gender?? || ageAtLastNews?? || ageAtDeath??>
                    ?event curie:eventSubject ?subject .
                    <#if species??> ?subject curie:isOfSpecies ?species . ${species}</#if>
-                   <#if gender??> ?subject curie:gender ?gender . ${gender}</#if>
+                   <#if gender??> ?subject curie:isOfGender ?gender . ${gender}</#if>
                    <#if ageAtLastNews??> ?subject curie:ageAtLastNews ?ageAtLastNews . ${ageAtLastNews}</#if>
                    <#if ageAtDeath??> ?subject curie:ageAtDeath ?ageAtDeath . ${ageAtDeath}</#if>
                 </#if>
@@ -713,7 +713,7 @@ search:
               FILTER EXISTS {
                 ?file curie:aboutSubject ?subject .
                 <#if species??> ?subject curie:isOfSpecies ?species . ${species}</#if>
-                <#if gender??> ?subject curie:gender ?gender . ${gender}</#if>
+                <#if gender??> ?subject curie:isOfGender ?gender . ${gender}</#if>
                 <#if ageAtLastNews??> ?subject curie:ageAtLastNews ?ageAtLastNews . ${ageAtLastNews}</#if>
                 <#if ageAtDeath??> ?subject curie:ageAtDeath ?ageAtDeath . ${ageAtDeath}</#if>
               }
