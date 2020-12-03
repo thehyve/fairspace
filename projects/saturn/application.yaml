@@ -644,12 +644,15 @@ search:
             }
           }
           BIND(?f AS ?file)
-          FILTER (EXISTS{?file a fs:File} || EXISTS{?file a fs:Directory} || EXISTS{?file a fs:Collection})
           </#if>
+
+          ?file a ?type .
+          <#if !fetch>FILTER ((?type = fs:File) || (?type = fs:Directory) || (?type = fs:Collection))</#if>
 
           <#if fetch || analysisType??> OPTIONAL { ?file curie:analysisType ?analysisType } ${analysisType!}</#if>
 
           <#if fetch>
+            BIND(IF(?type = fs:File, "File", IF(?type = fs:Collection, "Collection", "Workspace")) AS ?kind)
             ?file (fs:belongsTo)* ?collection . ?collection fs:ownedBy ?workspace .
             OPTIONAL {?file fs:dateCreated ?dateCreated}
             OPTIONAL {?file fs:dateModified ?dateModified}
@@ -719,9 +722,4 @@ search:
               }
             </#if>
           </#if>
-
-          ?file a ?type .
-          <#if fetch>FILTER ((?type = fs:File) || (?type = fs:Directory) ||  (?type = fs:Collection))</#if>
-
-          BIND(IF(?type = fs:File, "File", IF(?type = fs:Collection, "Collection", "Workspace")) AS ?kind)
         }
