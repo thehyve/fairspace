@@ -7,12 +7,12 @@ import {
     TableContainer,
     TableHead,
     TablePagination,
-    TableRow, Typography,
+    TableRow,
+    Typography,
     withStyles
 } from '@material-ui/core';
 import {useHistory} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
-import styles from "../../file/FileList.styles";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import IriTooltip from "../../common/components/IriTooltip";
@@ -43,6 +43,14 @@ type MetadataViewTableProperties = {
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
 };
+
+const styles = () => ({
+    table: {
+        maxHeight: 'calc(100vh - 215px)',
+        overflowY: 'auto',
+        overflowX: 'auto'
+    }
+});
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {columns, data, locationContext, toggleRow, selected, view, history} = props;
@@ -165,9 +173,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     };
 
     return (
-        <Paper className={props.classes.root}>
+        <Paper>
             {renderWarning()}
-            <TableContainer>
+            <TableContainer className={props.classes.table}>
                 <MetadataViewTable
                     {...props}
                     data={data}
