@@ -20,11 +20,13 @@ describe('MetadataViewTable', () => {
         const {queryByText, queryAllByText} = render(
             <MetadataViewTable
                 columns={columns}
+                visibleColumnNames={columns.map(c => c.name)}
                 data={data}
                 view=""
                 locationContext=""
                 toggleRow={() => {}}
                 history={historyMock}
+                idColumn={columns[0]}
             />
         );
 
@@ -51,11 +53,13 @@ describe('MetadataViewTable', () => {
         const data = {rows: mockRows(view)};
         const wrapper = shallow(<MetadataViewTable
             columns={columns}
+            visibleColumnNames={columns.map(c => c.name)}
             data={data}
             view={view}
             locationContext=""
             toggleRow={() => {}}
             history={historyMock}
+            idColumn={columns[0]}
         />);
 
         const tableRows = wrapper.find(TableBody).find(TableRow);

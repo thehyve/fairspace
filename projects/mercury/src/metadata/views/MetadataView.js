@@ -3,7 +3,6 @@ import {Button, Grid, withStyles} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
-import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
@@ -20,6 +19,7 @@ import * as consts from "../../constants";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
+import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
 
 type MetadataViewProperties = {
@@ -153,7 +153,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             </Tabs>
             {views.map((view, index) => (
                 <TabPanel value={selectedTab} index={index} {...a11yProps(index)} className={classes.tab}>
-                    <MetadataViewTable
+                    <MetadataViewTableContainer
                         columns={view.columns}
                         view={view.name}
                         filters={filters}
