@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.views;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.webdav.DavFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
@@ -27,11 +28,13 @@ import static org.apache.jena.sparql.expr.NodeValue.*;
 public class ViewService {
     private final Config.Search config;
     private final Dataset ds;
+    private final DavFactory davFactory;
     private final Map<String, Template> templates = new HashMap<>();
 
-    public ViewService(Config.Search config, Dataset ds) {
+    public ViewService(Config.Search config, Dataset ds, DavFactory davFactory) {
         this.config = config;
         this.ds = ds;
+        this.davFactory = davFactory;
 
         config.views.forEach(view -> {
             try {
@@ -225,17 +228,16 @@ public class ViewService {
         if (query == null || query.isEmpty()) {
             return null;
         }
-        var map = new TreeMap<String, String>();
+        var sortedSet = new TreeSet<ValueDTO>();
         try (var execution = QueryExecutionFactory.create(query, ds)) {
             execution.execSelect().forEachRemaining(row -> {
                 var resource = row.getResource(row.varNames().next());
-                map.put(getStringProperty(resource, RDFS.label), resource.getURI());
+                var label = getStringProperty(resource, RDFS.label);
+                var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
+                sortedSet.add(new ValueDTO(label, resource.getURI(), access));
             });
         }
-        return map.entrySet()
-                .stream()
-                .map(e -> new ValueDTO(e.getKey(), e.getValue()))
-                .collect(toList());
+        return new ArrayList<>(sortedSet);
     }
 
     List<ViewDTO> getViews() {
