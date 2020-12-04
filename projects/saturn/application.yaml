@@ -337,6 +337,9 @@ search:
         - name: ageAtDeath
           title: Age at Death
           type: number
+        - name: analysisTypes
+          title: AnalysisTypes
+          type: text
       query: |
         PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX curie: <https://institut-curie.org/ontology#>
@@ -345,13 +348,18 @@ search:
         <#if fetch>
         SELECT ?sample ?sampleTopography ?sampleNature ?sampleOrigin ?tumorCellularity ?event ?tumorTopography ?morphology ?eventType
           ?laterality ?tumorGradeType ?tumorGradeValue ?tnmType ?tnmT ?tnmN ?tnmM ?ageAtDiagnosis ?subject ?gender
-          ?species ?ageAtLastNews ?ageAtDeath
+          ?species ?ageAtLastNews ?ageAtDeath ?analysisTypes
         <#else>
         SELECT ?sample
         </#if>
         WHERE {
           <#if fetch>
-          VALUES ?sample { ${iris} }
+          { SELECT ?sample (GROUP_CONCAT(DISTINCT(?at); SEPARATOR = ", ") AS ?analysisTypes)
+            WHERE {
+              VALUES ?sample { ${iris} }
+              OPTIONAL { ?sample (^curie:sample)/curie:analysisType/rdfs:label ?at }
+            } GROUP BY ?sample
+          }
           <#elseif collection?? || analysisType??>
           {
             SELECT DISTINCT ?smpl WHERE {
@@ -395,8 +403,10 @@ search:
             <#if !has_event_filter>}</#if>
           </#if>
 
-          ?sample a curie:BiologicalSample .
-          FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+          <#if !fetch>
+            ?sample a curie:BiologicalSample .
+            FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+          </#if>
         }
     - name: events
       title: Tumor Pathology Events
