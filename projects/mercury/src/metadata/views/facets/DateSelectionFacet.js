@@ -8,15 +8,17 @@ import {formatDateTime} from "../../../common/utils/genericUtils";
 
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, classes, active} = props;
+    const {options = [], onChange = () => {}, classes, activeFilterValues} = props;
     const [value, setValue] = useState([null, null]);
     const [minDate, maxDate] = options;
 
     useEffect(() => {
-        if (!active) {
+        if (activeFilterValues.length > 0) {
+            setValue(activeFilterValues);
+        } else {
             setValue([null, null]);
         }
-    }, [active]);
+    }, [activeFilterValues]);
 
     const handleChange = (newValue) => {
         setValue(newValue);

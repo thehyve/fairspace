@@ -16,21 +16,21 @@ type SelectProperties = {
     options: Option[];
     onChange: (string[]) => void;
     textFilterValue: string;
-    active: boolean;
+    activeFilterValues: any[];
 }
 
 const filterByText = (options, textFilterValue) => options
     .filter(o => textFilterValue.trim() === "" || o.label.toLowerCase().includes(textFilterValue.toLowerCase()));
 
 const SelectSingle = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, active} = props;
+    const {options, onChange, textFilterValue, activeFilterValues} = props;
     const [value, setValue] = useState(null);
 
     useEffect(() => {
-        if (!active) {
-            setValue(null);
+        if (activeFilterValues.length > 0) {
+            setValue(activeFilterValues[0]);
         }
-    }, [active]);
+    }, [activeFilterValues]);
 
     const handleChange = (event) => {
         const newValue = event.target.value;
@@ -48,14 +48,14 @@ const SelectSingle = (props: SelectProperties) => {
 };
 
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, active} = props;
-    const [state, setState] = useState(Object.fromEntries(options.map(option => [option.value, false])));
+    const {options, onChange, textFilterValue, activeFilterValues} = props;
+    const defaultOptions = Object.fromEntries(options.map(option => [option.value, activeFilterValues.includes(option.value)]));
+    const [state, setState] = useState(defaultOptions);
 
     useEffect(() => {
-        if (!active) {
-            setState(Object.fromEntries(options.map(option => [option.value, false])));
-        }
-    }, [active, options]);
+        setState(defaultOptions);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [options, activeFilterValues]);
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -97,7 +97,7 @@ const SelectMultiple = (props: SelectProperties) => {
 };
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], multiple = false, onChange = () => {}, active, classes} = props;
+    const {options = [], multiple = false, onChange = () => {}, activeFilterValues, classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
     const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
 
@@ -148,9 +148,16 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                             onChange={onChange}
                             classes={classes}
                             textFilterValue={textFilterValue}
-                            active={active}
+                            activeFilterValues={activeFilterValues}
                         />
-                    ) : (<SelectSingle options={options} onChange={onChange} textFilterValue={textFilterValue} active={active} />)}
+                    ) : (
+                        <SelectSingle
+                            options={options}
+                            onChange={onChange}
+                            textFilterValue={textFilterValue}
+                            activeFilterValues={activeFilterValues}
+                        />
+                    )}
                 </FormControl>
             </div>
         </>

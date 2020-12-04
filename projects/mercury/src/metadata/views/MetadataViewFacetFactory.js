@@ -21,7 +21,7 @@ export type MetadataViewFacetProperties = {
     onChange: (string[]) => void;
     extraClasses?: string;
     classes?: any;
-    active?: boolean;
+    activeFilterValues: any[];
     clearFilter: () => {};
 };
 
@@ -80,7 +80,7 @@ const getFacet = (props: MetadataViewFacetProperties) => {
 };
 
 const Facet = (props: MetadataViewFacetProperties) => {
-    const {clearFilter, title, active, extraClasses} = props;
+    const {clearFilter, title, activeFilterValues, extraClasses} = props;
     const classes = useStyles();
     const [expanded, setExpanded] = useState(false);
 
@@ -100,7 +100,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
     );
 
     const clearFiltersAction = (
-        active && (
+        activeFilterValues.length > 0 && (
             <IconButton
                 onClick={clearFilter}
                 aria-label="Clear"

@@ -21,6 +21,7 @@ describe('MetadataViewFacetFactory', () => {
             type="unknown_type"
             multiple
             onChange={() => {}}
+            activeFilterValues={[]}
         />);
 
         expect(wrapper.find(FormLabel).length).toEqual(0);
@@ -35,6 +36,7 @@ describe('MetadataViewFacetFactory', () => {
             type="id"
             multiple
             onChange={() => {}}
+            activeFilterValues={[]}
         />);
 
         const textSelectionFacet = wrapper.find(TextSelectionFacet);
@@ -57,6 +59,7 @@ describe('MetadataViewFacetFactory', () => {
             type="number"
             multiple
             onChange={() => {}}
+            activeFilterValues={[]}
         />);
 
         const numericalRangeSelectionFacet = wrapper.find(NumericalRangeSelectionFacet);
@@ -83,6 +86,7 @@ describe('MetadataViewFacetFactory', () => {
             type="date"
             multiple
             onChange={() => {}}
+            activeFilterValues={[]}
         />);
 
         const dateSelectionFacet = wrapper.find(DateSelectionFacet);

@@ -5,14 +5,14 @@ import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
 import MetadataViewTable from './MetadataViewTable';
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getSearchPathSegments} from "../../collections/collectionUtils";
 import {getSearchContextFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {isCollectionView, LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
+import {isCollectionView, ofRangeValueType} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -20,7 +20,6 @@ import * as consts from "../../constants";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 
 type MetadataViewProperties = {
@@ -75,21 +74,15 @@ const styles = (theme) => ({
 
 export const MetadataView = (props: MetadataViewProperties) => {
     const {views, facets, locationContext, classes} = props;
+    const {filters, setLocationFilter, updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
 
     const {toggle, selected} = useSingleSelection();
     const [selectedTab, setSelectedTab] = useState(0);
     const currentViewTab = views[selectedTab];
     const isCurrentViewCollectionView = isCollectionView(currentViewTab.name);
-    const [filters: MetadataViewFilter[], setFilters] = useState([]);
 
     useEffect(() => {
-        if (isCurrentViewCollectionView) {
-            const newFilter: MetadataViewFilter = {
-                field: LOCATION_FILTER_FIELD,
-                values: [locationContext]
-            };
-            setFilters([...filters, newFilter]);
-        }
+        setLocationFilter(currentViewTab.name, locationContext);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentViewTab.name, locationContext]);
 
@@ -118,46 +111,15 @@ export const MetadataView = (props: MetadataViewProperties) => {
         setSelectedTab(tabIndex);
     };
 
-    const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
-        if (ofRangeValueType(type)) {
-            [filter.min, filter.max] = values;
-        } else {
-            filter.values = values;
-        }
-    };
-
-    const updateFilters = (facet: MetadataViewFacet, values: any[]) => {
-        if (filters.find(f => f.field === facet.name)) {
-            let updatedFilters;
-            if (values && values.length > 0 && values.some(isNonEmptyValue)) {
-                updatedFilters = [...filters];
-                const filter = updatedFilters.find(f => (f.field === facet.name));
-                setFilterValues(facet.type, filter, values);
-            } else {
-                updatedFilters = [...filters.filter(f => f.field !== facet.name)];
-            }
-            setFilters(updatedFilters);
-        } else {
-            const newFilter: MetadataViewFilter = {
-                field: facet.name
-            };
-            setFilterValues(facet.type, newFilter, values);
-            setFilters([...filters, newFilter]);
-        }
-    };
-
-    const clearFilter = (facetName: string) => {
-        setFilters([...filters.filter(f => f.field !== facetName)]);
-    };
-
-    const clearFilters = () => {
-        setFilters([]);
-    };
-
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
             {facets.map(facet => {
                 const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
+                const activeFilter = filters.find(filter => filter.field === facet.name);
+                let activeFilterValues = [];
+                if (activeFilter) {
+                    activeFilterValues = ofRangeValueType(facet.type) ? [activeFilter.min, activeFilter.max] : activeFilter.values;
+                }
                 return facetOptions && facetOptions.length > 0 && (
                     <Grid key={facet.name} item>
                         <Facet
@@ -167,7 +129,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             options={facetOptions || []}
                             onChange={(values) => updateFilters(facet, values)}
                             extraClasses={classes.facet}
-                            active={filters.some(filter => filter.field === facet.name)}
+                            activeFilterValues={activeFilterValues}
                             clearFilter={() => clearFilter(facet.name)}
                         />
                     </Grid>
@@ -214,7 +176,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             <BreadCrumbs additionalSegments={getPathSegments()} />
             {filters && filters.length > 0 && (
                 <Grid container direction="row" spacing={1}>
-                    <Grid item><Button data-testid="clear-button" onClick={() => clearFilters()} color="primary">Clear all</Button></Grid>
+                    <Grid item><Button data-testid="clear-button" onClick={() => clearAllFilters()} color="primary">Clear all</Button></Grid>
                     <Grid item><MetadataViewActiveFilters facets={facets} filters={filters} /></Grid>
                 </Grid>
             )}
@@ -267,7 +229,14 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
         return <MessageDisplay message="No metadata view found." />;
     }
 
-    return <MetadataView {...props} facets={facets} views={views} locationContext={locationContext} />;
+    return (
+        <MetadataView
+            {...props}
+            facets={facets}
+            views={views}
+            locationContext={locationContext}
+        />
+    );
 };
 
 export default withStyles(styles)(ContextualMetadataView);
