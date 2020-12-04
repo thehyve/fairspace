@@ -112,10 +112,14 @@ public class ViewService {
         row.varNames().forEachRemaining(name -> {
             var value = row.get(name);
             if (value.isURIResource()) {
-                map.put(name, value.asResource().getURI());
-                var label = getStringProperty(value.asResource(), RDFS.label);
+                var resource = value.asResource();
+                map.put(name, resource.getURI());
+                var label = getStringProperty(resource, RDFS.label);
                 if (label != null) {
                     map.put(name + ".label", label);
+                }
+                if (davFactory.isFileSystemResource(resource)) {
+                    map.put(name + ".access", davFactory.getAccess(resource));
                 }
             } else if (value.isLiteral()) {
                 var literal = value.asLiteral().getValue();
