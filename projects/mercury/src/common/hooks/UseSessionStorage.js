@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
  * Data in sessionStorage is cleared when the page session ends.
  *
  * @param sessionStorageKey     Key to store and retrieve the data
- * @param defaultValue          Default value, if local storage for this key is empty
+ * @param defaultValue          Default value, if session storage for this key is empty
  *
  * @returns A stateful value, and a function to update it.
  */

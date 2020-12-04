@@ -22,6 +22,12 @@ import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
+import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
+import {
+    LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY,
+    SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX
+} from "../../common/constants";
+import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 
 
 type MetadataViewTableContainerProperties = {
@@ -56,9 +62,12 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const {view, filters, columns, classes} = props;
 
     const [page, setPage] = useState(0);
-    const [visibleColumnNames, setVisibleColumnNames] = useState(columns.map(c => c.name));
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [visibleColumnNames, setVisibleColumnNames] = useStateWithSessionStorage(
+        `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
+        columns.map(c => c.name)
+    );
+    const [rowsPerPage, setRowsPerPage] = useStateWithLocalStorage(LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY, 10);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const idColumn = columns.find(c => c.type === 'id'); // first column of id type
     const columnSelectorOpen = Boolean(anchorEl);
