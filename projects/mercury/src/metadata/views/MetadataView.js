@@ -109,6 +109,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const changeTab = (event, tabIndex) => {
         setSelectedTab(tabIndex);
+        toggleRow();
     };
 
     const renderFacets = () => (
