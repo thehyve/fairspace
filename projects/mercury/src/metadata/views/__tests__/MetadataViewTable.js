@@ -9,11 +9,11 @@ import {MetadataViewTable} from "../MetadataViewTable";
 import {mockViews, mockRows} from "../__mocks__/MetadataViewAPI";
 
 describe('MetadataViewTable', () => {
-    it('renders correct header and values columns', () => {
-        const historyMock = {
-            push: jest.fn()
-        };
+    const historyMock = {
+        push: jest.fn()
+    };
 
+    it('renders correct header and values columns', () => {
         const view = 'samples';
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
@@ -44,10 +44,38 @@ describe('MetadataViewTable', () => {
         expect(queryByText('Tongue')).toBeInTheDocument();
     });
 
+    it('renders visible columns only', () => {
+        const view = 'samples';
+        const {columns} = mockViews().find(v => v.name === view);
+        const data = {rows: mockRows(view)};
+        const {queryByText, queryAllByText} = render(
+            <MetadataViewTable
+                columns={columns}
+                visibleColumnNames={['label', 'sampleType', 'origin']}
+                data={data}
+                view=""
+                locationContext=""
+                toggleRow={() => {}}
+                history={historyMock}
+                idColumn={columns[0]}
+            />
+        );
+
+        expect(queryByText('Sample label')).toBeInTheDocument();
+        expect(queryByText('Sample type')).toBeInTheDocument();
+        expect(queryByText('Lip')).not.toBeInTheDocument();
+        expect(queryByText('S01')).toBeInTheDocument();
+        expect(queryByText('S02')).toBeInTheDocument();
+        expect(queryAllByText('Tissue').length).toBe(2);
+        expect(queryByText('Topography')).not.toBeInTheDocument();
+        expect(queryByText('Nature')).not.toBeInTheDocument();
+        expect(queryByText('Origin')).not.toBeInTheDocument();
+        expect(queryByText('Files')).not.toBeInTheDocument();
+        expect(queryByText('DNA')).not.toBeInTheDocument();
+        expect(queryByText('Tongue')).not.toBeInTheDocument();
+    });
+
     it('should redirect when opening collection entry', () => {
-        const historyMock = {
-            push: jest.fn()
-        };
         const view = 'collections';
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
