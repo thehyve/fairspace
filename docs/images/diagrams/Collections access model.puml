@@ -1,0 +1,35 @@
+@startuml Collections access model
+
+class User {
+    + Username
+}
+
+class Workspace {
+    + Name
+}
+User "*" - "*" Workspace : member of >
+User "*" - "*" Workspace : manages >
+
+class File {
+    + Path
+}
+
+class Collection {
+    + Name
+    + Status
+    + Read access mode
+    + List access mode
+
+}
+Collection "1" *- "*" File : contains >
+Workspace "1" -- "*" Collection : owns >
+Workspace "*" -- "*" Collection : lists, reads >
+User "*" -- "*" Collection : lists, reads, edits >
+note right on link
+Collection editors and
+managers must be members
+of the owner workspace.
+end note
+User "*" -- "*" Collection : manages >
+
+@enduml

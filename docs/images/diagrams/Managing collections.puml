@@ -1,0 +1,68 @@
+@startuml Managing collections
+
+allowmixing
+
+class File {
+    + Path
+}
+
+class Collection {
+    + Name
+    + Status
+    + Read access mode
+    + List access mode
+}
+Collection "1" *- "*" File : contains
+
+actor Creator #lightgreen
+Creator --> Collection : creates
+
+actor Responsible #lightgreen
+Responsible --> Collection : manages
+
+Creator . Responsible : becomes >
+
+actor Editor #lightgreen
+Editor --> Collection : edits
+
+note as n1
+Responsible and editor must be
+members of the owner workspace.
+Responsibles of the owner workspace
+are automatically also responsible
+for the collection.
+end note
+
+n1 .. Responsible
+n1 .. Editor
+
+actor Reader #lightgreen
+Reader --> Collection : reads
+
+note as n2
+Readers are members of workspaces
+via ownership or sharing, or
+individual users via explicit access grant.
+end note
+n2 .. Reader
+
+actor Explorer #lightgreen
+Explorer --> Collection : lists
+
+class Workspace {
+  + Name
+}
+Workspace "1" *- "*" Collection : owns >
+Workspace "*" -- "*" Collection : shares >
+
+class User
+
+User "*" - "*" Workspace : member of
+
+class Project #lightgreen
+Workspace "*" -- "0..1" Project : belongs to >
+
+class Team #lightgreen
+Workspace "*" -- "0..1" Team : belongs to >
+
+@enduml
