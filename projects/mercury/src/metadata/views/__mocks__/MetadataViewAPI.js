@@ -1,5 +1,5 @@
 import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions} from "../MetadataViewAPI";
-import {isCollectionView} from "../metadataViewUtils";
+import {isFilesView} from "../metadataViewUtils";
 
 export const mockViews: MetadataViewOptions[] = () => [
     {
@@ -75,12 +75,12 @@ export const mockViews: MetadataViewOptions[] = () => [
         ]
     },
     {
-        name: "collections",
-        title: "Collections",
+        name: "files",
+        title: "Files",
         columns: [
             {
                 name: "label",
-                title: "Collection label",
+                title: "File label",
                 type: "id"
             }, {
                 name: "analysisType",
@@ -251,7 +251,7 @@ export const mockFacets = (name) => {
                     max: new Date(2020, 1, 4)
                 }
             ];
-        case "collections":
+        case "files":
             return [
                 {
                     name: 'analysisType',
@@ -381,7 +381,7 @@ export const mockRows = (viewName) => {
                     'species.label': 'Homo Sapiens'
                 },
             ];
-        case "collections":
+        case "files":
             return [
                 {
                     'label': 'http://localhost:8080/api/v1/webdav/c01',
@@ -400,6 +400,6 @@ export const mockGetViewData: Promise<MetadataViewData> = (viewName) => {
     return new Promise(resolve => resolve({
         page: 0,
         rows,
-        totalCount: !isCollectionView(rows) && rows.length
+        totalCount: !isFilesView(rows) && rows.length
     }));
 };

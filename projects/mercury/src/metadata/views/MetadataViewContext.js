@@ -2,7 +2,7 @@ import React from 'react';
 import type {MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
 import MetadataViewAPI from "./MetadataViewAPI";
 import useAsync from "../../common/hooks/UseAsync";
-import {isCollectionView, LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
+import {isFilesView, LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
 import {SESSION_STORAGE_METADATA_FILTERS_KEY} from "../../common/constants";
@@ -56,7 +56,7 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
     };
 
     const setLocationFilter = (viewName: string, locationContext: string) => {
-        if (isCollectionView(viewName)) {
+        if (isFilesView(viewName)) {
             const newFilter: MetadataViewFilter = {
                 field: LOCATION_FILTER_FIELD,
                 values: [locationContext]

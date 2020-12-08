@@ -5,13 +5,8 @@ import {withRouter} from 'react-router-dom';
 
 import {ExpandMore} from '@material-ui/icons';
 import {makeStyles} from '@material-ui/core/styles';
-import Typography from "@material-ui/core/Typography";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import EmptyInformationDrawer from "../../common/components/EmptyInformationDrawer";
 import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
-import {getContextualFileLink} from "./metadataViewUtils";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 
 
@@ -37,12 +32,10 @@ type MetadataViewInformationDrawerProps = {
     entity: MetadataViewEntityWithLinkedFiles;
     forceExpand: boolean;
     viewIcon: any;
-    showLinkedFiles: boolean;
-    locationContext: string;
 };
 
 const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps) => {
-    const {forceExpand, entity, viewIcon, showLinkedFiles, locationContext} = props;
+    const {forceExpand, entity, viewIcon} = props;
     const [expandedManually, setExpandedManually] = useState(null); // true | false | null
     const expanded = (expandedManually != null) ? expandedManually : forceExpand;
     const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
@@ -76,27 +69,6 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
                         subject={entity.iri}
                         hasEditRight={false}
                     />
-                    {showLinkedFiles && (
-                        <div>
-                            <Typography color="textSecondary" id="file-list">
-                                Linked files
-                            </Typography>
-                            <List dense>
-                                {entity.linkedFiles && entity.linkedFiles.length > 0 ? (
-                                    entity.linkedFiles.map(file => (
-                                        <ListItem key={file.iri} button component="a" href={getContextualFileLink(file.iri, locationContext)}>
-                                            <ListItemText
-                                                primary={file.label}
-                                            />
-                                        </ListItem>
-                                    ))) : (
-                                    <Typography variant="body2" className={classes.emptyLinkedFiles}>
-                                        Entity is not linked to a file.
-                                    </Typography>
-                                )}
-                            </List>
-                        </div>
-                    )}
                 </CardContent>
             </Collapse>
         </Card>

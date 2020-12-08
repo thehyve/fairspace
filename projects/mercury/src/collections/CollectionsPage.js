@@ -18,7 +18,7 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import styles from "./CollectionsPage.styles";
 import CollectionsContext from './CollectionsContext';
-import {isCollectionView} from "../metadata/views/metadataViewUtils";
+import {FILE_VIEW_NAME, getMetadataViewsPath, isFilesView} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
@@ -80,8 +80,8 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            {views && views.some(isCollectionView) && (
-                                <Link to="/collections-metadata-views">
+                            {views && views.map(v => v.name).some(isFilesView) && (
+                                <Link to={getMetadataViewsPath(FILE_VIEW_NAME)}>
                                     <Button
                                         variant="text"
                                         color="primary"

@@ -5,7 +5,7 @@ import IriTooltip from "../../common/components/IriTooltip";
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import Iri from "../../common/components/Iri";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import {getContextualFileLink, isCollectionView} from "./metadataViewUtils";
+import {getContextualFileLink, isFilesView} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
 
 
@@ -16,16 +16,15 @@ type MetadataViewTableProperties = {
     idColumn: MetadataViewColumn;
     toggleRow: () => {};
     view: string;
-    locationContext: string;
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
 };
 
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, locationContext, toggleRow, selected, view, idColumn, history} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, view, idColumn, history} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
-    const isCollectionViewTable = isCollectionView(view);
+    const isCollectionViewTable = isFilesView(view);
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
 
     const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
@@ -38,7 +37,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const handleResultDoubleClick = (itemIri) => {
         if (isCollectionViewTable) {
-            history.push(getContextualFileLink(itemIri, locationContext));
+            history.push(getContextualFileLink(itemIri));
         }
     };
 

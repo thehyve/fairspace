@@ -76,7 +76,7 @@ describe('MetadataViewTable', () => {
     });
 
     it('should redirect when opening collection entry', () => {
-        const view = 'collections';
+        const view = 'files';
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const wrapper = shallow(<MetadataViewTable
