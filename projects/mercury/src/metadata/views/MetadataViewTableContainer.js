@@ -136,7 +136,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         >
             <FormControl className={classes.viewColumnsFormControl}>
                 <Typography variant="caption">
-                    Configure visible columns
+                    Show/hide columns
                 </Typography>
                 <FormGroup>
                     {columns.map((column) => (
@@ -163,8 +163,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const renderTableSettings = () => (
         <div className={classes.tableSettings}>
             <IconButton
-                aria-label="Visible columns"
-                title="Visible columns"
+                aria-label="Show/hide columns"
+                title="Show/hide columns"
                 onClick={handleColumnSelectorButtonClick}
             >
                 <ViewColumn color="primary" />
