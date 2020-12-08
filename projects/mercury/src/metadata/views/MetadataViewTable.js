@@ -1,42 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    Typography,
-    withStyles
-} from '@material-ui/core';
-import {useHistory} from "react-router-dom";
-import type {MetadataViewColumn, MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
+import React from 'react';
+import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import IriTooltip from "../../common/components/IriTooltip";
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
 import Iri from "../../common/components/Iri";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink, isCollectionView} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
-import useViewData from "./UseViewData";
 
-
-type MetadataViewTableContainerProperties = {
-    columns: MetadataViewColumn[];
-    filters: MetadataViewFilter[];
-    toggleRow: () => {};
-    view: string;
-    locationContext: string;
-    selected: MetadataViewEntityWithLinkedFiles;
-    classes: any;
-};
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
     columns: MetadataViewColumn[];
+    visibleColumnNames: string[];
+    idColumn: MetadataViewColumn;
     toggleRow: () => {};
     view: string;
     locationContext: string;
@@ -44,18 +21,11 @@ type MetadataViewTableProperties = {
     selected?: MetadataViewEntityWithLinkedFiles;
 };
 
-const styles = () => ({
-    table: {
-        maxHeight: 'calc(100vh - 215px)',
-        overflowY: 'auto',
-        overflowX: 'auto'
-    }
-});
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, data, locationContext, toggleRow, selected, view, history} = props;
+    const {columns, visibleColumnNames, data, locationContext, toggleRow, selected, view, idColumn, history} = props;
+    const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const isCollectionViewTable = isCollectionView(view);
-    const idColumn = columns.find(c => c.type === 'id'); // first column of id type
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
 
     const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
@@ -100,10 +70,10 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     return (
-        <Table data-testid="results-table">
+        <Table data-testid="results-table" size="small">
             <TableHead>
                 <TableRow>
-                    {columns.map(column => (
+                    {visibleColumns.map(column => (
                         <TableCell key={column.name}>{column.title}</TableCell>
                     ))}
                 </TableRow>
@@ -121,7 +91,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                         )}
                         onDoubleClick={() => handleResultDoubleClick(row[idColumn.name])}
                     >
-                        {columns.map(column => renderTableCell(row, column))}
+                        {visibleColumns.map(column => renderTableCell(row, column))}
                     </TableRow>
                 ))}
             </TableBody>
@@ -129,71 +99,5 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     );
 };
 
-export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const {view, filters} = props;
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const history = useHistory();
 
-    const {data, count, countTimeout, error, loading, refreshDataOnly} = useViewData(view, filters, rowsPerPage);
-
-    useEffect(() => {setPage(0);}, [filters]);
-
-    if (loading) {
-        return <LoadingInlay />;
-    }
-
-    if (error && error.message) {
-        return <MessageDisplay message={error.message} />;
-    }
-
-    if (!data || !data.rows || !data.rows.length) {
-        return <MessageDisplay message="No results found." />;
-    }
-
-    const handleChangePage = (e, p) => {
-        setPage(p);
-        refreshDataOnly(p, rowsPerPage);
-    };
-
-    const handleChangeRowsPerPage = (e) => {
-        setRowsPerPage(e.target.value);
-        setPage(0);
-        refreshDataOnly(0, e.target.value);
-    };
-
-    const renderWarning = () => {
-        let warning = "";
-        if (data.timeout) {
-            warning = "Results shown below are incomplete. Fetching of data for the current page took too long.";
-        } else if (countTimeout) {
-            warning = "Fetching total count of results took too long. The count will not be shown.";
-        }
-        return warning && <Typography variant="body2" color="error" align="center">{warning}</Typography>;
-    };
-
-    return (
-        <Paper>
-            {renderWarning()}
-            <TableContainer className={props.classes.table}>
-                <MetadataViewTable
-                    {...props}
-                    data={data}
-                    history={history}
-                />
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 100]}
-                    component="div"
-                    count={count}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                    style={{overflowX: "hidden"}}
-                />
-            </TableContainer>
-        </Paper>
-    );
-};
-
-export default withStyles(styles)(MetadataViewTableContainer);
+export default MetadataViewTable;
