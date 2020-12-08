@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Button, Grid, withStyles} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -12,7 +12,7 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofRangeValueType,} from "./metadataViewUtils";
+import {getMetadataViewsPath, ofRangeValueType} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -88,7 +88,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         if (filterCandidates.find(f => f.field === facet.name)) {
             let updatedFilters;
             const existingFilter = filters.find(f => f.field === facet.name);
-            if ((newValues && existingFilter && existingFilter.value
+            if (!newValues || (newValues.filter(v => v !== null).length === 0) || (newValues && existingFilter && existingFilter.value
                 && _.isEqual(existingFilter.values.sort(), newValues.sort()))) {
                 updatedFilters = [...filterCandidates.filter(f => f.field !== facet.name)];
             } else {
@@ -97,7 +97,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 setFilterValues(facet.type, filter, newValues);
             }
             setFilterCandidates(updatedFilters);
-        } else {
+        } else if (newValues) {
             const newFilter: MetadataViewFilter = {
                 field: facet.name
             };

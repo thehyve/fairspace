@@ -2,14 +2,15 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.ViewsConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jena.datatypes.xsd.*;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
+import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -49,6 +50,13 @@ public class ViewService {
         this.ds = ds;
     }
 
+    private Object convertLiteralValue(Object value) {
+        if (value instanceof XSDDateTime) {
+            return ofEpochMilli(((XSDDateTime) value).asCalendar().getTimeInMillis());
+        }
+        return value;
+    }
+
     private FacetDTO getFacetInfo(View view, View.Column column) {
         List<ValueDTO> values = null;
         Object min = null;
@@ -73,14 +81,14 @@ public class ViewService {
                     }
                 }
             }
-            case Number -> {
+            case Number, Date -> {
                 var binding = new QuerySolutionMap();
                 binding.add("predicate", createResource(column.source));
 
                 try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
                     var row = execution.execSelect().next();
-                    min = ofNullable(row.getLiteral("min")).map(Literal::getValue).orElse(null);
-                    max = ofNullable(row.getLiteral("max")).map(Literal::getValue).orElse(null);
+                    min = ofNullable(row.getLiteral("min")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                    max = ofNullable(row.getLiteral("max")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
                 }
             }
         }

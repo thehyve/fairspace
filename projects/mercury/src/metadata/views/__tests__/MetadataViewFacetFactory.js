@@ -11,7 +11,6 @@ import TextSelectionFacet from "../facets/TextSelectionFacet";
 import {mockFacets} from "../__mocks__/MetadataViewAPI";
 import NumericalRangeSelectionFacet from "../facets/NumericalRangeSelectionFacet";
 import DateSelectionFacet from "../facets/DateSelectionFacet";
-import {formatDateTime} from "../../../common/utils/genericUtils";
 
 describe('MetadataViewFacetFactory', () => {
     it('should properly handle invalid facet type', () => {
@@ -89,13 +88,19 @@ describe('MetadataViewFacetFactory', () => {
         expect(dateSelectionFacet.length).toEqual(1);
         expect(dateSelectionFacet.prop('title')).toEqual(title);
 
+        const pad = (val, n) => `${val}`.padStart(n, '0');
+        const formatPlaceholderDate = (d: Date) => `${pad(d.getDate(), 2)}-${pad(d.getMonth() + 1, 2)}-${pad(d.getFullYear(), 4)}`;
+
         const facetValues = wrapper.find(KeyboardDatePicker);
         expect(facetValues.length).toEqual(2);
-        expect(facetValues.at(0).prop('placeholder')).toEqual(formatDateTime(mockFacet.min));
-        expect(facetValues.at(1).prop('placeholder')).toEqual(formatDateTime(mockFacet.max));
+
+        const max = new Date(mockFacet.max.getFullYear(), mockFacet.max.getMonth(), mockFacet.max.getDate(), 23, 59, 59, 999);
+
+        expect(facetValues.at(0).prop('placeholder')).toEqual(formatPlaceholderDate(mockFacet.min));
+        expect(facetValues.at(1).prop('placeholder')).toEqual(formatPlaceholderDate(max));
         expect(facetValues.at(0).prop('minDate')).toEqual(mockFacet.min);
-        expect(facetValues.at(0).prop('maxDate')).toEqual(mockFacet.max);
+        expect(facetValues.at(0).prop('maxDate')).toEqual(max);
         expect(facetValues.at(1).prop('minDate')).toEqual(mockFacet.min);
-        expect(facetValues.at(1).prop('maxDate')).toEqual(mockFacet.max);
+        expect(facetValues.at(1).prop('maxDate')).toEqual(max);
     });
 });

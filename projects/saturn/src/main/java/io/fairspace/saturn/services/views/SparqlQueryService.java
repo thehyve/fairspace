@@ -15,6 +15,7 @@ import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
 
+import java.time.*;
 import java.util.*;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
@@ -191,9 +192,9 @@ public class SparqlQueryService implements QueryService {
                     .map(field -> field.split("_")[0])
                     .distinct()
                     .forEach(entity -> {
-                        builder.append("FILTER EXISTS {\n");
-
                         if (!entity.equals(view.name)) {
+                            builder.append("FILTER EXISTS {\n");
+
                             var join = view.join
                                     .stream()
                                     .filter(j -> j.view.equals(entity))
@@ -229,8 +230,10 @@ public class SparqlQueryService implements QueryService {
                                                 .append(" \n");
                                     }
                                 });
-
-                        builder.append("}\n");
+                        if (!entity.equals(view.name)) {
+                            builder.append("}");
+                        }
+                        builder.append("\n");
                     });
         }
 
@@ -286,12 +289,18 @@ public class SparqlQueryService implements QueryService {
                 });
     }
 
+    private static Calendar convertDateValue(String value) {
+        var calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Instant.parse(value).toEpochMilli());
+        return calendar;
+    }
+
     private static NodeValue toNodeValue(Object o, ColumnType type) {
         return switch (type) {
             case Identifier, Term, TermSet -> makeNode(createURI(o.toString()));
             case Text, Set -> makeString(o.toString());
             case Number -> makeDecimal(o.toString());
-            case Date -> makeDate(o.toString());
+            case Date -> makeDateTime(convertDateValue(o.toString()));
         };
     }
 

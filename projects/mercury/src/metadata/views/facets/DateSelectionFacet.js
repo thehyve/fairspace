@@ -2,14 +2,26 @@ import React, {useEffect, useState} from 'react';
 import Grid from "@material-ui/core/Grid";
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
+import {format} from 'date-fns';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {DATE_FORMAT} from "../../../constants";
-import {formatDateTime} from "../../../common/utils/genericUtils";
+
+const getRangeLimit = (val: any, end: boolean = false): Date => {
+    if (!val) {
+        return null;
+    }
+    const date = new Date(val);
+    return end
+        ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999)
+        : new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, classes, activeFilterValues} = props;
     const [value, setValue] = useState([null, null]);
-    const [minDate, maxDate] = options;
+    const [minDateOption, maxDateOption] = options;
+    const minDate = getRangeLimit(minDateOption);
+    const maxDate = getRangeLimit(maxDateOption, true);
 
     useEffect(() => {
         if (activeFilterValues.length > 0) {
@@ -19,17 +31,44 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         }
     }, [activeFilterValues]);
 
+    const isValid = (val: Date | null): boolean => {
+        if (val === null) {
+            return true;
+        }
+        if (val.toString() === 'Invalid Date') {
+            return false;
+        }
+        return (val >= minDate && val <= maxDate);
+    };
+
     const handleChange = (newValue) => {
-        setValue(newValue);
-        onChange(newValue);
+        if (value !== newValue) {
+            setValue(newValue);
+            if (isValid(newValue[0]) && isValid(newValue[1])) {
+                onChange(newValue);
+            } else {
+                onChange(null);
+            }
+        }
     };
 
     const handleMinDateChange = (newValue) => {
-        handleChange([newValue, value[1]]);
+        handleChange([getRangeLimit(newValue), value[1]]);
     };
 
     const handleMaxDateChange = (newValue) => {
-        handleChange([value[0], newValue]);
+        handleChange([value[0], getRangeLimit(newValue, true)]);
+    };
+
+    const renderDate = (val: any): string => {
+        if (!val) {
+            return '';
+        }
+        try {
+            return format(val, DATE_FORMAT);
+        } catch (e) {
+            return '';
+        }
     };
 
     const renderDatePicker = (selectedDate, handleDateChange, label, min, max, placeholderDate) => (
@@ -38,8 +77,8 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 disableToolbar
                 variant="inline"
                 format={DATE_FORMAT}
+                invalidDateMessage="Invalid date format"
                 margin="normal"
-                id={`date-picker-${label}`}
                 label={label}
                 value={selectedDate}
                 onChange={handleDateChange}
@@ -47,7 +86,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 minDate={min || minDate}
                 maxDate={max || maxDate}
                 initialFocusedDate={placeholderDate}
-                placeholder={formatDateTime(placeholderDate)}
+                placeholder={renderDate(placeholderDate)}
                 KeyboardButtonProps={{
                     'aria-label': 'change date',
                 }}

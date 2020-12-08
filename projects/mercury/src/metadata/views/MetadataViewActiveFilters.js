@@ -2,7 +2,7 @@ import React from 'react';
 import {Chip, Grid, Typography} from '@material-ui/core';
 import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import {ofRangeValueType} from "./metadataViewUtils";
-import {formatDateTime, isNonEmptyValue} from "../../common/utils/genericUtils";
+import {formatDate, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 type MetadataViewActiveFiltersProperties = {
     facets: MetadataViewFacet[];
@@ -16,8 +16,8 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
         if (ofRangeValueType(facet.type)) {
             let min; let max; let label;
             if (facet.type === 'Date') {
-                min = formatDateTime(filter.min);
-                max = formatDateTime(filter.max);
+                min = formatDate(filter.min);
+                max = formatDate(filter.max);
             } else {
                 min = filter.min;
                 max = filter.max;
