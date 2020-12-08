@@ -7,10 +7,7 @@ import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 
@@ -26,7 +23,6 @@ import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class MetadataService {
@@ -63,24 +59,40 @@ public class MetadataService {
             if (!permissions.canReadMetadata(resource)) {
                 throw new AccessDeniedException(subject);
             }
-            resource.listProperties()
-                    .forEachRemaining(stmt -> {
-                        model.add(stmt);
-                        if (withObjectProperties && stmt.getObject().isResource()) {
-                            getPropertyShapesForResource(stmt.getResource(), vocabulary)
-                                    .forEach(shape -> {
-                                        if (shape.hasLiteral(FS.importantProperty, true)) {
-                                            var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
-                                            stmt.getResource()
-                                                    .listProperties(property)
-                                                    .forEachRemaining(model::add);
-                                        }
-                                    });
-                        }
-                    });
-        });
 
+            resource.listProperties().forEachRemaining(stmt -> {
+                model.add(stmt);
+                if (withObjectProperties && stmt.getObject().isURIResource() && permissions.canReadMetadata(stmt.getResource())) {
+                    addImportantProperties(stmt.getResource(), model);
+                }
+            });
+
+            getPropertyShapesForResource(resource, vocabulary)
+                    .stream()
+                    .map(ps -> ps.getProperty(SHACLM.path).getResource().getPropertyResourceValue(SHACLM.inversePath))
+                    .filter(Objects::nonNull)
+                    .map(p -> p.as(Property.class))
+                    .forEach(property -> m.listStatements(null, property, resource)
+                            .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
+                            .forEachRemaining(stmt -> {
+                                model.add(stmt);
+                                if (withObjectProperties) {
+                                    addImportantProperties(stmt.getResource(), model);
+                                }
+                            }));
+        });
         return model;
+    }
+
+    private void addImportantProperties(Resource s, Model dest) {
+        getPropertyShapesForResource(s, vocabulary)
+                .forEach(shape -> {
+                    if (shape.hasLiteral(FS.importantProperty, true)) {
+                        var property = shape.getPropertyResourceValue(SHACLM.path).as(Property.class);
+                        s.listProperties(property)
+                                .forEachRemaining(dest::add);
+                    }
+                });
     }
 
     /**
