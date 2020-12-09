@@ -14,10 +14,10 @@ describe('MetadataAPI', () => {
             headers: {'content-type': 'application/json'}
         }));
 
-        MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c', includeObjectProperties: true});
+        MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c', withValueProperties: true});
 
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        //    expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/metadata/?subject=a&predicate=b&object=c&includeObjectProperties=true', {headers: {Accept: 'application/ld+json'}});
+        //    expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/metadata/?subject=a&predicate=b&object=c&withValueProperties=true', {headers: {Accept: 'application/ld+json'}});
     });
 
     it('calls the correct url without any parameters', () => {

@@ -208,7 +208,12 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-    ] .
+    ],
+    [
+        sh:name "Files" ;
+        sh:description "Linked files" ;
+        sh:path [sh:inversePath curie:aboutSubject];
+    ].
 
 curie:isProjectConsent a rdf:Property .
 curie:authorizes a rdf:Property .
@@ -516,7 +521,12 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-    ] .
+    ],
+    [
+        sh:name "Files" ;
+        sh:description "Linked files" ;
+        sh:path [sh:inversePath curie:aboutEvent];
+    ].
 
 
 curie:SampleNature a rdfs:Class, sh:NodeShape ;
@@ -636,4 +646,9 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
-    ] .
+    ],
+    [
+        sh:name "Files" ;
+        sh:description "Linked files" ;
+        sh:path [sh:inversePath curie:sample];
+    ].
