@@ -256,7 +256,7 @@ search:
            ?analysis a curie:AnalysisType .
            FILTER EXISTS { ?x curie:analysisType ?analysis }
         }
-    - name: collection
+    - name: location
       title: Collection
       type: id
       query: |
@@ -360,10 +360,11 @@ search:
               OPTIONAL { ?sample (^curie:sample)/curie:analysisType/rdfs:label ?at }
             } GROUP BY ?sample
           }
-          <#elseif collection?? || analysisType??>
+          <#elseif location?? || analysisType??>
           {
             SELECT DISTINCT ?smpl WHERE {
-               <#if collection??> ?collection a fs:Collection . ${collection}  ?file (fs:belongsTo)* ?collection . </#if>
+               <#if location??>  ?file (fs:belongsTo)* ?location . ${location} </#if>
+               FILTER NOT EXISTS { ?file fs:dateDeleted ?any }
                ?file curie:sample ?smpl .
                <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
             }
@@ -479,10 +480,11 @@ search:
         WHERE {
           <#if fetch>
           VALUES ?event { ${iris} }
-          <#elseif collection?? || analysisType??>
+          <#elseif location?? || analysisType??>
           {
             SELECT DISTINCT ?e WHERE {
-               <#if collection??> ?collection a fs:Collection . ${collection}  ?file (fs:belongsTo)* ?collection . </#if>
+               <#if location??> ?file (fs:belongsTo)* ?location . ${location} </#if>
+               FILTER NOT EXISTS { ?file fs:dateDeleted ?any }
                ?file curie:aboutEvent ?e .
                <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
             }
@@ -555,10 +557,11 @@ search:
         WHERE {
           <#if fetch>
           VALUES ?subject { ${iris} }
-          <#elseif collection?? || analysisType??>
+          <#elseif location?? || analysisType??>
           {
             SELECT DISTINCT ?s WHERE {
-               <#if collection??> ?collection a fs:Collection . ${collection}  ?file (fs:belongsTo)* ?collection . </#if>
+               <#if location??> ?file (fs:belongsTo)* ?location . ${location} </#if>
+               FILTER NOT EXISTS { ?file fs:dateDeleted ?any }
                ?file curie:aboutSubject ?s .
                <#if analysisType??> ?file curie:analysisType ?analysisType . ${analysisType}</#if>
             }
@@ -647,10 +650,11 @@ search:
         WHERE {
           <#if fetch>
           VALUES ?file { ${iris} }
-          <#elseif collection??>
+          <#elseif location??>
           {
             SELECT ?f WHERE {
-               ?collection a fs:Collection . ${collection}  ?f (fs:belongsTo)* ?collection
+              ?f (fs:belongsTo)* ?location . ${location}
+              FILTER NOT EXISTS { ?f fs:dateDeleted ?any}
             }
           }
           BIND(?f AS ?file)
