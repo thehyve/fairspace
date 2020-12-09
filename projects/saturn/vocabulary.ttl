@@ -648,7 +648,7 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
-     sh:name "Files" ;
-     sh:description "Linked files" ;
-     sh:path [sh:inversePath curie:sample];
+        sh:name "Files" ;
+        sh:description "Linked files" ;
+        sh:path [sh:inversePath curie:sample];
     ].
