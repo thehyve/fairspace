@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup} from "@material-ui/core";
-import {Clear, Search} from "@material-ui/icons";
+import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@material-ui/core";
+import {Clear, Lock, Search} from "@material-ui/icons";
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -8,6 +8,8 @@ import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
+import Switch from "@material-ui/core/Switch";
+import Grid from "@material-ui/core/Grid";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
 
@@ -17,38 +19,11 @@ type SelectProperties = {
     onChange: (string[]) => void;
     textFilterValue: string;
     activeFilterValues: any[];
+    showAccessFilter: boolean;
 }
 
-const filterByText = (options, textFilterValue) => options
-    .filter(o => textFilterValue.trim() === "" || o.label.toLowerCase().includes(textFilterValue.toLowerCase()));
-
-const SelectSingle = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, activeFilterValues} = props;
-    const [value, setValue] = useState(null);
-
-    useEffect(() => {
-        if (activeFilterValues.length > 0) {
-            setValue(activeFilterValues[0]);
-        }
-    }, [activeFilterValues]);
-
-    const handleChange = (event) => {
-        const newValue = event.target.value;
-        setValue(newValue);
-        onChange([newValue]);
-    };
-
-    return (
-        <RadioGroup value={value} onChange={handleChange}>
-            {filterByText(options, textFilterValue).map(option => (
-                <FormControlLabel value={option.value} control={<Radio fontSize="small" />} label={option.label} />
-            ))}
-        </RadioGroup>
-    );
-};
-
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, activeFilterValues} = props;
+    const {options, onChange, textFilterValue, activeFilterValues, accessFilterValue, showAccessFilter, classes} = props;
     const defaultOptions = Object.fromEntries(options.map(option => [option.value, activeFilterValues.includes(option.value)]));
     const [state, setState] = useState(defaultOptions);
 
@@ -56,6 +31,12 @@ const SelectMultiple = (props: SelectProperties) => {
         setState(defaultOptions);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [options, activeFilterValues]);
+
+    const textFilter = (val) => (textFilterValue.trim() === "" || val.label.toLowerCase().includes(textFilterValue.toLowerCase()));
+
+    const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
+
+    const filterOptions = () => (options.filter(readAccessFilter).filter(textFilter));
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -66,8 +47,8 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
-    const renderCheckboxList = () => filterByText(options, textFilterValue)
-        .map(option => (
+    function renderCheckboxListElement(option) {
+        return (
             <FormControlLabel
                 key={option.value}
                 control={(
@@ -87,19 +68,39 @@ const SelectMultiple = (props: SelectProperties) => {
                     </Tooltip>
                 )}
             />
-        ));
+        );
+    }
+
+    const renderCheckboxList = () => {
+        if (showAccessFilter && !accessFilterValue) {
+            return filterOptions().map(option => (
+                <Grid container direction="row" key={option.value}>
+                    <Grid item xs={10}>
+                        {renderCheckboxListElement(option)}
+                    </Grid>
+                    <Grid item xs={2} style={{textAlign: "right"}}>
+                        {option.access === 'List' && <Lock fontSize="small" />}
+                    </Grid>
+                </Grid>
+            ));
+        }
+        return filterOptions().map(option => renderCheckboxListElement(option));
+    };
 
     return (
-        <FormGroup>
+        <FormGroup className={classes.multiselectList}>
             {renderCheckboxList()}
         </FormGroup>
     );
 };
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], multiple = false, onChange = () => {}, activeFilterValues, classes} = props;
+    const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
-    const showFilter = options.length > 5; // TODO decide if it should be conditional or configurable
+    const [showReadableFilterSelected, setShowReadableFilterSelected] = useState(false);
+
+    const showTextFilter = options.length > 5; // TODO decide if it should be conditional or configurable
+    const showAccessFilter = options.some(o => o.access);
 
     if (!options || options.length === 0) {
         return (
@@ -108,6 +109,22 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
             </Typography>
         );
     }
+
+    const renderAccessFilter = () => (
+        <FormGroup className={classes.accessFilter}>
+            <FormControlLabel
+                control={(
+                    <Switch
+                        size="small"
+                        color="primary"
+                        checked={showReadableFilterSelected}
+                        onChange={() => setShowReadableFilterSelected(!showReadableFilterSelected)}
+                    />
+                )}
+                label="Show only readable"
+            />
+        </FormGroup>
+    );
 
     const renderTextFilter = () => (
         <TextField
@@ -137,27 +154,27 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         />
     );
 
+    const renderFilters = () => (
+        <div>
+            {showTextFilter && renderTextFilter()}
+            {showAccessFilter && renderAccessFilter()}
+        </div>
+    );
+
     return (
         <>
-            {showFilter && renderTextFilter()}
+            {renderFilters()}
             <div className={classes.textContent}>
-                <FormControl component="fieldset">
-                    {multiple ? (
-                        <SelectMultiple
-                            options={options}
-                            onChange={onChange}
-                            classes={classes}
-                            textFilterValue={textFilterValue}
-                            activeFilterValues={activeFilterValues}
-                        />
-                    ) : (
-                        <SelectSingle
-                            options={options}
-                            onChange={onChange}
-                            textFilterValue={textFilterValue}
-                            activeFilterValues={activeFilterValues}
-                        />
-                    )}
+                <FormControl component="fieldset" style={{width: "100%"}}>
+                    <SelectMultiple
+                        options={options}
+                        onChange={onChange}
+                        classes={classes}
+                        textFilterValue={textFilterValue}
+                        activeFilterValues={activeFilterValues}
+                        accessFilterValue={showReadableFilterSelected}
+                        showAccessFilter={showAccessFilter}
+                    />
                 </FormControl>
             </div>
         </>

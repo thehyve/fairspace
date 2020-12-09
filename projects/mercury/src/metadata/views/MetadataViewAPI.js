@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import axios, {CancelTokenSource} from "axios";
 import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
+import type {AccessLevel} from "../../collections/CollectionAPI";
 
 export type ValueType = 'id' | 'text' | 'number' | 'date' | 'dataLink';
 
@@ -14,6 +15,7 @@ export type MetadataViewFilter = {
 export type MetadataViewFacetValue = {
     label: string;
     value: string; // iri
+    access?: AccessLevel;
 };
 
 export type MetadataViewFacet = {

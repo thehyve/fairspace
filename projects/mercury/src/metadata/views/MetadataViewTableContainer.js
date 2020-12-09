@@ -44,7 +44,10 @@ const styles = () => ({
     table: {
         maxHeight: 'calc(100vh - 215px)',
         overflowY: 'auto',
-        overflowX: 'auto'
+        overflowX: 'auto',
+        '& .MuiTableCell-stickyHeader': {
+            backgroundColor: "white"
+        }
     },
     tableSettings: {
         position: 'relative',
