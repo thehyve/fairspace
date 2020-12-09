@@ -12,7 +12,7 @@ import MetadataAPI from "./common/MetadataAPI";
 const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {vocabulary, vocabularyLoading, vocabularyError} = useContext(VocabularyContext);
 
-    const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, includeObjectProperties: true})
+    const fetchMetadataBySubject = useCallback((subject) => MetadataAPI.get({subject, withValueProperties: true})
         .catch(() => {
             throw new Error('An error occurred while loading the metadata');
         }), []);
