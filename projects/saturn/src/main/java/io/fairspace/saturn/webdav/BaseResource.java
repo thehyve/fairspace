@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
@@ -33,6 +34,7 @@ import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor;
 import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected final DavFactory factory;
@@ -85,6 +87,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     @Override
     public final void delete() throws NotAuthorizedException, ConflictException, BadRequestException {
         delete(subject.hasProperty(FS.dateDeleted));
+        updateParents(subject);
     }
 
     protected void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
@@ -121,10 +124,10 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
             name = name.trim();
         }
         validateTarget(parent, name);
-        move(subject, (parent instanceof DirectoryResource) ? ((DirectoryResource) parent).subject : null, name);
+        move(subject, (parent instanceof DirectoryResource) ? ((DirectoryResource) parent).subject : null, name, true);
     }
 
-    private void move(Resource subject, Resource parent, String name) {
+    private void move(Resource subject, Resource parent, String name, boolean isTop) {
         var newSubject = childSubject(parent != null ? parent : factory.rootSubject, name);
         newSubject.removeProperties().addProperty(RDFS.label, name);
         if (parent != null) {
@@ -148,7 +151,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         }
 
         subject.getModel().listSubjectsWithProperty(FS.belongsTo, subject)
-                .forEachRemaining(r -> move(r, newSubject, getStringProperty(r, RDFS.label)));
+                .forEachRemaining(r -> move(r, newSubject, getStringProperty(r, RDFS.label), false));
 
         subject.getModel().listStatements(null, null, subject)
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
@@ -157,6 +160,11 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
 
         subject.addProperty(FS.movedTo, newSubject);
+
+        if (isTop) {
+            updateParents(subject);
+            updateParents(newSubject);
+        }
     }
 
     private static Resource copyVersion(Resource ver) {
@@ -203,6 +211,9 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         subject.getModel()
                 .listSubjectsWithProperty(FS.belongsTo, subject)
                 .forEachRemaining(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
+
+        updateParents(subject);
+        updateParents(newSubject);
     }
 
     @Override
@@ -280,6 +291,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     }
 
     protected Resource newVersion(BlobInfo blob) {
+        updateParents(subject);
         return subject.getModel()
                 .createResource()
                 .addProperty(RDF.type, FS.FileVersion)
@@ -288,6 +300,14 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .addProperty(FS.md5, blob.md5)
                 .addProperty(FS.dateModified, timestampLiteral())
                 .addProperty(FS.modifiedBy, factory.currentUserResource());
+    }
+
+    protected static void updateParents(Resource subject) {
+        var now = timestampLiteral();
+        for (var s = subject.getPropertyResourceValue(FS.belongsTo); s != null; s = s.getPropertyResourceValue(FS.belongsTo)) {
+            s.addProperty(FS.dateModified, now)
+                    .addProperty(FS.modifiedBy, createResource(getUserURI().getURI()));
+        }
     }
 
     protected static Date parseDate(Resource s, org.apache.jena.rdf.model.Property p) {
@@ -328,6 +348,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         var date = subject.getProperty(FS.dateDeleted).getLiteral();
         var user = subject.getProperty(FS.deletedBy).getResource();
         undelete(subject, date, user);
+        updateParents(subject);
     }
 
     private void undelete(Resource resource, Literal date, Resource user) {
