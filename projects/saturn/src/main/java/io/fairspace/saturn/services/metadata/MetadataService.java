@@ -47,11 +47,11 @@ public class MetadataService {
      * subject is given and predicate and object are null, then all statements with the given subject will be returned.
      *
      * @param subject              Subject URI for which you want to return statements
-     * @param withObjectProperties If set to true, the returned model will also include statements specifying values for
+     * @param withValueProperties If set to true, the returned model will also include statements specifying values for
      *                             certain properties marked as fs:importantProperty in the vocabulary
      * @return
      */
-    public Model get(String subject, boolean withObjectProperties) {
+    public Model get(String subject, boolean withValueProperties) {
         var model = createDefaultModel();
 
         transactions.executeRead(m -> {
@@ -62,7 +62,7 @@ public class MetadataService {
 
             resource.listProperties().forEachRemaining(stmt -> {
                 model.add(stmt);
-                if (withObjectProperties && stmt.getObject().isURIResource() && permissions.canReadMetadata(stmt.getResource())) {
+                if (withValueProperties && stmt.getObject().isURIResource() && permissions.canReadMetadata(stmt.getResource())) {
                     addImportantProperties(stmt.getResource(), model);
                 }
             });
@@ -76,8 +76,8 @@ public class MetadataService {
                             .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
                             .forEachRemaining(stmt -> {
                                 model.add(stmt);
-                                if (withObjectProperties) {
-                                    addImportantProperties(stmt.getResource(), model);
+                                if (withValueProperties) {
+                                    addImportantProperties(stmt.getSubject(), model);
                                 }
                             }));
         });
