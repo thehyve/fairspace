@@ -76,14 +76,26 @@ const WorkspaceRoutes = () => {
                 path="/metadata"
                 exact
                 render={() => {
-                    const subject = getSubject();
+                    if (!currentUser.canViewPublicMetadata) {
+                        return null;
+                    }
 
-                    return (isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
-                        <MetadataWrapper>
-                            {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
-                                : <MetadataOverviewPage />}
-                        </MetadataWrapper>
-                    ));
+                    const subject = getSubject();
+                    if (subject) {
+                        return (
+                            <MetadataWrapper>
+                                <LinkedDataEntityPage title="Metadata" subject={subject} />
+                            </MetadataWrapper>
+                        );
+                    }
+                    if (isFeatureEnabled('MetadataEditing')) {
+                        return (
+                            <MetadataWrapper>
+                                <MetadataOverviewPage />
+                            </MetadataWrapper>
+                        );
+                    }
+                    return null;
                 }}
             />
 

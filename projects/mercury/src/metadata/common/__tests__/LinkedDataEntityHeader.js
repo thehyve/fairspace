@@ -17,8 +17,10 @@ import VocabularyContext from '../../vocabulary/VocabularyContext';
 describe('LinkedDataEntityHeader', () => {
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
 
+    type DeleteButtonState = 'Enabled' | 'Disabled' | 'NotPresent';
+
     describe('delete button', () => {
-        const testDeleteButtonDeletableState = (values, expectedDeletableState) => {
+        const testDeleteButtonDeletableState = (values, expectedState: DeleteButtonState, editingEnabled = true) => {
             const wrapper = mount(
                 <VocabularyContext.Provider
                     value={{
@@ -27,6 +29,7 @@ describe('LinkedDataEntityHeader', () => {
                 >
                     <LinkedDataEntityHeader
                         subject={subject}
+                        enableDelete={editingEnabled}
                         values={values}
                         isDeleted={values[DATE_DELETED_URI]}
                     />
@@ -34,15 +37,19 @@ describe('LinkedDataEntityHeader', () => {
             );
 
             const button = wrapper.find(DeleteEntityButton);
-            expect(button.length).toBe(1);
-            expect(button.prop("isDeletable")).toBe(expectedDeletableState);
+            if (expectedState === 'NotPresent') {
+                expect(button.length).toBe(0);
+            } else {
+                expect(button.length).toBe(1);
+                expect(button.prop("isDeletable")).toBe(expectedState === 'Enabled');
+            }
         };
 
         it('should show a delete button for regular entities', () => {
             testDeleteButtonDeletableState({
                 '@type': [{id: 'http://random-type'}],
                 [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}]
-            }, true);
+            }, 'Enabled');
         });
 
         it('should show a disabled delete button for deleted entities', () => {
@@ -50,13 +57,20 @@ describe('LinkedDataEntityHeader', () => {
                 [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}],
                 [DELETED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
                 [DATE_DELETED_URI]: [{value: '2000-01-01'}]
-            }, false);
+            }, 'Disabled');
         });
 
         it('should show a disabled delete button for collections, files and directories', () => {
-            testDeleteButtonDeletableState({'@type': [{id: COLLECTION_URI}]}, false);
-            testDeleteButtonDeletableState({'@type': [{id: DIRECTORY_URI}]}, false);
-            testDeleteButtonDeletableState({'@type': [{id: FILE_URI}]}, false);
+            testDeleteButtonDeletableState({'@type': [{id: COLLECTION_URI}]}, 'Disabled');
+            testDeleteButtonDeletableState({'@type': [{id: DIRECTORY_URI}]}, 'Disabled');
+            testDeleteButtonDeletableState({'@type': [{id: FILE_URI}]}, 'Disabled');
+        });
+
+        it('should not show a delete button when editing is disabled', () => {
+            testDeleteButtonDeletableState({
+                '@type': [{id: 'http://random-type'}],
+                [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}]
+            }, 'NotPresent', false);
         });
     });
 });
