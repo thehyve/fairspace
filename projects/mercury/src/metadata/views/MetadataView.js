@@ -1,17 +1,17 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import {Button, Grid, withStyles} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
+import {useHistory} from "react-router-dom";
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
-import {getSearchPathSegments} from "../../collections/collectionUtils";
-import {getSearchContextFromString} from "../../search/searchUtils";
+import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {isCollectionView, ofRangeValueType} from "./metadataViewUtils";
+import {getMetadataViewsPath, getPathSegments, ofRangeValueType} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -27,10 +27,11 @@ type MetadataViewProperties = {
     facets: MetadataViewFacet[];
     views: MetadataViewOptions[];
     locationContext: string;
+    currentViewName: string;
+    handleViewChangeRedirect: () => {};
 }
 
 type ContextualMetadataViewProperties = {
-    view: string;
     classes: any;
 }
 
@@ -73,34 +74,21 @@ const styles = (theme) => ({
 });
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, locationContext, classes} = props;
-    const {filters, setLocationFilter, updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
+    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect} = props;
 
+    const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
+    const currentView = views[currentViewIndex];
+
+    const {filters, updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
-    const [selectedTab, setSelectedTab] = useState(0);
-    const currentViewTab = views[selectedTab];
-    const isCurrentViewCollectionView = isCollectionView(currentViewTab.name);
 
-    useEffect(() => {
-        setLocationFilter(currentViewTab.name, locationContext);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentViewTab.name, locationContext]);
+    // TODO pass location filter to the API for files view
+    // useEffect(() => {
+    //     setLocationFilter(currentViewTab.name, locationContext);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [currentViewTab.name, locationContext]);
 
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
-
-    const getPathSegments = () => {
-        if (isCurrentViewCollectionView) {
-            return getSearchPathSegments(locationContext);
-        }
-        return [];
-    };
-
-    const getBreadcrumbSegmentPath = () => {
-        if (isCurrentViewCollectionView) {
-            return `/${currentViewTab.title}`;
-        }
-        return `/metadata-views`;
-    };
 
     const a11yProps = (index) => ({
         'key': `metadata-view-tab-${index}`,
@@ -108,7 +96,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     });
 
     const changeTab = (event, tabIndex) => {
-        setSelectedTab(tabIndex);
+        handleViewChangeRedirect(views[tabIndex].name);
     };
 
     const renderFacets = () => (
@@ -141,7 +129,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const renderViewTabs = () => (
         <div>
             <Tabs
-                value={selectedTab}
+                value={currentViewIndex}
                 onChange={changeTab}
                 indicatorColor="primary"
                 textColor="primary"
@@ -152,7 +140,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 ))}
             </Tabs>
             {views.map((view, index) => (
-                <TabPanel value={selectedTab} index={index} {...a11yProps(index)} className={classes.tab}>
+                <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
                         columns={view.columns}
                         view={view.name}
@@ -168,15 +156,17 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     return (
         <BreadcrumbsContext.Provider value={{
-            segments: [
-                {label: "Metadata views", href: getBreadcrumbSegmentPath(), icon: <Assignment />}
-            ]
+            segments: [{label: "Metadata views", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
         }}
         >
-            <BreadCrumbs additionalSegments={getPathSegments()} />
+            <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
             {filters && filters.length > 0 && (
                 <Grid container direction="row" spacing={1}>
-                    <Grid item><Button data-testid="clear-button" onClick={() => clearAllFilters()} color="primary">Clear all</Button></Grid>
+                    <Grid item>
+                        <Button data-testid="clear-button" onClick={() => clearAllFilters()} color="primary">
+                            Clear all
+                        </Button>
+                    </Grid>
                     <Grid item><MetadataViewActiveFilters facets={facets} filters={filters} /></Grid>
                 </Grid>
             )}
@@ -194,10 +184,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 <Grid item className={classes.sidePanel} hidden={!selected}>
                     <MetadataViewInformationDrawer
                         forceExpand
-                        showLinkedFiles={!isCurrentViewCollectionView}
                         entity={selected}
                         viewIcon=<Assignment />
-                        locationContext={locationContext}
                     />
                 </Grid>
             </Grid>
@@ -206,9 +194,10 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views: availableViews = [], loading, error, facets = []} = useContext(MetadataViewContext);
-    const locationContext = getSearchContextFromString(window.location.search);
-    const {view} = props;
+    const {views = [], loading, error, facets = []} = useContext(MetadataViewContext);
+    const currentViewName = getMetadataViewNameFromString(window.location.search);
+    const locationContext = getLocationContextFromString(window.location.search);
+    const history = useHistory();
 
     if (loading) {
         return <LoadingInlay />;
@@ -216,18 +205,16 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
     if (error && error.message) {
         return <MessageDisplay message={error.message} />;
     }
-    const views = [];
-    if (view) {
-        if (availableViews.find(v => v.name === view)) {
-            views.push(availableViews.find(v => v.name === view));
-        }
-    } else {
-        views.push(...availableViews);
-    }
 
     if (views.length < 1) {
         return <MessageDisplay message="No metadata view found." />;
     }
+
+    const handleViewChangeRedirect = (viewName) => {
+        if (viewName) {
+            history.push(getMetadataViewsPath(viewName));
+        }
+    };
 
     return (
         <MetadataView
@@ -235,6 +222,8 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             facets={facets}
             views={views}
             locationContext={locationContext}
+            currentViewName={currentViewName}
+            handleViewChangeRedirect={handleViewChangeRedirect}
         />
     );
 };

@@ -11,7 +11,7 @@ import {
 } from './collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
-import {getSearchContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
+import {getLocationContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
 import SearchBar from "../search/SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
@@ -147,7 +147,7 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const CollectionSearchResultListContainer = ({
-    location: {search}, query = getSearchQueryFromString(search), context = getSearchContextFromString(search),
+    location: {search}, query = getSearchQueryFromString(search), context = getLocationContextFromString(search),
     classes, history
 }) => {
     const {data, loading, error} = useAsync(() => searchFiles(query, context).catch(handleSearchError), [search, query]);

@@ -8,7 +8,7 @@ import {mockFacets} from "../__mocks__/MetadataViewAPI";
 
 describe('MetadataViewActiveFilters', () => {
     it('should not show active filters if no filter added', () => {
-        const view = 'collections';
+        const view = 'files';
         const facets = mockFacets(view);
         const wrapper = shallow(<MetadataViewActiveFilters
             facets={facets}

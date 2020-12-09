@@ -62,17 +62,6 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/collections-metadata-views"
-                render={() => (
-                    <BreadcrumbsContext.Provider value={{segments: []}}>
-                        <LinkedDataMetadataProvider>
-                            <MetadataView view="collections" />
-                        </LinkedDataMetadataProvider>
-                    </BreadcrumbsContext.Provider>
-                )}
-            />
-
-            <Route
                 path="/metadata-views"
                 render={() => (
                     <BreadcrumbsContext.Provider value={{segments: []}}>
