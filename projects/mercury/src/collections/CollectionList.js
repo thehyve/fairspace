@@ -20,6 +20,7 @@ import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import {currentWorkspace} from '../workspaces/workspaces';
+import {accessLevelForCollection, collectionAccessIcon} from './collectionUtils';
 
 const baseColumns = {
     name: {
@@ -129,6 +130,7 @@ const CollectionList = ({
                     <TableBody>
                         {pagedItems.map((collection) => {
                             const selected = isSelected(collection);
+                            const accessLevel = accessLevelForCollection(collection);
 
                             return (
                                 <TableRow
@@ -164,7 +166,7 @@ const CollectionList = ({
                                         {camelCaseToWords(collection.accessMode)}
                                     </TableCell>
                                     <TableCell>
-                                        {collection.access}
+                                        {collectionAccessIcon(accessLevel)}
                                     </TableCell>
                                     <TableCell>
                                         {formatDateTime(collection.dateCreated)}
