@@ -23,7 +23,8 @@ const generateValueEntry = (entry, allMetadata) => ({
  * @param allMetadata All known metadata to be processed. Is used to retrieve labels for associated entities
  * @returns {Array}
  */
-export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
+export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = [], vocabulary) => {
+    const iri = metadata['@id'];
     const valuesByPredicate = {};
 
     const expectsRdfList = predicateUri => {
@@ -32,8 +33,16 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
         return propertyShape && isRdfList(propertyShape);
     };
 
-    Object.keys(metadata)
-        .forEach(predicateUri => {
+    propertyShapes.forEach(shape => {
+        const path = getFirstPredicateId(shape, constants.SHACL_PATH);
+        if (path.startsWith('_')) {
+            const predicate = getFirstPredicateId(vocabulary.find(e => e['@id'] === path), constants.SHACL_INVERS_PATH);
+            valuesByPredicate[path] = allMetadata.filter(item => Object.prototype.hasOwnProperty.call(item, predicate)
+                && item[predicate].find(v => v['@id'] === iri) !== undefined)
+                .map(item => generateValueEntry(item, allMetadata));
+        } else {
+            const predicateUri = path;
+
             // Ensure that we have a list of values for the predicate
             if (!Array.isArray(metadata[predicateUri])) {
                 return;
@@ -62,7 +71,8 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = []) => {
             }
 
             valuesByPredicate[predicateUri] = values;
-        });
+        }
+    });
 
     return valuesByPredicate;
 };

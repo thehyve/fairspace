@@ -41,6 +41,7 @@ export const RDFS_CLASS = RDFS_NS + 'Class';
 export const SHACL_NAME = SHACL_NS + 'name';
 export const SHACL_DESCRIPTION = SHACL_NS + 'description';
 export const SHACL_PATH = SHACL_NS + 'path';
+export const SHACL_INVERS_PATH = SHACL_NS + 'inversePath';
 export const SHACL_TARGET_CLASS = SHACL_NS + 'targetClass';
 export const SHACL_PROPERTY = SHACL_NS + 'property';
 export const SHACL_CLASS = SHACL_NS + 'class';
