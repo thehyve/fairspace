@@ -9,6 +9,7 @@ import org.apache.jena.fuseki.main.FusekiServer;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
 @Slf4j
@@ -20,7 +21,7 @@ public class App {
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena, CONFIG.features.contains(Feature.MetadataEditing));
 
-        var svc = new Services(API_PREFIX, CONFIG, ds);
+        var svc = new Services(API_PREFIX, CONFIG, VIEWS_CONFIG, ds);
 
         var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))

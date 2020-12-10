@@ -2,13 +2,14 @@
 import axios, {CancelTokenSource} from "axios";
 import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
 
-export type ValueType = 'id' | 'text' | 'number' | 'date' | 'dataLink';
+export type ValueType = 'Identifier' | 'Text' | 'Number' | 'Date' | 'Term' | 'Set' | 'TermSet';
 
 export type MetadataViewFilter = {
     field: string;
     values: any[];
     min: any;
     max: any;
+    prefix: string;
 }
 
 export type MetadataViewFacetValue = {
@@ -62,6 +63,7 @@ type MetadataViewCountRequest = {
 type MetadataViewDataRequest = MetadataViewCountRequest & {|
     page: number;
     size: number;
+    includeJoinedViews: boolean;
 |};
 
 const metadataViewUrl = "/api/v1/views/";
@@ -82,7 +84,8 @@ class MetadataViewAPI {
             view: viewName,
             filters,
             page: page + 1, // API endpoint expects 1-base page number
-            size
+            size,
+            includeJoinedViews: true
         };
         const requestOptions = cancelToken ? {...defaultRequestOptions, cancelToken: cancelToken.token} : defaultRequestOptions;
 

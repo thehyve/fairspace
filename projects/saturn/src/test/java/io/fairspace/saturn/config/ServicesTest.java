@@ -7,14 +7,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class ServicesTest {
     private Dataset dataset = DatasetFactory.create();
     private Config config = new Config();
+    private ViewsConfig viewsConfig = new ViewsConfig();
     private Services svc;
 
     @Rule
@@ -23,8 +22,7 @@ public class ServicesTest {
     @Before
     public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        config.search.views = List.of();
-        svc = new Services("/api/v1", config, dataset);
+        svc = new Services("/api/v1", config, viewsConfig, dataset);
     }
 
     @Test

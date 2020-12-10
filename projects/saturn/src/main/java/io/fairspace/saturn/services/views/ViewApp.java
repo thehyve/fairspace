@@ -9,10 +9,12 @@ import static spark.Spark.post;
 public class ViewApp extends BaseApp {
 
     private final ViewService viewService;
+    private final QueryService queryService;
 
-    public ViewApp(String basePath, ViewService viewService) {
+    public ViewApp(String basePath, ViewService viewService, QueryService queryService) {
         super(basePath);
         this.viewService = viewService;
+        this.queryService = queryService;
     }
 
     @Override
@@ -23,13 +25,13 @@ public class ViewApp extends BaseApp {
         });
 
         post("/", (req, res) -> {
-            var result = viewService.retrieveViewPage(mapper.readValue(req.body(), ViewRequest.class));
+            var result = queryService.retrieveViewPage(mapper.readValue(req.body(), ViewRequest.class));
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
         });
 
         post("/count", (req, res) -> {
-            var result = viewService.getCount(mapper.readValue(req.body(), CountRequest.class));
+            var result = queryService.count(mapper.readValue(req.body(), CountRequest.class));
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
         });

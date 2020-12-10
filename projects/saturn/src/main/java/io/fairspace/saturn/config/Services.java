@@ -11,6 +11,7 @@ import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -45,14 +46,15 @@ public class Services {
     private final MailService mailService;
     private final MetadataPermissions metadataPermissions;
     private final MetadataService metadataService;
+    private final ViewService viewService;
+    private final QueryService queryService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
     private final SearchProxyServlet searchProxyServlet;
-    private final ViewService viewService;
 
-    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull Dataset dataset) {
+    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -81,8 +83,11 @@ public class Services {
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
-        viewService = new ViewService(config.search, filteredDataset, davFactory);
-                searchProxyServlet = new SearchProxyServlet(
+
+        viewService = new ViewService(viewsConfig, filteredDataset, davFactory);
+        queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset, davFactory);
+
+        searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,
                 CONFIG.elasticsearchUrl,
                 transactions,

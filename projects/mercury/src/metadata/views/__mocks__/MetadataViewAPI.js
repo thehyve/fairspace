@@ -3,89 +3,93 @@ import {isFilesView} from "../metadataViewUtils";
 
 export const mockViews: MetadataViewOptions[] = () => [
     {
-        name: "subjects",
+        name: "Subject",
         title: "Subjects",
         columns: [
             {
-                name: "label",
-                title: "Subject label",
-                type: "id"
+                name: "Subject",
+                title: "Subject",
+                type: "Identifier"
             },
             {
-                name: "gender",
+                name: "Subject_gender",
                 title: "Gender",
-                type: "text"
+                type: "Term"
             },
             {
-                name: "species",
+                name: "Subject_species",
                 title: "Species",
-                type: "text"
+                type: "Term"
             },
             {
-                name: "birthDate",
+                name: "Subject_birthDate",
                 title: "Birth date",
-                type: "date"
+                type: "Date"
             },
             {
-                name: "files",
+                name: "Collection",
                 title: "Files",
                 type: "dataLink"
             }
         ]
     },
     {
-        name: "samples",
+        name: "Sample",
         title: "Samples",
         columns: [
             {
-                name: "label",
-                title: "Sample label",
-                type: "id"
+                name: "Sample",
+                title: "Sample",
+                type: "Identifier"
             },
             {
-                name: "sampleType",
+                name: "Sample_sampleType",
                 title: "Sample type",
-                type: "text"
+                type: "Term"
             },
             {
-                name: "topography",
+                name: "Sample_topography",
                 title: "Topography",
-                type: "text"
+                type: "Term"
             },
             {
-                name: "tumorCellularity",
+                name: "Sample_tumorCellularity",
                 title: "Tumor cellularity",
-                type: "number"
+                type: "Number"
             },
             {
-                name: "sampleNature",
+                name: "Sample_nature",
                 title: "Nature",
-                type: "text"
+                type: "Term"
             },
             {
-                name: "sampleOrigin",
+                name: "Sample_origin",
                 title: "Origin",
-                type: "text"
+                type: "Term"
             },
             {
-                name: "files",
+                name: "Collection",
                 title: "Files",
                 type: "dataLink"
             }
         ]
     },
     {
-        name: "files",
-        title: "Files",
+        name: "Collection",
+        title: "Collections",
         columns: [
             {
-                name: "label",
-                title: "File label",
-                type: "id"
+                name: "Collection",
+                title: "Collection",
+                type: "Identifier"
             }, {
-                name: "analysisType",
+                name: "Collection_analysisType",
                 title: "Analysis type",
-                type: "text"
+                type: "Term"
+            }, {
+                name: "Collection_keyword",
+                title: "Key words",
+                type: "Set"
             }
         ]
     }
@@ -97,13 +101,13 @@ export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
 
 export const mockFacets = (name) => {
     switch (name) {
-        case "samples":
+        case "Sample":
             return [
                 {
-                    name: 'sampleType',
+                    name: 'Sample_sampleType',
                     title: 'Sample type',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Blood',
@@ -116,10 +120,10 @@ export const mockFacets = (name) => {
                     ]
                 },
                 {
-                    name: 'topography',
+                    name: 'Sample_topography',
                     title: 'Topography',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Lip',
@@ -136,18 +140,18 @@ export const mockFacets = (name) => {
                     ]
                 },
                 {
-                    name: 'tumorCellularity',
+                    name: 'Sample_tumorCellularity',
                     title: 'Tumor cellularity',
                     query: "",
-                    type: "number",
+                    type: "Number",
                     min: 2,
                     max: 8
                 },
                 {
-                    name: 'sampleNature',
+                    name: 'Subject_nature',
                     title: 'Nature',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Protein',
@@ -184,10 +188,10 @@ export const mockFacets = (name) => {
                     ]
                 },
                 {
-                    name: 'sampleOrigin',
+                    name: 'Subject_origin',
                     title: 'Origin',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Normal',
@@ -200,13 +204,13 @@ export const mockFacets = (name) => {
                     ]
                 }
             ];
-        case "subjects":
+        case "Subject":
             return [
                 {
-                    name: 'gender',
+                    name: 'Subject_gender',
                     title: 'Gender',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Male',
@@ -223,10 +227,10 @@ export const mockFacets = (name) => {
                     ]
                 },
                 {
-                    name: 'species',
+                    name: 'Subject_species',
                     title: 'Species',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Homo sapiens',
@@ -243,21 +247,21 @@ export const mockFacets = (name) => {
                     ]
                 },
                 {
-                    name: 'birthDate',
+                    name: 'Subject_birthDate',
                     title: 'Birth date',
                     query: "",
-                    type: "date",
+                    type: "Date",
                     min: new Date(2010, 11, 25),
                     max: new Date(2020, 1, 4)
                 }
             ];
-        case "files":
+        case "Collection":
             return [
                 {
-                    name: 'analysisType',
+                    name: 'Subject_analysisType',
                     title: 'Analysis type',
                     query: "",
-                    type: "id",
+                    type: "Term",
                     values: [
                         {
                             label: 'Biology',
@@ -289,105 +293,105 @@ export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
 
 export const mockRows = (viewName) => {
     switch (viewName) {
-        case "samples":
+        case "Sample":
             return [
                 {
-                    'label': 'http://example.com/sampleType/s01',
-                    'label.label': 'S01',
-                    'sampleType': 'http://example.com/sampleType#tissue',
-                    'sampleType.label': 'Tissue',
-                    'topography': 'http://example.com/sampleType#lip',
-                    'topography.label': 'Lip',
-                    'tumorCellularity': '2',
-                    'sampleNature': 'http://example.com/sampleType#dna',
-                    'sampleNature.label': 'DNA',
-                    'sampleOrigin': 'http://example.com/sampleType#normal',
-                    'sampleOrigin.label': 'Normal',
-                    'files': [
+                    'Sample': 'http://example.com/sampleType/s01',
+                    'Sample.label': 'S01',
+                    'Sample_sampleType': 'http://example.com/sampleType#tissue',
+                    'Sample_sampleType.label': 'Tissue',
+                    'Sample_topography': 'http://example.com/sampleType#lip',
+                    'Sample_topography.label': 'Lip',
+                    'Sample_tumorCellularity': '2',
+                    'Sample_nature': 'http://example.com/sampleType#dna',
+                    'Sample_nature.label': 'DNA',
+                    'Sample_origin': 'http://example.com/sampleType#normal',
+                    'Sample_origin.label': 'Normal',
+                    'Collection': [
                         {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
                         {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
                     ]
                 },
                 {
-                    'label': 'http://example.com/sampleType/s02',
-                    'label.label': 'S02',
-                    'sampleType': 'http://example.com/sampleType#tissue',
-                    'sampleType.label': 'Tissue',
-                    'topography': 'http://example.com/sampleType#tongue',
-                    'topography.label': 'Tongue',
-                    'tumorCellularity': '4',
-                    'sampleNature': 'http://example.com/sampleType#dna',
-                    'sampleNature.label': 'DNA',
-                    'sampleOrigin': 'http://example.com/sampleType#tumoral',
-                    'sampleOrigin.label': 'Tumoral',
+                    'Sample': 'http://example.com/sampleType/s02',
+                    'Sample.label': 'S02',
+                    'Sample_sampleType': 'http://example.com/sampleType#tissue',
+                    'Sample_sampleType.label': 'Tissue',
+                    'Sample_topography': 'http://example.com/sampleType#tongue',
+                    'Sample_topography.label': 'Tongue',
+                    'Sample_tumorCellularity': '4',
+                    'Sample_nature': 'http://example.com/sampleType#dna',
+                    'Sample_nature.label': 'DNA',
+                    'Sample_origin': 'http://example.com/sampleType#tumoral',
+                    'Sample_origin.label': 'Tumoral',
                 },
             ];
-        case "subjects":
+        case "Subject":
             return [
                 {
-                    'label': 'http://example.com/sampleType/p01',
-                    'label.label': 'P01',
-                    'gender': 'http://example.com/sampleType#male',
-                    'gender.label': 'Male',
-                    'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens',
-                    'birthDate': new Date(2010, 11, 25).toLocaleString(),
-                    'files': [
+                    'Subject': 'http://example.com/sampleType/p01',
+                    'Subject.label': 'P01',
+                    'Subject_gender': 'http://example.com/sampleType#male',
+                    'Subject_gender.label': 'Male',
+                    'Subject_species': 'http://example.com/sampleType#hs',
+                    'Subject_species.label': 'Homo Sapiens',
+                    'Subject_birthDate': new Date(2010, 11, 25).toLocaleString(),
+                    'Collection': [
                         {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
                         {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
                     ]
                 },
                 {
-                    'label': 'http://example.com/sampleType/p02',
-                    'label.label': 'P02',
-                    'gender': 'http://example.com/sampleType#male',
-                    'gender.label': 'Male',
-                    'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens'
+                    'Subject': 'http://example.com/sampleType/p02',
+                    'Subject.label': 'P02',
+                    'Subject_gender': 'http://example.com/sampleType#male',
+                    'Subject_gender.label': 'Male',
+                    'Subject_species': 'http://example.com/sampleType#hs',
+                    'Subject_species.label': 'Homo Sapiens'
                 },
                 {
-                    'label': 'http://example.com/sampleType/p03',
-                    'label.label': 'P03',
-                    'gender': 'http://example.com/sampleType#female',
-                    'gender.label': 'Female',
-                    'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens',
+                    'Subject': 'http://example.com/sampleType/p03',
+                    'Subject.label': 'P03',
+                    'Subject_gender': 'http://example.com/sampleType#female',
+                    'Subject_gender.label': 'Female',
+                    'Subject_species': 'http://example.com/sampleType#hs',
+                    'Subject_species.label': 'Homo Sapiens',
                     'files': [
                         {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'}
                     ]
                 },
                 {
-                    'label': 'http://example.com/sampleType/p04',
-                    'label.label': 'P04',
-                    'gender': 'http://example.com/sampleType#male',
-                    'gender.label': 'Male',
-                    'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens'
+                    'Subject': 'http://example.com/sampleType/p04',
+                    'Subject.label': 'P04',
+                    'Subject_gender': 'http://example.com/sampleType#male',
+                    'Subject_gender.label': 'Male',
+                    'Subject_species': 'http://example.com/sampleType#hs',
+                    'Subject_species.label': 'Homo Sapiens'
                 },
                 {
-                    'label': 'http://example.com/sampleType/p05',
-                    'label.label': 'P05',
-                    'gender': 'http://example.com/sampleType#female',
-                    'gender.label': 'Female',
-                    'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens'
+                    'Subject': 'http://example.com/sampleType/p05',
+                    'Subject.label': 'P05',
+                    'Subject_gender': 'http://example.com/sampleType#female',
+                    'Subject_gender.label': 'Female',
+                    'Subject_species': 'http://example.com/sampleType#hs',
+                    'Subject_species.label': 'Homo Sapiens'
                 },
                 {
-                    'label': 'http://example.com/sampleType/p06',
-                    'label.label': 'P06',
-                    'gender': 'http://example.com/sampleType#female',
-                    'gender.label': 'Female',
-                    'species': 'http://example.com/sampleType#hs',
-                    'species.label': 'Homo Sapiens'
+                    'Subject': 'http://example.com/sampleType/p06',
+                    'Subject.label': 'P06',
+                    'Subject_gender': 'http://example.com/sampleType#female',
+                    'Subject_gender.label': 'Female',
+                    'Subject_species': 'http://example.com/sampleType#hs',
+                    'Subject_species.label': 'Homo Sapiens'
                 },
             ];
-        case "files":
+        case "Collection":
             return [
                 {
-                    'label': 'http://localhost:8080/api/v1/webdav/c01',
-                    'label.label': 'C01',
-                    'analysisType': 'http://example.com/analysisType#biology',
-                    'analysisType.label': 'Biology'
+                    'Collection': 'http://localhost:8080/api/v1/webdav/c01',
+                    'Collection.label': 'C01',
+                    'Collection_analysisType': 'http://example.com/analysisType#biology',
+                    'Collection_analysisType.label': 'Biology'
                 }
             ];
         default:

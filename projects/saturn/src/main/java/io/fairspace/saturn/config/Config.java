@@ -86,42 +86,14 @@ public class Config {
         public String blobStorePath = "data/blobs";
     }
 
-
     public static class Search {
-        @JsonSetter(nulls = Nulls.AS_EMPTY)
-        public List<Facet> facets;
-        @JsonSetter(nulls = Nulls.AS_EMPTY)
-        public List<View> views;
         public long pageRequestTimeout = 10_000;
         public long countRequestTimeout = 100_1000;
-
-        public static class Facet {
-            public String name;
-            public String title;
-            public String query;
-            public ValueType type;
-            public Long min;
-            public Long max;
-        }
 
         public static class View {
             public String name;
             public String title;
             public String query;
-            public List<Column> columns;
-        }
-
-        public static class Column {
-            public String name;
-            public String title;
-            public ValueType type;
-        }
-
-        public enum ValueType {
-            id,
-            text,
-            number,
-            date
         }
     }
 

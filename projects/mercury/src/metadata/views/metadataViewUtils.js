@@ -11,8 +11,8 @@ export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
     linkedFiles: MetadataViewEntity[];
 |}
 
-export const LOCATION_FILTER_FIELD = 'belongsTo';
-export const FILE_VIEW_NAME = 'files';
+export const LOCATION_FILTER_FIELD = 'Collection';
+export const FILE_VIEW_NAME = 'Collection';
 
 export const getMetadataViewsPath = (currentViewName) => {
     let path = '/metadata-views';
@@ -47,6 +47,6 @@ export const getPathSegments = (context) => {
     return result.reverse();
 };
 
-export const ofRangeValueType: boolean = (type: ValueType) => type === 'number' || type === 'date';
+export const ofRangeValueType: boolean = (type: ValueType) => type === 'Number' || type === 'Date';
 
 export const isFilesView: boolean = (view: string) => view === FILE_VIEW_NAME;

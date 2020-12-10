@@ -69,7 +69,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [rowsPerPage, setRowsPerPage] = useStateWithLocalStorage(LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY, 10);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const idColumn = columns.find(c => c.type === 'id'); // first column of id type
+    const idColumn = columns.find(c => c.type === 'Identifier'); // first column of id type
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 

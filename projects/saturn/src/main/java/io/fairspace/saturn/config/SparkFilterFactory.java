@@ -17,7 +17,7 @@ public class SparkFilterFactory {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
-                new ViewApp(apiPathPrefix + "/views", svc.getViewService()),
+                new ViewApp(apiPathPrefix + "/views", svc.getViewService(), svc.getQueryService()),
                 new VocabularyApp(apiPathPrefix + "/vocabulary"),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),

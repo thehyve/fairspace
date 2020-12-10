@@ -8,7 +8,7 @@ import {mockFacets} from "../__mocks__/MetadataViewAPI";
 
 describe('MetadataViewActiveFilters', () => {
     it('should not show active filters if no filter added', () => {
-        const view = 'files';
+        const view = 'Collection';
         const facets = mockFacets(view);
         const wrapper = shallow(<MetadataViewActiveFilters
             facets={facets}
@@ -20,20 +20,20 @@ describe('MetadataViewActiveFilters', () => {
     });
 
     it('should render textual filters properly', () => {
-        const view = 'subjects';
+        const view = 'Subject';
         const facets = mockFacets(view);
         const wrapper = shallow(<MetadataViewActiveFilters
             facets={facets}
             filters={[
                 {
-                    field: 'gender',
+                    field: 'Subject_gender',
                     values: [
                         'http://example.com/gender#male',
                         'http://example.com/gender#female'
                     ]
                 },
                 {
-                    field: 'species',
+                    field: 'Subject_species',
                     values: [
                         'http://example.com/species#hs',
                     ]
@@ -53,13 +53,13 @@ describe('MetadataViewActiveFilters', () => {
     });
 
     it('should render range filters properly', () => {
-        const view = 'samples';
+        const view = 'Sample';
         const facets = mockFacets(view);
         let wrapper = shallow(<MetadataViewActiveFilters
             facets={facets}
             filters={[
                 {
-                    field: 'tumorCellularity',
+                    field: 'Sample_tumorCellularity',
                     min: 0,
                     max: 3
                 }
@@ -78,7 +78,7 @@ describe('MetadataViewActiveFilters', () => {
             facets={facets}
             filters={[
                 {
-                    field: 'tumorCellularity',
+                    field: 'Sample_tumorCellularity',
                     min: 2
                 }
             ]}
@@ -92,7 +92,7 @@ describe('MetadataViewActiveFilters', () => {
             facets={facets}
             filters={[
                 {
-                    field: 'tumorCellularity',
+                    field: 'Sample_tumorCellularity',
                     max: 3
                 }
             ]}

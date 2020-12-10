@@ -1,257 +1,146 @@
 package io.fairspace.saturn.services.views;
 
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.webdav.DavFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.webdav.*;
+import io.milton.http.exceptions.*;
+import io.milton.resource.*;
+import lombok.extern.slf4j.*;
 import org.apache.jena.query.*;
-import org.apache.jena.sparql.expr.*;
-import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
+import java.util.stream.*;
 
+import static io.fairspace.saturn.config.ViewsConfig.*;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static java.lang.String.join;
-import static java.time.Instant.ofEpochMilli;
 import static java.util.stream.Collectors.toList;
-import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.sparql.expr.NodeValue.*;
 
 @Slf4j
 public class ViewService {
-    private final Config.Search config;
+    private final ViewsConfig searchConfig;
     private final Dataset ds;
     private final DavFactory davFactory;
-    private final Map<String, Template> templates = new HashMap<>();
+    private final CollectionResource rootSubject;
 
-    public ViewService(Config.Search config, Dataset ds, DavFactory davFactory) {
-        this.config = config;
+    public ViewService(ViewsConfig viewsConfig, Dataset ds, DavFactory davFactory) {
+        this.searchConfig = viewsConfig;
         this.ds = ds;
         this.davFactory = davFactory;
-
-        config.views.forEach(view -> {
-            try {
-                templates.put(view.name, new Template(view.name, new StringReader(view.query), null));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        this.rootSubject = davFactory.root;
     }
 
-    public ViewPageDto retrieveViewPage(ViewRequest request) {
-        var selectQuery = getQuery(request.getView(), getFiltersModel(request.getFilters()));
-
-        var page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
-        var size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
-        selectQuery.setLimit(size + 1);
-        selectQuery.setOffset((page - 1) * size);
-
-        log.debug("Query with filters and pagination applied: \n{}", selectQuery);
-
-        var selectExecution = QueryExecutionFactory.create(selectQuery, ds);
-        selectExecution.setTimeout(config.pageRequestTimeout);
-
-        return Txn.calculateRead(ds, () -> {
-            var iris = new ArrayList<String>();
-            var rows = new ArrayList<Map<String, Object>>();
-            var timeout = false;
-            var hasNext = false;
-            try (selectExecution) {
-                var rs = selectExecution.execSelect();
-                var variable = rs.getResultVars().get(0);
-                rs.forEachRemaining(row -> iris.add("<" + row.getResource(variable).getURI() + ">"));
-            } catch (QueryCancelledException e) {
-                timeout = true;
-            }
-            while (iris.size() > size) {
-                iris.remove(iris.size() - 1);
-                hasNext = true;
-            }
-
-            var fetchQuery = getQuery(request.getView(), Map.of("fetch", true, "iris", join(" ", iris)));
-
-            try (var fetchExecution = QueryExecutionFactory.create(fetchQuery, ds)) {
-                fetchExecution.execSelect().forEachRemaining(row -> rows.add(rowToMap(row)));
-            }
-
-            return new ViewPageDto(rows, hasNext, timeout);
-        });
-
-    }
-
-    private Query getQuery(String view, Object model) {
-        try {
-            var template = templates.get(view);
-            var out = new StringWriter();
-            try {
-                template.process(model, out);
-            } catch (TemplateException e) {
-                throw new RuntimeException("Error interpolating template: \n " + template, e);
-            }
-            var sparql = out.toString();
-            try {
-                return QueryFactory.create(sparql);
-            } catch (QueryException e) {
-                log.error("Error parsing query:\n {}", sparql);
-                throw new RuntimeException("Error parsing query:\n" + sparql, e);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error loading query template for view " + view, e);
-        }
-    }
-
-    private Map<String, Object> rowToMap(QuerySolution row) {
-        var map = new HashMap<String, Object>();
-        row.varNames().forEachRemaining(name -> {
-            var value = row.get(name);
-            if (value.isURIResource()) {
-                var resource = value.asResource();
-                map.put(name, resource.getURI());
-                var label = getStringProperty(resource, RDFS.label);
-                if (label != null) {
-                    map.put(name + ".label", label);
-                }
-                if (davFactory.isFileSystemResource(resource)) {
-                    map.put(name + ".access", davFactory.getAccess(resource));
-                }
-            } else if (value.isLiteral()) {
-                var literal = value.asLiteral().getValue();
-                if (literal instanceof XSDDateTime) {
-                    literal = ofEpochMilli(((XSDDateTime) literal).asCalendar().getTimeInMillis());
-                }
-                map.put(name, literal);
-            } else {
-                map.put(name, null);
-            }
-        });
-        return map;
-    }
-
-    private Map<String, Object> getFiltersModel(List<ViewFilter> filters) {
-        var model = new HashMap<String, Object>();
-        model.put("fetch", false);
-        for (var filter : filters) {
-            model.put(filter.field, toFilterString(filter));
-        }
-        return model;
-    }
-
-    private String toFilterString(ViewFilter filter) {
-        var facet = getFacet(filter.field);
-
-        var variable = new ExprVar(filter.field);
-        Expr expr;
-        if (filter.min != null && filter.max != null && !same(filter.min, facet.min) && !same(filter.max, facet.max)) {
-            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, facet.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, facet.type)));
-        } else if (filter.min != null && !same(filter.min, facet.min)) {
-            expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, facet.type));
-        } else if (filter.max != null && !same(filter.max, facet.max)) {
-            expr = new E_LessThanOrEqual(variable, toNodeValue(filter.max, facet.type));
-        } else if (filter.values != null && !filter.values.isEmpty()) {
-            List<Expr> values = filter.values.stream()
-                    .map(o -> toNodeValue(o, facet.type))
-                    .collect(toList());
-            expr = new E_OneOf(variable, new ExprList(values));
-        } else {
+    private List<ValueDTO> getColumnValues(View view, View.Column column) {
+        if (!EnumSet.of(ColumnType.Term, ColumnType.TermSet).contains(column.type)) {
             return null;
         }
-
-        return new ElementFilter(expr).toString();
-    }
-
-    private static boolean same(Object x, Object y) {
-        if (x instanceof Number && y instanceof Number) {
-            return ((Number) x).doubleValue() == ((Number) y).doubleValue();
+        if (view.name.equalsIgnoreCase("Collection") && column.name.equalsIgnoreCase("type")) {
+            return Txn.calculateRead(ds, () -> view.types.stream()
+                    .map(type -> {
+                        var resource = ds.getDefaultModel().createResource(type);
+                        return new ValueDTO(getStringProperty(resource, RDFS.label), resource.getURI(), null);
+                    })
+                    .collect(Collectors.toList())
+            );
         }
-        return Objects.equals(x, y);
-    }
-
-    private Config.Search.Facet getFacet(String name) {
-        return config.facets
-                .stream()
-                .filter(f -> f.name.equals(name))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown facet: " + name));
-    }
-
-    private Config.Search.View getView(String viewName) {
-        return config.views
-                .stream()
-                .filter(v -> v.name.equals(viewName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
-    }
-
-    private static NodeValue toNodeValue(Object o, Config.Search.ValueType type) {
-        return switch (type) {
-            case id -> makeNode(createURI(o.toString()));
-            case text -> makeString(o.toString());
-            case number -> makeDecimal(o.toString());
-            case date -> makeDate(o.toString());
-        };
-    }
-
-    CountDTO getCount(CountRequest request) {
-        var query = getQuery(request.getView(), getFiltersModel(request.getFilters()));
-
-        log.debug("Querying the total number of matches: \n{}", query);
-
-        var execution = QueryExecutionFactory.create(query, ds);
-        execution.setTimeout(config.countRequestTimeout);
-
-        return Txn.calculateRead(ds, () -> {
-            long count = 0;
-            try (execution) {
-                for (var it = execution.execSelect(); it.hasNext(); it.next()) {
-                    count++;
-                }
-                return new CountDTO(count, false);
-            } catch (QueryCancelledException e) {
-                return new CountDTO(count, true);
-            }
-        });
-    }
-
-    List<FacetDTO> getFacets() {
-        return Txn.calculateRead(ds, () ->
-                config.facets
-                        .stream()
-                        .map(f -> new FacetDTO(f.name, f.title, f.type, getValues(f.query), f.min, f.max))
-                        .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
-                        .collect(toList()));
-    }
-
-    private List<ValueDTO> getValues(String query) {
-        if (query == null || query.isEmpty()) {
-            return null;
-        }
-        var sortedSet = new TreeSet<ValueDTO>();
+        var query =
+                String.format("PREFIX fs: <http://fairspace.io/ontology#>\n" +
+                        "SELECT ?value\n" +
+                        "WHERE {\n" +
+                        (column.rdfType == null ? "" : String.format("   ?value a <%s> . \n", column.rdfType)) +
+                        "   FILTER EXISTS { ?subject a ?type; <%s> ?value . }\n" +
+                        "   VALUES ?type { <%s> }\n" +
+                        "   FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }\n" +
+                        "}",
+                        column.source,
+                        String.join("> <", view.types));
+        var values = new TreeSet<ValueDTO>();
         try (var execution = QueryExecutionFactory.create(query, ds)) {
             execution.execSelect().forEachRemaining(row -> {
-                var resource = row.getResource(row.varNames().next());
-                var label = getStringProperty(resource, RDFS.label);
-                var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
-                sortedSet.add(new ValueDTO(label, resource.getURI(), access));
+                if (row.varNames().hasNext()) {
+                    var resource = row.getResource(row.varNames().next());
+                    var label = getStringProperty(resource, RDFS.label);
+                    var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
+                    values.add(new ValueDTO(label, resource.getURI(), access));
+                }
             });
         }
-        return new ArrayList<>(sortedSet);
+        return new ArrayList<>(values);
     }
 
-    List<ViewDTO> getViews() {
-        return config.views
-                .stream()
-                .map(v -> new ViewDTO(v.name, v.title,
-                        v.columns
-                                .stream()
-                                .map(c -> new ColumnDTO(c.name, c.title, c.type))
-                                .collect(toList())))
+    public List<FacetDTO> getFacets() {
+        return Txn.calculateRead(ds, () -> {
+                var facets = searchConfig.views
+                        .stream()
+                        .flatMap(view ->
+                            view.columns.stream()
+                                    .map(column -> new FacetDTO(
+                                            view.name + "_" + column.name,
+                                            column.title,
+                                            column.type,
+                                            getColumnValues(view, column),
+                                            column.min,
+                                            column.max))
+                                    .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
+                        )
+                        .collect(toList());
+            var rootLocation = rootSubject.getUniqueId() + "/";
+            try {
+                var collections = rootSubject.getChildren();
+                facets.add(new FacetDTO("Collection_collection", "Collection", ColumnType.Term,
+                        collections.stream().map(collection -> {
+                            var location = collection.getUniqueId().substring(rootLocation.length());
+                            var collectionId = location.split("/")[0];
+                            var access = davFactory.getAccess(ds.getDefaultModel().getResource(collection.getUniqueId()));
+                            return new ValueDTO(URLDecoder.decode(collectionId, StandardCharsets.UTF_8), collection.getUniqueId(), access);
+                        }).collect(Collectors.toList()), null, null));
+            } catch (NotAuthorizedException | BadRequestException e) {
+                log.error("Could not retrieve accessible collections", e);
+            }
+            return facets;
+        });
+    }
+
+    private List<View.Column> columnsIncludingCollection(View view) {
+        if (view.name.equalsIgnoreCase("Collection")) {
+            var result = new ArrayList<>(view.columns);
+            var collectionColumn = new View.Column();
+            collectionColumn.name = "collection";
+            collectionColumn.title = "Collection";
+            collectionColumn.type = ColumnType.Text;
+            result.add(collectionColumn);
+            return result;
+        }
+        return view.columns;
+    }
+
+    public List<ViewDTO> getViews() {
+        return searchConfig.views.stream()
+                .map(v -> {
+                    var columns = new ArrayList<ColumnDTO>();
+                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier));
+                    for (var c: columnsIncludingCollection(v)) {
+                        columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type));
+                    }
+                    for (var j: v.join) {
+                        var joinView = searchConfig.views.stream().filter(view -> view.name.equalsIgnoreCase(j.view)).findFirst().orElse(null);
+                        if (joinView == null) {
+                            continue;
+                        }
+                        if (j.include.contains("id")) {
+                            columns.add(new ColumnDTO(joinView.name, joinView.title, ColumnType.Identifier));
+                        }
+                        for (var c: columnsIncludingCollection(joinView)) {
+                            if (!j.include.contains(c.name)) {
+                                continue;
+                            }
+                            columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type));
+                        }
+                    }
+                    return new ViewDTO(v.name, v.title, columns);
+                })
                 .collect(toList());
     }
 }
