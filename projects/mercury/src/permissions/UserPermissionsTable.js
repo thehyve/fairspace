@@ -8,7 +8,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import PropTypes from "prop-types";
 import {accessLevels} from "../collections/CollectionAPI";
 import type {AccessLevel, Permission, Principal} from "../collections/CollectionAPI";
-import {getPermissionIcon} from "../collections/collectionUtils";
+import {collectionAccessIcon} from "../collections/collectionUtils";
 
 const styles = {
     table: {
@@ -80,7 +80,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
             >
                 {accessLevelOptions.map(access => (
                     <MenuItem key={access} value={access}>
-                        <span className={classes.accessIcon}>{getPermissionIcon(access)}</span>
+                        <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
                         <span>{access}</span>
                     </MenuItem>
                 ))}
@@ -115,7 +115,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                         renderAccessLevelDropdown(p, accessLevelOptions)
                                     ) : (
                                         <div>
-                                            <span className={classes.accessIcon}>{getPermissionIcon(p.access)}</span>
+                                            <span className={classes.accessIcon}>{collectionAccessIcon(p.access)}</span>
                                             <span>{p.access}</span>
                                         </div>
                                     )}

@@ -1,16 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {Checkbox, FormControl, FormControlLabel, FormGroup, Radio, RadioGroup} from "@material-ui/core";
-import {Clear, Search} from "@material-ui/icons";
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import InputAdornment from "@material-ui/core/InputAdornment";
-import TextField from "@material-ui/core/TextField";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import Tooltip from "@material-ui/core/Tooltip";
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import {
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    Grid,
+    IconButton,
+    InputAdornment, Radio, RadioGroup,
+    TextField,
+    Tooltip,
+    Typography
+} from "@material-ui/core";
+import {CheckBox, CheckBoxOutlineBlank, Clear, Search} from '@material-ui/icons';
+import type {MetadataViewFacetProperties, Option} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
-
+import {collectionAccessIcon} from '../../../collections/collectionUtils';
 
 type SelectProperties = {
     options: Option[];
@@ -66,28 +70,38 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
-    const renderCheckboxList = () => filterByText(options, textFilterValue)
-        .map(option => (
-            <FormControlLabel
-                key={option.value}
-                control={(
-                    <Checkbox
-                        checked={state[option.value]}
-                        onChange={handleChange}
-                        name={option.value}
-                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                        checkedIcon={<CheckBoxIcon fontSize="small" />}
-                    />
-                )}
-                label={(
-                    <Tooltip title={<Iri iri={option.value} />}>
-                        <Typography variant="body2">
-                            {option.label}
-                        </Typography>
-                    </Tooltip>
-                )}
-            />
-        ));
+    const renderCheckboxListElement = (option) => (
+        <FormControlLabel
+            key={option.value}
+            control={(
+                <Checkbox
+                    checked={state[option.value]}
+                    onChange={handleChange}
+                    name={option.value}
+                    icon={<CheckBoxOutlineBlank fontSize="small" />}
+                    checkedIcon={<CheckBox fontSize="small" />}
+                />
+            )}
+            label={(
+                <Tooltip title={<Iri iri={option.value} />}>
+                    <Typography variant="body2">
+                        {option.label}
+                    </Typography>
+                </Tooltip>
+            )}
+        />
+    );
+
+    const renderCheckboxList = () => filterByText(options, textFilterValue).map(option => (
+        <Grid container direction="row" key={option.value}>
+            <Grid item xs={10}>
+                {renderCheckboxListElement(option)}
+            </Grid>
+            <Grid item xs={2} style={{textAlign: "right"}}>
+                {collectionAccessIcon(option.access, 'small')}
+            </Grid>
+        </Grid>
+    ));
 
     return (
         <FormGroup>

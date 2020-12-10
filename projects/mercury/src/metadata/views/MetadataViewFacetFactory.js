@@ -8,10 +8,11 @@ import TextSelectionFacet from "./facets/TextSelectionFacet";
 import DateSelectionFacet from "./facets/DateSelectionFacet";
 import NumericalRangeSelectionFacet from "./facets/NumericalRangeSelectionFacet";
 
-type Option = {
+export type Option = {
+    value: string;
     label: string;
-    iri: string;
-}
+    access?: string;
+};
 
 export type MetadataViewFacetProperties = {
     title: string;
