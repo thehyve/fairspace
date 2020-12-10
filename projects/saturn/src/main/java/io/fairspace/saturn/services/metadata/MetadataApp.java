@@ -91,6 +91,6 @@ public class MetadataApp extends BaseApp {
     private Model getMetadata(Request req) {
         return api.get(
                 req.queryParams("subject"),
-                req.queryParams().contains("includeObjectProperties"));
+                req.queryParams().contains("withValueProperties"));
     }
 }
