@@ -24,6 +24,7 @@ import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
 import {FILE_VIEW_NAME, getMetadataViewsPath, isFilesView} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
+import UserContext from "../users/UserContext";
 
 export const FilesPage = ({
     location,
@@ -37,6 +38,7 @@ export const FilesPage = ({
     showDeleted,
     setShowDeleted,
     isOpenedPathDeleted = false,
+    currentUser,
     classes
 }) => {
     const selection = useMultipleSelection();
@@ -100,7 +102,7 @@ export const FilesPage = ({
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            {views && views.map(v => v.name).some(isFilesView) && (
+                            {currentUser.canViewPublicMetadata && views && views.map(v => v.name).some(isFilesView) && (
                                 <Link to={getAdvancedSearchRedirect()}>
                                     <Button
                                         variant="text"
@@ -180,6 +182,7 @@ const ParentAwareFilesPage = (props) => {
 const ContextualFilesPage = (props) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
     const {views} = useContext(MetadataViewContext);
+    const {currentUser} = useContext(UserContext);
     const {params} = props.match;
     const {collectionName, openedPath} = getPathInfoFromParams(params);
     const collection = collections.find(c => c.name === collectionName) || {};
@@ -193,6 +196,7 @@ const ContextualFilesPage = (props) => {
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
             views={views}
+            currentUser={currentUser}
             {...props}
         />
     ) : (
@@ -204,6 +208,7 @@ const ContextualFilesPage = (props) => {
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
             views={views}
+            currentUser={currentUser}
             {...props}
         />
     );
