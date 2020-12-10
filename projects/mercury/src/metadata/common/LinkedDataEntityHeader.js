@@ -41,7 +41,8 @@ const LinkedDataEntityHeader = ({
     linkedDataError = false,
     values = {},
     typeInfo = {},
-    updateLinkedData
+    updateLinkedData,
+    enableDelete = false
 }) => {
     const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
     const namespacedIri = UseNamespacedIri(subject);
@@ -60,11 +61,13 @@ const LinkedDataEntityHeader = ({
                     <CopyButton style={{marginLeft: 10}} value={subject} />
                 </Grid>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
-                    <DeleteEntityButton
-                        subject={subject}
-                        isDeletable={!isDeleted && !isProtectedEntity}
-                        updateLinkedData={updateLinkedData}
-                    />
+                    {enableDelete && (
+                        <DeleteEntityButton
+                            subject={subject}
+                            isDeletable={!isDeleted && !isProtectedEntity}
+                            updateLinkedData={updateLinkedData}
+                        />
+                    )}
 
                     <CollectionBrowserLink
                         type={typeInfo.typeIri}
@@ -98,7 +101,8 @@ const LinkedDataEntityHeader = ({
 };
 
 LinkedDataEntityHeader.propTypes = {
-    subject: PropTypes.string.isRequired
+    subject: PropTypes.string.isRequired,
+    enableDelete: PropTypes.bool
 };
 
 export default withStyles(styles)(LinkedDataEntityHeader);
