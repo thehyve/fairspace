@@ -227,7 +227,7 @@ public class SparqlQueryService implements QueryService {
     public CountDTO count(CountRequest request) {
         var query = getQuery(request.getView(), getFiltersModel(request.getFilters()));
 
-        log.info("Querying the total number of matches: \n{}", query);
+        log.debug("Querying the total number of matches: \n{}", query);
 
         var execution = QueryExecutionFactory.create(query, ds);
         execution.setTimeout(config.countRequestTimeout);
