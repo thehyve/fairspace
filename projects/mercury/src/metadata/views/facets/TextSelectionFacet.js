@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@material-ui/core";
-import {Clear, Lock, Search} from "@material-ui/icons";
+import {Clear, MenuBook, Search} from "@material-ui/icons";
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -79,14 +79,14 @@ const SelectMultiple = (props: SelectProperties) => {
     );
 
     const renderCheckboxList = () => {
-        if (showAccessFilter && !accessFilterValue) {
+        if (showAccessFilter) {
             return filterOptions().map(option => (
                 <Grid container direction="row" key={option.value}>
                     <Grid item xs={10}>
                         {renderCheckboxListElement(option)}
                     </Grid>
                     <Grid item xs={2} style={{textAlign: "right"}}>
-                        {option.access === 'List' && <Lock fontSize="small" />}
+                        {option.access !== 'List' && <MenuBook fontSize="small" />}
                     </Grid>
                 </Grid>
             ));
