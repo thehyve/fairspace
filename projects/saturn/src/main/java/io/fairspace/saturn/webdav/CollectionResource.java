@@ -87,12 +87,16 @@ class CollectionResource extends DirectoryResource {
             throw new BadRequestException(this, "Invalid owner");
         }
 
+        updateParents(subject);
+
         var old = subject.getPropertyResourceValue(FS.ownedBy);
 
         subject.removeAll(FS.ownedBy)
                 .addProperty(FS.ownedBy, owner)
                 .removeAll(FS.belongsTo)
                 .addProperty(FS.belongsTo, owner);
+
+        updateParents(subject);
 
         if (old != null) {
             subject.getModel().listResourcesWithProperty(FS.isMemberOf, old)
@@ -108,7 +112,6 @@ class CollectionResource extends DirectoryResource {
                     .removeAll(old, FS.canManage, subject)
                     .removeAll(old, FS.canWrite, subject)
                     .removeAll(old, FS.canRead, subject);
-
         }
     }
 

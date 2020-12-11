@@ -112,6 +112,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 .addProperty(FS.dateCreated, t);
 
         subj.addProperty(FS.belongsTo, subject);
+        updateParents(subject);
         return subj;
     }
 
