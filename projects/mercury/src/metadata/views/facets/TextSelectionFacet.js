@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@material-ui/core";
 import {Clear, Lock, Search} from "@material-ui/icons";
@@ -27,16 +28,24 @@ const SelectMultiple = (props: SelectProperties) => {
     const defaultOptions = Object.fromEntries(options.map(option => [option.value, activeFilterValues.includes(option.value)]));
     const [state, setState] = useState(defaultOptions);
 
-    useEffect(() => {
-        setState(defaultOptions);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [options, activeFilterValues]);
-
     const textFilter = (val) => (textFilterValue.trim() === "" || val.label.toLowerCase().includes(textFilterValue.toLowerCase()));
 
     const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
 
     const filterOptions = () => (options.filter(readAccessFilter).filter(textFilter));
+
+    useEffect(() => {
+        setState(defaultOptions);
+    }, [activeFilterValues]);
+
+    useEffect(() => {
+        if (accessFilterValue) {
+            const selectedReadableOnly = Object.entries(state)
+                .filter(([option, checked]) => options.filter(readAccessFilter).map(o => o.value).includes(option))
+                .map(([option, checked]) => option);
+            onChange(selectedReadableOnly);
+        }
+    }, [accessFilterValue]);
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
@@ -47,29 +56,27 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
-    function renderCheckboxListElement(option) {
-        return (
-            <FormControlLabel
-                key={option.value}
-                control={(
-                    <Checkbox
-                        checked={state[option.value]}
-                        onChange={handleChange}
-                        name={option.value}
-                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                        checkedIcon={<CheckBoxIcon fontSize="small" />}
-                    />
-                )}
-                label={(
-                    <Tooltip title={<Iri iri={option.value} />}>
-                        <Typography variant="body2">
-                            {option.label}
-                        </Typography>
-                    </Tooltip>
-                )}
-            />
-        );
-    }
+    const renderCheckboxListElement = (option) => (
+        <FormControlLabel
+            key={option.value}
+            control={(
+                <Checkbox
+                    checked={state[option.value]}
+                    onChange={handleChange}
+                    name={option.value}
+                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                    checkedIcon={<CheckBoxIcon fontSize="small" />}
+                />
+            )}
+            label={(
+                <Tooltip title={<Iri iri={option.value} />}>
+                    <Typography variant="body2">
+                        {option.label}
+                    </Typography>
+                </Tooltip>
+            )}
+        />
+    );
 
     const renderCheckboxList = () => {
         if (showAccessFilter && !accessFilterValue) {
