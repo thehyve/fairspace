@@ -13,6 +13,8 @@ import Switch from "@material-ui/core/Switch";
 import Grid from "@material-ui/core/Grid";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
+import useStateWithSessionStorage from "../../../common/hooks/UseSessionStorage";
+import {SHOW_READABLE_COLLECTION_FACET_FILTER} from "../../../common/constants";
 
 
 type SelectProperties = {
@@ -41,7 +43,7 @@ const SelectMultiple = (props: SelectProperties) => {
     useEffect(() => {
         if (accessFilterValue) {
             const selectedReadableOnly = Object.entries(state)
-                .filter(([option, checked]) => options.filter(readAccessFilter).map(o => o.value).includes(option))
+                .filter(([option, checked]) => (options.filter(readAccessFilter).map(o => o.value).includes(option) && checked))
                 .map(([option, checked]) => option);
             onChange(selectedReadableOnly);
         }
@@ -104,7 +106,9 @@ const SelectMultiple = (props: SelectProperties) => {
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
-    const [showReadableFilterSelected, setShowReadableFilterSelected] = useState(false);
+    const [showReadableFilterSelected, setShowReadableFilterSelected] = useStateWithSessionStorage(
+        SHOW_READABLE_COLLECTION_FACET_FILTER, false
+    );
 
     const showTextFilter = options.length > 5; // TODO decide if it should be conditional or configurable
     const showAccessFilter = options.some(o => o.access);
