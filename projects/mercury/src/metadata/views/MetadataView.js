@@ -5,13 +5,13 @@ import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
+import type {MetadataViewColumn, MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, getPathSegments, ofRangeValueType} from "./metadataViewUtils";
+import {getMetadataViewsPath, getPathSegments, isFilesView, ofRangeValueType} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -98,6 +98,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         handleViewChangeRedirect(views[tabIndex].name);
     };
 
+    const appendCustomColumns = (columns: MetadataViewColumn[]) => {
+        if (isFilesView(currentView.name)) {
+            const accessColumn = {title: "Collection access", name: "Collection.access", type: "Custom"};
+            return [...columns, accessColumn];
+        }
+        return columns;
+    };
+
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
             {facets.map(facet => {
@@ -141,7 +149,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             {views.map((view, index) => (
                 <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
-                        columns={view.columns}
+                        columns={appendCustomColumns(view.columns)}
                         view={view.name}
                         filters={filters}
                         locationContext={locationContext}

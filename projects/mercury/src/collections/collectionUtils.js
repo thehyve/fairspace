@@ -1,12 +1,7 @@
 import queryString from "query-string";
-import type {
-    AccessLevel,
-    AccessMode,
-    Collection,
-    Permission,
-    PrincipalPermission,
-    Status
-} from "./CollectionAPI";
+import {Create, MenuBook, Settings} from "@material-ui/icons";
+import React from "react";
+import type {AccessLevel, AccessMode, Collection, Permission, PrincipalPermission, Status} from "./CollectionAPI";
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
@@ -52,6 +47,19 @@ export const handleCollectionTextSearchRedirect = (history, value, context = '')
     } else {
         history.push(`/collections/${context ? pathForIri(context) : ''}`);
     }
+};
+
+export const getPermissionIcon = (access: AccessLevel) => {
+    if (access === 'Read') {
+        return <MenuBook fontSize="small" />;
+    }
+    if (access === 'Write') {
+        return <Create fontSize="small" />;
+    }
+    if (access === 'Manage') {
+        return <Settings fontSize="small" />;
+    }
+    return <></>;
 };
 
 const permissionLevel = p => accessLevels.indexOf(p.access);
@@ -127,6 +135,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     canManage: (properties.canManage?.toLowerCase() === 'true'),
     canDelete: properties.canDelete?.toLowerCase() === 'true',
     canUndelete: properties.canUndelete?.toLowerCase() === 'true',
+    access: properties.access,
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),
     userPermissions: parsePermissions(properties.userPermissions),

@@ -113,6 +113,11 @@ class CollectionResource extends DirectoryResource {
     }
 
     @Property
+    public String getAccess() {
+        return access.name();
+    }
+
+    @Property
     public boolean getCanRead() {
         return access.canRead();
     }

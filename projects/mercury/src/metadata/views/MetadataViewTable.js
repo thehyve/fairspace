@@ -1,5 +1,6 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import IriTooltip from "../../common/components/IriTooltip";
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
@@ -7,7 +8,6 @@ import Iri from "../../common/components/Iri";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink, isFilesView} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
-import {makeStyles} from '@material-ui/core/styles';
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;

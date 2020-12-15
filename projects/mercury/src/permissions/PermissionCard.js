@@ -11,12 +11,13 @@ import {
     FormGroup,
     FormHelperText,
     FormLabel,
-    IconButton, Typography,
+    IconButton,
     List,
     ListItem,
     ListItemText,
     MenuItem,
     Select,
+    Typography,
     withStyles
 } from "@material-ui/core";
 import classnames from "classnames";
@@ -26,9 +27,13 @@ import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
+import type {AccessLevel, AccessMode} from '../collections/CollectionAPI';
 import {accessLevels} from "../collections/CollectionAPI";
-import {descriptionForAccessMode, getPrincipalsWithCollectionAccess} from "../collections/collectionUtils";
-import type {AccessMode} from '../collections/CollectionAPI';
+import {
+    descriptionForAccessMode,
+    getPermissionIcon,
+    getPrincipalsWithCollectionAccess
+} from "../collections/collectionUtils";
 
 const styles = theme => ({
     expand: {
@@ -59,6 +64,13 @@ const styles = theme => ({
     },
     property: {
         marginTop: 10
+    },
+    accessIcon: {
+        verticalAlign: 'middle'
+    },
+    accessName: {
+        marginRight: 10,
+        marginLeft: 5
     }
 });
 
@@ -259,7 +271,8 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                     >
                         {availableWorkspaceMembersAccessLevels.map(access => (
                             <MenuItem key={access} value={access}>
-                                <span style={{marginRight: 10}}>{access}</span>
+                                <span className={classes.accessIcon}>{getPermissionIcon(access)}</span>
+                                <span className={classes.accessName}>{access}</span>
                             </MenuItem>
                         ))}
                     </Select>
@@ -269,12 +282,19 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         </FormControl>
     );
 
+    const getTitleWithAccessIcon = (access: AccessLevel) => (
+        <div>
+            <span>Access</span>
+            <span className={classes.accessIcon} title={`Current user access: ${access}`}>{getPermissionIcon(access)}</span>
+        </div>
+    );
+
     return (
         <Card classes={{root: classes.permissionsCard}}>
             <CardHeader
                 action={cardHeaderAction}
                 titleTypographyProps={{variant: 'h6'}}
-                title="Access"
+                title={getTitleWithAccessIcon(collection.access)}
                 avatar={(
                     <LockOpen />
                 )}

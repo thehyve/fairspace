@@ -8,6 +8,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import PropTypes from "prop-types";
 import {accessLevels} from "../collections/CollectionAPI";
 import type {AccessLevel, Permission, Principal} from "../collections/CollectionAPI";
+import {getPermissionIcon} from "../collections/collectionUtils";
 
 const styles = {
     table: {
@@ -35,6 +36,13 @@ const styles = {
     },
     accessDropdown: {
         fontSize: 14
+    },
+    accessIcon: {
+        verticalAlign: 'middle',
+        paddingRight: 5
+    },
+    accessCell: {
+        padding: 0
     }
 };
 
@@ -72,6 +80,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
             >
                 {accessLevelOptions.map(access => (
                     <MenuItem key={access} value={access}>
+                        <span className={classes.accessIcon}>{getPermissionIcon(access)}</span>
                         <span>{access}</span>
                     </MenuItem>
                 ))}
@@ -101,11 +110,14 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                         </Typography>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell width={90}>
+                                <TableCell width={90} className={classes.accessCell}>
                                     {canManageCurrentPermission && accessLevelOptions.length > 1 ? (
                                         renderAccessLevelDropdown(p, accessLevelOptions)
                                     ) : (
-                                        <span>{p.access}</span>
+                                        <div>
+                                            <span className={classes.accessIcon}>{getPermissionIcon(p.access)}</span>
+                                            <span>{p.access}</span>
+                                        </div>
                                     )}
                                 </TableCell>
                                 <TableCell width={40} className={classes.iconCellButton}>

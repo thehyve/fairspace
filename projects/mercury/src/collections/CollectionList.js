@@ -38,6 +38,10 @@ const baseColumns = {
         valueExtractor: 'accessMode',
         label: 'View mode'
     },
+    access: {
+        valueExtractor: 'access',
+        label: 'Access'
+    },
     created: {
         valueExtractor: 'dateCreated',
         label: 'Created'
@@ -158,6 +162,9 @@ const CollectionList = ({
                                     </TableCell>
                                     <TableCell>
                                         {camelCaseToWords(collection.accessMode)}
+                                    </TableCell>
+                                    <TableCell>
+                                        {collection.access}
                                     </TableCell>
                                     <TableCell>
                                         {formatDateTime(collection.dateCreated)}
