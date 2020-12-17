@@ -127,7 +127,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     return (
-        <Table data-testid="results-table" size="small">
+        <Table data-testid="results-table" size="small" stickyHeader>
             <TableHead>
                 <TableRow>
                     {visibleColumns.map(column => (

@@ -95,6 +95,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     });
 
     const changeTab = (event, tabIndex) => {
+        toggle();
         handleViewChangeRedirect(views[tabIndex].name);
     };
 
@@ -110,10 +111,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 return facetOptions && facetOptions.length > 0 && (
                     <Grid key={facet.name} item>
                         <Facet
-                            multiple
                             type={facet.type}
                             title={facet.title}
-                            options={facetOptions || []}
+                            options={facetOptions}
                             onChange={(values) => updateFilters(facet, values)}
                             extraClasses={classes.facet}
                             activeFilterValues={activeFilterValues}

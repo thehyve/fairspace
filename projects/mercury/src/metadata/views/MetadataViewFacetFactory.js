@@ -17,7 +17,6 @@ export type MetadataViewFacetProperties = {
     title: string;
     options: Option[];
     type: ValueType;
-    multiple?: boolean;
     onChange: (string[]) => void;
     extraClasses?: string;
     classes?: any;
@@ -48,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "small"
     },
     textContent: {
+        width: "100%",
         maxHeight: 220,
         overflowY: "auto"
     },
@@ -63,6 +63,15 @@ const useStyles = makeStyles((theme) => ({
     },
     headerIcon: {
         padding: 0
+    },
+    multiselectList: {
+        "& .MuiFormControlLabel-root": {
+            marginRight: 0
+        }
+    },
+    accessFilter: {
+        alignContent: "center",
+        marginBottom: 10
     }
 }));
 
