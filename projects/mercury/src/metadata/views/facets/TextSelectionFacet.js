@@ -57,7 +57,6 @@ const SelectMultiple = (props: SelectProperties) => {
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
-        setState(newState);
         const selected = Object.entries(newState)
             .filter(([option, checked]) => checked)
             .map(([option, checked]) => option);
@@ -74,6 +73,7 @@ const SelectMultiple = (props: SelectProperties) => {
                     name={option.value}
                     icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                     checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    className={classes.checkbox}
                 />
             )}
             label={(
@@ -116,7 +116,6 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         SHOW_READABLE_COLLECTION_FACET_FILTER, false
     );
 
-    const showTextFilter = options.length > 5; // TODO decide if it should be conditional or configurable
     const showAccessFilter = options.some(o => o.access);
 
     if (!options || options.length === 0) {
@@ -126,6 +125,33 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
             </Typography>
         );
     }
+
+    const selectAll = () => {
+        onChange(options.map(option => option.value));
+    };
+
+    const deselectAll = () => {
+        onChange([]);
+    };
+
+    const handleChangeSelectAll = (event) => {
+        if (event.target.checked) {
+            selectAll();
+        } else {
+            deselectAll();
+        }
+    };
+
+    const renderSelectAllCheckbox = () => (
+        <Checkbox
+            checked={activeFilterValues.length === options.length}
+            onChange={handleChangeSelectAll}
+            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+            checkedIcon={<CheckBoxIcon fontSize="small" />}
+            className={classes.checkbox}
+            title={activeFilterValues.length === options.length ? "Deselect all" : "Select all"}
+        />
+    );
 
     const renderAccessFilter = () => (
         <FormGroup className={classes.accessFilter}>
@@ -171,16 +197,23 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         />
     );
 
-    const renderFilters = () => (
+    const renderOptionsHeader = () => (
         <div>
-            {showTextFilter && renderTextFilter()}
+            <Grid container direction="row" key="text-selection-facet-header">
+                <Grid item xs={2}>
+                    {renderSelectAllCheckbox()}
+                </Grid>
+                <Grid item xs={10}>
+                    {renderTextFilter()}
+                </Grid>
+            </Grid>
             {showAccessFilter && renderAccessFilter()}
         </div>
     );
 
     return (
         <>
-            {renderFilters()}
+            {renderOptionsHeader()}
             <div className={classes.textContent}>
                 <FormControl component="fieldset" style={{width: "100%"}}>
                     <SelectMultiple
