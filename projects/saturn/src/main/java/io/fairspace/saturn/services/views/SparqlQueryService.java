@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.views;
 
 import freemarker.template.*;
-import freemarker.template.Template;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.webdav.*;
@@ -18,6 +17,7 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.*;
 
+import static freemarker.template.Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static java.lang.String.join;
 import static java.time.Instant.*;
@@ -29,20 +29,19 @@ public class SparqlQueryService implements QueryService {
     private final ViewsConfig searchConfig;
     private final Dataset ds;
     private final DavFactory davFactory;
-    private final Map<String, Template> templates = new HashMap<>();
+    private final Configuration freemakerConfig = new Configuration(DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 
     public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds, DavFactory davFactory) {
         this.config = config;
         this.searchConfig = viewsConfig;
         this.ds = ds;
         this.davFactory = davFactory;
-        viewsConfig.views.forEach(view -> {
-            try {
-                templates.put(view.name, new Template(view.name, new StringReader(view.query), null));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        try {
+            freemakerConfig.setDirectoryForTemplateLoading(new File("./templates"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
@@ -94,7 +93,7 @@ public class SparqlQueryService implements QueryService {
 
     private Query getQuery(String view, Object model) {
         try {
-            var template = templates.get(view);
+            var template = freemakerConfig.getTemplate(view + ".sparql.ftl");
             var out = new StringWriter();
             try {
                 template.process(model, out);
