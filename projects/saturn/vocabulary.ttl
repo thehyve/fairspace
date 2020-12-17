@@ -210,8 +210,8 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
-        sh:name "Tumor Pathology Events" ;
-        sh:description "Tumor Pathology Events" ;
+        sh:name "Tumor pathology events" ;
+        sh:description "Tumor pathology events" ;
         sh:path [sh:inversePath curie:eventSubject];
     ],
     [
