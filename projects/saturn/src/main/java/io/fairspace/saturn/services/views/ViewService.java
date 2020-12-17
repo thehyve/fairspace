@@ -16,6 +16,7 @@ import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.*;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -45,36 +46,37 @@ public class ViewService {
                     .collect(Collectors.toList())
             );
         }
-        var query =
-                String.format("PREFIX fs: <http://fairspace.io/ontology#>\n" +
-                        "SELECT ?value\n" +
-                        "WHERE {\n" +
-                        (column.rdfType == null ? "" : String.format("   ?value a <%s> . \n", column.rdfType)) +
-                        "   FILTER EXISTS { ?subject a ?type; <%s> ?value . }\n" +
-                        "   VALUES ?type { <%s> }\n" +
-                        "   FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }\n" +
-                        "}",
-                        column.source,
-                        String.join("> <", view.types));
-        var values = new TreeSet<ValueDTO>();
+
+        var query = format("""
+                        PREFIX fs: <http://fairspace.io/ontology#>
+                        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+                        SELECT ?value
+                        WHERE {
+                           ?value a <%s> .
+                           FILTER EXISTS { ?subject <%s> ?value }
+                           FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
+                           OPTIONAL {?value rdfs:label ?label} 
+                        } ORDER BY ?label
+                        """,
+                column.rdfType,
+                column.source);
+        var values = new ArrayList<ValueDTO>();
         try (var execution = QueryExecutionFactory.create(query, ds)) {
             execution.execSelect().forEachRemaining(row -> {
-                if (row.varNames().hasNext()) {
-                    var resource = row.getResource(row.varNames().next());
-                    var label = getStringProperty(resource, RDFS.label);
-                    var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
-                    values.add(new ValueDTO(label, resource.getURI(), access));
-                }
+                var resource = row.getResource("value");
+                var label = row.getLiteral("label");
+                var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
+                values.add(new ValueDTO(label != null ? label.getString() : null, resource.getURI(), access));
             });
         }
-        return new ArrayList<>(values);
+        return values;
     }
 
     public List<FacetDTO> getFacets() {
         return Txn.calculateRead(ds, () -> {
-                var facets = searchConfig.views
-                        .stream()
-                        .flatMap(view ->
+            var facets = searchConfig.views
+                    .stream()
+                    .flatMap(view ->
                             view.columns.stream()
                                     .map(column -> new FacetDTO(
                                             view.name + "_" + column.name,
@@ -84,8 +86,8 @@ public class ViewService {
                                             column.min,
                                             column.max))
                                     .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
-                        )
-                        .collect(toList());
+                    )
+                    .collect(toList());
             var rootLocation = rootSubject.getUniqueId() + "/";
             try {
                 var collections = rootSubject.getChildren();
@@ -121,10 +123,10 @@ public class ViewService {
                 .map(v -> {
                     var columns = new ArrayList<ColumnDTO>();
                     columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier));
-                    for (var c: columnsIncludingCollection(v)) {
+                    for (var c : columnsIncludingCollection(v)) {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type));
                     }
-                    for (var j: v.join) {
+                    for (var j : v.join) {
                         var joinView = searchConfig.views.stream().filter(view -> view.name.equalsIgnoreCase(j.view)).findFirst().orElse(null);
                         if (joinView == null) {
                             continue;
@@ -132,7 +134,7 @@ public class ViewService {
                         if (j.include.contains("id")) {
                             columns.add(new ColumnDTO(joinView.name, joinView.title, ColumnType.Identifier));
                         }
-                        for (var c: columnsIncludingCollection(joinView)) {
+                        for (var c : columnsIncludingCollection(joinView)) {
                             if (!j.include.contains(c.name)) {
                                 continue;
                             }
