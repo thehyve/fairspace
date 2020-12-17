@@ -168,7 +168,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {filters && filters.filter(f => f.name === LOCATION_FILTER_FIELD).length > 0 && (
+            {filters && filters.find(f => f.name === LOCATION_FILTER_FIELD) && (
                 <Grid container direction="row" spacing={1}>
                     <Grid item>
                         <Button data-testid="clear-button" onClick={() => clearAllFilters()} color="primary">
