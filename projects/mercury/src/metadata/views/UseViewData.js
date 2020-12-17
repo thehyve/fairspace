@@ -6,7 +6,7 @@ import type {MetadataViewData} from "./MetadataViewAPI";
 
 
 const useViewData = (view, filters, rowsPerPage) => {
-    const [data = {}, setData] = useState();
+    const [data, setData] = useState({});
     const [count, setCount] = useState(-1);
     const [countTimeout, setCountTimeout] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -42,6 +42,8 @@ const useViewData = (view, filters, rowsPerPage) => {
     };
 
     const refreshAll = useCallback(() => {
+        setLoading(true);
+        setCount(-1);
         getViewData(0, rowsPerPage)
             .then(d => {
                 setData(d);
@@ -59,7 +61,8 @@ const useViewData = (view, filters, rowsPerPage) => {
             .finally(() => setLoading(false));
     }, [view, filters]);
 
-    const refreshDataOnly = useCallback((newPage, newRowsPerPage) => (
+    const refreshDataOnly = useCallback((newPage, newRowsPerPage) => {
+        setLoading(true);
         getViewData(newPage, newRowsPerPage).then(d => {
             setData(d);
             setError(undefined);
@@ -68,7 +71,8 @@ const useViewData = (view, filters, rowsPerPage) => {
                 setError(e || true);
                 console.error(e || new Error('Unknown error'));
             })
-            .finally(() => setLoading(false))));
+            .finally(() => setLoading(false));
+    });
 
 
     useEffect(() => {refreshAll();}, [view, filters]);
