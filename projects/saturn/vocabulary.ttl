@@ -210,6 +210,16 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
+        sh:name "Tumor pathology events" ;
+        sh:description "Tumor pathology events" ;
+        sh:path [sh:inversePath curie:eventSubject];
+    ],
+    [
+        sh:name "Samples" ;
+        sh:description "Samples" ;
+        sh:path [sh:inversePath curie:subject];
+    ],
+    [
         sh:name "Files" ;
         sh:description "Linked files" ;
         sh:path [sh:inversePath curie:aboutSubject];
@@ -523,6 +533,11 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:comment
     ],
     [
+        sh:name "Samples" ;
+        sh:description "Samples" ;
+        sh:path [sh:inversePath curie:diagosis];
+    ],
+    [
         sh:name "Files" ;
         sh:description "Linked files" ;
         sh:path [sh:inversePath curie:aboutEvent];
@@ -646,6 +661,11 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:path rdfs:comment
+    ],
+    [
+        sh:name "Child samples" ;
+        sh:description "Child samples" ;
+        sh:path [sh:inversePath curie:isChildOf];
     ],
     [
         sh:name "Files" ;
