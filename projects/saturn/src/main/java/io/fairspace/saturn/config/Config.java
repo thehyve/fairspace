@@ -89,12 +89,6 @@ public class Config {
     public static class Search {
         public long pageRequestTimeout = 10_000;
         public long countRequestTimeout = 100_1000;
-
-        public static class View {
-            public String name;
-            public String title;
-            public String query;
-        }
     }
 
     @Override
