@@ -8,7 +8,7 @@ jdk:
 env:
   global:
      - NODE_VERSION="14.12.0"
-     - PATH=/usr/lib/jvm/java-14-openjdk-amd64/bin/:$PATH
+     - PATH=/usr/lib/jvm/java-15-openjdk-amd64/bin/:$PATH
      - APPNAME="fairspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
