@@ -1,17 +1,15 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.DavFactory;
 import lombok.extern.slf4j.*;
 import org.apache.jena.query.*;
 import org.apache.jena.system.Txn;
-import org.apache.jena.vocabulary.RDFS;
 
 import java.util.*;
-import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.*;
-import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
@@ -28,6 +26,11 @@ public class ViewService {
             } ORDER BY ?label
             """);
 
+    private static final List<ValueDTO> RESOURCE_TYPES = List.of(
+            new ValueDTO("Collection", FS.COLLECTION_URI, null),
+            new ValueDTO("Directory", FS.DIRECTORY_URI, null),
+            new ValueDTO("File", FS.FILE_URI, null));
+
     private final ViewsConfig searchConfig;
     private final Dataset ds;
     private final DavFactory davFactory;
@@ -43,13 +46,7 @@ public class ViewService {
             return null;
         }
         if (view.name.equalsIgnoreCase("Collection") && column.name.equalsIgnoreCase("type")) {
-            return Txn.calculateRead(ds, () -> view.types.stream()
-                    .map(type -> {
-                        var resource = ds.getDefaultModel().createResource(type);
-                        return new ValueDTO(getStringProperty(resource, RDFS.label), resource.getURI(), null);
-                    })
-                    .collect(Collectors.toList())
-            );
+            return RESOURCE_TYPES;
         }
 
         var binding = new QuerySolutionMap();
