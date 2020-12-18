@@ -50,12 +50,11 @@ public class ViewService {
         var query = format("""
                         PREFIX fs: <http://fairspace.io/ontology#>
                         PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-                        SELECT ?value
+                        SELECT ?value ?label
                         WHERE {
-                           ?value a <%s> .
+                           ?value a <%s> ; rdfs:label ?label .
                            FILTER EXISTS { ?subject <%s> ?value }
                            FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
-                           OPTIONAL {?value rdfs:label ?label} 
                         } ORDER BY ?label
                         """,
                 column.rdfType,
@@ -64,9 +63,9 @@ public class ViewService {
         try (var execution = QueryExecutionFactory.create(query, ds)) {
             execution.execSelect().forEachRemaining(row -> {
                 var resource = row.getResource("value");
-                var label = row.getLiteral("label");
+                var label = row.getLiteral("label").getString();
                 var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
-                values.add(new ValueDTO(label != null ? label.getString() : null, resource.getURI(), access));
+                values.add(new ValueDTO(label, resource.getURI(), access));
             });
         }
         return values;
