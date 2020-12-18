@@ -2,15 +2,11 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.webdav.*;
-import io.milton.http.exceptions.*;
-import io.milton.resource.*;
 import lombok.extern.slf4j.*;
 import org.apache.jena.query.*;
 import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.net.*;
-import java.nio.charset.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -24,17 +20,15 @@ public class ViewService {
     private final ViewsConfig searchConfig;
     private final Dataset ds;
     private final DavFactory davFactory;
-    private final CollectionResource rootSubject;
 
     public ViewService(ViewsConfig viewsConfig, Dataset ds, DavFactory davFactory) {
         this.searchConfig = viewsConfig;
         this.ds = ds;
         this.davFactory = davFactory;
-        this.rootSubject = davFactory.root;
     }
 
     private List<ValueDTO> getColumnValues(View view, View.Column column) {
-        if (!EnumSet.of(ColumnType.Term, ColumnType.TermSet).contains(column.type)) {
+        if (column.type != ColumnType.Term && column.type != ColumnType.TermSet) {
             return null;
         }
         if (view.name.equalsIgnoreCase("Collection") && column.name.equalsIgnoreCase("type")) {
@@ -72,49 +66,20 @@ public class ViewService {
     }
 
     public List<FacetDTO> getFacets() {
-        return Txn.calculateRead(ds, () -> {
-            var facets = searchConfig.views
-                    .stream()
-                    .flatMap(view ->
-                            view.columns.stream()
-                                    .map(column -> new FacetDTO(
-                                            view.name + "_" + column.name,
-                                            column.title,
-                                            column.type,
-                                            getColumnValues(view, column),
-                                            column.min,
-                                            column.max))
-                                    .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
-                    )
-                    .collect(toList());
-            var rootLocation = rootSubject.getUniqueId() + "/";
-            try {
-                var collections = rootSubject.getChildren();
-                facets.add(new FacetDTO("Collection_collection", "Collection", ColumnType.Term,
-                        collections.stream().map(collection -> {
-                            var location = collection.getUniqueId().substring(rootLocation.length());
-                            var collectionId = location.split("/")[0];
-                            var access = davFactory.getAccess(ds.getDefaultModel().getResource(collection.getUniqueId()));
-                            return new ValueDTO(URLDecoder.decode(collectionId, StandardCharsets.UTF_8), collection.getUniqueId(), access);
-                        }).collect(Collectors.toList()), null, null));
-            } catch (NotAuthorizedException | BadRequestException e) {
-                log.error("Could not retrieve accessible collections", e);
-            }
-            return facets;
-        });
-    }
-
-    private List<View.Column> columnsIncludingCollection(View view) {
-        if (view.name.equalsIgnoreCase("Collection")) {
-            var result = new ArrayList<>(view.columns);
-            var collectionColumn = new View.Column();
-            collectionColumn.name = "collection";
-            collectionColumn.title = "Collection";
-            collectionColumn.type = ColumnType.Text;
-            result.add(collectionColumn);
-            return result;
-        }
-        return view.columns;
+        return Txn.calculateRead(ds, () -> searchConfig.views
+                .stream()
+                .flatMap(view ->
+                        view.columns.stream()
+                                .map(column -> new FacetDTO(
+                                        view.name + "_" + column.name,
+                                        column.title,
+                                        column.type,
+                                        getColumnValues(view, column),
+                                        column.min,
+                                        column.max))
+                                .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
+                )
+                .collect(toList()));
     }
 
     public List<ViewDTO> getViews() {
@@ -122,7 +87,7 @@ public class ViewService {
                 .map(v -> {
                     var columns = new ArrayList<ColumnDTO>();
                     columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier));
-                    for (var c : columnsIncludingCollection(v)) {
+                    for (var c : v.columns) {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type));
                     }
                     for (var j : v.join) {
@@ -133,7 +98,7 @@ public class ViewService {
                         if (j.include.contains("id")) {
                             columns.add(new ColumnDTO(joinView.name, joinView.title, ColumnType.Identifier));
                         }
-                        for (var c : columnsIncludingCollection(joinView)) {
+                        for (var c : joinView.columns) {
                             if (!j.include.contains(c.name)) {
                                 continue;
                             }
