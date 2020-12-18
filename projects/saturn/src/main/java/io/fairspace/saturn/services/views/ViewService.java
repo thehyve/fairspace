@@ -12,11 +12,22 @@ import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.*;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 @Slf4j
 public class ViewService {
+    private static final Query VALUES_QUERY = QueryFactory.create("""
+            PREFIX fs: <http://fairspace.io/ontology#>
+            PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT ?value ?label
+            WHERE {
+               ?value a ?type ; rdfs:label ?label .
+               FILTER EXISTS { ?subject ?predicate ?value }
+               FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
+            } ORDER BY ?label
+            """);
+
     private final ViewsConfig searchConfig;
     private final Dataset ds;
     private final DavFactory davFactory;
@@ -41,20 +52,11 @@ public class ViewService {
             );
         }
 
-        var query = format("""
-                        PREFIX fs: <http://fairspace.io/ontology#>
-                        PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-                        SELECT ?value ?label
-                        WHERE {
-                           ?value a <%s> ; rdfs:label ?label .
-                           FILTER EXISTS { ?subject <%s> ?value }
-                           FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
-                        } ORDER BY ?label
-                        """,
-                column.rdfType,
-                column.source);
+        var binding = new QuerySolutionMap();
+        binding.add("type", createResource(column.rdfType));
+        binding.add("predicate", createResource(column.source));
         var values = new ArrayList<ValueDTO>();
-        try (var execution = QueryExecutionFactory.create(query, ds)) {
+        try (var execution = QueryExecutionFactory.create(VALUES_QUERY, ds, binding)) {
             execution.execSelect().forEachRemaining(row -> {
                 var resource = row.getResource("value");
                 var label = row.getLiteral("label").getString();
