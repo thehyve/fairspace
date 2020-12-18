@@ -14,7 +14,7 @@ VALUES ?Subject { ${iris} }
 {
   SELECT DISTINCT ?s WHERE {
      <#if Collection_collection??> ?Collection_collection a fs:Collection . ${Collection_collection}  ?file (fs:belongsTo)* ?Collection_collection . </#if>
-     ?Collection curie:aboutSubject ?s .
+     ?file curie:aboutSubject ?s .
      <#if Collection_analysisType??> ?Collection curie:analysisType ?Collection_analysisType . ${Collection_analysisType}</#if>
   }
 }
