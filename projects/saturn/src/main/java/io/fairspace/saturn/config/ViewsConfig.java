@@ -86,8 +86,6 @@ public class ViewsConfig {
             @NotNull public ColumnType type;
             @NotBlank public String source;
             public String rdfType;
-            public Long min;
-            public Long max;
         }
 
         public static class JoinView {

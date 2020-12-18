@@ -19,14 +19,10 @@ views:
         title: Age at last news
         source: https://institut-curie.org/ontology#ageAtLastNews
         type: number
-        min: 0
-        max: 150
       - name: ageAtDeath
         title: Age at death
         source: https://institut-curie.org/ontology#ageAtDeath
         type: number
-        min: 0
-        max: 150
     join:
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#eventSubject
@@ -79,8 +75,6 @@ views:
         title: Age at diagnosis
         source: https://institut-curie.org/ontology#ageAtDiagnosis
         type: number
-        min: 0
-        max: 150
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#eventSubject
