@@ -171,6 +171,11 @@ views:
         title: Key words
         source: http://www.w3.org/ns/dcat#keyword
         type: set
+      - name: collection
+        title: Collection
+        source: http://fairspace.io/ontology#belongsTo
+        rdfType: http://fairspace.io/ontology#Collection
+        type: term
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#aboutSubject
