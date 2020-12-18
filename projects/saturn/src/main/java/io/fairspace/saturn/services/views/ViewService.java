@@ -1,15 +1,19 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.vocabulary.FS;
 import io.fairspace.saturn.webdav.DavFactory;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.system.Txn;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static io.fairspace.saturn.config.ViewsConfig.*;
+import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import static io.fairspace.saturn.config.ViewsConfig.View;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
@@ -18,12 +22,24 @@ public class ViewService {
     private static final Query VALUES_QUERY = QueryFactory.create("""
             PREFIX fs: <http://fairspace.io/ontology#>
             PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+            
             SELECT ?value ?label
             WHERE {
                ?value a ?type ; rdfs:label ?label .
                FILTER EXISTS { ?subject ?predicate ?value }
+               FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
                FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
             } ORDER BY ?label
+            """);
+
+    private static final Query BOUNDS_QUERY = QueryFactory.create("""
+            PREFIX fs: <http://fairspace.io/ontology#>
+                                   
+            SELECT (MIN(?value) AS ?min) (MAX(?value) AS ?max)
+            WHERE {
+               ?subject ?predicate ?value
+               FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
+            }
             """);
 
     private static final List<ValueDTO> RESOURCE_TYPES = List.of(
@@ -41,27 +57,45 @@ public class ViewService {
         this.davFactory = davFactory;
     }
 
-    private List<ValueDTO> getColumnValues(View view, View.Column column) {
-        if (column.type != ColumnType.Term && column.type != ColumnType.TermSet) {
-            return null;
-        }
-        if (view.name.equalsIgnoreCase("Collection") && column.name.equalsIgnoreCase("type")) {
-            return RESOURCE_TYPES;
+    private FacetDTO getFacetInfo(View view, View.Column column) {
+        List<ValueDTO> values = null;
+        Object min = null;
+        Object max = null;
+
+        switch (column.type) {
+            case Term, TermSet -> {
+                if (view.name.equalsIgnoreCase("Collection") && column.name.equalsIgnoreCase("type")) {
+                    values = RESOURCE_TYPES;
+                } else {
+                    var binding = new QuerySolutionMap();
+                    binding.add("type", createResource(column.rdfType));
+                    binding.add("predicate", createResource(column.source));
+
+                    values = new ArrayList<>();
+                    try (var execution = QueryExecutionFactory.create(VALUES_QUERY, ds, binding)) {
+                        //noinspection NullableProblems
+                        for (var row : (Iterable<QuerySolution>) execution::execSelect) {
+                            var resource = row.getResource("value");
+                            var label = row.getLiteral("label").getString();
+                            var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
+                            values.add(new ValueDTO(label, resource.getURI(), access));
+                        }
+                    }
+                }
+            }
+            case Number -> {
+                var binding = new QuerySolutionMap();
+                binding.add("predicate", createResource(column.source));
+
+                try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
+                    var row = execution.execSelect().next();
+                    min = ofNullable(row.getLiteral("min")).map(Literal::getValue).orElse(null);
+                    max = ofNullable(row.getLiteral("max")).map(Literal::getValue).orElse(null);
+                }
+            }
         }
 
-        var binding = new QuerySolutionMap();
-        binding.add("type", createResource(column.rdfType));
-        binding.add("predicate", createResource(column.source));
-        var values = new ArrayList<ValueDTO>();
-        try (var execution = QueryExecutionFactory.create(VALUES_QUERY, ds, binding)) {
-            execution.execSelect().forEachRemaining(row -> {
-                var resource = row.getResource("value");
-                var label = row.getLiteral("label").getString();
-                var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
-                values.add(new ValueDTO(label, resource.getURI(), access));
-            });
-        }
-        return values;
+        return new FacetDTO(view.name + "_" + column.name, column.title, column.type, values, min, max);
     }
 
     public List<FacetDTO> getFacets() {
@@ -69,13 +103,7 @@ public class ViewService {
                 .stream()
                 .flatMap(view ->
                         view.columns.stream()
-                                .map(column -> new FacetDTO(
-                                        view.name + "_" + column.name,
-                                        column.title,
-                                        column.type,
-                                        getColumnValues(view, column),
-                                        column.min,
-                                        column.max))
+                                .map(column -> getFacetInfo(view, column))
                                 .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
                 )
                 .collect(toList()));
