@@ -11,7 +11,13 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, getPathSegments, ofRangeValueType} from "./metadataViewUtils";
+import {
+    getMetadataViewsPath,
+    getPathSegments,
+    LOCATION_FILTER_FIELD,
+    LOCATION_RELATED_FACETS,
+    ofRangeValueType
+} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -73,19 +79,19 @@ const styles = (theme) => ({
 });
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect} = props;
+    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect, filters} = props;
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
 
-    const {filters, updateFilters, clearFilter, clearAllFilters, setLocationFilter} = useContext(MetadataViewContext);
+    const {updateFilters, clearFilter, clearAllFilters, setLocationFilter} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
 
     // pass location filter to the API for files view
     useEffect(() => {
         setLocationFilter(currentViewName, locationContext);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentViewName, locationContext]);
+    }, [locationContext]);
 
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
 
@@ -95,12 +101,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
     });
 
     const changeTab = (event, tabIndex) => {
+        toggle();
         handleViewChangeRedirect(views[tabIndex].name);
     };
 
+    // Facet filter not to use both location context and location related facet values
+    const locationFilter = (facet: MetadataViewFacet) => !locationContext || !LOCATION_RELATED_FACETS.includes(facet.name);
+
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
-            {facets.map(facet => {
+            {facets.filter(locationFilter).map(facet => {
                 const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
                 const activeFilter = filters.find(filter => filter.field === facet.name);
                 let activeFilterValues = [];
@@ -110,10 +120,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 return facetOptions && facetOptions.length > 0 && (
                     <Grid key={facet.name} item>
                         <Facet
-                            multiple
                             type={facet.type}
                             title={facet.title}
-                            options={facetOptions || []}
+                            options={facetOptions}
                             onChange={(values) => updateFilters(facet, values)}
                             extraClasses={classes.facet}
                             activeFilterValues={activeFilterValues}
@@ -159,7 +168,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {filters && filters.length > 0 && (
+            {filters && filters.find(f => f.name === LOCATION_FILTER_FIELD) && (
                 <Grid container direction="row" spacing={1}>
                     <Grid item>
                         <Button data-testid="clear-button" onClick={() => clearAllFilters()} color="primary">
@@ -193,7 +202,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], loading, error, facets = []} = useContext(MetadataViewContext);
+    const {views = [], loading, error, facets = [], filters} = useContext(MetadataViewContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
@@ -222,6 +231,7 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             views={views}
             locationContext={locationContext}
             currentViewName={currentViewName}
+            filters={filters}
             handleViewChangeRedirect={handleViewChangeRedirect}
         />
     );

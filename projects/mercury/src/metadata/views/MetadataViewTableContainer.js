@@ -44,7 +44,10 @@ const styles = () => ({
     table: {
         maxHeight: 'calc(100vh - 215px)',
         overflowY: 'auto',
-        overflowX: 'auto'
+        overflowX: 'auto',
+        '& .MuiTableCell-stickyHeader': {
+            backgroundColor: "white"
+        }
     },
     tableSettings: {
         position: 'relative',
@@ -77,7 +80,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     useEffect(() => {setPage(0);}, [filters]);
 
-    if (loading) {
+    if (loading || !data) {
         return <LoadingInlay />;
     }
 
@@ -85,7 +88,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return <MessageDisplay message={error.message} />;
     }
 
-    if (!data || !data.rows || !data.rows.length) {
+    if (count === 0) {
         return <MessageDisplay message="No results found." />;
     }
 
