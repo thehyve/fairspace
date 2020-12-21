@@ -23,6 +23,11 @@ public class LocalBlobStore implements BlobStore {
     public String write(InputStream in) throws IOException {
         var id = randomUUID().toString();
         var dest = new File(dir, id);
+        while (dest.exists()) {
+            // The chance that this happens is zero, but we need to guarantee uniqueness.
+            id = randomUUID().toString();
+            dest = new File(dir, id);
+        }
         try (var out = new BufferedOutputStream(new FileOutputStream(dest))) {
              copyLarge(in, out);
         } catch (IOException e) {
