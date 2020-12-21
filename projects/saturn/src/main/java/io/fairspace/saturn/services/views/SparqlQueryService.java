@@ -155,11 +155,11 @@ public class SparqlQueryService implements QueryService {
 
         var variable = new ExprVar(filter.field);
         Expr expr;
-        if (filter.min != null && filter.max != null && !same(filter.min, column.min) && !same(filter.max, column.max)) {
+        if (filter.min != null && filter.max != null) {
             expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, column.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, column.type)));
-        } else if (filter.min != null && !same(filter.min, column.min)) {
+        } else if (filter.min != null) {
             expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, column.type));
-        } else if (filter.max != null && !same(filter.max, column.max)) {
+        } else if (filter.max != null) {
             expr = new E_LessThanOrEqual(variable, toNodeValue(filter.max, column.type));
         } else if (filter.values != null && !filter.values.isEmpty()) {
             List<Expr> values = filter.values.stream()
@@ -173,13 +173,6 @@ public class SparqlQueryService implements QueryService {
         }
 
         return new ElementFilter(expr).toString();
-    }
-
-    private static boolean same(Object x, Object y) {
-        if (x instanceof Number && y instanceof Number) {
-            return ((Number) x).doubleValue() == ((Number) y).doubleValue();
-        }
-        return Objects.equals(x, y);
     }
 
     private View.Column getColumn(String name) {

@@ -1,4 +1,4 @@
-FROM openjdk:14
+FROM openjdk:15
 
 ADD saturn/build/distributions/*.tar /opt/
 ADD mercury/build /opt/mercury/build
