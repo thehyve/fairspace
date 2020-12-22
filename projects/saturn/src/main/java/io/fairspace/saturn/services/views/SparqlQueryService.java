@@ -38,7 +38,7 @@ public class SparqlQueryService implements QueryService {
         this.davFactory = davFactory;
 
         try {
-            freemakerConfig.setDirectoryForTemplateLoading(new File("./templates"));
+            freemakerConfig.setDirectoryForTemplateLoading(new File("."));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
