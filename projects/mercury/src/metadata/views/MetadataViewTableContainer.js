@@ -37,6 +37,7 @@ type MetadataViewTableContainerProperties = {
     view: string;
     locationContext: string;
     selected: MetadataViewEntityWithLinkedFiles;
+    hasInactiveFilters: boolean;
     classes: any;
 };
 
@@ -58,11 +59,14 @@ const styles = () => ({
     },
     viewColumnsFormControl: {
         padding: 10
+    },
+    messageBox: {
+        padding: 5
     }
 });
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const {view, filters, columns, classes} = props;
+    const {view, filters, columns, hasInactiveFilters, classes} = props;
 
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithSessionStorage(
@@ -119,15 +123,25 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         setAnchorEl(null);
     };
 
-    const renderWarning = () => {
-        let warning = "";
-        if (data.timeout) {
-            warning = "Results shown below are incomplete. Fetching of data for the current page took too long.";
-        } else if (countTimeout) {
-            warning = "Fetching total count of results took too long. The count will not be shown.";
-        }
-        return warning && <Typography variant="body2" color="error" align="center">{warning}</Typography>;
-    };
+    const renderMessages = () => (
+        <div className={classes.messageBox}>
+            {hasInactiveFilters && (
+                <Typography variant="body2" align="center" color="primary">
+                    Note! Apply filters to see data matching your current selection.
+                </Typography>
+            )}
+            {data.timeout && (
+                <Typography variant="body2" color="error" align="center">
+                    Results shown below are incomplete. Fetching of data for the current page took too long.
+                </Typography>
+            )}
+            {countTimeout && (
+                <Typography variant="body2" color="error" align="center">
+                    Fetching total count of results took too long. The count will not be shown.
+                </Typography>
+            )}
+        </div>
+    );
 
     const renderColumnSelector = () => (
         <Popover
@@ -179,7 +193,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     return (
         <Paper>
             {renderTableSettings()}
-            {renderWarning()}
+            {renderMessages()}
             <TableContainer className={classes.table}>
                 <MetadataViewTable
                     {...props}
