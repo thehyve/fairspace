@@ -1,6 +1,6 @@
 dependencies:
 - name: elasticsearch
-  repository: https://kubernetes-charts.storage.googleapis.com
+  repository: https://charts.helm.sh/stable
   version: 1.31.0
-digest: sha256:4e7e8fc3b66bbf1da720e5a8ca8991f12eb70bac274243cb2ec4bae51eeb4678
-generated: "2020-03-26T20:08:03.491681815+01:00"
+digest: sha256:4a10c3835fb1990dbb781e2902f1db05414a763c9ea1daa51d56bc9d40aa0dd9
+generated: "2020-12-22T21:31:40.281196109+01:00"
