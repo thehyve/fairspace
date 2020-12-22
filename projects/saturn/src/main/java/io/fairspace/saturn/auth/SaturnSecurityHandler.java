@@ -32,6 +32,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         var localhost = CONFIG.auth.authServerUrl.startsWith("http://localhost:");
         adapterConfig.setSslRequired(SslRequired.NONE.name());
         if(!localhost) {
+            adapterConfig.setSslRequired(SslRequired.ALL.name());
             adapterConfig.setConfidentialPort(443);
         }
         return adapterConfig;
