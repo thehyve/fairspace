@@ -44,10 +44,24 @@ data:
     mail:
 {{ toYaml .Values.saturn.mail | indent 6 }}
   vocabulary.ttl: |
-{{ if .Values.saturn.vocabulary }}
-{{ .Values.saturn.vocabulary | indent 4 }}
-{{ else }}
-{{ .Files.Get "vocabulary.ttl" | indent 4  }}
+{{ if .Values.saturn.vocabulary -}}
+{{ .Values.saturn.vocabulary | indent 4 -}}
+{{ else -}}
+{{ .Files.Get "vocabulary.ttl" | indent 4 -}}
 {{ end }}
-   
-
+  views.yaml: |
+{{ if .Values.saturn.views -}}
+{{ toYaml .Values.saturn.views | indent 4 -}}
+{{ else -}}
+{{ .Files.Get "views.yaml" | indent 4 -}}
+{{ end }}
+{{- $files := .Files -}}
+{{ range .Values.views }}
+  {{ .name }}.sparql.ftl: |
+{{ if .template -}}
+{{ .template | indent 4 -}}
+{{ else -}}
+{{ $template_file := printf "%s.sparql.ftl" .name -}}
+{{ $files.Get $template_file | indent 4 -}}
+{{ end }}
+{{ end }}
