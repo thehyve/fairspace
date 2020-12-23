@@ -34,7 +34,6 @@ public class App {
         var server = serverBuilder
                 .build();
 
-        server.getJettyServer().insertHandler(new ProxiedRequestHandler());
         server.getJettyServer().insertHandler(new SessionHandler());
 
         server.start();
