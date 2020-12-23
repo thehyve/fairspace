@@ -121,10 +121,10 @@ public class SparqlQueryService implements QueryService {
     }
 
     private Set<ValueDTO> getValues(Resource resource, View.Column column) {
-        return resource.listProperties(createProperty(column.source))
+        return new TreeSet<>(resource.listProperties(createProperty(column.source))
                 .mapWith(Statement::getObject)
                 .mapWith(this::toValueDTO)
-                .toSet();
+                .toSet());
     }
 
     private View getView(String viewName) {
