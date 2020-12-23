@@ -177,7 +177,7 @@ public class SparqlQueryService implements QueryService {
 
     private View.Column getColumn(String name) {
         var fieldNameParts = name.split("_");
-        if (fieldNameParts.length != 2) {
+        if (fieldNameParts.length > 2) {
             throw new IllegalArgumentException("Invalid field: " + name);
         }
         var viewConfig = searchConfig.views.stream().filter(
@@ -185,6 +185,12 @@ public class SparqlQueryService implements QueryService {
         ).findFirst().orElseThrow(() -> {
             throw new IllegalArgumentException("Unknown view name: " + fieldNameParts[0]);
         });
+        if (fieldNameParts.length == 1) {
+            var column = new View.Column();
+            column.name = viewConfig.name;
+            column.type = ColumnType.Identifier;
+            return column;
+        }
         return viewConfig.columns.stream()
                 .filter(column -> column.name.equalsIgnoreCase(fieldNameParts[1]))
                 .findFirst().orElseThrow(() -> {
