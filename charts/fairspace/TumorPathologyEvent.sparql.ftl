@@ -1,1 +1,0 @@
-../../projects/saturn/TumorPathologyEvent.sparql.ftl
