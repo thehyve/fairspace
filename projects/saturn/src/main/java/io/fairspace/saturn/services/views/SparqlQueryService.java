@@ -110,8 +110,8 @@ public class SparqlQueryService implements QueryService {
 
                     var values = refs.stream()
                             .flatMap(ref -> getValues(ref, col)
-                                    .stream())
-                            .collect(toSet());
+                                    .stream()).
+                                    collect(toCollection(TreeSet::new));
 
                     result.put(joinView.name + "_" + colName, values);
                 }
