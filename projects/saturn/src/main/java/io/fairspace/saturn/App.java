@@ -1,11 +1,12 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.SaturnSecurityHandler;
+import io.fairspace.saturn.auth.*;
 import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
+import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
@@ -33,6 +34,7 @@ public class App {
         var server = serverBuilder
                 .build();
 
+        server.getJettyServer().insertHandler(new ProxiedRequestHandler());
         server.getJettyServer().insertHandler(new SessionHandler());
 
         server.start();
