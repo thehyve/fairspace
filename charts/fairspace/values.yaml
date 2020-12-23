@@ -252,37 +252,8 @@ saturn:
     mail.smtp.port: 587
     mail.smtp.starttls.enable: true
   vocabulary:
-
-# Settings for the documentation container
-docs:
-  nameOverride:
-  replicaCount: 1
-  image:
-    image: eu.gcr.io/fairspace-207108/docs
-    tag: RELEASEVERSION
-    pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
-    externalPort: 80
-    internalPort: 8080
-  resources:
-    limits:
-      cpu: 200m
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 64Mi
-  probePath: /
-  livenessProbe:
-    initialDelaySeconds: 60
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  readinessProbe:
-    periodSeconds: 10
-    successThreshold: 1
-    timeoutSeconds: 1
-  terminationGracePeriodSeconds: 60
+  views:
+  templates:
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: {}
