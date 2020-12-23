@@ -4,11 +4,12 @@ import lombok.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Value @Builder
 public class ViewPageDTO {
     @NonNull
-    List<Map<String, Object>> rows;
+    List<Map<String, Set<ValueDTO>>> rows;
     boolean hasNext;
     boolean timeout;
 }

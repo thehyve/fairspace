@@ -1,12 +1,8 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
-import IriTooltip from "../../common/components/IriTooltip";
-import {TOOLTIP_ENTER_DELAY} from "../../constants";
-import Iri from "../../common/components/Iri";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink, isFilesView} from "./metadataViewUtils";
-import {formatDateTime} from "../../common/utils/genericUtils";
 import {makeStyles} from '@material-ui/core/styles';
 
 type MetadataViewTableProperties = {
@@ -90,38 +86,12 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     const renderTableCell = (row, column) => {
-        let value = row[column.name];
-        if (value instanceof Array) {
-            value = value.join(', ');
-        }
-        let displayValue;
-        if (column.type === 'dataLink') {
-            displayValue = !value ? 0 : value.length;
-        } else if (column.type === 'Date') {
-            displayValue = formatDateTime(value);
-        } else if (['Set'].includes(column.type) && value instanceof Array) {
-            displayValue = value;
-        } else if (['TermSet'].includes(column.type) && row[`${column.name}.label`] instanceof Array) {
-            displayValue = row[`${column.name}.label`].join(', ');
-        } else {
-            displayValue = row[`${column.name}.label`] || value;
-        }
-        if (displayValue) {
-            displayValue = `${displayValue}`;
-        }
+        const value = row[column.name];
+        const displayValue = value.map(v => v.label).join(', ');
+
         return (
             <TableCell key={column.name}>
-                {row[`${column.name}.label`] ? (
-                    <IriTooltip
-                        key={column.name}
-                        enterDelay={TOOLTIP_ENTER_DELAY}
-                        title={<Iri iri={value} />}
-                    >
-                        <span className={classes.cellContents}>{displayValue}</span>
-                    </IriTooltip>
-                ) : (
-                    <span className={classes.cellContents}>{displayValue}</span>
-                )}
+                <span className={classes.cellContents}>{displayValue}</span>
             </TableCell>
         );
     };
@@ -143,11 +113,11 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                         hover={isCollectionViewTable}
                         selected={selected && selected.iri === row[idColumn.name]}
                         onClick={() => handleResultSingleClick(
-                            row[idColumn.name],
-                            row[`${idColumn.name}.label`],
+                            row[idColumn.name][0].value,
+                            row[idColumn.name][0].label,
                             dataLinkColumn ? row[dataLinkColumn.name] : []
                         )}
-                        onDoubleClick={() => handleResultDoubleClick(row[idColumn.name])}
+                        onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value)}
                     >
                         {visibleColumns.map(column => renderTableCell(row, column))}
                     </TableRow>
