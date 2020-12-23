@@ -83,7 +83,7 @@ jobs:
       install:
         - source charts/.travis/install.sh
       script:
-      - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
+      - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET -f projects/saturn/views.yaml
 
 notifications:
   slack:
