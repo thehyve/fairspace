@@ -34,7 +34,7 @@ BIND(?smpl AS ?Sample)
   <#if !has_Subject_filter>OPTIONAL {</#if>
     ?Sample curie:subject ?Subject .
     <#if fetch || Subject_species??>OPTIONAL {?Subject curie:isOfSpecies ?Subject_species} ${Subject_species!}</#if>
-    <#if fetch || Subject_gender??> OPTIONAL {?Subject curie:gender ?Subject_gender} ${Subject_gender!}</#if>
+    <#if fetch || Subject_gender??> OPTIONAL {?Subject curie:isOfGender ?Subject_gender} ${Subject_gender!}</#if>
     <#if fetch || Subject_ageAtLastNews??>OPTIONAL {?Subject curie:ageAtLastNews ?Subject_ageAtLastNews} ${Subject_ageAtLastNews!}</#if>
     <#if fetch || Subject_ageAtDeath??>OPTIONAL {?Subject curie:ageAtDeath ?Subject_ageAtDeath} ${Subject_ageAtDeath!}</#if>
   <#if !has_Subject_filter>}</#if>
