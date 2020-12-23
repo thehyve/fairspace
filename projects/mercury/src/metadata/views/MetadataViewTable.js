@@ -87,7 +87,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const renderTableCell = (row, column) => {
         const value = row[column.name];
-        const displayValue = value.map(v => v.label).join(', ');
+        const displayValue = value ? value.map(v => v.label).join(', ') : "";
 
         return (
             <TableCell key={column.name}>
