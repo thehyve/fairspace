@@ -13,7 +13,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.system.Txn;
 import org.apache.jena.vocabulary.RDFS;
 
 import java.util.*;
@@ -25,6 +24,7 @@ import static java.util.stream.Collectors.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.sparql.expr.NodeValue.*;
+import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class SparqlQueryService implements QueryService {
@@ -55,7 +55,7 @@ public class SparqlQueryService implements QueryService {
         var selectExecution = QueryExecutionFactory.create(query, ds);
         selectExecution.setTimeout(config.pageRequestTimeout);
 
-        return Txn.calculateRead(ds, () -> {
+        return calculateRead(ds, () -> {
             var iris = new ArrayList<Resource>();
             var timeout = false;
             var hasNext = false;
@@ -269,7 +269,7 @@ public class SparqlQueryService implements QueryService {
         var execution = QueryExecutionFactory.create(query, ds);
         execution.setTimeout(config.countRequestTimeout);
 
-        return Txn.calculateRead(ds, () -> {
+        return calculateRead(ds, () -> {
             long count = 0;
             try (execution) {
                 for (var it = execution.execSelect(); it.hasNext(); it.next()) {
