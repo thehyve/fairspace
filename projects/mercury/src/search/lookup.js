@@ -16,7 +16,18 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX fs: <http://fairspace.io/ontology#>
 
 SELECT ?id ?label ?comment
-WHERE { 
+WHERE {
+    BIND(${JSON.stringify(query)} AS ?label)    
+    ?id rdfs:label ?label; a <${type}> .
+    OPTIONAL { ?id rdfs:comment ?comment }
+    FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }
+}
+`).then(results => (results.length ? results : search(`
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX fs: <http://fairspace.io/ontology#>
+
+SELECT ?id ?label ?comment
+WHERE {
     ?id a <${type}> ;
         rdfs:label ?label .
     OPTIONAL { ?id rdfs:comment ?comment }
@@ -24,7 +35,7 @@ WHERE {
     FILTER (regex(?label, "${regex(query)}", "i") || regex(?comment, "${regex(query)}", "i"))
 }
 LIMIT 20
-`);
+`)));
 
 export const searchFiles = (query, parentIri) => search(`
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
