@@ -145,13 +145,11 @@ public class SparqlQueryService implements QueryService {
             return new ValueDTO(value.toString(), value, null);
         }
         var resource = node.asResource();
-        var label = resource.listProperties(RDFS.label)
-                .nextOptional()
-                .map(Statement::getString)
-                .orElseGet(resource::getLocalName);
+        var label = resource.getProperty(RDFS.label).getString();
         var access = davFactory.isFileSystemResource(resource)
                 ? davFactory.getAccess(resource)
                 : null;
+
         return new ValueDTO(label, resource.getURI(), access);
     }
 
