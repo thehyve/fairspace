@@ -62,7 +62,7 @@ const Layout = ({
             <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
                 {renderMain()}
             </main>
-            <Footer content={`${versionInfo.id} ${versionInfo.version}`} />
+            <Footer content={`${versionInfo.name} ${versionInfo.version}`} />
         </>
     );
 };
