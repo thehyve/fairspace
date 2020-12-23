@@ -30,6 +30,7 @@ import static io.fairspace.saturn.auth.RequestContext.*;
 import static io.fairspace.saturn.config.Services.*;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.query.DatasetFactory.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -134,16 +135,16 @@ public class SparqlQueryServiceTest {
         request.setPage(1);
         request.setSize(10);
         var page = queryService.retrieveViewPage(request);
-        Assert.assertEquals(2, page.getRows().size());
+        assertEquals(2, page.getRows().size());
         // The implementation does not sort results. Probably deterministic,
         // but no certain order is guaranteed.
-        var row = page.getRows().get(0).get("Sample").equals("http://example.com/samples#s1-a")
+        var row = page.getRows().get(0).get("Sample").iterator().next().getValue().equals("http://example.com/samples#s1-a")
                 ? page.getRows().get(0) : page.getRows().get(1);
-        Assert.assertEquals("Sample A for subject 1", row.get("Sample.label"));
-        Assert.assertEquals(SAMPLE_NATURE_BLOOD, row.get("Sample_nature"));
-        Assert.assertEquals("Blood", row.get("Sample_nature.label"));
-        Assert.assertEquals("Liver", row.get("Sample_topography.label"));
-        Assert.assertEquals(45.2f, ((Number) row.get("Sample_tumorCellularity")).floatValue(), 0.01);
+        assertEquals("Sample A for subject 1", row.get("Sample").iterator().next().getLabel());
+        assertEquals(SAMPLE_NATURE_BLOOD, row.get("Sample_nature").iterator().next().getValue());
+        assertEquals("Blood", row.get("Sample_nature").iterator().next().getLabel());
+        assertEquals("Liver", row.get("Sample_topography").iterator().next().getLabel());
+        assertEquals(45.2f, ((Number) row.get("Sample_tumorCellularity").iterator().next().getValue()).floatValue(), 0.01);
     }
 
     @Test
@@ -151,7 +152,7 @@ public class SparqlQueryServiceTest {
         var request = new CountRequest();
         request.setView("Sample");
         var result = queryService.count(request);
-        Assert.assertEquals(2, result.getCount());
+        assertEquals(2, result.getCount());
     }
 
     @Test
@@ -160,14 +161,14 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
+        request.setFilters(List.of(
                 ViewFilter.builder()
                         .field("Sample_nature")
-                        .values(Collections.singletonList(SAMPLE_NATURE_BLOOD))
+                        .values(List.of(SAMPLE_NATURE_BLOOD))
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);
-        Assert.assertEquals(1, page.getRows().size());
+        assertEquals(1, page.getRows().size());
     }
 
     @Test
@@ -183,7 +184,7 @@ public class SparqlQueryServiceTest {
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);
-        Assert.assertEquals(1, page.getRows().size());
+        assertEquals(1, page.getRows().size());
     }
 
     @Test
@@ -193,13 +194,13 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
+        request.setFilters(List.of(
                 ViewFilter.builder()
                         .field("Collection_analysisType")
-                        .values(Collections.singletonList(ANALYSIS_TYPE_IMAGING))
+                        .values(List.of(ANALYSIS_TYPE_IMAGING))
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);
-        Assert.assertEquals(0, page.getRows().size());
+        assertEquals(0, page.getRows().size());
     }
 }

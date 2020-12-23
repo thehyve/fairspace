@@ -164,45 +164,47 @@ public class SparqlQueryService implements QueryService {
                 ?subject a ?type .
                 """);
 
-        request.getFilters()
-                .stream()
-                .sorted(comparing(f -> getColumn(f.field).priority))
-                .map(f -> f.getField().split("_")[0])
-                .distinct()
-                .forEach(entity -> {
-                    builder.append("FILTER EXISTS {\n");
+        if (request.getFilters() != null) {
+            request.getFilters()
+                    .stream()
+                    .sorted(comparing(f -> getColumn(f.field).priority))
+                    .map(f -> f.getField().split("_")[0])
+                    .distinct()
+                    .forEach(entity -> {
+                        builder.append("FILTER EXISTS {\n");
 
-                    if (!entity.equals(view.name)) {
-                        var join = view.join
-                                .stream()
-                                .filter(j -> j.view.equals(entity))
-                                .findFirst()
-                                .orElseThrow(() -> new RuntimeException("Unknown view: " + entity));
+                        if (!entity.equals(view.name)) {
+                            var join = view.join
+                                    .stream()
+                                    .filter(j -> j.view.equals(entity))
+                                    .findFirst()
+                                    .orElseThrow(() -> new RuntimeException("Unknown view: " + entity));
 
-                        builder.append("?subject ")
-                                .append(join.reverse ? "^<" : "<")
-                                .append(join.on)
-                                .append("> ?")
-                                .append(join.view)
-                                .append(" .\n");
-                    }
-
-                    request.getFilters()
-                            .stream()
-                            .filter(f -> f.getField().startsWith(entity + "_"))
-                            .sorted(comparing(f -> getColumn(f.field).priority))
-                            .forEach(f -> builder.append("?")
-                                    .append(entity)
-                                    .append(" <")
-                                    .append(getColumn(f.field).source)
+                            builder.append("?subject ")
+                                    .append(join.reverse ? "^<" : "<")
+                                    .append(join.on)
                                     .append("> ?")
-                                    .append(f.field)
-                                    .append(" .\n")
-                                    .append(toFilterString(f))
-                                    .append(" \n"));
+                                    .append(join.view)
+                                    .append(" .\n");
+                        }
 
-                    builder.append("}\n");
-                });
+                        request.getFilters()
+                                .stream()
+                                .filter(f -> f.getField().startsWith(entity + "_"))
+                                .sorted(comparing(f -> getColumn(f.field).priority))
+                                .forEach(f -> builder.append("?")
+                                        .append(entity.equals(view.name) ? "subject" : entity)
+                                        .append(" <")
+                                        .append(getColumn(f.field).source)
+                                        .append("> ?")
+                                        .append(f.field)
+                                        .append(" .\n")
+                                        .append(toFilterString(f))
+                                        .append(" \n"));
+
+                        builder.append("}\n");
+                    });
+        }
 
         builder.append("FILTER (?type IN (")
                 .append(view.types.stream().map(t -> "<" + t + ">").collect(joining(", ")))
