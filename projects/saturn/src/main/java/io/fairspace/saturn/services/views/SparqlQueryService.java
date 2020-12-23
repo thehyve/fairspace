@@ -7,7 +7,6 @@ import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.webdav.DavFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -23,7 +22,9 @@ import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
+import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.sparql.expr.NodeValue.*;
 
 @Slf4j
 public class SparqlQueryService implements QueryService {
@@ -229,7 +230,7 @@ public class SparqlQueryService implements QueryService {
                     .collect(toList());
             expr = new E_OneOf(variable, new ExprList(values));
         } else if (filter.prefix != null && !filter.prefix.isEmpty()) {
-            expr = new E_StrStartsWith(new E_Str(variable), NodeValue.makeString(filter.prefix));
+            expr = new E_StrStartsWith(new E_Str(variable), makeString(filter.prefix));
         } else {
             return null;
         }
@@ -255,10 +256,10 @@ public class SparqlQueryService implements QueryService {
 
     private static NodeValue toNodeValue(Object o, ColumnType type) {
         return switch (type) {
-            case Identifier, Term, TermSet -> NodeValue.makeNode(NodeFactory.createURI(o.toString()));
-            case Text, Set -> NodeValue.makeString(o.toString());
-            case Number -> NodeValue.makeDecimal(o.toString());
-            case Date -> NodeValue.makeDate(o.toString());
+            case Identifier, Term, TermSet -> makeNode(createURI(o.toString()));
+            case Text, Set -> makeString(o.toString());
+            case Number -> makeDecimal(o.toString());
+            case Date -> makeDate(o.toString());
         };
     }
 
