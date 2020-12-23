@@ -5,7 +5,7 @@ import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
+import type {MetadataViewColumn, MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
@@ -16,6 +16,7 @@ import {
     getPathSegments,
     LOCATION_FILTER_FIELD,
     LOCATION_RELATED_FACETS,
+    isFilesView,
     ofRangeValueType
 } from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
@@ -108,6 +109,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
     // Facet filter not to use both location context and location related facet values
     const locationFilter = (facet: MetadataViewFacet) => !locationContext || !LOCATION_RELATED_FACETS.includes(facet.name);
 
+    const appendCustomColumns = (columns: MetadataViewColumn[]) => {
+        if (isFilesView(currentView.name)) {
+            const accessColumn = {title: "Collection access", name: "Collection.access", type: "Custom"};
+            return [...columns, accessColumn];
+        }
+        return columns;
+    };
+
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
             {facets.filter(locationFilter).map(facet => {
@@ -150,7 +159,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             {views.map((view, index) => (
                 <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
-                        columns={view.columns}
+                        columns={appendCustomColumns(view.columns)}
                         view={view.name}
                         filters={filters}
                         locationContext={locationContext}
