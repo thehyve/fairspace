@@ -1,7 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
-import {Checkbox, FormControl, FormControlLabel, FormGroup} from "@material-ui/core";
-import {Clear, MenuBook, Search} from "@material-ui/icons";
+import {
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup
+} from "@material-ui/core";
+import {Clear, Search} from "@material-ui/icons";
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -11,10 +16,11 @@ import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 import Switch from "@material-ui/core/Switch";
 import Grid from "@material-ui/core/Grid";
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import type {MetadataViewFacetProperties, Option} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
 import useStateWithSessionStorage from "../../../common/hooks/UseSessionStorage";
 import {SHOW_READABLE_COLLECTION_FACET_FILTER} from "../../../common/constants";
+import {collectionAccessIcon} from '../../../collections/collectionUtils';
 
 
 type SelectProperties = {
@@ -88,7 +94,7 @@ const SelectMultiple = (props: SelectProperties) => {
                         {renderCheckboxListElement(option)}
                     </Grid>
                     <Grid item xs={2} style={{textAlign: "right"}}>
-                        {option.access !== 'List' && <MenuBook fontSize="small" />}
+                        {collectionAccessIcon(option.access, 'small')}
                     </Grid>
                 </Grid>
             ));
