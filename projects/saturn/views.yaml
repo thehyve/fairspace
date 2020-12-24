@@ -41,7 +41,7 @@ views:
           - topography
           - nature
           - origin
-      - view: Collection
+      - view: Resource
         on: https://institut-curie.org/ontology#aboutSubject
         reverse: true
         include:
@@ -86,7 +86,7 @@ views:
           - id
           - gender
           - ageAtDeath
-      - view: Collection
+      - view: Resource
         on: https://institut-curie.org/ontology#aboutSubject
         reverse: true
         include:
@@ -136,13 +136,13 @@ views:
           - laterality
           - eventType
           - ageAtDiagnosis
-      - view: Collection
+      - view: Resource
         on: https://institut-curie.org/ontology#sample
         reverse: true
         include:
           - analysisType
 
-  - name: Collection
+  - name: Resource
     title: Collections and files
     itemName: Name
     types:
@@ -151,7 +151,7 @@ views:
       - http://fairspace.io/ontology#File
     columns:
       - name: type
-        title: Type
+        title: Resource type
         source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
         type: term
       - name: dateCreated

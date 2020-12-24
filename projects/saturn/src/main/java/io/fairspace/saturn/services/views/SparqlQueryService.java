@@ -61,7 +61,7 @@ public class SparqlQueryService implements QueryService {
             var hasNext = false;
             try (selectExecution) {
                 var rs = selectExecution.execSelect();
-                rs.forEachRemaining(row -> iris.add(row.getResource("subject")));
+                rs.forEachRemaining(row -> iris.add(row.getResource(request.getView())));
             } catch (QueryCancelledException e) {
                 timeout = true;
             }
@@ -145,7 +145,10 @@ public class SparqlQueryService implements QueryService {
             return new ValueDTO(value.toString(), value, null);
         }
         var resource = node.asResource();
-        var label = resource.getProperty(RDFS.label).getString();
+        var label = resource.listProperties(RDFS.label)
+                .nextOptional()
+                .map(Statement::getString)
+                .orElseGet(resource::getLocalName);
         var access = davFactory.isFileSystemResource(resource)
                 ? davFactory.getAccess(resource)
                 : null;
@@ -156,19 +159,44 @@ public class SparqlQueryService implements QueryService {
     private Query getQuery(CountRequest request) {
         var view = getView(request.getView());
 
-        var builder = new StringBuilder("""
-                PREFIX fs: <http://fairspace.io/ontology#>
-                            
-                SELECT ?subject 
-                WHERE { 
-                ?subject a ?type .
-                """);
+        var builder = new StringBuilder("PREFIX fs: <http://fairspace.io/ontology#>\n\nSELECT ?")
+                .append(view.name)
+                .append("\nWHERE {\n");
 
         if (request.getFilters() != null) {
-            request.getFilters()
-                    .stream()
-                    .sorted(comparing(f -> getColumn(f.field).priority))
-                    .map(f -> f.getField().split("_")[0])
+            var filters = new ArrayList<>(request.getFilters());
+
+            var collectionFilter = filters.stream().filter(f -> f.field.equals("Collection")).findFirst();
+            collectionFilter.ifPresent(cf -> {
+                filters.remove(cf);
+
+                if (view.name.equals("Resource")) {
+                    builder.append("?Resource fs:belongsTo* ?Collection .\n FILTER (?Collection IN (")
+                            .append(cf.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                            .append("))\n");
+                } else {
+                    var predicate = view.join
+                            .stream()
+                            .filter(j -> j.view.equals("Resource"))
+                            .findFirst()
+                            .map(j -> (j.reverse ? "<" : "^<") + j.on + ">")
+                            .get();
+
+                    builder.append("{SELECT DISTINCT ?s\n WHERE {")
+                            .append("FILTER (?Collection IN (")
+                            .append(cf.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                            .append("))\n?file fs:belongsTo* ?Collection . ?file ")
+                            .append(predicate)
+                            .append(" ?s .\n}}\nBIND (?s AS ?")
+                            .append(view.name)
+                            .append(")\n");
+                }
+            });
+
+            filters.stream()
+                    .map(f -> f.field)
+                    .sorted(comparing(field -> field.contains("_") ? getColumn(field).priority : 0))
+                    .map(field -> field.split("_")[0])
                     .distinct()
                     .forEach(entity -> {
                         builder.append("FILTER EXISTS {\n");
@@ -180,8 +208,9 @@ public class SparqlQueryService implements QueryService {
                                     .findFirst()
                                     .orElseThrow(() -> new RuntimeException("Unknown view: " + entity));
 
-                            builder.append("?subject ")
-                                    .append(join.reverse ? "^<" : "<")
+                            builder.append("?")
+                                    .append(view.name)
+                                    .append(join.reverse ? " ^<" : " <")
                                     .append(join.on)
                                     .append("> ?")
                                     .append(join.view)
@@ -192,41 +221,49 @@ public class SparqlQueryService implements QueryService {
                                 .stream()
                                 .filter(f -> f.getField().startsWith(entity + "_"))
                                 .sorted(comparing(f -> getColumn(f.field).priority))
-                                .forEach(f -> builder.append("?")
-                                        .append(entity.equals(view.name) ? "subject" : entity)
-                                        .append(" <")
-                                        .append(getColumn(f.field).source)
-                                        .append("> ?")
-                                        .append(f.field)
-                                        .append(" .\n")
-                                        .append(toFilterString(f))
-                                        .append(" \n"));
+                                .forEach(f -> {
+                                    if (!f.getField().equals(entity)) {
+                                        builder.append("?")
+                                                .append(entity)
+                                                .append(" <")
+                                                .append(getColumn(f.field).source)
+                                                .append("> ?")
+                                                .append(f.field)
+                                                .append(" .\n");
+                                    }
+                                    builder.append(toFilterString(f))
+                                            .append(" \n");
+                                });
 
                         builder.append("}\n");
                     });
         }
 
-        builder.append("FILTER (?type IN (")
+        builder.append("?")
+                .append(view.name)
+                .append(" a ?type .\nFILTER (?type IN (")
                 .append(view.types.stream().map(t -> "<" + t + ">").collect(joining(", ")))
-                .append("))\nFILTER NOT EXISTS { ?subject fs:dateDeleted ?any }\n}");
+                .append("))\nFILTER NOT EXISTS { ?")
+                .append(view.name)
+                .append(" fs:dateDeleted ?any }\n}");
 
         return QueryFactory.create(builder.toString());
     }
 
     private String toFilterString(ViewFilter filter) {
-        var column = getColumn(filter.field);
+        var type = getColumn(filter.field).type;
 
         var variable = new ExprVar(filter.field);
         Expr expr;
         if (filter.min != null && filter.max != null) {
-            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, column.type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, column.type)));
+            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, type)));
         } else if (filter.min != null) {
-            expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, column.type));
+            expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, type));
         } else if (filter.max != null) {
-            expr = new E_LessThanOrEqual(variable, toNodeValue(filter.max, column.type));
+            expr = new E_LessThanOrEqual(variable, toNodeValue(filter.max, type));
         } else if (filter.values != null && !filter.values.isEmpty()) {
             List<Expr> values = filter.values.stream()
-                    .map(o -> toNodeValue(o, column.type))
+                    .map(o -> toNodeValue(o, type))
                     .collect(toList());
             expr = new E_OneOf(variable, new ExprList(values));
         } else if (filter.prefix != null && !filter.prefix.isEmpty()) {
