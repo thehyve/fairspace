@@ -125,6 +125,7 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
             return facade.getResponse();
         }
 
+        @SuppressWarnings("removal")
         @Override
         public X509Certificate[] getCertificateChain() {
             return facade.getCertificateChain();
