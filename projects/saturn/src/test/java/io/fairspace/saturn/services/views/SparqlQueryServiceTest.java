@@ -179,7 +179,7 @@ public class SparqlQueryServiceTest {
         request.setSize(10);
         request.setFilters(Collections.singletonList(
                 ViewFilter.builder()
-                        .field("Collection_analysisType")
+                        .field("Resource_analysisType")
                         .values(Collections.singletonList(ANALYSIS_TYPE_RNA_SEQ))
                         .build()
         ));
@@ -196,7 +196,7 @@ public class SparqlQueryServiceTest {
         request.setSize(10);
         request.setFilters(List.of(
                 ViewFilter.builder()
-                        .field("Collection_analysisType")
+                        .field("Resource_analysisType")
                         .values(List.of(ANALYSIS_TYPE_IMAGING))
                         .build()
         ));
