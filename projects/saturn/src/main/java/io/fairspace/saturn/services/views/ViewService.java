@@ -3,26 +3,31 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.vocabulary.FS;
 import io.fairspace.saturn.webdav.DavFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.CollectionResource;
+import io.milton.resource.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.system.Txn;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class ViewService {
     private static final Query VALUES_QUERY = QueryFactory.create("""
             PREFIX fs: <http://fairspace.io/ontology#>
             PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-            
+                        
             SELECT ?value ?label
             WHERE {
                ?value a ?type ; rdfs:label ?label .
@@ -99,14 +104,29 @@ public class ViewService {
     }
 
     public List<FacetDTO> getFacets() {
-        return Txn.calculateRead(ds, () -> searchConfig.views
-                .stream()
-                .flatMap(view ->
-                        view.columns.stream()
-                                .map(column -> getFacetInfo(view, column))
-                                .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
-                )
-                .collect(toList()));
+        return calculateRead(ds, () -> {
+            var facets = searchConfig.views
+                    .stream()
+                    .flatMap(view ->
+                            view.columns.stream()
+                                    .map(column -> getFacetInfo(view, column))
+                                    .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
+                    )
+                    .collect(toList());
+            try {
+                var collections = ((CollectionResource) davFactory.root)
+                        .getChildren()
+                        .stream()
+                        .map(c -> (CollectionResource) c)
+                        .sorted(comparing(Resource::getName))
+                        .map(c -> new ValueDTO(c.getName(), c.getUniqueId(), davFactory.getAccess(ds.getDefaultModel().createResource(c.getUniqueId()))))
+                        .collect(toList());
+                facets.add(new FacetDTO("Collection", "Collections", ColumnType.Term, collections, null, null));
+            } catch (NotAuthorizedException | BadRequestException e) {
+                log.error("Could not retrieve accessible collections", e);
+            }
+            return facets;
+        });
     }
 
     public List<ViewDTO> getViews() {

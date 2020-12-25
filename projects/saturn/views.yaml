@@ -10,6 +10,7 @@ views:
         source: https://institut-curie.org/ontology#isOfGender
         rdfType: https://institut-curie.org/ontology#Gender
         type: term
+        priority: 1000
       - name: species
         title: Species
         source: https://institut-curie.org/ontology#isOfSpecies
@@ -19,6 +20,7 @@ views:
         title: Age at last news
         source: https://institut-curie.org/ontology#ageAtLastNews
         type: number
+        priority: 100
       - name: ageAtDeath
         title: Age at death
         source: https://institut-curie.org/ontology#ageAtDeath
@@ -39,11 +41,10 @@ views:
           - topography
           - nature
           - origin
-      - view: Collection
+      - view: Resource
         on: https://institut-curie.org/ontology#aboutSubject
         reverse: true
         include:
-          - collection
           - analysisType
   - name: TumorPathologyEvent
     title: Tumor pathology events
@@ -66,27 +67,29 @@ views:
         source: https://institut-curie.org/ontology#tumorLaterality
         rdfType: https://institut-curie.org/ontology#Laterality
         type: term
+        priority: 1000
       - name: eventType
         title: Event type
         source: https://institut-curie.org/ontology#eventType
         rdfType: https://institut-curie.org/ontology#EventType
         type: term
+        priority: 100
       - name: ageAtDiagnosis
         title: Age at diagnosis
         source: https://institut-curie.org/ontology#ageAtDiagnosis
         type: number
+        priority: 100
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#eventSubject
         include:
-          - label
+          - id
           - gender
           - ageAtDeath
-      - view: Collection
+      - view: Resource
         on: https://institut-curie.org/ontology#aboutSubject
         reverse: true
         include:
-          - collection
           - analysisType
   - name: Sample
     title: Samples
@@ -98,6 +101,7 @@ views:
         title: Tumor cellularity
         source: https://institut-curie.org/ontology#tumorCellularity
         type: number
+        priority: 1000
       - name: topography
         title: Sample topography
         source: https://institut-curie.org/ontology#topography
@@ -108,35 +112,37 @@ views:
         source: https://institut-curie.org/ontology#isOfNature
         rdfType: https://institut-curie.org/ontology#SampleNature
         type: term
+        priority: 100
       - name: origin
         title: Sample origin
         source: https://institut-curie.org/ontology#hasOrigin
         rdfType: https://institut-curie.org/ontology#SampleOrigin
         type: term
+        priority: 100
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#subject
         include:
-          - label
+          - id
           - species
           - gender
           - ageAtDeath
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#diagnosis
         include:
+          - id
           - topography
           - morphology
           - laterality
           - eventType
           - ageAtDiagnosis
-      - view: Collection
-        on: https://institut-curie.org/ontology#aboutEvent
+      - view: Resource
+        on: https://institut-curie.org/ontology#sample
         reverse: true
         include:
-          - collection
           - analysisType
 
-  - name: Collection
+  - name: Resource
     title: Collections and files
     itemName: Name
     types:
@@ -145,7 +151,7 @@ views:
       - http://fairspace.io/ontology#File
     columns:
       - name: type
-        title: Type
+        title: Resource type
         source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
         type: term
       - name: dateCreated
@@ -161,15 +167,11 @@ views:
         source: https://institut-curie.org/ontology#analysisType
         rdfType: https://institut-curie.org/ontology#AnalysisType
         type: termset
+        priority: 100
       - name: keywords
         title: Key words
         source: http://www.w3.org/ns/dcat#keyword
         type: set
-      - name: collection
-        title: Collection
-        source: http://fairspace.io/ontology#belongsTo
-        rdfType: http://fairspace.io/ontology#Collection
-        type: term
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#aboutSubject

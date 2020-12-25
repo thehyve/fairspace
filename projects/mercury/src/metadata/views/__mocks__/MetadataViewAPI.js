@@ -296,102 +296,72 @@ export const mockRows = (viewName) => {
         case "Sample":
             return [
                 {
-                    'Sample': 'http://example.com/sampleType/s01',
-                    'Sample.label': 'S01',
-                    'Sample_sampleType': 'http://example.com/sampleType#tissue',
-                    'Sample_sampleType.label': 'Tissue',
-                    'Sample_topography': 'http://example.com/sampleType#lip',
-                    'Sample_topography.label': 'Lip',
-                    'Sample_tumorCellularity': '2',
-                    'Sample_nature': 'http://example.com/sampleType#dna',
-                    'Sample_nature.label': 'DNA',
-                    'Sample_origin': 'http://example.com/sampleType#normal',
-                    'Sample_origin.label': 'Normal',
-                    'Collection': [
-                        {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
-                        {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
+                    Sample: [{value: 'http://example.com/sampleType/s01', label: 'S01'}],
+                    Sample_sampleType: [{value: 'http://example.com/sampleType#tissue', label: 'Tissue'}],
+                    Sample_topography: [{value: 'http://example.com/sampleType#lip', label: 'Lip'}],
+                    Sample_tumorCellularity: [{value: 2, label: '2'}],
+                    Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
+                    Sample_origin: [{value: 'http://example.com/sampleType#normal', label: 'Normal'}],
+                    Collection: [
+                        {value: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
+                        {value: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
                     ]
                 },
                 {
-                    'Sample': 'http://example.com/sampleType/s02',
-                    'Sample.label': 'S02',
-                    'Sample_sampleType': 'http://example.com/sampleType#tissue',
-                    'Sample_sampleType.label': 'Tissue',
-                    'Sample_topography': 'http://example.com/sampleType#tongue',
-                    'Sample_topography.label': 'Tongue',
-                    'Sample_tumorCellularity': '4',
-                    'Sample_nature': 'http://example.com/sampleType#dna',
-                    'Sample_nature.label': 'DNA',
-                    'Sample_origin': 'http://example.com/sampleType#tumoral',
-                    'Sample_origin.label': 'Tumoral',
+                    Sample: [{value: 'http://example.com/sampleType/s02', label: 'S02'}],
+                    Sample_sampleType: [{value: 'http://example.com/sampleType#tissue', label: 'Tissue'}],
+                    Sample_topography: [{value: 'http://example.com/sampleType#tongue', label: 'Tongue'}],
+                    Sample_tumorCellularity: [{value: 4, label: '4'}],
+                    Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
+                    Sample_origin: [{value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}],
                 },
             ];
         case "Subject":
             return [
                 {
-                    'Subject': 'http://example.com/sampleType/p01',
-                    'Subject.label': 'P01',
-                    'Subject_gender': 'http://example.com/sampleType#male',
-                    'Subject_gender.label': 'Male',
-                    'Subject_species': 'http://example.com/sampleType#hs',
-                    'Subject_species.label': 'Homo Sapiens',
-                    'Subject_birthDate': new Date(2010, 11, 25).toLocaleString(),
-                    'Collection': [
-                        {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
-                        {iri: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
+                    Subject: [{value: 'http://example.com/sampleType/p01', label: 'P01'}],
+                    Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
+                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
+                    Subject_birthDate: [{value: new Date(2010, 11, 25).toLocaleString(), label: "2010-11-25"}],
+                    Collection: [
+                        {value: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
+                        {value: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
                     ]
                 },
                 {
-                    'Subject': 'http://example.com/sampleType/p02',
-                    'Subject.label': 'P02',
-                    'Subject_gender': 'http://example.com/sampleType#male',
-                    'Subject_gender.label': 'Male',
-                    'Subject_species': 'http://example.com/sampleType#hs',
-                    'Subject_species.label': 'Homo Sapiens'
+                    Subject: [{value: 'http://example.com/sampleType/p02', label: 'P02'}],
+                    Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
+                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
                 },
                 {
-                    'Subject': 'http://example.com/sampleType/p03',
-                    'Subject.label': 'P03',
-                    'Subject_gender': 'http://example.com/sampleType#female',
-                    'Subject_gender.label': 'Female',
-                    'Subject_species': 'http://example.com/sampleType#hs',
-                    'Subject_species.label': 'Homo Sapiens',
-                    'files': [
-                        {iri: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'}
+                    Subject: [{value: 'http://example.com/sampleType/p03', label: 'P03'}],
+                    Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
+                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
+                    files: [
+                        {value: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'}
                     ]
                 },
                 {
-                    'Subject': 'http://example.com/sampleType/p04',
-                    'Subject.label': 'P04',
-                    'Subject_gender': 'http://example.com/sampleType#male',
-                    'Subject_gender.label': 'Male',
-                    'Subject_species': 'http://example.com/sampleType#hs',
-                    'Subject_species.label': 'Homo Sapiens'
+                    Subject: [{value: 'http://example.com/sampleType/p04', label: 'P04'}],
+                    Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
+                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
                 },
                 {
-                    'Subject': 'http://example.com/sampleType/p05',
-                    'Subject.label': 'P05',
-                    'Subject_gender': 'http://example.com/sampleType#female',
-                    'Subject_gender.label': 'Female',
-                    'Subject_species': 'http://example.com/sampleType#hs',
-                    'Subject_species.label': 'Homo Sapiens'
+                    Subject: [{value: 'http://example.com/sampleType/p05', label: 'P05'}],
+                    Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
+                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
                 },
                 {
-                    'Subject': 'http://example.com/sampleType/p06',
-                    'Subject.label': 'P06',
-                    'Subject_gender': 'http://example.com/sampleType#female',
-                    'Subject_gender.label': 'Female',
-                    'Subject_species': 'http://example.com/sampleType#hs',
-                    'Subject_species.label': 'Homo Sapiens'
+                    Subject: [{value: 'http://example.com/sampleType/p06', label: 'P06'}],
+                    Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
+                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
                 },
             ];
         case "Collection":
             return [
                 {
-                    'Collection': 'http://localhost:8080/api/v1/webdav/c01',
-                    'Collection.label': 'C01',
-                    'Collection_analysisType': 'http://example.com/analysisType#biology',
-                    'Collection_analysisType.label': 'Biology'
+                    Collection: [{value: 'http://localhost:8080/api/v1/webdav/c01', label: 'C01'}],
+                    Collection_analysisType: [{value: 'http://example.com/analysisType#biology', label: 'Biology'}]
                 }
             ];
         default:

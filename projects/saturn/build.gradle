@@ -64,7 +64,6 @@ dependencies {
 
     implementation 'org.keycloak:keycloak-jetty94-adapter:11.0.2'
     implementation 'org.keycloak:keycloak-admin-client:11.0.2'
-    implementation 'org.freemarker:freemarker:2.3.30'
 
     runtime 'org.slf4j:slf4j-jdk14:1.7.30'
 

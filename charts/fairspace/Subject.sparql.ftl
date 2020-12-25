@@ -1,1 +1,0 @@
-../../projects/saturn/Subject.sparql.ftl

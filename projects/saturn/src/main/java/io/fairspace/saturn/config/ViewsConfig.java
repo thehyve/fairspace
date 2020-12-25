@@ -86,6 +86,7 @@ public class ViewsConfig {
             @NotNull public ColumnType type;
             @NotBlank public String source;
             public String rdfType;
+            public int priority;
         }
 
         public static class JoinView {
