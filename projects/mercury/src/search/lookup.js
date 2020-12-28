@@ -8,7 +8,7 @@ const search = (sparql) => axios.post('/api/v1/rdf/query', sparql,
     .catch(handleHttpError("Error while performing search"))
     .then(extractSparqlSelectResults);
 
-const regex = query => ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/)" + escapeStringRegexp(query))
+const regex = query => ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)" + escapeStringRegexp(query))
     .replace(/\\/g, "\\\\");
 
 export const lookup = (query, type) => search(`
