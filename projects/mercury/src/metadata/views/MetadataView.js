@@ -4,6 +4,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
+import _ from 'lodash';
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewColumn, MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
@@ -26,7 +27,6 @@ import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 import styles from "./MetadataView.styles";
 
@@ -84,15 +84,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
     };
 
-    const updateInactiveFilters = (facet: MetadataViewFacet, values: any[]) => {
+    const updateFilterCandidates = (facet: MetadataViewFacet, values: any[]) => {
         if (filterCandidates.find(f => f.field === facet.name)) {
             let updatedFilters;
-            if (values && values.length > 0 && values.some(isNonEmptyValue)) {
+            if ((values && filters.find(f => f.field === facet.name)
+                && _.isEqual(filters.find(f => f.field === facet.name).values.sort(), values.sort()))) {
+                updatedFilters = [...filterCandidates.filter(f => f.field !== facet.name)];
+            } else {
                 updatedFilters = [...filterCandidates];
                 const filter = updatedFilters.find(f => (f.field === facet.name));
                 setFilterValues(facet.type, filter, values);
-            } else {
-                updatedFilters = [...filterCandidates.filter(f => f.field !== facet.name)];
             }
             setFilterCandidates(updatedFilters);
         } else {
@@ -140,7 +141,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             type={facet.type}
                             title={facet.title}
                             options={facetOptions}
-                            onChange={(values) => updateInactiveFilters(facet, values)}
+                            onChange={(values) => updateFilterCandidates(facet, values)}
                             extraClasses={classes.facet}
                             activeFilterValues={activeFilterValues}
                             clearFilter={() => handleClearFilter(facet.name)}
