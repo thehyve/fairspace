@@ -5,6 +5,7 @@ import useAsync from "../../common/hooks/UseAsync";
 import {isFilesView, LOCATION_FILTER_FIELD, LOCATION_RELATED_FACETS} from "./metadataViewUtils";
 import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
 import {SESSION_STORAGE_METADATA_FILTERS_KEY} from "../../common/constants";
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 const MetadataViewContext = React.createContext({});
 
@@ -27,7 +28,10 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
     };
 
     const updateFilters = (filterCandidates: MetadataViewFilter[]) => {
-        setFilters([...filters.filter(f => !filterCandidates.some(u => u.field === f.field)), ...filterCandidates]);
+        setFilters([
+            ...filters.filter(f => !filterCandidates.some(u => u.field === f.field)),
+            ...filterCandidates.filter(f => (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max))
+        ]);
     };
 
     const setLocationFilter = (viewName: string, locationContext: string) => {
