@@ -75,7 +75,7 @@ export const mockViews: MetadataViewOptions[] = () => [
         ]
     },
     {
-        name: "Collection",
+        name: "Resource",
         title: "Collections",
         columns: [
             {
@@ -357,7 +357,7 @@ export const mockRows = (viewName) => {
                     Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
                 },
             ];
-        case "Collection":
+        case "Resource":
             return [
                 {
                     Collection: [{value: 'http://localhost:8080/api/v1/webdav/c01', label: 'C01'}],
