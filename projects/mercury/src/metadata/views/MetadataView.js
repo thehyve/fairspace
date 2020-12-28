@@ -6,7 +6,7 @@ import {Assignment} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
 import _ from 'lodash';
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewColumn, MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
@@ -15,9 +15,6 @@ import type {MetadataViewEntity} from "./metadataViewUtils";
 import {
     getMetadataViewsPath,
     getPathSegments,
-    LOCATION_FILTER_FIELD,
-    LOCATION_RELATED_FACETS,
-    isFilesView,
     ofRangeValueType
 } from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
@@ -29,6 +26,7 @@ import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
 import styles from "./MetadataView.styles";
+import CollectionsContext from "../../collections/CollectionsContext";
 
 type MetadataViewProperties = {
     classes: any;
@@ -52,6 +50,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {updateFilters, clearFilter, clearAllFilters, setLocationFilter} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
     const [filterCandidates, setFilterCandidates] = useState([]);
+    const {collections} = useContext(CollectionsContext);
 
     // pass location filter to the API for files view
     useEffect(() => {
@@ -115,20 +114,18 @@ export const MetadataView = (props: MetadataViewProperties) => {
         clearFilter(facetName);
     };
 
-    // Facet filter not to use both location context and location related facet values
-    const locationFilter = (facet: MetadataViewFacet) => !locationContext || !LOCATION_RELATED_FACETS.includes(facet.name);
-
-    const appendCustomColumns = (columns: MetadataViewColumn[]) => {
-        if (isFilesView(currentView.name)) {
-            const accessColumn = {title: "Collection access", name: "Collection.access", type: "Custom"};
-            return [...columns, accessColumn];
-        }
-        return columns;
+    const collectionsFacet = !locationContext && collections && {
+        name: 'location',
+        title: "Collection",
+        type: 'Term',
+        values: collections.map(c => ({value: c.iri, label: c.name, access: c.access}))
     };
+
+    const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
 
     const renderFacets = () => (
         <Grid container item direction="column" justify="flex-start" spacing={1}>
-            {facets.filter(locationFilter).map(facet => {
+            {facetsEx.map(facet => {
                 const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
                 const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
                 let activeFilterValues = [];
@@ -177,7 +174,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             {views.map((view, index) => (
                 <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
-                        columns={appendCustomColumns(view.columns)}
+                        columns={view.columns}
                         view={view.name}
                         filters={filters}
                         locationContext={locationContext}
@@ -196,14 +193,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {filters && filters.some(f => f.field !== LOCATION_FILTER_FIELD) && (
+            {filters && filters.some(filter => facets.some(facet => facet.name === filter.field)) && (
                 <Grid container direction="row" spacing={1}>
                     <Grid item>
                         <Button data-testid="clear-button" onClick={handleClearAllFilters} color="primary">
                             Clear all
                         </Button>
                     </Grid>
-                    <Grid item><MetadataViewActiveFilters facets={facets} filters={filters} /></Grid>
+                    <Grid item><MetadataViewActiveFilters facets={facetsEx} filters={filters} /></Grid>
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">

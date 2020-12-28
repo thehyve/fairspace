@@ -29,7 +29,6 @@ import {
 } from "../../common/constants";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 
-
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
     filters: MetadataViewFilter[];

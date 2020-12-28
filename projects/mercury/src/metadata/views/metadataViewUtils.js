@@ -11,9 +11,7 @@ export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
     linkedFiles: MetadataViewEntity[];
 |}
 
-export const LOCATION_FILTER_FIELD = 'Collection';
-export const FILE_VIEW_NAME = 'Collection';
-export const LOCATION_RELATED_FACETS = ['Collection_collection'];
+export const FILE_VIEW_NAME = 'Resource';
 
 export const getMetadataViewsPath = (currentViewName) => {
     let path = '/metadata-views';

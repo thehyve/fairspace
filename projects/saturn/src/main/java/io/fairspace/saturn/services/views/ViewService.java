@@ -2,11 +2,6 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.DavFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.CollectionResource;
-import io.milton.resource.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
@@ -16,7 +11,6 @@ import java.util.List;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
-import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -48,18 +42,16 @@ public class ViewService {
             """);
 
     private static final List<ValueDTO> RESOURCE_TYPES = List.of(
-            new ValueDTO("Collection", FS.COLLECTION_URI, null),
-            new ValueDTO("Directory", FS.DIRECTORY_URI, null),
-            new ValueDTO("File", FS.FILE_URI, null));
+            new ValueDTO("Collection", FS.COLLECTION_URI),
+            new ValueDTO("Directory", FS.DIRECTORY_URI),
+            new ValueDTO("File", FS.FILE_URI));
 
     private final ViewsConfig searchConfig;
     private final Dataset ds;
-    private final DavFactory davFactory;
 
-    public ViewService(ViewsConfig viewsConfig, Dataset ds, DavFactory davFactory) {
+    public ViewService(ViewsConfig viewsConfig, Dataset ds) {
         this.searchConfig = viewsConfig;
         this.ds = ds;
-        this.davFactory = davFactory;
     }
 
     private FacetDTO getFacetInfo(View view, View.Column column) {
@@ -82,8 +74,7 @@ public class ViewService {
                         for (var row : (Iterable<QuerySolution>) execution::execSelect) {
                             var resource = row.getResource("value");
                             var label = row.getLiteral("label").getString();
-                            var access = davFactory.isFileSystemResource(resource) ? davFactory.getAccess(resource) : null;
-                            values.add(new ValueDTO(label, resource.getURI(), access));
+                            values.add(new ValueDTO(label, resource.getURI()));
                         }
                     }
                 }
@@ -104,29 +95,14 @@ public class ViewService {
     }
 
     public List<FacetDTO> getFacets() {
-        return calculateRead(ds, () -> {
-            var facets = searchConfig.views
-                    .stream()
-                    .flatMap(view ->
-                            view.columns.stream()
-                                    .map(column -> getFacetInfo(view, column))
-                                    .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
-                    )
-                    .collect(toList());
-            try {
-                var collections = ((CollectionResource) davFactory.root)
-                        .getChildren()
-                        .stream()
-                        .map(c -> (CollectionResource) c)
-                        .sorted(comparing(Resource::getName))
-                        .map(c -> new ValueDTO(c.getName(), c.getUniqueId(), davFactory.getAccess(ds.getDefaultModel().createResource(c.getUniqueId()))))
-                        .collect(toList());
-                facets.add(new FacetDTO("Collection", "Collections", ColumnType.Term, collections, null, null));
-            } catch (NotAuthorizedException | BadRequestException e) {
-                log.error("Could not retrieve accessible collections", e);
-            }
-            return facets;
-        });
+        return calculateRead(ds, () -> searchConfig.views
+                .stream()
+                .flatMap(view ->
+                        view.columns.stream()
+                                .map(column -> getFacetInfo(view, column))
+                                .filter(f -> f.getMin() != null || f.getMax() != null || (f.getValues() != null && f.getValues().size() > 1))
+                )
+                .collect(toList()));
     }
 
     public List<ViewDTO> getViews() {
@@ -152,7 +128,7 @@ public class ViewService {
                             columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type));
                         }
                     }
-                    return new ViewDTO(v.name, v.title, columns);
+                    return new ViewDTO(v.name, v.title, v.fileLink == null, columns);
                 })
                 .collect(toList());
     }

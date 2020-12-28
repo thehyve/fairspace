@@ -84,7 +84,7 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        viewService = new ViewService(viewsConfig, filteredDataset, davFactory);
+        viewService = new ViewService(viewsConfig, filteredDataset);
         queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset, davFactory);
 
         searchProxyServlet = new SearchProxyServlet(

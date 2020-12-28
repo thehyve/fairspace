@@ -80,6 +80,9 @@ public class ViewsConfig {
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public List<Column> columns;
 
+
+        public String fileLink;
+
         public static class Column {
             @NotBlank public String name;
             @NotBlank public String title;
