@@ -4,6 +4,7 @@ import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink, isFilesView} from "./metadataViewUtils";
 import {makeStyles} from '@material-ui/core/styles';
+import {formatDateTime} from "../../common/utils/genericUtils";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -47,7 +48,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const renderTableCell = (row, column) => {
         const value = row[column.name];
-        const displayValue = value ? value.map(v => v.label).join(', ') : "";
+        const displayValue = (value || []).map(v => ((column.type === 'Date') ? formatDateTime(v.value) : v.label)).join(', ');
 
         return (
             <TableCell key={column.name}>
