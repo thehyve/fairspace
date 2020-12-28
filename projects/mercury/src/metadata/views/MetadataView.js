@@ -1,11 +1,11 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Button, Grid, withStyles} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {Assignment} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewColumn, MetadataViewFacet, MetadataViewOptions} from "./MetadataViewAPI";
+import type {MetadataViewColumn, MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
@@ -22,11 +22,13 @@ import {
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
-import * as consts from "../../constants";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
+
+import styles from "./MetadataView.styles";
 
 type MetadataViewProperties = {
     classes: any;
@@ -41,44 +43,6 @@ type ContextualMetadataViewProperties = {
     classes: any;
 }
 
-export const CENTRAL_PANEL_WIDTH = '70%';
-export const RIGHT_PANEL_WIDTH = '30%';
-
-const styles = (theme) => ({
-    facet: {
-        borderColor: theme.palette.info.light,
-        borderWidth: 1.5,
-        borderRadius: 6
-    },
-    facets: {
-        marginTop: 10,
-        minWidth: 280,
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
-        overflowY: 'auto'
-    },
-    centralPanel: {
-        width: CENTRAL_PANEL_WIDTH,
-        overflowX: 'auto',
-    },
-    centralPanelFullWidth: {
-        width: '100%'
-    },
-    sidePanel: {
-        width: RIGHT_PANEL_WIDTH
-    },
-    metadataViewTabs: {
-        marginTop: 10,
-        overflowX: 'auto',
-        width: '100%',
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
-    },
-    tab: {
-        '& .MuiBox-root': {
-            padding: 0,
-        },
-    },
-});
-
 export const MetadataView = (props: MetadataViewProperties) => {
     const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect, filters} = props;
 
@@ -87,6 +51,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const {updateFilters, clearFilter, clearAllFilters, setLocationFilter} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
+    const [filterCandidates, setFilterCandidates] = useState([]);
 
     // pass location filter to the API for files view
     useEffect(() => {
@@ -106,6 +71,49 @@ export const MetadataView = (props: MetadataViewProperties) => {
         handleViewChangeRedirect(views[tabIndex].name);
     };
 
+    const applyFilters = () => {
+        updateFilters(filterCandidates);
+        setFilterCandidates([]);
+    };
+
+    const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
+        if (ofRangeValueType(type)) {
+            [filter.min, filter.max] = values;
+        } else {
+            filter.values = values;
+        }
+    };
+
+    const updateInactiveFilters = (facet: MetadataViewFacet, values: any[]) => {
+        if (filterCandidates.find(f => f.field === facet.name)) {
+            let updatedFilters;
+            if (values && values.length > 0 && values.some(isNonEmptyValue)) {
+                updatedFilters = [...filterCandidates];
+                const filter = updatedFilters.find(f => (f.field === facet.name));
+                setFilterValues(facet.type, filter, values);
+            } else {
+                updatedFilters = [...filterCandidates.filter(f => f.field !== facet.name)];
+            }
+            setFilterCandidates(updatedFilters);
+        } else {
+            const newFilter: MetadataViewFilter = {
+                field: facet.name
+            };
+            setFilterValues(facet.type, newFilter, values);
+            setFilterCandidates([...filterCandidates, newFilter]);
+        }
+    };
+
+    const handleClearAllFilters = () => {
+        setFilterCandidates([]);
+        clearAllFilters();
+    };
+
+    const handleClearFilter = (facetName: string) => {
+        setFilterCandidates([...filterCandidates.filter(f => f.field !== facetName)]);
+        clearFilter(facetName);
+    };
+
     // Facet filter not to use both location context and location related facet values
     const locationFilter = (facet: MetadataViewFacet) => !locationContext || !LOCATION_RELATED_FACETS.includes(facet.name);
 
@@ -121,7 +129,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         <Grid container item direction="column" justify="flex-start" spacing={1}>
             {facets.filter(locationFilter).map(facet => {
                 const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
-                const activeFilter = filters.find(filter => filter.field === facet.name);
+                const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
                 let activeFilterValues = [];
                 if (activeFilter) {
                     activeFilterValues = ofRangeValueType(facet.type) ? [activeFilter.min, activeFilter.max] : activeFilter.values;
@@ -132,14 +140,23 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             type={facet.type}
                             title={facet.title}
                             options={facetOptions}
-                            onChange={(values) => updateFilters(facet, values)}
+                            onChange={(values) => updateInactiveFilters(facet, values)}
                             extraClasses={classes.facet}
                             activeFilterValues={activeFilterValues}
-                            clearFilter={() => clearFilter(facet.name)}
+                            clearFilter={() => handleClearFilter(facet.name)}
                         />
                     </Grid>
                 );
             })}
+            <Button
+                onClick={applyFilters}
+                variant="contained"
+                color="secondary"
+                className={`${classes.confirmFiltersButtonBlock} ${filterCandidates.length > 0 && classes.confirmFiltersButtonBlockActive}`}
+                disabled={filterCandidates.length === 0}
+            >
+                Apply filters
+            </Button>
         </Grid>
     );
 
@@ -165,6 +182,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         locationContext={locationContext}
                         selected={selected}
                         toggleRow={toggleRow}
+                        hasInactiveFilters={filterCandidates.length > 0}
                     />
                 </TabPanel>
             ))}
@@ -180,7 +198,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             {filters && filters.some(f => f.field !== LOCATION_FILTER_FIELD) && (
                 <Grid container direction="row" spacing={1}>
                     <Grid item>
-                        <Button data-testid="clear-button" onClick={() => clearAllFilters()} color="primary">
+                        <Button data-testid="clear-button" onClick={handleClearAllFilters} color="primary">
                             Clear all
                         </Button>
                     </Grid>

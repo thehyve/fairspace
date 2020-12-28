@@ -1,9 +1,8 @@
 import React from 'react';
-import type {MetadataViewFacet, MetadataViewFilter, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewFilter} from "./MetadataViewAPI";
 import MetadataViewAPI from "./MetadataViewAPI";
 import useAsync from "../../common/hooks/UseAsync";
-import {isFilesView, LOCATION_FILTER_FIELD, LOCATION_RELATED_FACETS, ofRangeValueType} from "./metadataViewUtils";
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import {isFilesView, LOCATION_FILTER_FIELD, LOCATION_RELATED_FACETS} from "./metadataViewUtils";
 import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
 import {SESSION_STORAGE_METADATA_FILTERS_KEY} from "../../common/constants";
 
@@ -27,32 +26,8 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
         setFilters([]);
     };
 
-    const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
-        if (ofRangeValueType(type)) {
-            [filter.min, filter.max] = values;
-        } else {
-            filter.values = values;
-        }
-    };
-
-    const updateFilters = (facet: MetadataViewFacet, values: any[]) => {
-        if (filters.find(f => f.field === facet.name)) {
-            let updatedFilters;
-            if (values && values.length > 0 && values.some(isNonEmptyValue)) {
-                updatedFilters = [...filters];
-                const filter = updatedFilters.find(f => (f.field === facet.name));
-                setFilterValues(facet.type, filter, values);
-            } else {
-                updatedFilters = [...filters.filter(f => f.field !== facet.name)];
-            }
-            setFilters(updatedFilters);
-        } else {
-            const newFilter: MetadataViewFilter = {
-                field: facet.name
-            };
-            setFilterValues(facet.type, newFilter, values);
-            setFilters([...filters, newFilter]);
-        }
+    const updateFilters = (filterCandidates: MetadataViewFilter[]) => {
+        setFilters([...filters.filter(f => !filterCandidates.some(u => u.field === f.field)), ...filterCandidates]);
     };
 
     const setLocationFilter = (viewName: string, locationContext: string) => {
