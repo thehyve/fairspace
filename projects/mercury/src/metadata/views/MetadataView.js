@@ -70,9 +70,13 @@ export const MetadataView = (props: MetadataViewProperties) => {
         handleViewChangeRedirect(views[tabIndex].name);
     };
 
+    const clearFilterCandidates = () => {
+        setFilterCandidates([]);
+    };
+
     const applyFilters = () => {
         updateFilters(filterCandidates);
-        setFilterCandidates([]);
+        clearFilterCandidates();
     };
 
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
@@ -146,15 +150,34 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     </Grid>
                 );
             })}
-            <Button
-                onClick={applyFilters}
-                variant="contained"
-                color="secondary"
+            <Grid
+                container
+                spacing={1}
                 className={`${classes.confirmFiltersButtonBlock} ${filterCandidates.length > 0 && classes.confirmFiltersButtonBlockActive}`}
-                disabled={filterCandidates.length === 0}
             >
-                Apply filters
-            </Button>
+                <Grid item xs={4}>
+                    <Button
+                        onClick={clearFilterCandidates}
+                        variant="contained"
+                        color="default"
+                        className={classes.confirmFiltersButton}
+                        disabled={filterCandidates.length === 0}
+                    >
+                        Cancel
+                    </Button>
+                </Grid>
+                <Grid item xs={8}>
+                    <Button
+                        onClick={applyFilters}
+                        variant="contained"
+                        color="secondary"
+                        className={classes.confirmFiltersButton}
+                        disabled={filterCandidates.length === 0}
+                    >
+                        Apply filters
+                    </Button>
+                </Grid>
+            </Grid>
         </Grid>
     );
 
