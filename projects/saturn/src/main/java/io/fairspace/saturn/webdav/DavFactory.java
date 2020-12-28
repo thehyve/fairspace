@@ -60,9 +60,7 @@ public class DavFactory implements ResourceFactory {
     public Access getAccess(org.apache.jena.rdf.model.Resource subject) {
         var uri = subject.getURI();
         var nextSeparatorPos = uri.indexOf('/', rootSubject.getURI().length() + 1);
-        var coll = nextSeparatorPos < 0 ?
-                rootSubject.getModel().createResource(uri.substring(0)) :
-                rootSubject.getModel().createResource(uri.substring(0, nextSeparatorPos));
+        var coll = rootSubject.getModel().createResource(nextSeparatorPos < 0 ? uri : uri.substring(0, nextSeparatorPos));
         if (!coll.hasProperty(RDF.type, FS.Collection)) {
             return Access.None;
         }
