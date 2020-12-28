@@ -9,7 +9,7 @@ import {isNonEmptyValue} from "../../../common/utils/genericUtils";
 const INPUT_CHANGE_DELAY = 250; // in milliseconds
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, activeFilterValues} = props;
+    const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
     const minValue = isNonEmptyValue(min(options)) ? min(options) : -1;
     const maxValue = isNonEmptyValue(max(options)) ? max(options) : -1;
     const [value, setValue] = useState([null, null]);
@@ -82,7 +82,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     );
 
     return (
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} alignItems="center" className={classes.numericalContent}>
             <Grid item>
                 {renderInput(value[0], handleMinValueInputChange, minValue)}
             </Grid>

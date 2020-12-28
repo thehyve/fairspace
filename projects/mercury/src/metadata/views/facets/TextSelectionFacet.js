@@ -37,10 +37,8 @@ const SelectMultiple = (props: SelectProperties) => {
     const [state, setState] = useState(defaultOptions);
 
     const textFilter = (val) => (textFilterValue.trim() === "" || val.label.toLowerCase().includes(textFilterValue.toLowerCase()));
-
     const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
-
-    const filterOptions = () => (options.filter(readAccessFilter).filter(textFilter));
+    const filteredOptions = options.filter(readAccessFilter).filter(textFilter);
 
     useEffect(() => {
         setState(defaultOptions);
@@ -57,7 +55,6 @@ const SelectMultiple = (props: SelectProperties) => {
 
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
-        setState(newState);
         const selected = Object.entries(newState)
             .filter(([option, checked]) => checked)
             .map(([option, checked]) => option);
@@ -69,11 +66,12 @@ const SelectMultiple = (props: SelectProperties) => {
             key={option.value}
             control={(
                 <Checkbox
-                    checked={state[option.value]}
+                    checked={!!state[option.value]}
                     onChange={handleChange}
                     name={option.value}
                     icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                     checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    className={classes.checkbox}
                 />
             )}
             label={(
@@ -88,7 +86,7 @@ const SelectMultiple = (props: SelectProperties) => {
 
     const renderCheckboxList = () => {
         if (showAccessFilter) {
-            return filterOptions().map(option => (
+            return filteredOptions.map(option => (
                 <Grid container direction="row" key={option.value}>
                     <Grid item xs={10}>
                         {renderCheckboxListElement(option)}
@@ -99,7 +97,7 @@ const SelectMultiple = (props: SelectProperties) => {
                 </Grid>
             ));
         }
-        return filterOptions().map(option => renderCheckboxListElement(option));
+        return filteredOptions.map(option => renderCheckboxListElement(option));
     };
 
     return (
@@ -112,20 +110,51 @@ const SelectMultiple = (props: SelectProperties) => {
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
-    const [showReadableFilterSelected, setShowReadableFilterSelected] = useStateWithSessionStorage(
+    const [accessFilterValue, setAccessFilterValue] = useStateWithSessionStorage(
         SHOW_READABLE_COLLECTION_FACET_FILTER, false
     );
-
-    const showTextFilter = options.length > 5; // TODO decide if it should be conditional or configurable
     const showAccessFilter = options.some(o => o.access);
+    const [availableOptions, setAvailableOptions] = useState(options);
 
-    if (!options || options.length === 0) {
+    useEffect(() => {
+        const newAvailableOptions = showAccessFilter && accessFilterValue ? options.filter(o => o.access !== 'List') : options;
+        setAvailableOptions(newAvailableOptions);
+    }, [showAccessFilter, accessFilterValue]);
+
+    if (!availableOptions || availableOptions.length === 0) {
         return (
             <Typography variant="body2">
                 No filter available.
             </Typography>
         );
     }
+
+    const selectAll = () => {
+        onChange(availableOptions.map(option => option.value));
+    };
+
+    const deselectAll = () => {
+        onChange([]);
+    };
+
+    const handleChangeSelectAll = (event) => {
+        if (event.target.checked) {
+            selectAll();
+        } else {
+            deselectAll();
+        }
+    };
+
+    const renderSelectAllCheckbox = () => (
+        <Checkbox
+            checked={activeFilterValues.length === availableOptions.length}
+            onChange={handleChangeSelectAll}
+            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+            checkedIcon={<CheckBoxIcon fontSize="small" />}
+            className={classes.checkbox}
+            title={activeFilterValues.length === availableOptions.length ? "Deselect all" : "Select all"}
+        />
+    );
 
     const renderAccessFilter = () => (
         <FormGroup className={classes.accessFilter}>
@@ -134,8 +163,8 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                     <Switch
                         size="small"
                         color="primary"
-                        checked={showReadableFilterSelected}
-                        onChange={() => setShowReadableFilterSelected(!showReadableFilterSelected)}
+                        checked={accessFilterValue}
+                        onChange={() => setAccessFilterValue(!accessFilterValue)}
                     />
                 )}
                 label="Show only readable"
@@ -171,25 +200,32 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         />
     );
 
-    const renderFilters = () => (
+    const renderOptionsHeader = () => (
         <div>
-            {showTextFilter && renderTextFilter()}
+            <Grid container direction="row" key="text-selection-facet-header">
+                <Grid item xs={2}>
+                    {renderSelectAllCheckbox()}
+                </Grid>
+                <Grid item xs={10}>
+                    {renderTextFilter()}
+                </Grid>
+            </Grid>
             {showAccessFilter && renderAccessFilter()}
         </div>
     );
 
     return (
         <>
-            {renderFilters()}
+            {renderOptionsHeader()}
             <div className={classes.textContent}>
                 <FormControl component="fieldset" style={{width: "100%"}}>
                     <SelectMultiple
-                        options={options}
+                        options={availableOptions}
                         onChange={onChange}
                         classes={classes}
                         textFilterValue={textFilterValue}
                         activeFilterValues={activeFilterValues}
-                        accessFilterValue={showReadableFilterSelected}
+                        accessFilterValue={accessFilterValue}
                         showAccessFilter={showAccessFilter}
                     />
                 </FormControl>

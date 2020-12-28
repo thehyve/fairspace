@@ -44,10 +44,10 @@ describe('MetadataViewFacetFactory', () => {
         expect(textSelectionFacet.prop('title')).toEqual(title);
 
         const facetValues = wrapper.find(Checkbox);
-        expect(facetValues.length).toEqual(options.length);
-        expect(facetValues.at(0).prop('name')).toBe(options[0].value);
-        expect(facetValues.at(1).prop('name')).toBe(options[1].value);
-        expect(facetValues.at(2).prop('name')).toBe(options[2].value);
+        expect(facetValues.length).toEqual(options.length + 1); // options + "select all" checkbox
+        expect(facetValues.at(1).prop('name')).toBe(options[0].value);
+        expect(facetValues.at(2).prop('name')).toBe(options[1].value);
+        expect(facetValues.at(3).prop('name')).toBe(options[2].value);
     });
 
     it('should render a numerical range selection facet', () => {

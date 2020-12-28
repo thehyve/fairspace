@@ -1,12 +1,14 @@
 import React, {useState} from "react";
 import {Card, CardContent, CardHeader, Collapse, IconButton} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
 import classnames from "classnames";
+import {withStyles} from '@material-ui/core/styles';
 import {Clear, ExpandMore} from "@material-ui/icons";
 import type {ValueType} from "./MetadataViewAPI";
 import TextSelectionFacet from "./facets/TextSelectionFacet";
 import DateSelectionFacet from "./facets/DateSelectionFacet";
 import NumericalRangeSelectionFacet from "./facets/NumericalRangeSelectionFacet";
+
+import styles from "./MetadataViewFacetFactory.styles";
 
 export type Option = {
     value: string;
@@ -25,57 +27,6 @@ export type MetadataViewFacetProperties = {
     clearFilter: () => {};
 };
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: 250,
-        boxShadow: "0px 1px 1px -1px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 1px 1px 0px rgba(0,0,0,0.12)"
-    },
-    title: {
-        "padding": 8,
-        "fontWidth": "bold",
-        "& .MuiCardHeader-action": {
-            alignSelf: "auto",
-            margin: 0
-        }
-    },
-    content: {
-        "&:last-child": {
-            paddingTop: 0,
-            paddingBottom: 8
-        }
-    },
-    input: {
-        fontSize: "small"
-    },
-    textContent: {
-        width: "100%",
-        maxHeight: 220,
-        overflowY: "auto"
-    },
-    expand: {
-        transform: "rotate(0deg)",
-        marginLeft: "auto",
-        transition: theme.transitions.create("transform", {
-            duration: theme.transitions.duration.shortest,
-        }),
-    },
-    expandOpen: {
-        transform: "rotate(180deg)",
-    },
-    headerIcon: {
-        padding: 0
-    },
-    multiselectList: {
-        "& .MuiFormControlLabel-root": {
-            marginRight: 0
-        }
-    },
-    accessFilter: {
-        alignContent: "center",
-        marginBottom: 10
-    }
-}));
-
 const getFacet = (props: MetadataViewFacetProperties) => {
     switch (props.type) {
         case "Identifier":
@@ -92,8 +43,7 @@ const getFacet = (props: MetadataViewFacetProperties) => {
 };
 
 const Facet = (props: MetadataViewFacetProperties) => {
-    const {clearFilter, title, activeFilterValues, extraClasses} = props;
-    const classes = useStyles();
+    const {clearFilter, title, activeFilterValues, extraClasses, classes} = props;
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);
@@ -141,4 +91,4 @@ const Facet = (props: MetadataViewFacetProperties) => {
     );
 };
 
-export default Facet;
+export default withStyles(styles)(Facet);
