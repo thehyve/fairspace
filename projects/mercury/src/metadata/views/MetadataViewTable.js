@@ -69,9 +69,9 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                 {idColumn && rows.map(row => (
                     <TableRow
                         className={classes.row}
-                        key={row[idColumn.name]}
+                        key={row[idColumn.name][0].value}
                         hover={isCollectionViewTable}
-                        selected={selected && selected.iri === row[idColumn.name]}
+                        selected={selected && selected.iri === row[idColumn.name][0].value}
                         onClick={() => handleResultSingleClick(
                             row[idColumn.name][0].value,
                             row[idColumn.name][0].label,
