@@ -199,7 +199,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             Clear all
                         </Button>
                     </Grid>
-                    <Grid item><MetadataViewActiveFilters facets={facets} filters={filters} /></Grid>
+                    <Grid item><MetadataViewActiveFilters facets={facetsEx} filters={filters} /></Grid>
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
