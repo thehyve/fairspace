@@ -31,13 +31,11 @@ public class SparqlQueryService implements QueryService {
     private final Config.Search config;
     private final ViewsConfig searchConfig;
     private final Dataset ds;
-    private final DavFactory davFactory;
 
     public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds, DavFactory davFactory) {
         this.config = config;
         this.searchConfig = viewsConfig;
         this.ds = ds;
-        this.davFactory = davFactory;
     }
 
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
@@ -142,18 +140,15 @@ public class SparqlQueryService implements QueryService {
             if (value instanceof XSDDateTime) {
                 value = ofEpochMilli(((XSDDateTime) value).asCalendar().getTimeInMillis());
             }
-            return new ValueDTO(value.toString(), value, null);
+            return new ValueDTO(value.toString(), value);
         }
         var resource = node.asResource();
         var label = resource.listProperties(RDFS.label)
                 .nextOptional()
                 .map(Statement::getString)
                 .orElseGet(resource::getLocalName);
-        var access = davFactory.isFileSystemResource(resource)
-                ? davFactory.getAccess(resource)
-                : null;
 
-        return new ValueDTO(label, resource.getURI(), access);
+        return new ValueDTO(label, resource.getURI());
     }
 
     private Query getQuery(CountRequest request) {
@@ -166,30 +161,27 @@ public class SparqlQueryService implements QueryService {
         if (request.getFilters() != null) {
             var filters = new ArrayList<>(request.getFilters());
 
-            var collectionFilter = filters.stream().filter(f -> f.field.equals("Collection")).findFirst();
-            collectionFilter.ifPresent(cf -> {
-                filters.remove(cf);
+            filters.stream()
+                    .filter(f -> f.field.equals("location"))
+                    .findFirst()
+                    .ifPresent(locationFilter -> {
+                filters.remove(locationFilter);
 
-                if (view.name.equals("Resource")) {
-                    builder.append("?Resource fs:belongsTo* ?Collection .\n FILTER (?Collection IN (")
-                            .append(cf.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
-                            .append("))\n");
-                } else {
-                    var predicate = view.join
-                            .stream()
-                            .filter(j -> j.view.equals("Resource"))
-                            .findFirst()
-                            .map(j -> (j.reverse ? "<" : "^<") + j.on + ">")
-                            .get();
-
-                    builder.append("{SELECT DISTINCT ?s\n WHERE {")
-                            .append("FILTER (?Collection IN (")
-                            .append(cf.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
-                            .append("))\n?file fs:belongsTo* ?Collection . ?file ")
-                            .append(predicate)
-                            .append(" ?s .\n}}\nBIND (?s AS ?")
-                            .append(view.name)
-                            .append(")\n");
+                if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
+                    if (view.fileLink != null) {
+                        builder.append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
+                                .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                                .append("))\n ?file <")
+                                .append(view.fileLink)
+                                .append("> ?")
+                                .append(view.name)
+                                .append(" . \n");
+                    } else {
+                        builder.append("?").append(view.name)
+                                .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
+                                .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                                .append("))\n");
+                    }
                 }
             });
 

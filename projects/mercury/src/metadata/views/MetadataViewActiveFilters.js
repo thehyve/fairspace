@@ -1,7 +1,7 @@
 import React from 'react';
 import {Chip, Grid, Typography} from '@material-ui/core';
 import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
-import {LOCATION_FILTER_FIELD, ofRangeValueType} from "./metadataViewUtils";
+import {ofRangeValueType} from "./metadataViewUtils";
 import {formatDateTime, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 
@@ -67,8 +67,7 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
         >
             {
                 filters && filters.map(filter => {
-                    if ((!isNonEmptyValue(filter.min) && !isNonEmptyValue(filter.max) && (!filter.values || filter.values.length === 0))
-                        || filter.field === LOCATION_FILTER_FIELD) {
+                    if ((!isNonEmptyValue(filter.min) && !isNonEmptyValue(filter.max) && (!filter.values || filter.values.length === 0))) {
                         return null;
                     }
                     const facet = facets.find(f => f.name === filter.field);

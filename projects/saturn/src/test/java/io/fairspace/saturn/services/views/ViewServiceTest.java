@@ -51,7 +51,7 @@ public class ViewServiceTest {
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
         ds.getContext().set(FS_ROOT, davFactory.root);
 
-        viewService = new ViewService(ConfigLoader.VIEWS_CONFIG, ds, davFactory);
+        viewService = new ViewService(ConfigLoader.VIEWS_CONFIG, ds);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
