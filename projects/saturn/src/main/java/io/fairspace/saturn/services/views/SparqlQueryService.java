@@ -214,17 +214,20 @@ public class SparqlQueryService implements QueryService {
                                 .filter(f -> f.getField().startsWith(entity + "_"))
                                 .sorted(comparing(f -> getColumn(f.field).priority))
                                 .forEach(f -> {
-                                    if (!f.getField().equals(entity)) {
-                                        builder.append("?")
-                                                .append(entity)
-                                                .append(" <")
-                                                .append(getColumn(f.field).source)
-                                                .append("> ?")
-                                                .append(f.field)
-                                                .append(" .\n");
+                                    var condition = toFilterString(f);
+                                    if (condition != null) {
+                                        if (!f.getField().equals(entity)) {
+                                            builder.append("?")
+                                                    .append(entity)
+                                                    .append(" <")
+                                                    .append(getColumn(f.field).source)
+                                                    .append("> ?")
+                                                    .append(f.field)
+                                                    .append(" .\n");
+                                        }
+                                        builder.append(condition)
+                                                .append(" \n");
                                     }
-                                    builder.append(toFilterString(f))
-                                            .append(" \n");
                                 });
 
                         builder.append("}\n");
