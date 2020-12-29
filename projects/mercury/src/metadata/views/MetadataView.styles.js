@@ -1,5 +1,5 @@
-import * as consts from "../../constants";
 import {fade} from "@material-ui/core/styles/colorManipulator";
+import * as consts from "../../constants";
 
 const CENTRAL_PANEL_WIDTH = '70%';
 const RIGHT_PANEL_WIDTH = '30%';
@@ -31,6 +31,7 @@ const styles = theme => ({
         marginTop: 10,
         overflowX: 'auto',
         width: '100%',
+        overflowY: 'hidden',
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
     },
     tab: {
