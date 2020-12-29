@@ -255,11 +255,11 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
 
-    if (loading) {
-        return <LoadingInlay />;
-    }
     if (error && error.message) {
         return <MessageDisplay message={error.message} />;
+    }
+    if (loading) {
+        return <LoadingInlay />;
     }
 
     if (views.length < 1) {

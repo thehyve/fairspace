@@ -83,12 +83,12 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     useEffect(() => {setPage(0);}, [filters]);
 
-    if (loading || !data) {
-        return <LoadingInlay />;
-    }
-
     if (error && error.message) {
         return <MessageDisplay message={error.message} />;
+    }
+
+    if (loading || !data) {
+        return <LoadingInlay />;
     }
 
     if (count === 0) {

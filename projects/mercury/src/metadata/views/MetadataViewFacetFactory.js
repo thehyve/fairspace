@@ -43,7 +43,7 @@ const getFacet = (props: MetadataViewFacetProperties) => {
 };
 
 const Facet = (props: MetadataViewFacetProperties) => {
-    const {clearFilter, title, activeFilterValues, extraClasses, classes} = props;
+    const {clearFilter, title, activeFilterValues = [], extraClasses, classes} = props;
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => setExpanded(!expanded);

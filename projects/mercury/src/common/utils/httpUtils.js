@@ -47,7 +47,7 @@ export function handleHttpError(defaultMessage) {
                     }
                     throw data;
                 }
-                throw Error(data || defaultMessage);
+                throw Error(defaultMessage);
         }
     };
 }
