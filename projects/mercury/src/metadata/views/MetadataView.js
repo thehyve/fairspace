@@ -55,9 +55,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     // pass location filter to the API for files view
     useEffect(() => {
-        setLocationFilter(currentViewName, locationContext);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [locationContext]);
+        setLocationFilter(locationContext);
+    }, [setLocationFilter, locationContext]);
 
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
 

@@ -6,7 +6,6 @@ import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {DATE_FORMAT} from "../../../constants";
 import {formatDateTime} from "../../../common/utils/genericUtils";
 
-
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, classes, activeFilterValues} = props;
     const [value, setValue] = useState([null, null]);

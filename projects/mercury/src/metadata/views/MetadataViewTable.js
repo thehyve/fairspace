@@ -1,9 +1,9 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink} from "./metadataViewUtils";
-import {makeStyles} from '@material-ui/core/styles';
 import {formatDateTime} from "../../common/utils/genericUtils";
 
 type MetadataViewTableProperties = {

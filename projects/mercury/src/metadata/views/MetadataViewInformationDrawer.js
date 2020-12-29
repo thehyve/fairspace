@@ -9,7 +9,6 @@ import EmptyInformationDrawer from "../../common/components/EmptyInformationDraw
 import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 
-
 const useStyles = makeStyles(() => ({
     expandOpen: {
         transform: 'rotate(180deg)',

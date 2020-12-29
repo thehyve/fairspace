@@ -59,7 +59,6 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
         }
     };
 
-
     const handleConfirmSwitchCollection = () => {
         setShowConfirmDialog(false);
         toggle(preselectedCollectionIri);
