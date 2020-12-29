@@ -34,7 +34,7 @@ type MetadataViewTableContainerProperties = {
     filters: MetadataViewFilter[];
     toggleRow: () => {};
     view: string;
-    resourcesView: boolean;
+    resourcesView: boolean; // we assume that only one view at most can have this flag set to true
     locationContext: string;
     selected: MetadataViewEntityWithLinkedFiles;
     hasInactiveFilters: boolean;
