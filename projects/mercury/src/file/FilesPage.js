@@ -22,7 +22,7 @@ import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import styles from "./FilesPage.styles";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
-import {FILE_VIEW_NAME, getMetadataViewsPath, isFilesView} from "../metadata/views/metadataViewUtils";
+import {getMetadataViewsPath} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 
@@ -58,7 +58,7 @@ export const FilesPage = ({
     };
 
     const getAdvancedSearchRedirect = () => (
-        `${getMetadataViewsPath()}?${queryString.stringify({view: FILE_VIEW_NAME, context: getLocationContext()})}`
+        `${getMetadataViewsPath()}?${queryString.stringify({view: (views.find(v => v.resourcesView) || {}).name, context: getLocationContext()})}`
     );
 
     const handleTextSearch = (value) => {
@@ -102,7 +102,7 @@ export const FilesPage = ({
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            {currentUser.canViewPublicMetadata && views && views.map(v => v.name).some(isFilesView) && (
+                            {currentUser.canViewPublicMetadata && views && views.some(v => v.resourcesView) && (
                                 <Link to={getAdvancedSearchRedirect()}>
                                     <Button
                                         variant="text"

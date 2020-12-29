@@ -14,7 +14,6 @@ import {getLocationContextFromString, getMetadataViewNameFromString} from "../..
 import type {MetadataViewEntity} from "./metadataViewUtils";
 import {
     getMetadataViewsPath,
-    getPathSegments,
     ofRangeValueType
 } from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
@@ -27,6 +26,8 @@ import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
 import styles from "./MetadataView.styles";
 import CollectionsContext from "../../collections/CollectionsContext";
+import {pathForIri} from "../../collections/collectionUtils";
+import {getParentPath} from "../../file/fileUtils";
 
 type MetadataViewProperties = {
     classes: any;
@@ -199,6 +200,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     <MetadataViewTableContainer
                         columns={view.columns}
                         view={view.name}
+                        resourcesView={view.resourcesView}
                         filters={filters}
                         locationContext={locationContext}
                         selected={selected}
@@ -209,6 +211,22 @@ export const MetadataView = (props: MetadataViewProperties) => {
             ))}
         </div>
     );
+
+    const getPathSegments = () => {
+        const segments = ((locationContext && pathForIri(locationContext)) || '').split('/');
+        const result = [];
+        if (segments[0] === '') {
+            return result;
+        }
+
+        const pathPrefix = getMetadataViewsPath(views.find(v => v.resourcesView).name) + '&context=';
+        let path = locationContext;
+        segments.reverse().forEach(segment => {
+            result.push({label: segment, href: (pathPrefix + encodeURIComponent(path))});
+            path = getParentPath(path);
+        });
+        return result.reverse();
+    };
 
     return (
         <BreadcrumbsContext.Provider value={{

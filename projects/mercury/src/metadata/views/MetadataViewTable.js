@@ -2,7 +2,7 @@ import React from 'react';
 import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import {getContextualFileLink, isFilesView} from "./metadataViewUtils";
+import {getContextualFileLink} from "./metadataViewUtils";
 import {makeStyles} from '@material-ui/core/styles';
 import {formatDateTime} from "../../common/utils/genericUtils";
 
@@ -12,7 +12,6 @@ type MetadataViewTableProperties = {
     visibleColumnNames: string[];
     idColumn: MetadataViewColumn;
     toggleRow: () => {};
-    view: string;
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
 };
@@ -25,10 +24,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, toggleRow, selected, view, idColumn, history} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, resourcesView, idColumn, history} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
-    const isCollectionViewTable = isFilesView(view);
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const {rows} = data;
 
@@ -41,7 +39,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     const handleResultDoubleClick = (itemIri) => {
-        if (isCollectionViewTable) {
+        if (resourcesView) {
             history.push(getContextualFileLink(itemIri));
         }
     };
@@ -71,7 +69,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                     <TableRow
                         className={classes.row}
                         key={row[idColumn.name][0].value}
-                        hover={isCollectionViewTable}
+                        hover={resourcesView}
                         selected={selected && selected.iri === row[idColumn.name][0].value}
                         onClick={() => handleResultSingleClick(
                             row[idColumn.name][0].value,

@@ -37,6 +37,7 @@ export type MetadataViewColumn = {
 export type MetadataViewOptions = {
     name: string;
     title: string;
+    resourcesView: boolean;
     columns: MetadataViewColumn[];
 };
 

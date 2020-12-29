@@ -1,5 +1,4 @@
 import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions} from "../MetadataViewAPI";
-import {isFilesView} from "../metadataViewUtils";
 
 export const mockViews: MetadataViewOptions[] = () => [
     {
@@ -374,6 +373,6 @@ export const mockGetViewData: Promise<MetadataViewData> = (viewName) => {
     return new Promise(resolve => resolve({
         page: 0,
         rows,
-        totalCount: !isFilesView(rows) && rows.length
+        totalCount: rows.length
     }));
 };

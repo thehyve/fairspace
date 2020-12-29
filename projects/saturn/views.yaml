@@ -50,6 +50,7 @@ views:
   - name: TumorPathologyEvent
     title: Tumor pathology events
     itemName: Tumor pathology event
+    fileLink: https://institut-curie.org/ontology#aboutEvent
     types:
       - https://institut-curie.org/ontology#TumorPathologyEvent
     columns:
