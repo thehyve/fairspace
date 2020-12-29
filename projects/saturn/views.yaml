@@ -87,6 +87,12 @@ views:
           - id
           - gender
           - ageAtDeath
+      - view: Sample
+        on: https://institut-curie.org/ontology#diagnosis
+        reverse: true
+        include:
+          - topography
+          - nature
       - view: Resource
         on: https://institut-curie.org/ontology#aboutEvent
         reverse: true
