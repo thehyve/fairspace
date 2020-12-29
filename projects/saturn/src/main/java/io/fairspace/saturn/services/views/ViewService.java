@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
@@ -41,10 +40,6 @@ public class ViewService {
             }
             """);
 
-    private static final List<ValueDTO> RESOURCE_TYPES = List.of(
-            new ValueDTO("Collection", FS.COLLECTION_URI),
-            new ValueDTO("Directory", FS.DIRECTORY_URI),
-            new ValueDTO("File", FS.FILE_URI));
 
     private final ViewsConfig searchConfig;
     private final Dataset ds;
@@ -61,21 +56,20 @@ public class ViewService {
 
         switch (column.type) {
             case Term, TermSet -> {
-                if (view.name.equalsIgnoreCase("Collection") && column.name.equalsIgnoreCase("type")) {
-                    values = RESOURCE_TYPES;
-                } else {
-                    var binding = new QuerySolutionMap();
-                    binding.add("type", createResource(column.rdfType));
-                    binding.add("predicate", createResource(column.source));
+                var query = (column.query != null && !column.query.isEmpty())
+                        ? QueryFactory.create(column.query)
+                        : VALUES_QUERY;
+                var binding = new QuerySolutionMap();
+                binding.add("type", createResource(column.rdfType));
+                binding.add("predicate", createResource(column.source));
 
-                    values = new ArrayList<>();
-                    try (var execution = QueryExecutionFactory.create(VALUES_QUERY, ds, binding)) {
-                        //noinspection NullableProblems
-                        for (var row : (Iterable<QuerySolution>) execution::execSelect) {
-                            var resource = row.getResource("value");
-                            var label = row.getLiteral("label").getString();
-                            values.add(new ValueDTO(label, resource.getURI()));
-                        }
+                values = new ArrayList<>();
+                try (var execution = QueryExecutionFactory.create(query, ds, binding)) {
+                    //noinspection NullableProblems
+                    for (var row : (Iterable<QuerySolution>) execution::execSelect) {
+                        var resource = row.getResource("value");
+                        var label = row.getLiteral("label").getString();
+                        values.add(new ValueDTO(label, resource.getURI()));
                     }
                 }
             }

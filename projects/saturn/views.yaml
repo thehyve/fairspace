@@ -156,6 +156,16 @@ views:
         title: Resource type
         source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
         type: term
+        query: |
+          PREFIX fs: <http://fairspace.io/ontology#>
+          SELECT ?value ?label
+          WHERE {
+            VALUES (?value ?label) {
+              (fs:Collection "Collection")
+              (fs:Directory "Directory")
+              (fs:File "File")
+            }
+          }
       - name: dateCreated
         title: Created
         source: http://fairspace.io/ontology#dateCreated
