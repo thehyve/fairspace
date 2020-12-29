@@ -1,4 +1,4 @@
-import type {ValueType} from "./MetadataViewAPI";
+import type {ValueType, MetadataViewOptions} from "./MetadataViewAPI";
 import {getCollectionAbsolutePath, pathForIri} from "../../collections/collectionUtils";
 import {getParentPath} from "../../file/fileUtils";
 
@@ -29,3 +29,6 @@ export const getContextualFileLink = (item) => {
 };
 
 export const ofRangeValueType: boolean = (type: ValueType) => type === 'Number' || type === 'Date';
+
+// we assume that only one view at most can have resourcesView flag set to true
+export const resourcesView = (views: MetadataViewOptions[]): MetadataViewOptions => views.find(v => v.resourcesView);

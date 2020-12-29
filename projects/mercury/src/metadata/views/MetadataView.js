@@ -14,7 +14,7 @@ import {getLocationContextFromString, getMetadataViewNameFromString} from "../..
 import type {MetadataViewEntity} from "./metadataViewUtils";
 import {
     getMetadataViewsPath,
-    ofRangeValueType
+    ofRangeValueType, resourcesView
 } from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
@@ -219,7 +219,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             return result;
         }
 
-        const pathPrefix = getMetadataViewsPath(views.find(v => v.resourcesView).name) + '&context=';
+        const pathPrefix = getMetadataViewsPath(resourcesView(views).name) + '&context=';
         let path = locationContext;
         segments.reverse().forEach(segment => {
             result.push({label: segment, href: (pathPrefix + encodeURIComponent(path))});
