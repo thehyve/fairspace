@@ -32,7 +32,7 @@ type SelectProperties = {
 }
 
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, activeFilterValues, accessFilterValue, showAccessFilter, classes} = props;
+    const {options, onChange, textFilterValue, activeFilterValues = [], accessFilterValue, showAccessFilter, classes} = props;
     const defaultOptions = Object.fromEntries(options.map(option => [option.value, activeFilterValues.includes(option.value)]));
     const [state, setState] = useState(defaultOptions);
 
@@ -108,7 +108,7 @@ const SelectMultiple = (props: SelectProperties) => {
 };
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
+    const {options = [], onChange = () => {}, activeFilterValues = [], classes} = props;
     const [textFilterValue, setTextFilterValue] = useState("");
     const [accessFilterValue, setAccessFilterValue] = useStateWithSessionStorage(
         SHOW_READABLE_COLLECTION_FACET_FILTER, false

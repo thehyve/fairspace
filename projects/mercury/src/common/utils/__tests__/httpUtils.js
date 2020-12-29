@@ -21,10 +21,10 @@ describe('Http Utils', () => {
             expect(
                 () => {
                     handleHttpError("Default error")({
-                        response: {status: 500, data: 'Backend error'}
+                        response: {status: 500, data: {message: 'Internal server error'}}
                     });
                 }
-            ).toThrow(new Error('Backend error'));
+            ).toThrow(new Error('Default error'));
         });
     });
 
