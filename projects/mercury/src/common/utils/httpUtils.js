@@ -12,6 +12,7 @@ import ErrorDialog from "../components/ErrorDialog";
 export const handleAuthError = (status) => {
     switch (status) {
         case 401:
+            sessionStorage.clear();
             ErrorDialog.showError('Your session has expired. Please log in again.',
                 null,
                 () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
