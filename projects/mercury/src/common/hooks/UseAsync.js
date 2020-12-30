@@ -25,8 +25,12 @@ const useAsync = (callback, deps = []) => {
         })
         // eslint-disable-next-line
         .finally(() => setLoading(false)), deps);
+
+    useEffect(() => {
+        setLoading(true);
+        refresh();
     // eslint-disable-next-line
-    useEffect(() => {refresh();}, deps);
+    }, deps);
 
     return {
         data,
