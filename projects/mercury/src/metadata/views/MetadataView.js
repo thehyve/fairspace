@@ -207,6 +207,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         selected={selected}
                         toggleRow={toggleRow}
                         hasInactiveFilters={filterCandidates.length > 0}
+                        collections={collections}
                     />
                 </TabPanel>
             ))}

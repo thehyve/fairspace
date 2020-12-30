@@ -24,6 +24,7 @@ import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
 import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
+import {Collection} from "../../collections/CollectionAPI";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -31,6 +32,7 @@ type MetadataViewTableContainerProperties = {
     toggleRow: () => {};
     view: string;
     isResourcesView: boolean;
+    collections: Collection[];
     locationContext: string;
     selected: MetadataViewEntityWithLinkedFiles;
     hasInactiveFilters: boolean;

@@ -1,10 +1,12 @@
 import React from 'react';
-import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {Box, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
+import type {Collection} from "../../collections/CollectionAPI";
+import {collectionAccessIcon} from "../../collections/collectionUtils";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -14,6 +16,7 @@ type MetadataViewTableProperties = {
     toggleRow: () => {};
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
+    collections: Collection[];
 };
 
 const useStyles = makeStyles(() => ({
@@ -24,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history, collections} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
@@ -44,13 +47,18 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
     };
 
+    const getAccess = (iri) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
+
     const renderTableCell = (row, column) => {
         const value = row[column.name];
         const displayValue = (value || []).map(v => ((column.type === 'Date') ? formatDateTime(v.value) : v.label)).join(', ');
 
         return (
             <TableCell key={column.name}>
-                <span className={classes.cellContents}>{displayValue}</span>
+                <Box display="flex" flexDirection="row" alignItems="center">
+                    {isResourcesView && (column === idColumn) && collectionAccessIcon(getAccess(value[0].value))}
+                    <span className={classes.cellContents}>{displayValue}</span>
+                </Box>
             </TableCell>
         );
     };
