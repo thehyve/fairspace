@@ -91,7 +91,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return <LoadingInlay />;
     }
 
-    if (count === 0) {
+    if (count === 0 && !data.timeout && !countTimeout) {
         return <MessageDisplay message="No results found." />;
     }
 
