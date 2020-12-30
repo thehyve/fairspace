@@ -42,7 +42,8 @@ export type MetadataViewOptions = {
 
 export type MetadataViews = {
     facets: MetadataViewFacet[];
-    views: MetadataViewOptions[]
+    views: MetadataViewOptions[];
+    resourcesView: String;
 };
 
 export type MetadataViewData = {

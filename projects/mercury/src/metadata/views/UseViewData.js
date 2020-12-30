@@ -4,7 +4,6 @@ import axios from "axios";
 import MetadataViewAPI from "./MetadataViewAPI";
 import type {MetadataViewData} from "./MetadataViewAPI";
 
-
 const useViewData = (view, filters, rowsPerPage) => {
     const [data, setData] = useState({});
     const [count, setCount] = useState(-1);
@@ -73,7 +72,6 @@ const useViewData = (view, filters, rowsPerPage) => {
             })
             .finally(() => setLoading(false));
     });
-
 
     useEffect(() => {refreshAll();}, [view, filters]);
 

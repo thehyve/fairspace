@@ -8,4 +8,5 @@ import java.util.List;
 public class ViewsDTO {
     List<FacetDTO> facets;
     List<ViewDTO> views;
+    String resourcesView;
 }

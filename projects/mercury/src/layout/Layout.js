@@ -6,10 +6,12 @@ import styles from './Layout.styles';
 import Footer from './Footer';
 import TopBar from "./TopBar";
 import MenuDrawer from "./MenuDrawer";
-import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../common/constants";
 import LoadingInlay from "../common/components/LoadingInlay";
 import versionInfo from '../common/VersionInfo';
 import UserContext from "../users/UserContext";
+
+const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
+const LEFT_MENU_EXPANSION_DELAY = 500;
 
 const Layout = ({
     classes,

@@ -22,7 +22,7 @@ describe('MetadataViewTable', () => {
                 columns={columns}
                 visibleColumnNames={columns.map(c => c.name)}
                 data={data}
-                view=""
+                isResourcesView={false}
                 locationContext=""
                 toggleRow={() => {}}
                 history={historyMock}
@@ -83,7 +83,7 @@ describe('MetadataViewTable', () => {
             columns={columns}
             visibleColumnNames={columns.map(c => c.name)}
             data={data}
-            view={view}
+            isResourcesView
             locationContext=""
             toggleRow={() => {}}
             history={historyMock}

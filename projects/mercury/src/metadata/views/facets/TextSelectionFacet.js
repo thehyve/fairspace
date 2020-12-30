@@ -19,9 +19,7 @@ import Grid from "@material-ui/core/Grid";
 import type {MetadataViewFacetProperties, Option} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
 import useStateWithSessionStorage from "../../../common/hooks/UseSessionStorage";
-import {SHOW_READABLE_COLLECTION_FACET_FILTER} from "../../../common/constants";
 import {collectionAccessIcon} from '../../../collections/collectionUtils';
-
 
 type SelectProperties = {
     options: Option[];
@@ -30,6 +28,8 @@ type SelectProperties = {
     activeFilterValues: any[];
     showAccessFilter: boolean;
 }
+
+export const SHOW_READABLE_COLLECTION_FACET_FILTER = 'FAIRSPACE_COLLECTION_FACET_SHOW_READABLE_FILTER';
 
 const SelectMultiple = (props: SelectProperties) => {
     const {options, onChange, textFilterValue, activeFilterValues = [], accessFilterValue, showAccessFilter, classes} = props;

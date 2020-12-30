@@ -23,10 +23,6 @@ import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
 import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
-import {
-    LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY,
-    SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX
-} from "../../common/constants";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 
 type MetadataViewTableContainerProperties = {
@@ -34,6 +30,7 @@ type MetadataViewTableContainerProperties = {
     filters: MetadataViewFilter[];
     toggleRow: () => {};
     view: string;
+    isResourcesView: boolean;
     locationContext: string;
     selected: MetadataViewEntityWithLinkedFiles;
     hasInactiveFilters: boolean;
@@ -42,9 +39,9 @@ type MetadataViewTableContainerProperties = {
 
 const styles = () => ({
     table: {
-        maxHeight: 'calc(100vh - 215px)',
-        overflowY: 'auto',
-        overflowX: 'auto',
+        "maxHeight": 'calc(100vh - 215px)',
+        "overflowY": 'auto',
+        "overflowX": 'auto',
         '& .MuiTableCell-stickyHeader': {
             backgroundColor: "white"
         }
@@ -63,6 +60,9 @@ const styles = () => ({
         padding: 5
     }
 });
+
+const LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY = 'FAIRSPACE_METADATA_TABLE_ROWS_NUM';
+const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_COLUMNS';
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, hasInactiveFilters, classes} = props;

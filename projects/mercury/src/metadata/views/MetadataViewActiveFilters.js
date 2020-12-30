@@ -4,7 +4,6 @@ import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import {ofRangeValueType} from "./metadataViewUtils";
 import {formatDateTime, isNonEmptyValue} from "../../common/utils/genericUtils";
 
-
 type MetadataViewActiveFiltersProperties = {
     facets: MetadataViewFacet[];
     filters: MetadataViewFilter[];

@@ -14,8 +14,7 @@ import {getLocationContextFromString, getMetadataViewNameFromString} from "../..
 import type {MetadataViewEntity} from "./metadataViewUtils";
 import {
     getMetadataViewsPath,
-    getPathSegments,
-    ofRangeValueType
+    ofRangeValueType,
 } from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
@@ -27,6 +26,8 @@ import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
 import styles from "./MetadataView.styles";
 import CollectionsContext from "../../collections/CollectionsContext";
+import {pathForIri} from "../../collections/collectionUtils";
+import {getParentPath} from "../../file/fileUtils";
 
 type MetadataViewProperties = {
     classes: any;
@@ -34,6 +35,7 @@ type MetadataViewProperties = {
     views: MetadataViewOptions[];
     locationContext: string;
     currentViewName: string;
+    resourcesView: String;
     handleViewChangeRedirect: () => {};
 }
 
@@ -42,7 +44,7 @@ type ContextualMetadataViewProperties = {
 }
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect, filters} = props;
+    const {views, facets, currentViewName, resourcesView, locationContext, classes, handleViewChangeRedirect, filters} = props;
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
@@ -54,7 +56,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     // pass location filter to the API for files view
     useEffect(() => {
-        setLocationFilter(currentViewName, locationContext);
+        setLocationFilter(locationContext);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [locationContext]);
 
@@ -199,6 +201,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     <MetadataViewTableContainer
                         columns={view.columns}
                         view={view.name}
+                        isResourcesView={view.name === resourcesView}
                         filters={filters}
                         locationContext={locationContext}
                         selected={selected}
@@ -209,6 +212,22 @@ export const MetadataView = (props: MetadataViewProperties) => {
             ))}
         </div>
     );
+
+    const getPathSegments = () => {
+        const segments = ((locationContext && pathForIri(locationContext)) || '').split('/');
+        const result = [];
+        if (segments[0] === '') {
+            return result;
+        }
+
+        const pathPrefix = getMetadataViewsPath(resourcesView) + '&context=';
+        let path = locationContext;
+        segments.reverse().forEach(segment => {
+            result.push({label: segment, href: (pathPrefix + encodeURIComponent(path))});
+            path = getParentPath(path);
+        });
+        return result.reverse();
+    };
 
     return (
         <BreadcrumbsContext.Provider value={{
@@ -250,7 +269,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], loading, error, facets = [], filters} = useContext(MetadataViewContext);
+    const {views = [], loading, error, facets = [], filters, resourcesView} = useContext(MetadataViewContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
@@ -277,6 +296,7 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             {...props}
             facets={facets}
             views={views}
+            resourcesView={resourcesView}
             locationContext={locationContext}
             currentViewName={currentViewName}
             filters={filters}
