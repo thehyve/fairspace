@@ -8,6 +8,5 @@ import java.util.List;
 public class ViewDTO {
     String name;
     String title;
-    boolean resourcesView;
     List<ColumnDTO> columns;
 }

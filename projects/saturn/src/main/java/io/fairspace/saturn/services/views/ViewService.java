@@ -128,8 +128,12 @@ public class ViewService {
                             columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type));
                         }
                     }
-                    return new ViewDTO(v.name, v.title, v.fileLink == null, columns);
+                    return new ViewDTO(v.name, v.title, columns);
                 })
                 .collect(toList());
+    }
+
+    public String getResourcesView() {
+        return searchConfig.resourcesView;
     }
 }

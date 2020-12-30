@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, toggleRow, selected, resourcesView, idColumn, history} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
@@ -39,7 +39,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     const handleResultDoubleClick = (itemIri) => {
-        if (resourcesView) {
+        if (isResourcesView) {
             history.push(getContextualFileLink(itemIri));
         }
     };
@@ -69,7 +69,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                     <TableRow
                         className={classes.row}
                         key={row[idColumn.name][0].value}
-                        hover={resourcesView}
+                        hover={isResourcesView}
                         selected={selected && selected.iri === row[idColumn.name][0].value}
                         onClick={() => handleResultSingleClick(
                             row[idColumn.name][0].value,

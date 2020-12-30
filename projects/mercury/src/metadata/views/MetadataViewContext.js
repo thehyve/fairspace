@@ -61,6 +61,7 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
             value={{
                 views: data.views,
                 facets: data.facets,
+                resourcesView: data.resourcesView,
                 filters,
                 setLocationFilter,
                 updateFilters,

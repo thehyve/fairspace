@@ -18,7 +18,7 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import styles from "./CollectionsPage.styles";
 import CollectionsContext from './CollectionsContext';
-import {getMetadataViewsPath, resourcesView} from "../metadata/views/metadataViewUtils";
+import {getMetadataViewsPath} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 
@@ -26,7 +26,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
     usePageTitleUpdater("Collections");
 
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
-    const {views} = useContext(MetadataViewContext);
+    const {views, resourcesView} = useContext(MetadataViewContext);
     const {currentUser} = useContext(UserContext);
 
     const [busy, setBusy] = useState(false);
@@ -81,8 +81,8 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            {currentUser.canViewPublicMetadata && views && resourcesView(views) && (
-                                <Link to={getMetadataViewsPath(resourcesView(views).name)}>
+                            {currentUser.canViewPublicMetadata && views && resourcesView && (
+                                <Link to={getMetadataViewsPath(resourcesView)}>
                                     <Button
                                         variant="text"
                                         color="primary"

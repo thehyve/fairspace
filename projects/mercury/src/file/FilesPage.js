@@ -22,7 +22,7 @@ import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import styles from "./FilesPage.styles";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
-import {getMetadataViewsPath, resourcesView} from "../metadata/views/metadataViewUtils";
+import {getMetadataViewsPath} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 
@@ -32,7 +32,7 @@ export const FilesPage = ({
     fileApi,
     collection,
     openedPath,
-    views,
+    resourcesView,
     loading = false,
     error = false,
     showDeleted,
@@ -58,7 +58,7 @@ export const FilesPage = ({
     };
 
     const getAdvancedSearchRedirect = () => (
-        `${getMetadataViewsPath()}?${queryString.stringify({view: resourcesView(views).name, context: getLocationContext()})}`
+        `${getMetadataViewsPath()}?${queryString.stringify({view: resourcesView, context: getLocationContext()})}`
     );
 
     const handleTextSearch = (value) => {
@@ -102,7 +102,7 @@ export const FilesPage = ({
                             />
                         </Grid>
                         <Grid item xs={3} className={classes.advancedSearchButton}>
-                            {currentUser.canViewPublicMetadata && views && resourcesView(views) && (
+                            {currentUser.canViewPublicMetadata && resourcesView && (
                                 <Link to={getAdvancedSearchRedirect()}>
                                     <Button
                                         variant="text"
@@ -181,7 +181,7 @@ const ParentAwareFilesPage = (props) => {
 
 const ContextualFilesPage = (props) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
-    const {views} = useContext(MetadataViewContext);
+    const {resourcesView} = useContext(MetadataViewContext);
     const {currentUser} = useContext(UserContext);
     const {params} = props.match;
     const {collectionName, openedPath} = getPathInfoFromParams(params);
@@ -195,7 +195,7 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
-            views={views}
+            resourcesView={resourcesView}
             currentUser={currentUser}
             {...props}
         />
@@ -207,7 +207,7 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
-            views={views}
+            resourcesView={resourcesView}
             currentUser={currentUser}
             {...props}
         />
