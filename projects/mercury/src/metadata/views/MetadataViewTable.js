@@ -5,6 +5,8 @@ import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink} from "./metadataViewUtils";
 import {formatDateTime} from "../../common/utils/genericUtils";
+import type {Collection} from "../../collections/CollectionAPI";
+import {collectionAccessIcon} from "../../collections/collectionUtils";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -14,6 +16,7 @@ type MetadataViewTableProperties = {
     toggleRow: () => {};
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
+    collections: Collection[];
 };
 
 const useStyles = makeStyles(() => ({
@@ -24,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history, collections} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
@@ -44,7 +47,19 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
     };
 
+    const getAccess = (iri) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
+
     const renderTableCell = (row, column) => {
+        if (isResourcesView && column.name === 'access') {
+            const iri = row[idColumn.name][0].value;
+            const access = getAccess(iri);
+            return (
+                <TableCell key={column.name}>
+                    {collectionAccessIcon(access)}
+                </TableCell>
+            );
+        }
+
         const value = row[column.name];
         const displayValue = (value || []).map(v => ((column.type === 'Date') ? formatDateTime(v.value) : v.label)).join(', ');
 
