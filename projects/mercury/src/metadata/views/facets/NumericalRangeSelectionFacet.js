@@ -2,18 +2,18 @@ import React, {useEffect, useState} from 'react';
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import Slider from "@material-ui/core/Slider";
-import {max, min} from "lodash/math";
+import {Typography} from "@material-ui/core";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {isNonEmptyValue} from "../../../common/utils/genericUtils";
 
-const INPUT_CHANGE_DELAY = 250; // in milliseconds
+const nonEmptyNumber = (value, alternative) => (isNonEmptyValue(value) ? Number(value) : alternative);
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
-    const minValue = isNonEmptyValue(min(options)) ? min(options) : -1;
-    const maxValue = isNonEmptyValue(max(options)) ? max(options) : -1;
+    const minValue = nonEmptyNumber(options[0], -1);
+    const maxValue = nonEmptyNumber(options[1], -1);
     const [value, setValue] = useState([null, null]);
-    const [timeoutId, setTimeoutId] = useState();
+    const [validationError, setValidationError] = useState(null);
 
     useEffect(() => {
         if (activeFilterValues.length > 0) {
@@ -24,10 +24,8 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     }, [activeFilterValues]);
 
     const handleChange = (val: number[]) => {
-        clearTimeout(timeoutId);
-        const newValue = isNonEmptyValue(val[0]) && isNonEmptyValue(val[1]) ? [min(val), max(val)] : val;
-        setValue(newValue);
-        setTimeoutId(setTimeout(() => onChange(newValue), INPUT_CHANGE_DELAY));
+        setValidationError(null);
+        onChange(val);
     };
 
     const handleSliderChange = (event, val) => {
@@ -35,29 +33,59 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const handleMinValueInputChange = (event) => {
-        const newMinValue = isNonEmptyValue(event.target.value) ? Number(event.target.value) : null;
-        handleChange([newMinValue, value[1]]);
+        const newMinValue = event.target.value;
+        setValue([newMinValue, value[1]]);
+        if (isNonEmptyValue(newMinValue)) {
+            if (Number.isNaN(newMinValue)) {
+                setValidationError("Min value has to be a number.");
+            } else if (Number(newMinValue) < minValue) {
+                setValidationError(`Min value cannot be lower than ${minValue}.`);
+            } else if (Number(newMinValue) > value[1]) {
+                setValidationError("Min value cannot be higher than max value.");
+            } else {
+                handleChange([Number(newMinValue), value[1]]);
+            }
+        } else {
+            handleChange([null, value[1]]);
+        }
     };
 
     const handleMaxValueInputChange = (event) => {
-        const newMaxValue = isNonEmptyValue(event.target.value) ? Number(event.target.value) : null;
-        handleChange([value[0], newMaxValue]);
+        const newMaxValue = event.target.value;
+        setValue([value[0], newMaxValue]);
+        if (isNonEmptyValue(event.target.value)) {
+            if (Number.isNaN(newMaxValue)) {
+                setValidationError("Max value has to be a number.");
+            } else if (Number(newMaxValue) > maxValue) {
+                setValidationError(`Max value cannot be higher than ${maxValue}.`);
+            } else if (Number(newMaxValue) < value[0]) {
+                setValidationError("Max value cannot be lower than min value.");
+            } else {
+                handleChange([value[0], Number(newMaxValue)]);
+            }
+        } else {
+            handleChange([value[0], null]);
+        }
     };
 
     const handleBlur = () => {
-        if (value[0] && value[0] < minValue) {
-            handleChange([minValue, value[1]]);
-        } else if (value[1] && value[1] > maxValue) {
-            handleChange([value[0], maxValue]);
+        if (validationError) {
+            if (activeFilterValues.length > 0) {
+                setValue(activeFilterValues);
+            } else {
+                setValue([null, null]);
+            }
         }
+        setValidationError(null);
     };
 
     const renderInput = (inputValue, handleInputChange, placeholder) => (
         <Input
-            value={isNonEmptyValue(inputValue) ? inputValue : ""}
+            value={nonEmptyNumber(inputValue, "")}
             margin="dense"
             onChange={handleInputChange}
             onBlur={handleBlur}
+            error={!!validationError}
             inputProps={{
                 'step': 1,
                 'min': minValue,
@@ -71,7 +99,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     const renderSlider = () => (
         <Slider
-            value={[value[0] || minValue, value[1] || maxValue]}
+            value={[nonEmptyNumber(value[0], null), nonEmptyNumber(value[1], null)]}
             onChangeCommitted={handleSliderChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
@@ -82,17 +110,22 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     );
 
     return (
-        <Grid container spacing={2} alignItems="center" className={classes.numericalContent}>
-            <Grid item>
-                {renderInput(value[0], handleMinValueInputChange, minValue)}
+        <div>
+            <Grid container spacing={2} alignItems="center" className={classes.numericalContent}>
+                <Grid item xs={3}>
+                    {renderInput(value[0], handleMinValueInputChange, minValue)}
+                </Grid>
+                <Grid item xs={6}>
+                    {renderSlider()}
+                </Grid>
+                <Grid item xs={3}>
+                    {renderInput(value[1], handleMaxValueInputChange, maxValue)}
+                </Grid>
             </Grid>
-            <Grid item xs>
-                {renderSlider()}
-            </Grid>
-            <Grid item>
-                {renderInput(value[1], handleMaxValueInputChange, maxValue)}
-            </Grid>
-        </Grid>
+            <Typography color="error">
+                {validationError}
+            </Typography>
+        </div>
     );
 };
 
