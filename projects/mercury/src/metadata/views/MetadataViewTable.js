@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -50,15 +50,22 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const getAccess = (iri) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
 
     const renderTableCell = (row, column) => {
+        if (isResourcesView && column.name === 'access') {
+            const iri = row[idColumn.name][0].value;
+            const access = getAccess(iri);
+            return (
+                <TableCell key={column.name}>
+                    {collectionAccessIcon(access)}
+                </TableCell>
+            );
+        }
+
         const value = row[column.name];
         const displayValue = (value || []).map(v => ((column.type === 'Date') ? formatDateTime(v.value) : v.label)).join(', ');
 
         return (
             <TableCell key={column.name}>
-                <Box display="flex" flexDirection="row" alignItems="center">
-                    {isResourcesView && (column === idColumn) && collectionAccessIcon(getAccess(value[0].value))}
-                    <span className={classes.cellContents}>{displayValue}</span>
-                </Box>
+                <span className={classes.cellContents}>{displayValue}</span>
             </TableCell>
         );
     };

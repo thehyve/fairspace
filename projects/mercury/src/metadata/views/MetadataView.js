@@ -127,6 +127,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         values: collections.map(c => ({value: c.iri, label: c.name, access: c.access}))
     };
 
+    const appendCustomColumns = (view: MetadataViewOptions) => {
+        if (view.name === resourcesView) {
+            const accessColumn = {title: "Access", name: "access", type: "Custom"};
+            return [...view.columns, accessColumn];
+        }
+        return view.columns;
+    };
+
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
 
     const renderFacets = () => (
@@ -199,7 +207,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             {views.map((view, index) => (
                 <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
-                        columns={view.columns}
+                        columns={appendCustomColumns(view)}
                         view={view.name}
                         isResourcesView={view.name === resourcesView}
                         filters={filters}
