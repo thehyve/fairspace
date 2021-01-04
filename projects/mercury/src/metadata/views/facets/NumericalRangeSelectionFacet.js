@@ -29,7 +29,13 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const handleSliderChange = (event, val) => {
-        handleChange(val);
+        if (val instanceof Array) {
+            handleChange(val);
+        } else if (value[0] === null) {
+            handleChange([null, val]);
+        } else {
+            handleChange([val, null]);
+        }
     };
 
     const handleMinValueInputChange = (event) => {
@@ -97,10 +103,23 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         />
     );
 
+    const getSliderValue = () => {
+        const val1 = nonEmptyNumber(value[0], null);
+        const val2 = nonEmptyNumber(value[1], null);
+        if (val1 != null && val2 != null) {
+            return [val1, val2];
+        }
+        if (val1 != null) {
+            return val1;
+        }
+        return val2;
+    };
+
     const renderSlider = () => (
         <Slider
-            value={[nonEmptyNumber(value[0], null), nonEmptyNumber(value[1], null)]}
-            onChangeCommitted={handleSliderChange}
+            value={getSliderValue()}
+            track={value[1] === null && isNonEmptyValue(value[0]) ? 'inverted' : 'normal'}
+            onChange={handleSliderChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
             getAriaValueText={() => value}
