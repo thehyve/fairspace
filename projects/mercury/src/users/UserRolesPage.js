@@ -19,6 +19,7 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {setUserRole} from "./UsersAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 const columns = {
     name: {
@@ -59,6 +60,8 @@ const UserRolesPage = () => {
     const {users, usersLoading, usersError, refresh} = useContext(UsersContext);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users || [], columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+
+    usePageTitleUpdater("Users");
 
     if (usersError) {
         return (<MessageDisplay message="An error occurred loading users" />);

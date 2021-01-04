@@ -28,6 +28,7 @@ import styles from "./MetadataView.styles";
 import CollectionsContext from "../../collections/CollectionsContext";
 import {pathForIri} from "../../collections/collectionUtils";
 import {getParentPath} from "../../file/fileUtils";
+import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 
 type MetadataViewProperties = {
     classes: any;
@@ -45,6 +46,8 @@ type ContextualMetadataViewProperties = {
 
 export const MetadataView = (props: MetadataViewProperties) => {
     const {views, facets, currentViewName, resourcesView, locationContext, classes, handleViewChangeRedirect, filters} = props;
+
+    usePageTitleUpdater("Metadata views");
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
