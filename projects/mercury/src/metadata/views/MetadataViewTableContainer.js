@@ -22,7 +22,6 @@ import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
-import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 import {Collection} from "../../collections/CollectionAPI";
 
@@ -70,7 +69,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const {view, filters, columns, hasInactiveFilters, classes} = props;
 
     const [page, setPage] = useState(0);
-    const [visibleColumnNames, setVisibleColumnNames] = useStateWithSessionStorage(
+    const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
         columns.map(c => c.name)
     );
