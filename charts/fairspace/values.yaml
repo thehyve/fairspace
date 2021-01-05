@@ -5,6 +5,16 @@ nameOverride:
 
 # External dependencies for running the fairspace
 external:
+  # Settings for the Keycloak adapter, used to authenticate users and fetch user information.
+  keycloak:
+    baseUrl:
+    loginRealm: fairspace
+    realm:
+    clientSecret:
+    serviceAccount:
+      username: fairspace-service-account
+      password:
+
   elasticsearch:
     enabled: false
     rest:
