@@ -41,9 +41,12 @@ export type MetadataViewOptions = {
 };
 
 export type MetadataViews = {
-    facets: MetadataViewFacet[];
     views: MetadataViewOptions[];
     resourcesView: String;
+};
+
+export type MetadataFacets = {
+    facets: MetadataViewFacet[];
 };
 
 export type MetadataViewData = {
@@ -79,7 +82,13 @@ class MetadataViewAPI {
     getViews(): Promise<MetadataViews> {
         return axios.get(metadataViewUrl, defaultRequestOptions)
             .then(extractJsonData)
-            .catch(handleHttpError("Failure when retrieving metadata views configuration."));
+            .catch(handleHttpError("Failure when retrieving metadata views."));
+    }
+
+    getFacets(): Promise<MetadataFacets> {
+        return axios.get(`${metadataViewUrl}facets`, defaultRequestOptions)
+            .then(extractJsonData)
+            .catch(handleHttpError("Failure when retrieving metadata facets."));
     }
 
     getViewData(cancelToken: CancelTokenSource, viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {

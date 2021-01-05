@@ -29,6 +29,7 @@ import CollectionsContext from "../../collections/CollectionsContext";
 import {pathForIri} from "../../collections/collectionUtils";
 import {getParentPath} from "../../file/fileUtils";
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
+import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
 
 type MetadataViewProperties = {
     classes: any;
@@ -282,15 +283,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], loading, error, facets = [], filters, resourcesView} = useContext(MetadataViewContext);
+    const {views = [], loading, error, filters, resourcesView} = useContext(MetadataViewContext);
+    const {facets = [], loading: facetsLoading, error: facetsError} = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
 
-    if (error && error.message) {
+    if ((error && error.message) || (facetsError && facetsError.message)) {
         return <MessageDisplay message={error.message} />;
     }
-    if (loading) {
+    if (loading || facetsLoading) {
         return <LoadingInlay />;
     }
 
