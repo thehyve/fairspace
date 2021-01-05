@@ -2,9 +2,9 @@
 import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import MetadataViewAPI from "./MetadataViewAPI";
-import type {MetadataViewData} from "./MetadataViewAPI";
+import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
 
-const useViewData = (view, filters, rowsPerPage) => {
+const useViewData = (view: string, filters: MetadataViewFilter[], rowsPerPage: number) => {
     const [data, setData] = useState({});
     const [count, setCount] = useState(-1);
     const [countTimeout, setCountTimeout] = useState(false);
@@ -31,7 +31,7 @@ const useViewData = (view, filters, rowsPerPage) => {
         });
     };
 
-    const getViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
+    const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
         if (viewDataRequestCancelToken) {
             viewDataRequestCancelToken.cancel("Fetching data operation canceled due to new request.");
         }
@@ -43,13 +43,18 @@ const useViewData = (view, filters, rowsPerPage) => {
     const refreshAll = useCallback(() => {
         setLoading(true);
         setCount(-1);
-        getViewData(0, rowsPerPage)
+        fetchViewData(0, rowsPerPage)
             .then(d => {
                 setData(d);
-                if (d && !d.hasNext) {
-                    setCount(d.rows.length);
-                } else {
-                    fetchCount();
+                if (d) {
+                    if (!d.hasNext) {
+                        if (viewDataRequestCancelToken) {
+                            viewDataRequestCancelToken.cancel("Fetching count operation canceled due to new data.");
+                        }
+                        setCount(d.rows.length);
+                    } else {
+                        fetchCount();
+                    }
                 }
                 setError(undefined);
             })
@@ -58,11 +63,11 @@ const useViewData = (view, filters, rowsPerPage) => {
                 console.error(e || new Error('Unknown error'));
             })
             .finally(() => setLoading(false));
-    }, [view, filters]);
+    });
 
     const refreshDataOnly = useCallback((newPage, newRowsPerPage) => {
         setLoading(true);
-        getViewData(newPage, newRowsPerPage).then(d => {
+        fetchViewData(newPage, newRowsPerPage).then(d => {
             setData(d);
             setError(undefined);
         })
