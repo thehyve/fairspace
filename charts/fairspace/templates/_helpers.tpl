@@ -88,15 +88,8 @@ Scheme to access fairspace components (http or https)
 {{ template "fairspace.scheme" . }}://{{ template "saturn.hostname" . }}
 {{- end -}}
 
-{{- define "jupyter.url" -}}
-{{ template "fairspace.scheme" . }}://jupyter.{{ template "saturn.hostname" . }}
-{{- end -}}
-
 {{- define "saturn.fullname" -}}
 {{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
-{{- end -}}
-{{- define "docs.fullname" -}}
-{{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
 {{- end -}}
 
 {{- define "elasticsearch.baseurl" -}}

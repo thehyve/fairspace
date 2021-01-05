@@ -17,13 +17,9 @@ fairspace:
   description: "CI Fairspace"
   ingress:
     domain: fairspace.ci.fairway.app
-  configurationScripts:
-    keycloak:
-      enabled: false
   features:
-
-services:
-  "JupyterHub Server": https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
+  services:
+    JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
 # Specific settings for Saturn subchart
 saturn:
@@ -44,8 +40,8 @@ saturn:
   image:
     pullPolicy: Always
   customStorageClass:
-      create: true
-      name: expandable
-      type: pd-standard
-      provisioner: kubernetes.io/gce-pd
-      allowVolumeExpansion: true
+    create: true
+    name: expandable
+    type: pd-standard
+    provisioner: kubernetes.io/gce-pd
+    allowVolumeExpansion: true
