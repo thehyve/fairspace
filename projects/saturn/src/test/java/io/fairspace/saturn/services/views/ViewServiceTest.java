@@ -2,7 +2,6 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.mail.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.*;
@@ -33,8 +32,6 @@ public class ViewServiceTest {
     @Mock
     UserService userService;
     @Mock
-    MailService mailService;
-    @Mock
     private MetadataPermissions permissions;
     MetadataService api;
     ViewService viewService;
@@ -48,7 +45,7 @@ public class ViewServiceTest {
 
         var context = new Context();
 
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
         ds.getContext().set(FS_ROOT, davFactory.root);
 
         viewService = new ViewService(ConfigLoader.VIEWS_CONFIG, ds);

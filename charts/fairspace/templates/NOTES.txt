@@ -25,7 +25,7 @@ Your fairspace is named {{ template "fairspace.name" . }} and can be accessed vi
 
 {{- end }}
 
-The installation contain an instance Saturn.
+The installation contains an instance of Saturn.
 
 {{- if not .Values.fairspace.ingress.enabled }}
 ----------------------------
@@ -37,7 +37,7 @@ You can do so with the following steps:
 - Log in to Keycloak at {{ template "keycloak.baseUrl" .}}
 - Go to realm {{ .Values.external.keycloak.realm }}
 - Go to client {{ template "fairspace.name" . }}-private
-- Add the Fairspace url (with /*, so for example http://localhost:32124/*) as valid return url
+- Add the Fairspace url (with /*, so for example https://localhost:32124/*) as valid return url
 - Save the client.
 
 {{- end -}}

@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
 import static java.util.stream.Collectors.joining;
@@ -338,15 +337,6 @@ class CollectionResource extends DirectoryResource {
             case Read -> principal.addProperty(FS.canRead, subject);
             case Write -> principal.addProperty(FS.canWrite, subject);
             case Manage -> principal.addProperty(FS.canManage, subject);
-        }
-
-        if (principal.hasProperty(RDF.type, FS.User) && principal.hasProperty(FS.email)) {
-            var message = grantedAccess == Access.None
-                    ? "Your access to collection " + getName() + " has been revoked."
-                    : "You've been granted " + grantedAccess.name().toLowerCase() + " access to collection " + getName() + "\n" + subject.getURI();
-            var email = principal.getProperty(FS.email).getString();
-            getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
-                    (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
         }
     }
 

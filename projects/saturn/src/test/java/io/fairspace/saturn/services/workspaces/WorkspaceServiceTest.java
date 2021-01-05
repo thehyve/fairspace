@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.workspaces;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -43,14 +42,12 @@ public class WorkspaceServiceTest {
     @Mock
     private UserService userService;
     User user = new User();
-    @Mock
-    private MailService mailService = new MailService(session);
 
     @Before
     public void setUp() {
         setupRequestContext();
         when(userService.currentUser()).thenReturn(user);
-        service = new WorkspaceService(txn, userService, mailService);
+        service = new WorkspaceService(txn, userService);
 
         txn.executeWrite(model -> model
                 .add(WORKSPACE_1, RDF.type, FS.Workspace)

@@ -17,13 +17,9 @@ fairspace:
   description: "CI Fairspace"
   ingress:
     domain: fairspace.ci.fairway.app
-  configurationScripts:
-    keycloak:
-      enabled: false
   features:
-
-services:
-  "JupyterHub Server": https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
+  services:
+    JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
 # Specific settings for Saturn subchart
 saturn:
@@ -44,17 +40,8 @@ saturn:
   image:
     pullPolicy: Always
   customStorageClass:
-      create: true
-      name: expandable
-      type: pd-standard
-      provisioner: kubernetes.io/gce-pd
-      allowVolumeExpansion: true
-  mail:
-    mail.from: pavel@thehyve.nl
-    mail.user: AKIAISXHGXUIMMU75YVA
-    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    mail.transport.protocol: smtp
-    mail.smtp.auth: true
-    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
-    mail.smtp.port: 587
-    mail.smtp.starttls.enable: true
+    create: true
+    name: expandable
+    type: pd-standard
+    provisioner: kubernetes.io/gce-pd
+    allowVolumeExpansion: true

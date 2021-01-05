@@ -14,7 +14,7 @@ env:
      - ARTIFACT_BUILD_FILE=""
      - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
      - DEPLOYMENT_CONFIG_DIR="./.travis"
-     - RELEASE_BRANCH="master"
+     - RELEASE_BRANCH="release"
      - SNAPSHOT_BRANCH="dev"
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
@@ -70,7 +70,7 @@ jobs:
       - source charts/.travis/install.sh
       script:
       - charts/.travis/build.sh
-    - if: branch = master AND type != pull_request
+    - if: branch = release and type != pull_request
       cache: false
       stage: Versioning
       name: Set tag and update version
@@ -79,7 +79,7 @@ jobs:
       - "ci/versioning/set_next_version.sh"
     - stage: deploy
       cache: false
-      if: branch in (dev, master) and type != pull_request
+      if: branch = dev and type != pull_request
       install:
         - source charts/.travis/install.sh
       script:

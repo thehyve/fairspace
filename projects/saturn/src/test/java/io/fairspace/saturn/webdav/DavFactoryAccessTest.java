@@ -3,7 +3,6 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.workspaces.Workspace;
@@ -39,7 +38,6 @@ public class DavFactoryAccessTest {
     private static final String baseUri = "http://example.com" + BASE_PATH;
     BlobStore store = mock(BlobStore.class);
     UserService userService = mock(UserService.class);
-    MailService mailService = mock(MailService.class);
     WorkspaceService workspaceService;
 
     User user;
@@ -48,7 +46,6 @@ public class DavFactoryAccessTest {
     Authentication.User adminAuthentication;
 
     private org.eclipse.jetty.server.Request request;
-
     private ResourceFactory factory;
     private Dataset ds = createTxnMem();
     private Transactions tx = new SimpleTransactions(ds);
@@ -110,8 +107,8 @@ public class DavFactoryAccessTest {
 
     @Before
     public void before() {
-        workspaceService = new WorkspaceService(tx, userService, mailService);
-        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        workspaceService = new WorkspaceService(tx, userService);
+        factory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
         setupRequestContext();
         request = getCurrentRequest();

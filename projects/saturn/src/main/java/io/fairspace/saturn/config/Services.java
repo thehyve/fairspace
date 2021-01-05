@@ -5,7 +5,6 @@ import io.fairspace.saturn.rdf.search.IndexDispatcher;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
@@ -43,7 +42,6 @@ public class Services {
 
     private final WorkspaceService workspaceService;
     private final UserService userService;
-    private final MailService mailService;
     private final MetadataPermissions metadataPermissions;
     private final MetadataService metadataService;
     private final ViewService viewService;
@@ -61,13 +59,12 @@ public class Services {
         userService = new UserService(config.auth, transactions);
         dataset.getContext().set(USER_SERVICE, userService);
 
-        mailService = new MailService(config.mail);
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, mailService, dataset.getContext());
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, dataset.getContext());
         dataset.getContext().set(FS_ROOT, davFactory.root);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        workspaceService = new WorkspaceService(transactions, userService, mailService);
+        workspaceService = new WorkspaceService(transactions, userService);
 
         metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
 

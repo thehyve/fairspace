@@ -37,12 +37,9 @@ data:
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     services:
-      {{ if ( and .Values.services .Values.services.jupyterhub  ) }}"jupyterhub": "{{ .Values.services.jupyterhub }}"{{ end }}
-      {{ if ( and .Values.services .Values.services.cbioportal  ) }}"cbioportal": "{{ .Values.services.cbioportal }}"{{ end }}
+{{ toYaml .Values.fairspace.services | indent 6 }}
     features:
 {{ toYaml .Values.fairspace.features | indent 6 }}
-    mail:
-{{ toYaml .Values.saturn.mail | indent 6 }}
   vocabulary.ttl: |
 {{ if .Values.saturn.vocabulary -}}
 {{ .Values.saturn.vocabulary | indent 4 -}}
@@ -54,14 +51,4 @@ data:
 {{ toYaml .Values.saturn.views | indent 4 -}}
 {{ else -}}
 {{ .Files.Get "views.yaml" | indent 4 -}}
-{{ end }}
-{{- $files := .Files -}}
-{{ range .Values.views }}
-  {{ .name }}.sparql.ftl: |
-{{ if .template -}}
-{{ .template | indent 4 -}}
-{{ else -}}
-{{ $template_file := printf "%s.sparql.ftl" .name -}}
-{{ $files.Get $template_file | indent 4 -}}
-{{ end }}
 {{ end }}

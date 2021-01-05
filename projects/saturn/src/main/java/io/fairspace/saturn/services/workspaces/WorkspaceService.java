@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.workspaces;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -22,7 +21,6 @@ import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
-import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.stream.Collectors.toList;
 
@@ -30,12 +28,10 @@ import static java.util.stream.Collectors.toList;
 public class WorkspaceService {
     private final Transactions tx;
     private final UserService userService;
-    private final MailService mailService;
 
-    public WorkspaceService(Transactions tx, UserService userService, MailService mailService) {
+    public WorkspaceService(Transactions tx, UserService userService) {
         this.tx = tx;
         this.userService = userService;
-        this.mailService = mailService;
     }
 
     public List<Workspace> listWorkspaces() {
@@ -194,7 +190,7 @@ public class WorkspaceService {
         validate(user != null, "User is not provided");
         validate(role != null, "Role is not provided");
 
-        Runnable postCommitAction = tx.calculateWrite(m -> {
+        tx.executeWrite(m -> {
             var workspaceResource = m.wrapAsResource(workspace);
             var userResource = m.wrapAsResource(user);
             validateResource(workspaceResource, FS.Workspace);
@@ -205,15 +201,12 @@ public class WorkspaceService {
             }
             m.removeAll(userResource, FS.isManagerOf, workspaceResource)
                     .removeAll(userResource, FS.isMemberOf, workspaceResource);
-            String message;
             switch (role) {
                 case Member -> {
                     userResource.addProperty(FS.isMemberOf, workspaceResource);
-                    message = "You're now a member of workspace " + workspaceResource.getProperty(RDFS.label).getString() + "\n" + workspaceResource.getURI();
                 }
                 case Manager -> {
                     userResource.addProperty(FS.isManagerOf, workspaceResource);
-                    message = "You're now a manager of workspace " + workspaceResource.getProperty(RDFS.label).getString() + "\n" + workspaceResource.getURI();
                 }
                 default -> {
                     var writeableCollections = workspaceResource.getModel().listSubjectsWithProperty(FS.ownedBy, workspaceResource)
@@ -223,14 +216,9 @@ public class WorkspaceService {
                             .removeAll(userResource, FS.canManage, c)
                             .removeAll(userResource, FS.canWrite, c)
                             .add(userResource, FS.canRead, c));
-                    message = "You're no longer a member of workspace " + workspaceResource.getProperty(RDFS.label).getString();
                 }
             }
-            var email = getStringProperty(userResource, FS.email);
-            return () -> mailService.send(email, "Access changed", message);
         });
-
-        postCommitAction.run();
 
         audit("WS_SET_USER_ROLE", "workspace", workspace, "user", user, "role", role);
     }

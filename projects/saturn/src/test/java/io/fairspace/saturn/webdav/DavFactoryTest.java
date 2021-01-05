@@ -3,7 +3,6 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
@@ -53,8 +52,6 @@ public class DavFactoryTest {
     @Mock
     UserService userService;
     @Mock
-    MailService mailService;
-    @Mock
     MetadataService metadataService;
     WorkspaceService workspaceService;
 
@@ -89,8 +86,8 @@ public class DavFactoryTest {
 
     @Before
     public void before() {
-        workspaceService = new WorkspaceService(tx, userService, mailService);
-        factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        workspaceService = new WorkspaceService(tx, userService);
+        factory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
         userAuthentication = mockAuthentication("user");
         user = createTestUser("user", false);

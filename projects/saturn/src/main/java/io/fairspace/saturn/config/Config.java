@@ -40,8 +40,6 @@ public class Config {
 
     public WebDAV webDAV = new WebDAV();
 
-    public Properties mail = new Properties();
-
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public final Set<Feature> features = new HashSet<>();
 
