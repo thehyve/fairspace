@@ -19,7 +19,6 @@ describe('MetadataViewFacetFactory', () => {
             title="Facet1"
             options={[]}
             type="unknown_type"
-            multiple
             onChange={() => {}}
             activeFilterValues={[]}
         />);
@@ -34,7 +33,6 @@ describe('MetadataViewFacetFactory', () => {
             title={title}
             options={options}
             type="Term"
-            multiple
             onChange={() => {}}
             activeFilterValues={[]}
         />);
@@ -57,7 +55,6 @@ describe('MetadataViewFacetFactory', () => {
             title={title}
             options={[mockFacet.min, mockFacet.max]}
             type="Number"
-            multiple
             onChange={() => {}}
             activeFilterValues={[]}
         />);
@@ -84,7 +81,6 @@ describe('MetadataViewFacetFactory', () => {
             title={title}
             options={[mockFacet.min, mockFacet.max]}
             type="Date"
-            multiple
             onChange={() => {}}
             activeFilterValues={[]}
         />);
