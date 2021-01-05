@@ -10,32 +10,31 @@ const nonEmptyNumber = (value, alternative) => (isNonEmptyValue(value) ? Number(
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
-    const minValue = nonEmptyNumber(options[0], -1);
-    const maxValue = nonEmptyNumber(options[1], -1);
+    const minValue = nonEmptyNumber(options[0], null);
+    const maxValue = nonEmptyNumber(options[1], null);
+
     const [value, setValue] = useState([null, null]);
+    const [dynamicSliderValue, setDynamicSliderValue] = useState([minValue, maxValue]);
     const [validationError, setValidationError] = useState(null);
 
     useEffect(() => {
         if (activeFilterValues.length > 0) {
             setValue(activeFilterValues);
+            setDynamicSliderValue(activeFilterValues);
         } else {
             setValue([null, null]);
+            setDynamicSliderValue([minValue, maxValue]);
         }
-    }, [activeFilterValues]);
+    }, [activeFilterValues, minValue, maxValue]);
 
-    const handleChange = (val: number[]) => {
+    const commitChange = (val: number[]) => {
         setValidationError(null);
         onChange(val);
     };
 
-    const handleSliderChange = (event, val) => {
-        if (val instanceof Array) {
-            handleChange(val);
-        } else if (value[0] === null) {
-            handleChange([null, val]);
-        } else {
-            handleChange([val, null]);
-        }
+    const handleInputChange = (val: number[]) => {
+        setDynamicSliderValue(val);
+        commitChange(val);
     };
 
     const handleMinValueInputChange = (event) => {
@@ -44,15 +43,17 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         if (isNonEmptyValue(newMinValue)) {
             if (Number.isNaN(newMinValue)) {
                 setValidationError("Min value has to be a number.");
-            } else if (Number(newMinValue) < minValue) {
+            } else if (minValue !== null && Number(newMinValue) < minValue) {
                 setValidationError(`Min value cannot be lower than ${minValue}.`);
-            } else if (Number(newMinValue) > value[1]) {
+            } else if (isNonEmptyValue(value[1]) && Number(newMinValue) > value[1]) {
                 setValidationError("Min value cannot be higher than max value.");
+            } else if (maxValue !== null && Number(newMinValue) > maxValue) {
+                setValidationError(`Min value cannot be higher than ${maxValue}.`);
             } else {
-                handleChange([Number(newMinValue), value[1]]);
+                handleInputChange([Number(newMinValue), value[1]]);
             }
         } else {
-            handleChange([null, value[1]]);
+            handleInputChange([null, value[1]]);
         }
     };
 
@@ -62,15 +63,27 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         if (isNonEmptyValue(event.target.value)) {
             if (Number.isNaN(newMaxValue)) {
                 setValidationError("Max value has to be a number.");
-            } else if (Number(newMaxValue) > maxValue) {
+            } else if (maxValue !== null && Number(newMaxValue) > maxValue) {
                 setValidationError(`Max value cannot be higher than ${maxValue}.`);
-            } else if (Number(newMaxValue) < value[0]) {
+            } else if (isNonEmptyValue(value[0]) && Number(newMaxValue) < value[0]) {
                 setValidationError("Max value cannot be lower than min value.");
+            } else if (minValue !== null && Number(newMaxValue) < minValue) {
+                setValidationError(`Min value cannot be lower than ${minValue}.`);
             } else {
-                handleChange([value[0], Number(newMaxValue)]);
+                handleInputChange([value[0], Number(newMaxValue)]);
             }
         } else {
-            handleChange([value[0], null]);
+            handleInputChange([value[0], null]);
+        }
+    };
+
+    const handleSliderChange = (event, val) => {
+        if (val instanceof Array) {
+            setDynamicSliderValue(val);
+        } else if (value[0] === null) {
+            setDynamicSliderValue([null, val]);
+        } else {
+            setDynamicSliderValue([val, null]);
         }
     };
 
@@ -85,11 +98,11 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         setValidationError(null);
     };
 
-    const renderInput = (inputValue, handleInputChange, placeholder) => (
+    const renderInput = (inputValue, onInputChange, placeholder) => (
         <Input
             value={nonEmptyNumber(inputValue, "")}
             margin="dense"
-            onChange={handleInputChange}
+            onChange={onInputChange}
             onBlur={handleBlur}
             error={!!validationError}
             inputProps={{
@@ -104,8 +117,8 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     );
 
     const getSliderValue = () => {
-        const val1 = nonEmptyNumber(value[0], null);
-        const val2 = nonEmptyNumber(value[1], null);
+        const val1 = nonEmptyNumber(dynamicSliderValue[0], null);
+        const val2 = nonEmptyNumber(dynamicSliderValue[1], null);
         if (val1 != null && val2 != null) {
             return [val1, val2];
         }
@@ -118,11 +131,12 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const renderSlider = () => (
         <Slider
             value={getSliderValue()}
-            track={value[1] === null && isNonEmptyValue(value[0]) ? 'inverted' : 'normal'}
+            track={dynamicSliderValue[1] === null && isNonEmptyValue(dynamicSliderValue[0]) ? 'inverted' : 'normal'}
             onChange={handleSliderChange}
+            onChangeCommitted={() => commitChange(dynamicSliderValue)}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
-            getAriaValueText={() => value}
+            getAriaValueText={() => dynamicSliderValue}
             min={minValue}
             max={maxValue}
         />
@@ -130,17 +144,28 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     return (
         <div>
-            <Grid container spacing={2} alignItems="center" className={classes.numericalContent}>
-                <Grid item xs={3}>
-                    {renderInput(value[0], handleMinValueInputChange, minValue)}
+            {minValue !== null && maxValue !== null ? (
+                <Grid container spacing={2} alignItems="center" className={classes.numericalContent}>
+                    <Grid item xs={3}>
+                        {renderInput(value[0], handleMinValueInputChange, minValue)}
+                    </Grid>
+                    <Grid item xs={6}>
+                        {renderSlider()}
+                    </Grid>
+                    <Grid item xs={3}>
+                        {renderInput(value[1], handleMaxValueInputChange, maxValue)}
+                    </Grid>
                 </Grid>
-                <Grid item xs={6}>
-                    {renderSlider()}
+            ) : (
+                <Grid container spacing={3} alignItems="center" className={classes.numericalContent}>
+                    <Grid item xs={6}>
+                        {renderInput(value[0], handleMinValueInputChange, nonEmptyNumber(minValue, 'min'))}
+                    </Grid>
+                    <Grid item xs={6}>
+                        {renderInput(value[1], handleMaxValueInputChange, nonEmptyNumber(maxValue, 'max'))}
+                    </Grid>
                 </Grid>
-                <Grid item xs={3}>
-                    {renderInput(value[1], handleMaxValueInputChange, maxValue)}
-                </Grid>
-            </Grid>
+            )}
             <Typography color="error">
                 {validationError}
             </Typography>
