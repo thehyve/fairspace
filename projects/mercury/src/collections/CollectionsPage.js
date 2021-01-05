@@ -22,8 +22,8 @@ import {getMetadataViewsPath} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 
-const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, classes}) => {
-    usePageTitleUpdater("Collections");
+const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle, classes}) => {
+    usePageTitleUpdater(documentTitle || "Collections");
 
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
     const {views, resourcesView} = useContext(MetadataViewContext);

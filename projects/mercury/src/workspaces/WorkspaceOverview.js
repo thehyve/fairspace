@@ -16,6 +16,7 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 export const TabPanel = (props) => {
     const {children, value, index, ...other} = props;
@@ -49,6 +50,8 @@ const WorkspaceOverview = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
     const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
+
+    usePageTitleUpdater(workspace ? workspace.name : "");
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
@@ -109,7 +112,7 @@ const WorkspaceOverview = (props) => {
             </TabPanel>
             <TabPanel value={selectedTab} index={2}>
                 <LinkedDataMetadataProvider>
-                    <Collections history={props.history} workspaceIri={workspace.iri} />
+                    <Collections history={props.history} workspaceIri={workspace.iri} documentTitle={workspace.name} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
         </BreadcrumbsContext.Provider>
