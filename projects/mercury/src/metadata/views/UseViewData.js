@@ -4,7 +4,9 @@ import axios from "axios";
 import MetadataViewAPI from "./MetadataViewAPI";
 import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
 
-const useViewData = (view: string, filters: MetadataViewFilter[], rowsPerPage: number) => {
+const LOCATION_FILTER_FIELD = 'location';
+
+const useViewData = (view: string, filters: MetadataViewFilter[], locationContext: string, rowsPerPage: number) => {
     const [data, setData] = useState({});
     const [count, setCount] = useState(-1);
     const [countTimeout, setCountTimeout] = useState(false);
@@ -13,13 +15,24 @@ const useViewData = (view: string, filters: MetadataViewFilter[], rowsPerPage: n
     const [countRequestCancelToken, setCountRequestCancelToken] = useState();
     const [viewDataRequestCancelToken, setViewDataRequestCancelToken] = useState();
 
+    const locationFilter: MetadataViewFilter = {
+        field: LOCATION_FILTER_FIELD,
+        values: [locationContext]
+    };
+
+    const allFilters = !locationContext ? (
+        [...filters]
+    ) : (
+        [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter]
+    );
+
     const fetchCount = () => {
         if (countRequestCancelToken) {
             countRequestCancelToken.cancel("Fetching count operation canceled due to new request.");
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
-        MetadataViewAPI.getCount(token, view, filters).then(res => {
+        MetadataViewAPI.getCount(token, view, allFilters).then(res => {
             if (res) {
                 if (res.count != null) {
                     setCount(res.count);
@@ -37,7 +50,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], rowsPerPage: n
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
-        return MetadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, filters);
+        return MetadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
     };
 
     const refreshAll = useCallback(() => {
@@ -78,7 +91,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], rowsPerPage: n
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters]);
+    useEffect(() => {refreshAll();}, [view, filters, locationContext]);
 
     return {
         data,
