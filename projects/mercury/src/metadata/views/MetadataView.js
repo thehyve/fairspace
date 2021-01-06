@@ -284,10 +284,13 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
     const {views = [], loading, error, filters, resourcesView} = useContext(MetadataViewContext);
-    const {facets = [], loading: facetsLoading, error: facetsError} = useContext(MetadataViewFacetsContext);
+    const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {initialLoad();}, []);
 
     if ((error && error.message) || (facetsError && facetsError.message)) {
         return <MessageDisplay message={error.message} />;
