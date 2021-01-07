@@ -2,6 +2,8 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.services.BaseApp;
 
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -21,13 +23,18 @@ public class ViewApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(new ViewsDTO(viewService.getFacets(), viewService.getViews(), viewService.getResourcesView()));
+            return mapper.writeValueAsString(new ViewsDTO(viewService.getViews(), viewService.getResourcesView()));
         });
 
         post("/", (req, res) -> {
             var result = queryService.retrieveViewPage(mapper.readValue(req.body(), ViewRequest.class));
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
+        });
+
+        get("/facets", (req, res) -> {
+            res.type(APPLICATION_JSON.asString());
+            return mapper.writeValueAsString(new FacetsDTO(viewService.getFacets()));
         });
 
         post("/count", (req, res) -> {
