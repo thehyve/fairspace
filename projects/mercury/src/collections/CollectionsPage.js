@@ -80,7 +80,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
                                 disabled={collectionsLoading || collectionsError || !collections || collections.length === 0}
                             />
                         </Grid>
-                        <Grid item xs={3} className={classes.advancedSearchButton}>
+                        <Grid item xs={4} className={classes.metadataSearchButton}>
                             {currentUser.canViewPublicMetadata && views && resourcesView && (
                                 <Link to={getMetadataViewsPath(resourcesView)}>
                                     <Button
@@ -88,12 +88,12 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
                                         color="primary"
                                         startIcon={<Search />}
                                     >
-                                        Advanced search
+                                        Collection metadata search
                                     </Button>
                                 </Link>
                             )}
                         </Grid>
-                        <Grid item xs={3} className={classes.topBarSwitch}>
+                        <Grid item xs={2} className={classes.topBarSwitch}>
                             <FormControlLabel
                                 control={(
                                     <Switch

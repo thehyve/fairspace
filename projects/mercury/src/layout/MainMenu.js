@@ -53,12 +53,12 @@ export default () => {
                         <ListItemIcon>
                             <Assignment />
                         </ListItemIcon>
-                        <ListItemText primary="Metadata views" />
+                        <ListItemText primary="Metadata" />
                     </ListItem>
                 )}
                 {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
                     <ListItem
-                        key="metadata"
+                        key="metadata-editing"
                         component={NavLink}
                         to="/metadata"
                         button
@@ -66,7 +66,7 @@ export default () => {
                         <ListItemIcon>
                             <Assignment />
                         </ListItemIcon>
-                        <ListItemText primary="Metadata" />
+                        <ListItemText primary="Metadata editor" />
                     </ListItem>
                 )}
                 {isAdmin(currentUser) && (

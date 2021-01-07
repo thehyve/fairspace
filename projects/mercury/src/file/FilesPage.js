@@ -57,7 +57,7 @@ export const FilesPage = ({
         return encodeURI(collectionRoot + openedPath);
     };
 
-    const getAdvancedSearchRedirect = () => (
+    const getMetadataSearchRedirect = () => (
         `${getMetadataViewsPath()}?${queryString.stringify({view: resourcesView, context: getLocationContext()})}`
     );
 
@@ -101,20 +101,20 @@ export const FilesPage = ({
                                 onSearchChange={handleTextSearch}
                             />
                         </Grid>
-                        <Grid item xs={3} className={classes.advancedSearchButton}>
+                        <Grid item xs={4} className={classes.metadataSearchButton}>
                             {currentUser.canViewPublicMetadata && resourcesView && (
-                                <Link to={getAdvancedSearchRedirect()}>
+                                <Link to={getMetadataSearchRedirect()}>
                                     <Button
                                         variant="text"
                                         color="primary"
                                         startIcon={<Search />}
                                     >
-                                        Advanced search
+                                        Collection metadata search
                                     </Button>
                                 </Link>
                             )}
                         </Grid>
-                        <Grid item xs={3} className={classes.topBarSwitch}>
+                        <Grid item xs={2} className={classes.topBarSwitch}>
                             <FormControlLabel
                                 control={(
                                     <Switch

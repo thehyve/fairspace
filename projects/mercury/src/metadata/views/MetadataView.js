@@ -45,7 +45,7 @@ type ContextualMetadataViewProperties = {
 export const MetadataView = (props: MetadataViewProperties) => {
     const {views, facets, currentViewName, resourcesView, locationContext, classes, handleViewChangeRedirect, filters} = props;
 
-    usePageTitleUpdater("Metadata views");
+    usePageTitleUpdater("Metadata");
 
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
@@ -236,7 +236,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     return (
         <BreadcrumbsContext.Provider value={{
-            segments: [{label: "Metadata views", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
+            segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
