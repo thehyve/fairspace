@@ -7,9 +7,9 @@ const styles = () => ({
     },
     topBarSwitch: {
         textAlign: "right",
-        width: 160
+        whiteSpace: "nowrap"
     },
-    advancedSearchButton: {
+    metadataSearchButton: {
         textAlign: "center"
     },
     centralPanel: {

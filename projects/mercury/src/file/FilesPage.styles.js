@@ -10,9 +10,10 @@ const styles = () => ({
         width: consts.MAIN_CONTENT_WIDTH
     },
     topBarSwitch: {
-        textAlign: "right"
+        textAlign: "right",
+        whiteSpace: "nowrap"
     },
-    advancedSearchButton: {
+    metadataSearchButton: {
         textAlign: "center"
     },
     centralPanel: {
