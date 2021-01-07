@@ -125,8 +125,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const appendCustomColumns = (view: MetadataViewOptions) => {
         if (view.name === resourcesView) {
+            const pathColumn = {title: "Path", name: "path", type: "Custom"};
             const accessColumn = {title: "Access", name: "access", type: "Custom"};
-            return [...view.columns, accessColumn];
+            return [
+                view.columns.find(c => c.type === 'Identifier'),
+                pathColumn,
+                ...view.columns.filter(c => c.type !== 'Identifier'),
+                accessColumn
+            ];
         }
         return view.columns;
     };

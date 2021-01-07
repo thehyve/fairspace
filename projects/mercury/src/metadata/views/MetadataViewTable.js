@@ -1,12 +1,14 @@
 import React from 'react';
-import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
+import {Link as RouterLink} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {getContextualFileLink} from "./metadataViewUtils";
 import {formatDate} from "../../common/utils/genericUtils";
 import type {Collection} from "../../collections/CollectionAPI";
-import {collectionAccessIcon} from "../../collections/collectionUtils";
+import {collectionAccessIcon, pathForIri, redirectLink} from "../../collections/collectionUtils";
+import {COLLECTION_URI, FILE_URI} from "../../constants";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -25,6 +27,8 @@ const useStyles = makeStyles(() => ({
         whiteSpace: 'nowrap',
     }
 }));
+
+const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history, collections} = props;
@@ -47,17 +51,48 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
     };
 
+    const isCustomResourceColumn = (column) => (
+        isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
+    );
+
     const getAccess = (iri) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
 
+    const renderCustomResourceColumn = (row, column) => {
+        const iri = row[idColumn.name][0].value;
+        switch (column.name) {
+            case 'access': {
+                const access = getAccess(iri);
+                return (
+                    <TableCell key={column.name}>
+                        {collectionAccessIcon(access)}
+                    </TableCell>
+                );
+            }
+            case 'path': {
+                const path = pathForIri(iri);
+                const type = collections.find(c => c.iri === iri) ? COLLECTION_URI : FILE_URI;
+                return (
+                    <TableCell key={column.name}>
+                        <Link
+                            to={redirectLink(iri, type)}
+                            component={RouterLink}
+                            color="inherit"
+                            underline="hover"
+                            className={classes.cellContents}
+                        >
+                            {path}
+                        </Link>
+                    </TableCell>
+                );
+            }
+            default:
+                return <TableCell />;
+        }
+    };
+
     const renderTableCell = (row, column) => {
-        if (isResourcesView && column.name === 'access') {
-            const iri = row[idColumn.name][0].value;
-            const access = getAccess(iri);
-            return (
-                <TableCell key={column.name}>
-                    {collectionAccessIcon(access)}
-                </TableCell>
-            );
+        if (isCustomResourceColumn(column)) {
+            return renderCustomResourceColumn(row, column);
         }
 
         const value = row[column.name];
