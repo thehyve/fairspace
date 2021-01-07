@@ -128,19 +128,14 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const renderMessages = () => (
         <div className={classes.messageBox}>
+            {countTimeout && (
+                <Typography variant="body2" color="error" align="center">
+                    The count request timed out.
+                </Typography>
+            )}
             {hasInactiveFilters && (
                 <Typography variant="body2" align="center" color="primary">
                     Note! Apply filters to see data matching your current selection.
-                </Typography>
-            )}
-            {data.timeout && (
-                <Typography variant="body2" color="error" align="center">
-                    Results shown below are incomplete. Fetching of data for the current page took too long.
-                </Typography>
-            )}
-            {countTimeout && (
-                <Typography variant="body2" color="error" align="center">
-                    Fetching total count of results took too long. The count will not be shown.
                 </Typography>
             )}
         </div>
@@ -208,13 +203,19 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             {renderTableSettings()}
             {renderMessages()}
             <TableContainer className={classes.tableContents}>
-                <MetadataViewTable
-                    {...props}
-                    visibleColumnNames={visibleColumnNames}
-                    idColumn={idColumn}
-                    data={data}
-                    history={history}
-                />
+                {data.timeout ? (
+                    <Typography variant="body2" color="error" align="center">
+                        The data request timed out.
+                    </Typography>
+                ) : (
+                    <MetadataViewTable
+                        {...props}
+                        visibleColumnNames={visibleColumnNames}
+                        idColumn={idColumn}
+                        data={data}
+                        history={history}
+                    />
+                )}
             </TableContainer>
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
