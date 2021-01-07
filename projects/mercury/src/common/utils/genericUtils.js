@@ -104,6 +104,21 @@ const timeFormatter = new Intl.DateTimeFormat(defaultLocale, {
 });
 
 /**
+ * Returns a user friendly date format.
+ *
+ * @param {string | number | Date} value - the date to be formatted
+ * @return {string} the formatted date
+ */
+export const formatDate = (value) => {
+    const date = new Date(value);
+    if (!value || !isValid(date)) {
+        return value;
+    }
+
+    return dateFormatter.format(date);
+};
+
+/**
  * Returns a user friendly date/date-time format, it will return the time if the date is today
  *
  * @param {string | number | Date} value - the date to be formatted

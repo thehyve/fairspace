@@ -30,7 +30,7 @@ class DateTimeValue extends React.Component {
             <DateTimePicker
                 showTodayButton
                 openTo="year"
-                format={`${DATE_FORMAT} hh:mm a`}
+                format={`${DATE_FORMAT} HH:mm`}
                 views={["year", "month", "date", "hours", "minutes"]}
                 {...otherProps}
                 value={this.state.value}

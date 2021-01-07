@@ -175,12 +175,8 @@ views:
             }
           }
       - name: dateCreated
-        title: Created
+        title: File created
         source: http://fairspace.io/ontology#dateCreated
-        type: date
-      - name: dateModified
-        title: Modified
-        source: http://fairspace.io/ontology#dateModified
         type: date
       - name: analysisType
         title: Analysis type

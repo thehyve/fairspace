@@ -12,7 +12,7 @@ export const COLLECTIONS_PATH = 'collections';
 export const METADATA_PATH = '/metadata';
 export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';
 export const TOOLTIP_ENTER_DELAY = 350;
-export const DATE_FORMAT = 'dd/MM/yyyy';
+export const DATE_FORMAT = 'dd-MM-yyyy';
 
 // Search
 export const COLLECTION_SEARCH_TYPE = 'collections';
