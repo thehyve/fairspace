@@ -2,9 +2,11 @@
 import {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import MetadataViewAPI from "./MetadataViewAPI";
-import type {MetadataViewData} from "./MetadataViewAPI";
+import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
 
-const useViewData = (view, filters, rowsPerPage) => {
+const LOCATION_FILTER_FIELD = 'location';
+
+const useViewData = (view: string, filters: MetadataViewFilter[], locationContext: string, rowsPerPage: number) => {
     const [data, setData] = useState({});
     const [count, setCount] = useState(-1);
     const [countTimeout, setCountTimeout] = useState(false);
@@ -13,13 +15,24 @@ const useViewData = (view, filters, rowsPerPage) => {
     const [countRequestCancelToken, setCountRequestCancelToken] = useState();
     const [viewDataRequestCancelToken, setViewDataRequestCancelToken] = useState();
 
+    const locationFilter: MetadataViewFilter = {
+        field: LOCATION_FILTER_FIELD,
+        values: [locationContext]
+    };
+
+    const allFilters = !locationContext ? (
+        [...filters]
+    ) : (
+        [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter]
+    );
+
     const fetchCount = () => {
         if (countRequestCancelToken) {
             countRequestCancelToken.cancel("Fetching count operation canceled due to new request.");
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
-        MetadataViewAPI.getCount(token, view, filters).then(res => {
+        MetadataViewAPI.getCount(token, view, allFilters).then(res => {
             if (res) {
                 if (res.count != null) {
                     setCount(res.count);
@@ -31,25 +44,30 @@ const useViewData = (view, filters, rowsPerPage) => {
         });
     };
 
-    const getViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
+    const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
         if (viewDataRequestCancelToken) {
             viewDataRequestCancelToken.cancel("Fetching data operation canceled due to new request.");
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
-        return MetadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, filters);
+        return MetadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
     };
 
     const refreshAll = useCallback(() => {
         setLoading(true);
         setCount(-1);
-        getViewData(0, rowsPerPage)
+        fetchViewData(0, rowsPerPage)
             .then(d => {
                 setData(d);
-                if (d && !d.hasNext) {
-                    setCount(d.rows.length);
-                } else {
-                    fetchCount();
+                if (d) {
+                    if (!d.hasNext) {
+                        if (viewDataRequestCancelToken) {
+                            viewDataRequestCancelToken.cancel("Fetching count operation canceled due to new data.");
+                        }
+                        setCount(d.rows.length);
+                    } else {
+                        fetchCount();
+                    }
                 }
                 setError(undefined);
             })
@@ -58,11 +76,11 @@ const useViewData = (view, filters, rowsPerPage) => {
                 console.error(e || new Error('Unknown error'));
             })
             .finally(() => setLoading(false));
-    }, [view, filters]);
+    });
 
     const refreshDataOnly = useCallback((newPage, newRowsPerPage) => {
         setLoading(true);
-        getViewData(newPage, newRowsPerPage).then(d => {
+        fetchViewData(newPage, newRowsPerPage).then(d => {
             setData(d);
             setError(undefined);
         })
@@ -73,7 +91,7 @@ const useViewData = (view, filters, rowsPerPage) => {
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters]);
+    useEffect(() => {refreshAll();}, [view, filters, locationContext]);
 
     return {
         data,

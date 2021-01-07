@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Button, Grid, withStyles} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -12,10 +12,7 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {
-    getMetadataViewsPath,
-    ofRangeValueType,
-} from "./metadataViewUtils";
+import {getMetadataViewsPath, ofRangeValueType,} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -49,21 +46,15 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     usePageTitleUpdater("Metadata views");
 
-    const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
-    const currentView = views[currentViewIndex];
-
-    const {updateFilters, clearFilter, clearAllFilters, setLocationFilter} = useContext(MetadataViewContext);
+    const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const {toggle, selected} = useSingleSelection();
     const [filterCandidates, setFilterCandidates] = useState([]);
     const {collections} = useContext(CollectionsContext);
 
-    // pass location filter to the API for files view
-    useEffect(() => {
-        setLocationFilter(locationContext);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [locationContext]);
-
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
+
+    const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
+    const currentView = views[currentViewIndex];
 
     const a11yProps = (index) => ({
         'key': `metadata-view-tab-${index}`,
