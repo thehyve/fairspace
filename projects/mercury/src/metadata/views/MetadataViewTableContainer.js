@@ -193,6 +193,16 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         </div>
     );
 
+    const labelDisplayedRows = ({from, to, count: totalCount}) => (
+        <div>
+            <Typography variant="body2" display="inline">{from}-{to} of </Typography>
+            <Typography variant="body2" display="inline" style={{fontWeight: "bold"}}>
+                {totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
+            </Typography>
+        </div>
+    );
+
+
     return (
         <Paper>
             {renderTableSettings()}
@@ -215,6 +225,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 onChangePage={handleChangePage}
                 onChangeRowsPerPage={handleChangeRowsPerPage}
                 className={classes.tableFooter}
+                labelDisplayedRows={labelDisplayedRows}
             />
         </Paper>
     );
