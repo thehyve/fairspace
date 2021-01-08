@@ -185,12 +185,12 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     );
 
     const labelDisplayedRows = ({from, to, count: totalCount}) => (
-        <div>
-            <Typography variant="body2" display="inline">{from}-{to} of </Typography>
-            <Typography variant="body2" display="inline" style={{fontWeight: "bold"}}>
+        <span>
+            <Typography variant="body2" component="span" display="inline">{from}-{to} of </Typography>
+            <Typography variant="body2" component="span" display="inline" style={{fontWeight: "bold"}}>
                 {totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
             </Typography>
-        </div>
+        </span>
     );
 
 
