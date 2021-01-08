@@ -126,14 +126,10 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const renderMessages = () => (
         <div className={classes.messageBox}>
             {countTimeout && (
-                <Typography variant="body2" color="error" align="center">
-                    The count request timed out.
-                </Typography>
+                <MessageDisplay small message="The count request timed out." />
             )}
             {hasInactiveFilters && (
-                <Typography variant="body2" align="center" color="primary">
-                    Note! Apply filters to see data matching your current selection.
-                </Typography>
+                <MessageDisplay color="primary" isError={false} small message="Apply filters to see data matching your current selection." />
             )}
         </div>
     );
@@ -191,9 +187,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             {renderMessages()}
             <TableContainer className={classes.table}>
                 {data.timeout ? (
-                    <Typography variant="body2" color="error" align="center">
-                        The data request timed out.
-                    </Typography>
+                    <MessageDisplay isError message="The data request timed out." />
                 ) : (
                     <MetadataViewTable
                         {...props}
