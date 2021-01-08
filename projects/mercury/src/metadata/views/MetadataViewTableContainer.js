@@ -197,8 +197,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     return (
         <Paper>
             {renderTableSettings()}
-            {renderMessages()}
             <TableContainer className={classes.tableContents}>
+                {renderMessages()}
                 {data.timeout ? (
                     <MessageDisplay isError message="The data request timed out." />
                 ) : (
