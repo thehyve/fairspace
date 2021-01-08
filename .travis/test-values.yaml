@@ -2,27 +2,20 @@
 external:
   keycloak:
     baseUrl: https://keycloak.ci.fairway.app
-    username: keycloak
-    password: keycloak-ci-123
     realm: ci
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
     serviceAccount:
       password: fairspace123
   elasticsearch:
-    enabled: true
-    transport:
-      host: fairspace-test-elasticsearch-discovery.fairspace-test.svc.cluster.local
-    rest:
-      host: fairspace-test-elasticsearch-client.fairspace-test.svc.cluster.local
+    enabled: false
 
-# Settings for the fairspace
+# Settings for fairspace
 fairspace:
-  name: "test Fairspace"
-  description: "test Fairspace"
+  name: "Test Fairspace"
+  description: "Test Fairspace"
   ingress:
     domain: fairspace.test.fairway.app
-  enableExperimentalFeatures: false
   features:
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
@@ -44,6 +37,7 @@ saturn:
       cpu: 500m
       memory: 512Mi
   image:
+    tag: 0.7.4-SNAPSHOT
     pullPolicy: Always
   customStorageClass:
       create: true
