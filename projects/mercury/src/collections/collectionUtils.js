@@ -14,7 +14,7 @@ import type {
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
 import {encodePath, getParentPath} from '../file/fileUtils';
-import {COLLECTION_URI} from "../constants";
+import {FILE_URI} from "../constants";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -36,11 +36,11 @@ export const pathForIri = (iri: string) => {
 
 export const redirectLink = (iri: string, type: string) => {
     const path = pathForIri(iri);
-    if (type && type === COLLECTION_URI) {
-        return getCollectionAbsolutePath(path);
+    if (type && type === FILE_URI) {
+        const parentPath = getParentPath(path);
+        return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
     }
-    const parentPath = getParentPath(path);
-    return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
+    return getCollectionAbsolutePath(path);
 };
 
 export const getSearchPathSegments = (context) => {

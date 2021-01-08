@@ -211,7 +211,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     <MetadataViewTableContainer
                         columns={appendCustomColumns(view)}
                         view={view.name}
-                        isResourcesView={view.name === resourcesView}
+                        resourcesView={resourcesView}
                         filters={filters}
                         locationContext={locationContext}
                         selected={selected}
