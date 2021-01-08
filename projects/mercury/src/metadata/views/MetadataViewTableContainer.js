@@ -39,13 +39,16 @@ type MetadataViewTableContainerProperties = {
 };
 
 const styles = () => ({
-    table: {
-        "maxHeight": 'calc(100vh - 215px)',
+    tableContents: {
+        "maxHeight": 'calc(100vh - 270px)',
         "overflowY": 'auto',
         "overflowX": 'auto',
         '& .MuiTableCell-stickyHeader': {
             backgroundColor: "white"
         }
+    },
+    tableFooter: {
+        overflowX: "hidden"
     },
     tableSettings: {
         position: 'relative',
@@ -194,7 +197,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         <Paper>
             {renderTableSettings()}
             {renderMessages()}
-            <TableContainer className={classes.table}>
+            <TableContainer className={classes.tableContents}>
                 <MetadataViewTable
                     {...props}
                     visibleColumnNames={visibleColumnNames}
@@ -202,17 +205,17 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     data={data}
                     history={history}
                 />
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 100]}
-                    component="div"
-                    count={count}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                    style={{overflowX: "hidden"}}
-                />
             </TableContainer>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={count}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                className={classes.tableFooter}
+            />
         </Paper>
     );
 };
