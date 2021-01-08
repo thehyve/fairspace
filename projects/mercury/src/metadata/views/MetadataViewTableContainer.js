@@ -30,7 +30,7 @@ type MetadataViewTableContainerProperties = {
     filters: MetadataViewFilter[];
     toggleRow: () => {};
     view: string;
-    isResourcesView: boolean;
+    resourcesView: string;
     collections: Collection[];
     locationContext: string;
     selected: MetadataViewEntityWithLinkedFiles;

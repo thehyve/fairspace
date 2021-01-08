@@ -1,12 +1,12 @@
 import React from 'react';
-import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
+import {Link as RouterLink} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
-import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import {getContextualFileLink} from "./metadataViewUtils";
+import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {formatDate} from "../../common/utils/genericUtils";
 import type {Collection} from "../../collections/CollectionAPI";
-import {collectionAccessIcon} from "../../collections/collectionUtils";
+import {collectionAccessIcon, pathForIri, redirectLink} from "../../collections/collectionUtils";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -16,6 +16,8 @@ type MetadataViewTableProperties = {
     toggleRow: () => {};
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
+    view: string;
+    resourcesView: string;
     collections: Collection[];
 };
 
@@ -26,38 +28,78 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
+const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
+
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, toggleRow, selected, isResourcesView, idColumn, history, collections} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, view, resourcesView, idColumn, history, collections} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const {rows} = data;
 
-    const handleResultSingleClick = (itemIri, itemLabel, linkedFiles) => {
-        if (selected && selected.iri === itemIri) {
+    const isResourcesView = view === resourcesView;
+    const resourceTypeColumn = `${resourcesView}_type`;
+
+    const isCustomResourceColumn = (column: MetadataViewColumn) => (
+        isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
+    );
+
+    const getAccess = (iri: string) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
+
+    const getResourceType = (row: Map<string, any>) => (
+        row[resourceTypeColumn] && row[resourceTypeColumn][0] && row[resourceTypeColumn][0].value
+    );
+
+    const handleResultSingleClick = (iri: string, label: string, linkedFiles: MetadataViewEntity[]) => {
+        if (selected && selected.iri === iri) {
             toggleRow();
         } else {
-            toggleRow({label: itemLabel, iri: itemIri, linkedFiles: linkedFiles || []});
+            toggleRow({label, iri, linkedFiles: linkedFiles || []});
         }
     };
 
-    const handleResultDoubleClick = (itemIri) => {
+    const handleResultDoubleClick = (iri: string, row: Map<string, any>) => {
         if (isResourcesView) {
-            history.push(getContextualFileLink(itemIri));
+            history.push(redirectLink(iri, getResourceType(row)));
         }
     };
 
-    const getAccess = (iri) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
+    const renderCustomResourceColumn = (row: Map<string, any>, column: MetadataViewColumn) => {
+        const iri = row[idColumn.name][0].value;
+        switch (column.name) {
+            case 'access': {
+                const access = getAccess(iri);
+                return (
+                    <TableCell key={column.name}>
+                        {collectionAccessIcon(access)}
+                    </TableCell>
+                );
+            }
+            case 'path': {
+                const path = pathForIri(iri);
+                const type = getResourceType(row);
+                return (
+                    <TableCell key={column.name}>
+                        <Link
+                            to={redirectLink(iri, type)}
+                            component={RouterLink}
+                            color="inherit"
+                            underline="hover"
+                            className={classes.cellContents}
+                        >
+                            {path}
+                        </Link>
+                    </TableCell>
+                );
+            }
+            default:
+                return <TableCell />;
+        }
+    };
 
-    const renderTableCell = (row, column) => {
-        if (isResourcesView && column.name === 'access') {
-            const iri = row[idColumn.name][0].value;
-            const access = getAccess(iri);
-            return (
-                <TableCell key={column.name}>
-                    {collectionAccessIcon(access)}
-                </TableCell>
-            );
+    const renderTableCell = (row: Map<string, any>, column: MetadataViewColumn) => {
+        if (isCustomResourceColumn(column)) {
+            return renderCustomResourceColumn(row, column);
         }
 
         const value = row[column.name];
@@ -91,7 +133,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                             row[idColumn.name][0].label,
                             dataLinkColumn ? row[dataLinkColumn.name] : []
                         )}
-                        onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value)}
+                        onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
                     >
                         {visibleColumns.map(column => renderTableCell(row, column))}
                     </TableRow>

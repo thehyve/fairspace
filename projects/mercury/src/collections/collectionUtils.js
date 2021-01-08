@@ -4,7 +4,8 @@ import {Create, MenuBook, Settings, Toc} from "@material-ui/icons";
 import type {
     AccessLevel,
     AccessMode,
-    Collection, CollectionPermissions,
+    Collection,
+    CollectionPermissions,
     Permission,
     PrincipalPermission,
     Status
@@ -12,7 +13,8 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
-import {encodePath} from '../file/fileUtils';
+import {encodePath, getParentPath} from '../file/fileUtils';
+import {FILE_URI} from "../constants";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -30,6 +32,15 @@ export const getCollectionAbsolutePath = (path: string) => (
 export const pathForIri = (iri: string) => {
     const path = decodeURIComponent(new URL(iri).pathname);
     return path.replace('/api/v1/webdav/', '');
+};
+
+export const redirectLink = (iri: string, type: string) => {
+    const path = pathForIri(iri);
+    if (type && type === FILE_URI) {
+        const parentPath = getParentPath(path);
+        return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
+    }
+    return getCollectionAbsolutePath(path);
 };
 
 export const getSearchPathSegments = (context) => {
