@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+    CircularProgress,
     FormControlLabel,
     IconButton,
     Paper,
@@ -17,13 +18,13 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import FormGroup from "@material-ui/core/FormGroup";
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
-import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 import {Collection} from "../../collections/CollectionAPI";
+import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -40,6 +41,7 @@ type MetadataViewTableContainerProperties = {
 
 const styles = () => ({
     tableContents: {
+        "minHeight": '200px',
         "maxHeight": 'calc(100vh - 270px)',
         "overflowY": 'auto',
         "overflowX": 'auto',
@@ -83,7 +85,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, countTimeout, error, loading, refreshDataOnly} = useViewData(view, filters, locationContext, rowsPerPage);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, locationContext, rowsPerPage);
 
     useEffect(() => {setPage(0);}, [filters]);
 
@@ -91,11 +93,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return <MessageDisplay message={error.message} />;
     }
 
-    if (loading || !data) {
-        return <LoadingInlay />;
-    }
-
-    if (count === 0 && !data.timeout && !countTimeout) {
+    if (count.count === 0 && !data.timeout && !count.timeout) {
         return <MessageDisplay message="No results found." />;
     }
 
@@ -128,7 +126,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const renderMessages = () => (
         <div className={classes.messageBox}>
-            {countTimeout && (
+            {count.timeout && (
                 <MessageDisplay small message="The count request timed out." />
             )}
             {hasInactiveFilters && (
@@ -184,43 +182,46 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         </div>
     );
 
-    const labelDisplayedRows = ({from, to, count: totalCount}) => (
+    const labelDisplayedRows = ({from, to, count: totalCount, countIsLoading}) => (
         <span>
             <Typography variant="body2" component="span" display="inline">{from}-{to} of </Typography>
             <Typography variant="body2" component="span" display="inline" style={{fontWeight: "bold"}}>
-                {totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
+                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
+                {countIsLoading && <CircularProgress size={14} style={{marginLeft: 3}} />}
             </Typography>
         </span>
     );
 
-
     return (
         <Paper>
             {renderTableSettings()}
-            <TableContainer className={classes.tableContents}>
-                {renderMessages()}
-                {data.timeout ? (
-                    <MessageDisplay isError message="The data request timed out." />
-                ) : (
-                    <MetadataViewTable
-                        {...props}
-                        visibleColumnNames={visibleColumnNames}
-                        idColumn={idColumn}
-                        data={data}
-                        history={history}
-                    />
-                )}
-            </TableContainer>
+            <LoadingOverlayWrapper loading={!data || loading}>
+                <TableContainer className={classes.tableContents}>
+                    {renderMessages()}
+                    {data && data.timeout ? (
+                        <MessageDisplay isError message="The data request timed out." />
+                    ) : (
+                        <MetadataViewTable
+                            {...props}
+                            visibleColumnNames={visibleColumnNames}
+                            idColumn={idColumn}
+                            data={data}
+                            loading={!data || loading}
+                            history={history}
+                        />
+                    )}
+                </TableContainer>
+            </LoadingOverlayWrapper>
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
-                count={count}
+                count={count ? count.count : -1}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={handleChangePage}
                 onChangeRowsPerPage={handleChangeRowsPerPage}
                 className={classes.tableFooter}
-                labelDisplayedRows={labelDisplayedRows}
+                labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
             />
         </Paper>
     );

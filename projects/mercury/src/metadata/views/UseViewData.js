@@ -6,11 +6,25 @@ import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
 
 const LOCATION_FILTER_FIELD = 'location';
 
-const useViewData = (view: string, filters: MetadataViewFilter[], locationContext: string, rowsPerPage: number) => {
+export type Count = {
+    count: number;
+    timeout: boolean;
+}
+
+export type ViewData = {
+    data: MetadataViewData;
+    count: Count;
+    loading: boolean;
+    loadingCount: boolean;
+    error: any;
+    refreshDataOnly: boolean;
+};
+
+const useViewData = (view: string, filters: MetadataViewFilter[], locationContext: string, rowsPerPage: number): ViewData => {
     const [data, setData] = useState({});
-    const [count, setCount] = useState(-1);
-    const [countTimeout, setCountTimeout] = useState(false);
+    const [count, setCount] = useState({});
     const [loading, setLoading] = useState(true);
+    const [loadingCount, setLoadingCount] = useState(true);
     const [error, setError] = useState();
     const [countRequestCancelToken, setCountRequestCancelToken] = useState();
     const [viewDataRequestCancelToken, setViewDataRequestCancelToken] = useState();
@@ -27,6 +41,8 @@ const useViewData = (view: string, filters: MetadataViewFilter[], locationContex
     );
 
     const fetchCount = () => {
+        setCount({count: -1});
+        setLoadingCount(true);
         if (countRequestCancelToken) {
             countRequestCancelToken.cancel("Fetching count operation canceled due to new request.");
         }
@@ -34,12 +50,11 @@ const useViewData = (view: string, filters: MetadataViewFilter[], locationContex
         setCountRequestCancelToken(token);
         MetadataViewAPI.getCount(token, view, allFilters).then(res => {
             if (res) {
-                if (res.count != null) {
-                    setCount(res.count);
-                } else {
-                    setCount(-1);
+                if (res.count == null) {
+                    res.count = -1;
                 }
-                setCountTimeout(res.timeout);
+                setCount(res);
+                setLoadingCount(false);
             }
         });
     };
@@ -55,16 +70,17 @@ const useViewData = (view: string, filters: MetadataViewFilter[], locationContex
 
     const refreshAll = useCallback(() => {
         setLoading(true);
-        setCount(-1);
+        setCount({count: -1});
         fetchViewData(0, rowsPerPage)
-            .then(d => {
+            .then((d: MetadataViewData) => {
                 setData(d);
                 if (d) {
                     if (!d.hasNext) {
                         if (viewDataRequestCancelToken) {
                             viewDataRequestCancelToken.cancel("Fetching count operation canceled due to new data.");
                         }
-                        setCount(d.rows.length);
+                        setCount({count: d.rows.length, timeout: false});
+                        setLoadingCount(false);
                     } else {
                         fetchCount();
                     }
@@ -96,8 +112,8 @@ const useViewData = (view: string, filters: MetadataViewFilter[], locationContex
     return {
         data,
         count,
-        countTimeout,
         loading,
+        loadingCount,
         error,
         refreshDataOnly
     };

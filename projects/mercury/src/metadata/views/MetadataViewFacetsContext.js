@@ -32,7 +32,7 @@ export const MetadataViewFacetsProvider = ({children, metadataViewApi = Metadata
     return (
         <MetadataViewFacetsContext.Provider
             value={{
-                facets: data.facets,
+                facets: data && data.facets,
                 facetsError,
                 facetsLoading,
                 initialLoad
