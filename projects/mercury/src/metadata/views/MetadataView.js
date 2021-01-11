@@ -312,7 +312,7 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             facets={facets}
             views={views}
             resourcesView={resourcesView}
-            locationContext={locationContext}
+            locationContext={currentViewName === resourcesView && locationContext}
             currentViewName={currentViewName}
             filters={filters}
             handleViewChangeRedirect={handleViewChangeRedirect}
