@@ -115,6 +115,7 @@ public class SparqlQueryServiceTest {
         var root = (MakeCollectionableResource) ((ResourceFactory) davFactory).getResource(null, BASE_PATH);
         var coll1 = (PutableResource) root.createCollection("coll1");
         coll1.createNew("coffee.jpg", null, 0L, "image/jpeg");
+        coll1.createNew("coffee_copy.jpg", null, 0L, "image/jpeg");
 
         selectRegularUser();
 
@@ -178,6 +179,22 @@ public class SparqlQueryServiceTest {
                 ViewFilter.builder()
                         .field("Resource_analysisType")
                         .values(Collections.singletonList(ANALYSIS_TYPE_RNA_SEQ))
+                        .build()
+        ));
+        var page = queryService.retrieveViewPage(request);
+        assertEquals(1, page.getRows().size());
+    }
+
+    @Test
+    public void testRetrieveUniqueSamplesForLocation() {
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        request.setFilters(Collections.singletonList(
+                ViewFilter.builder()
+                        .field("location")
+                        .values(Collections.singletonList(baseUri + "/coll1"))
                         .build()
         ));
         var page = queryService.retrieveViewPage(request);

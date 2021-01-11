@@ -170,13 +170,15 @@ public class SparqlQueryService implements QueryService {
 
                 if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
                     if (view.fileLink != null) {
-                        builder.append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
+                        builder.append("FILTER EXISTS {\n")
+                                .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
                                 .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
                                 .append("))\n ?file <")
                                 .append(view.fileLink)
                                 .append("> ?")
                                 .append(view.name)
-                                .append(" . \n");
+                                .append(" . \n")
+                                .append("}\n");
                     } else {
                         builder.append("?").append(view.name)
                                 .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
