@@ -102,7 +102,7 @@ export const FilesPage = ({
                             />
                         </Grid>
                         <Grid item xs={4} className={classes.metadataSearchButton}>
-                            {currentUser.canViewPublicMetadata && resourcesView && (
+                            {currentUser.canViewPublicMetadata && resourcesView && !isOpenedPathDeleted && collection.iri && (
                                 <Link to={getMetadataSearchRedirect()}>
                                     <Button
                                         variant="text"
