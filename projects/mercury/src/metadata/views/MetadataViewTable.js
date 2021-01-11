@@ -10,6 +10,7 @@ import {collectionAccessIcon, pathForIri, redirectLink} from "../../collections/
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
+    loading: boolean;
     columns: MetadataViewColumn[];
     visibleColumnNames: string[];
     idColumn: MetadataViewColumn;
@@ -31,11 +32,11 @@ const useStyles = makeStyles(() => ({
 const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, data, toggleRow, selected, view, resourcesView, idColumn, history, collections} = props;
+    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, resourcesView, idColumn, history, collections} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
-    const {rows} = data;
+    const {rows = []} = data;
 
     const isResourcesView = view === resourcesView;
     const resourceTypeColumn = `${resourcesView}_type`;
@@ -113,7 +114,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     return (
-        <Table data-testid="results-table" size="small" stickyHeader>
+        <Table data-testid="results-table" size="small" stickyHeader={!loading}>
             <TableHead>
                 <TableRow>
                     {visibleColumns.map(column => (
