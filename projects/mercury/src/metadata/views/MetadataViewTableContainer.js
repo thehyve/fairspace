@@ -25,6 +25,7 @@ import MetadataViewTable from "./MetadataViewTable";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 import {Collection} from "../../collections/CollectionAPI";
 import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -215,7 +216,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 100]}
                 component="div"
-                count={count ? count.count : -1}
+                count={count && isNonEmptyValue(count.count) ? count.count : -1}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onChangePage={handleChangePage}
