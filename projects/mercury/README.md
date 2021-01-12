@@ -1,3 +1,6 @@
+:warning: `FIXME`: move parts to [../..](../../README.md).
+
+
 # Mercury
 
 This application contains the user interface to list, manage and 

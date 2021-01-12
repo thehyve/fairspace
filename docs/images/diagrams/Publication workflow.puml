@@ -1,0 +1,41 @@
+@startuml Publication workflow
+
+title Data set publication workflow
+
+start
+:Preparation;
+note right
+    Editing enabled,
+    metadata editing enabled,
+    access to restricted set
+    of groups and users.
+end note
+:Active;
+note right
+    Editing enabled,
+    metadata editing enabled,
+    access to all project members.
+end note
+split
+    :Published;
+    note left
+        Read-only, immutable,
+        access to all users,
+        metadata published.
+    end note
+    end
+split again
+    :Archived;
+    note right
+        Read-only, immutable,
+        access explicitly granted,
+        metadata published.
+    end note
+    :Closed;
+    note right
+        No access,
+        metadata unpublished.
+    end note
+    end
+end split
+@enduml

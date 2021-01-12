@@ -1,3 +1,5 @@
+:warning: `FIXME`: move parts to [../..](../../README.md).
+
 # A Helm chart for VRE fairspaces
 This helm chart will install and setup a single VRE fairspace.
 
