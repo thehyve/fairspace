@@ -22,9 +22,9 @@ import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import styles from "./FilesPage.styles";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
-import {getMetadataViewsPath} from "../metadata/views/metadataViewUtils";
-import MetadataViewContext from "../metadata/views/MetadataViewContext";
+import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import UserContext from "../users/UserContext";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 export const FilesPage = ({
     location,
@@ -32,7 +32,7 @@ export const FilesPage = ({
     fileApi,
     collection,
     openedPath,
-    resourcesView,
+    views,
     loading = false,
     error = false,
     showDeleted,
@@ -58,7 +58,7 @@ export const FilesPage = ({
     };
 
     const getMetadataSearchRedirect = () => (
-        `${getMetadataViewsPath()}?${queryString.stringify({view: resourcesView, context: getLocationContext()})}`
+        `${getMetadataViewsPath()}?${queryString.stringify({view: RESOURCES_VIEW, context: getLocationContext()})}`
     );
 
     const handleTextSearch = (value) => {
@@ -86,6 +86,11 @@ export const FilesPage = ({
     // Path for which metadata should be rendered
     const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
 
+    const showMetadataSearchButton: boolean = (
+        currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
+        && !isOpenedPathDeleted && collection.iri
+    );
+
     return (
         <CollectionBreadcrumbsContextProvider>
             <div className={classes.breadcrumbs}>
@@ -102,7 +107,7 @@ export const FilesPage = ({
                             />
                         </Grid>
                         <Grid item xs={4} className={classes.metadataSearchButton}>
-                            {currentUser.canViewPublicMetadata && resourcesView && !isOpenedPathDeleted && collection.iri && (
+                            {showMetadataSearchButton && (
                                 <Link to={getMetadataSearchRedirect()}>
                                     <Button
                                         variant="text"
@@ -181,8 +186,8 @@ const ParentAwareFilesPage = (props) => {
 
 const ContextualFilesPage = (props) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
-    const {resourcesView} = useContext(MetadataViewContext);
     const {currentUser} = useContext(UserContext);
+    const {views} = useContext(MetadataViewContext);
     const {params} = props.match;
     const {collectionName, openedPath} = getPathInfoFromParams(params);
     const collection = collections.find(c => c.name === collectionName) || {};
@@ -195,8 +200,8 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
-            resourcesView={resourcesView}
             currentUser={currentUser}
+            views={views}
             {...props}
         />
     ) : (
@@ -207,8 +212,8 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
-            resourcesView={resourcesView}
             currentUser={currentUser}
+            views={views}
             {...props}
         />
     );

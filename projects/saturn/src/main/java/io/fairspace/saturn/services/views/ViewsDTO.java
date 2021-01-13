@@ -7,5 +7,4 @@ import java.util.List;
 @Value
 public class ViewsDTO {
     List<ViewDTO> views;
-    String resourcesView;
 }

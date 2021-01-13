@@ -13,8 +13,6 @@ public class ViewsConfig {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public List<View> views = new ArrayList<>();
 
-    public String resourcesView;
-
     public enum ColumnType {
         Text,
         Set,
@@ -82,8 +80,6 @@ public class ViewsConfig {
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public List<Column> columns;
 
-
-        public String fileLink;
 
         public static class Column {
             @NotBlank public String name;

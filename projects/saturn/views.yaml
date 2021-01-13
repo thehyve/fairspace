@@ -1,9 +1,7 @@
-resourcesView: Resource
 views:
   - name: Subject
     title: Subjects
     itemName: Subject
-    fileLink: https://institut-curie.org/ontology#aboutSubject
     types:
       - https://institut-curie.org/ontology#Subject
     columns:
@@ -51,7 +49,6 @@ views:
   - name: TumorPathologyEvent
     title: Tumor pathology events
     itemName: Tumor pathology event
-    fileLink: https://institut-curie.org/ontology#aboutEvent
     types:
       - https://institut-curie.org/ontology#TumorPathologyEvent
     columns:
@@ -103,7 +100,6 @@ views:
   - name: Sample
     title: Samples
     itemName: Sample
-    fileLink: https://institut-curie.org/ontology#sample
     types:
       - https://institut-curie.org/ontology#BiologicalSample
     columns:

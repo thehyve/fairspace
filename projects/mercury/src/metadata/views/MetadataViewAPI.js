@@ -42,7 +42,6 @@ export type MetadataViewOptions = {
 
 export type MetadataViews = {
     views: MetadataViewOptions[];
-    resourcesView: String;
 };
 
 export type MetadataFacets = {

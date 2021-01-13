@@ -7,6 +7,7 @@ import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./meta
 import {formatDate} from "../../common/utils/genericUtils";
 import type {Collection} from "../../collections/CollectionAPI";
 import {collectionAccessIcon, pathForIri, redirectLink} from "../../collections/collectionUtils";
+import {RESOURCES_VIEW} from "./metadataViewUtils";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -18,7 +19,6 @@ type MetadataViewTableProperties = {
     history: any;
     selected?: MetadataViewEntityWithLinkedFiles;
     view: string;
-    resourcesView: string;
     collections: Collection[];
 };
 
@@ -30,16 +30,16 @@ const useStyles = makeStyles(() => ({
 }));
 
 const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
+const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, resourcesView, idColumn, history, collections} = props;
+    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} = props;
     const classes = useStyles();
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const {rows = []} = data;
 
-    const isResourcesView = view === resourcesView;
-    const resourceTypeColumn = `${resourcesView}_type`;
+    const isResourcesView = view === RESOURCES_VIEW;
 
     const isCustomResourceColumn = (column: MetadataViewColumn) => (
         isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
@@ -48,7 +48,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const getAccess = (iri: string) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
 
     const getResourceType = (row: Map<string, any>) => (
-        row[resourceTypeColumn] && row[resourceTypeColumn][0] && row[resourceTypeColumn][0].value
+        row[RESOURCE_TYPE_COLUMN] && row[RESOURCE_TYPE_COLUMN][0] && row[RESOURCE_TYPE_COLUMN][0].value
     );
 
     const handleResultSingleClick = (iri: string, label: string, linkedFiles: MetadataViewEntity[]) => {
