@@ -152,6 +152,6 @@ public class DavFactory implements ResourceFactory {
     }
 
     public boolean isFileSystemResource(org.apache.jena.rdf.model.Resource resource) {
-        return resource.getURI().startsWith(baseUri);
+        return resource.getURI().startsWith(rootSubject.getURI());
     }
 }
