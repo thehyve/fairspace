@@ -83,8 +83,6 @@ public class ViewsConfig {
         public List<Column> columns;
 
 
-        public String fileLink;
-
         public static class Column {
             @NotBlank public String name;
             @NotBlank public String title;

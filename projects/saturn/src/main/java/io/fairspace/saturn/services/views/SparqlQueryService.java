@@ -169,12 +169,14 @@ public class SparqlQueryService implements QueryService {
                 filters.remove(locationFilter);
 
                 if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
-                    if (view.fileLink != null) {
+                    var fileLink = view.join.stream().filter(v -> v.view.equals(searchConfig.resourcesView))
+                            .findFirst().orElse(null);
+                    if (fileLink != null) {
                         builder.append("FILTER EXISTS {\n")
                                 .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
                                 .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
                                 .append("))\n ?file <")
-                                .append(view.fileLink)
+                                .append(fileLink.on)
                                 .append("> ?")
                                 .append(view.name)
                                 .append(" . \n")
