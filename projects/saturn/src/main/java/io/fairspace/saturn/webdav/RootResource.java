@@ -130,7 +130,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
 
     @Override
     public String getUniqueId() {
-        return factory.rootSubject.toString();
+        return factory.rootSubject.getURI();
     }
 
     @Override
