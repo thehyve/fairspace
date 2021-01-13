@@ -12,7 +12,7 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofRangeValueType} from "./metadataViewUtils";
+import {getMetadataViewsPath, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
 import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -34,7 +34,6 @@ type MetadataViewProperties = {
     views: MetadataViewOptions[];
     locationContext: string;
     currentViewName: string;
-    resourcesView: String;
     handleViewChangeRedirect: () => {};
 }
 
@@ -43,7 +42,7 @@ type ContextualMetadataViewProperties = {
 }
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, currentViewName, resourcesView, locationContext, classes, handleViewChangeRedirect, filters} = props;
+    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect, filters} = props;
 
     usePageTitleUpdater("Metadata");
 
@@ -124,7 +123,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     };
 
     const appendCustomColumns = (view: MetadataViewOptions) => {
-        if (view.name === resourcesView) {
+        if (view.name === RESOURCES_VIEW) {
             const pathColumn = {title: "Path", name: "path", type: "Custom"};
             const accessColumn = {title: "Access", name: "access", type: "Custom"};
             return [
@@ -211,7 +210,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     <MetadataViewTableContainer
                         columns={appendCustomColumns(view)}
                         view={view.name}
-                        resourcesView={resourcesView}
                         filters={filters}
                         locationContext={locationContext}
                         selected={selected}
@@ -231,7 +229,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             return result;
         }
 
-        const pathPrefix = getMetadataViewsPath(resourcesView) + '&context=';
+        const pathPrefix = getMetadataViewsPath(RESOURCES_VIEW) + '&context=';
         let path = locationContext;
         segments.reverse().forEach(segment => {
             result.push({label: segment, href: (pathPrefix + encodeURIComponent(path))});
@@ -280,7 +278,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], loading, error, filters, resourcesView} = useContext(MetadataViewContext);
+    const {views = [], loading, error, filters} = useContext(MetadataViewContext);
     const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
@@ -311,8 +309,7 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             {...props}
             facets={facets}
             views={views}
-            resourcesView={resourcesView}
-            locationContext={currentViewName === resourcesView && locationContext}
+            locationContext={currentViewName === RESOURCES_VIEW && locationContext}
             currentViewName={currentViewName}
             filters={filters}
             handleViewChangeRedirect={handleViewChangeRedirect}

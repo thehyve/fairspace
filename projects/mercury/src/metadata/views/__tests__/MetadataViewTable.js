@@ -7,6 +7,7 @@ import {TableBody} from "@material-ui/core";
 import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockViews, mockRows} from "../__mocks__/MetadataViewAPI";
+import {RESOURCES_VIEW} from "../metadataViewUtils";
 
 describe('MetadataViewTable', () => {
     const historyMock = {
@@ -22,7 +23,6 @@ describe('MetadataViewTable', () => {
                 columns={columns}
                 visibleColumnNames={columns.map(c => c.name)}
                 data={data}
-                resourcesView="Resource"
                 locationContext=""
                 toggleRow={() => {}}
                 history={historyMock}
@@ -76,19 +76,20 @@ describe('MetadataViewTable', () => {
     });
 
     it('should redirect when opening collection entry', () => {
-        const view = 'Resource';
+        const view = RESOURCES_VIEW;
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const wrapper = shallow(<MetadataViewTable
+            view={view}
             columns={columns}
             visibleColumnNames={columns.map(c => c.name)}
             data={data}
-            isResourcesView
             collections={[{iri: 'http://localhost:8080/api/v1/webdav/c01', access: 'Read'}]}
             locationContext=""
             toggleRow={() => {}}
             history={historyMock}
             idColumn={columns[0]}
+            loading={false}
         />);
 
         const tableRows = wrapper.find(TableBody).find(TableRow);

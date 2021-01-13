@@ -4,7 +4,6 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.webdav.DavFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
@@ -29,11 +28,12 @@ import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class SparqlQueryService implements QueryService {
+    private static final String RESOURCES_VIEW = "Resource";
     private final Config.Search config;
     private final ViewsConfig searchConfig;
     private final Dataset ds;
 
-    public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds, DavFactory davFactory) {
+    public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds) {
         this.config = config;
         this.searchConfig = viewsConfig;
         this.ds = ds;
@@ -169,7 +169,7 @@ public class SparqlQueryService implements QueryService {
                 filters.remove(locationFilter);
 
                 if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
-                    var fileLink = view.join.stream().filter(v -> v.view.equals(searchConfig.resourcesView))
+                    var fileLink = view.join.stream().filter(v -> v.view.equals(RESOURCES_VIEW))
                             .findFirst().orElse(null);
                     if (fileLink != null) {
                         builder.append("FILTER EXISTS {\n")

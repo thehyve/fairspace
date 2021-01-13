@@ -21,7 +21,7 @@ public class ViewService {
     private static final Query VALUES_QUERY = QueryFactory.create("""
             PREFIX fs: <http://fairspace.io/ontology#>
             PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-                        
+
             SELECT ?value ?label
             WHERE {
                ?value a ?type ; rdfs:label ?label .
@@ -33,7 +33,7 @@ public class ViewService {
 
     private static final Query BOUNDS_QUERY = QueryFactory.create("""
             PREFIX fs: <http://fairspace.io/ontology#>
-                                   
+
             SELECT (MIN(?value) AS ?min) (MAX(?value) AS ?max)
             WHERE {
                ?subject ?predicate ?value
@@ -133,9 +133,5 @@ public class ViewService {
                     return new ViewDTO(v.name, v.title, columns);
                 })
                 .collect(toList());
-    }
-
-    public String getResourcesView() {
-        return searchConfig.resourcesView;
     }
 }

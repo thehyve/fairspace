@@ -23,7 +23,7 @@ public class ViewApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(new ViewsDTO(viewService.getViews(), viewService.getResourcesView()));
+            return mapper.writeValueAsString(new ViewsDTO(viewService.getViews()));
         });
 
         post("/", (req, res) -> {

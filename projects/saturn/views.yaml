@@ -1,4 +1,3 @@
-resourcesView: Resource
 views:
   - name: Subject
     title: Subjects

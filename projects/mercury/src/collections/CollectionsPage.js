@@ -18,7 +18,7 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import styles from "./CollectionsPage.styles";
 import CollectionsContext from './CollectionsContext';
-import {getMetadataViewsPath} from "../metadata/views/metadataViewUtils";
+import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 
@@ -26,7 +26,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
     usePageTitleUpdater(documentTitle || "Collections");
 
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
-    const {views, resourcesView} = useContext(MetadataViewContext);
+    const {views} = useContext(MetadataViewContext);
     const {currentUser} = useContext(UserContext);
 
     const [busy, setBusy] = useState(false);
@@ -66,6 +66,10 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
 
     const handleCancelSwitchCollection = () => setShowConfirmDialog(false);
 
+    const showMetadataSearchButton = (
+        currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
+    );
+
     return (
         <CollectionBreadcrumbsContextProvider>
             {showBreadCrumbs && <BreadCrumbs />}
@@ -81,8 +85,8 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
                             />
                         </Grid>
                         <Grid item xs={4} className={classes.metadataSearchButton}>
-                            {currentUser.canViewPublicMetadata && views && resourcesView && (
-                                <Link to={getMetadataViewsPath(resourcesView)}>
+                            {showMetadataSearchButton && (
+                                <Link to={getMetadataViewsPath(RESOURCES_VIEW)}>
                                     <Button
                                         variant="text"
                                         color="primary"

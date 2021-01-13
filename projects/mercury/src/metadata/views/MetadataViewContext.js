@@ -38,7 +38,6 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
         <MetadataViewContext.Provider
             value={{
                 views: data.views,
-                resourcesView: data.resourcesView,
                 filters,
                 updateFilters,
                 clearAllFilters,
