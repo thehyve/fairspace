@@ -16,6 +16,7 @@ import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.LocalBlobStore;
 import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +72,7 @@ public class Services {
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(VOCABULARY),
                 new ProtectMachineOnlyPredicatesValidator(VOCABULARY),
+                new URIPrefixValidator(((Resource) davFactory.root).getUniqueId()),
                 new DeletionValidator(),
                 new UniqueLabelValidator(),
                 new ShaclValidator(VOCABULARY));

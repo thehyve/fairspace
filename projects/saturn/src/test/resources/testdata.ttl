@@ -69,15 +69,15 @@ file:coll1\/coffee.jpg
     dcat:keyword "fairspace", "java" ;
     curie:aboutSubject subject:s1, subject:s2, subject:s3 .
 
-file:coll1\/coffee_copy.jpg
-    curie:aboutEvent event:s1-e1 ;
-    curie:aboutSubject subject:s1 ;
-    curie:sample sample:s1-a .
 
 file:coll2\/sample-s2-b-rna.fastq
     curie:aboutSubject subject:s2 ;
     curie:sample sample:s2-b .
 
-
 file:coll2\/sample-s2-b-rna.fastq
     curie:analysisType analysis:O6-12 .  # RNA-seq
+
+
+file:coll2\/sample-s2-b-rna_copy.fastq
+curie:aboutSubject subject:s2 ;
+curie:sample sample:s2-b .
