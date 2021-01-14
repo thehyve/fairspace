@@ -15,6 +15,7 @@ public class URIPrefixValidator implements MetadataRequestValidator {
     public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         added.listSubjects()
                 .filterKeep(Resource::isURIResource)
+                .filterDrop(resource -> before.contains(resource, null))
                 .filterKeep(resource -> resource.getURI().startsWith(restrictedPrefix))
                 .forEachRemaining(resource ->
                         violationHandler.onViolation(
