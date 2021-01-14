@@ -249,7 +249,7 @@ Authentication (Curl code example)
 </summary>
 
 ```bash
-curl -v -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" http://localhost:8080/api/v1/users/current
+curl -v -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" http://localhost:8080/api/users/current
 ```
 </details>
 
@@ -268,7 +268,7 @@ Example file: `testdata.ttl`:
 @prefix example: <https://example.com/ontology#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix subject: <http://example.com/subjects#> .
-@prefix file: <http://example.com/api/v1/webdav/> .
+@prefix file: <http://example.com/api/webdav/> .
 @prefix gender: <http://hl7.org/fhir/administrative-gender#> .
 @prefix ncbitaxon: <https://bioportal.bioontology.org/ontologies/NCBITAXON/> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
@@ -296,7 +296,7 @@ log = logging.getLogger()
 
 session = Session()
 with open('testdata.ttl') as testdata: 
-    response: Response = session.put(f"{server_url}/api/v1/metadata/",
+    response: Response = session.put(f"{server_url}/api/metadata/",
                            data=testdata.read(),
                            headers={'Content-type': 'text/turtle'})
     if not response.ok:

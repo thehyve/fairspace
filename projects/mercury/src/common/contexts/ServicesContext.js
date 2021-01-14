@@ -6,7 +6,7 @@ import useAsync from "../hooks/UseAsync";
 const ServicesContext = React.createContext({});
 
 export const ServicesProvider = ({children}) => {
-    const {data: services = [], loading: servicesLoading, error: servicesError} = useAsync(() => axios.get('/api/v1/services/')
+    const {data: services = [], loading: servicesLoading, error: servicesError} = useAsync(() => axios.get('/api/services/')
         .then(extractJsonData)
         .catch(handleHttpError('Connection error.')));
 

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionResourceTest {
-    public static final String BASE_PATH = "/api/v1/webdav";
+    public static final String BASE_PATH = "/api/webdav";
     private static final String baseUri = "http://example.com" + BASE_PATH;
 
     private Model model = createTxnMem().getDefaultModel();

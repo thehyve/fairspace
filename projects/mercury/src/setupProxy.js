@@ -36,7 +36,7 @@ module.exports = (app) => {
 
     const addToken = (proxyReq, req) => req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
-    app.use(proxy('/api/v1', {
+    app.use(proxy('/api', {
         target: 'http://localhost:8080/',
         onProxyReq: addToken
     }));

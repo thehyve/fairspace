@@ -47,7 +47,7 @@ public class WebDAVServletTest {
     public void before() throws Exception {
         servlet = new WebDAVServlet(factory, txn, store);
 
-        when(req.getRequestURL()).thenReturn(new StringBuffer("http://ex.com/api/v1/webdav/resource"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://ex.com/api/webdav/resource"));
         when(req.getInputStream()).thenReturn(in);
         when(req.getParameterNames()).thenReturn(new Vector<String>().elements());
         when(req.getHeaderNames()).thenReturn(new Vector<String>().elements());

@@ -61,7 +61,7 @@ public class Services {
         dataset.getContext().set(USER_SERVICE, userService);
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, dataset.getContext());
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/webdav"), blobStore, userService, dataset.getContext());
         dataset.getContext().set(FS_ROOT, davFactory.root);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DavFactoryTest {
     public static final long FILE_SIZE = 3L;
-    public static final String BASE_PATH = "/api/v1/webdav";
+    public static final String BASE_PATH = "/api/webdav";
     public static final QName VERSION = new QName(FS.NS, "version");
     private static final String baseUri = "http://example.com" + BASE_PATH;
     @Mock
@@ -129,7 +129,7 @@ public class DavFactoryTest {
         assertTrue(coll instanceof FolderResource);
         assertEquals(collName, coll.getName());
         assertNotNull(root.child(collName));
-        assertNotNull(factory.getResource(null, format("/api/v1/webdav/%s/", collName)));
+        assertNotNull(factory.getResource(null, format("/api/webdav/%s/", collName)));
         assertEquals(1, root.getChildren().size());
     }
 
@@ -142,7 +142,7 @@ public class DavFactoryTest {
         assertTrue(coll instanceof FolderResource);
         assertEquals(collName, coll.getName());
         assertNotNull(root.child(collName));
-        assertNotNull(factory.getResource(null,format("/api/v1/webdav/%s/", collName)));
+        assertNotNull(factory.getResource(null,format("/api/webdav/%s/", collName)));
         assertEquals(1, root.getChildren().size());
     }
 

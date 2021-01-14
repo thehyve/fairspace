@@ -14,7 +14,7 @@ describe('CrossWorkspacesSearchAPI', () => {
         }));
         await crossWorkspacesSearchAPI.search({query: 'test'});
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/search/_all?query=test',
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/search/_all?query=test',
             {headers: {Accept: 'application/json'}});
     });
 });

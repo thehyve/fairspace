@@ -302,8 +302,8 @@ export const mockRows = (viewName) => {
                     Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
                     Sample_origin: [{value: 'http://example.com/sampleType#normal', label: 'Normal'}],
                     Collection: [
-                        {value: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
-                        {value: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
+                        {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'},
+                        {value: 'http://localhost:8080/api/webdav/f02', label: 'f02'}
                     ]
                 },
                 {
@@ -323,8 +323,8 @@ export const mockRows = (viewName) => {
                     Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
                     Subject_birthDate: [{value: new Date(2010, 11, 25).toLocaleString(), label: "2010-11-25"}],
                     Collection: [
-                        {value: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'},
-                        {value: 'http://localhost:8080/api/v1/webdav/f02', label: 'f02'}
+                        {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'},
+                        {value: 'http://localhost:8080/api/webdav/f02', label: 'f02'}
                     ]
                 },
                 {
@@ -337,7 +337,7 @@ export const mockRows = (viewName) => {
                     Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
                     Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
                     files: [
-                        {value: 'http://localhost:8080/api/v1/webdav/f01', label: 'f01'}
+                        {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'}
                     ]
                 },
                 {
@@ -359,7 +359,7 @@ export const mockRows = (viewName) => {
         case "Resource":
             return [
                 {
-                    Collection: [{value: 'http://localhost:8080/api/v1/webdav/c01', label: 'C01'}],
+                    Collection: [{value: 'http://localhost:8080/api/webdav/c01', label: 'C01'}],
                     Collection_analysisType: [{value: 'http://example.com/analysisType#biology', label: 'Biology'}]
                 }
             ];

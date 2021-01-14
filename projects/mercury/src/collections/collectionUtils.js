@@ -31,7 +31,7 @@ export const getCollectionAbsolutePath = (path: string) => (
 
 export const pathForIri = (iri: string) => {
     const path = decodeURIComponent(new URL(iri).pathname);
-    return path.replace('/api/v1/webdav/', '');
+    return path.replace('/api/webdav/', '');
 };
 
 export const redirectLink = (iri: string, type: string) => {

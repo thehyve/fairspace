@@ -3,7 +3,7 @@ import escapeStringRegexp from 'escape-string-regexp';
 import {handleHttpError} from "../common/utils/httpUtils";
 import {extractSparqlSelectResults, SPARQL_SELECT_HEADERS} from "./sparqlUtils";
 
-const search = (sparql) => axios.post('/api/v1/rdf/query', sparql,
+const search = (sparql) => axios.post('/api/rdf/query', sparql,
     {headers: SPARQL_SELECT_HEADERS})
     .catch(handleHttpError("Error while performing search"))
     .then(extractSparqlSelectResults);

@@ -1,7 +1,7 @@
 import axios from "axios";
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 
-const crossWorkspacesSearchUrl = "/api/v1/search/_all";
+const crossWorkspacesSearchUrl = "/api/search/_all";
 
 class CrossWorkspacesSearchAPI {
     search({query}) {

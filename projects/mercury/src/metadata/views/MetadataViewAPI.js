@@ -71,7 +71,7 @@ type MetadataViewDataRequest = MetadataViewCountRequest & {|
     includeJoinedViews: boolean;
 |};
 
-const metadataViewUrl = "/api/v1/views/";
+const metadataViewUrl = "/api/views/";
 
 const defaultRequestOptions = {
     headers: {Accept: 'application/json'}

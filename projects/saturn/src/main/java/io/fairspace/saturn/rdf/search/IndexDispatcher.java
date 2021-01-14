@@ -20,7 +20,7 @@ public class IndexDispatcher {
     private static final String SHARED_INDEX = "shared";
 
     // TODO: Inject via context?
-    private static final String collectionPrefix = CONFIG.publicUrl + "/api/v1/webdav/";
+    private static final String collectionPrefix = CONFIG.publicUrl + "/api/webdav/";
 
 
     private final Context context;

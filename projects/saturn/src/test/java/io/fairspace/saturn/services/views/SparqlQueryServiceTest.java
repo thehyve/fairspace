@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SparqlQueryServiceTest {
-    static final String BASE_PATH = "/api/v1/webdav";
+    static final String BASE_PATH = "/api/webdav";
     static final String baseUri = "http://example.com" + BASE_PATH;
     static final String SAMPLE_NATURE_BLOOD = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12434";
     static final String ANALYSIS_TYPE_RNA_SEQ = "https://institut-curie.org/analysis#O6-12";
