@@ -152,16 +152,16 @@ views:
     title: Collections and files
     itemName: Name
     types:
-      - http://fairspace.io/ontology#Collection
-      - http://fairspace.io/ontology#Directory
-      - http://fairspace.io/ontology#File
+      - https://fairspace.nl/ontology#Collection
+      - https://fairspace.nl/ontology#Directory
+      - https://fairspace.nl/ontology#File
     columns:
       - name: type
         title: Resource type
         source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
         type: term
         query: |
-          PREFIX fs: <http://fairspace.io/ontology#>
+          PREFIX fs: <https://fairspace.nl/ontology#>
           SELECT ?value ?label
           WHERE {
             VALUES (?value ?label) {
@@ -172,7 +172,7 @@ views:
           }
       - name: dateCreated
         title: File created
-        source: http://fairspace.io/ontology#dateCreated
+        source: https://fairspace.nl/ontology#dateCreated
         type: date
       - name: analysisType
         title: Analysis type

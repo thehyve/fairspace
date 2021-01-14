@@ -22,8 +22,8 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
-    private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
-    private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
+    private static final Property P1 = createProperty("https://fairspace.nl/ontology/P1");
+    private static final Property P2 = createProperty("https://fairspace.nl/ontology/P2");
 
 
     private final ProtectMachineOnlyPredicatesValidator validator = new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY);

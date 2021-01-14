@@ -7,7 +7,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class FS {
-    public static final String NS = "http://fairspace.io/ontology#";
+    public static final String NS = "https://fairspace.nl/ontology#";
 
     public static final String COLLECTION_URI = NS + "Collection";
     public static final Resource Collection = createResource(COLLECTION_URI);
@@ -142,6 +142,8 @@ public class FS {
     public static final String MARKDOWN_URI = NS + "markdown";
     public static final Property markdown = createProperty(MARKDOWN_URI);
 
+    public static final String NILL_URI = NS + "nill";
+    public static final Property nill = createProperty(NILL_URI);
 
     public static final String IS_ADMIN_URI = NS + "isAdmin";
     public static final String CAN_VIEW_PUBLIC_METADATA_URI = NS + "canViewPublicMetadata";

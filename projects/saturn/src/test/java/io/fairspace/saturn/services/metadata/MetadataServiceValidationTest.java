@@ -40,10 +40,10 @@ public class MetadataServiceValidationTest {
 
     private static final Resource resource1 = createResource("http://localhost/iri/S1");
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
-    private static final Property property1 = createProperty("http://fairspace.io/ontology/P1");
-    private static final Property property2 = createProperty("http://fairspace.io/ontology/P2");
-    private static final Property class1 = createProperty("http://fairspace.io/ontology/C1");
-    private static final Property class2 = createProperty("http://fairspace.io/ontology/C2");
+    private static final Property property1 = createProperty("https://fairspace.nl/ontology/P1");
+    private static final Property property2 = createProperty("https://fairspace.nl/ontology/P2");
+    private static final Property class1 = createProperty("https://fairspace.nl/ontology/C1");
+    private static final Property class2 = createProperty("https://fairspace.nl/ontology/C2");
 
     private static final Statement STMT1 = createStatement(resource1, property1, resource2);
 

@@ -31,9 +31,9 @@ public class WorkspaceServiceTest {
     private static final Resource EMPTY_WORKSPACE = createResource("http://localhost/iri/W2");
     private static final Resource COLLECTION_1 = createResource("http://localhost/iri/C1");
     private static final Resource RESOURCE_1 = createResource("http://localhost/iri/R1");
-    private static final Property PROPERTY_1 = createProperty("http://fairspace.io/ontology/P1");
+    private static final Property PROPERTY_1 = createProperty("https://fairspace.nl/ontology/P1");
     private static final Resource RESOURCE_2 = createResource("http://localhost/iri/R2");
-    private static final Property PROPERTY_2 = createProperty("http://fairspace.io/ontology/P2");
+    private static final Property PROPERTY_2 = createProperty("https://fairspace.nl/ontology/P2");
 
     private Transactions txn = new SimpleTransactions(createTxnMem());
     private WorkspaceService service;

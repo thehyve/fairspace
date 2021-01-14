@@ -2,6 +2,7 @@ import axios from 'axios';
 import escapeStringRegexp from 'escape-string-regexp';
 import {handleHttpError} from "../common/utils/httpUtils";
 import {extractSparqlSelectResults, SPARQL_SELECT_HEADERS} from "./sparqlUtils";
+import {FAIRSPACE_NS, RDFS_NS} from "../constants";
 
 const search = (sparql) => axios.post('/api/rdf/query', sparql,
     {headers: SPARQL_SELECT_HEADERS})
@@ -12,8 +13,8 @@ const regex = query => ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)"
     .replace(/\\/g, "\\\\");
 
 export const lookup = (query, type) => search(`
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <${RDFS_NS}>
+PREFIX fs: <${FAIRSPACE_NS}>
 
 SELECT ?id ?label ?comment
 WHERE {
@@ -23,8 +24,8 @@ WHERE {
     FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }
 }
 `).then(results => (results.length ? results : search(`
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <${RDFS_NS}>
+PREFIX fs: <${FAIRSPACE_NS}>
 
 SELECT ?id ?label ?comment
 WHERE {
@@ -38,8 +39,8 @@ LIMIT 20
 `)));
 
 export const searchFiles = (query, parentIri) => search(`
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX fs: <http://fairspace.io/ontology#>
+PREFIX rdfs: <${RDFS_NS}>
+PREFIX fs: <${FAIRSPACE_NS}>
 
 SELECT ?id ?label ?comment ?type
 WHERE { 

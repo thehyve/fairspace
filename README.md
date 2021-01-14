@@ -413,7 +413,7 @@ Example taxonomy types and entity type:
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dash: <http://datashapes.org/dash#> .
-@prefix fs: <http://fairspace.io/ontology#> .
+@prefix fs: <https://fairspace.nl/ontology#> .
 @prefix example: <https://example.com/ontology#> .
 
 example:Gender a rdfs:Class, sh:NodeShape ;

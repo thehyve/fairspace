@@ -58,15 +58,15 @@ describe('UseFormSubmission', () => {
     it('should render validation errors IRIs with namespaces', async () => {
         const namespaces = [
             {
-                namespace: 'http://fairspace.io/',
+                namespace: 'https://fairspace.nl/',
                 prefix: 'fs'
             }
         ];
         const details = [
             {
                 message: "Cannot add a machine-only property",
-                subject: "http://fairspace.io/ontology#collectionTypeShape",
-                predicate: "http://fairspace.io/ontology#domainIncludes",
+                subject: "https://fairspace.nl/ontology#collectionTypeShape",
+                predicate: "https://fairspace.nl/ontology#domainIncludes",
                 value: "http://workspace.ci.fairway.app/vocabulary/AnalysisShape"
             }
         ];
