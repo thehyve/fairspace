@@ -26,7 +26,7 @@ export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
 export const XMLSCHEMA_NS = 'http://www.w3.org/2001/XMLSchema#';
 export const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
 export const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
-export const FAIRSPACE_NS = 'http://fairspace.io/ontology#';
+export const FAIRSPACE_NS = 'https://fairspace.nl/ontology#';
 export const DASH_NS = 'http://datashapes.org/dash#';
 export const RDF_TYPE = RDF_NS + 'type';
 

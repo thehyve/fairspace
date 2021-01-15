@@ -20,7 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.services.metadata.MetadataService.NIL;
 import static io.fairspace.saturn.vocabulary.FS.NS;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -35,8 +34,8 @@ public class MetadataServiceTest {
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
-    private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
-    private static final Property P2 = createProperty("http://fairspace.io/ontology/P2");
+    private static final Property P1 = createProperty("https://fairspace.nl/ontology/P1");
+    private static final Property P2 = createProperty("https://fairspace.nl/ontology/P2");
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
@@ -133,7 +132,7 @@ public class MetadataServiceTest {
     public void patchWithNil() {
         txn.executeWrite(m -> m.add(S1, P1, S2).add(S1, P1, S3));
 
-        api.patch(createDefaultModel().add(S1, P1, NIL));
+        api.patch(createDefaultModel().add(S1, P1, FS.nill));
 
         assertFalse(txn.calculateRead(m -> m.contains(S1, P1)));
     }

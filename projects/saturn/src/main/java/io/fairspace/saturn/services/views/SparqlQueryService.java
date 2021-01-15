@@ -4,6 +4,7 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
@@ -155,7 +156,9 @@ public class SparqlQueryService implements QueryService {
     private Query getQuery(CountRequest request) {
         var view = getView(request.getView());
 
-        var builder = new StringBuilder("PREFIX fs: <http://fairspace.io/ontology#>\n\nSELECT ?")
+        var builder = new StringBuilder("PREFIX fs: <")
+                .append(FS.NS)
+                .append(">\n\nSELECT ?")
                 .append(view.name)
                 .append("\nWHERE {\n");
 

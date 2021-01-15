@@ -23,11 +23,8 @@ import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class MetadataService {
-    static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
-
     private final Transactions transactions;
     private final Model vocabulary;
     private final MetadataRequestValidator validator;
@@ -176,7 +173,7 @@ public class MetadataService {
                     .toSet()
                     .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
-            return update(existing.difference(model), model.remove(existing).removeAll(null, null, NIL));
+            return update(existing.difference(model), model.remove(existing).removeAll(null, null, FS.nill));
         }));
     }
 

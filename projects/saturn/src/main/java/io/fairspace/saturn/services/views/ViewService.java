@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.datatypes.xsd.*;
 import org.apache.jena.query.*;
@@ -18,8 +19,8 @@ import static org.apache.jena.system.Txn.calculateRead;
 
 @Slf4j
 public class ViewService {
-    private static final Query VALUES_QUERY = QueryFactory.create("""
-            PREFIX fs: <http://fairspace.io/ontology#>
+    private static final Query VALUES_QUERY = QueryFactory.create(String.format("""
+            PREFIX fs: <%s>
             PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
             SELECT ?value ?label
@@ -29,17 +30,17 @@ public class ViewService {
                FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
                FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
             } ORDER BY ?label
-            """);
+            """, FS.NS));
 
-    private static final Query BOUNDS_QUERY = QueryFactory.create("""
-            PREFIX fs: <http://fairspace.io/ontology#>
+    private static final Query BOUNDS_QUERY = QueryFactory.create(String.format("""
+            PREFIX fs: <%s>
 
             SELECT (MIN(?value) AS ?min) (MAX(?value) AS ?max)
             WHERE {
                ?subject ?predicate ?value
                FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
             }
-            """);
+            """, FS.NS));
 
 
     private final ViewsConfig searchConfig;

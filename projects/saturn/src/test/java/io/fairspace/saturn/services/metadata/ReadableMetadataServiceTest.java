@@ -29,7 +29,7 @@ public class ReadableMetadataServiceTest {
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
-    private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
+    private static final Property P1 = createProperty("https://fairspace.nl/ontology/P1");
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
