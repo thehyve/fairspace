@@ -25,18 +25,18 @@ public class URIPrefixValidatorTest {
 
     @Before
     public void setUp() {
-        validator = new URIPrefixValidator("http://example.com/api/v1/webdav");
+        validator = new URIPrefixValidator("http://example.com/api/webdav");
     }
 
     @Test
     public void resourcesWithRestrictedPrefixCannotBeCreated() {
-        Resource resource1 = createResource("http://example.com/api/v1/webdav/123");
+        Resource resource1 = createResource("http://example.com/api/webdav/123");
         Resource resource1Type = createResource("http://example.com/Resource");
         var model = modelOf(resource1, RDF.type, resource1Type);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         verify(violationHandler).onViolation(
-                "Cannot add resource with URI starting with restricted prefix 'http://example.com/api/v1/webdav'.",
+                "Cannot add resource with URI starting with restricted prefix 'http://example.com/api/webdav'.",
                 resource1, null, null);
         verifyNoMoreInteractions(violationHandler);
     }

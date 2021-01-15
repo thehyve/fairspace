@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(Parameterized.class)
 public class DavFactoryAccessTest {
-    public static final String BASE_PATH = "/api/v1/webdav";
+    public static final String BASE_PATH = "/api/webdav";
     private static final String baseUri = "http://example.com" + BASE_PATH;
     BlobStore store = mock(BlobStore.class);
     UserService userService = mock(UserService.class);

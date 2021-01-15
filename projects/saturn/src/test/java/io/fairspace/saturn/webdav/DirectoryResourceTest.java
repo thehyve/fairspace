@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DirectoryResourceTest {
-    private static final String baseUri = "http://example.comapi/v1/webdav";
+    private static final String baseUri = "http://example.comapi/webdav";
     private static final int FILE_SIZE = 10;
 
     private Model model = createTxnMem().getDefaultModel();

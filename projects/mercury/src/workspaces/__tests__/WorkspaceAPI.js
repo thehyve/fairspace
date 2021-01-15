@@ -23,7 +23,7 @@ describe('WorkspacesAPI', () => {
         await workspacesAPI.createWorkspace(workspaceData);
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
-            '/api/v1/workspaces/',
+            '/api/workspaces/',
             "{\"name\":\"workspace1\"}",
             {headers: {Accept: 'application/json'}}
         );
@@ -62,7 +62,7 @@ describe('WorkspacesAPI', () => {
         await workspacesAPI.updateWorkspace(workspaceData);
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
         expect(mockAxios.patch).toHaveBeenCalledWith(
-            '/api/v1/workspaces/',
+            '/api/workspaces/',
             JSON.stringify({
                 iri: 'workspace1',
                 name: 'w1',
@@ -82,7 +82,7 @@ describe('WorkspacesAPI', () => {
         await workspacesAPI.deleteWorkspace(workspaceIri);
         expect(mockAxios.delete).toHaveBeenCalledTimes(1);
         expect(mockAxios.delete).toHaveBeenCalledWith(
-            '/api/v1/workspaces/?workspace=workspace1',
+            '/api/workspaces/?workspace=workspace1',
             {headers: {Accept: 'application/json'}}
         );
     });

@@ -168,10 +168,10 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
             // -F 'action=upload_files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
             // -F '/dir/subdir/file2.ext=@/dir/subdir/file2.ext' \
-            // http://localhost:8080/api/v1/webdav/c1/
+            // http://localhost:8080/api/webdav/c1/
             case "upload_files" -> uploadFiles(files);
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
-            // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
+            // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/webdav/c1/
             case "upload_metadata" -> uploadMetadata(files.get("file"));
             default -> super.performAction(action, parameters, files);
         }

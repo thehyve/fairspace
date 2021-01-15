@@ -15,7 +15,7 @@ import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
 @Slf4j
 public class App {
-    public static final String API_PREFIX = "/api/v1";
+    public static final String API_PREFIX = "/api";
 
     public static void main(String[] args) {
         log.info("Saturn is starting");

@@ -131,4 +131,4 @@ export class SearchAPI {
     } : {});
 }
 
-export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search', log: 'error'}));
+export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/search', log: 'error'}));

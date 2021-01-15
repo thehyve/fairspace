@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ViewServiceTest {
-    static final String BASE_PATH = "/api/v1/webdav";
+    static final String BASE_PATH = "/api/webdav";
     static final String baseUri = "http://example.com" + BASE_PATH;
 
     @Mock

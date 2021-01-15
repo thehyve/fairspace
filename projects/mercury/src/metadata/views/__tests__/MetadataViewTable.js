@@ -84,7 +84,7 @@ describe('MetadataViewTable', () => {
             columns={columns}
             visibleColumnNames={columns.map(c => c.name)}
             data={data}
-            collections={[{iri: 'http://localhost:8080/api/v1/webdav/c01', access: 'Read'}]}
+            collections={[{iri: 'http://localhost:8080/api/webdav/c01', access: 'Read'}]}
             locationContext=""
             toggleRow={() => {}}
             history={historyMock}
