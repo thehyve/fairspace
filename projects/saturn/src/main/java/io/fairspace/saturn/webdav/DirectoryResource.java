@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.*;
@@ -297,10 +296,25 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     var values = text.split("\\|");
 
                     for (var value : values) {
-                        var o = (class_ != null)
-                                ? model.wrapAsResource(generateMetadataIri(value))
-                                : model.createTypedLiteral(value, datatype.getURI());
-                        model.add(s, property, o);
+                        if (class_ != null) {
+                            var object = subject.getModel().listResourcesWithProperty(RDF.type, class_)
+                                    .filterKeep(r -> r.getURI().equals(value) || r.hasProperty(RDFS.label, value))
+                                    .toList();
+                            if (object.size() == 1) {
+                                model.add(s, property, object.get(0));
+                            } else if (object.size() > 1) {
+                                setErrorMessage("Line " +  record.getRecordNumber()
+                                        + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" is not unique.");
+                                throw new BadRequestException(this);
+                            } else {
+                                setErrorMessage("Line " +  record.getRecordNumber()
+                                        + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" does not exist.");
+                                throw new BadRequestException(this);
+                            }
+                        } else {
+                            var o = model.createTypedLiteral(value, datatype.getURI());
+                            model.add(s, property, o);
+                        }
                     }
                 }
             }
