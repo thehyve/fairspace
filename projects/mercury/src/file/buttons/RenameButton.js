@@ -15,7 +15,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
 
     const openDialog = (e) => {
         if (e) e.stopPropagation();
-        nameControl.setValue('');
+        nameControl.setValue(currentName);
         if (!disabled) {
             setOpened(true);
         }

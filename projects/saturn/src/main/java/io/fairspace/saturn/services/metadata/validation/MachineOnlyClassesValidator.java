@@ -7,9 +7,13 @@ import org.apache.jena.vocabulary.RDF;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getBooleanProperty;
 
-public class MachineOnlyClassesValidator implements MetadataRequestValidator {
+public class MachineOnlyClassesValidator extends VocabularyAwareValidator {
+    public MachineOnlyClassesValidator(Model vocabulary) {
+        super(vocabulary);
+    }
+
     @Override
-    public void validate(Model before, Model after, Model removed, Model added, Model vocabulary, ViolationHandler violationHandler) {
+    public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
         vocabulary.listSubjectsWithProperty(RDF.type, SHACLM.NodeShape)
                 .filterKeep(shape -> getBooleanProperty(shape, FS.machineOnly))
                 .forEachRemaining(moc -> {

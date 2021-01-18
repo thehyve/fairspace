@@ -8,7 +8,7 @@ export type Feature = 'MetadataEditing'; // more to come
 const FeaturesContext = React.createContext({});
 
 export const FeaturesProvider = ({children}) => {
-    const {data = []} = useAsync(() => axios.get('/api/v1/features/')
+    const {data = []} = useAsync(() => axios.get('/api/features/')
         .then(extractJsonData)
         .catch(handleHttpError('Connection error.')));
 

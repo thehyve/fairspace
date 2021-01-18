@@ -10,7 +10,11 @@ const styles = () => ({
         width: consts.MAIN_CONTENT_WIDTH
     },
     topBarSwitch: {
-        textAlign: "right"
+        textAlign: "right",
+        whiteSpace: "nowrap"
+    },
+    metadataSearchButton: {
+        textAlign: "center"
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,

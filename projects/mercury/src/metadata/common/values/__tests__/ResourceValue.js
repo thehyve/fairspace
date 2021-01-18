@@ -16,7 +16,7 @@ describe('ResourceValue', () => {
         iriValue.prop('onNamespaceChange')({
             id: 'b',
             label: 'Fairspace',
-            value: 'http://fairspace.io/ontology#'
+            value: 'https://fairspace.nl/ontology#'
         });
 
         // Expect no invocations of the parent onChange function
@@ -26,7 +26,7 @@ describe('ResourceValue', () => {
         iriValue.prop('onLocalPartChange')('postfix');
 
         expect(onChange).toHaveBeenCalledTimes(1);
-        expect(onChange).toHaveBeenCalledWith({id: 'http://fairspace.io/ontology#postfix'});
+        expect(onChange).toHaveBeenCalledWith({id: 'https://fairspace.nl/ontology#postfix'});
     });
 
     it('should use the entry id as value for the textfield', () => {

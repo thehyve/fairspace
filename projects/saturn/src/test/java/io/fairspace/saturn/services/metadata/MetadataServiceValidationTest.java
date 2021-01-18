@@ -29,21 +29,21 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceValidationTest {
     @Mock
     MetadataRequestValidator validator;
+    @Mock
+    MetadataPermissions permissions;
 
     private static final Resource resource1 = createResource("http://localhost/iri/S1");
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
-    private static final Property property1 = createProperty("http://fairspace.io/ontology/P1");
-    private static final Property property2 = createProperty("http://fairspace.io/ontology/P2");
-    private static final Property class1 = createProperty("http://fairspace.io/ontology/C1");
-    private static final Property class2 = createProperty("http://fairspace.io/ontology/C2");
+    private static final Property property1 = createProperty("https://fairspace.nl/ontology/P1");
+    private static final Property property2 = createProperty("https://fairspace.nl/ontology/P2");
+    private static final Property class1 = createProperty("https://fairspace.nl/ontology/C1");
+    private static final Property class2 = createProperty("https://fairspace.nl/ontology/C2");
 
     private static final Statement STMT1 = createStatement(resource1, property1, resource2);
 
@@ -57,7 +57,8 @@ public class MetadataServiceValidationTest {
     public void setUp() {
         ds = createTxnMem();
         txn = new SimpleTransactions(ds);
-        api = new MetadataService(txn, VOCABULARY, validator);
+        when(permissions.canWriteMetadata(any())).thenReturn(true);
+        api = new MetadataService(txn, VOCABULARY, validator, permissions);
 
         setupRequestContext();
     }
@@ -79,11 +80,11 @@ public class MetadataServiceValidationTest {
 
     private void produceValidationError() {
         doAnswer(invocation -> {
-            ViolationHandler handler = invocation.getArgument(5);
+            ViolationHandler handler = invocation.getArgument(4);
             handler.onViolation("ERROR", createResource(), null, null);
 
             return null;
-        }).when(validator).validate(any(), any(), any(), any(), any(), any());
+        }).when(validator).validate(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -150,7 +151,6 @@ public class MetadataServiceValidationTest {
                         resource1, property1, createTypedLiteral(1))),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                eq(VOCABULARY),
                 any());
     }
 
@@ -172,7 +172,6 @@ public class MetadataServiceValidationTest {
                         resource1, property1, resource2)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                eq(VOCABULARY),
                 any());
     }
 
@@ -206,7 +205,6 @@ public class MetadataServiceValidationTest {
                 isomorphic(modelWithList.union(toAdd)),
                 isomorphic(EMPTY_MODEL),
                 isomorphic(toAdd),
-                eq(VOCABULARY),
                 any());
     }
 }

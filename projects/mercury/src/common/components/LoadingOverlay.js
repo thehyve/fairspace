@@ -2,7 +2,7 @@ import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import LoadingInlay from './LoadingInlay';
 
-const loadingOverlay = ({loading}) => (
+const LoadingOverlay = ({loading}) => (
     <Dialog
         open={loading || false}
         PaperProps={{
@@ -17,4 +17,4 @@ const loadingOverlay = ({loading}) => (
     </Dialog>
 );
 
-export default loadingOverlay;
+export default LoadingOverlay;

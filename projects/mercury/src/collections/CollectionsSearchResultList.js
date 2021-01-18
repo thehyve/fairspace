@@ -1,16 +1,27 @@
 import React from 'react';
-import {Link, ListItemText, Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, withStyles} from '@material-ui/core';
+import {
+    Link,
+    ListItemText,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Tooltip,
+    Typography,
+    withStyles
+} from '@material-ui/core';
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {getCollectionAbsolutePath, handleCollectionSearchRedirect, pathForIri} from './collectionUtils';
+import {getSearchPathSegments, handleCollectionTextSearchRedirect, pathForIri, redirectLink} from './collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
-import {getSearchContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
+import {getLocationContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
 import SearchBar from "../search/SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {getParentPath} from '../file/fileUtils';
 import {searchFiles} from "../search/lookup";
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import BreadCrumbs from '../common/components/BreadCrumbs';
@@ -68,14 +79,7 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
         return <Typography>{typeLabel}</Typography>;
     };
 
-    const link = (item) => {
-        const path = pathForIri(item.id);
-        if (item.type && item.type === FILE_URI) {
-            const parentPath = getParentPath(path);
-            return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
-        }
-        return getCollectionAbsolutePath(path);
-    };
+    const link = (item) => redirectLink(item.id, item.type);
 
     /**
      * Handles a click on a search result.
@@ -142,29 +146,14 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const CollectionSearchResultListContainer = ({
-    location: {search}, query = getSearchQueryFromString(search), context = getSearchContextFromString(search),
+    location: {search}, query = getSearchQueryFromString(search), context = getLocationContextFromString(search),
     classes, history
 }) => {
     const {data, loading, error} = useAsync(() => searchFiles(query, context).catch(handleSearchError), [search, query]);
     const items = data || [];
     const total = items.length;
     const handleSearch = (value) => {
-        handleCollectionSearchRedirect(history, value, context);
-    };
-
-    const pathSegments = () => {
-        const segments = ((context && pathForIri(context)) || '').split('/');
-        if (segments[0] === '') {
-            return [];
-        }
-        const result = [];
-        let href = '/collections';
-        segments.forEach(segment => {
-            href += '/' + segment;
-            result.push({label: segment, href});
-        });
-        result.push({label: 'Search results', href: ''});
-        return result;
+        handleCollectionTextSearchRedirect(history, value, context);
     };
 
     return (
@@ -176,7 +165,7 @@ export const CollectionSearchResultListContainer = ({
             }
         ]}}
         >
-            <BreadCrumbs additionalSegments={pathSegments()} />
+            <BreadCrumbs additionalSegments={getSearchPathSegments(context)} />
             <SearchBar
                 placeholder="Search"
                 disableUnderline={false}

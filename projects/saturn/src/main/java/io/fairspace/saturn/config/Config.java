@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -41,13 +40,13 @@ public class Config {
 
     public WebDAV webDAV = new WebDAV();
 
-    public Properties mail = new Properties();
-
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public final Set<Feature> features = new HashSet<>();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
+
+    public Search search = new Search();
 
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
@@ -83,6 +82,11 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
+    }
+
+    public static class Search {
+        public long pageRequestTimeout = 10_000;
+        public long countRequestTimeout = 100_1000;
     }
 
     @Override

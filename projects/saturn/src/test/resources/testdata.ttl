@@ -1,0 +1,83 @@
+@prefix curie: <https://institut-curie.org/ontology#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix subject: <http://example.com/subjects#> .
+@prefix event: <http://example.com/events#> .
+@prefix sample: <http://example.com/samples#> .
+@prefix file: <http://example.com/api/webdav/> .
+@prefix gender: <http://hl7.org/fhir/administrative-gender#> .
+@prefix ncbitaxon: <https://bioportal.bioontology.org/ontologies/NCBITAXON/> .
+@prefix icdo3t: <https://bioportal.bioontology.org/ontologies/ICD-O-3-T/> .
+@prefix icdo3m: <https://bioportal.bioontology.org/ontologies/ICD-O-3-M/> .
+@prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
+@prefix analysis: <https://institut-curie.org/analysis#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+
+subject:s1 a curie:Subject ;
+           rdfs:label "Subject 1" ;
+           curie:isOfGender gender:female ;
+           curie:isOfSpecies ncbitaxon:9606 .
+
+subject:s2 a curie:Subject ;
+           rdfs:label "Subject 2" ;
+           curie:isOfGender gender:male ;
+           curie:isOfSpecies ncbitaxon:9606 .
+
+subject:s3 a curie:Subject ;
+           rdfs:label "Subject 3" ;
+           curie:isOfGender gender:female ;
+           curie:isOfSpecies ncbitaxon:9606 .
+
+event:s1-e1
+    a curie:TumorPathologyEvent ;
+    rdfs:label "Tumor pathology event 1 for subject 1" ;
+    curie:ageAtDiagnosis 57 ;
+    curie:eventSubject subject:s1 ;
+    curie:eventType evs:C8509 ;
+    curie:topography icdo3t:C42 ;
+    curie:tumorLaterality evs:C25229 ;
+    curie:tumorMorphology icdo3m:9423\/3 .
+
+
+sample:s1-a
+    a curie:BiologicalSample ;
+    rdfs:label "Sample A for subject 1" ;
+    curie:isOfNature evs:C12434 ;  # Blood
+    curie:subject subject:s1 ;
+    curie:topography icdo3t:C22.0 ;  # Liver
+    curie:tumorCellularity 45.2 .
+
+
+sample:s2-b
+    a curie:BiologicalSample ;
+    rdfs:label "Sample B for subject 2" ;
+    curie:isOfNature evs:C812 ;  # RNA
+    curie:subject subject:s2 ;
+    curie:topography icdo3t:C34.9 ;  # Lung, NOS
+    curie:tumorCellularity 13.5 .
+
+
+file:coll1\/coffee.jpg
+    curie:aboutEvent event:s1-e1 ;
+    curie:aboutSubject subject:s1 ;
+    curie:sample sample:s1-a .
+
+file:coll1\/coffee.jpg
+    curie:analysisType analysis:C37-2 .  # Imaging
+
+
+file:coll1\/coffee.jpg
+    dcat:keyword "fairspace", "java" ;
+    curie:aboutSubject subject:s1, subject:s2, subject:s3 .
+
+
+file:coll2\/sample-s2-b-rna.fastq
+    curie:aboutSubject subject:s2 ;
+    curie:sample sample:s2-b .
+
+file:coll2\/sample-s2-b-rna.fastq
+    curie:analysisType analysis:O6-12 .  # RNA-seq
+
+
+file:coll2\/sample-s2-b-rna_copy.fastq
+curie:aboutSubject subject:s2 ;
+curie:sample sample:s2-b .

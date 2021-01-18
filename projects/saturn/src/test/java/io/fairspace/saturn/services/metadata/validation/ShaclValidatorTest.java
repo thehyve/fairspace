@@ -43,19 +43,19 @@ public class ShaclValidatorTest {
                 .add(closedClassShape, SHACLM.targetClass, closedClass)
                 .add(closedClassShape, SHACLM.closed, createTypedLiteral(true)));
 
-        validator = new ShaclValidator();
+        validator = new ShaclValidator(vocabulary);
     }
 
     @Test
     public void validateNoChanges() {
-        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
         verifyZeroInteractions(violationHandler);
     }
 
     @Test
     public void validateResourceWithNoType() {
         var model = modelOf(resource1, RDFS.label, createTypedLiteral(123));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -67,7 +67,7 @@ public class ShaclValidatorTest {
                 resource1, RDFS.label, createTypedLiteral(123),
                 resource1, RDFS.comment, createTypedLiteral(123));
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         expect(resource1, RDFS.comment, createTypedLiteral(123));
 
@@ -81,7 +81,7 @@ public class ShaclValidatorTest {
         var model = modelOf(
                 resource1, RDF.type, closedClass,
                 resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         expect(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
         expect(resource1, RDF.type, closedClass);
@@ -92,13 +92,12 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceMissingRequiredProperty() {
         var model = modelOf(
-                resource1, RDF.type, FS.Workspace,
-                resource1, RDFS.label, createStringLiteral("Test")
+                resource1, RDF.type, FS.Workspace
         );
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
-        expect(resource1, FS.workspaceDescription, null);
+        expect(resource1, RDFS.label, null);
 
         verifyNoMoreInteractions(violationHandler);
     }
@@ -108,7 +107,7 @@ public class ShaclValidatorTest {
         var model = modelOf(
                 resource1, RDF.type, FS.File,
                 resource1, FS.createdBy, createTypedLiteral(123));
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         expect(resource1, FS.createdBy, createTypedLiteral(123));
     }
@@ -121,13 +120,13 @@ public class ShaclValidatorTest {
                 resource1, RDF.type, FS.File,
                 resource1, FS.createdBy, resource2);
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
         verifyZeroInteractions(violationHandler);
 
         before = modelOf(resource2, RDF.type, FOAF.Person);
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
         expect(resource1, FS.createdBy, resource2);
 
@@ -143,7 +142,7 @@ public class ShaclValidatorTest {
         var model = modelOf(blankNode, RDF.type, closedClass,
                 blankNode, FS.md5, createStringLiteral("test"));
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         expect(blankNode, FS.md5, createStringLiteral("test"));
     }
@@ -162,7 +161,7 @@ public class ShaclValidatorTest {
                 blankNode, RDF.type, FS.User,
                 blankNode, RDFS.label, createTypedLiteral("My label"));
 
-        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -185,7 +184,7 @@ public class ShaclValidatorTest {
         var toRemove = createDefaultModel()
                 .add(resource1, RDFS.label, "collection");
 
-        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, violationHandler);
 
         verifyZeroInteractions(violationHandler);
     }
@@ -206,7 +205,7 @@ public class ShaclValidatorTest {
 
         var toRemove = modelOf(resource1, FS.createdBy, blankNode);
 
-        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, vocabulary, violationHandler);
+        validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, violationHandler);
 
         expect(resource1, FS.createdBy, newBlankNode);
     }
@@ -219,7 +218,7 @@ public class ShaclValidatorTest {
             model.add(resource, RDF.type, FS.File).add(resource, FS.createdBy, createTypedLiteral(123));
         }
 
-        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, vocabulary, violationHandler);
+        validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         model.listSubjects().forEachRemaining(resource ->
                 expect(resource, FS.createdBy, createTypedLiteral(123)));

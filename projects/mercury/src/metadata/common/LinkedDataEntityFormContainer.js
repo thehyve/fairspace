@@ -11,6 +11,7 @@ import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
 import useLinkedData from "./UseLinkedData";
 import {DATE_DELETED_URI} from "../../constants";
 import ConfirmationDialog from "../../common/components/ConfirmationDialog";
+import {UpdatePageTitleEditingMark} from '../../common/hooks/UsePageTitleUpdater';
 
 const LinkedDataEntityFormContainer = ({
     subject, typeInfo, hasEditRight = true, showEditButtons = false, fullpage = false,
@@ -44,6 +45,8 @@ const LinkedDataEntityFormContainer = ({
     const {
         confirmationShown, hideConfirmation, executeNavigation
     } = useNavigationBlocker(hasFormUpdates && editingEnabled);
+
+    UpdatePageTitleEditingMark(hasFormUpdates && editingEnabled);
 
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, subject, isEntityEditable: editingEnabled});

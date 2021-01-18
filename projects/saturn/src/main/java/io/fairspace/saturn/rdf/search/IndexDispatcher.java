@@ -4,10 +4,10 @@ import io.fairspace.saturn.services.users.UserService;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
-import org.apache.commons.codec.binary.*;
+import org.apache.commons.codec.binary.Base32;
 import org.apache.jena.sparql.util.Context;
 
-import java.util.stream.*;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.Services.FS_ROOT;
@@ -20,7 +20,7 @@ public class IndexDispatcher {
     private static final String SHARED_INDEX = "shared";
 
     // TODO: Inject via context?
-    private static final String collectionPrefix = CONFIG.publicUrl + "/api/v1/webdav/";
+    private static final String collectionPrefix = CONFIG.publicUrl + "/api/webdav/";
 
 
     private final Context context;

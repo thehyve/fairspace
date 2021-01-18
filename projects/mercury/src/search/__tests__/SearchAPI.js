@@ -1,5 +1,4 @@
-import {SearchAPI} from "../SearchAPI";
-import {SEARCH_DEFAULT_SIZE} from "../../common/constants";
+import {SEARCH_DEFAULT_SIZE, SearchAPI} from "../SearchAPI";
 
 let mockClient;
 let searchAPI;

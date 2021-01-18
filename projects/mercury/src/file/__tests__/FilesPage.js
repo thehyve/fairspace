@@ -33,6 +33,7 @@ function shallowRender(history, path, locationSearch = '') {
             selectCollection={() => {}}
             collection={collections[0]}
             classes={{}}
+            currentUser={{canViewPublicMetadata: true}}
         />
     );
 }

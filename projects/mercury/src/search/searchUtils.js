@@ -18,7 +18,8 @@ export const buildSearchUrl = (query) => {
 };
 
 export const getSearchQueryFromString = (searchString) => queryString.parse(searchString).q || '';
-export const getSearchContextFromString = (searchString) => queryString.parse(searchString).context || '';
+export const getLocationContextFromString = (searchString) => queryString.parse(searchString).context || '';
+export const getMetadataViewNameFromString = (searchString) => queryString.parse(searchString).view || '';
 
 /**
  * Error handler for search queries. Handles HTTP statuses 400 and 401 separately

@@ -1,23 +1,28 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.rdf.search.*;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.rdf.search.IndexDispatcher;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.LocalBlobStore;
 import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
 
 import javax.servlet.http.HttpServlet;
@@ -38,44 +43,48 @@ public class Services {
 
     private final WorkspaceService workspaceService;
     private final UserService userService;
-    private final MailService mailService;
     private final MetadataPermissions metadataPermissions;
     private final MetadataService metadataService;
+    private final ViewService viewService;
+    private final QueryService queryService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
-    private final FilteredDatasetGraph filteredDatasetGraph;
+    private final DatasetGraph filteredDatasetGraph;
     private final SearchProxyServlet searchProxyServlet;
 
-    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull Dataset dataset) {
+    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions);
         dataset.getContext().set(USER_SERVICE, userService);
 
-        mailService = new MailService(config.mail);
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/v1/webdav"), blobStore, userService, mailService, dataset.getContext());
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/webdav"), blobStore, userService, dataset.getContext());
         dataset.getContext().set(FS_ROOT, davFactory.root);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        workspaceService = new WorkspaceService(transactions, userService, mailService);
+        workspaceService = new WorkspaceService(transactions, userService);
 
         metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
 
         var metadataValidator = new ComposedValidator(
-                new MachineOnlyClassesValidator(),
-                new ProtectMachineOnlyPredicatesValidator(),
-                new PermissionCheckingValidator(metadataPermissions),
+                new MachineOnlyClassesValidator(VOCABULARY),
+                new ProtectMachineOnlyPredicatesValidator(VOCABULARY),
+                new URIPrefixValidator(((Resource) davFactory.root).getUniqueId()),
                 new DeletionValidator(),
                 new UniqueLabelValidator(),
-                new ShaclValidator());
+                new ShaclValidator(VOCABULARY));
 
-        metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator);
+        metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
+        var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
+
+        viewService = new ViewService(viewsConfig, filteredDataset);
+        queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset);
 
         searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,

@@ -6,30 +6,20 @@ external:
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
   elasticsearch:
-    enabled: true
-    transport:
-      host: fairspace-ci-elasticsearch-discovery.fairspace-ci.svc.cluster.local
-    rest:
-      host: fairspace-ci-elasticsearch-client.fairspace-ci.svc.cluster.local
+    enabled: false
 
-# Settings for the fairspace
+elasticsearch:
+  enabled: false
+
+# Settings for fairspace
 fairspace:
   name: "CI Fairspace"
   description: "CI Fairspace"
   ingress:
     domain: fairspace.ci.fairway.app
-  configurationScripts:
-    keycloak:
-      enabled: true
-      username: keycloak
-      password: keycloak-ci-123
-      configurationScriptsTag: 0.1.9-SNAPSHOT
-      pullPolicy: Always
   features:
-    - MetadataEditing
-
-services:
-  "JupyterHub Server": https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
+  services:
+    JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
 # Specific settings for Saturn subchart
 saturn:
@@ -50,22 +40,8 @@ saturn:
   image:
     pullPolicy: Always
   customStorageClass:
-      create: true
-      name: expandable
-      type: pd-standard
-      provisioner: kubernetes.io/gce-pd
-      allowVolumeExpansion: true
-  mail:
-    mail.from: pavel@thehyve.nl
-    mail.user: AKIAISXHGXUIMMU75YVA
-    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    mail.transport.protocol: smtp
-    mail.smtp.auth: true
-    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
-    mail.smtp.port: 587
-    mail.smtp.starttls.enable: true
-
-# Specific settings for Docs subchart
-docs:
-  image:
-    pullPolicy: Always
+    create: true
+    name: expandable
+    type: pd-standard
+    provisioner: kubernetes.io/gce-pd
+    allowVolumeExpansion: true

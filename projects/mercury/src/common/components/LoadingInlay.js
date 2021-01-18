@@ -15,4 +15,6 @@ const loadingInlay = (props) => (
     </div>
 );
 
-export default withStyles(styles)(loadingInlay);
+export const LoadingInlay = withStyles(styles)(loadingInlay);
+
+export default LoadingInlay;

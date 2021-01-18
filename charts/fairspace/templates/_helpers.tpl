@@ -84,28 +84,12 @@ Scheme to access fairspace components (http or https)
 {{- end -}}
 
 
-{{/* Docs external hostname */}}
-{{- define "docs.hostname" -}}
-{{- printf "docs.%s" .Values.fairspace.ingress.domain -}}
-{{- end -}}
-
 {{- define "fairspace.url" -}}
 {{ template "fairspace.scheme" . }}://{{ template "saturn.hostname" . }}
 {{- end -}}
 
-{{- define "jupyter.url" -}}
-{{ template "fairspace.scheme" . }}://jupyter.{{ template "saturn.hostname" . }}
-{{- end -}}
-
-{{- define "docs.url" -}}
-{{ template "fairspace.scheme" . }}://{{ template "docs.hostname" . }}
-{{- end -}}
-
 {{- define "saturn.fullname" -}}
 {{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
-{{- end -}}
-{{- define "docs.fullname" -}}
-{{- .Values.docs.nameOverride | default (printf "%s-docs" .Release.Name) -}}
 {{- end -}}
 
 {{- define "elasticsearch.baseurl" -}}

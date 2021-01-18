@@ -4,7 +4,6 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
 import io.milton.http.*;
-import io.milton.http.entity.StringEntity;
 import io.milton.http.http11.DefaultHttp11ResponseHandler;
 import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;

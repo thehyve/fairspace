@@ -1,6 +1,5 @@
 import React, {useContext, useState} from 'react';
-import PropTypes from "prop-types";
-import {ExpandMore, LockOpen} from "@material-ui/icons";
+import {ExpandMore} from "@material-ui/icons";
 import {
     Avatar,
     Card,
@@ -11,12 +10,13 @@ import {
     FormGroup,
     FormHelperText,
     FormLabel,
-    IconButton, Typography,
+    IconButton,
     List,
     ListItem,
     ListItemText,
     MenuItem,
     Select,
+    Typography,
     withStyles
 } from "@material-ui/core";
 import classnames from "classnames";
@@ -26,9 +26,16 @@ import {camelCaseToWords} from "../common/utils/genericUtils";
 import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
-import {accessLevels} from "../collections/CollectionAPI";
-import {descriptionForAccessMode, getPrincipalsWithCollectionAccess} from "../collections/collectionUtils";
-import type {AccessMode} from '../collections/CollectionAPI';
+import type {AccessLevel, AccessMode} from '../collections/CollectionAPI';
+import {accessLevels, Collection} from "../collections/CollectionAPI";
+import {
+    accessLevelForCollection,
+    collectionAccessIcon,
+    descriptionForAccessMode,
+    getPrincipalsWithCollectionAccess
+} from "../collections/collectionUtils";
+import type {User} from '../users/UsersAPI';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 const styles = theme => ({
     expand: {
@@ -59,10 +66,28 @@ const styles = theme => ({
     },
     property: {
         marginTop: 10
+    },
+    accessIcon: {
+        verticalAlign: 'middle'
+    },
+    accessName: {
+        marginRight: 10,
+        marginLeft: 5
     }
 });
 
-export const PermissionCard = ({classes, collection, users, workspaceUsers, workspaces, maxCollaboratorIcons = 5, setBusy}) => {
+type PermissionCardProperties = {
+    classes?: any;
+    collection: Collection;
+    users: User[];
+    workspaceUsers: User[];
+    workspaces: Workspace[];
+    maxCollaboratorIcons?: number;
+    setBusy?: (boolean) => void;
+}
+
+export const PermissionCard = (props: PermissionCardProperties) => {
+    const {classes, collection, users, workspaceUsers, workspaces, maxCollaboratorIcons = 5, setBusy} = props;
     const [expanded, setExpanded] = useState(false);
     const [changingAccessMode, setChangingAccessMode] = useState(false);
     const [selectedAccessMode, setSelectedAccessMode] = useState(collection.accessMode);
@@ -259,7 +284,8 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
                     >
                         {availableWorkspaceMembersAccessLevels.map(access => (
                             <MenuItem key={access} value={access}>
-                                <span style={{marginRight: 10}}>{access}</span>
+                                <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
+                                <span className={classes.accessName}>{access}</span>
                             </MenuItem>
                         ))}
                     </Select>
@@ -269,16 +295,32 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
         </FormControl>
     );
 
+    const accessLevelDescription = (access: AccessLevel): string => {
+        switch (access) {
+            case 'List':
+                return 'You can see which files are available in this collection.';
+            case 'Read':
+                return 'You can download files from this collection.';
+            case 'Write':
+                return 'You can upload files and add metadata to this collection.';
+            case 'Manage':
+                return 'Share the collection with users and workspaces.';
+            case 'None':
+            default:
+                return 'No access';
+        }
+    };
+
+    const accessLevel = accessLevelForCollection(collection);
+
     return (
         <Card classes={{root: classes.permissionsCard}}>
             <CardHeader
                 action={cardHeaderAction}
                 titleTypographyProps={{variant: 'h6'}}
-                title="Access"
-                avatar={(
-                    <LockOpen />
-                )}
-                subheader="Share the collection with users and workspaces."
+                title={collection.canManage ? 'Manage access' : `${accessLevel} access`}
+                avatar={collectionAccessIcon(accessLevel, 'large')}
+                subheader={accessLevelDescription(accessLevel)}
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
@@ -304,16 +346,6 @@ export const PermissionCard = ({classes, collection, users, workspaceUsers, work
             </Collapse>
         </Card>
     );
-};
-
-PermissionCard.propTypes = {
-    classes: PropTypes.object,
-    collection: PropTypes.object.isRequired,
-    users: PropTypes.array.isRequired,
-    workspaceUsers: PropTypes.array.isRequired,
-    workspaces: PropTypes.array.isRequired,
-    maxCollaboratorIcons: PropTypes.number,
-    setBusy: PropTypes.func
 };
 
 export default withStyles(styles)(PermissionCard);

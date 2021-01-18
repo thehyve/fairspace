@@ -94,7 +94,7 @@ public class UserService {
                             user.setIri(iri);
                             user.setId(ku.getId());
 
-                            if (config.superAdminUser.equals(ku.getUsername())) {
+                            if (config.superAdminUser.equalsIgnoreCase(ku.getUsername())) {
                                 user.setSuperadmin(true);
                                 user.setAdmin(true);
                                 user.setCanViewPublicMetadata(true);

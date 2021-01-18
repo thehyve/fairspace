@@ -1,26 +1,28 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.SaturnSecurityHandler;
+import io.fairspace.saturn.auth.*;
 import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
+import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
 @Slf4j
 public class App {
-    public static final String API_PREFIX = "/api/v1";
+    public static final String API_PREFIX = "/api";
 
     public static void main(String[] args) {
         log.info("Saturn is starting");
 
         var ds = SaturnDatasetFactory.connect(CONFIG.jena, CONFIG.features.contains(Feature.MetadataEditing));
 
-        var svc = new Services(API_PREFIX, CONFIG, ds);
+        var svc = new Services(API_PREFIX, CONFIG, VIEWS_CONFIG, ds);
 
         var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))

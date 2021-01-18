@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.metadata;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
@@ -9,7 +10,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -23,20 +23,18 @@ import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class MetadataService {
-    static final Resource NIL = createResource("http://fairspace.io/ontology#nil");
-
     private final Transactions transactions;
     private final Model vocabulary;
     private final MetadataRequestValidator validator;
+    private final MetadataPermissions permissions;
 
-    public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator) {
+    public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator, MetadataPermissions permissions) {
         this.transactions = transactions;
         this.vocabulary = vocabulary;
         this.validator = validator;
+        this.permissions = permissions;
     }
 
     /**
@@ -46,31 +44,52 @@ public class MetadataService {
      * subject is given and predicate and object are null, then all statements with the given subject will be returned.
      *
      * @param subject              Subject URI for which you want to return statements
-     * @param withObjectProperties If set to true, the returned model will also include statements specifying values for
+     * @param withValueProperties If set to true, the returned model will also include statements specifying values for
      *                             certain properties marked as fs:importantProperty in the vocabulary
      * @return
      */
-    public Model get(String subject, boolean withObjectProperties) {
+    public Model get(String subject, boolean withValueProperties) {
         var model = createDefaultModel();
 
-        transactions.executeRead(m -> m
-                .listStatements(subject != null ? createResource(subject) : null, null, (RDFNode) null)
-                .forEachRemaining(stmt -> {
-                    model.add(stmt);
-                    if (withObjectProperties && stmt.getObject().isResource()) {
-                        getPropertyShapesForResource(stmt.getResource(), vocabulary)
-                                .forEach(shape -> {
-                                    if (shape.hasLiteral(FS.importantProperty, true)) {
-                                        var property = createProperty(shape.getPropertyResourceValue(SHACLM.path).getURI());
-                                        stmt.getResource()
-                                                .listProperties(property)
-                                                .forEachRemaining(model::add);
-                                    }
-                                });
-                    }
-                }));
+        transactions.executeRead(m -> {
+            var resource = m.createResource(subject);
+            if (!permissions.canReadMetadata(resource)) {
+                throw new AccessDeniedException(subject);
+            }
 
+            resource.listProperties().forEachRemaining(stmt -> {
+                model.add(stmt);
+                if (withValueProperties && stmt.getObject().isURIResource() && permissions.canReadMetadata(stmt.getResource())) {
+                    addImportantProperties(stmt.getResource(), model);
+                }
+            });
+
+            getPropertyShapesForResource(resource, vocabulary)
+                    .stream()
+                    .map(ps -> ps.getProperty(SHACLM.path).getResource().getPropertyResourceValue(SHACLM.inversePath))
+                    .filter(Objects::nonNull)
+                    .map(p -> p.as(Property.class))
+                    .forEach(property -> m.listStatements(null, property, resource)
+                            .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
+                            .forEachRemaining(stmt -> {
+                                model.add(stmt);
+                                if (withValueProperties) {
+                                    addImportantProperties(stmt.getSubject(), model);
+                                }
+                            }));
+        });
         return model;
+    }
+
+    private void addImportantProperties(Resource s, Model dest) {
+        getPropertyShapesForResource(s, vocabulary)
+                .forEach(shape -> {
+                    if (shape.hasLiteral(FS.importantProperty, true)) {
+                        var property = shape.getPropertyResourceValue(SHACLM.path).as(Property.class);
+                        s.listProperties(property)
+                                .forEachRemaining(dest::add);
+                    }
+                });
     }
 
     /**
@@ -93,7 +112,9 @@ public class MetadataService {
     public boolean softDelete(Resource subject) {
         var success = transactions.calculateWrite(model -> {
             var resource = subject.inModel(model);
-
+            if (!permissions.canWriteMetadata(resource)) {
+                throw new AccessDeniedException(resource.getURI());
+            }
             var machineOnly = resource.listProperties(RDF.type)
                     .mapWith(Statement::getObject)
                     .filterKeep(SYSTEM_VOCABULARY::containsResource)
@@ -152,7 +173,7 @@ public class MetadataService {
                     .toSet()
                     .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
-            return update(existing.difference(model), model.remove(existing).removeAll(null, null, NIL));
+            return update(existing.difference(model), model.remove(existing).removeAll(null, null, FS.nil));
         }));
     }
 
@@ -161,7 +182,7 @@ public class MetadataService {
             trimLabels(modelToAdd);
             var after = updatedView(before, modelToRemove, modelToAdd);
 
-            validate(before, after, modelToRemove, modelToAdd, vocabulary);
+            validate(before, after, modelToRemove, modelToAdd);
 
             persist(modelToRemove, modelToAdd);
 
@@ -173,10 +194,17 @@ public class MetadataService {
         updatedResources.forEach(resource -> audit("METADATA_UPDATED", "iri", resource.getURI()));
     }
 
-    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd, Model vocabularyModel) {
+    private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd) {
+        modelToAdd.listSubjects()
+                .andThen(modelToRemove.listSubjects())
+                .filterDrop(permissions::canWriteMetadata)
+                .forEachRemaining(s -> {
+                    throw new AccessDeniedException(s.getURI());
+                });
+
         var violations = new LinkedHashSet<Violation>();
         validator.validate(before, after, modelToRemove, modelToAdd,
-                vocabularyModel, (message, subject, predicate, object) ->
+                (message, subject, predicate, object) ->
                         violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
 
         if (!violations.isEmpty()) {

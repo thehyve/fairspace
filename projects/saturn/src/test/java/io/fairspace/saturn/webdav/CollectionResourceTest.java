@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -24,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectionResourceTest {
-    public static final String BASE_PATH = "/api/v1/webdav";
+    public static final String BASE_PATH = "/api/webdav";
     private static final String baseUri = "http://example.com" + BASE_PATH;
 
     private Model model = createTxnMem().getDefaultModel();
@@ -43,8 +42,6 @@ public class CollectionResourceTest {
     @Mock
     UserService userService;
     @Mock
-    MailService mailService;
-    @Mock
     MetadataService metadataService;
 
     Context context = new Context();
@@ -54,10 +51,11 @@ public class CollectionResourceTest {
         model.add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(WORKSPACE_2, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
-                .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1);
+                .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1)
+                .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1);
 
         context.set(METADATA_SERVICE, metadataService);
-        var factory = new DavFactory(model.createResource(baseUri), store, userService, mailService, context);
+        var factory = new DavFactory(model.createResource(baseUri), store, userService, context);
         resource = new CollectionResource(factory, COLLECTION_1, Access.Manage);
 
         setupRequestContext();
@@ -80,6 +78,9 @@ public class CollectionResourceTest {
 
         assertFalse(model.contains(COLLECTION_1, FS.ownedBy, WORKSPACE_1));
         assertTrue(model.contains(COLLECTION_1, FS.ownedBy, WORKSPACE_2));
+
+        assertFalse(model.contains(COLLECTION_1, FS.belongsTo, WORKSPACE_1));
+        assertTrue(model.contains(COLLECTION_1, FS.belongsTo, WORKSPACE_2));
 
         // User 1 - manager of workspace 1
         assertFalse(model.contains(USER_1, FS.canManage, COLLECTION_1));

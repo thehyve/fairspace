@@ -7,7 +7,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 public class FS {
-    public static final String NS = "http://fairspace.io/ontology#";
+    public static final String NS = "https://fairspace.nl/ontology#";
 
     public static final String COLLECTION_URI = NS + "Collection";
     public static final Resource Collection = createResource(COLLECTION_URI);
@@ -32,6 +32,9 @@ public class FS {
 
     public static final String OWNED_BY_URI = NS + "ownedBy";
     public static final Property ownedBy = createProperty(OWNED_BY_URI);
+
+    public static final String BELONGS_TO_URI = NS + "belongsTo";
+    public static final Property belongsTo = createProperty(BELONGS_TO_URI);
 
     public static final String CREATED_BY_URI = NS + "createdBy";
     public static final Property createdBy = createProperty(CREATED_BY_URI);
@@ -75,9 +78,6 @@ public class FS {
 
     public static final String HAS_ROLE_URI = NS + "hasRole";
     public static final Property hasRole = createProperty(HAS_ROLE_URI);
-
-    public static final String CONTAINS_URI = NS + "contains";
-    public static final Property contains = createProperty(CONTAINS_URI);
 
     public static final String FILE_SIZE_URI = NS + "fileSize";
     public static final Property fileSize = createProperty(FILE_SIZE_URI);
@@ -142,6 +142,8 @@ public class FS {
     public static final String MARKDOWN_URI = NS + "markdown";
     public static final Property markdown = createProperty(MARKDOWN_URI);
 
+    public static final String NIL_URI = NS + "nil";
+    public static final Property nil = createProperty(NIL_URI);
 
     public static final String IS_ADMIN_URI = NS + "isAdmin";
     public static final String CAN_VIEW_PUBLIC_METADATA_URI = NS + "canViewPublicMetadata";

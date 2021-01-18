@@ -28,7 +28,4 @@ spec:
             backend:
               serviceName: {{ .Release.Name }}-saturn
               servicePort: 80
-      annotations:
-        nginx.org/location-snippets: |
-          proxy_set_header      X-Forwarded-Proto https;
   {{- end -}}

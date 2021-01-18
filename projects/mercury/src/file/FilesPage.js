@@ -1,10 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
-import {withRouter} from "react-router-dom";
+import {Link, withRouter} from "react-router-dom";
 import queryString from "query-string";
 
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Switch, withStyles} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import {Search} from "@material-ui/icons";
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
 import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";
@@ -13,13 +15,16 @@ import CollectionBreadcrumbsContextProvider from "../collections/CollectionBread
 import CollectionsContext from "../collections/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
 import LoadingOverlay from "../common/components/LoadingOverlay";
-import {handleCollectionSearchRedirect} from "../collections/collectionUtils";
+import {handleCollectionTextSearchRedirect} from "../collections/collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import styles from "./FilesPage.styles";
 import useAsync from "../common/hooks/UseAsync";
 import FileAPI from "./FileAPI";
+import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
+import UserContext from "../users/UserContext";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 export const FilesPage = ({
     location,
@@ -27,11 +32,13 @@ export const FilesPage = ({
     fileApi,
     collection,
     openedPath,
+    views,
     loading = false,
     error = false,
     showDeleted,
     setShowDeleted,
     isOpenedPathDeleted = false,
+    currentUser,
     classes
 }) => {
     const selection = useMultipleSelection();
@@ -44,10 +51,18 @@ export const FilesPage = ({
     // If so, select it on first render
     const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
 
-    const handleSearch = (value) => {
-        const collectionIri: string = collection.iri;
+    const getLocationContext = () => {
+        const collectionIri: string = collection.iri || '';
         const collectionRoot = collectionIri.substring(0, collectionIri.lastIndexOf('/'));
-        handleCollectionSearchRedirect(history, value, collectionRoot + openedPath);
+        return encodeURI(collectionRoot + openedPath);
+    };
+
+    const getMetadataSearchRedirect = () => (
+        `${getMetadataViewsPath()}?${queryString.stringify({view: RESOURCES_VIEW, context: getLocationContext()})}`
+    );
+
+    const handleTextSearch = (value) => {
+        handleCollectionTextSearchRedirect(history, value, getLocationContext());
     };
 
     useEffect(() => {
@@ -71,31 +86,53 @@ export const FilesPage = ({
     // Path for which metadata should be rendered
     const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
 
+    const showMetadataSearchButton: boolean = (
+        currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
+        && !isOpenedPathDeleted && collection.iri
+    );
+
     return (
         <CollectionBreadcrumbsContextProvider>
             <div className={classes.breadcrumbs}>
                 <BreadCrumbs additionalSegments={breadcrumbSegments} />
             </div>
-            <Grid container justify="space-between" alignItems="center" className={classes.topBar}>
-                <Grid item xs={9}>
-                    <SearchBar
-                        placeholder="Search"
-                        disableUnderline={false}
-                        onSearchChange={handleSearch}
-                    />
-                </Grid>
-                <Grid item xs={3} className={classes.topBarSwitch}>
-                    <FormControlLabel
-                        control={(
-                            <Switch
-                                color="primary"
-                                checked={showDeleted}
-                                onChange={() => setShowDeleted(!showDeleted)}
-                                disabled={isOpenedPathDeleted}
+            <Grid container justify="space-between" spacing={1}>
+                <Grid item className={classes.topBar}>
+                    <Grid container>
+                        <Grid item xs={6}>
+                            <SearchBar
+                                placeholder="Search"
+                                disableUnderline={false}
+                                onSearchChange={handleTextSearch}
                             />
-                        )}
-                        label="Show deleted"
-                    />
+                        </Grid>
+                        <Grid item xs={4} className={classes.metadataSearchButton}>
+                            {showMetadataSearchButton && (
+                                <Link to={getMetadataSearchRedirect()}>
+                                    <Button
+                                        variant="text"
+                                        color="primary"
+                                        startIcon={<Search />}
+                                    >
+                                        Collection metadata search
+                                    </Button>
+                                </Link>
+                            )}
+                        </Grid>
+                        <Grid item xs={2} className={classes.topBarSwitch}>
+                            <FormControlLabel
+                                control={(
+                                    <Switch
+                                        color="primary"
+                                        checked={showDeleted}
+                                        onChange={() => setShowDeleted(!showDeleted)}
+                                        disabled={isOpenedPathDeleted}
+                                    />
+                                )}
+                                label="Show deleted"
+                            />
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid container spacing={1}>
@@ -149,6 +186,8 @@ const ParentAwareFilesPage = (props) => {
 
 const ContextualFilesPage = (props) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
+    const {currentUser} = useContext(UserContext);
+    const {views} = useContext(MetadataViewContext);
     const {params} = props.match;
     const {collectionName, openedPath} = getPathInfoFromParams(params);
     const collection = collections.find(c => c.name === collectionName) || {};
@@ -161,6 +200,8 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
+            currentUser={currentUser}
+            views={views}
             {...props}
         />
     ) : (
@@ -171,6 +212,8 @@ const ContextualFilesPage = (props) => {
             error={error}
             showDeleted={showDeleted}
             setShowDeleted={setShowDeleted}
+            currentUser={currentUser}
+            views={views}
             {...props}
         />
     );

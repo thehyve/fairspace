@@ -1,3 +1,5 @@
+:warning: `FIXME`: move parts to [../..](../../README.md).
+
 # A Helm chart for VRE fairspaces
 This helm chart will install and setup a single VRE fairspace.
 
@@ -87,22 +89,6 @@ installation.
 #### Tool configuration
 Configuration settings for specific applications should be put under a corresponding section in config.yaml:
 
-## Image pull secrets
-When pulling docker images from a private repository, k8s needs credentials to do so. This can be configured using [image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry).
-To use the secret for installing a fairspace, follow these steps:
-- [Create a image pull secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-in-the-cluster-that-holds-your-authorization-token) with the credentials to login. Please note
-  that this secret is bound to a namespace, and as such should be added to each namespace separately.
-- Specify the image pull secret as follows for fairspace services:
-    ```yaml
-      imagePullSecrets:
-      - name: <secret-name>
-    ```
-    This configuration should be added for each fairspace service (saturn, docs), so for example:
-    ```yaml
-      saturn:
-        imagePullSecrets:
-        - name: <secret-name>
-    ```
 
 ## Upgrading installations
 Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades

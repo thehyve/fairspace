@@ -6,6 +6,7 @@ import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
 import io.fairspace.saturn.services.services.ServicesApp;
 import io.fairspace.saturn.services.users.UserApp;
+import io.fairspace.saturn.services.views.ViewApp;
 import io.fairspace.saturn.services.web.StaticFilesApp;
 import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 
@@ -16,6 +17,7 @@ public class SparkFilterFactory {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
+                new ViewApp(apiPathPrefix + "/views", svc.getViewService(), svc.getQueryService()),
                 new VocabularyApp(apiPathPrefix + "/vocabulary"),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),

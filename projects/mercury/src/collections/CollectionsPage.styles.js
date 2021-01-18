@@ -6,7 +6,11 @@ const styles = () => ({
         width: consts.MAIN_CONTENT_WIDTH
     },
     topBarSwitch: {
-        textAlign: "right"
+        textAlign: "right",
+        whiteSpace: "nowrap"
+    },
+    metadataSearchButton: {
+        textAlign: "center"
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
@@ -14,8 +18,11 @@ const styles = () => ({
     },
     sidePanel: {
         width: consts.SIDE_PANEL_WIDTH
+    },
+    endIcon: {
+        position: 'absolute',
+        right: '1rem'
     }
-
 });
 
 export default styles;

@@ -49,6 +49,6 @@ class AuditEventListener implements EventListener {
     }
 
     private static String resourcePath(String path) {
-        return path.substring("/api/v1/webdav".length());
+        return path.substring("/api/webdav".length());
     }
 }

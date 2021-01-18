@@ -1,3 +1,5 @@
+FIXME: move to [../README.md](../README.md)
+
 # Local development
 
 - Startup `keycloak`

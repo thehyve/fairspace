@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.workspaces;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -32,9 +31,9 @@ public class WorkspaceServiceTest {
     private static final Resource EMPTY_WORKSPACE = createResource("http://localhost/iri/W2");
     private static final Resource COLLECTION_1 = createResource("http://localhost/iri/C1");
     private static final Resource RESOURCE_1 = createResource("http://localhost/iri/R1");
-    private static final Property PROPERTY_1 = createProperty("http://fairspace.io/ontology/P1");
+    private static final Property PROPERTY_1 = createProperty("https://fairspace.nl/ontology/P1");
     private static final Resource RESOURCE_2 = createResource("http://localhost/iri/R2");
-    private static final Property PROPERTY_2 = createProperty("http://fairspace.io/ontology/P2");
+    private static final Property PROPERTY_2 = createProperty("https://fairspace.nl/ontology/P2");
 
     private Transactions txn = new SimpleTransactions(createTxnMem());
     private WorkspaceService service;
@@ -43,20 +42,19 @@ public class WorkspaceServiceTest {
     @Mock
     private UserService userService;
     User user = new User();
-    @Mock
-    private MailService mailService = new MailService(session);
 
     @Before
     public void setUp() {
         setupRequestContext();
         when(userService.currentUser()).thenReturn(user);
-        service = new WorkspaceService(txn, userService, mailService);
+        service = new WorkspaceService(txn, userService);
 
         txn.executeWrite(model -> model
                 .add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(EMPTY_WORKSPACE, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
                 .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1)
+                .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1)
                 .add(WORKSPACE_1, PROPERTY_1, RESOURCE_1)
                 .add(EMPTY_WORKSPACE, PROPERTY_2, RESOURCE_2)
         );

@@ -2,35 +2,23 @@
 external:
   keycloak:
     baseUrl: https://keycloak.ci.fairway.app
-    username: keycloak
-    password: keycloak-ci-123
     realm: ci
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
     serviceAccount:
       password: fairspace123
   elasticsearch:
-    enabled: true
-    transport:
-      host: fairspace-test-elasticsearch-discovery.fairspace-test.svc.cluster.local
-    rest:
-      host: fairspace-test-elasticsearch-client.fairspace-test.svc.cluster.local
+    enabled: false
 
-# Settings for the fairspace
+# Settings for fairspace
 fairspace:
-  name: "test Fairspace"
-  description: "test Fairspace"
+  name: "Test Fairspace"
+  description: "Test Fairspace"
   ingress:
     domain: fairspace.test.fairway.app
-  enableExperimentalFeatures: false
-  configurationScripts:
-    keycloak:
-      enabled: false
-      configurationScriptsTag: 0.1.9-SNAPSHOT
-      pullPolicy: Always
-
-services:
-  jupyterhub: https://jupyter.fairspace.test.fairway.app
+  features:
+  services:
+    JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
 # Specific settings for Saturn subchart
 saturn:
@@ -49,6 +37,7 @@ saturn:
       cpu: 500m
       memory: 512Mi
   image:
+    tag: 0.7.4-SNAPSHOT
     pullPolicy: Always
   customStorageClass:
       create: true
@@ -56,17 +45,3 @@ saturn:
       type: pd-standard
       provisioner: kubernetes.io/gce-pd
       allowVolumeExpansion: true
-  mail:
-    mail.from: pavel@thehyve.nl
-    mail.user: AKIAISXHGXUIMMU75YVA
-    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    mail.transport.protocol: smtp
-    mail.smtp.auth: true
-    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
-    mail.smtp.port: 587
-    mail.smtp.starttls.enable: true
-
-# Specific settings for Docs subchart
-docs:
-  image:
-    pullPolicy: Always

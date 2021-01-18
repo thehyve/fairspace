@@ -1,8 +1,11 @@
+import React from "react";
 import queryString from "query-string";
+import {Create, MenuBook, Settings, Toc} from "@material-ui/icons";
 import type {
     AccessLevel,
     AccessMode,
     Collection,
+    CollectionPermissions,
     Permission,
     PrincipalPermission,
     Status
@@ -10,7 +13,8 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
-import {encodePath} from '../file/fileUtils';
+import {encodePath, getParentPath} from '../file/fileUtils';
+import {FILE_URI} from "../constants";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -27,15 +31,69 @@ export const getCollectionAbsolutePath = (path: string) => (
 
 export const pathForIri = (iri: string) => {
     const path = decodeURIComponent(new URL(iri).pathname);
-    return path.replace('/api/v1/webdav/', '');
+    return path.replace('/api/webdav/', '');
 };
 
-export const handleCollectionSearchRedirect = (history, value, context = '') => {
+export const redirectLink = (iri: string, type: string) => {
+    const path = pathForIri(iri);
+    if (type && type === FILE_URI) {
+        const parentPath = getParentPath(path);
+        return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
+    }
+    return getCollectionAbsolutePath(path);
+};
+
+export const getSearchPathSegments = (context) => {
+    const segments = ((context && pathForIri(context)) || '').split('/');
+    const result = [];
+    if (segments[0] === '') {
+        result.push({label: 'Search results', href: ''});
+        return result;
+    }
+    let href = '/collections';
+    segments.forEach(segment => {
+        href += '/' + segment;
+        result.push({label: segment, href});
+    });
+    result.push({label: 'Search results', href: ''});
+    return result;
+};
+
+export const handleCollectionTextSearchRedirect = (history, value, context = '') => {
     if (value) {
         history.push('/collections-search/?' + queryString.stringify({q: value, context}));
     } else {
         history.push(`/collections/${context ? pathForIri(context) : ''}`);
     }
+};
+
+export const collectionAccessIcon = (access: AccessLevel, fontSize: 'inherit' | 'default' | 'small' | 'large' = 'default') => {
+    switch (access) {
+        case 'List':
+            return <Toc titleAccess={`${access} access`} fontSize={fontSize} />;
+        case 'Read':
+            return <MenuBook titleAccess={`${access} access`} fontSize={fontSize} />;
+        case 'Write':
+            return <Create titleAccess={`${access} access`} fontSize={fontSize} />;
+        case 'Manage':
+            return <Settings titleAccess={`${access} access`} fontSize={fontSize} />;
+        case 'None':
+        default:
+            return <></>;
+    }
+};
+
+export const accessLevelForCollection = (collection: CollectionPermissions): AccessLevel => {
+    if (collection.canManage) {
+        return 'Manage';
+    }
+    if (collection.canWrite) {
+        return 'Write';
+    }
+    if (collection.canRead) {
+        return 'Read';
+    }
+    return 'List';
 };
 
 const permissionLevel = p => accessLevels.indexOf(p.access);
@@ -48,9 +106,11 @@ export const sortPermissions = (permissions) => {
         compareBy('name')
     ));
 };
+
 export const compareTo: boolean = (currentAccess, baseAccess) => (
     permissionLevel(currentAccess) >= permissionLevel(baseAccess)
 );
+
 /**
  * Check if collaborator can alter permission. User can alter permission if:
  * - has manage access to a resource
@@ -60,11 +120,13 @@ export const canAlterPermission = (canManage, user, currentLoggedUser) => {
     const isSomeoneElsePermission = currentLoggedUser.iri !== user.iri;
     return canManage && isSomeoneElsePermission;
 };
+
 export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
     iri: principalProperties.iri,
     name: principalProperties.name,
     access
 });
+
 export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principals, permissions: Permission[]) => {
     const results = [];
     principals.forEach(u => {
@@ -75,6 +137,7 @@ export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principal
     });
     return results;
 };
+
 export const descriptionForAccessMode = (accessMode: AccessMode) => {
     switch (accessMode) {
         case "Restricted":
@@ -111,6 +174,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     canManage: (properties.canManage?.toLowerCase() === 'true'),
     canDelete: properties.canDelete?.toLowerCase() === 'true',
     canUndelete: properties.canUndelete?.toLowerCase() === 'true',
+    access: properties.access,
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),
     userPermissions: parsePermissions(properties.userPermissions),

@@ -13,15 +13,16 @@ import static org.junit.Assert.assertNotNull;
 public class ServicesTest {
     private Dataset dataset = DatasetFactory.create();
     private Config config = new Config();
+    private ViewsConfig viewsConfig = new ViewsConfig();
     private Services svc;
 
     @Rule
     public final EnvironmentVariables environmentVariables
             = new EnvironmentVariables();
     @Before
-    public void before() throws Exception {
+    public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        svc = new Services("/api/v1", config, dataset);
+        svc = new Services("/api", config, viewsConfig, dataset);
     }
 
     @Test
@@ -37,11 +38,6 @@ public class ServicesTest {
     @Test
     public void getUserService() {
         assertNotNull(svc.getUserService());
-    }
-
-    @Test
-    public void getMailService() {
-        assertNotNull(svc.getMailService());
     }
 
     @Test

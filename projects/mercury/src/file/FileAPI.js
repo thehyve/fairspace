@@ -25,7 +25,7 @@ export type File = {
 
 class FileAPI {
     client() {
-        return createClient('/api/v1/webdav');
+        return createClient('/api/webdav');
     }
 
     stat(path, showDeleted) {

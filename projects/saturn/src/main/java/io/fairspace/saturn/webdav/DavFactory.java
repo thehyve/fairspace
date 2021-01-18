@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.mail.MailService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.milton.http.ResourceFactory;
@@ -20,19 +19,18 @@ import static io.fairspace.saturn.webdav.PathUtils.encodePath;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
 public class DavFactory implements ResourceFactory {
+    // Represents the root URI, not stored in the database
     final org.apache.jena.rdf.model.Resource rootSubject;
     final BlobStore store;
     final UserService userService;
-    final MailService mailService;
     final Context context;
     private final String baseUri;
     public final RootResource root = new RootResource(this);
 
-    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, MailService mailService, Context context) {
+    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, Context context) {
         this.rootSubject = rootSubject;
         this.store = store;
         this.userService = userService;
-        this.mailService = mailService;
         this.context = context;
         var uri = URI.create(rootSubject.getURI());
         this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
@@ -59,7 +57,7 @@ public class DavFactory implements ResourceFactory {
     public Access getAccess(org.apache.jena.rdf.model.Resource subject) {
         var uri = subject.getURI();
         var nextSeparatorPos = uri.indexOf('/', rootSubject.getURI().length() + 1);
-        var coll = nextSeparatorPos < 0 ? subject : subject.getModel().createResource(uri.substring(0, nextSeparatorPos));
+        var coll = rootSubject.getModel().createResource(nextSeparatorPos < 0 ? uri : uri.substring(0, nextSeparatorPos));
         if (!coll.hasProperty(RDF.type, FS.Collection)) {
             return Access.None;
         }
@@ -81,7 +79,7 @@ public class DavFactory implements ResourceFactory {
             access = Access.List;
         }
 
-        var userWorkspacesIterator = subject.getModel()
+        var userWorkspacesIterator = rootSubject.getModel()
                 .listSubjectsWithProperty(RDF.type, FS.Workspace)
                 .filterKeep(ws -> user.hasProperty(FS.isManagerOf, ws) || user.hasProperty(FS.isMemberOf, ws))
                 .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
@@ -154,6 +152,6 @@ public class DavFactory implements ResourceFactory {
     }
 
     public boolean isFileSystemResource(org.apache.jena.rdf.model.Resource resource) {
-        return resource.getURI().startsWith(baseUri);
+        return resource.getURI().startsWith(rootSubject.getURI());
     }
 }

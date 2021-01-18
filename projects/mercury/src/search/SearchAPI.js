@@ -1,21 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import elasticsearch from "elasticsearch";
 
-import {SEARCH_DEFAULT_SIZE} from '../common/constants';
 import {USER_URI, WORKSPACE_URI} from '../constants';
 
 export const SORT_SCORE = ["_score"];
 
-export const SORT_DATE_CREATED = [
-    "_score",
-    {
-        dateCreated: {order: "desc"}
-    },
-];
-
-export const SORT_ALPHABETICALLY = [
-    "_score", "label.keyword", "name.keyword"
-];
+export const SEARCH_DEFAULT_SIZE = 10;
 
 export class SearchAPI {
     constructor(client) {
@@ -141,4 +131,4 @@ export class SearchAPI {
     } : {});
 }
 
-export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/v1/search', log: 'error'}));
+export default new SearchAPI(new elasticsearch.Client({host: window.location.origin + '/api/search', log: 'error'}));

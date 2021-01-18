@@ -236,7 +236,7 @@ const generatePropertyEntry = (vocabulary, predicate, shape) => {
  * @param propertyShapes    List of propertyshapes that apply to a certain entity
  * @returns {array}         A list of properties that can be used to show a form. The format is similar to this
  * {
- *      key: "http://fairspace.io/ontology#description",
+ *      key: "https://fairspace.nl/ontology#description",
  *      label: "Description",
  *      ...
  *  }

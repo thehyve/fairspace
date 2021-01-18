@@ -12,18 +12,24 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ReadableMetadataServiceTest {
     private static final Resource S1 = createResource("http://localhost/iri/S1");
     private static final Resource S2 = createResource("http://localhost/iri/S2");
     private static final Resource S3 = createResource("http://localhost/iri/S3");
-    private static final Property P1 = createProperty("http://fairspace.io/ontology/P1");
+    private static final Property P1 = createProperty("https://fairspace.nl/ontology/P1");
 
     private static final Statement STMT1 = createStatement(S1, P1, S2);
     private static final Statement STMT2 = createStatement(S2, P1, S3);
@@ -34,10 +40,13 @@ public class ReadableMetadataServiceTest {
     private Transactions txn = new SimpleTransactions(createTxnMem());
     private MetadataService api;
     private Model vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel());
+    @Mock
+    MetadataPermissions permissions;
 
     @Before
     public void setUp() {
-        api = new MetadataService(txn, vocabulary, null);
+        when(permissions.canReadMetadata(any())).thenReturn(true);
+        api = new MetadataService(txn, vocabulary, null, permissions);
     }
 
     @Test
@@ -46,57 +55,19 @@ public class ReadableMetadataServiceTest {
 
         txn.executeWrite(m -> m.add(STMT1).add(STMT2));
 
-        Model m1 = api.get(null, false);
-        assertEquals(2, m1.size());
-        assertTrue(m1.contains(STMT1));
-        assertTrue(m1.contains(STMT2));
+        assertTrue(api.get(S1.getURI(), false).contains(STMT1));
+        assertTrue(api.get(S2.getURI(), false).contains(STMT2));
 
-        Model m2 = api.get(S1.getURI(), false);
-        assertEquals(1, m2.size());
-        assertTrue(m2.contains(STMT1));
-
-        Model m3 = api.get(null, false);
-        assertEquals(2, m3.size());
-        assertTrue(m3.contains(STMT1));
-        assertTrue(m3.contains(STMT2));
-
-        Model m5 = api.get(S3.getURI(), false);
-        assertTrue(m5.isEmpty());
-    }
-
-    @Test
-    public void getWithImportantPropertiesReturnsFullModel() {
-        assertEquals(0, api.get(null, true).size());
-
-        txn.executeWrite(m -> {
-            m
-                    .add(STMT1).add(STMT2)
-                    .add(LBL_STMT1).add(LBL_STMT2);
-            setupImportantProperties();
-        });
-
-        // Fetching the whole model should work with object properties as well
-        Model m1 = api.get(null, true);
-        assertEquals(4, m1.size());
-        assertTrue(m1.contains(STMT1));
-        assertTrue(m1.contains(STMT2));
-        assertTrue(m1.contains(LBL_STMT1));
-        assertTrue(m1.contains(LBL_STMT2));
+        assertTrue(api.get(S3.getURI(), false).isEmpty());
     }
 
     @Test
     public void getWithImportantPropertiesWorksWithoutImportantProperties() {
         txn.executeWrite(m -> m
-                .add(STMT1).add(STMT2)
-                .add(LBL_STMT1).add(LBL_STMT2));
+                .add(STMT1)
+                .add(LBL_STMT1));
 
-        // Fetching the whole model should work with object properties as well
-        Model m1 = api.get(null, true);
-        assertEquals(4, m1.size());
-        assertTrue(m1.contains(STMT1));
-        assertTrue(m1.contains(STMT2));
-        assertTrue(m1.contains(LBL_STMT1));
-        assertTrue(m1.contains(LBL_STMT2));
+        assertTrue(api.get(S1.getURI(), true).contains(LBL_STMT1));
     }
 
     @Test

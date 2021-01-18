@@ -17,19 +17,21 @@ import io.milton.resource.Resource;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.shacl.vocabulary.*;
+import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.*;
@@ -108,7 +110,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                 .addProperty(FS.createdBy, factory.currentUserResource())
                 .addProperty(FS.dateCreated, t);
 
-        subject.addProperty(FS.contains, subj);
+        subj.addProperty(FS.belongsTo, subject);
+        updateParents(subject);
         return subj;
     }
 
@@ -119,8 +122,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
 
     @Override
     public List<? extends Resource> getChildren() {
-        return subject.listProperties(FS.contains)
-                .mapWith(Statement::getResource)
+        return subject.getModel()
+                .listSubjectsWithProperty(FS.belongsTo, subject)
                 .mapWith(r -> factory.getResource(r, access))
                 .filterDrop(Objects::isNull)
                 .toList();
@@ -164,10 +167,10 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
             // -F 'action=upload_files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
             // -F '/dir/subdir/file2.ext=@/dir/subdir/file2.ext' \
-            // http://localhost:8080/api/v1/webdav/c1/
+            // http://localhost:8080/api/webdav/c1/
             case "upload_files" -> uploadFiles(files);
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
-            // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/v1/webdav/c1/
+            // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/webdav/c1/
             case "upload_metadata" -> uploadMetadata(files.get("file"));
             default -> super.performAction(action, parameters, files);
         }
@@ -293,10 +296,25 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     var values = text.split("\\|");
 
                     for (var value : values) {
-                        var o = (class_ != null)
-                                ? model.wrapAsResource(generateMetadataIri(value))
-                                : model.createTypedLiteral(value, datatype.getURI());
-                        model.add(s, property, o);
+                        if (class_ != null) {
+                            var object = subject.getModel().listResourcesWithProperty(RDF.type, class_)
+                                    .filterKeep(r -> r.getURI().equals(value) || r.hasProperty(RDFS.label, value))
+                                    .toList();
+                            if (object.size() == 1) {
+                                model.add(s, property, object.get(0));
+                            } else if (object.size() > 1) {
+                                setErrorMessage("Line " +  record.getRecordNumber()
+                                        + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" is not unique.");
+                                throw new BadRequestException(this);
+                            } else {
+                                setErrorMessage("Line " +  record.getRecordNumber()
+                                        + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" does not exist.");
+                                throw new BadRequestException(this);
+                            }
+                        } else {
+                            var o = model.createTypedLiteral(value, datatype.getURI());
+                            model.add(s, property, o);
+                        }
                     }
                 }
             }

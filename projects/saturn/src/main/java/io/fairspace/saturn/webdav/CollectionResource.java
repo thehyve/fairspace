@@ -12,9 +12,11 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
 import static java.util.stream.Collectors.joining;
@@ -84,9 +86,16 @@ class CollectionResource extends DirectoryResource {
             throw new BadRequestException(this, "Invalid owner");
         }
 
+        updateParents(subject);
+
         var old = subject.getPropertyResourceValue(FS.ownedBy);
 
-        subject.removeAll(FS.ownedBy).addProperty(FS.ownedBy, owner);
+        subject.removeAll(FS.ownedBy)
+                .addProperty(FS.ownedBy, owner)
+                .removeAll(FS.belongsTo)
+                .addProperty(FS.belongsTo, owner);
+
+        updateParents(subject);
 
         if (old != null) {
             subject.getModel().listResourcesWithProperty(FS.isMemberOf, old)
@@ -102,8 +111,12 @@ class CollectionResource extends DirectoryResource {
                     .removeAll(old, FS.canManage, subject)
                     .removeAll(old, FS.canWrite, subject)
                     .removeAll(old, FS.canRead, subject);
-
         }
+    }
+
+    @Property
+    public String getAccess() {
+        return access.name();
     }
 
     @Property
@@ -137,7 +150,7 @@ class CollectionResource extends DirectoryResource {
     /**
      * Compute available access modes for the collection, given its current status
      * and the user's permissions.
-     *
+     * <p>
      * Returns only the current access mode when:
      * - the current user does not have manage permission; or
      * - the collection is deleted; or
@@ -324,15 +337,6 @@ class CollectionResource extends DirectoryResource {
             case Read -> principal.addProperty(FS.canRead, subject);
             case Write -> principal.addProperty(FS.canWrite, subject);
             case Manage -> principal.addProperty(FS.canManage, subject);
-        }
-
-        if (principal.hasProperty(RDF.type, FS.User) && principal.hasProperty(FS.email)) {
-            var message = grantedAccess == Access.None
-                    ? "Your access to collection " + getName() + " has been revoked."
-                    : "You've been granted " + grantedAccess.name().toLowerCase() + " access to collection " + getName() + "\n" + subject.getURI();
-            var email = principal.getProperty(FS.email).getString();
-            getCurrentRequest().setAttribute(WebDAVServlet.POST_COMMIT_ACTION_ATTRIBUTE,
-                    (Runnable) () -> factory.mailService.send(email, "Your access permissions changed", message));
         }
     }
 

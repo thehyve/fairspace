@@ -17,7 +17,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     public SaturnSecurityHandler(Config.Auth config) {
         setAuthenticator(new SaturnKeycloakJettyAuthenticator(adapterConfig(config)));
         addConstraintMapping(constraintMapping("/*", true));
-        addConstraintMapping(constraintMapping("/api/v1/health/", false));
+        addConstraintMapping(constraintMapping("/api/health/", false));
     }
 
     private static AdapterConfig adapterConfig(Config.Auth config) {
@@ -32,6 +32,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         var localhost = CONFIG.auth.authServerUrl.startsWith("http://localhost:");
         adapterConfig.setSslRequired(SslRequired.NONE.name());
         if(!localhost) {
+            adapterConfig.setSslRequired(SslRequired.ALL.name());
             adapterConfig.setConfidentialPort(443);
         }
         return adapterConfig;

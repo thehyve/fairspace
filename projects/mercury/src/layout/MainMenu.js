@@ -6,12 +6,14 @@ import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
 import FeaturesContext from "../common/contexts/FeaturesContext";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
 export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
     const {isFeatureEnabled} = useContext(FeaturesContext);
+    const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
@@ -40,9 +42,23 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
+                {views && views.length > 0 && currentUser.canViewPublicMetadata && (
+                    <ListItem
+                        key="metadata-views"
+                        component={NavLink}
+                        to="/metadata-views"
+                        button
+                        selected={pathname.startsWith('/metadata-views')}
+                    >
+                        <ListItemIcon>
+                            <Assignment />
+                        </ListItemIcon>
+                        <ListItemText primary="Metadata" />
+                    </ListItem>
+                )}
                 {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
                     <ListItem
-                        key="metadata"
+                        key="metadata-editing"
                         component={NavLink}
                         to="/metadata"
                         button
@@ -50,7 +66,7 @@ export default () => {
                         <ListItemIcon>
                             <Assignment />
                         </ListItemIcon>
-                        <ListItemText primary="Metadata" />
+                        <ListItemText primary="Metadata editor" />
                     </ListItem>
                 )}
                 {isAdmin(currentUser) && (

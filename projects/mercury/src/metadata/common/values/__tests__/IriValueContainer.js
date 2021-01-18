@@ -8,7 +8,7 @@ describe('IriValueContainer', () => {
     it('should render a dropdown with namespaces', () => {
         const namespaces = [
             {id: 'a', label: 'RDF', prefix: 'rdf', namespace: 'http://rdf'},
-            {id: 'b', label: 'Fairspace', namespace: 'http://fairspace.io/ontology#'}
+            {id: 'b', label: 'Fairspace', namespace: 'https://fairspace.nl/ontology#'}
         ];
         const wrapper = shallow(<IriValue namespaces={namespaces} />);
         const select = wrapper.find(Autocomplete);
@@ -28,7 +28,7 @@ describe('IriValueContainer', () => {
             {
                 id: 'b',
                 label: 'Fairspace',
-                value: 'http://fairspace.io/ontology#'
+                value: 'https://fairspace.nl/ontology#'
             }
         ]);
     });

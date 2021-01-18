@@ -16,6 +16,8 @@ import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
 import FeaturesContext from "../common/contexts/FeaturesContext";
+import MetadataView from '../metadata/views/MetadataView';
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
@@ -42,15 +44,6 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/collections-search"
-                render={(props) => (
-                    <LinkedDataMetadataProvider>
-                        <CollectionSearchResultList {...props} />
-                    </LinkedDataMetadataProvider>
-                )}
-            />
-
-            <Route
                 path="/collections/:collection/:path(.*)?"
                 render={(props) => (
                     <LinkedDataMetadataProvider>
@@ -60,17 +53,49 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
+                path="/collections-search"
+                render={(props) => (
+                    <LinkedDataMetadataProvider>
+                        <CollectionSearchResultList {...props} />
+                    </LinkedDataMetadataProvider>
+                )}
+            />
+
+            <Route
+                path="/metadata-views"
+                render={() => (
+                    <BreadcrumbsContext.Provider value={{segments: []}}>
+                        <LinkedDataMetadataProvider>
+                            <MetadataView />
+                        </LinkedDataMetadataProvider>
+                    </BreadcrumbsContext.Provider>
+                )}
+            />
+
+            <Route
                 path="/metadata"
                 exact
                 render={() => {
-                    const subject = getSubject();
+                    if (!currentUser.canViewPublicMetadata) {
+                        return null;
+                    }
 
-                    return (isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
-                        <MetadataWrapper>
-                            {subject ? <LinkedDataEntityPage title="Metadata" subject={subject} />
-                                : <MetadataOverviewPage />}
-                        </MetadataWrapper>
-                    ));
+                    const subject = getSubject();
+                    if (subject) {
+                        return (
+                            <MetadataWrapper>
+                                <LinkedDataEntityPage title="Metadata" subject={subject} />
+                            </MetadataWrapper>
+                        );
+                    }
+                    if (isFeatureEnabled('MetadataEditing')) {
+                        return (
+                            <MetadataWrapper>
+                                <MetadataOverviewPage />
+                            </MetadataWrapper>
+                        );
+                    }
+                    return null;
                 }}
             />
 
