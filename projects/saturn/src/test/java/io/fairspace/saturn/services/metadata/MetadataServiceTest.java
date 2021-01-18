@@ -132,7 +132,7 @@ public class MetadataServiceTest {
     public void patchWithNil() {
         txn.executeWrite(m -> m.add(S1, P1, S2).add(S1, P1, S3));
 
-        api.patch(createDefaultModel().add(S1, P1, FS.nill));
+        api.patch(createDefaultModel().add(S1, P1, FS.nil));
 
         assertFalse(txn.calculateRead(m -> m.contains(S1, P1)));
     }

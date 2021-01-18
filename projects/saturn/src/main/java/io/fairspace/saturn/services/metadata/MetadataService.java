@@ -173,7 +173,7 @@ public class MetadataService {
                     .toSet()
                     .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
-            return update(existing.difference(model), model.remove(existing).removeAll(null, null, FS.nill));
+            return update(existing.difference(model), model.remove(existing).removeAll(null, null, FS.nil));
         }));
     }
 
