@@ -110,12 +110,12 @@ const generateTemplate = (vocabulary) => {
     ]);
 
     return '#   This section describes the CSV-based format used for bulk metadata uploads.\n'
-        + '#   Entity types can referenced by ID; multiple values must be separated by the pipe symbol |.\n'
+        + '#   Entity types can be referenced by ID or unique label; multiple values must be separated by the pipe symbol |.\n'
         + '#\n'
         + table([
             ['#', 'COLUMN', 'DESCRIPTION', 'TYPE', 'CARDINALITY', 'PREDICATE'],
-            ['#', 'Path', 'A relative path to a file or a directory, use ./ for the current directory or collection.', 'string', '1..1', ''],
-            ...doc]) + '\n\n'
+            ['#', 'Path', 'A relative path to a file or a directory; use ./ for the current directory or collection.', 'string', '1..1', ''],
+            ...doc]) + '\n#\n'
         + '"Path",' + uniqueProps.map(ps => JSON.stringify(getFirstPredicateValue(ps, SHACL_NAME))).join(',') + '\n'
         + '<PUT YOUR DATA HERE>\n';
 };
