@@ -6,7 +6,7 @@ const RIGHT_PANEL_WIDTH = '30%';
 
 const styles = theme => ({
     facet: {
-        borderColor: theme.palette.info.light,
+        borderColor: theme.palette.primary.light,
         borderWidth: 1.5,
         borderRadius: 6
     },

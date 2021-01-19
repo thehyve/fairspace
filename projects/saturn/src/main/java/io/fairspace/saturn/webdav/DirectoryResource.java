@@ -318,7 +318,8 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
+            setErrorMessage(e.getMessage());
             throw new BadRequestException("Error parsing file " + file.getName(), e);
         }
 

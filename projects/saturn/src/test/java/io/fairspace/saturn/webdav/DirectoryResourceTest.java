@@ -182,6 +182,17 @@ public class DirectoryResourceTest {
     }
 
     @Test(expected = BadRequestException.class)
+    public void testMetadataUploadEmptyHeader() throws NotAuthorizedException, ConflictException, BadRequestException {
+        String csv =
+                ",\n" +
+                        "./coll1,\"Blah blah\"\n";
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
+        dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
+
+        dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
+    }
+
+    @Test(expected = BadRequestException.class)
     public void testMetadataUploadUnknownFile() throws NotAuthorizedException, ConflictException, BadRequestException {
         String csv =
                 "Path,Description\n" +
