@@ -32,6 +32,18 @@ public class ViewService {
             } ORDER BY ?label
             """, FS.NS));
 
+    private static final Query RESOURCE_TYPE_VALUES_QUERY = QueryFactory.create(String.format("""
+          PREFIX fs: <%s>
+          SELECT ?value ?label
+          WHERE {
+             VALUES (?value ?label) {
+                (fs:Collection "Collection")
+                (fs:Directory "Directory")
+                (fs:File "File")
+             }
+          }
+          """, FS.NS));
+
     private static final Query BOUNDS_QUERY = QueryFactory.create(String.format("""
             PREFIX fs: <%s>
 
@@ -65,8 +77,8 @@ public class ViewService {
 
         switch (column.type) {
             case Term, TermSet -> {
-                var query = (column.query != null && !column.query.isEmpty())
-                        ? QueryFactory.create(column.query)
+                var query = (view.name.equalsIgnoreCase("Resource") && column.name.equalsIgnoreCase("type"))
+                        ? RESOURCE_TYPE_VALUES_QUERY
                         : VALUES_QUERY;
                 var binding = new QuerySolutionMap();
                 binding.add("type", createResource(column.rdfType));
