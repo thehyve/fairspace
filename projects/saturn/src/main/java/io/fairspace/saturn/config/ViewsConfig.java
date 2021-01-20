@@ -86,7 +86,6 @@ public class ViewsConfig {
             @NotBlank public String title;
             @NotNull public ColumnType type;
             @NotBlank public String source;
-            public String query;
             public String rdfType;
             public int priority;
         }
