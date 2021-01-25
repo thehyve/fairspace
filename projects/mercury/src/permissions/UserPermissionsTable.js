@@ -97,7 +97,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                         const canManageCurrentPermission = canManagePermission(p);
                         return (
                             <TableRow key={p.iri} className={classes.tableRow}>
-                                <TableCell width={30}>
+                                <TableCell width={25}>
                                     <Person />
                                 </TableCell>
                                 <TableCell
@@ -110,7 +110,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                         </Typography>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell width={90} className={classes.accessCell}>
+                                <TableCell width={115} className={classes.accessCell}>
                                     {canManageCurrentPermission && accessLevelOptions.length > 1 ? (
                                         renderAccessLevelDropdown(p, accessLevelOptions)
                                     ) : (
