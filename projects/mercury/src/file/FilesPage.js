@@ -146,6 +146,7 @@ export const FilesPage = ({
                         collectionsError={error}
                         fileApi={fileApi}
                         selection={selection}
+                        preselectedFile={preselectedFile}
                         showDeleted={showDeleted}
                     />
                 </Grid>

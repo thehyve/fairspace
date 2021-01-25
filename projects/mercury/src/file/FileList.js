@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
     Checkbox,
     Grid,
@@ -25,7 +25,7 @@ import usePagination from "../common/hooks/UsePagination";
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
     selectionEnabled, onAllSelection, onPathHighlight,
-    showDeleted
+    showDeleted, preselectedFile
 }) => {
     const [hoveredFileName, setHoveredFileName] = useState('');
 
@@ -49,8 +49,23 @@ const FileList = ({
     };
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns, 'name');
-    const directoriesBeforeFiles = stableSort(orderedItems, compareBy('type'));
+    const directoriesBeforeFiles = useMemo(
+        () => stableSort(orderedItems, compareBy('type')),
+        [orderedItems]
+    );
+
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
+
+    useEffect(() => {
+        if (preselectedFile) {
+            const preselectedFileIndex = directoriesBeforeFiles.findIndex(f => f.filename === preselectedFile);
+            if (preselectedFileIndex > -1) {
+                const preselectedFilePage = Math.floor(preselectedFileIndex / rowsPerPage);
+                setPage(preselectedFilePage);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [preselectedFile]);
 
     if (!files || files.length === 0 || files[0] === null) {
         return (
