@@ -353,28 +353,85 @@ Now everything should be ready to start using Fairspace:
   | user               | fairspace123 |
 
 
-## Kubernetes
+## Kubernetes and helm
 
-The Fairspace helm chart, which will install and configure a single Fairspace.
-See [charts/fairspace/README.md](/charts/fairspace/README.md) for more information.
-
-Instructions for Google Cloud
+You can deploy Fairspace on a Kubernetes cluster using [Helm](https://helm.sh/).
+Helm charts for Fairspace are published to the public helm repository at
+`https://storage.googleapis.com/fairspace-helm`.
 
 <details>
 <summary>
-Instructions for Google Cloud
+Instructions for deploying to Google Cloud
 </summary>
 
+### Instructions for deploying to Google Cloud
+
+#### Download and install helm and gcloud
+- Download `helm 2.14.3` from from https://github.com/helm/helm/releases/tag/v2.14.3
+- Extract the downloaded archive to `~/bin/helm` and check with:
+  ```bash
+  ~/bin/helm/helm version
+  ```
+- Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+- Download and install the Google Cloud tools: https://cloud.google.com/sdk/docs/install (requires Python).
+- Obtain credentials for Kubernetes:
+  ```bash
+  gcloud container clusters get-credentials <cluster id> --zone europe-west1-b
+  ```
+  Use `fairspacecicluster` as cluster id for the CI environment. 
+- Check if all tools are correctly installed:
+  ```bash
+  # List available clusters
+  gcloud container clusters list
+  # List Kubernetes namespaces
+  kubectl get ns
+  # List helm releases (deployments)
+  ~/bin/helm/helm list
+  ```
+
+#### Initialise helm and add fairspace repository
 ```bash
-gcloud container clusters get-credentials fairspacecicluster --zone europe-west1-b
-~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git
-gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
-export GOOGLE_APPLICATION_CREDENTIALS=/home/pm/test/credentials.json
-~/bin/helm/helm gcs init gs://fairspace-helm
+# Initialise helm
+~/bin/helm/helm init --client-only --stable-repo-url https://charts.helm.sh/stable
+# Add the fairspace repo 
+~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
+```
+
+#### Fetch chart
+```bash
+# Update repo
 ~/bin/helm/helm repo update
-~/bin/helm/helm fetch fairspace/fairspace --version 0.6.9-SNAPSHOT
-~/bin/helm/helm upgrade fairspace-test ./fairspace-0.6.9-SNAPSHOT.tgz
-# ~/bin/helm/helm install fairspace/fairspace --namespace fairspace-test --name fairspace-test --version 0.6.9-SNAPSHOT -f ~/test/values.yaml 
+# Fetch the fairspace chart
+~/bin/helm/helm fetch fairspace/fairspace --version 0.7.5
+```
+
+#### Deploy Fairspace
+Create a new Kubernetes namespace:
+```bash
+kubectl create namespace fairspace-new
+```
+Create a new deployment (called _release_ in helm terminology) and
+install the Fairspace chart:
+```bash
+~/bin/helm/helm install fairspace/fairspace --version 0.7.5 --name fairspace-new --namespace=fairspace-new \
+-f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
+```
+You can pass values files with `-f` and provide a file for a specified
+value with `--set-file`.
+
+#### Update an existing deployment
+To update a deployment using a new chart:
+```bash
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.5.tgz
+```
+With `helm upgrade` you can also pass new values files with `-f`
+and pass files with `--set-file` as for `helm install`.
+
+#### Clean up deployment
+To clean up an environment or completely reinstall an environment, you can use `helm del`.
+:warning: Be careful, you may lose data!
+```bash
+~/bin/helm/helm del --purge fairspace-test
 ```
 </details>
 
