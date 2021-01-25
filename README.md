@@ -936,8 +936,13 @@ Instructions for deploying to Google Cloud
 ```bash
 # Initialise helm
 ~/bin/helm/helm init --client-only --stable-repo-url https://charts.helm.sh/stable
-# Add the fairspace repo 
+# Add the fairspace repo for reading 
 ~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
+# (Optional) Add the fairspace via the GCS plugin for writing
+~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.2.2
+gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json 
+~/bin/helm/helm repo add fairspace-gcs gs://fairspace-helm
 ```
 
 #### Fetch chart
