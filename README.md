@@ -373,12 +373,17 @@ Instructions for deploying to Google Cloud
   ~/bin/helm/helm version
   ```
 - Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
-- Download and install the Google Cloud tools: https://cloud.google.com/sdk/docs/install (requires Python).
+- Download and install the [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (requires Python).
 - Obtain credentials for Kubernetes:
   ```bash
   gcloud container clusters get-credentials <cluster id> --zone europe-west1-b
   ```
-  Use `fairspacecicluster` as cluster id for the CI environment. 
+  Use `fairspacecicluster` as cluster id for the CI environment.
+  Ensure that your Google account has access to the `fairspace-207108` GCP project
+  and log in using
+  ```bash
+  gcloud auth login
+  ```
 - Check if all tools are correctly installed:
   ```bash
   # List available clusters
