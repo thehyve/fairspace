@@ -67,7 +67,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
     const handleCancelSwitchCollection = () => setShowConfirmDialog(false);
 
     const showMetadataSearchButton = (
-        currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
+        currentUser && currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
     );
 
     return (
