@@ -321,6 +321,9 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
         } catch (IllegalArgumentException | IOException e) {
             setErrorMessage(e.getMessage());
             throw new BadRequestException("Error parsing file " + file.getName(), e);
+        } catch (IllegalStateException e) {
+            setErrorMessage("Metadata file is not a valid comma separated values file (CSV).");
+            throw new BadRequestException("Error parsing file " + file.getName(), e);
         }
 
         MetadataService metadataService = factory.context.get(METADATA_SERVICE);
