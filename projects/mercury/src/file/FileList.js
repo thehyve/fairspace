@@ -149,7 +149,7 @@ const FileList = ({
                                 <TableRow
                                     hover
                                     key={file.filename}
-                                    selected={selectionEnabled && file.selected}
+                                    selected={file.selected}
                                     onClick={() => onPathHighlight(file)}
                                     onDoubleClick={() => onPathDoubleClick(file)}
                                     onMouseEnter={() => setHoveredFileName(file.filename)}
