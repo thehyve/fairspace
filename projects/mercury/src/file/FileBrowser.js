@@ -71,6 +71,7 @@ export const FileBrowser = ({
     refreshFiles = () => {},
     fileActions = {},
     selection = {},
+    preselectedFile = {},
     classes
 }) => {
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
@@ -290,6 +291,7 @@ export const FileBrowser = ({
                     onPathDoubleClick={handlePathDoubleClick}
                     onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
                     showDeleted={showDeleted}
+                    preselectedFile={preselectedFile}
                 />
                 {openedCollection.canRead && renderFileOperations()}
             </div>
