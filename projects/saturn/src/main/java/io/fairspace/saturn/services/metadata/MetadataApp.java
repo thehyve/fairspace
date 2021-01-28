@@ -11,8 +11,7 @@ import spark.Request;
 
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.saturn.services.metadata.Serialization.deserialize;
-import static io.fairspace.saturn.services.metadata.Serialization.serialize;
+import static io.fairspace.saturn.services.metadata.Serialization.*;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static javax.servlet.http.HttpServletResponse.*;
@@ -33,8 +32,9 @@ public class MetadataApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             var model = getMetadata(req);
-            res.type(req.headers("Accept"));
-            return serialize(model, req.headers("Accept"));
+            var format = getFormat(req.headers("Accept"));
+            res.type(format.getLang().getHeaderString());
+            return serialize(model, format);
         });
 
         put("/", (req, res) -> {
