@@ -1,6 +1,10 @@
-= image:docs/images/Fairspace.png[Fairspace]
+= Fairspace
+:description: Fairspace documentation.
+:doctype: book
+:showtitle!:
+:url-repo: https://github.com/fairspace/workspace
 :source-highlighter: rouge
-:toc: left
+:toc: macro
 :toc-title: Table of contents
 
 :Jena: https://jena.apache.org/
@@ -12,6 +16,7 @@
 :FAIR: https://www.go-fair.org/fair-principles/
 :WebDAV: https://en.wikipedia.org/wiki/WebDAV
 
+image:docs/images/Fairspace.png[Fairspace]
 
 Fairspace is a secure place for managing research data.
 Research teams have their own workspaces in which they
@@ -20,7 +25,7 @@ Researchers can upload directories and files to data collections.
 Data access is organised on data collection level.
 Collections can be shared with other teams or individual researchers.
 Also, collections can be published for all researchers in the organisation. +
- +
+
 Collections and files can be annotated with descriptive metadata.
 The metadata is stored using the {RDF}[Resource Description Framework (RDF)] in
 an {Jena}[Apache Jena] database.
@@ -55,6 +60,8 @@ which contributes to the *reusability* of the data.
 and stimulates the uses of standard vocabularies,
 contributing to *interoperability* of data.
 ****
+
+toc::[]
 
 
 
@@ -160,6 +167,13 @@ Path,Is about subject,Type of analysis,Description,Keywords
 ./,,,Directory with samples,sample|lab,
 test.txt,Subject 1,https://institut-curie.org/analysis#O6-12,,
 ----
+This specified the table:
+[%header,format=csv]
+|===
+Path,Is about subject,Type of analysis,Description,Keywords
+./,,,Directory with samples,sample|lab,
+test.txt,Subject 1,https://institut-curie.org/analysis#O6-12,,
+|===
 ====
 
 ==== Metadata
@@ -957,19 +971,38 @@ The user that creates the collection gets _Manage_ access.
 
 == Data model and view configuration
 
-Data model defined using the {SHACL}[Shapes Constraint Language (SHACL)].
+Fairspace uses an {Jena}[Apache Jena] database to store system metadata
+and the custom domain specific metadata.
+The data models for these metadata are defined using the {SHACL}[Shapes Constraint Language (SHACL)].
 
-* System data model: link:projects/saturn/src/main/resources/system-vocabulary.ttl[system-vocabulary.ttl]
-* Customisable data model: link:projects/saturn/vocabulary.ttl[vocabulary.ttl]
-* Taxonomies: link:projects/saturn/taxonomies.ttl[taxonomies.ttl]
+* The system metadata includes workspaces, collections, directories, files, file versions, users and access rights.
+  The system data model is defined in  link:projects/saturn/src/main/resources/system-vocabulary.ttl[system-vocabulary.ttl]
+* The customisable data model includes the custom (shared)
+  metadata entities, custom controlled vocabulary types,
+  and custom properties of the system entities.
+  The default custom data model is defined in link:projects/saturn/vocabulary.ttl[vocabulary.ttl].
+  This data model can be overriden by a data more suitable for your organisation.
 
 A schematic overview of the default data model in link:projects/saturn/vocabulary.ttl[vocabulary.ttl]:
 
 image:docs/images/diagrams/CDR data model.png[CDR data model]
 
-Terminologies as types, entities as types.
+The data model defines an entity-relationship model, specifying
+the entity types that are relevant to describe your data assets,
+the properties of the entities, and the relationships between entities.
 
-Example taxonomy types and entity type:
+
+.Example data model
+====
+
+In this example data model, the following custom entity types are defined:
+
+ * ``example:Gender`` with property _Label_;
+ * ``example:Species`` with property _Label_;
+ * ``example:Subject`` with properties _Gender_, _Species_, _Age at last news_ and _Files_.
+
+The system class ``fs:File`` is extended with the _Is about subject_ property.
+
 [source, turtle]
 ----
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -1015,6 +1048,7 @@ example:Species a rdfs:Class, sh:NodeShape ;
 
 example:isOfGender a rdf:Property .
 example:isOfSpecies a rdf:Property .
+example:ageAtLastNews a rdf:Property .
 
 example:Subject a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
@@ -1022,6 +1056,16 @@ example:Subject a rdfs:Class, sh:NodeShape ;
     sh:name "Subject" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique subject label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label;
+        sh:order 0
+    ],
     [
         sh:name "Gender" ;
         sh:description "The gender of the subject." ;
@@ -1035,6 +1079,18 @@ example:Subject a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         sh:class example:Species ;
         sh:path example:isOfSpecies
+    ],
+    [
+        sh:name "Age at last news" ;
+        sh:description "The age at last news." ;
+        sh:datatype xsd:integer ;
+        sh:maxCount 1 ;
+        sh:path example:ageAtLastNews
+    ],
+    [
+        sh:name "Files" ;
+        sh:description "Linked files" ;
+        sh:path [sh:inversePath example:aboutSubject];
     ] .
 
 example:aboutSubject a rdf:Property .
@@ -1048,8 +1104,72 @@ fs:File sh:property
         sh:path example:aboutSubject
     ] .
 ----
+All entity types have a unique label, specified using the ``rdfs:label`` predicate.
+The _Gender_ and _Species_ properties link the subject to an entity from
+the respective controlled vocabularies.
+The _Age at last news_ property is a numerical (integer) value property. +
+The _Files_ property of the _Subject_ entity type is an example of an inverse relation.
+The link is defined on the file, but the link will be visible on the subject as well, because of this inverse relation.
+====
 
-Example taxonomy:
+
+The following guidelines should be followed when creating a custom data model.
+
+* Define a namespace for your custom entities and properties,
+  like ``@prefix example: <https://example.com/ontology#> .`` in the example.
+* Each custom entity type must have types ``rdfs:Class`` and ``sh:NodeShape``, the properties ``sh:closed false`` and
+  ``sh:ignoredProperties ( rdf:type owl:sameAs )``,
+  and a valid value for ``sh:name``.
+  The ``sh:description`` property is optional.
+* Controlled vocabulary or terminology types are modelled as entity types as well, having only the _Label_ (``rdfs:label``) property, see ``example:Gender`` and ``example:Species``.
+* Properties are specified using the ``sh:property`` property.
+** Every entity type must have a property _Label_ (``sh:path rdfs:label``)
+   of data type ``xsd:string``.
+   The label of an entity must be unique for that type.
+   The label property should be singleton and marked ``fs:importantProperty true``. If there are multiple properties, the label should have ``sh:order: 0``.
+** Properties must have a valid value for ``sh:name``.
+  The ``sh:description`` property is optional.
+** A property must either have a ``sh:datatype`` property,
+specifying one of ``xsd:string``, ``xsd:integer`` or ``xsd:date``,
+   or a property ``sh:class`` specifying an entity type as the target of a relationship.
+** The predicate used for the property (the middle part of the RDF triple)
+is specified with the ``sh:path`` property, e.g., ``example:aboutSubject``
+for the _Is about subject_ relation.
+** If a relationship is bidirectional, the path of the inverse relation is specified using ``sh:inversePath``, see the _Files_ property on the _Subject_ entity type.
+** A property can be marked _mandatory_ by specifying ``sh:minCount 1``.
+   A property can be marked _singleton_ by specifying ``sh:maxCount 1``.
+** A text property (with ``sh:datatype xsd:string``) can be limited
+   to a single line text field using ``dash:singleLine true``.
+
+=== Limitations
+Although assigning multiple types to an entity is easy in RDF, Fairspace assumes entities to have a single type.
+
+Inheritance is possible in SHACL, but not supported by Fairspace.
+Instead of specifying an entity type as a subtype of another,
+a single type can be specified with a _type_ property,
+indicating the sub type of the entity.
+
+E.g., instead of defining entity types _DNASeqAssay_ and _RNASeqAssay_
+as sub types of _Assay_, a property type _assayType_ can be defined on _Assay_,
+using a controlled vocabulary type _AssayType_ with the assay types as values.
+
+=== Controlled vocabularies
+
+For controlled vocabulary types, e.g., _Gender_ and _Species_ in the example, you should insert the allowed values in the database by uploading
+a taxonomies file using the <<Metadata upload API>>.
+An example taxonomy is in link:projects/saturn/taxonomies.ttl[taxonomies.ttl].
+
+It is preferred to use existing standard taxonomies and labels.
+If that is not possible, please define your own namespaces for
+your custom taxonomies.
+
+.Example taxonomy
+====
+In this example we use existing standard ontologies for the _Gender_ and _Species_ controlled vocabulary types.
+
+* The https://hl7.org/fhir/R4/codesystem-administrative-gender.html[HL7 FHIR AdministrativeGender code system] for _Gender_.
+* The https://bioportal.bioontology.org/ontologies/NCBITAXON/[NCBI Organismal Classification] for _Species_.
+
 [source, turtle]
 ----
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -1083,6 +1203,8 @@ ncbitaxon:9606 a example:Species ;
 ncbitaxon:10090 a example:Species ;
   rdfs:label "Mus musculus" .
 ----
+====
+
 
 
 == Installation and configuration
@@ -1186,7 +1308,7 @@ kubectl get ns
 ~/bin/helm/helm init --client-only --stable-repo-url https://charts.helm.sh/stable
 # Add the fairspace repo for reading
 ~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
-# (Optional) Add the fairspace via the GCS plugin for writing
+# (Optional) Add the fairspace repo via the GCS plugin for writing
 ~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.2.2
 gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json

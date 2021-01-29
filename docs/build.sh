@@ -21,7 +21,7 @@ asciidoctor-pdf -o build/Fairspace.pdf ../README.adoc || {
   popd
   exit 1
 }
-asciidoctor -D build/ -o index.html ../README.adoc || {
+asciidoctor -a toc=left -D build/ -o index.html ../README.adoc || {
   echo "Error building site"
   popd
   exit 1
