@@ -17,8 +17,10 @@
 :JupyterHub: https://jupyterhub.readthedocs.io/
 :FAIR: https://www.go-fair.org/fair-principles/
 :WebDAV: https://en.wikipedia.org/wiki/WebDAV
+:json-ld: https://json-ld.org/
 :jsonld-schema: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
 :turtle: https://www.w3.org/TR/turtle/
+:n-triples: https://www.w3.org/TR/n-triples/
 
 image:docs/images/Fairspace.png[Fairspace]
 
@@ -124,7 +126,7 @@ image:docs/images/screenshots/Metadata form.png[Metadata form]
 
 The shared metadata entities and controlled vocabularies cannot
 be added via the user interface.
-The <<Metadata upload API>> should be used for that instead.
+The <<RDF metadata>> API should be used for that instead.
 
 ===== Metadata upload
 
@@ -245,14 +247,44 @@ def fetch_access_token(keycloak_url: str,
 
 Use the ``base64`` encoded ``username:password`` in the ``Authorization`` header.
 
-.Authentication (Curl code example)
+.Basic authentication (Python code example)
+[%collapsible]
+====
+[source, python]
+----
+import base64
+import logging
+import os
+from requests import Response, Session
+import sys
+
+log = logging.getLogger()
+
+server_url = os.environ.get('FAIRSPACE_URL')
+username = os.environ.get('USERNAME')
+password = os.environ.get('PASSWORD')
+auth = base64.b64encode(f'{username}:{password}'.encode()).decode()
+session = Session()
+response: Response = session.get(f'{server_url}/api/users/current', headers={
+  'Authorization': f'Basic {auth}',
+  'Accept': 'application/json'
+})
+if not response.ok:
+  log.error('Error fetching current user!')
+  log.error(f'{response.status_code} {response.reason}')
+  sys.exit(1)
+----
+====
+
+.Basic authentication (Curl code example)
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -v -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" http://localhost:8080/api/users/current
+curl -v -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" "${FAIRSPACE_URL}/api/users/current"
 ----
 ====
+
 
 ===== Automatic authentication in Jupyter Hub
 
@@ -297,7 +329,7 @@ This endpoint is read-only and can be used for advanced search, analytics, data 
 ====
 [source, bash]
 ----
-curl -X POST -H 'Content-Type: application/sparql-query' -H 'Accept: application/json'
+curl -X POST -H 'Content-Type: application/sparql-query' -H 'Accept: application/json' \
 -d '{
   "query": "
     PREFIX example: <https://example.com/ontology#>
@@ -311,18 +343,59 @@ curl -X POST -H 'Content-Type: application/sparql-query' -H 'Accept: application
     # ORDER BY ?sample
     LIMIT 500",
   "aggregate": True
-}'
-'http://localhost:8080/api/rdf/query'
+}' \
+"http://localhost:8080/api/rdf/query"
 ----
 ====
 
 
 ==== RDF metadata
 
-Metadata can be specified using several formats:
+For reading and writing metadata to the database,
+the ``/api/metadata`` endpoint supports a number of operations:
 
-* {turtle}[turtle] (``text/turtle``)
-* {jsonld-schema}[json-ld] (``application/ld+json``)
+* ``GET``: Retrieve metadata for a specified subject, predicate or object.
+* ``PUT``: Add metadata
+* ``PATCH``: Update metadata
+* ``DELETE``: Delete specified triples or all metadata linked to a subject.
+
+The metadata is stored as subject-predicate-object triples.
+The API supports several serialisation formats for sending :
+
+* {turtle}[Turtle] (``text/turtle``)
+* {json-ld}[JSON-LD] (``application/ld+json``, {jsonld-schema}[JSON schema])
+* {n-triples}[N-Triples] (``application/n-triples``)
+
+After any update, the metadata must be consistent with the data model, see <<Data model and view configuration>>.
+If an update would violate the data model constraints,
+the request is rejected with a status ``400`` response, with a message indicating the violation.
+
+===== Uploading metadata
+
+Shared metadata entities will in most cases come from other systems and will be added to Fairspace exclusively by an ETL process which will extract data from the laboratory and clinical systems, perform pseudonymization of identifiers, convert the metadata to some RDF-native format conforming the data model and send them to Fairspace.
+
+Fairspace will validate the uploaded metadata against the constraints defined in the data model and returns a detailed error message in case of violations.
+The validations include all the necessary type checks, referential consistency (validity of identifiers) checks, validation of mandatory fields, etc.
+If any entity violates the constraints, the entire bulk upload will be rejected.
+
+The ETL process will use a special technical account with the _Add shared metadata_ role.
+Regular users will not be able to add or modify shared metadata entities.
+Regular users can link files to shared metadata entities,
+see <<Metadata forms>> and <<Metadata upload>>.
+
+In addition to the main ETL workflow, data managers needs a possibility to add or modify certain properties of top-level metadata entities. This can be done using the RDF-based metadata API.
+
+A number of guidelines for uploading shared metadata:
+
+* Entities must have a type, a globally unique identifier,
+  and a unique label for the type. +
+It is advised to use a unique identifier from an existing reference system for this purpose.
+* Because of the nature of linked data, it is advised
+  to add shared metatdata entities in an append-only fashion: only adding entities and avoid updating or deleting entities.
+* By nature of RDF, metadata is typically added on the level of triples.
+E.g., when adding a property ``dcat:keyword`` to a file, this will add a key word to the (possibly) already existing list of key words. +
+If you want to completely replace (or remove)
+a property from an entity, use the ``PATCH`` method instead of ``PUT``.
 
 Example metadata file in turtle format: ``testdata.ttl``:
 [source, turtle]
@@ -336,8 +409,8 @@ Example metadata file in turtle format: ``testdata.ttl``:
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 
 subject:s1 a example:Subject ;
-           rdfs:label "Subject 1" ;
-           example:isOfSpecies ncbitaxon:9606 .
+    rdfs:label "Subject 1" ;
+    example:isOfSpecies ncbitaxon:9606 .
 
 file:coll1\/coffee.jpg
     dcat:keyword "fairspace", "java" ;
@@ -349,17 +422,27 @@ file:coll1\/coffee.jpg
 ====
 [source, python]
 ----
+import base64
 import logging
-from requests import Session
+import os
+from requests import Response, Session
 import sys
 
 log = logging.getLogger()
 
+server_url = os.environ.get('FAIRSPACE_URL')
+username = os.environ.get('USERNAME')
+password = os.environ.get('PASSWORD')
+auth = base64.b64encode(f'{username}:{password}'.encode()).decode()
+
 session = Session()
 with open('testdata.ttl') as testdata:
     response: Response = session.put(f"{server_url}/api/metadata/",
-                           data=testdata.read(),
-                           headers={'Content-type': 'text/turtle'})
+        data=testdata.read(),
+        headers={
+            'Authorization': f'Basic {auth}',
+            'Content-type': 'text/turtle'
+        })
     if not response.ok:
         log.error('Error uploading metadata!')
         log.error(f'{response.status_code} {response.reason}')
@@ -372,24 +455,21 @@ with open('testdata.ttl') as testdata:
 ====
 [source, bash]
 ----
-curl -H "Content-type: text/turtle" --data @testdata.ttl http://localhost:8080/api/metadata
+curl -v -X PUT -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" \
+  -H "Content-type: text/turtle" --data @testdata.ttl "${FAIRSPACE_URL}/api/metadata/"
 ----
 ====
 
-The metadata is stored as triples. Its structure should match the vocabulary definition in /vocabulary.
-Any updates that do not match the vocabulary definition will return a 400 status with a message indicating what went wrong.
-
-Operations with metadata are implemented using a simple CRUD protocol based on standard RDF triples serialization formats.
-Currently, supported formats are JSON-LD and Turtle.
+===== API specification
 
 |===
-3+| ``GET /api/metadata``
+3+| ``GET /api/metadata/``
 
 3+| Retrieve metadata
 3+| _Parameters:_
 | ``subject``
 | string
-| The subject to filter on, not required.
+| The subject to filter on.
 | ``predicate``
 | string
 | The predicate to filter on, not required.
@@ -401,25 +481,32 @@ Currently, supported formats are JSON-LD and Turtle.
 | If set, the response will include several properties for the included objects.
   The properties to be included are marked with ``fs:importantProperty`` in the vocabulary.
 3+| _Response:_
-3+| Returns JsonLD-encoded statements matching the query parameters.
+3+| Returns serialised triples matching the query parameters.
 |===
 
 .Example of retrieving metadata using curl
 [%collapsible]
 ====
+Request metadata for the triple with subject 'a', predicate 'b' and object 'c'.
 [source, bash]
 ----
-curl -H "Accept: application/ld+json" \
-"http://localhost:8080/api/metadata?subject?subject=a&predicate=b&object=c&withValueProperties=true"
+curl -G -H "Accept: application/ld+json" \
+--data-urlencode "subject=a" \
+--data-urlencode "predicate=b" \
+--data-urlencode "object=c" \
+--data-urlencode "withValueProperties=true" \
+"http://localhost:8080/api/metadata/"
 ----
 ====
 
 |===
-3+| ``PUT /api/metadata``
+3+| ``PUT /api/metadata/``
 
 3+| Add metadata. Existing metadata is left untouched.
+    The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
+    otherwise ``400`` is returned.
 3+| _Request body:_
-3+| Request body following {jsonld-schema}[jsonld-schema].
+3+| Serialised RDF triples.
 3+| _Response:_
 3+| Response contains the workspace name and newly assigned IRI.
 |===
@@ -429,7 +516,7 @@ curl -H "Accept: application/ld+json" \
 ====
 [source, bash]
 ----
-curl -X PUT -H 'Content-type: application/ld+json' -d \
+curl -X PUT -H "Content-type: application/ld+json" -d \
 '{
   "@graph" : [ {
     "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
@@ -443,17 +530,19 @@ curl -X PUT -H 'Content-type: application/ld+json' -d \
     "ws" : "http://fairspace.ci.fairway.app/iri/"
   }
 }' \
-"http://localhost:8080/api/metadata"
+"http://localhost:8080/api/metadata/"
 ----
 ====
 
 |===
-3+| ``PATCH /api/metadata``
+3+| ``PATCH /api/metadata/``
 
-3+| Update metadata. Existing metadata is overwritten.
+3+| Update metadata.
+    Any existing metadata for a given subject/predicate combination will be overwritten with the provided values.
+    The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
+    otherwise ``400`` is returned.
 3+| _Request body:_
-3+| Request body following {jsonld-schema}[jsonld-schema].
-  Any existing metadata for a given subject/predicate combination will be overwritten with the provided values.
+3+| Serialised RDF triples.
 3+| _Response:_
 3+| Response contains the workspace name and newly assigned IRI.
 |===
@@ -463,7 +552,7 @@ curl -X PUT -H 'Content-type: application/ld+json' -d \
 ====
 [source, bash]
 ----
-curl -X PATCH -H 'Content-type: application/ld+json' -d \
+curl -X PATCH -H "Content-type: application/ld+json" -d \
 '{
   "@graph" : [ {
     "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
@@ -477,25 +566,23 @@ curl -X PATCH -H 'Content-type: application/ld+json' -d \
     "ws" : "http://fairspace.ci.fairway.app/iri/"
   }
 }' \
-"http://localhost:8080/api/metadata"
+"http://localhost:8080/api/metadata/"
 ----
 ====
 
 |===
-3+| ``DELETE /api/metadata``
+3+| ``DELETE /api/metadata/``
 
 3+| Delete metadata.
-If a request body is given in JSON-LD format, the triples specified in the body will be deleted.
+If a request body is provided, the triples specified in the body will be deleted.
 Otherwise, the subject specified in the subject parameter will be marked as deleted.
 Please note that the subject will still exist in the database.
 3+| _Parameters:_
 | ``subject``
 | string
-| The subject to filter on.
+| The subject to filter on. (_Optional_)
 3+| _Request body:_
-3+|
-3+| _Response:_
-3+| Response contains the workspace name and newly assigned IRI.
+3+| Serialised RDF triples. (_Optional_)
 |===
 
 .Example of deleting metadata using curl
@@ -503,7 +590,7 @@ Please note that the subject will still exist in the database.
 ====
 [source, bash]
 ----
-curl -X DELETE -H 'Content-Type: application/ld+json' -d
+curl -X DELETE -H "Content-Type: application/ld+json" -d
 '{
   "@graph" : [ {
     "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
@@ -516,8 +603,8 @@ curl -X DELETE -H 'Content-Type: application/ld+json' -d
     },
     "ws" : "http://fairspace.ci.fairway.app/iri/"
   }
-}'
-'http://localhost:8080/api/metadata'
+}' \
+"http://localhost:8080/api/metadata/"
 ----
 ====
 
@@ -527,7 +614,7 @@ curl -X DELETE -H 'Content-Type: application/ld+json' -d
 Metadata views endpoint used for metadata-based search.
 
 |===
-| ``GET /api/views``
+| ``GET /api/views/``
 
 | List all views with available columns per each view.
 |===
@@ -537,12 +624,12 @@ Metadata views endpoint used for metadata-based search.
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/views'
+curl -H "Accept: application/json" "http://localhost:8080/api/views/"
 ----
 ====
 
 |===
-3+| ``POST /api/views``
+3+| ``POST /api/views/``
 
 3+| Fetch page of rows of a view matching the request filters.
 3+| _Parameters:_
@@ -577,7 +664,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
   "page":1,
   "size":100
 }' \
-'http://localhost:8080/api/views'
+"http://localhost:8080/api/views/"
 ----
 ====
 
@@ -624,7 +711,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/views/facets'
+curl -H "Accept: application/json" "http://localhost:8080/api/views/facets"
 ----
 ====
 
@@ -634,7 +721,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/views/facets'
 Operations on workspace entities.
 
 |===
-2+| ``GET /api/workspaces``
+2+| ``GET /api/workspaces/``
 
 2+| List all available workspaces.
 2+| _Response_ contains the following data:
@@ -659,12 +746,12 @@ Operations on workspace entities.
 ====
 [source, bash]
 ----
-curl -H "Accept: application/json" "http://localhost:8080/api/workspaces"
+curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 ----
 ====
 
 |===
-3+| ``PUT /api/workspaces``
+3+| ``PUT /api/workspaces/``
 
 3+| Add a workspace. Available only to administrators.
 3+| _Parameters:_
@@ -680,12 +767,12 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces"
 ====
 [source, bash]
 ----
-curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces"
+curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces/"
 ----
 ====
 
 |===
-3+| ``PATCH /api/workspaces``
+3+| ``PATCH /api/workspaces/``
 
 3+| Update a workspace.
 3+| _Parameters:_
@@ -711,12 +798,12 @@ curl -X PATCH -H "Accept: application/json" -d \
   "name": "new test name",
   "comment": "New description"
 }"' \
-"http://localhost:8080/api/workspaces"
+"http://localhost:8080/api/workspaces/"
 ----
 ====
 
 |===
-3+| ``DELETE /api/workspaces``
+3+| ``DELETE /api/workspaces/``
 
 3+| Delete a workspace. Available only to administrators.
 3+| _Parameters:_
@@ -730,7 +817,7 @@ curl -X PATCH -H "Accept: application/json" -d \
 ====
 [source, bash]
 ----
-curl -X DELETE 'http://localhost:8080/api/workspaces?workspace=http://fairspace.com/iri/123'
+curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http://localhost:8080/api/workspaces/"
 ----
 ====
 
@@ -774,7 +861,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?w
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?workspace=http://fairspace.com/iri/123'
+curl -H 'Accept: application/json' --data-urlencode "workspace=http://fairspace.com/iri/123" "http://localhost:8080/api/workspaces/users"
 ----
 ====
 
@@ -782,7 +869,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?w
 ==== Users and permissions
 
 |===
-| ``GET /api/users``
+| ``GET /api/users/``
 
 | List all organisation users.
 | _Response:_
@@ -795,12 +882,12 @@ if a user is an administrator, super-administrator or can view public metadata, 
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/users'
+curl -H 'Accept: application/json' 'http://localhost:8080/api/users/'
 ----
 ====
 
 |===
-3+| ``PATCH /api/users``
+3+| ``PATCH /api/users/``
 
 3+| Update user roles.
 3+| _Parameters:_
@@ -824,7 +911,7 @@ curl -X PATCH -H "Accept: application/json" -d \
   "canViewPublicData": false,
   "canViewPublicMetadata": true
 }' \
-"http://localhost:8080/api/users"
+"http://localhost:8080/api/users/"
 ----
 ====
 
@@ -872,7 +959,7 @@ It contains the types of entities that can be created, along with the data types
 It is stored in {SHACL}[SHACL] format.
 
 |===
-| ``GET /api/vocabulary``
+| ``GET /api/vocabulary/``
 
 | Retrieve a representation of the vocabulary.
 |===
@@ -882,7 +969,7 @@ It is stored in {SHACL}[SHACL] format.
 ====
 [source, bash]
 ----
-curl -H 'Accept: text/turtle' 'http://localhost:8080/api/vocabulary'
+curl -H 'Accept: text/turtle' 'http://localhost:8080/api/vocabulary/'
 ----
 ====
 .Example fetching the vocabulary in json-ld format using curl
@@ -890,14 +977,14 @@ curl -H 'Accept: text/turtle' 'http://localhost:8080/api/vocabulary'
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json+ld' 'http://localhost:8080/api/vocabulary'
+curl -H 'Accept: application/json+ld' 'http://localhost:8080/api/vocabulary/'
 ----
 ====
 
 ===== Features
 
 |===
-| ``GET /api/features``
+| ``GET /api/features/``
 
 | List available application features.
 |===
@@ -910,14 +997,14 @@ e.g., metadata editing in the user interface.
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/features'
+curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 ----
 ====
 
 ===== Services
 
 |===
-| ``GET /api/services``
+| ``GET /api/services/``
 
 | List linked services.
 |===
@@ -930,7 +1017,7 @@ e.g. JupyterHub, cBioPortal, etc.
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/services'
+curl -H 'Accept: application/json' 'http://localhost:8080/api/services/'
 ----
 ====
 
@@ -1051,6 +1138,100 @@ The user that creates the collection gets _Manage_ access.
 
 
 == Data model and view configuration
+
+=== Metadata
+
+Metadata is data about data.
+Metadata is used to describe data assets, e.g., for making it easier to find or use certain data.
+Because metadata is data itself, it can be difficult to make a proper distinction between data and metadata in a system.
+
+==== Types of metadata
+
+In a digital archive, _technical metadata_ is linked to data assets, like file type, location, size, creation or modification dates, checksums for checking data integrity, ownership.
+Such metadata is essential for a system to store and retrieve data files.
+Technical metadata can also include data format specific properties, like encoding, data layout, resolution, etc., required to correctly read the data. +
+With most publications, _bibliographic metadata_ is associated, such as author, title, abstract, publication details, keywords and subject categories.
+Such metadata makes it possible to find relevant publications.
+This is the kind of metadata used by libraries and archives and numerous standards exist for such data, such as https://www.dublincore.org/[Dublin Core] and https://www.loc.gov/standards/mets/[METS].
+
+More detailed _descriptive metadata_ provides information about the contents of the data,
+e.g., description of rows and columns, summary statistics, project information, geographical information, results, study design, methods, materials or equipment.
+In the extreme case, the entire content of the file is captured in descriptive metadata.
+
+We can distinguish different kinds of descriptive metadata, such as:
+
+* Description of the _contents_ (rows, columns, values, summary statistics)
+* Description of the _subject_, what the data is about (subject, topic, project, study design, object of study, time, location)
+* Description of _data sources_ (for derived or processed data)
+* Description of the _methods_ or technology used to produce or capture the data, such as scripts and versions.
+
+In the context of health research data, it is essential to link data to research subjects, i.e., patients and samples.
+
+The values of the metadata can be of any type, numerical, free text, date,
+conform to a controlled vocabulary (e.g., ICD or SNOMED codes, units, file types)
+or a reference to a typed entity within the database, or external entities.
+
+Likewise, the data the metadata is about can be of any type, a file system, a tabular file, image, genomic data, a relational database, etc.
+
+==== Purpose
+Metadata is used for several purposes:
+
+* Descriptors to enable use of the data (file type, file format, encoding, how it was created/generated).
+The metadata may be used by users or scripts to read or interpret a particular file or data set.
+* Finding relevant data for analysis:
+** Metadata may be used to organise data within a data set that a researcher is working on, by using (study specific) categories linked to individual files.
+** Metadata may be used in search queries or navigation to find out if data is available that meets certain selection criteria (e.g., data types, categories, cohort characteristics), for inclusion in a new analysis.
+** Metadata may be used to identify data that is linked to a specific entity, such as a patient or a sample, to determine if such data has already been analysed, in order to avoid duplicate analysis.
+
+It is important to identify for which purpose metadata is collected and used, as it may affect which types of metadata are collected, how they are navigated and if access control on metadata is desired or required.
+
+=== Data model
+
+To enable validation of (meta)data, and to enable intuitive navigation and search within the metadata, it is essential to have a good data model. +
+The data model consists of the entity types (classes), their properties (with types) and relationships between entities that can be represented in the system.
+
+The data model needs to be broad (expressive) enough to allow users to express all relevant facts about data sets conveniently and accurately, but it needs to be specific enough to allow validation and the generation of useful overviews and information pages.
+International data standards should be used as much as possible to enable interoperability between systems.
+
+E.g., it is probably better to use a specific field ‘disease’ where the value must be a valid ICD-10 code, than using a generic ‘description’ field where a disease is described in a free text field.
+
+==== Data domains
+
+We distinguish different data domains in order to clearly separate the data that is system specific and the metadata that is more flexible.
+
+===== Workspaces and collection-level data
+
+Users, workspaces, collections, directories and files are system-level entities,
+representing the file system of the system.
+Access to these entities is restricted by the workspace-level and collection-level access control.
+These entities cannot be changed on demand, but are inherent to the system.
+However, custom properties and relations may be added, e.g., to link files to patients.
+
+===== Metadata
+
+The data model for the other (non system-level) entities, the shared metadata, can be configured,
+in order to make the metadata suitable for the environment where it is used.
+These metadata are used to link entities in the file system to entities in the research domain,
+such as samples, patients, diseases, diagnoses,
+or to entities in the organisation domain, such as projects.
+These entities may be displayed and navigated in the application and can be explored through the API (for technical users).
+
+====== Controlled vocabularies
+
+The data model may contain controlled vocabularies (e.g., disease codes, file types, project phases) that can be used as values in the metadata.
+Every value in a controlled vocabulary has a unique identifier and a label.
+Using such vocabularies enables standardisation and validation of metadata values.
+
+====== Reference data
+
+The data model may support domain specific entity types (patients, samples, genes, treatments, studies, etc.)
+or generic entity types (project, organisation, person, etc), defining the metadata objects that collection-level data assets can refer to.
+The reference data can also be linked.
+
+Every entity has a unique identifier, a type, a label, and the properties and relations as specified by the type.
+These entities do not belong to a particular space that is owned by a specific group or user.
+
+=== Data model configuration
 
 Fairspace uses an {Jena}[Apache Jena] database to store system metadata
 and the custom domain specific metadata.
@@ -1193,7 +1374,6 @@ The _Files_ property of the _Subject_ entity type is an example of an inverse re
 The link is defined on the file, but the link will be visible on the subject as well, because of this inverse relation.
 ====
 
-
 The following guidelines should be followed when creating a custom data model.
 
 * Define a namespace for your custom entities and properties,
@@ -1222,7 +1402,7 @@ for the _Is about subject_ relation.
 ** A text property (with ``sh:datatype xsd:string``) can be limited
    to a single line text field using ``dash:singleLine true``.
 
-=== Limitations
+==== Limitations
 Although assigning multiple types to an entity is easy in RDF, Fairspace assumes entities to have a single type.
 
 Inheritance is possible in SHACL, but not supported by Fairspace.
@@ -1234,7 +1414,7 @@ E.g., instead of defining entity types _DNASeqAssay_ and _RNASeqAssay_
 as sub types of _Assay_, a property type _assayType_ can be defined on _Assay_,
 using a controlled vocabulary type _AssayType_ with the assay types as values.
 
-=== Controlled vocabularies
+==== Controlled vocabularies
 
 For controlled vocabulary types, e.g., _Gender_ and _Species_ in the example, you should insert the allowed values in the database by uploading
 a taxonomies file using the <<Metadata upload API>>.
@@ -1285,6 +1465,12 @@ ncbitaxon:10090 a example:Species ;
   rdfs:label "Mus musculus" .
 ----
 ====
+
+=== View configuration
+
+For the metadata pages in the user interface, a view configuration needs to be created
+that specifies the tables and columns.
+An example can be found in link:projects/saturn/views.yaml[views.yaml]
 
 
 

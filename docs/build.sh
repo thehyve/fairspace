@@ -2,8 +2,9 @@
 
 PROJECT_FILES=(
   "projects/saturn/src/main/resources/system-vocabulary.ttl"
-  "projects/saturn/vocabulary.ttl"
   "projects/saturn/taxonomies.ttl"
+  "projects/saturn/views.yaml"
+  "projects/saturn/vocabulary.ttl"
 )
 
 
