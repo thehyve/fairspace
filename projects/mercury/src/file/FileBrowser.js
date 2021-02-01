@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
@@ -143,7 +143,14 @@ export const FileBrowser = ({
     // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
     useEffect(() => open(), [isFolderUpload, open]);
 
-    useEffect(() => {refreshFiles();}, [openedCollection.dateDeleted, refreshFiles]);
+    const isParentCollectionDeleted = openedCollection.dateDeleted != null;
+    const parentCollectionDeletedRef = useRef(isParentCollectionDeleted);
+    useEffect(() => {
+        if (isParentCollectionDeleted !== parentCollectionDeletedRef.current) {
+            refreshFiles();
+            parentCollectionDeletedRef.current = isParentCollectionDeleted;
+        }
+    }, [isParentCollectionDeleted, refreshFiles]);
 
     useEffect(() => {
         if (showCannotOverwriteWarning) {
