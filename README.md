@@ -186,6 +186,8 @@ Explore metadata and find associated collections and files.
 
 ## Interfaces for accessing and querying data (API)
 
+Fairspace exposes a number of heterogeneous, HTTP-based APIs.
+
 ### Authentication
 
 #### OpenID Connect (OICD) / OAuth2 workflow
@@ -201,7 +203,6 @@ Fetch token (Python code example)
 import logging
 import requests
 import sys
-import time
 
 log = logging.getLogger()
 
@@ -260,8 +261,8 @@ curl -v -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" 
 ### Data upload API
 
 Metadata can be specified using: 
-- turtle
-- json-ld
+- turtle - bulk metadata uploads
+- json-ld - CRUD-like operations (see a description of a `/api/metadata` endpoint)
 
 Example file: `testdata.ttl`:
 ```turtle
@@ -312,6 +313,543 @@ curl -v
 ```
 
 ### WebDAV
+
+A file storage API is exposed via the WebDAV protocol. It runs on `/api/webdav/`. All visible collections in the system are exposed as top-level directories.
+Creating a top-level directory via WebDAV will result in an error message.
+
+[WebDAV] (Web-based Distributed Authoring and Versioning) protocol allows users to operate on collections and files.
+Fairspace exposes a WebDAV API for accessing the file systems, while restricting access to only the files accessible by the user.
+
+WebDAV API allows to upload and download files and to perform standard file operations such as copying or moving,
+as well as custom operations, such as collection lifecycle management
+and advanced data loss prevention features such as versioning and undeletion.
+
+...TODO Detailed list of supported request methods? Sample request?
+
+
+### SPARQL
+[SPARQL] API is a standard API for querying RDF databases. This endpoint is read-only and can be used
+for advanced search, analytics, data extraction, etc.
+
+<details>
+<summary>
+<i>POST /api/rdf/query</i>
+- SPARQL query
+</summary>
+
+<b>Parameters:</b>
+
+- query - SPARQL query.
+- aggregate - boolean - include aggregates.
+
+```bash
+curl -X POST -H 'Content-Type: application/sparql-query' -H 'Accept: application/json'
+-d '{
+  "query": "
+    PREFIX example: <https://example.com/ontology#>
+    PREFIX fs:    <https://fairspace.nl/ontology#>
+
+    SELECT DISTINCT ?sample
+    WHERE {
+      ?sample a example:BiologicalSample .
+      FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+    }
+    # ORDER BY ?sample
+    LIMIT 500",
+  "aggregate": True
+}'
+'http://localhost:8080/api/rdf/query'
+```
+</details>
+
+### Custom APIs
+REST/JSON based.
+
+#### Metadata
+The metadata is stored as triples. Its structure should match the vocabulary definition in /vocabulary.
+Any updates that do not match the vocabulary definition will return a 400 status with a message indicating what went wrong.
+
+Operations with metadata are implemented using a simple CRUD protocol based on standard RDF triples serialization formats.
+Currently, supported formats are JSON-LD and Turtle.
+
+<details>
+<summary>
+<i>GET /api/metadata</i>
+- retrieve metadata
+</summary>
+
+<b>Parameters:</b>
+
+- subject - string - the subject to filter on, not required.
+
+- predicate - string - the predicate to filter on, not required.
+
+- object - string - the object to filter on, not required.
+
+- includeObjectProperties - boolean - if set, the response will include several properties for the included objects.
+  The properties to be included are marked with `fs:importantProperty` in the vocabulary.
+
+Returns JsonLD-encoded statements matching the query parameters.
+
+```
+curl -X GET -H 'Content-Type: application/json' -H 'Accept: 'application/ld+json'
+'http://localhost:8080/api/metadata?subject?subject=a&predicate=b&object=c&withValueProperties=true'
+```
+</details>
+
+
+<details>
+<summary>
+<i>PUT /api/metadata</i>
+- add metadata. Existing metadata is left untouched.
+</summary>
+
+<b>Parameters:</b>
+Request body following
+<a href="https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json">jsonld-schema</a>
+
+```
+curl -X PUT -H 'Content-Type: application/ld+json' -d
+'{
+  "@graph" : [ {
+    "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
+    "hasData" : "ws:4bcd1780-c9cd-4bdd-0000-1ce966ff9ac3"
+   } ],
+  "@context" : {
+    "hasData" : {
+      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
+      "@type" : "@id"
+    },
+    "ws" : "http://fairspace.ci.fairway.app/iri/"
+  }
+}'
+'http://localhost:8080/api/metadata'
+```
+</details>
+
+
+<details>
+<summary>
+<i>PATCH /api/metadata</i>
+- update metadata. Existing metadata is overwritten.
+</summary>
+
+<b>Parameters:</b>
+Request body following
+<a href="https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json">jsonld-schema</a>.
+Any existing metadata for a given subject/predicate combination will be overwritten with the provided values.
+
+```
+curl -X PATCH -H 'Content-Type: application/ld+json' -d
+'{
+  "@graph" : [ {
+    "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
+    "hasData" : "ws:4bcd1780-c9cd-4bdd-0000-1ce966ff9ac3"
+   } ],
+  "@context" : {
+    "hasData" : {
+      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
+      "@type" : "@id"
+    },
+    "ws" : "http://fairspace.ci.fairway.app/iri/"
+  }
+}'
+'http://localhost:8080/api/metadata'
+```
+</details>
+
+
+<details>
+<summary>
+<i>DELETE /api/metadata</i>
+- delete metadata.
+</summary>
+
+<b>Parameters:</b>
+
+- subject - string - the subject to filter on.
+  If a request body is given in JSON-LD format, the triples specified in the body will be deleted.
+  Otherwise, the subject specified in the subject parameter will be marked as deleted.
+  Please note that the subject will still exist in the database.
+
+```
+curl -X DELETE -H 'Content-Type: application/ld+json' -d
+'{
+  "@graph" : [ {
+    "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
+    "hasData" : "ws:4bcd1780-c9cd-4bdd-0000-1ce966ff9ac3"
+   } ],
+  "@context" : {
+    "hasData" : {
+      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
+      "@type" : "@id"
+    },
+    "ws" : "http://fairspace.ci.fairway.app/iri/"
+  }
+}'
+'http://localhost:8080/api/metadata'
+```
+</details>
+
+
+#### Workspace management
+
+CRUD operations on workspace entities.
+
+<details>
+<summary>
+<i>GET /api/workspaces</i>
+- list all available workspaces.
+</summary>
+
+Response contains the following data:
+- iri - unique workspace IRI.
+
+- name - unique workspace name.
+
+- comment - workspace description in markdown format.
+
+- managers - list of  workspace managers.
+
+- summary - short summary on the workspace - how many collections and how many users it has.
+
+- canCollaborate - if a current user is added to the workspace as a collaborator.
+
+- canManage - if a current user is a workspace manager.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/workspaces'
+```
+</details>
+
+
+<details>
+<summary>
+<i>PUT /api/workspaces</i>
+- add a workspace.
+</summary>
+
+Available only to administrators.
+
+<b>Parameters:</b>
+
+- name - string - workspace name.
+
+Response contains the workspace name and newly assigned IRI.
+
+```
+curl -X PUT -H 'Accept: application/json' -d '{"name": "test workspace"}' 'http://localhost:8080/api/workspaces'
+```
+</details>
+
+
+<details>
+<summary>
+<i>PATCH /api/workspaces</i>
+- update a workspace.
+</summary>
+
+<b>Parameters:</b>
+
+- iri - string - unique workspace IRI (required).
+
+- name - string - unique workspace name.
+
+- comment - workspace description in markdown format.
+
+```
+curl -X PATCH -H 'Accept: application/json' -d
+'{
+  "iri": "http://fairspace.com/iri/123,
+  "name": "new test name",
+  "comment": "New description"
+}"'
+'http://localhost:8080/api/workspaces'
+```
+</details>
+
+
+<details>
+<summary>
+<i>DELETE /api/workspaces</i>
+- delete a workspace.
+</summary>
+
+Available only to administrators.
+
+<b>Parameters:</b>
+
+- workspace - string - workspace IRI (URL-encoded).
+
+```
+curl -X DELETE -H 'Accept: application/json' 'http://localhost:8080/api/workspaces?workspace=http://fairspace.com/iri/123'
+```
+</details>
+
+
+<details>
+<summary>
+<i>GET /api/workspaces/users</i>
+- list all workspace users with workspace roles.
+</summary>
+
+<b>Parameters:</b>
+
+- workspace - string - workspace IRI (URL-encoded).
+
+Response contains list of workspace users with their workspace roles.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?workspace=http://fairspace.com/iri/123'
+```
+</details>
+
+
+<details>
+<summary>
+<i>PATCH /api/workspaces/users</i>
+- update workspace users and their workspace roles.
+</summary>
+
+<b>Parameters:</b>
+
+- workspace - string - workspace IRI (URL-encoded).
+
+Response contains list of workspace users with their updated workspace roles.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?workspace=http://fairspace.com/iri/123'
+```
+</details>
+
+
+#### User and permission management
+
+<details>
+<summary>
+<i>GET /api/users</i>
+- list all organisation users.
+</summary>
+
+Returns list of users with user's unique ID, name, email, username and user's organisation-level permissions
+- if a user is an administrator, super-administrator or can view public metadata, view public data or add shared metadata.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/users'
+```
+</details>
+
+
+<details>
+<summary>
+<i>PATCH /api/users</i>
+- update user's organisation credentials
+</summary>
+
+<b>Parameters:</b>
+
+- id - string - id of a user for which roles will be updated.
+
+- ["role name": <true|false>] - pairs having role name as a key,
+  and a flag determining whether a user has a role or not as a value.
+
+
+```
+curl -X PATCH -H 'Accept: application/json' -d
+'{
+  "id": "xyz-0000",
+  "canViewPublicData": false,
+  "canViewPublicMetadata": true
+}'
+'http://localhost:8080/api/users'
+```
+</details>
+
+
+<details>
+<summary>
+<i>GET /api/users/current</i>
+- get current user
+</summary>
+
+Returns current user's unique ID, name, email, username and user's organisation-level permissions
+- if the user is an administrator, super-administrator or can view public metadata,
+  view public data or add shared metadata.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/users/current'
+```
+</details>
+
+
+<details>
+<summary>
+<i>POST /api/users/current/logout</i>
+- logout the current user
+</summary>
+
+```
+curl -X POST -H 'Accept: application/json' 'http://localhost:8080/api/users/current/logout'
+```
+</details>
+
+
+#### Read-only endpoints
+
+**Vocabulary**
+
+The vocabulary contains a description of the structure of the metadata.
+It contains the types of entities that can be created, along with the data types for the fields.
+It is stored in the [SHACL] format.
+
+<details>
+<summary>
+<i>GET /api/vocabulary</i>
+- retrieve a representation of the vocabulary.
+</summary>
+
+<b>Parameters:</b>
+
+- subject - string - the subject to filter on, not required.
+
+- predicate - string - the predicate to filter on, not required.
+
+- object - string - the object to filter on, not required.
+
+Returns JsonLD-encoded statements matching the query parameters.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/vocabulary'
+```
+</details>
+
+
+**Views**
+
+Metadata views endpoint used for metadata-based search.
+
+<details>
+<summary>
+<i>GET /api/views</i>
+- list all views with available columns per each view.
+</summary>
+
+```
+curl -X GET -H Content-Type': 'application/json' -H 'Accept: application/json' 'http://localhost:8080/api/views'
+```
+</details>
+
+
+<details>
+<summary>
+<i>POST /api/views</i>
+- get view data matching request filters.
+</summary>
+<b>Parameters:</b>
+
+- view - string - name of the view.
+
+- filters - list of filters, based on available facets and their values.
+  Each filter has to contain a "field" property, matching the name of a facet, and list of values to filter on.
+
+- page and size - pagination properties.
+
+
+```
+curl -X POST -H Content-Type': 'application/json' -H 'Accept: application/json' -d
+'{
+  "view":"Resource",
+  "filters":[
+    {
+      "field":"Resource_type",
+      "values":["https://fairspace.nl/ontology#Collection"]
+    }
+  ],
+  "page":1,
+  "size":100
+}'
+'http://localhost:8080/api/views'
+```
+</details>
+
+
+<details>
+<summary>
+<i>POST /api/views/count</i>
+-  get view data count matching request filters.
+</summary>
+<b>Parameters:</b>
+
+- view - string - name of the view.
+
+- filters - list of filters, based on available facets and their values.
+  Each filter has to contain a "field" property, matching the name of a facet, and list of values to filter on.
+
+- page and size - pagination properties.
+
+
+```
+curl -X POST -H Content-Type': 'application/json' -H 'Accept: application/json' -d
+'{
+  "view":"Resource",
+  "filters":[
+    {
+      "field":"Resource_type",
+      "values":["https://fairspace.nl/ontology#Collection"]
+    }
+  ],
+  "page":1,
+  "size":100
+}'
+'http://localhost:8080/api/views/count'
+```
+</details>
+
+
+<details>
+<summary>
+<i>GET /api/views/facets</i>
+- list all facets with available values per each facet.
+</summary>
+
+```
+curl -X GET -H Content-Type': 'application/json' -H 'Accept: application/json' 'http://localhost:8080/api/views/facets'
+```
+</details>
+
+
+**Features**
+
+<details>
+<summary>
+<i>GET /api/features</i>
+- list available application features.
+</summary>
+
+Response contains list of additional features that are currently available in the application,
+e.g. metadata editing in the user interface.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/features'
+```
+</details>
+
+
+**Services**
+
+<details>
+<summary>
+<i>GET /api/services</i>
+- list linked services.
+</summary>
+
+Response contains list of external services linked to Fairspace,
+e.g. JupyterHub, cBioPortal, etc.
+
+```
+curl -X GET -H 'Accept: application/json' 'http://localhost:8080/api/services'
+```
+</details>
 
 
 # Installation and configuration
@@ -587,3 +1125,7 @@ ncbitaxon:10090 a example:Species ;
 [Keycloak]: https://www.keycloak.org/
 [Keycloak server administration]: https://www.keycloak.org/docs/latest/server_admin/
 [Jupyter Hub]: https://jupyterhub.readthedocs.io/
+[WebDAV]: https://webdav.io/
+[SPARQL]: https://www.w3.org/TR/sparql11-query/
+[SHACL]: https://www.w3.org/TR/shacl/
+[jsonld-schema]: https://raw.githubusercontent.com/json-ld/json-ld.org/master/schemas/jsonld-schema.json
