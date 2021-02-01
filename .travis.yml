@@ -16,6 +16,7 @@ env:
      - DEPLOYMENT_CONFIG_DIR="./.travis"
      - RELEASE_BRANCH="release"
      - SNAPSHOT_BRANCH="dev"
+     - DOCUMENTATION_REPO="fairspace/fairspace-docs"
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
      - GCP_PROJECT="fairspace-207108"
@@ -83,6 +84,11 @@ jobs:
         - source charts/.travis/install.sh
       script:
       - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET -f projects/saturn/views.yaml
+    - if: branch = documentation and type != pull_request
+      install:
+        - docs/.travis/install.sh
+      script:
+        - docs/.travis/publish.sh
 
 notifications:
   slack:
