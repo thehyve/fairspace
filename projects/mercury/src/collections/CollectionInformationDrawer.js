@@ -98,6 +98,14 @@ const generateTemplate = (vocabulary) => {
         return getFirstPredicateValue(classShape, SHACL_NAME);
     };
 
+    const type = ps => {
+        let shaclType = getFirstPredicateId(ps, SHACL_DATATYPE);
+        if (!shaclType) {
+            shaclType = getFirstPredicateId(ps, SHACL_CLASS);
+        }
+        return shaclType.substring(shaclType.lastIndexOf('#') + 1);
+    };
+
     const cardinality = ps => getFirstPredicateValue(ps, SHACL_MIN_COUNT, 0) + '..' + getFirstPredicateValue(ps, SHACL_MAX_COUNT, '*');
 
     const doc = uniqueProps.map(ps => [
@@ -109,15 +117,23 @@ const generateTemplate = (vocabulary) => {
         getFirstPredicateId(ps, SHACL_PATH)
     ]);
 
+    const entityNames = uniqueProps.filter(ps => !getFirstPredicateId(ps, SHACL_DATATYPE))
+        .map(ps => JSON.stringify(getFirstPredicateValue(ps, SHACL_NAME)).replaceAll('"', "'"));
+    const sampleEntityNames = entityNames.length > 2 ? entityNames.slice(0, 2).join(' and ') : entityNames.join(' and ');
+    const sampleRow = suffix => uniqueProps.map(prop => (type(prop) === "string" ? "\"Sample text value\"" : `${type(prop)}${suffix}`));
+
     return '#   This section describes the CSV-based format used for bulk metadata uploads.\n'
-        + '#   Entity types can be referenced by ID or unique label; multiple values must be separated by the pipe symbol |.\n'
+        + `#   Entities (e.g. ${sampleEntityNames}) can be referenced by ID or unique label; multiple values must be separated by the pipe symbol |.\n`
         + '#\n'
         + table([
             ['#', 'COLUMN', 'DESCRIPTION', 'TYPE', 'CARDINALITY', 'PREDICATE'],
             ['#', 'Path', 'A relative path to a file or a directory; use ./ for the current directory or collection.', 'string', '1..1', ''],
             ...doc]) + '\n#\n'
         + '"Path",' + uniqueProps.map(ps => JSON.stringify(getFirstPredicateValue(ps, SHACL_NAME))).join(',') + '\n'
-        + '<PUT YOUR DATA HERE>\n';
+        + '<PUT YOUR DATA HERE FOLLOWING SAMPLE ROWS BELOW. REMOVE THE SAMPLE ROWS AFTERWARDS.>\n'
+        + '# ./,' + sampleRow("_0").join(',') + '\n'
+        + '# ./file1,' + sampleRow("_1").join(',') + '\n'
+        + '# ./file2,' + sampleRow("_2").join(',') + '\n';
 };
 
 const MetadataCard = (props) => {
