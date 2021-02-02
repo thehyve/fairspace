@@ -87,7 +87,7 @@ export const FilesPage = ({
     const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
 
     const showMetadataSearchButton: boolean = (
-        currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
+        currentUser && currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
         && !isOpenedPathDeleted && collection.iri
     );
 
@@ -146,6 +146,7 @@ export const FilesPage = ({
                         collectionsError={error}
                         fileApi={fileApi}
                         selection={selection}
+                        preselectedFile={preselectedFile}
                         showDeleted={showDeleted}
                     />
                 </Grid>

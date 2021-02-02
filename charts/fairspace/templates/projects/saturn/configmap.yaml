@@ -48,7 +48,7 @@ data:
 {{ end }}
   views.yaml: |
 {{ if .Values.saturn.views -}}
-{{ toYaml .Values.saturn.views | indent 4 -}}
+{{ .Values.saturn.views | indent 4 -}}
 {{ else -}}
 {{ .Files.Get "views.yaml" | indent 4 -}}
 {{ end }}

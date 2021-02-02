@@ -211,18 +211,18 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         />
                     )}
                 </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, 100]}
+                    component="div"
+                    count={count && isNonEmptyValue(count.count) ? count.count : -1}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                    className={classes.tableFooter}
+                    labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
+                />
             </LoadingOverlayWrapper>
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25, 100]}
-                component="div"
-                count={count && isNonEmptyValue(count.count) ? count.count : -1}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-                className={classes.tableFooter}
-                labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
-            />
         </Paper>
     );
 };

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
@@ -71,6 +71,7 @@ export const FileBrowser = ({
     refreshFiles = () => {},
     fileActions = {},
     selection = {},
+    preselectedFile = {},
     classes
 }) => {
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
@@ -142,7 +143,14 @@ export const FileBrowser = ({
     // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
     useEffect(() => open(), [isFolderUpload, open]);
 
-    useEffect(() => {refreshFiles();}, [openedCollection.dateDeleted, refreshFiles]);
+    const isParentCollectionDeleted = openedCollection.dateDeleted != null;
+    const parentCollectionDeletedRef = useRef(isParentCollectionDeleted);
+    useEffect(() => {
+        if (isParentCollectionDeleted !== parentCollectionDeletedRef.current) {
+            refreshFiles();
+            parentCollectionDeletedRef.current = isParentCollectionDeleted;
+        }
+    }, [isParentCollectionDeleted, refreshFiles]);
 
     useEffect(() => {
         if (showCannotOverwriteWarning) {
@@ -169,8 +177,11 @@ export const FileBrowser = ({
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
+        const wasSelected = selection.isSelected(path.filename);
         selection.deselectAll();
-        selection.select(path.filename);
+        if (!wasSelected) {
+            selection.select(path.filename);
+        }
     };
 
     const handlePathDoubleClick = (path) => {
@@ -290,6 +301,7 @@ export const FileBrowser = ({
                     onPathDoubleClick={handlePathDoubleClick}
                     onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
                     showDeleted={showDeleted}
+                    preselectedFile={preselectedFile}
                 />
                 {openedCollection.canRead && renderFileOperations()}
             </div>

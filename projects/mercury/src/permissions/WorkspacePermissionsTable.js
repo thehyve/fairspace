@@ -46,20 +46,20 @@ export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermis
                 {
                     selectedPermissions.map(p => (
                         <TableRow key={p.iri} className={classes.tableRow}>
-                            <TableCell width={30}>
+                            <TableCell width={25}>
                                 <Widgets />
                             </TableCell>
                             <TableCell
-                                width={355}
+                                width={345}
                                 data-testid="permission"
                             >
                                 <Tooltip title={p.name} placement="left-start" arrow>
-                                    <Typography variant="body2" noWrap style={{width: 355}}>
+                                    <Typography variant="body2" noWrap style={{width: '100%'}}>
                                         {p.name}
                                     </Typography>
                                 </Tooltip>
                             </TableCell>
-                            <TableCell width={10}>
+                            <TableCell width={5}>
                                 <span>&nbsp;</span>
                             </TableCell>
                             <TableCell width={40} className={classes.iconCellButton}>

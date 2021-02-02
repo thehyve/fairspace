@@ -199,7 +199,10 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 onChange={changeTab}
                 indicatorColor="primary"
                 textColor="primary"
+                variant="scrollable"
+                scrollButtons="auto"
                 aria-label="metadata view tabs"
+                className={classes.tabsPanel}
             >
                 {views.map((view, index) => (
                     <Tab label={view.title} {...a11yProps(index)} />

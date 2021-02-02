@@ -12,5 +12,4 @@ public class CountRequest {
     @NotBlank
     private String view;
     private List<ViewFilter> filters;
-    private List<Resource> locations;
 }

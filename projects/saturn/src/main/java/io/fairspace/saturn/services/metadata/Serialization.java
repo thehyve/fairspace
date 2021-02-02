@@ -7,11 +7,10 @@ import org.apache.jena.riot.RDFFormat;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.eclipse.jetty.http.MimeTypes.getContentTypeWithoutCharset;
 
 public class Serialization {
     private static final List<RDFFormat> SUPPORTED_FORMATS = List.of(RDFFormat.JSONLD, RDFFormat.TURTLE, RDFFormat.NTRIPLES);
@@ -27,18 +26,28 @@ public class Serialization {
         return model;
     }
 
-    public static String serialize(Model model, String contentType) {
-        var format = getFormat(contentType);
+    public static String serialize(Model model, RDFFormat format) {
         var writer = new StringWriter();
         RDFDataMgr.write(writer, model, format);
         return writer.toString();
     }
 
-    private static RDFFormat getFormat(String headerString) {
-        var type = getContentTypeWithoutCharset(headerString);
+    public static RDFFormat getFormat(String contentType) {
+        if (contentType == null || contentType.isEmpty()) {
+            return RDFFormat.TURTLE;
+        }
+        var types = Arrays.stream(contentType.split(","))
+                .map(type -> type.split(";")[0].trim())
+                .collect(Collectors.toSet());
         return SUPPORTED_FORMATS.stream()
-                .filter(f -> f.getLang().getHeaderString().equals(type))
+                .filter(f -> types.contains(f.getLang().getHeaderString()))
                 .findFirst()
+                .or(() -> {
+                    if (types.contains("*/*") || types.contains("text/*")) {
+                        return Optional.of(RDFFormat.TURTLE);
+                    }
+                    return Optional.empty();
+                })
                 .orElseThrow(() -> new UnsupportedMediaTypeException(SUPPORTED_MIMETYPES));
     }
 }

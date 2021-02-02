@@ -34,6 +34,9 @@ const styles = theme => ({
         overflowY: 'hidden',
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
     },
+    tabsPanel: {
+        paddingRight: 70
+    },
     tab: {
         '& .MuiBox-root': {
             padding: 0,

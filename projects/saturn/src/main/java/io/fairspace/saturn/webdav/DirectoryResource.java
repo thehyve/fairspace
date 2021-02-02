@@ -229,94 +229,99 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
                      .parse(reader)) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
             if (!headers.contains("Path")) {
-                setErrorMessage("Invalid file format. 'Path' column is missing.");
+                setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Invalid file format. 'Path' column is missing.");
                 throw new BadRequestException(this);
             }
-            for (var record : csvParser) {
-                var path = record.get("Path");
-                org.apache.jena.rdf.model.Resource s;
-                if (path.equals(".") || path.equals("./") || path.equals("/")) {
-                    s = subject;
-                } else {
-                    if (path.startsWith("./")) {
-                        path = path.substring(2);
+            try {
+                for (var record : csvParser) {
+                    var path = record.get("Path");
+                    org.apache.jena.rdf.model.Resource s;
+                    if (path.equals(".") || path.equals("./") || path.equals("/")) {
+                        s = subject;
+                    } else {
+                        if (path.startsWith("./")) {
+                            path = path.substring(2);
+                        }
+                        path = normalizePath(path);
+                        s = subject.getModel().createResource(subject + "/" + encodePath(path));
                     }
-                    path = normalizePath(path);
-                    s = subject.getModel().createResource(subject + "/" + encodePath(path));
-                }
-                if (!s.getModel().containsResource(s)) {
-                    setErrorMessage("Line " +  record.getRecordNumber() + ". File \"" + path + "\" not found");
-                    throw new BadRequestException(this);
-                }
-
-                if (s.hasProperty(FS.dateDeleted)) {
-                    setErrorMessage("Line " +  record.getRecordNumber() + ". File \"" + path + "\" was deleted");
-                    throw new BadRequestException(this);
-                }
-
-                var classShape = s.getPropertyResourceValue(RDF.type).inModel(VOCABULARY);
-                var propertyShapes = new HashMap<String, org.apache.jena.rdf.model.Resource>();
-
-                classShape.listProperties(SHACLM.property)
-                        .mapWith(Statement::getObject)
-                        .mapWith(RDFNode::asResource)
-                        .filterKeep(propertyShape -> propertyShape.hasProperty(SHACLM.name)
-                                && propertyShape.hasProperty(SHACLM.path)
-                                && propertyShape.getProperty(SHACLM.path).getObject().isURIResource())
-                        .forEachRemaining(propertyShape -> {
-                            var name = getStringProperty(propertyShape, SHACLM.name);
-                            if (name != null) {
-                                propertyShapes.put(name, propertyShape);
-                            }
-                        });
-
-                for (var header : headers) {
-                    if (header.equals("Path")) {
-                        continue;
-                    }
-
-                    var text = record.get(header);
-
-                    if (isBlank(text)) {
-                        continue;
-                    }
-
-                    var propertyShape = propertyShapes.get(header);
-
-                    if (propertyShape == null) {
-                        setErrorMessage("Line " +  record.getRecordNumber() + ". Unknown attribute: " + header);
+                    if (!s.getModel().containsResource(s)) {
+                        setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". File \"" + path + "\" not found");
                         throw new BadRequestException(this);
                     }
 
-                    var property = model.createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());
-                    var datatype = propertyShape.getPropertyResourceValue(SHACLM.datatype);
-                    var class_ = propertyShape.getPropertyResourceValue(SHACLM.class_);
-                    assert (datatype != null) ^ (class_ != null);
+                    if (s.hasProperty(FS.dateDeleted)) {
+                        setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". File \"" + path + "\" was deleted");
+                        throw new BadRequestException(this);
+                    }
 
-                    var values = text.split("\\|");
+                    var classShape = s.getPropertyResourceValue(RDF.type).inModel(VOCABULARY);
+                    var propertyShapes = new HashMap<String, org.apache.jena.rdf.model.Resource>();
 
-                    for (var value : values) {
-                        if (class_ != null) {
-                            var object = subject.getModel().listResourcesWithProperty(RDF.type, class_)
-                                    .filterKeep(r -> r.getURI().equals(value) || r.hasProperty(RDFS.label, value))
-                                    .toList();
-                            if (object.size() == 1) {
-                                model.add(s, property, object.get(0));
-                            } else if (object.size() > 1) {
-                                setErrorMessage("Line " +  record.getRecordNumber()
-                                        + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" is not unique.");
-                                throw new BadRequestException(this);
+                    classShape.listProperties(SHACLM.property)
+                            .mapWith(Statement::getObject)
+                            .mapWith(RDFNode::asResource)
+                            .filterKeep(propertyShape -> propertyShape.hasProperty(SHACLM.name)
+                                    && propertyShape.hasProperty(SHACLM.path)
+                                    && propertyShape.getProperty(SHACLM.path).getObject().isURIResource())
+                            .forEachRemaining(propertyShape -> {
+                                var name = getStringProperty(propertyShape, SHACLM.name);
+                                if (name != null) {
+                                    propertyShapes.put(name, propertyShape);
+                                }
+                            });
+
+                    for (var header : headers) {
+                        if (header.equals("Path")) {
+                            continue;
+                        }
+
+                        var text = record.get(header);
+
+                        if (isBlank(text)) {
+                            continue;
+                        }
+
+                        var propertyShape = propertyShapes.get(header);
+
+                        if (propertyShape == null) {
+                            setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Unknown attribute: " + header);
+                            throw new BadRequestException(this);
+                        }
+
+                        var property = model.createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());
+                        var datatype = propertyShape.getPropertyResourceValue(SHACLM.datatype);
+                        var class_ = propertyShape.getPropertyResourceValue(SHACLM.class_);
+                        assert (datatype != null) ^ (class_ != null);
+
+                        var values = text.split("\\|");
+
+                        for (var value : values) {
+                            if (class_ != null) {
+                                var object = subject.getModel().listResourcesWithProperty(RDF.type, class_)
+                                        .filterKeep(r -> r.getURI().equals(value) || r.hasProperty(RDFS.label, value))
+                                        .toList();
+                                if (object.size() == 1) {
+                                    model.add(s, property, object.get(0));
+                                } else if (object.size() > 1) {
+                                    setErrorMessage("Line " + csvParser.getCurrentLineNumber()
+                                            + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" is not unique.");
+                                    throw new BadRequestException(this);
+                                } else {
+                                    setErrorMessage("Line " + csvParser.getCurrentLineNumber()
+                                            + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" does not exist.");
+                                    throw new BadRequestException(this);
+                                }
                             } else {
-                                setErrorMessage("Line " +  record.getRecordNumber()
-                                        + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" does not exist.");
-                                throw new BadRequestException(this);
+                                var o = model.createTypedLiteral(value, datatype.getURI());
+                                model.add(s, property, o);
                             }
-                        } else {
-                            var o = model.createTypedLiteral(value, datatype.getURI());
-                            model.add(s, property, o);
                         }
                     }
                 }
+            } catch (IllegalStateException e) {
+                setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Metadata file is not a valid comma separated values file (CSV).");
+                throw new BadRequestException("Error parsing file " + file.getName(), e);
             }
         } catch (IllegalArgumentException | IOException e) {
             setErrorMessage(e.getMessage());
