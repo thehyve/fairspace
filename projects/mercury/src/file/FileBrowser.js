@@ -177,8 +177,11 @@ export const FileBrowser = ({
 
     // A highlighting of a path means only this path would be selected/checked
     const handlePathHighlight = path => {
+        const wasSelected = selection.isSelected(path.filename);
         selection.deselectAll();
-        selection.select(path.filename);
+        if (!wasSelected) {
+            selection.select(path.filename);
+        }
     };
 
     const handlePathDoubleClick = (path) => {
