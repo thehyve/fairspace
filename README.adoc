@@ -372,7 +372,7 @@ print(response.json())
 
 For examples using curl, an authorisation header needs to be passed using the ``-H`` option.
 
-For basic authentation:
+For Basic authentication:
 [source, bash]
 ----
 AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
