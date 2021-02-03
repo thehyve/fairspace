@@ -419,7 +419,7 @@ and advanced data loss prevention features such as versioning and undeletion.
 ===== Directory listing and path properties
 
 |===
-2+| ``PROPFIND /api/webdav/{path}/``
+2+| ``PROPFIND /api/webdav/{path}``
 
 2+| _Request headers_:
 | `Depth`
@@ -583,7 +583,7 @@ like the description (``ns1:comment``), to be included in the WebDAV response.
 ===== Create collection or directory
 
 |===
-2+| ``MKCOL /api/webdav/{path}/``
+2+| ``MKCOL /api/webdav/{path}``
 
 2+| Create collection or directory
 2+| _Request headers_:
@@ -636,7 +636,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X MKCOL "${FAIRSPACE_URL}/api/webdav
 ===== Upload files
 
 |===
-2+| ``POST /api/webdav/{path}/`` +
+2+| ``POST /api/webdav/{path}`` +
   ``action=upload_files``
 
 2+| _Request data_:
@@ -684,7 +684,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F 'action=upload_files' -F '
 ===== Copy and move a directory or file
 
 |===
-2+| ``COPY /api/webdav/{path}/``
+2+| ``COPY /api/webdav/{path}``
 
 2+| Copy a directory or file.
 2+| _Request headers_:
@@ -705,7 +705,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X COPY -H "Destination: ${target}" "
 ====
 
 |===
-2+| ``MOVE /api/webdav/{path}/``
+2+| ``MOVE /api/webdav/{path}``
 
 2+| Move or rename a directory or file
 2+| _Request headers_:
@@ -728,7 +728,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X MOVE -H "Destination: ${target}" "
 ===== Undelete a directory or file
 
 |===
-2+| ``POST /api/webdav/{path}/`` +
+2+| ``POST /api/webdav/{path}`` +
     ``action=undelete``
 
 2+| Undelete a directory or file
@@ -752,7 +752,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=undelete" "${FAIRS
 ===== Revert to a file version
 
 |===
-2+| ``POST /api/webdav/{path}/`` +
+2+| ``POST /api/webdav/{path}`` +
 ``action=revert``
 
 2+| Restore a previous file version
