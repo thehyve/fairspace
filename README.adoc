@@ -234,7 +234,7 @@ check the https://www.keycloak.org/docs/latest/securing_apps/[Securing applicati
 
 For use in scripts, it is advised to obtain a token for offline access, using the https://www.keycloak.org/docs/latest/server_admin/#_offline-access[Offline access] feature of OpenID Connect.
 
-.Code to obtain the authorisation header (Python)
+.Code to obtain the OpenID Connect authorisation header (Python)
 [%collapsible]
 ====
 [source, python]
@@ -289,10 +289,10 @@ def auth():
 ----
 ====
 
-.Code to obtain the authorisation header (bash, curl)
+.Code to obtain the OpenID Connect authorisation header (bash, curl)
 [%collapsible]
 ====
-Requires the https://stedolan.github.io/jq/[jq]) JSON parser.
+Requires the https://stedolan.github.io/jq/[jq] JSON parser.
 [source, bash]
 ----
 fetch_access_token() {
@@ -319,7 +319,7 @@ token based authentication, because it requires scripts to have
 a plain text password stored somewhere.
 Also, users may have to retype their passwords when logging in, tempting them to choose less secure, easier to remember, passwords.
 
-.Code to generate the authorisation header (Python)
+.Code to generate the Basic authorisation header (Python)
 [%collapsible]
 ====
 [source, python]
@@ -334,7 +334,7 @@ def auth():
 ----
 ====
 
-.Code to generate the authorisation header (bash)
+.Code to generate the Basic authorisation header (bash)
 [%collapsible]
 ====
 [source, bash]
