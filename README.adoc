@@ -191,21 +191,57 @@ image:docs/images/screenshots/Metadata view.png[Metadata]
 
 === Interfaces for accessing and querying data (API)
 
+The data in Fairspace can be accessed via Application Programming Interfaces (APIs).
+The user interfaces application uses those APIs, but also other programs can use them,
+e.g., for automated data uploading or for exporting data for further processing
+or for synchronisation with other systems.
+
 ==== Authentication
+
+All API endpoints require authentication via an authorisation header.
+To enable WebDAV clients to connect to Fairspace, also so-called _Basic authentication_ is supported.
+
+For secure authentication, it is strongly advised to use the _OpenID Connect (OICD) / OAuth2_ workflow.
+The user interface application also uses this workflow.
+
+When using the APIs in automated scripts, ensure that an account is used with only the required
+privileges (conform the _principle of least privilege_). I.e., when an admin account is not needed, use a non-admin account.
+For adding shared metadata, an account with
+_Add shared metadata_ role is required, see <<Uploading metadata>>.
+
+When an action is done on behalf of a specific user,
+do not use a service account or system account for the action directly, but obtain a token for that user first, e.g.,
+by using the https://www.keycloak.org/docs/latest/securing_apps/#impersonation[impersonation] feature of Keycloak.
+That way the audit logging still captures which user did what.
 
 ===== OpenID Connect (OICD) / OAuth2 workflow
 
-Via header, via session.
+Fairspace supports OpenID Connect authentication via Keycloak.
+The workflow for API access is roughly as follows.
 
-.Fetch token (Python code example)
+* The client authenticates with the token endpoint of the identity provider (Keycloak) and obtains a signed access token
+* The client uses the access token in the request header when connecting to the Fairspace API
+* Fairspace receives the request with the access token and validates if the token is valid,
+  using the public key of the identity provider.
+
+The token endpoint of Keycloak supports refreshing the token if it is close to expiry.
+However, checking the token expiration and refreshing make the authentication logic quite complex.
+
+You can either obtain a fresh token before every API request or use an existing library
+that implements the authentication workflow.
+For finding available client-side libraries,
+check the https://www.keycloak.org/docs/latest/securing_apps/[Securing applications and services guide] of Keycloak.
+
+For use in scripts, it is advised to obtain a token for offline access, using the https://www.keycloak.org/docs/latest/server_admin/#_offline-access[Offline access] feature of OpenID Connect.
+
+.Code to obtain the authorisation header (Python)
 [%collapsible]
 ====
 [source, python]
 ----
 import logging
+import os
 import requests
-import sys
-import time
 
 log = logging.getLogger()
 
@@ -235,55 +271,122 @@ def fetch_access_token(keycloak_url: str,
                              headers=headers)
     if not response.ok:
         log.error('Error fetching token!', response.json())
-        sys.exit(1)
+        raise Exception('Error fetching token.')
     data = response.json()
     token = data['access_token']
     log.info(f"Token obtained successfully. It will expire in {data['expires_in']} seconds")
     return token
+
+def auth():
+    keycloak_url = os.environ.get('KEYCLOAK_URL')
+    realm = os.environ.get('KEYCLOAK_REALM')
+    client_id = os.environ.get('KEYCLOAK_CLIENT_ID')
+    client_secret = os.environ.get('KEYCLOAK_CLIENT_SECRET')
+    username = os.environ.get('USERNAME')
+    password = os.environ.get('PASSWORD')
+    token = fetch_access_token(keycloak_url, realm, client_id, client_secret, username, password)
+    return f'Bearer: {token}'
+----
+====
+
+.Code to obtain the authorisation header (bash, curl)
+[%collapsible]
+====
+Requires the https://stedolan.github.io/jq/[jq]) JSON parser.
+[source, bash]
+----
+fetch_access_token() {
+  curl -s \
+    -d "client_id=${KEYCLOAK_CLIENT_ID}" \
+    -d "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+    -d "username=${USERNAME}" \
+    -d "password=${PASSWORD}" \
+    -d 'grant_type=password' \
+    "${KEYCLOAK_SERVER_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
+}
+ACCESS_TOKEN=$(fetch_access_token)
 ----
 ====
 
 ===== Basic authentication
 
-Use the ``base64`` encoded ``username:password`` in the ``Authorization`` header.
+For WebDAV client access and for a simpler authentication method
+during testing, Fairspace also supports _Basic authentication_,
+which means that the ``base64`` encoded ``username:password`` string is sent in the ``Authorization`` header together with a prefix ``Basic ``.
 
-.Basic authentication (Python code example)
+This authentication method is considered to be less secure than
+token based authentication, because it requires scripts to have
+a plain text password stored somewhere.
+Also, users may have to retype their passwords when logging in, tempting them to choose less secure, easier to remember, passwords.
+
+.Code to generate the authorisation header (Python)
 [%collapsible]
 ====
 [source, python]
 ----
 import base64
-import logging
 import os
-from requests import Response, Session
-import sys
 
-log = logging.getLogger()
-
-server_url = os.environ.get('FAIRSPACE_URL')
-username = os.environ.get('USERNAME')
-password = os.environ.get('PASSWORD')
-auth = base64.b64encode(f'{username}:{password}'.encode()).decode()
-session = Session()
-response: Response = session.get(f'{server_url}/api/users/current', headers={
-  'Authorization': f'Basic {auth}',
-  'Accept': 'application/json'
-})
-if not response.ok:
-  log.error('Error fetching current user!')
-  log.error(f'{response.status_code} {response.reason}')
-  sys.exit(1)
+def auth():
+    username = os.environ.get('USERNAME')
+    password = os.environ.get('PASSWORD')
+    return f"Basic {base64.b64encode(f'{username}:{password}'.encode()).decode()}"
 ----
 ====
 
-.Basic authentication (Curl code example)
+.Code to generate the authorisation header (bash)
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -v -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" "${FAIRSPACE_URL}/api/users/current"
+AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
 ----
 ====
+
+===== Examples
+
+In the examples in this documentation, we assume one of both methods to be available.
+
+This means for the Python examples that a function ``auth()`` should be implemented that returns the authorisation header value, see the examples above.
+
+[source, python]
+----
+import os
+from requests import Response, Session
+
+def auth():
+    """ Returns authorisation header
+    Replace this with an implementation from one of the sections above.
+    """
+    pass
+
+server_url = os.environ.get('FAIRSPACE_URL')
+headers = {
+    'Authorization': auth()
+}
+response = Session().get(f'{server_url}/api/users/current', headers)
+if not response.ok:
+    raise Exception(f"Error fetching current user: {response.status_code} {response.reason}")
+print(response.json())
+----
+
+For examples using curl, an authorisation header needs to be passed using the ``-H`` option.
+
+For basic authentation:
+[source, bash]
+----
+AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
+curl -i -H "Authorization: ${AUTH_HEADER}" "${FAIRSPACE_URL}/api/users/current"
+----
+
+For OpenID Connect:
+[source, bash]
+----
+# ACCESS_TOKEN=...
+AUTH_HEADER="Bearer ${ACCESS_TOKEN}"
+curl -i -H "Authorization: ${AUTH_HEADER}" "${FAIRSPACE_URL}/api/users/current"
+----
+
 
 
 ===== Automatic authentication in Jupyter Hub
@@ -294,8 +397,17 @@ local API address without adding authentication headers.
 
 ==== WebDAV
 
-A file storage API is exposed via the WebDAV protocol. It runs on `/api/webdav/`. All visible collections in the system are exposed as top-level directories.
-Creating a top-level directory via WebDAV will result in an error message.
+A file storage API is exposed via the WebDAV protocol for accessing the file system via the web. It runs on `/api/webdav/`.
+
+This endpoint can be used by many file explorers,
+including Windows Explorer,
+and by tools like https://filezilla-project.org/[FileZilla] and https://cyberduck.io/[Cyberduck].
+Use ``\https://fairspace.example.com/api/webdav/`` or
+``davs://fairspace.example.com/api/webdav/`` as location, with
+``fairspace.example.com`` replaced by the server name.
+
+All visible collections in the system are exposed as top-level directories.
+Creating a top-level directory via WebDAV will result in an error message, see <<Create collection or directory>>.
 
 The {WebDAV}[Web-based Distributed Authoring and Versioning (WebDAV)] protocol allows users to operate on collections and files.
 Fairspace exposes a WebDAV API for accessing the file systems, while restricting access to only the files accessible by the user.
@@ -304,7 +416,384 @@ The WebDAV API allows to upload and download files and to perform standard file 
 as well as custom operations, such as collection lifecycle management
 and advanced data loss prevention features such as versioning and undeletion.
 
-TODO: Detailed list of supported request methods? Sample request?
+===== Directory listing and path properties
+
+|===
+2+| ``PROPFIND /api/webdav/{path}/``
+
+2+| _Request headers_:
+| `Depth`
+| When ``0`` only the information about the path is returned,
+  when ``1`` the contents of the directory is returned, if the path is a directory.
+| `Show-Deleted`
+| Include deleted paths when the value is `on`. (_Optional_)
+| `Version`
+| Specify a version number to request properties of a specific file version.
+  The first version has number `1`. If not specific, the current version is returned.
+2+| _Request body_:
+2+| To include also custom Fairspace attributes in the response, like the collection description, send the following request body: +
+  ``<propfind><allprop /></propfind>``
+|===
+
+====== Code examples
+
+.Check if path exists (Python)
+[%collapsible]
+====
+[source, python]
+----
+import logging
+import os
+from requests import Request, Response, Session
+
+log = logging.getLogger()
+
+server_url = os.environ.get('FAIRSPACE_URL')
+
+def exists(path):
+    """ Check if a path exists
+    """
+    headers = {
+        'Depth': '0',
+        'Authorization': auth()
+    }
+    session = Session()
+    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}/', headers, cookies=session.cookies)
+    response: Response = session.send(req.prepare())
+    return response.ok
+----
+====
+
+.Fetch directory listing (Python)
+[%collapsible]
+====
+[source, python]
+----
+import logging
+import os
+from requests import Request, Response, Session
+from xml.etree.ElementTree import fromstring
+
+log = logging.getLogger()
+
+server_url = os.environ.get('FAIRSPACE_URL')
+
+def ls(path: str):
+    """ List contents of path
+    """
+    headers = {
+        'Depth': '1',
+        'Authorization': auth()
+    }
+    session = Session()
+    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}', headers, cookies=session.cookies)
+    response: Response = session.send(req.prepare())
+    if not response.ok:
+        raise Exception(f"Error fetching directory '{path}': {response.status_code} {response.reason}")
+    tree = fromstring(response.content.decode())
+    for item in tree.findall('{DAV:}response'):
+        print(item.find('{DAV:}href').text)
+----
+====
+
+.Fetch directory listing (curl)
+[%collapsible]
+====
+Requires the http://xmlstar.sourceforge.net/[xmlstarlet] tool.
+[source, bash]
+----
+curl -s -H "Authorization: ${AUTH_HEADER}" -X PROPFIND -H "Depth: 1" "${FAIRSPACE_URL}/api/webdav/${path}" -d '<propfind><allprop /></propfind>' \
+| xmlstarlet sel -T -t -m d:multistatus/d:response -v d:propstat/d:prop/d:displayname -n
+----
+====
+
+====== Example response
+.Example ``PROPFIND`` response
+[%collapsible]
+====
+Example response using ``PROPFIND`` on the root location ``https://fairspace.ci.fairway.app/api/webdav`` with ``Depth: 1`` and request body ``<propfind><allprop /></propfind>``.
+Adding the ``<allprop />`` in the request results in custom Fairspace properties,
+like the description (``ns1:comment``), to be included in the WebDAV response.
+[source, xml]
+----
+<?xml version="1.0" encoding="utf-8" ?>
+<d:multistatus xmlns:ns1="https://fairspace.nl/ontology#" xmlns:d="DAV:">
+    <d:response>
+        <d:href>/api/webdav/</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getcontenttype></d:getcontenttype>
+                <d:getetag>"https://fairspace.ci.fairway.app/api/webdav"</d:getetag>
+                <d:iscollection>TRUE</d:iscollection>
+                <d:displayname></d:displayname>
+                <d:isreadonly>TRUE</d:isreadonly>
+                <d:name></d:name>
+                <d:supported-report-set></d:supported-report-set>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/api/webdav/Demonstration/</d:href>
+        <d:propstat>
+            <d:prop>
+                <ns1:access>Write</ns1:access>
+                <ns1:canRead>TRUE</ns1:canRead>
+                <ns1:userPermissions>http://fairspace.ci.fairway.app/iri/user-iri Manage
+                </ns1:userPermissions>
+                <ns1:accessMode>Restricted</ns1:accessMode>
+                <ns1:availableStatuses>Active</ns1:availableStatuses>
+                <ns1:canDelete>FALSE</ns1:canDelete>
+                <ns1:iri>https://fairspace.ci.fairway.app/api/webdav/Demonstration</ns1:iri>
+                <ns1:canWrite>TRUE</ns1:canWrite>
+                <ns1:ownedByName>Demo</ns1:ownedByName>
+                <ns1:canManage>FALSE</ns1:canManage>
+                <ns1:canUndelete>FALSE</ns1:canUndelete>
+                <ns1:workspacePermissions>http://fairspace.ci.fairway.app/iri/workspace-iri
+                    Write
+                </ns1:workspacePermissions>
+                <ns1:createdBy>http://fairspace.ci.fairway.app/iri/user-iri</ns1:createdBy>
+                <ns1:comment>Demonstration collection</ns1:comment>
+                <ns1:availableAccessModes>Restricted</ns1:availableAccessModes>
+                <ns1:ownedBy>http://fairspace.ci.fairway.app/iri/workspace-iri</ns1:ownedBy>
+                <ns1:status>Active</ns1:status>
+                <d:getcreated>2021-02-02T12:12:33Z</d:getcreated>
+                <d:creationdate>2021-02-02T12:12:33Z</d:creationdate>
+                <d:getcontenttype>text/html</d:getcontenttype>
+                <d:getetag>"https://fairspace.ci.fairway.app/api/webdav/Demonstration"</d:getetag>
+                <d:iscollection>TRUE</d:iscollection>
+                <d:displayname>Demonstration collection</d:displayname>
+                <d:isreadonly>FALSE</d:isreadonly>
+                <d:name>Demonstration collection</d:name>
+                <d:supported-report-set></d:supported-report-set>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+</d:multistatus>
+----
+====
+
+===== Create collection or directory
+
+|===
+2+| ``MKCOL /api/webdav/{path}/``
+
+2+| Create collection or directory
+2+| _Request headers_:
+| `Owner`
+| Specify the identifier of the owner workspace when creating a collection.
+|===
+
+
+.Example create collection or directory (Python)
+[%collapsible]
+====
+[source, python]
+----
+import logging
+import os
+from requests import Request, Response, Session
+
+log = logging.getLogger()
+
+server_url = os.environ.get('FAIRSPACE_URL')
+
+def mkdir(path: str, workspace_iri: str=None):
+    # Create directory
+    headers = {
+        'Authorization': auth()
+    }
+    if workspace is not None:
+        headers['Owner'] = workspace_iri
+    req = Request('MKCOL', f'{server_url}/api/webdav/{path}/', headers, cookies=self.session().cookies)
+    response: Response = Session().send(req.prepare())
+    if not response.ok:
+        raise Exception(f"Error creating directory '{path}': {response.status_code} {response.reason}")
+----
+====
+
+.Example create collection or directory (curl)
+[%collapsible]
+====
+[source, bash]
+----
+# Create a new collection, owned by workspace WORKSPACE_IRI
+NEW_COLLECTION=New collection
+WORKSPACE_IRI=http://fairspace.ci.fairway.app/iri/workspace-iri
+curl -i -H "Authorization: ${AUTH_HEADER}" -X MKCOL -H "Owner: ${WORKSPACE_IRI}" "${FAIRSPACE_URL}/api/webdav/${NEW_COLLECTION}"
+# Create a new directory in the newly created collection
+curl -i -H "Authorization: ${AUTH_HEADER}" -X MKCOL "${FAIRSPACE_URL}/api/webdav/${NEW_COLLECTION}/Test directory"
+----
+====
+
+===== Upload files
+
+|===
+2+| ``POST /api/webdav/{path}/`` +
+  ``action=upload_files``
+
+2+| _Request data_:
+| ``action``
+| ``upload_files``
+| ``files``
+| Send files with the target file names as keys, see the examples below.
+|===
+
+.Example uploading files (Python)
+[%collapsible]
+====
+[source, python]
+----
+import logging
+import os
+from requests import Response, Session
+
+log = logging.getLogger()
+
+server_url = os.environ.get('FAIRSPACE_URL')
+
+def upload_files(path: str, files: Dict[str, any]):
+    # Upload files
+    response: Response = Session().post(f'{server_url}/api/webdav/{path}/',
+            headers={'Authorization': auth()},
+            data={'action': 'upload_files'},
+            files=files)
+    if not response.ok:
+        raise Exception(f"Error uploading files into '{path}': {response.status_code} {response.reason}")
+----
+====
+
+.Example uploading files (curl)
+[%collapsible]
+====
+[source, bash]
+----
+# Upload files 'coffee.jpg' and 'coffee 2.jpg' to a collection
+path="new collection"
+curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F 'action=upload_files' -F 'coffee.jpg=@coffee.jpg' -F 'coffee 2.jpg=@coffee 2.jpg'"${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
+===== Copy and move a directory or file
+
+|===
+2+| ``COPY /api/webdav/{path}/``
+
+2+| Copy a directory or file.
+2+| _Request headers_:
+| ``Destination``
+| The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
+|===
+
+.Example copy path (curl)
+[%collapsible]
+====
+[source, bash]
+----
+# Copy 'Examples/Test dir/test 1.txt' to 'Examples/Test dir/test 2.txt'
+path="Examples/Test dir/test 1.txt"
+target="/api/webdav/Examples/Test%20dir/test%202.txt"
+curl -i -H "Authorization: ${AUTH_HEADER}" -X COPY -H "Destination: ${target}" "${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
+|===
+2+| ``MOVE /api/webdav/{path}/``
+
+2+| Move or rename a directory or file
+2+| _Request headers_:
+| ``Destination``
+| The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
+|===
+
+.Example copy path (curl)
+[%collapsible]
+====
+[source, bash]
+----
+# Move 'Examples/Test dir/test 1.txt' to 'Examples/Test dir/test 2.txt'
+path="Examples/Test dir/test 1.txt"
+target="/api/webdav/Examples/Test%20dir/test%202.txt"
+curl -i -H "Authorization: ${AUTH_HEADER}" -X MOVE -H "Destination: ${target}" "${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
+===== Undelete a directory or file
+
+|===
+2+| ``POST /api/webdav/{path}/`` +
+    ``action=undelete``
+
+2+| Undelete a directory or file
+2+| _Request headers_:
+| ``Show-deleted``
+| ``on``
+2+| _Request data_:
+| ``action``
+| ``undelete``
+|===
+
+.Example undelete path (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=undelete" "${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
+===== Revert to a file version
+
+|===
+2+| ``POST /api/webdav/{path}/`` +
+``action=revert``
+
+2+| Restore a previous file version
+2+| _Request data_:
+| ``action``
+| ``revert``
+| ``version``
+| The version number to restore.
+|===
+
+.Example revert file version (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=revert" -F "version=${version}" "${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
+===== Other collection actions
+
+On collections, a number of actions is available.
+These are not documented here in detail, but can be used from the user interface instead.
+
+[cols="1,1"]
+|===
+| Action
+
+| Description
+
+| ``set_access_mode``
+| Change the access mode of a collection.
+| ``set_status``
+| Change the status of a collection.
+| ``set_permission``
+| Change the permission of the specified user or workspace on a collection.
+| ``set_owned_by``
+| Transfer ownership of a collection to another workspace.
+| ``unpublish``
+| Unpublish a published collection.
+|===
 
 
 ==== SPARQL
@@ -422,31 +911,23 @@ file:coll1\/coffee.jpg
 ====
 [source, python]
 ----
-import base64
 import logging
 import os
 from requests import Response, Session
-import sys
 
 log = logging.getLogger()
 
 server_url = os.environ.get('FAIRSPACE_URL')
-username = os.environ.get('USERNAME')
-password = os.environ.get('PASSWORD')
-auth = base64.b64encode(f'{username}:{password}'.encode()).decode()
 
-session = Session()
 with open('testdata.ttl') as testdata:
-    response: Response = session.put(f"{server_url}/api/metadata/",
+    response: Response = Session().put(f"{server_url}/api/metadata/",
         data=testdata.read(),
         headers={
-            'Authorization': f'Basic {auth}',
+            'Authorization': auth(),
             'Content-type': 'text/turtle'
         })
     if not response.ok:
-        log.error('Error uploading metadata!')
-        log.error(f'{response.status_code} {response.reason}')
-        sys.exit(1)
+        raise Exception(f"Error uploading metadata: {response.status_code} {response.reason}")
 ----
 ====
 
@@ -505,6 +986,7 @@ curl -G -H "Accept: application/ld+json" \
 3+| Add metadata. Existing metadata is left untouched.
     The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
     otherwise ``400`` is returned.
+  Only available for users with _Add shared metadata_ role.
 3+| _Request body:_
 3+| Serialised RDF triples.
 3+| _Response:_
@@ -541,6 +1023,8 @@ curl -X PUT -H "Content-type: application/ld+json" -d \
     Any existing metadata for a given subject/predicate combination will be overwritten with the provided values.
     The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
     otherwise ``400`` is returned.
+  Only available for users with _Add shared metadata_ role.
+
 3+| _Request body:_
 3+| Serialised RDF triples.
 3+| _Response:_
@@ -577,6 +1061,8 @@ curl -X PATCH -H "Content-type: application/ld+json" -d \
 If a request body is provided, the triples specified in the body will be deleted.
 Otherwise, the subject specified in the subject parameter will be marked as deleted.
 Please note that the subject will still exist in the database.
+Only available for users with _Add shared metadata_ role.
+
 3+| _Parameters:_
 | ``subject``
 | string
@@ -590,7 +1076,7 @@ Please note that the subject will still exist in the database.
 ====
 [source, bash]
 ----
-curl -X DELETE -H "Content-Type: application/ld+json" -d
+curl -X DELETE -H "Content-Type: application/ld+json" -d \
 '{
   "@graph" : [ {
     "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
