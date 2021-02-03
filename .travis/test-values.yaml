@@ -37,7 +37,7 @@ saturn:
       cpu: 500m
       memory: 512Mi
   image:
-    tag: 0.7.5
+    tag: 0.7.6
     pullPolicy: Always
   customStorageClass:
       create: true
