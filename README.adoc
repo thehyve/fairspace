@@ -201,7 +201,7 @@ or for synchronisation with other systems.
 All API endpoints require authentication via an authorisation header.
 To enable WebDAV clients to connect to Fairspace, also so-called _Basic authentication_ is supported.
 
-For secure authentication, it is strongly advised to use the _OpenID Connect (OICD) / OAuth2_ workflow.
+For secure authentication, it is strongly advised to use the _OpenID Connect (OIDC) / OAuth2_ workflow.
 The user interface application also uses this workflow.
 
 When using the APIs in automated scripts, ensure that an account is used with only the required
@@ -214,7 +214,7 @@ do not use a service account or system account for the action directly, but obta
 by using the https://www.keycloak.org/docs/latest/securing_apps/#impersonation[impersonation] feature of Keycloak.
 That way the audit logging still captures which user did what.
 
-===== OpenID Connect (OICD) / OAuth2 workflow
+===== OpenID Connect (OIDC) / OAuth2 workflow
 
 Fairspace supports OpenID Connect authentication via Keycloak.
 The workflow for API access is roughly as follows.
@@ -706,7 +706,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X COPY -H "Destination: ${target}" "
 | The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
 |===
 
-.Example copy path (curl)
+.Example move path (curl)
 [%collapsible]
 ====
 [source, bash]
