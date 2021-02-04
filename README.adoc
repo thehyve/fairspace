@@ -2035,8 +2035,13 @@ https://storage.googleapis.com/fairspace-helm.
 ----
 +
 Use ``fairspacecicluster`` as cluster id for the CI environment.
-Ensure that your Google account has access to the ``fairspace-207108`` GCP project
-and log in using
+Ensure that your Google account has access to the ``fairspace-207108`` GCP project and set the project property
++
+[source, bash]
+----
+  gcloud config set project fairspace-207108
+----
+Log in using
 +
 [source, bash]
 ----
@@ -2073,6 +2078,8 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ----
 # Update repo
 ~/bin/helm/helm repo update
+# List available fairspace chart versions
+~/bin/helm/helm fetch fairspace/fairspace --versions
 # Fetch the fairspace chart
 ~/bin/helm/helm fetch fairspace/fairspace --version 0.7.5
 ----
