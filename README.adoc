@@ -1966,13 +1966,17 @@ Requires:
 To run the development version, checkout this repository,
 navigate to ``projects/mercury`` and run
 
-[source, bash]
+[source, shell]
 ----
 yarn dev
 ----
 
-If on MacOS, configure docker logging.... TODO
-As env variable, or in ``.env`` file: ``DOCKER_LOGGING_DRIVER=json-file``.
+On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
+Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
+[source, shell]
+----
+DOCKER_LOGGING_DRIVER=json-file
+----
 
 This will start a Keycloak instance for authentication at port ``5100``,
 the backend application named Saturn at port ``8080`` and the
@@ -2013,7 +2017,7 @@ https://storage.googleapis.com/fairspace-helm.
 * Download ``helm 2.14.3`` from from https://github.com/helm/helm/releases/tag/v2.14.3
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
-[source, bash]
+[source, shell]
 ----
 ~/bin/helm/helm version
 ----
@@ -2022,7 +2026,7 @@ https://storage.googleapis.com/fairspace-helm.
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
-[source, bash]
+[source, shell]
 ----
   gcloud container clusters get-credentials <cluster id> --zone europe-west1-b
 ----
@@ -2030,19 +2034,19 @@ https://storage.googleapis.com/fairspace-helm.
 Use ``fairspacecicluster`` as cluster id for the CI environment.
 Ensure that your Google account has access to the ``fairspace-207108`` GCP project and set the project property
 +
-[source, bash]
+[source, shell]
 ----
   gcloud config set project fairspace-207108
 ----
 Log in using
 +
-[source, bash]
+[source, shell]
 ----
   gcloud auth login
 ----
 * Check if all tools are correctly installed:
 +
-[source, bash]
+[source, shell]
 ----
 # List available clusters
 gcloud container clusters list
@@ -2053,7 +2057,7 @@ kubectl get ns
 ----
 
 ===== Initialise helm and add fairspace repository
-[source, bash]
+[source, shell]
 ----
 # Initialise helm
 ~/bin/helm/helm init --client-only --stable-repo-url https://charts.helm.sh/stable
@@ -2067,7 +2071,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ----
 
 ===== Fetch chart
-[source, bash]
+[source, shell]
 ----
 # Update repo
 ~/bin/helm/helm repo update
@@ -2079,13 +2083,13 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 
 ===== Deploy Fairspace
 Create a new Kubernetes namespace:
-[source, bash]
+[source, shell]
 ----
 kubectl create namespace fairspace-new
 ----
 Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
-[source, bash]
+[source, shell]
 ----
 ~/bin/helm/helm install fairspace/fairspace --version 0.7.5 --name fairspace-new --namespace=fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
@@ -2095,7 +2099,7 @@ value with ``--set-file``.
 
 ===== Update an existing deployment
 To update a deployment using a new chart:
-[source, bash]
+[source, shell]
 ----
 ~/bin/helm/helm upgrade fairspace-new fairspace-0.7.5.tgz
 ----
@@ -2105,7 +2109,7 @@ and pass files with ``--set-file`` as for ``helm install``.
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm del``.
 :warning: Be careful, you may lose data!
-[source, bash]
+[source, shell]
 ----
 ~/bin/helm/helm del --purge fairspace-test
 ----
