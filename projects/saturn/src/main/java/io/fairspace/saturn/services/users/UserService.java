@@ -9,6 +9,7 @@ import io.fairspace.saturn.rdf.dao.PersistentEntity;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.*;
 import org.apache.jena.graph.Node;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -22,13 +23,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.*;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.System.getenv;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 public class UserService {
@@ -104,9 +105,13 @@ public class UserService {
                             updated.add(user);
                         }
 
-                        var name = (isNotEmpty(ku.getFirstName()) || isNotEmpty(ku.getLastName()))
-                                ? (ku.getFirstName() + " " + ku.getLastName()).trim()
-                                : ku.getUsername();
+                        var name = Stream.of(ku.getFirstName(), ku.getLastName())
+                                .filter(StringUtils::isNotEmpty)
+                                .map(String::trim)
+                                .collect(Collectors.joining(" "));
+                        if (name.isEmpty()) {
+                            name = ku.getUsername();
+                        }
 
                         if (!Objects.equals(user.getName(), name)
                                 || !Objects.equals(user.getEmail(), ku.getEmail())
