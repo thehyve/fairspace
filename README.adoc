@@ -1892,7 +1892,7 @@ using a controlled vocabulary type _AssayType_ with the assay types as values.
 ==== Controlled vocabularies
 
 For controlled vocabulary types, e.g., _Gender_ and _Species_ in the example, you should insert the allowed values in the database by uploading
-a taxonomies file using the <<Metadata upload API>>.
+a taxonomies file using the <<RDF metadata>> API.
 An example taxonomy is in link:projects/saturn/taxonomies.ttl[taxonomies.ttl].
 
 It is preferred to use existing standard taxonomies and labels.
