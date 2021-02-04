@@ -245,12 +245,12 @@ import requests
 
 log = logging.getLogger()
 
-def fetch_access_token(keycloak_url: str,
-                       realm: str,
-                       client_id: str,
-                       client_secret: str,
-                       username: str,
-                       password: str) -> str:
+def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
+                       realm: str = os.environ.get('KEYCLOAK_REALM'),
+                       client_id: str = os.environ.get('KEYCLOAK_CLIENT_ID'),
+                       client_secret: str = os.environ.get('KEYCLOAK_CLIENT_SECRET'),
+                       username: str = os.environ.get('USERNAME'),
+                       password: str = os.environ.get('PASSWORD')) -> str:
     """
     Obtain access token from Keycloak
     :return: the access token as string.
@@ -278,14 +278,7 @@ def fetch_access_token(keycloak_url: str,
     return token
 
 def auth():
-    keycloak_url = os.environ.get('KEYCLOAK_URL')
-    realm = os.environ.get('KEYCLOAK_REALM')
-    client_id = os.environ.get('KEYCLOAK_CLIENT_ID')
-    client_secret = os.environ.get('KEYCLOAK_CLIENT_SECRET')
-    username = os.environ.get('USERNAME')
-    password = os.environ.get('PASSWORD')
-    token = fetch_access_token(keycloak_url, realm, client_id, client_secret, username, password)
-    return f'Bearer: {token}'
+    return f'Bearer: {fetch_access_token()}'
 ----
 ====
 
