@@ -173,7 +173,7 @@ Path,Is about subject,Type of analysis,Description,Keywords
 ./,,,Directory with samples,sample|lab,
 test.txt,Subject 1,https://institut-curie.org/analysis#O6-12,,
 ----
-This specified the table:
+This specifies the table:
 [%header,format=csv]
 |===
 Path,Is about subject,Type of analysis,Description,Keywords
@@ -603,7 +603,7 @@ def mkdir(path: str, workspace_iri: str=None):
     headers = {
         'Authorization': auth()
     }
-    if workspace is not None:
+    if workspace_iri is not None:
         headers['Owner'] = workspace_iri
     req = Request('MKCOL', f'{server_url}/api/webdav/{path}/', headers, cookies=self.session().cookies)
     response: Response = Session().send(req.prepare())
