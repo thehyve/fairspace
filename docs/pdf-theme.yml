@@ -1,0 +1,4 @@
+extends: default
+
+code:
+  font-size: 9

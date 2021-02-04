@@ -2,8 +2,9 @@
 
 PROJECT_FILES=(
   "projects/saturn/src/main/resources/system-vocabulary.ttl"
-  "projects/saturn/vocabulary.ttl"
   "projects/saturn/taxonomies.ttl"
+  "projects/saturn/views.yaml"
+  "projects/saturn/vocabulary.ttl"
 )
 
 
@@ -16,7 +17,7 @@ for f in ${PROJECT_FILES[*]}; do
   mkdir -p "build/$(dirname "$f")"
   cp "../$f" "build/"$(dirname "$f")""
 done
-asciidoctor-pdf -o build/Fairspace.pdf ../README.adoc || {
+asciidoctor-pdf -a pdf-theme=pdf-theme.yml -o build/Fairspace.pdf ../README.adoc || {
   echo "Error building PDF"
   popd
   exit 1
