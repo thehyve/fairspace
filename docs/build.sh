@@ -17,7 +17,7 @@ for f in ${PROJECT_FILES[*]}; do
   mkdir -p "build/$(dirname "$f")"
   cp "../$f" "build/"$(dirname "$f")""
 done
-asciidoctor-pdf -o build/Fairspace.pdf ../README.adoc || {
+asciidoctor-pdf -a pdf-theme=pdf-theme.yml -o build/Fairspace.pdf ../README.adoc || {
   echo "Error building PDF"
   popd
   exit 1
