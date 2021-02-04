@@ -26,8 +26,10 @@ public class ViewService {
             SELECT ?value ?label
             WHERE {
                ?value a ?type ; rdfs:label ?label .
-               FILTER EXISTS { ?subject ?predicate ?value }
-               FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
+               FILTER EXISTS {
+                  ?subject ?predicate ?value
+                  FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
+               }
                FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
             } ORDER BY ?label
             """, FS.NS));
