@@ -177,7 +177,7 @@ This specifies the table:
 [%header,format=csv]
 |===
 Path,Is about subject,Type of analysis,Description,Keywords
-./,,,Directory with samples,sample|lab,
+./,,,Directory with samples,sample|lab
 test.txt,Subject 1,https://institut-curie.org/analysis#O6-12,,
 |===
 ====
@@ -982,8 +982,6 @@ curl -G -H "Accept: application/ld+json" \
   Only available for users with _Add shared metadata_ role.
 3+| _Request body:_
 3+| Serialised RDF triples.
-3+| _Response:_
-3+| Response contains the workspace name and newly assigned IRI.
 |===
 
 .Example of adding metadata using curl
@@ -1020,8 +1018,6 @@ curl -X PUT -H "Content-type: application/ld+json" -d \
 
 3+| _Request body:_
 3+| Serialised RDF triples.
-3+| _Response:_
-3+| Response contains the workspace name and newly assigned IRI.
 |===
 
 .Example of updating metadata using curl
