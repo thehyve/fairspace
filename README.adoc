@@ -41,9 +41,9 @@ The data model is specified using the {SHACL}[Shapes Constraint Language (SHACL)
 see the section on <<Data model and view configuration>>.
 Descriptive metadata entities (e.g., subjects, projects, samples) should be added to the database by a
 careful process, ensuring that duplicates and inconsistencies are avoided and
-all entities have proper unique identifiers.
+that all entities have proper unique identifiers.
 The application provides overviews of the available metadata entities.
-In the collection browser, researchers can link their collections and file to these entities
+In the collection browser, researchers can link their collections and files to these entities
 or add textual descriptions and key words.
 
 
@@ -56,14 +56,14 @@ and *share* the data with collaborators.
 and link the data to associated metadata entities (subjects, samples, projects, etc.).
 This helps researchers find their own data and make it *findable* for others,
 contributing to implementation of the {FAIR}[FAIR principles].
-* Fairspace ensures that all metadata entities have a unique identifier and validates
+* Fairspace ensures that all metadata entities have a unique identifier and checks
 metadata consistency and validity upon data entry.
-* Fairspace allows organisations to use *customise* the configured data model,
+* Fairspace allows organisations to *customise* the configured data model,
 by specifying custom entity types and constraints.
 This enables the adoption of community standards for metadata relevant for the research domain,
 which contributes to the *reusability* of the data.
 * Fairspace uses the {RDF}[Resource Description Framework (RDF)] and {WebDAV}[WebDAV] standards for data exchange,
-and stimulates the uses of standard vocabularies,
+and stimulates the use of standard vocabularies,
 contributing to *interoperability* of data.
 ****
 
@@ -107,9 +107,17 @@ and see its metadata, double click to navigate into directories or
 open a file.
 
 Access is managed on collection level.
-Users with at least write access to a collection can upload files or directories,
+Users with at least _write_ access to a collection can upload files or directories,
 rename or delete files, restore old file versions,
 and edit the associated metadata.
+
+Users with _manage_ access can share collections with other users or workspaces,
+and change the default access mode for workspace members.
+Collection managers can also change the status of the collection
+(_Active_, _Archived_ or _Closed_), change the view mode
+(_Restricted_, _Metadata published_ or _Data published_ -- only available in the _Archived_ status),
+delete the collection,
+or transfer ownership of the collection to another workspace.
 
 image:docs/images/screenshots/Collection browser.png[Collection browser]
 
