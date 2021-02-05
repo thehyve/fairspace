@@ -794,39 +794,73 @@ The {SPARQL}[SPARQL] API is a standard API for querying RDF databases.
 This endpoint is read-only and can be used for advanced search, analytics, data extraction, etc.
 
 |===
-3+| ``POST /api/rdf/query``
+| ``POST /api/rdf/query``
 
-3+| SPARQL query
-3+| _Parameters:_
-| ``query``
-| SPARQL
-| Query.
-| ``aggregate``
-| boolean
-| Include aggregates.
+| Execute SPARQL query
+| _Request body:_
+| The SPARQL query.
 |===
 
-.Example SPARQL query using curl
+.Example SPARQL query (Python)
 [%collapsible]
 ====
-[source, bash]
+Query for the first 500 samples.
+[source, python]
 ----
-curl -X POST -H 'Content-Type: application/sparql-query' -H 'Accept: application/json' \
--d '{
-  "query": "
+import logging
+import os
+from requests import Response, Session
+
+log = logging.getLogger()
+
+server_url = os.environ.get('FAIRSPACE_URL')
+
+def query_sparql(query: str):
+    headers = {
+        'Authorization': auth(),
+        'Content-Type': 'application/sparql-query',
+        'Accept': 'application/json'
+    }
+    response: Response = Session().post(f"{server_url}/api/rdf/query", data=query, headers=headers)
+    if not response.ok:
+        raise Exception(f'Error querying metadata: {response.status_code} {response.reason}')
+    return response.json()
+
+query_sparql("""
     PREFIX example: <https://example.com/ontology#>
-    PREFIX fs:    <https://fairspace.nl/ontology#>
+    PREFIX fs: <https://fairspace.nl/ontology#>
 
     SELECT DISTINCT ?sample
     WHERE {
-      ?sample a example:BiologicalSample .
-      FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+        ?sample a example:BiologicalSample .
+        FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
     }
     # ORDER BY ?sample
-    LIMIT 500",
-  "aggregate": True
-}' \
-"http://localhost:8080/api/rdf/query"
+    LIMIT 500
+""")
+----
+====
+
+.Example SPARQL query (curl)
+[%collapsible]
+====
+Query for the first 500 samples.
+[source, bash]
+----
+curl -X POST -H "Authorization: ${AUTH_HEADER}" -H 'Content-Type: application/sparql-query' -H 'Accept: application/json' \
+-d "
+    PREFIX example: <https://example.com/ontology#>
+    PREFIX fs: <https://fairspace.nl/ontology#>
+
+    SELECT DISTINCT ?sample
+    WHERE {
+        ?sample a example:BiologicalSample .
+        FILTER NOT EXISTS { ?sample fs:dateDeleted ?anyDateDeleted }
+    }
+    # ORDER BY ?sample
+    LIMIT 500
+" \
+"${FAIRSPACE_URL}/api/rdf/query"
 ----
 ====
 
@@ -2024,7 +2058,7 @@ https://storage.googleapis.com/fairspace-helm.
 +
 [source, shell]
 ----
-  gcloud container clusters get-credentials <cluster id> --zone europe-west1-b
+gcloud container clusters get-credentials <cluster id> --zone europe-west1-b
 ----
 +
 Use ``fairspacecicluster`` as cluster id for the CI environment.
@@ -2032,13 +2066,13 @@ Ensure that your Google account has access to the ``fairspace-207108`` GCP proje
 +
 [source, shell]
 ----
-  gcloud config set project fairspace-207108
+gcloud config set project fairspace-207108
 ----
 Log in using
 +
 [source, shell]
 ----
-  gcloud auth login
+gcloud auth login
 ----
 * Check if all tools are correctly installed:
 +
@@ -2074,7 +2108,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 # List available fairspace chart versions
 ~/bin/helm/helm fetch fairspace/fairspace --versions
 # Fetch the fairspace chart
-~/bin/helm/helm fetch fairspace/fairspace --version 0.7.5
+~/bin/helm/helm fetch fairspace/fairspace --version 0.7.8
 ----
 
 ===== Deploy Fairspace
@@ -2087,7 +2121,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace/fairspace --version 0.7.5 --name fairspace-new --namespace=fairspace-new \
+~/bin/helm/helm install fairspace/fairspace --version 0.7.8 --name fairspace-new --namespace=fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2097,7 +2131,7 @@ value with ``--set-file``.
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.5.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.8.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
