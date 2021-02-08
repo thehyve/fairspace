@@ -257,8 +257,8 @@ def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
                        realm: str = os.environ.get('KEYCLOAK_REALM'),
                        client_id: str = os.environ.get('KEYCLOAK_CLIENT_ID'),
                        client_secret: str = os.environ.get('KEYCLOAK_CLIENT_SECRET'),
-                       username: str = os.environ.get('USERNAME'),
-                       password: str = os.environ.get('PASSWORD')) -> str:
+                       username: str = os.environ.get('KEYCLOAK_USERNAME'),
+                       password: str = os.environ.get('KEYCLOAK_PASSWORD')) -> str:
     """
     Obtain access token from Keycloak
     :return: the access token as string.
@@ -300,8 +300,8 @@ fetch_access_token() {
   curl -s \
     -d "client_id=${KEYCLOAK_CLIENT_ID}" \
     -d "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-    -d "username=${USERNAME}" \
-    -d "password=${PASSWORD}" \
+    -d "username=${KEYCLOAK_USERNAME}" \
+    -d "password=${KEYCLOAK_PASSWORD}" \
     -d 'grant_type=password' \
     "${KEYCLOAK_SERVER_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
 }
@@ -329,8 +329,8 @@ import base64
 import os
 
 def auth():
-    username = os.environ.get('USERNAME')
-    password = os.environ.get('PASSWORD')
+    username = os.environ.get('KEYCLOAK_USERNAME')
+    password = os.environ.get('KEYCLOAK_PASSWORD')
     return f"Basic {base64.b64encode(f'{username}:{password}'.encode()).decode()}"
 ----
 ====
@@ -340,7 +340,7 @@ def auth():
 ====
 [source, bash]
 ----
-AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
+AUTH_HEADER="Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLOAK_PASSWORD}" | base64)"
 ----
 ====
 
@@ -376,7 +376,7 @@ For examples using curl, an authorisation header needs to be passed using the ``
 For Basic authentication:
 [source, bash]
 ----
-AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
+AUTH_HEADER="Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLOAK_PASSWORD}" | base64)"
 curl -i -H "Authorization: ${AUTH_HEADER}" "${FAIRSPACE_URL}/api/users/current"
 ----
 
@@ -971,7 +971,7 @@ with open('testdata.ttl') as testdata:
 ====
 [source, bash]
 ----
-curl -v -X PUT -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" \
+curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLOAK_PASSWORD}" | base64)" \
   -H "Content-type: text/turtle" --data @testdata.ttl "${FAIRSPACE_URL}/api/metadata/"
 ----
 ====
@@ -2146,7 +2146,7 @@ and pass files with ``--set-file`` as for ``helm install``.
 
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm del``.
-:warning: Be careful, you may lose data!
+⚠ Be careful, you may lose data!
 [source, shell]
 ----
 ~/bin/helm/helm del --purge fairspace-test
