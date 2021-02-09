@@ -4,9 +4,10 @@
 :showtitle!:
 :url-repo: https://github.com/fairspace/workspace
 :source-highlighter: rouge
+:icons: font
 :toc: macro
 :toclevels: 3
-:toc-title: Table of contents
+:toc-title: Fairspace
 
 :Jena: https://jena.apache.org/
 :RDF: https://en.wikipedia.org/wiki/Resource_Description_Framework
@@ -966,7 +967,7 @@ with open('testdata.ttl') as testdata:
 ----
 ====
 
-.Example uploading metadata file using curl.
+.Example uploading metadata file (curl).
 [%collapsible]
 ====
 [source, bash]
@@ -1000,7 +1001,7 @@ curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLO
 3+| Returns serialised triples matching the query parameters.
 |===
 
-.Example of retrieving metadata using curl
+.Example of retrieving metadata (curl)
 [%collapsible]
 ====
 Request metadata for the triple with subject 'a', predicate 'b' and object 'c'.
@@ -1026,7 +1027,7 @@ curl -G -H "Accept: application/ld+json" \
 3+| Serialised RDF triples.
 |===
 
-.Example of adding metadata using curl
+.Example of adding metadata (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1062,7 +1063,7 @@ curl -X PUT -H "Content-type: application/ld+json" -d \
 3+| Serialised RDF triples.
 |===
 
-.Example of updating metadata using curl
+.Example of updating metadata (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1102,7 +1103,7 @@ Only available for users with _Add shared metadata_ role.
 3+| Serialised RDF triples. (_Optional_)
 |===
 
-.Example of deleting metadata using curl
+.Example of deleting metadata (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1136,7 +1137,7 @@ Metadata views endpoint used for metadata-based search.
 | List all views with available columns per each view.
 |===
 
-.Example using curl
+.Example list view (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1164,7 +1165,7 @@ Each filter has to contain a "field" property, matching the name of a facet, and
 | Page size
 |===
 
-.Example fetching page of view rows using curl
+.Example fetching page of view rows (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1198,7 +1199,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 Each filter has to contain a "field" property, matching the name of a facet, and list of values to filter on.
 |===
 
-.Example counting view rows using curl
+.Example counting view rows (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1223,7 +1224,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 | List all facets with available values per each facet.
 |===
 
-.Example retrieving facets with values using curl
+.Example retrieving facets with values (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1258,7 +1259,7 @@ Operations on workspace entities.
 | If a current user is a workspace manager.
 |===
 
-.Example of listing available workspaces using curl
+.Example of listing available workspaces (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1279,7 +1280,7 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 3+| Response contains the workspace name and newly assigned IRI.
 |===
 
-.Example of adding a workspace using curl
+.Example of adding a workspace (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1304,7 +1305,7 @@ curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http:
 | Workspace description in markdown format.
 |===
 
-.Example of updating a workspace using curl
+.Example of updating a workspace (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1329,7 +1330,7 @@ curl -X PATCH -H "Accept: application/json" -d \
 | Workspace IRI (URL-encoded).
 |===
 
-.Example of deleting a workspace using curl
+.Example of deleting a workspace (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1352,7 +1353,7 @@ curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http:/
 3+| Response contains list of workspace users with their workspace roles.
 |===
 
-.Example of listing workspace users using curl
+.Example of listing workspace users (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1373,7 +1374,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?w
 3+| Response contains list of workspace users with their updated workspace roles.
 |===
 
-.Example of updating workspace users using curl
+.Example of updating workspace users (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1394,7 +1395,7 @@ curl -H 'Accept: application/json' --data-urlencode "workspace=http://fairspace.
 if a user is an administrator, super-administrator or can view public metadata, view public data or add shared metadata.
 |===
 
-.Example listing users using curl
+.Example listing users (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1417,7 +1418,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/users/'
 The value determines whether the user has the role or not.
 |===
 
-.Example updating user roles using curl
+.Example updating user roles (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1442,7 +1443,7 @@ if the user is an administrator, super-administrator or can view public metadata
 view public data or add shared metadata.
 |===
 
-.Example getting current user using curl
+.Example getting current user (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1457,7 +1458,7 @@ curl -H "Accept: application/json" "http://localhost:8080/api/users/current"
 | logout the current user.
 |===
 
-.Example logging out using curl
+.Example logging out (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1481,7 +1482,7 @@ It is stored in {SHACL}[SHACL] format.
 | Retrieve a representation of the vocabulary.
 |===
 
-.Example fetching the vocabulary in turtle format using curl
+.Example fetching the vocabulary in turtle format (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1489,7 +1490,7 @@ It is stored in {SHACL}[SHACL] format.
 curl -H 'Accept: text/turtle' 'http://localhost:8080/api/vocabulary/'
 ----
 ====
-.Example fetching the vocabulary in json-ld format using curl
+.Example fetching the vocabulary in json-ld format (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1509,7 +1510,7 @@ curl -H 'Accept: application/json+ld' 'http://localhost:8080/api/vocabulary/'
 Response contains list of additional features that are currently available in the application,
 e.g., metadata editing in the user interface.
 
-.Example listing features using curl
+.Example listing features (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1529,7 +1530,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 Response contains list of external services linked to Fairspace,
 e.g. JupyterHub, cBioPortal, etc.
 
-.Example listing services using curl
+.Example listing services (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -2146,7 +2147,9 @@ and pass files with ``--set-file`` as for ``helm install``.
 
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm del``.
-⚠ Be careful, you may lose data!
+
+WARNING: Be careful, you may lose data!
+
 [source, shell]
 ----
 ~/bin/helm/helm del --purge fairspace-test
