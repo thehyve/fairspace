@@ -32,6 +32,7 @@ Object.freeze(Operations);
 export const FileOperations = ({
     isWritingEnabled,
     showDeleted,
+    isExternalStorage = false,
     openedPath,
     selectedPaths,
     clearSelection,
@@ -292,14 +293,16 @@ export const FileOperations = ({
                 )}
             </FileOperationsGroup>
             <FileOperationsGroup>
-                <IconButton
-                    aria-label="Copy"
-                    title="Copy"
-                    onClick={e => handleCopy(e)}
-                    disabled={noPathSelected || isDeletedItemSelected || busy}
-                >
-                    <ContentCopy />
-                </IconButton>
+                {!isExternalStorage && (
+                    <IconButton
+                        aria-label="Copy"
+                        title="Copy"
+                        onClick={e => handleCopy(e)}
+                        disabled={noPathSelected || isDeletedItemSelected || busy}
+                    >
+                        <ContentCopy />
+                    </IconButton>
+                )}
                 {isWritingEnabled && (
                     <>
                         <IconButton
@@ -324,22 +327,24 @@ export const FileOperations = ({
                 )}
             </FileOperationsGroup>
             <FileOperationsGroup>
-                <ProgressButton active={activeOperation === Operations.REVERT}>
-                    <ShowFileVersionsButton
-                        selectedFile={selectedItem}
-                        onRevert={handleRevert}
-                        disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
-                        isWritingEnabled={isWritingEnabled}
-                    >
-                        <IconButton
-                            aria-label="Show history"
-                            title="Show history"
+                {!isExternalStorage && (
+                    <ProgressButton active={activeOperation === Operations.REVERT}>
+                        <ShowFileVersionsButton
+                            selectedFile={selectedItem}
+                            onRevert={handleRevert}
                             disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                            isWritingEnabled={isWritingEnabled}
                         >
-                            <Restore />
-                        </IconButton>
-                    </ShowFileVersionsButton>
-                </ProgressButton>
+                            <IconButton
+                                aria-label="Show history"
+                                title="Show history"
+                                disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                            >
+                                <Restore />
+                            </IconButton>
+                        </ShowFileVersionsButton>
+                    </ProgressButton>
+                )}
             </FileOperationsGroup>
         </>
     );

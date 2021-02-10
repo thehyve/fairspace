@@ -10,6 +10,7 @@ import UserContext from "../users/UserContext";
 import UsersContext from "../users/UsersContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
+import {getDisplayName} from "../users/userUtils";
 
 export const CollectionBrowser = ({
     loading = false,
@@ -39,8 +40,8 @@ export const CollectionBrowser = ({
     const handleCancelAddCollection = () => setAddingNewCollection(false);
 
     const renderCollectionList = () => {
-        collections.forEach(col => {
-            col.creatorObj = users.find(u => u.iri === col.createdBy);
+        collections.forEach(collection => {
+            collection.creatorDisplayName = getDisplayName(users.find(u => u.iri === collection.createdBy));
         });
         return (
             <>

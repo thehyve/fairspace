@@ -12,6 +12,7 @@ import {UsersProvider} from "../users/UsersContext";
 import {FeaturesProvider} from "../common/contexts/FeaturesContext";
 import {MetadataViewProvider} from "../metadata/views/MetadataViewContext";
 import {MetadataViewFacetsProvider} from "../metadata/views/MetadataViewFacetsContext";
+import {ExternalStoragesProvider} from "../external-storage/ExternalStoragesContext";
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
@@ -25,15 +26,17 @@ const WorkspaceLayoutInner = () => {
                 <CollectionsProvider>
                     <ServicesProvider>
                         <FeaturesProvider>
-                            <MetadataViewFacetsProvider>
-                                <MetadataViewProvider>
-                                    <Layout
-                                        renderMenu={() => <MainMenu />}
-                                        renderMain={() => <WorkspaceRoutes />}
-                                        renderTopbar={() => <TopBar title={title} />}
-                                    />
-                                </MetadataViewProvider>
-                            </MetadataViewFacetsProvider>
+                            <ExternalStoragesProvider>
+                                <MetadataViewFacetsProvider>
+                                    <MetadataViewProvider>
+                                        <Layout
+                                            renderMenu={() => <MainMenu />}
+                                            renderMain={() => <WorkspaceRoutes />}
+                                            renderTopbar={() => <TopBar title={title} />}
+                                        />
+                                    </MetadataViewProvider>
+                                </MetadataViewFacetsProvider>
+                            </ExternalStoragesProvider>
                         </FeaturesProvider>
                     </ServicesProvider>
                 </CollectionsProvider>

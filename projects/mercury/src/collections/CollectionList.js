@@ -14,7 +14,6 @@ import {
 } from "@material-ui/core";
 
 import styles from './CollectionList.styles';
-import {getDisplayName} from "../users/userUtils";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
@@ -48,7 +47,7 @@ const baseColumns = {
         label: 'Created'
     },
     creator: {
-        valueExtractor: 'displayName',
+        valueExtractor: 'creatorDisplayName',
         label: 'Creator'
     }
 };
@@ -74,13 +73,7 @@ const CollectionList = ({
         delete columns.workspace;
     }
 
-    // Extend collections with displayName to avoid computing it when sorting
-    const collectionsWithDisplayName = collections.map(collection => ({
-        ...collection,
-        displayName: getDisplayName(collection.creatorObj)
-    }));
-
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collectionsWithDisplayName, allColumns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collections, allColumns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!collections || collections.length === 0) {
@@ -172,7 +165,7 @@ const CollectionList = ({
                                         {formatDateTime(collection.dateCreated)}
                                     </TableCell>
                                     <TableCell>
-                                        {getDisplayName(collection.creatorObj)}
+                                        {collection.creatorDisplayName}
                                     </TableCell>
                                     {showDeleted && (
                                         <TableCell>
