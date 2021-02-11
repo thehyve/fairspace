@@ -18,6 +18,7 @@ import org.apache.jena.query.text.es.ESSettings;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
+import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -45,6 +46,9 @@ public class Config {
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
+
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    public List<Storage> storages = new LinkedList<>();
 
     public Search search = new Search();
 
@@ -87,6 +91,12 @@ public class Config {
     public static class Search {
         public long pageRequestTimeout = 10_000;
         public long countRequestTimeout = 100_1000;
+    }
+
+    public static class Storage {
+        @NotBlank public String name;
+        @NotBlank public String label;
+        @NotBlank public String url;
     }
 
     @Override

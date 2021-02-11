@@ -107,6 +107,7 @@ fairspace:
 
   features:
   services:
+  storages:
 
 # Generic settings for tracing
 tracing:

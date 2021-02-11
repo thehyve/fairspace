@@ -1530,6 +1530,25 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/services/'
 ----
 ====
 
+===== External storages
+
+|===
+| ``GET /api/storages/``
+
+| List linked data storages.
+|===
+
+Response contains list of external data storages linked to Fairspace.
+
+.Example listing external storages using curl
+[%collapsible]
+====
+[source, bash]
+----
+curl -H 'Accept: application/json' 'http://localhost:8080/api/storages/'
+----
+====
+
 
 
 

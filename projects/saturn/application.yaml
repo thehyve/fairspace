@@ -63,6 +63,7 @@ services:
   "test username": http://google.com?q=${username}
 features:
 #  - MetadataEditing
+storages:
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
