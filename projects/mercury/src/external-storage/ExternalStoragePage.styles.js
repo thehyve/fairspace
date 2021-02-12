@@ -11,10 +11,6 @@ const styles = () => ({
     },
     sidePanel: {
         width: consts.SIDE_PANEL_WIDTH
-    },
-    endIcon: {
-        position: 'absolute',
-        right: '1rem'
     }
 });
 

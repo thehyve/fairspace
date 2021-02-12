@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {withRouter} from "react-router-dom";
 import {withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {useExternalStorage} from "./UseExternalStorage";
@@ -21,13 +22,13 @@ const styles = () => ({
 });
 
 export const ExternalStorageBrowser = ({
-    loading = false,
-    error = false,
-    storage = {},
-    files = [],
-    fileActions = [],
-    selection = {},
-    setBreadcrumbSegments = () => {},
+    loading,
+    error,
+    storage,
+    files,
+    fileActions,
+    selection,
+    setBreadcrumbSegments,
     openedPath,
     history,
     classes
@@ -35,7 +36,7 @@ export const ExternalStorageBrowser = ({
     const pathSegments = splitPathIntoArray(openedPath);
     const breadcrumbSegments = pathSegments.map((segment, idx) => ({
         label: segment,
-        href: getExternalStoragePathPrefix(storage)
+        href: getExternalStoragePathPrefix(storage.name)
             + consts.PATH_SEPARATOR
             + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
     }));
@@ -86,6 +87,30 @@ export const ExternalStorageBrowser = ({
             </div>
         </div>
     );
+};
+
+ExternalStorageBrowser.propTypes = {
+    loading: PropTypes.bool,
+    error: PropTypes.object,
+    storage: PropTypes.object,
+    files: PropTypes.array,
+    fileActions: PropTypes.object,
+    selection: PropTypes.object,
+    setBreadcrumbSegments: PropTypes.func,
+    openedPath: PropTypes.string,
+    history: PropTypes.object,
+    classes: PropTypes.object
+};
+
+ExternalStorageBrowser.defaultProps = {
+    loading: false,
+    error: undefined,
+    storage: {},
+    files: [],
+    fileActions: {},
+    selection: {},
+    setBreadcrumbSegments: () => {},
+    classes: {}
 };
 
 const ContextualExternalStorageBrowser = (props) => {

@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
+import PropTypes from "prop-types";
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from './collectionUtils';
@@ -12,9 +13,10 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {getDisplayName} from "../users/userUtils";
 
+
 export const CollectionBrowser = ({
     loading = false,
-    error = false,
+    error,
     collections = [],
     isSelected = () => false,
     toggleCollection = () => {},
@@ -88,6 +90,34 @@ export const CollectionBrowser = ({
         </>
     );
 };
+
+CollectionBrowser.propTypes = {
+    loading: PropTypes.bool,
+    error: PropTypes.object,
+    collections: PropTypes.array,
+    users: PropTypes.array,
+    history: PropTypes.object.isRequired,
+    workspaceIri: PropTypes.string,
+    showDeleted: PropTypes.bool,
+    canAddCollection: PropTypes.bool,
+    isSelected: PropTypes.func,
+    toggleCollection: PropTypes.func,
+    setBusy: PropTypes.func,
+};
+
+CollectionBrowser.defaultProps = {
+    loading: false,
+    error: undefined,
+    files: [],
+    users: [],
+    showDeleted: false,
+    canAddCollection: true,
+    openedCollection: {},
+    isSelected: () => false,
+    toggleCollection: () => {},
+    setBusy: () => {},
+};
+
 
 const ContextualCollectionBrowser = (props) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);

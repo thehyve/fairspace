@@ -5,6 +5,7 @@ import {Switch, withStyles} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import {Search} from "@material-ui/icons";
+import PropTypes from "prop-types";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
@@ -21,6 +22,7 @@ import CollectionsContext from './CollectionsContext';
 import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
+
 
 const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle, classes}) => {
     usePageTitleUpdater(documentTitle || "Collections");
@@ -151,6 +153,18 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
             <LoadingOverlay loading={busy} />
         </CollectionBreadcrumbsContextProvider>
     );
+};
+
+CollectionsPage.propTypes = {
+    history: PropTypes.object.isRequired,
+    showBreadCrumbs: PropTypes.bool,
+    workspaceIri: PropTypes.string,
+    documentTitle: PropTypes.string,
+    classes: PropTypes.object
+};
+
+CollectionsPage.defaultProps = {
+    showBreadCrumbs: true,
 };
 
 export default withStyles(styles)(CollectionsPage);

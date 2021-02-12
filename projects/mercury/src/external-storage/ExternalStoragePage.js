@@ -1,6 +1,7 @@
 import React, {useContext, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import {useSingleSelection} from "../file/UseSelection";
@@ -11,11 +12,12 @@ import ExternalStorageBrowser from "./ExternalStorageBrowser";
 import ExternalStoragesContext from "./ExternalStoragesContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import ExternalStorageBreadcrumbsContextProvider from "./ExternalStorageBreadcrumbsContextProvider";
+import type {ExternalStorage} from "./externalStorageUtils";
 
-export const ExternalStoragePage = (props) => {
+
+export const ExternalStoragePage = ({match, location, externalStorages, classes}) => {
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
-    const {match, location, externalStorages} = props;
-    const storage = externalStorages.find(s => s.name === match.params.storage);
+    const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
     const isSearchAvailable = false; // TODO add search handling
 
@@ -32,7 +34,7 @@ export const ExternalStoragePage = (props) => {
             <BreadCrumbs additionalSegments={breadcrumbSegments} />
             {isSearchAvailable && (
                 <Grid container justify="space-between" spacing={1}>
-                    <Grid item className={props.classes.topBar}>
+                    <Grid item className={classes.topBar}>
                         <SearchBar
                             placeholder="Search"
                             disableUnderline={false}
@@ -43,7 +45,7 @@ export const ExternalStoragePage = (props) => {
                 </Grid>
             )}
             <Grid container spacing={1}>
-                <Grid item className={props.classes.centralPanel}>
+                <Grid item className={classes.centralPanel}>
                     <ExternalStorageBrowser
                         selection={selection}
                         storage={storage}
@@ -51,12 +53,23 @@ export const ExternalStoragePage = (props) => {
                         setBreadcrumbSegments={setBreadcrumbSegments}
                     />
                 </Grid>
-                <Grid item className={props.classes.sidePanel}>
+                <Grid item className={classes.sidePanel}>
                     {/* TODO add right panel */}
                 </Grid>
             </Grid>
         </ExternalStorageBreadcrumbsContextProvider>
     );
+};
+
+ExternalStoragePage.propTypes = {
+    match: PropTypes.object.isRequired,
+    location: PropTypes.object.isRequired,
+    externalStorages: PropTypes.array.isRequired,
+    classes: PropTypes.object
+};
+
+ExternalStoragePage.defaultProps = {
+    classes: {}
 };
 
 const ContextualExternalStoragePage = (props) => {

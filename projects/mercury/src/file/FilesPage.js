@@ -7,6 +7,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Switch, withStyles} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {Search} from "@material-ui/icons";
+import PropTypes from "prop-types";
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
 import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";
@@ -26,15 +27,15 @@ import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataVi
 import UserContext from "../users/UserContext";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 
+
 export const FilesPage = ({
     location,
     history,
-    fileApi,
     collection,
     openedPath,
     views,
     loading = false,
-    error = false,
+    error,
     showDeleted,
     setShowDeleted,
     isOpenedPathDeleted = false,
@@ -142,9 +143,8 @@ export const FilesPage = ({
                         openedCollection={collection}
                         openedPath={openedPath}
                         isOpenedPathDeleted={isOpenedPathDeleted}
-                        collectionsLoading={loading}
-                        collectionsError={error}
-                        fileApi={fileApi}
+                        loading={loading}
+                        error={error}
                         selection={selection}
                         preselectedFile={preselectedFile}
                         showDeleted={showDeleted}
@@ -218,6 +218,32 @@ const ContextualFilesPage = (props) => {
             {...props}
         />
     );
+};
+
+FilesPage.propTypes = {
+    history: PropTypes.object.isRequired,
+    location: PropTypes.object.isRequired,
+    collection: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
+    openedPath: PropTypes.string,
+    views: PropTypes.array,
+    loading: PropTypes.bool,
+    error: PropTypes.object,
+    isOpenedPathDeleted: PropTypes.bool,
+    showDeleted: PropTypes.bool,
+    setShowDeleted: PropTypes.func,
+    classes: PropTypes.object
+};
+
+FilesPage.defaultProps = {
+    openedPath: "",
+    views: [],
+    loading: false,
+    error: undefined,
+    isOpenedPathDeleted: false,
+    showDeleted: false,
+    setShowDeleted: () => {},
+    classes: {}
 };
 
 export default withRouter(withStyles(styles)(ContextualFilesPage));

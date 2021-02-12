@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
@@ -13,6 +14,7 @@ import UploadProgressComponent from "./UploadProgressComponent";
 import UploadsContext, {showCannotOverwriteDeletedError} from "./UploadsContext";
 import {generateUuid} from "../metadata/common/metadataUtils";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
+
 
 const styles = (theme) => ({
     container: {
@@ -60,13 +62,11 @@ const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
 export const FileBrowser = ({
     history,
     openedCollection = {},
-    collectionsLoading = false,
-    collectionsError = false,
     openedPath,
     isOpenedPathDeleted,
     files = [],
     loading = false,
-    error = false,
+    error,
     showDeleted,
     refreshFiles = () => {},
     fileActions = {},
@@ -91,7 +91,7 @@ export const FileBrowser = ({
     const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
-    const [isFolderUpload, setIsFolderUpload] = useState(true);
+    const [isFolderUpload, setIsFolderUpload] = useState();
 
     const {
         getRootProps,
@@ -141,7 +141,11 @@ export const FileBrowser = ({
     }, [history]);
 
     // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
-    useEffect(() => open(), [isFolderUpload, open]);
+    useEffect(() => {
+        if (isFolderUpload !== undefined) {
+            open();
+        }
+    }, [isFolderUpload, open]);
 
     const isParentCollectionDeleted = openedCollection.dateDeleted != null;
     const parentCollectionDeletedRef = useRef(isParentCollectionDeleted);
@@ -202,7 +206,7 @@ export const FileBrowser = ({
         setCurrentUpload({});
     };
 
-    if (loading || collectionsLoading) {
+    if (loading) {
         return <LoadingInlay />;
     }
 
@@ -217,7 +221,7 @@ export const FileBrowser = ({
         );
     }
 
-    if (error || collectionsError) {
+    if (error) {
         return (<MessageDisplay message="An error occurred while loading files" />);
     }
 
@@ -313,18 +317,50 @@ export const FileBrowser = ({
     );
 };
 
-const ContextualFileBrowser = ({openedPath, fileApi, showDeleted, ...props}) => {
-    const {files, loading, error, refresh, fileActions} = useFiles(openedPath, showDeleted, fileApi);
+
+FileBrowser.propTypes = {
+    history: PropTypes.object.isRequired,
+    openedCollection: PropTypes.object,
+    openedPath: PropTypes.string,
+    isOpenedPathDeleted: PropTypes.bool,
+    files: PropTypes.array,
+    showDeleted: PropTypes.bool,
+    loading: PropTypes.bool,
+    error: PropTypes.object,
+    refreshFiles: PropTypes.func,
+    fileActions: PropTypes.object,
+    selection: PropTypes.object,
+    preselectedFile: PropTypes.object,
+    classes: PropTypes.object
+};
+
+FileBrowser.defaultProps = {
+    openedCollection: {},
+    loading: false,
+    error: undefined,
+    openedPath: "",
+    isOpenedPathDeleted: false,
+    files: [],
+    showDeleted: false,
+    refreshFiles: () => {},
+    fileActions: {},
+    selection: {},
+    preselectedFile: {},
+    classes: {}
+};
+
+
+const ContextualFileBrowser = ({openedPath, showDeleted, ...props}) => {
+    const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
     return (
         <FileBrowser
             files={files}
-            loading={loading}
-            error={error}
+            loading={props.loading || filesLoading}
+            error={props.error || filesError}
             showDeleted={showDeleted}
             refreshFiles={refresh}
             fileActions={fileActions}
             openedPath={openedPath}
-            fileApi={fileApi}
             {...props}
         />
     );

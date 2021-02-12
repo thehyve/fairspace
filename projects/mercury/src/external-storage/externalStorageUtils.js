@@ -1,6 +1,12 @@
 import {encodePath} from "../file/fileUtils";
 import * as consts from "../constants";
 
+export type ExternalStorage = {
+    url: string,
+    name: string,
+    label: string
+}
+
 export const getExternalStoragePathPrefix = (storageName: string) => (
     consts.PATH_SEPARATOR + "external-storages" + consts.PATH_SEPARATOR + storageName
 );
