@@ -28,12 +28,6 @@ public class WorkspaceApp extends BaseApp {
             return mapper.writeValueAsString(workspaceService.listWorkspaces());
         });
 
-        patch("/", (req, res) -> {
-            var ws = workspaceService.updateWorkspace(mapper.readValue(req.body(), Workspace.class));
-            res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(ws);
-        });
-
         delete("/", (req, res) -> {
             workspaceService.deleteWorkspace(createURI(req.queryParams("workspace")));
             res.status(SC_NO_CONTENT);

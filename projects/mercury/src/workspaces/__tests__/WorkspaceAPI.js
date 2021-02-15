@@ -48,31 +48,6 @@ describe('WorkspacesAPI', () => {
         }
     });
 
-    it('Updates a workspace status', async () => {
-        const workspaceData: Workspace = {
-            iri: 'workspace1',
-            name: 'w1',
-            description: 'Description of workspace1',
-            status: 'Active'
-        };
-        const patchResponse: AxiosResponse = {
-            headers: {'content-type': 'application/json'}
-        };
-        mockAxios.patch.mockImplementationOnce(() => Promise.resolve(patchResponse));
-        await workspacesAPI.updateWorkspace(workspaceData);
-        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith(
-            '/api/workspaces/',
-            JSON.stringify({
-                iri: 'workspace1',
-                name: 'w1',
-                description: 'Description of workspace1',
-                status: 'Active'
-            }),
-            {headers: {Accept: 'application/json'}}
-        );
-    });
-
     it('Deletes a new workspace', async () => {
         const workspaceIri: string = 'workspace1';
         const deleteResponse: AxiosResponse = {

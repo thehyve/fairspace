@@ -1290,37 +1290,6 @@ curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http:
 ====
 
 |===
-3+| ``PATCH /api/workspaces/``
-
-3+| Update a workspace.
-3+| _Parameters:_
-| ``iri``
-| string
-| Unique workspace IRI _(required)_.
-| ``name``
-| string
-| Unique workspace name.
-| ``comment``
-| Markdown
-| Workspace description in markdown format.
-|===
-
-.Example of updating a workspace (curl)
-[%collapsible]
-====
-[source, bash]
-----
-curl -X PATCH -H "Accept: application/json" -d \
-'{
-  "iri": "http://fairspace.com/iri/123,
-  "name": "new test name",
-  "comment": "New description"
-}"' \
-"http://localhost:8080/api/workspaces/"
-----
-====
-
-|===
 3+| ``DELETE /api/workspaces/``
 
 3+| Delete a workspace. Available only to administrators.
