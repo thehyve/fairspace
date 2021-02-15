@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import PropTypes from "prop-types";
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
 import {getCollectionAbsolutePath} from './collectionUtils';
@@ -12,25 +11,41 @@ import UsersContext from "../users/UsersContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {getDisplayName} from "../users/userUtils";
+import type {User} from "../users/UsersAPI";
+import type {Collection} from "./CollectionAPI";
 
 
-export const CollectionBrowser = ({
-    loading = false,
-    error,
-    collections = [],
-    isSelected = () => false,
-    toggleCollection = () => {},
-    users = [],
-    history,
-    workspaceIri,
-    canAddCollection = true,
-    showDeleted,
-    setBusy = () => {}
-}) => {
+type ContextualCollectionBrowserProperties = {
+    history: History;
+    workspaceIri: string;
+    isSelected: (any) => boolean;
+    toggleCollection: (any) => void;
+    setBusy: () => void;
+}
+
+type CollectionBrowserProperties = ContextualCollectionBrowserProperties & {
+    loading: boolean;
+    error: Error;
+    collections: Collection[];
+    users: User[];
+    showDeleted: boolean;
+    canAddCollection: boolean;
+}
+
+export const CollectionBrowser = (props: CollectionBrowserProperties) => {
+    const {
+        loading = false,
+        collections = [],
+        isSelected = () => false,
+        toggleCollection = () => {},
+        users = [],
+        canAddCollection = true,
+        setBusy = () => {},
+        showDeleted, history, error, workspaceIri
+    } = props;
+
     const [addingNewCollection, setAddingNewCollection] = useState(false);
-
     const handleAddCollectionClick = () => setAddingNewCollection(true);
-
     const handleCollectionClick = (collection) => {
         toggleCollection(collection);
     };
@@ -91,35 +106,8 @@ export const CollectionBrowser = ({
     );
 };
 
-CollectionBrowser.propTypes = {
-    loading: PropTypes.bool,
-    error: PropTypes.object,
-    collections: PropTypes.array,
-    users: PropTypes.array,
-    history: PropTypes.object.isRequired,
-    workspaceIri: PropTypes.string,
-    showDeleted: PropTypes.bool,
-    canAddCollection: PropTypes.bool,
-    isSelected: PropTypes.func,
-    toggleCollection: PropTypes.func,
-    setBusy: PropTypes.func,
-};
 
-CollectionBrowser.defaultProps = {
-    loading: false,
-    error: undefined,
-    files: [],
-    users: [],
-    showDeleted: false,
-    canAddCollection: true,
-    openedCollection: {},
-    isSelected: () => false,
-    toggleCollection: () => {},
-    setBusy: () => {},
-};
-
-
-const ContextualCollectionBrowser = (props) => {
+const ContextualCollectionBrowser = (props: ContextualCollectionBrowserProperties) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
     const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} = useContext(CollectionsContext);

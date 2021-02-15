@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 import {withRouter} from "react-router-dom";
 import {withStyles} from "@material-ui/core";
-import PropTypes from "prop-types";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {useExternalStorage} from "./UseExternalStorage";
 import FileList from "../file/FileList";
 import FileOperations from "../file/FileOperations";
+import type {ExternalStorage} from "./externalStorageUtils";
 import {getExternalStorageAbsolutePath, getExternalStoragePathPrefix, getRelativePath} from "./externalStorageUtils";
 import FileAPI from "../file/FileAPI";
 import {splitPathIntoArray} from "../file/fileUtils";
@@ -21,18 +21,37 @@ const styles = () => ({
     }
 });
 
-export const ExternalStorageBrowser = ({
-    loading,
-    error,
-    storage,
-    files,
-    fileActions,
-    selection,
-    setBreadcrumbSegments,
-    openedPath,
-    history,
-    classes
-}) => {
+type ContextualExternalStorageBrowserProperties = {
+    pathname: string;
+    storage: ExternalStorage;
+    selection: any;
+    setBreadcrumbSegments: () => void;
+    history: History;
+    classes: any;
+};
+
+type ExternalStorageBrowserProperties = ContextualExternalStorageBrowserProperties & {
+    loading: boolean;
+    error: Error;
+    files: File[];
+    fileActions: any;
+    openedPath: string;
+};
+
+export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) => {
+    const {
+        loading = false,
+        error,
+        storage,
+        files,
+        fileActions,
+        selection,
+        setBreadcrumbSegments = () => {},
+        openedPath = "",
+        history,
+        classes
+    } = props;
+
     const pathSegments = splitPathIntoArray(openedPath);
     const breadcrumbSegments = pathSegments.map((segment, idx) => ({
         label: segment,
@@ -89,31 +108,8 @@ export const ExternalStorageBrowser = ({
     );
 };
 
-ExternalStorageBrowser.propTypes = {
-    loading: PropTypes.bool,
-    error: PropTypes.object,
-    storage: PropTypes.object,
-    files: PropTypes.array,
-    fileActions: PropTypes.object,
-    selection: PropTypes.object,
-    setBreadcrumbSegments: PropTypes.func,
-    openedPath: PropTypes.string,
-    history: PropTypes.object,
-    classes: PropTypes.object
-};
 
-ExternalStorageBrowser.defaultProps = {
-    loading: false,
-    error: undefined,
-    storage: {},
-    files: [],
-    fileActions: {},
-    selection: {},
-    setBreadcrumbSegments: () => {},
-    classes: {}
-};
-
-const ContextualExternalStorageBrowser = (props) => {
+const ContextualExternalStorageBrowser = (props: ContextualExternalStorageBrowserProperties) => {
     const {pathname, storage} = props;
     const path = getRelativePath(pathname, storage.name);
     const {files, loading, error, fileActions} = useExternalStorage(path, storage.url);

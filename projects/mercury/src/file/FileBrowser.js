@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
-import PropTypes from "prop-types";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import FileAPI from "./FileAPI";
@@ -14,6 +13,7 @@ import UploadProgressComponent from "./UploadProgressComponent";
 import UploadsContext, {showCannotOverwriteDeletedError} from "./UploadsContext";
 import {generateUuid} from "../metadata/common/metadataUtils";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import type {Collection} from "../collections/CollectionAPI";
 
 
 const styles = (theme) => ({
@@ -59,21 +59,40 @@ const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
     newFiles.filter(f => existingFileNames.includes(f.path)).map(c => c.name)
 );
 
-export const FileBrowser = ({
-    history,
-    openedCollection = {},
-    openedPath,
-    isOpenedPathDeleted,
-    files = [],
-    loading = false,
-    error,
-    showDeleted,
-    refreshFiles = () => {},
-    fileActions = {},
-    selection = {},
-    preselectedFile = {},
-    classes
-}) => {
+type ContextualFileBrowserProperties = {
+    history: History;
+    openedCollection: Collection;
+    openedPath: string,
+    isOpenedPathDeleted: boolean,
+    showDeleted: boolean,
+    loading: boolean,
+    error: Error,
+    selection: any,
+    preselectedFile: File,
+    classes: any
+}
+
+type FileBrowserProperties = ContextualFileBrowserProperties & {
+    files: File[];
+    refreshFiles: () => void;
+    fileActions: any;
+};
+
+export const FileBrowser = (props: FileBrowserProperties) => {
+    const {
+        openedCollection = {},
+        openedPath = "",
+        isOpenedPathDeleted = false,
+        files = [],
+        loading = false,
+        showDeleted = false,
+        refreshFiles = () => {},
+        fileActions = {},
+        selection = {},
+        preselectedFile = {},
+        classes = {},
+        history, error
+    } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
@@ -317,46 +336,14 @@ export const FileBrowser = ({
     );
 };
 
-
-FileBrowser.propTypes = {
-    history: PropTypes.object.isRequired,
-    openedCollection: PropTypes.object,
-    openedPath: PropTypes.string,
-    isOpenedPathDeleted: PropTypes.bool,
-    files: PropTypes.array,
-    showDeleted: PropTypes.bool,
-    loading: PropTypes.bool,
-    error: PropTypes.object,
-    refreshFiles: PropTypes.func,
-    fileActions: PropTypes.object,
-    selection: PropTypes.object,
-    preselectedFile: PropTypes.object,
-    classes: PropTypes.object
-};
-
-FileBrowser.defaultProps = {
-    openedCollection: {},
-    loading: false,
-    error: undefined,
-    openedPath: "",
-    isOpenedPathDeleted: false,
-    files: [],
-    showDeleted: false,
-    refreshFiles: () => {},
-    fileActions: {},
-    selection: {},
-    preselectedFile: {},
-    classes: {}
-};
-
-
-const ContextualFileBrowser = ({openedPath, showDeleted, ...props}) => {
+const ContextualFileBrowser = (props: ContextualFileBrowserProperties) => {
+    const {openedPath, showDeleted, loading, error} = props;
     const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
     return (
         <FileBrowser
             files={files}
-            loading={props.loading || filesLoading}
-            error={props.error || filesError}
+            loading={loading || filesLoading}
+            error={error || filesError}
             showDeleted={showDeleted}
             refreshFiles={refresh}
             fileActions={fileActions}

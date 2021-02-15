@@ -1,7 +1,6 @@
 import React, {useContext, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withStyles} from "@material-ui/core";
-import PropTypes from "prop-types";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import {useSingleSelection} from "../file/UseSelection";
@@ -13,9 +12,22 @@ import ExternalStoragesContext from "./ExternalStoragesContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import ExternalStorageBreadcrumbsContextProvider from "./ExternalStorageBreadcrumbsContextProvider";
 import type {ExternalStorage} from "./externalStorageUtils";
+import type {Match} from "../types";
 
 
-export const ExternalStoragePage = ({match, location, externalStorages, classes}) => {
+type ContextualExternalStoragePageProperties = {
+    match: Match;
+    location: Location;
+    classes: any;
+}
+
+type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
+    externalStorages: ExternalStorage[];
+}
+
+export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
+    const {externalStorages, match, location, classes = {}} = props;
+
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
@@ -61,18 +73,7 @@ export const ExternalStoragePage = ({match, location, externalStorages, classes}
     );
 };
 
-ExternalStoragePage.propTypes = {
-    match: PropTypes.object.isRequired,
-    location: PropTypes.object.isRequired,
-    externalStorages: PropTypes.array.isRequired,
-    classes: PropTypes.object
-};
-
-ExternalStoragePage.defaultProps = {
-    classes: {}
-};
-
-const ContextualExternalStoragePage = (props) => {
+const ContextualExternalStoragePage = (props: ContextualExternalStoragePageProperties) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
 
     return (
