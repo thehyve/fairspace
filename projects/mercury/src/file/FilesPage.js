@@ -25,22 +25,44 @@ import FileAPI from "./FileAPI";
 import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import UserContext from "../users/UserContext";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
+import type {Collection} from "../collections/CollectionAPI";
+import type {User} from "../users/UsersAPI";
+import {MetadataViewOptions} from "../metadata/views/MetadataViewAPI";
+import type {Match} from "../types";
 
-export const FilesPage = ({
-    location,
-    history,
-    fileApi,
-    collection,
-    openedPath,
-    views,
-    loading = false,
-    error = false,
-    showDeleted,
-    setShowDeleted,
-    isOpenedPathDeleted = false,
-    currentUser,
-    classes
-}) => {
+type ContextualFilesPageProperties = {
+    match: Match,
+    history: History;
+    location: Location;
+    classes: any;
+};
+
+type ParentAwareFilesPageProperties = ContextualFilesPageProperties & {
+    collection: Collection;
+    currentUser: User;
+    openedPath: string;
+    views: MetadataViewOptions[];
+    loading: boolean;
+    error: Error;
+    showDeleted: boolean;
+    setShowDeleted: (boolean) => void;
+}
+
+type FilesPageProperties = ParentAwareFilesPageProperties & {
+    isOpenedPathDeleted: boolean;
+};
+
+export const FilesPage = (props: FilesPageProperties) => {
+    const {
+        loading = false,
+        isOpenedPathDeleted = false,
+        showDeleted = false,
+        setShowDeleted = () => {},
+        openedPath = "",
+        views = [],
+        currentUser, error, location, history, collection, classes
+    } = props;
+
     const selection = useMultipleSelection();
     const [busy, setBusy] = useState(false);
 
@@ -77,7 +99,8 @@ export const FilesPage = ({
     const breadcrumbSegments = collection.name
         ? pathSegments.map((segment, idx) => ({
             label: idx === 0 ? collection.name : segment,
-            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
+            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR
+                + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
         }))
         : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + encodeURI(openedPath)}];
 
@@ -142,9 +165,8 @@ export const FilesPage = ({
                         openedCollection={collection}
                         openedPath={openedPath}
                         isOpenedPathDeleted={isOpenedPathDeleted}
-                        collectionsLoading={loading}
-                        collectionsError={error}
-                        fileApi={fileApi}
+                        loading={loading}
+                        error={error}
                         selection={selection}
                         preselectedFile={preselectedFile}
                         showDeleted={showDeleted}
@@ -164,7 +186,7 @@ export const FilesPage = ({
     );
 };
 
-const ParentAwareFilesPage = (props) => {
+const ParentAwareFilesPage = (props: ParentAwareFilesPageProperties) => {
     const {data, error, loading, refresh} = useAsync(
         () => (FileAPI.stat(props.openedPath, true)),
         [props.openedPath]
@@ -185,7 +207,7 @@ const ParentAwareFilesPage = (props) => {
     );
 };
 
-const ContextualFilesPage = (props) => {
+const ContextualFilesPage = (props: ContextualFilesPageProperties) => {
     const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
     const {currentUser} = useContext(UserContext);
     const {views} = useContext(MetadataViewContext);

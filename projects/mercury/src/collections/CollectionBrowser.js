@@ -10,24 +10,42 @@ import UserContext from "../users/UserContext";
 import UsersContext from "../users/UsersContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
+import {getDisplayName} from "../users/userUtils";
+import type {User} from "../users/UsersAPI";
+import type {Collection} from "./CollectionAPI";
 
-export const CollectionBrowser = ({
-    loading = false,
-    error = false,
-    collections = [],
-    isSelected = () => false,
-    toggleCollection = () => {},
-    users = [],
-    history,
-    workspaceIri,
-    canAddCollection = true,
-    showDeleted,
-    setBusy = () => {}
-}) => {
+
+type ContextualCollectionBrowserProperties = {
+    history: History;
+    workspaceIri: string;
+    isSelected: (any) => boolean;
+    toggleCollection: (any) => void;
+    setBusy: () => void;
+}
+
+type CollectionBrowserProperties = ContextualCollectionBrowserProperties & {
+    loading: boolean;
+    error: Error;
+    collections: Collection[];
+    users: User[];
+    showDeleted: boolean;
+    canAddCollection: boolean;
+}
+
+export const CollectionBrowser = (props: CollectionBrowserProperties) => {
+    const {
+        loading = false,
+        collections = [],
+        isSelected = () => false,
+        toggleCollection = () => {},
+        users = [],
+        canAddCollection = true,
+        setBusy = () => {},
+        showDeleted, history, error, workspaceIri
+    } = props;
+
     const [addingNewCollection, setAddingNewCollection] = useState(false);
-
     const handleAddCollectionClick = () => setAddingNewCollection(true);
-
     const handleCollectionClick = (collection) => {
         toggleCollection(collection);
     };
@@ -39,8 +57,8 @@ export const CollectionBrowser = ({
     const handleCancelAddCollection = () => setAddingNewCollection(false);
 
     const renderCollectionList = () => {
-        collections.forEach(col => {
-            col.creatorObj = users.find(u => u.iri === col.createdBy);
+        collections.forEach(collection => {
+            collection.creatorDisplayName = getDisplayName(users.find(u => u.iri === collection.createdBy));
         });
         return (
             <>
@@ -88,7 +106,8 @@ export const CollectionBrowser = ({
     );
 };
 
-const ContextualCollectionBrowser = (props) => {
+
+const ContextualCollectionBrowser = (props: ContextualCollectionBrowserProperties) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
     const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} = useContext(CollectionsContext);

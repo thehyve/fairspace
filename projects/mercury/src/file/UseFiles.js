@@ -68,5 +68,3 @@ export const useFiles = (path, showDeleted = false, fileApi = FileAPI) => {
         }
     };
 };
-
-export default useFiles;

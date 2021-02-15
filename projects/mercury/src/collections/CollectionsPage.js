@@ -22,7 +22,18 @@ import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataVi
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 
-const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle, classes}) => {
+
+type CollectionsPageProperties = {
+    history: History;
+    showBreadCrumbs: boolean;
+    workspaceIri: string;
+    documentTitle: string;
+    classes: any;
+}
+
+const CollectionsPage = (props: CollectionsPageProperties) => {
+    const {showBreadCrumbs = true, history, workspaceIri, documentTitle, classes} = props;
+
     usePageTitleUpdater(documentTitle || "Collections");
 
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
@@ -152,5 +163,6 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
         </CollectionBreadcrumbsContextProvider>
     );
 };
+
 
 export default withStyles(styles)(CollectionsPage);

@@ -24,8 +24,12 @@ export type File = {
 }
 
 class FileAPI {
+    constructor(remoteURL = '/api/webdav') {
+        this.remoteURL = remoteURL;
+    }
+
     client() {
-        return createClient('/api/webdav');
+        return createClient(this.remoteURL);
     }
 
     stat(path, showDeleted) {
@@ -409,5 +413,7 @@ class FileAPI {
         return properties;
     }
 }
+
+export const ExternalFileApi = (remoteURL) => new FileAPI(remoteURL);
 
 export default new FileAPI();

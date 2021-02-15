@@ -20,6 +20,7 @@ fairspace:
   features:
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
+  storages:
 
 # Specific settings for Saturn subchart
 saturn:
