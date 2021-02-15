@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.*;
 
+import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
@@ -148,6 +149,7 @@ public class UserService {
         if (!currentUser().isAdmin()) {
             throw new AccessDeniedException();
         }
+        final String[] username = new String[1];
         transactions.executeWrite(model -> {
             var dao = new DAO(model);
             var user = dao.read(User.class, generateMetadataIri(roles.getId()));
@@ -157,6 +159,7 @@ public class UserService {
             if (user.isSuperadmin()) {
                 throw new IllegalArgumentException("Cannot modify superadmin's roles");
             }
+            username[0] = user.getUsername();
             if (roles.getAdmin() != null) {
                 user.setAdmin(roles.getAdmin());
                 if (user.isAdmin()) {
@@ -184,7 +187,7 @@ public class UserService {
 
             dao.write(user);
         });
-
+        audit("USER_UPDATE", "user", username[0]);
         usersCache.invalidateAll();
     }
 }
