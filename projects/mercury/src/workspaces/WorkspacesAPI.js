@@ -53,14 +53,6 @@ class WorkspacesAPI {
             .catch(handleHttpError("Failure while creating a workspace"));
     }
 
-    updateWorkspace(workspace: WorkspaceProperties): Promise<void> {
-        return axios.patch(workspacesUrl, JSON.stringify(workspace), {
-            headers: {Accept: 'application/json'},
-        })
-            .then(extractJsonData)
-            .catch(handleHttpError("Failure while updating a workspace"));
-    }
-
     deleteWorkspace(workspaceIri: string): Promise<WorkspaceProperties> {
         return axios.delete(`${workspacesUrl}?workspace=${encodeURI(workspaceIri)}`, {
             headers: {Accept: 'application/json'},
