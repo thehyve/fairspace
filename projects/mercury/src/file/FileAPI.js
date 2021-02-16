@@ -3,6 +3,7 @@ import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
 import {decodeHTMLEntities, generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
 import {handleHttpError} from "../common/utils/httpUtils";
+import {encodePath, joinURL} from 'webdav/dist/node/request';
 
 // Ensure that the client passes along the credentials
 const defaultOptions = {withCredentials: true};
@@ -361,6 +362,7 @@ class FileAPI {
     post(path, data, showDeleted = false) {
         const requestOptions = {
             method: "POST",
+            url: joinURL('/api/webdav', encodePath(path)),
             headers: {
                 "Accept": "text/plain",
                 "Content-Type": "application/x-www-form-urlencoded",
