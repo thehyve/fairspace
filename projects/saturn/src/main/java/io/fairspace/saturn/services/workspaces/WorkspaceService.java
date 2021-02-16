@@ -118,43 +118,6 @@ public class WorkspaceService {
         return created;
     }
 
-    public Workspace updateWorkspace(Workspace patch) {
-        validate(patch.getIri() != null, "No IRI provided");
-
-        var updated = tx.calculateWrite(m -> {
-            var dao = new DAO(m);
-            var workspace = dao.read(Workspace.class, patch.getIri());
-            if (workspace == null) {
-                throw new AccessDeniedException();
-            }
-
-            var workspaceResource = m.wrapAsResource(patch.getIri());
-            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.canManage, workspaceResource) || userService.currentUser().isAdmin();
-            if (!canManage) {
-                throw new AccessDeniedException();
-            }
-
-            if (patch.getName() != null && !patch.getName().equals(workspace.getName())) {
-                var conflictingWorkspace = findExistingWorkspace(m, patch.getName());
-                if (conflictingWorkspace.isPresent()) {
-                    throw new IllegalArgumentException("Workspace already exists with the same name.");
-                }
-                workspace.setName(patch.getName());
-            }
-
-            if (patch.getComment() != null && !patch.getComment().equals(workspace.getComment())) {
-                workspace.setComment(patch.getComment());
-            }
-
-            return dao.write(workspace);
-        });
-
-        updated.setCanManage(true);
-        updated.setCanCollaborate(true);
-
-        return updated;
-    }
-
     public void deleteWorkspace(Node iri) {
         if (!userService.currentUser().isAdmin()) {
             throw new AccessDeniedException();
