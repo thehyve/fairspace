@@ -1,5 +1,6 @@
 import {encodePath} from "../file/fileUtils";
 import * as consts from "../constants";
+import {PATH_SEPARATOR} from "../constants";
 
 export type ExternalStorage = {
     url: string,
@@ -18,3 +19,14 @@ export const getExternalStorageAbsolutePath = (path: string, storageName: string
 export const getRelativePath = (absolutePath: string, storageName: string) => (
     absolutePath.replace(getExternalStoragePathPrefix(storageName), '')
 );
+
+export const getPathToDisplay = (path: string) => {
+    let displayPath = path;
+    if (displayPath.startsWith(PATH_SEPARATOR)) {
+        displayPath = displayPath.substring(1, displayPath.length);
+    }
+    if (displayPath.endsWith(PATH_SEPARATOR)) {
+        displayPath = path.substring(0, displayPath.length - 1);
+    }
+    return displayPath;
+};

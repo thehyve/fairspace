@@ -28,6 +28,7 @@ type ContextualExternalStorageBrowserProperties = {
     setBreadcrumbSegments: () => void;
     history: History;
     classes: any;
+    setAtLeastSingleRootFileExists: (boolean) => void;
 };
 
 type ExternalStorageBrowserProperties = ContextualExternalStorageBrowserProperties & {
@@ -66,6 +67,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
     }, [openedPath]);
 
     const handlePathDoubleClick = (path) => {
+        selection.deselectAll();
         if (path.type === 'directory') {
             history.push(getExternalStorageAbsolutePath(path.filename, storage.name));
         } else {
@@ -110,9 +112,13 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
 
 
 const ContextualExternalStorageBrowser = (props: ContextualExternalStorageBrowserProperties) => {
-    const {pathname, storage} = props;
+    const {pathname, storage, setAtLeastSingleRootFileExists} = props;
     const path = getRelativePath(pathname, storage.name);
-    const {files, loading, error, fileActions} = useExternalStorage(path, storage.url);
+    const {files = [], loading, error, fileActions} = useExternalStorage(path, storage.url);
+
+    useEffect(() => {
+        setAtLeastSingleRootFileExists(files.length > 0);
+    }, [files, setAtLeastSingleRootFileExists]);
 
     return (
         <ExternalStorageBrowser

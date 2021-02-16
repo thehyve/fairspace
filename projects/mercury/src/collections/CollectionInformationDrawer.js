@@ -37,18 +37,8 @@ import {
 } from "../constants";
 import {determinePropertyShapesForTypes, determineShapeForTypes} from "../metadata/common/vocabularyUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "../metadata/common/jsonLdUtils";
+import {getPathHierarchy} from "../file/fileUtils";
 
-const pathHierarchy = (fullPath) => {
-    if (!fullPath) return [];
-
-    const paths = [];
-    let path = fullPath;
-    while (path && path.lastIndexOf('/') > 0) {
-        paths.push(path);
-        path = path.substring(0, path.lastIndexOf('/'));
-    }
-    return paths.reverse();
-};
 
 const useStyles = makeStyles((theme) => ({
     expandOpen: {
@@ -294,7 +284,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
         inCollectionsBrowser, path, showDeleted
     } = props;
 
-    const paths = pathHierarchy(path);
+    const paths = getPathHierarchy(path);
 
     if (!collection) {
         return atLeastSingleCollectionExists && inCollectionsBrowser

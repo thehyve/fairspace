@@ -12,7 +12,11 @@ import ExternalStoragesContext from "./ExternalStoragesContext";
 import MessageDisplay from "../common/components/MessageDisplay";
 import ExternalStorageBreadcrumbsContextProvider from "./ExternalStorageBreadcrumbsContextProvider";
 import type {ExternalStorage} from "./externalStorageUtils";
+import {getRelativePath} from "./externalStorageUtils";
 import type {Match} from "../types";
+import ExternalStorageInformationDrawer from "./ExternalStorageInformationDrawer";
+import UsersContext from "../users/UsersContext";
+import type {User} from "../users/UsersAPI";
 
 
 type ContextualExternalStoragePageProperties = {
@@ -23,12 +27,14 @@ type ContextualExternalStoragePageProperties = {
 
 type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
     externalStorages: ExternalStorage[];
+    users: User[];
 }
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
-    const {externalStorages, match, location, classes = {}} = props;
+    const {externalStorages, match, location, users, classes = {}} = props;
 
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
+    const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
     const isSearchAvailable = false; // TODO add search handling
@@ -63,10 +69,17 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
                         storage={storage}
                         pathname={location.pathname}
                         setBreadcrumbSegments={setBreadcrumbSegments}
+                        setAtLeastSingleRootFileExists={setAtLeastSingleRootFileExists}
                     />
                 </Grid>
                 <Grid item className={classes.sidePanel}>
-                    {/* TODO add right panel */}
+                    <ExternalStorageInformationDrawer
+                        atLeastSingleRootFileExists={atLeastSingleRootFileExists}
+                        path={getRelativePath(location.pathname, storage.name)}
+                        selected={selection.selected}
+                        storage={storage}
+                        users={users}
+                    />
                 </Grid>
             </Grid>
         </ExternalStorageBreadcrumbsContextProvider>
@@ -75,11 +88,13 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
 
 const ContextualExternalStoragePage = (props: ContextualExternalStoragePageProperties) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
+    const {users} = useContext(UsersContext);
 
     return (
         <ExternalStoragePage
             {...props}
             externalStorages={externalStorages}
+            users={users}
         />
     );
 };
