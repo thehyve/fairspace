@@ -183,7 +183,7 @@ public class WorkspaceService {
             }
         });
 
-        audit("WS_SET_USER_ROLE", "workspace", workspace, "user", user, "role", role);
+        audit("WS_SET_USER_ROLE", "workspace", workspace, "affected_user", user, "role", role);
     }
 
     private void validateResource(Resource r, Resource type) {

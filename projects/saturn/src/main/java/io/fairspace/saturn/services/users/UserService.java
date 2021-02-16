@@ -187,7 +187,7 @@ public class UserService {
 
             dao.write(user);
         });
-        audit("USER_UPDATE", "user", username[0]);
+        audit("USER_UPDATE", "affected_user", username[0]);
         usersCache.invalidateAll();
     }
 }
