@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
@@ -50,6 +51,10 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     @Override
     public String getUniqueId() {
         return subject.getURI();
+    }
+
+    String getRelativePath() {
+        return getUniqueId().substring(factory.root.getUniqueId().length());
     }
 
     @Override
@@ -86,8 +91,14 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     @Override
     public final void delete() throws NotAuthorizedException, ConflictException, BadRequestException {
-        delete(subject.hasProperty(FS.dateDeleted));
+        var purge = subject.hasProperty(FS.dateDeleted);
+        delete(purge);
         updateParents(subject);
+        if (purge) {
+            audit("FS_DELETE", "path", getRelativePath(), "success", true);
+        } else {
+            audit("FS_MARK_AS_DELETED", "path", getRelativePath(), "success", true);
+        }
     }
 
     protected void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {

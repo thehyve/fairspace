@@ -34,9 +34,13 @@ class AuditEventListener implements EventListener {
                         "path", path,
                         "destination", resourcePath(re.getRequest().getDestinationHeader()),
                         "success", success);
-                case DELETE -> audit("FS_DELETE",
-                        "path", path,
-                        "success", success);
+                case DELETE -> {
+                    if (!success) {
+                        audit("FS_DELETE",
+                                "path", path,
+                                "success", false);
+                    }
+                }
                 case PUT -> audit("FS_WRITE",
                         "path", path,
                         "success", success);

@@ -147,7 +147,7 @@ public class MetadataService {
      * @param model
      */
     public void delete(Model model) {
-        logUpdates(update(model, EMPTY_MODEL));
+        logDeleted(update(model, EMPTY_MODEL));
     }
 
     /**
@@ -188,6 +188,10 @@ public class MetadataService {
 
             return modelToRemove.listSubjects().andThen(modelToAdd.listSubjects()).toSet();
         });
+    }
+
+    private void logDeleted(Set<Resource> updatedResources) {
+        updatedResources.forEach(resource -> audit("METADATA_DELETED", "iri", resource.getURI()));
     }
 
     private void logUpdates(Set<Resource> updatedResources) {
