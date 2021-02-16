@@ -32,7 +32,7 @@ public class Audit {
         MDC.put("user_id", token.getSubject());
 
 
-        log.info(event);
+        log.trace(event);
 
         MDC.clear();
     }
