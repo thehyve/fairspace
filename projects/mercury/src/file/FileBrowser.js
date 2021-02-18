@@ -4,7 +4,7 @@ import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
-import FileAPI from "./FileAPI";
+import {LocalFileAPI} from "./FileAPI";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
@@ -215,7 +215,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
              */
             history.push(`/collections${encodeURI(encodePath(path.filename))}`);
         } else if (isReadingEnabled) {
-            FileAPI.open(path.filename);
+            LocalFileAPI.open(path.filename);
         }
     };
 

@@ -21,7 +21,7 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import styles from "./FilesPage.styles";
 import useAsync from "../common/hooks/UseAsync";
-import FileAPI from "./FileAPI";
+import {LocalFileAPI} from "./FileAPI";
 import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import UserContext from "../users/UserContext";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
@@ -188,7 +188,7 @@ export const FilesPage = (props: FilesPageProperties) => {
 
 const ParentAwareFilesPage = (props: ParentAwareFilesPageProperties) => {
     const {data, error, loading, refresh} = useAsync(
-        () => (FileAPI.stat(props.openedPath, true)),
+        () => (LocalFileAPI.stat(props.openedPath, true)),
         [props.openedPath]
     );
 

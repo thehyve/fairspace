@@ -19,12 +19,12 @@ import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer"
 import {getPathHierarchy} from "../file/fileUtils";
 import {getPathToDisplay} from "./externalStorageUtils";
 import useAsync from "../common/hooks/UseAsync";
-import {ExternalFileApi} from "../file/FileAPI";
 import MessageDisplay from "../common/components/MessageDisplay";
 import {formatDate} from "../common/utils/genericUtils";
 import {getDisplayName} from "../users/userUtils";
 import type {User} from "../users/UsersAPI";
 import type {ExternalStorage} from "./externalStorageUtils";
+import FileAPI from "../file/FileAPI";
 
 
 const useStyles = makeStyles(() => ({
@@ -110,7 +110,7 @@ type ExternalMetadataCardProperties = {
 
 const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     const {title, forceExpand, path, storage, users} = props;
-    const fileAPI = new ExternalFileApi(storage.remoteURL);
+    const fileAPI = new FileAPI(storage.remoteURL);
     const {data = {}, error, loading} = useAsync(() => fileAPI.stat(path), [path]);
     const {iscollection} = data;
     const filePropertiesToDisplay = mapFileProperties(data, users);

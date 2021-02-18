@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import FileAPI from "./FileAPI";
+import {LocalFileAPI} from "./FileAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {isValidFileName} from './fileUtils';
 import {PATH_SEPARATOR} from '../constants';
@@ -41,7 +41,7 @@ export const showCannotOverwriteDeletedError = (filesLength: number) => {
 
 export const UploadsContext = React.createContext({});
 
-export const UploadsProvider = ({children, fileApi = FileAPI}) => {
+export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
     const [uploads, setUploads] = useState([]);
 
     const updateSpecificUpload = (selected, updateFunc) => setUploads(

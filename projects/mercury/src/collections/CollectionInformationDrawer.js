@@ -18,7 +18,7 @@ import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataE
 import type {Collection} from './CollectionAPI';
 import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
 import useAsync from '../common/hooks/UseAsync';
-import FileAPI from '../file/FileAPI';
+import {LocalFileAPI} from '../file/FileAPI';
 import MessageDisplay from '../common/components/MessageDisplay';
 import ErrorDialog from "../common/components/ErrorDialog";
 import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
@@ -139,7 +139,7 @@ const MetadataCard = (props) => {
 
     const uploadMetadata = (file) => {
         setUploadingMetadata(true);
-        FileAPI.uploadMetadata(metadataUploadPath, file)
+        LocalFileAPI.uploadMetadata(metadataUploadPath, file)
             .then(() => enqueueSnackbar('Metadata have been successfully uploaded'))
             .catch(e => {
                 const errorContents = (
@@ -228,7 +228,7 @@ const MetadataCard = (props) => {
 };
 
 const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
-    const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
+    const {data, error, loading} = useAsync(() => LocalFileAPI.stat(path, showDeleted), [path]);
 
     let body;
     let isDirectory;

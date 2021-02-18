@@ -8,7 +8,6 @@ import FileList from "../file/FileList";
 import FileOperations from "../file/FileOperations";
 import type {ExternalStorage} from "./externalStorageUtils";
 import {getExternalStorageAbsolutePath, getExternalStoragePathPrefix, getRelativePath} from "./externalStorageUtils";
-import FileAPI from "../file/FileAPI";
 import {splitPathIntoArray} from "../file/fileUtils";
 import * as consts from "../constants";
 
@@ -71,7 +70,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
         if (path.type === 'directory') {
             history.push(getExternalStorageAbsolutePath(path.filename, storage.name));
         } else {
-            FileAPI.open(path.filename);
+            fileActions.open(path.filename);
         }
     };
 

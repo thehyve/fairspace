@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-cycle
 import {mapFilePropertiesToCollection} from "./collectionUtils";
 import {handleHttpError} from '../common/utils/httpUtils';
-import FileAPI from "../file/FileAPI";
+import {LocalFileAPI} from "../file/FileAPI";
 import MetadataAPI from "../metadata/common/MetadataAPI";
 import {COMMENT_URI} from "../constants";
 
@@ -71,11 +71,11 @@ export type Collection = Resource & CollectionProperties & CollectionType & Coll
 
 class CollectionAPI {
     getCollectionProperties(name: string): Promise<Collection> {
-        return FileAPI.stat(name).then(mapFilePropertiesToCollection);
+        return LocalFileAPI.stat(name).then(mapFilePropertiesToCollection);
     }
 
     getCollections(showDeleted = false): Promise<Collection[]> {
-        return FileAPI.list(rootUrl, showDeleted)
+        return LocalFileAPI.list(rootUrl, showDeleted)
             .then(collections => collections.map(mapFilePropertiesToCollection))
             .catch(handleHttpError("Failure when retrieving a list of collections"));
     }
@@ -87,7 +87,7 @@ class CollectionAPI {
             },
             withCredentials: true
         };
-        return FileAPI.createDirectory(collection.name, options)
+        return LocalFileAPI.createDirectory(collection.name, options)
             .then(() => this.getCollectionProperties(collection.name))
             .then((properties) => {
                 collection.iri = properties.iri;
@@ -96,21 +96,21 @@ class CollectionAPI {
     }
 
     deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
-        return FileAPI.delete(collection.name, showDeleted)
+        return LocalFileAPI.delete(collection.name, showDeleted)
             .catch(handleHttpError("Failure while deleting collection"));
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
-        return FileAPI.undelete(collection.name)
+        return LocalFileAPI.undelete(collection.name)
             .catch(handleHttpError("Failure while undeleting collection"));
     }
 
     unpublish(collection: CollectionProperties): Promise<void> {
-        return FileAPI.post(collection.name, {action: 'unpublish'});
+        return LocalFileAPI.post(collection.name, {action: 'unpublish'});
     }
 
     renameCollection(name: string, target: string): Promise<void> {
-        return FileAPI.move(name, target);
+        return LocalFileAPI.move(name, target);
     }
 
     updateCollection(collection: Collection, vocabulary): Promise<void> {
@@ -122,19 +122,19 @@ class CollectionAPI {
     }
 
     setAccessMode(name: string, mode: AccessMode): Promise<void> {
-        return FileAPI.post(name, {action: 'set_access_mode', mode});
+        return LocalFileAPI.post(name, {action: 'set_access_mode', mode});
     }
 
     setStatus(name: string, status: Status): Promise<void> {
-        return FileAPI.post(name, {action: 'set_status', status});
+        return LocalFileAPI.post(name, {action: 'set_status', status});
     }
 
     setPermission(name: string, principal: string, access: AccessLevel): Promise<void> {
-        return FileAPI.post(name, {action: 'set_permission', principal, access});
+        return LocalFileAPI.post(name, {action: 'set_permission', principal, access});
     }
 
     setOwnedBy(name: string, owner: string): Promise<void> {
-        return FileAPI.post(name, {action: 'set_owned_by', owner});
+        return LocalFileAPI.post(name, {action: 'set_owned_by', owner});
     }
 }
 
