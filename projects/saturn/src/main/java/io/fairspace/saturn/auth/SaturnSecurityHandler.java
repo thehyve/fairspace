@@ -24,6 +24,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         var adapterConfig = new AdapterConfig();
         adapterConfig.setResource(config.clientId);
         adapterConfig.setRealm(config.realm);
+        adapterConfig.setCors(true);
         adapterConfig.setAuthServerUrl(CONFIG.auth.authServerUrl);
         adapterConfig.setTokenStore(TokenStore.SESSION.name());
         adapterConfig.setCredentials(Map.of("secret",  getenv("KEYCLOAK_CLIENT_SECRET")));
