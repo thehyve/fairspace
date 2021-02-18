@@ -2013,7 +2013,13 @@ At first run, you need to configure the service account in Keycloak.
 
 * Navigate to link:http://localhost:5100[http://localhost:5100]
 * Login with credentials ``keycloak``, ``keycloak``
-* Grant ``realm-management`` roles in the Fairspace realm: ``view-realm``, ``manage-realm``, ``manage-authorization``, ``manage-users``.
+* Grant the ``view-users`` role to the client service account:
+** In the realm, select `Clients` -> Select client
+** Choose tab `Service Account Roles`
+** Select `realm-management` from the `Client Roles` dropdown
+** Select `view-users` from the available roles, click `Add selected`.
++
+image:docs/images/screenshots/Keycloak service account roles.png[Keycloak service account roles, role="th", align="center"]
 
 Now everything should be ready to start using Fairspace:
 
