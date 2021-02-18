@@ -1,12 +1,11 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.*;
+import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
@@ -30,7 +29,8 @@ public class App {
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addServlet(API_PREFIX + "/search/*", svc.getSearchProxyServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
-                .port(CONFIG.port);
+                .port(CONFIG.port)
+                .enableCors(true);
         var server = serverBuilder
                 .build();
 

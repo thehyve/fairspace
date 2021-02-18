@@ -21,6 +21,9 @@ fairspace:
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
   storages:
+    - name: fairspace-test
+      label: "Test storage"
+      url: https://fairspace.test.fairway.app/api/webdav
 
 # Specific settings for Saturn subchart
 saturn:
