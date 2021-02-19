@@ -106,7 +106,7 @@ type ExternalMetadataCardProperties = {
 
 const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     const {title, forceExpand, path, storage, users} = props;
-    const fileAPI = new FileAPI(storage.remoteURL);
+    const fileAPI = new FileAPI(storage.url);
     const {data = {}, error, loading} = useAsync(() => fileAPI.stat(path), [path]);
     const {iscollection} = data;
     const filePropertiesToDisplay = mapFileProperties(data, users);
