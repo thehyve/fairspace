@@ -52,7 +52,7 @@ const ignoredProperties = [
     'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'accessMode', 'isreadonly',
     'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
     'status', 'getcreated', 'getcontenttype', 'etag', 'getetag', 'iscollection',
-    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength'
+    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size'
 ];
 
 const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, DisplayProperty> => {
@@ -72,11 +72,7 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Disp
         creationdate: {
             label: "Creation date",
             value: formatDate(data.creationdate)
-        },
-        size: {
-            label: "Size",
-            value: data.size
-        },
+        }
     };
     const propertiesToDisplay = Object.keys(data).filter(
         k => !ignoredProperties.includes(k) && !Object.keys(defaultProperties).includes(k)
