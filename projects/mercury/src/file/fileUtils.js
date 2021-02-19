@@ -82,6 +82,21 @@ export const getPathInfoFromParams = ({collection, path}) => (
     }
 );
 
+export const getPathHierarchy = (fullPath, skipRootFolder = true) => {
+    if (!fullPath) return [];
+
+    const paths = [];
+    let path = fullPath;
+    while (path && path.lastIndexOf(PATH_SEPARATOR) > 0) {
+        paths.push(path);
+        path = path.substring(0, path.lastIndexOf(PATH_SEPARATOR));
+    }
+    if (!skipRootFolder) {
+        paths.push(path);
+    }
+    return paths.reverse();
+};
+
 export const isUnsafeFileName = (fileName) => NON_SAFE_FILE_NAMES.includes(fileName);
 
 export const fileNameContainsInvalidCharacter = (fileName) => NON_SAFE_FILE_NAME_CHARACTERS.some(character => fileName.includes(character));

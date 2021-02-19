@@ -3,7 +3,7 @@ import React from 'react';
 import {mount} from "enzyme";
 import {act} from "@testing-library/react";
 import UploadsContext, {UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UploadsProvider} from "../UploadsContext";
-import FileAPI from "../FileAPI";
+import {LocalFileAPI} from "../FileAPI";
 
 const getUploadsProviderValue = props => {
     let contextValue;
@@ -22,7 +22,7 @@ const getUploadsProviderValue = props => {
 };
 
 describe('UploadsProvider', () => {
-    FileAPI.uploadMulti = jest.fn(() => Promise.resolve());
+    LocalFileAPI.uploadMulti = jest.fn(() => Promise.resolve());
 
     it('should upload files with default state', async () => {
         const getContext = getUploadsProviderValue();

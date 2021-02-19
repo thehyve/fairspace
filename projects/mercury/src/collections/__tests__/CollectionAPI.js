@@ -1,5 +1,5 @@
 import CollectionAPI from "../CollectionAPI";
-import FileAPI from "../../file/FileAPI";
+import {LocalFileAPI} from "../../file/FileAPI";
 import MetadataAPI from "../../metadata/common/MetadataAPI";
 import {RDFS_NS} from "../../constants";
 
@@ -9,32 +9,32 @@ afterEach(() => {
 
 describe('CollectionAPI', () => {
     describe('Retrieving', () => {
-        FileAPI.list = jest.fn(() => Promise.resolve(
+        LocalFileAPI.list = jest.fn(() => Promise.resolve(
             [{basename: 'collection1'}, {basename: 'collection2'}, {basename: 'collection3'}]
         ));
-        FileAPI.stat = jest.fn(() => Promise.resolve(
+        LocalFileAPI.stat = jest.fn(() => Promise.resolve(
             {iri: 'c_iri'}
         ));
 
         it('retrieves data for collections', async () => {
             await CollectionAPI.getCollections();
 
-            expect(FileAPI.list).toHaveBeenCalledTimes(1);
-            expect(FileAPI.list).toHaveBeenCalledWith('', false);
+            expect(LocalFileAPI.list).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.list).toHaveBeenCalledWith('', false);
 
-            expect(FileAPI.stat).toHaveBeenCalledTimes(0);
+            expect(LocalFileAPI.stat).toHaveBeenCalledTimes(0);
         });
 
         it('retrieves collections including deleted', async () => {
             await CollectionAPI.getCollections(true);
-            expect(FileAPI.list).toHaveBeenCalledTimes(1);
-            expect(FileAPI.list).toHaveBeenCalledWith('', true);
+            expect(LocalFileAPI.list).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.list).toHaveBeenCalledWith('', true);
         });
     });
 
     describe('Adding', () => {
-        FileAPI.createDirectory = jest.fn(() => Promise.resolve());
-        FileAPI.stat = jest.fn(() => Promise.resolve({iri: 'c_iri'}));
+        LocalFileAPI.createDirectory = jest.fn(() => Promise.resolve());
+        LocalFileAPI.stat = jest.fn(() => Promise.resolve({iri: 'c_iri'}));
         MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
 
         it('makes the proper calls to add a collection', async () => {
@@ -43,10 +43,10 @@ describe('CollectionAPI', () => {
                 description: 'description1'
             }, {});
 
-            expect(FileAPI.createDirectory).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.createDirectory).toHaveBeenCalledTimes(1);
 
-            expect(FileAPI.stat).toHaveBeenCalledTimes(1);
-            expect(FileAPI.stat).toHaveBeenCalledWith('name1');
+            expect(LocalFileAPI.stat).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.stat).toHaveBeenCalledWith('name1');
 
             expect(MetadataAPI.updateEntity).toHaveBeenCalledTimes(1);
             expect(MetadataAPI.updateEntity).toHaveBeenCalledWith(
@@ -81,7 +81,7 @@ describe('CollectionAPI', () => {
     });
 
     describe('Undeleting', () => {
-        FileAPI.undelete = jest.fn(() => Promise.resolve());
+        LocalFileAPI.undelete = jest.fn(() => Promise.resolve());
 
         it('makes a proper call to undelete a collection', async () => {
             await CollectionAPI.undeleteCollection({
@@ -90,13 +90,13 @@ describe('CollectionAPI', () => {
                 iri: 'c1'
             }, {});
 
-            expect(FileAPI.undelete).toHaveBeenCalledTimes(1);
-            expect(FileAPI.undelete).toHaveBeenCalledWith('name 1');
+            expect(LocalFileAPI.undelete).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.undelete).toHaveBeenCalledWith('name 1');
         });
     });
 
     describe('Deleting', () => {
-        FileAPI.delete = jest.fn(() => Promise.resolve());
+        LocalFileAPI.delete = jest.fn(() => Promise.resolve());
 
         it('makes a proper call to delete a collection', async () => {
             await CollectionAPI.deleteCollection({
@@ -105,8 +105,8 @@ describe('CollectionAPI', () => {
                 iri: 'c1'
             });
 
-            expect(FileAPI.delete).toHaveBeenCalledTimes(1);
-            expect(FileAPI.delete).toHaveBeenCalledWith('name 1', false);
+            expect(LocalFileAPI.delete).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.delete).toHaveBeenCalledWith('name 1', false);
         });
 
         it('makes a proper call to delete a collection permanently', async () => {
@@ -116,8 +116,8 @@ describe('CollectionAPI', () => {
                 iri: 'c1'
             }, true);
 
-            expect(FileAPI.delete).toHaveBeenCalledTimes(1);
-            expect(FileAPI.delete).toHaveBeenCalledWith('name 1', true);
+            expect(LocalFileAPI.delete).toHaveBeenCalledTimes(1);
+            expect(LocalFileAPI.delete).toHaveBeenCalledWith('name 1', true);
         });
     });
 });

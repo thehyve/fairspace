@@ -416,6 +416,6 @@ class FileAPI {
     }
 }
 
-export const ExternalFileApi = (remoteURL) => new FileAPI(remoteURL);
+export const LocalFileAPI = new FileAPI();
 
-export default new FileAPI();
+export default FileAPI;

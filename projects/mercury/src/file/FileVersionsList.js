@@ -8,11 +8,11 @@ import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import filesize from "filesize";
 import Download from "mdi-material-ui/Download";
 import useAsync from "../common/hooks/UseAsync";
-import FileAPI from "./FileAPI";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import {formatDateTime} from '../common/utils/genericUtils';
+import {LocalFileAPI} from "./FileAPI";
 
 const styles = (theme) => ({
     fileVersionDialog: {
@@ -76,7 +76,7 @@ const columns = [
 
 const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, classes}) => {
     const {data: selectedFileDetails, error, loading} = useAsync(
-        () => FileAPI.stat(selectedFile.filename, false)
+        () => LocalFileAPI.stat(selectedFile.filename, false)
     );
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
@@ -95,7 +95,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
     }
 
     const handleOpenVersion = (version) => {
-        FileAPI.open(selectedFile.filename, version);
+        LocalFileAPI.open(selectedFile.filename, version);
     };
 
     const handleRevertToVersion = (version) => {
@@ -138,7 +138,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
     );
 
     function getDownloadLink(version) {
-        return FileAPI.getDownloadLink(selectedFile.filename) + `?version=${version}`;
+        return LocalFileAPI.getDownloadLink(selectedFile.filename) + `?version=${version}`;
     }
 
     const renderDownloadActionCell = (rowIndex) => (
@@ -188,7 +188,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
     const loadMoreRows = ({startIndex, stopIndex}) => {
         const fromVersion = startIndex === 1 ? startIndex : startIndex + 1;
         const toVersion = stopIndex + 1;
-        FileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion)
+        LocalFileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion)
             .then(res => {
                 if (res) {
                     setLoadedData([...loadedData, ...res]);

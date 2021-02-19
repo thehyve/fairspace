@@ -18,7 +18,7 @@ import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataE
 import type {Collection} from './CollectionAPI';
 import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
 import useAsync from '../common/hooks/UseAsync';
-import FileAPI from '../file/FileAPI';
+import {LocalFileAPI} from '../file/FileAPI';
 import MessageDisplay from '../common/components/MessageDisplay';
 import ErrorDialog from "../common/components/ErrorDialog";
 import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
@@ -37,18 +37,8 @@ import {
 } from "../constants";
 import {determinePropertyShapesForTypes, determineShapeForTypes} from "../metadata/common/vocabularyUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "../metadata/common/jsonLdUtils";
+import {getPathHierarchy} from "../file/fileUtils";
 
-const pathHierarchy = (fullPath) => {
-    if (!fullPath) return [];
-
-    const paths = [];
-    let path = fullPath;
-    while (path && path.lastIndexOf('/') > 0) {
-        paths.push(path);
-        path = path.substring(0, path.lastIndexOf('/'));
-    }
-    return paths.reverse();
-};
 
 const useStyles = makeStyles((theme) => ({
     expandOpen: {
@@ -149,7 +139,7 @@ const MetadataCard = (props) => {
 
     const uploadMetadata = (file) => {
         setUploadingMetadata(true);
-        FileAPI.uploadMetadata(metadataUploadPath, file)
+        LocalFileAPI.uploadMetadata(metadataUploadPath, file)
             .then(() => enqueueSnackbar('Metadata have been successfully uploaded'))
             .catch(e => {
                 const errorContents = (
@@ -238,7 +228,7 @@ const MetadataCard = (props) => {
 };
 
 const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
-    const {data, error, loading} = useAsync(() => FileAPI.stat(path, showDeleted), [path]);
+    const {data, error, loading} = useAsync(() => LocalFileAPI.stat(path, showDeleted), [path]);
 
     let body;
     let isDirectory;
@@ -294,7 +284,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
         inCollectionsBrowser, path, showDeleted
     } = props;
 
-    const paths = pathHierarchy(path);
+    const paths = getPathHierarchy(path);
 
     if (!collection) {
         return atLeastSingleCollectionExists && inCollectionsBrowser
