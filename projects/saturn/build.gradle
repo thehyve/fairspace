@@ -66,6 +66,8 @@ dependencies {
 
     runtime 'org.slf4j:slf4j-api:1.7.30'
     runtime 'org.slf4j:slf4j-log4j12:1.7.30'
+    runtime 'log4j:log4j:1.2.17'
+    runtime 'log4j:apache-log4j-extras:1.2.17'
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"

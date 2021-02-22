@@ -2149,6 +2149,159 @@ WARNING: Be careful, you may lose data!
 ~/bin/helm/helm del --purge fairspace-test
 ----
 
+=== Logging
+
+For several purposes, three types of logs are generated:
+
+- _Application log:_ Informative messages about the system state and application errors. This enables system administrators to diagnose problems.
+- _Audit log:_ Records all user actions that add, change or delete data and access to files. This enables system administrators to audit important changes and access to sensitive data.
+- _Transaction log:_ Detailed log of all database changes. This enables the system to restore the database if it is corrupted.
++
+WARNING: _Do not change or remove this log!_
+
+As default, application and audit logs are written to standard output.
+Additionally, the audit log is also written to log files in ``data/audit``.
+The log files are automatically ‘rolled over’: today’s records are in ``audit.log``, previous records are stored in daily log files with file name pattern
+``data/audit/audit.yyyy-MM-dd.log``, and are retained for 50 days.
+If the audit log needs to be kept for a longer period, the log configuration can be replaced, or log files can be transferred elsewhere, e.g., using link:https://www.elastic.co/guide/en/beats/filebeat/current/index.html[filebeat].
+The audit log is encoded in a JSON format, that can be processed by, e.g., link:https://www.elastic.co/logstash[logstash].
+
+The transaction log is stored in ``data/log`` by default.
+
+==== Configuration
+
+The default log configuration for application and audit logs is in  link:projects/saturn/src/main/resources/log4j.properties[log4j.properties].
+The default can be overridden by placing a file ``log4j.properties`` in the working directory where the application is run.
+
+==== Audit log
+
+The audit log is generated using link:https://logging.apache.org/log4j/1.2/[log4j] and _Mapped Diagnostic Context (MDC)_.
+The basic idea of Mapped Diagnostic Context is to provide a way to enrich log messages with pieces of information that could be not available in the scope where the logging actually occurs, but that can be indeed useful to better track the execution of the program. Basically it groups log data from a single event (``MDC.put``) into a one log message.
+
+Audit log entries contain several fields, including
+``event``, ``user_name``, ``user_email``, ``user_id`` and request specific additional parameters.
+Below we list the actions that are logged and which information is captured in the audit log.
+
+===== WebDAV
+
+Request: ``/api/webdav``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``GET``
+| ``FS_READ``
+| ``path``, ``version``, ``success``
+| Read file
+
+| ``PROPPATCH``
+| ``FS_PROPPATCH``
+| ``path``, ``success``
+| Not used by the UI (metadata endpoint used instead)
+
+| ``MKCOL``
+| ``FS_MKDIR``
+| ``path``, ``success``
+| Create a new collection or directory.
+
+| ``COPY``
+| ``FS_COPY``
+| ``path``, ``destination``, ``success``
+| Copy a file or directory (executed on “paste” action)
+
+| ``MOVE``
+| ``FS_MOVE``
+| ``path``, ``destination``, ``success``
+| Rename a resource, move to a different location
+
+| ``DELETE``
+| ``FS_MARK_AS_DELETED``, ``FS_DELETE``
+| ``path``, ``success``
+| Mark a resource as deleted or delete permanently
+
+| ``PUT``
+| ``FS_WRITE``
+| ``path``, ``success``
+| Not used by the UI (metadata endpoint used instead)
+
+| ``POST``
+| ``FS_ACTION``
+| ``path``, ``action``, ``parameters``, ``success``
+| Upload a file(s) or folder, undelete a resource, change collection status, access mode, owner or permissions.
+|===
+
+Events that are not logged: accessing collections, listing collection and directory contents, listing previous versions.
+
+===== Metadata
+
+Request: ``/api/metadata/``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``PUT``
+| ``METADATA_UPDATED``
+| ``iri``
+| Add all the statements in the given model to the database
+
+| (Soft) ``DELETE``
+| ``METADATA_MARKED_AS_DELETED``
+| ``iri``
+| Mark an entity as deleted
+
+| ``DELETE``
+| ``METADATA_DELETED``
+| ``iri``
+| Delete metadata
+
+| ``PATCH``
+| ``METADATA_UPDATED``
+| ``iri``
+| Overwrite metadata in the database
+|===
+
+Fetching metadata is not included in audit log.
+
+===== Workspace operations
+
+Request: ``/api/workspace/``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``PUT``
+| ``WS_CREATE``
+| ``workspace``
+| Create workspace
+
+| ``DELETE``
+| ``WS_DELETE``
+| ``workspace``
+| Delete workspace
+
+| ``PATCH users/``
+| ``WS_SET_USER_ROLE``
+| ``workspace``, ``affected_user``, ``role``
+| Add user to the workspace, change workspace user role, delete a user from a workspace
+|===
+
+Listing workspaces and workspace users is not included in the audit log.
+
+===== User roles operations
+
+Request: ``/api/users/``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``PATCH``
+| ``USER_UPDATE``
+| ``affected_user``
+| Change organisation user role
+|===
+
+Fetching user information is not included in the audit log.
+
 
 
 == Design
