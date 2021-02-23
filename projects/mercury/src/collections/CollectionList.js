@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    Link,
     ListItemText,
     Paper,
     Table,
@@ -135,11 +136,20 @@ const CollectionList = ({
                                     className={collection.dateDeleted && classes.deletedCollectionRow}
                                 >
                                     <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
-                                        <ListItemText
-                                            style={{margin: 0}}
-                                            primary={collection.name}
-                                            secondary={collection.description}
-                                        />
+                                        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                                        <Link
+                                            component="button"
+                                            onClick={(e) => {e.stopPropagation(); onCollectionDoubleClick(collection);}}
+                                            color="inherit"
+                                            variant="body2"
+                                            style={{textAlign: "left"}}
+                                        >
+                                            <ListItemText
+                                                style={{margin: 0}}
+                                                primary={collection.name}
+                                                secondary={collection.description}
+                                            />
+                                        </Link>
                                     </TableCell>
                                     { currentWorkspace() ? null : (
                                         <TableCell style={{

@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {
     Checkbox,
-    Grid,
+    Grid, Link,
     Paper,
     Table,
     TableBody,
@@ -176,7 +176,15 @@ const FileList = ({
                                         {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                     </TableCell>
                                     <TableCell>
-                                        {file.basename}
+                                        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                                        <Link
+                                            component="button"
+                                            onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
+                                            color="inherit"
+                                            variant="body2"
+                                        >
+                                            {file.basename}
+                                        </Link>
                                     </TableCell>
                                     <TableCell align="right">
                                         {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}
