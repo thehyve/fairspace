@@ -104,10 +104,9 @@ fairspace:
         issuerRef:
           name: letsencrypt-prod
           kind: ClusterIssuer
-
-  features:
-  services:
-  storages:
+  features: []
+  services: {}
+  storages: []
 
 # Generic settings for tracing
 tracing:
