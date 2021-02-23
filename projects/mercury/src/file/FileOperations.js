@@ -9,7 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import ErrorDialog from "../common/components/ErrorDialog";
 
-import {getParentPath, joinPaths} from "./fileUtils";
+import {getParentPath, isListOnlyFile, joinPaths} from "./fileUtils";
 import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
@@ -55,6 +55,7 @@ export const FileOperations = ({
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const selectedDeletedItems = selectedItems.filter(f => f.dateDeleted);
     const isDeletedItemSelected = selectedDeletedItems.length > 0;
+    const isListOnlyItemSelected = isListOnlyFile(selectedItem);
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
     const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
@@ -228,7 +229,10 @@ export const FileOperations = ({
                 <IconButton
                     title={`Download ${selectedItem.basename}`}
                     aria-label={`Download ${selectedItem.basename}`}
-                    disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                    disabled={
+                        isDisabledForMoreThanOneSelection || selectedItem.type !== 'file'
+                        || isDeletedItemSelected || busy || isListOnlyItemSelected
+                    }
                     component="a"
                     href={fileActions.getDownloadLink(selectedItem.filename)}
                     download

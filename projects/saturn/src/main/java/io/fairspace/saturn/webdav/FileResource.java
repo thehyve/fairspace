@@ -117,6 +117,11 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
         return version;
     }
 
+    @Property
+    public String getAccess() {
+        return access.name();
+    }
+
     @Override
     protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {

@@ -5,10 +5,11 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {useExternalStorage} from "./UseExternalStorage";
 import FileList from "../file/FileList";
+import {File} from "../file/FileAPI";
+import {isListOnlyFile, splitPathIntoArray} from "../file/fileUtils";
 import FileOperations from "../file/FileOperations";
 import type {ExternalStorage} from "./externalStorageUtils";
 import {getExternalStorageAbsolutePath, getExternalStoragePathPrefix, getRelativePath} from "./externalStorageUtils";
-import {splitPathIntoArray} from "../file/fileUtils";
 import * as consts from "../constants";
 
 const styles = () => ({
@@ -69,7 +70,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
         selection.deselectAll();
         if (path.type === 'directory') {
             history.push(getExternalStorageAbsolutePath(path.filename, storage.name));
-        } else {
+        } else if (!isListOnlyFile(path)) {
             fileActions.open(path.filename);
         }
     };

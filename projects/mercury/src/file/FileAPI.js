@@ -22,6 +22,7 @@ export type File = {
     dateCreated: string;
     dateModified?: string;
     dateDeleted?: string;
+    access?: string;
 }
 
 class FileAPI {
