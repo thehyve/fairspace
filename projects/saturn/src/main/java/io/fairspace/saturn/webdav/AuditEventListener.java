@@ -4,6 +4,9 @@ import io.milton.event.Event;
 import io.milton.event.EventListener;
 import io.milton.event.ResponseEvent;
 
+import java.util.*;
+import java.util.stream.*;
+
 import static io.fairspace.saturn.audit.Audit.audit;
 
 class AuditEventListener implements EventListener {
@@ -44,13 +47,26 @@ class AuditEventListener implements EventListener {
                 case PUT -> audit("FS_WRITE",
                         "path", path,
                         "success", success);
-                case POST -> audit("FS_ACTION",
-                        "path", path,
-                        "parameters", re.getRequest().getParams(),
-                        "success", success);
+                case POST -> {
+                    var params = new ArrayList<>();
+                    Stream.concat(
+                            Map.of(
+                                    "path", path,
+                                    "success", success
+                            ).entrySet().stream(),
+                            re.getRequest().getParams().entrySet().stream()
+                                    .filter(entry -> actionParameters.contains(entry.getKey()))
+                    ).forEachOrdered((Map.Entry<String, ?> entry) -> {
+                        params.add(entry.getKey());
+                        params.add(entry.getValue());
+                    });
+                    audit("FS_ACTION", params.toArray());
+                }
             }
         }
     }
+
+    private final Set<String> actionParameters = Set.of("action", "mode", "status", "access", "principal", "owner");
 
     private static String resourcePath(String path) {
         return path.substring("/api/webdav".length());
