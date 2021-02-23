@@ -17,7 +17,7 @@ fairspace:
   description: "CI Fairspace"
   ingress:
     domain: fairspace.ci.fairway.app
-  features:
+  features: []
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
   storages:

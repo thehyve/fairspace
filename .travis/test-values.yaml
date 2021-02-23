@@ -16,10 +16,10 @@ fairspace:
   description: "Test Fairspace"
   ingress:
     domain: fairspace.test.fairway.app
-  features:
+  features: []
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
-  storages:
+  storages: []
 
 # Specific settings for Saturn subchart
 saturn:
