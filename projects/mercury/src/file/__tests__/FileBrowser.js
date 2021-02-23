@@ -95,19 +95,6 @@ describe('FileBrowser', () => {
         expect(getByText(/collection does not exist/i)).toBeInTheDocument();
     });
 
-    it('show error when when an error messsage is given', () => {
-        const {getByText} = renderWithProviders(
-            <FileBrowser
-                {...initialProps}
-                openedCollection={openedCollection}
-                error="some error"
-            />
-        );
-
-        // finds substring ignoring case
-        expect(getByText(/error occurred/i)).toBeInTheDocument();
-    });
-
     it('cleans up listener after unmount', () => {
         const cleanupFn = jest.fn();
 
