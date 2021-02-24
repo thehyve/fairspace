@@ -125,7 +125,17 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="name">
                                         <ListItemText
                                             style={{margin: 0}}
-                                            primary={workspace.name}
+                                            primary={workspace.canCollaborate ? (
+                                                <Link
+                                                    component="button"
+                                                    onClick={(e) => {e.stopPropagation(); onWorkspaceDoubleClick(workspace);}}
+                                                    color="inherit"
+                                                    variant="body2"
+                                                    style={{textAlign: "left"}}
+                                                >
+                                                    {workspace.name}
+                                                </Link>
+                                            ) : workspace.name}
                                             secondary={workspace.comment}
                                         />
                                     </TableCell>
