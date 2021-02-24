@@ -15,7 +15,6 @@ import {generateUuid} from "../metadata/common/metadataUtils";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import type {Collection} from "../collections/CollectionAPI";
 
-
 const styles = (theme) => ({
     container: {
         height: "100%"
@@ -84,14 +83,13 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         openedPath = "",
         isOpenedPathDeleted = false,
         files = [],
-        loading = false,
         showDeleted = false,
         refreshFiles = () => {},
         fileActions = {},
         selection = {},
         preselectedFile = {},
         classes = {},
-        history, error
+        history
     } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
@@ -182,6 +180,17 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         }
     }, [overwriteFileCandidateNames, overwriteFolderCandidateNames, showCannotOverwriteWarning]);
 
+    const collectionExists = openedCollection && openedCollection.iri;
+    if (!collectionExists) {
+        return (
+            <MessageDisplay
+                message="This collection does not exist or you don't have sufficient permissions to view it."
+                variant="h6"
+                noWrap={false}
+            />
+        );
+    }
+
     const uploadFolder = () => {
         if (isFolderUpload) {
             open();
@@ -224,25 +233,6 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         setOverwriteFileCandidateNames([]);
         setCurrentUpload({});
     };
-
-    if (loading) {
-        return <LoadingInlay />;
-    }
-
-    const collectionExists = openedCollection && openedCollection.iri;
-    if (!collectionExists) {
-        return (
-            <MessageDisplay
-                message="This collection does not exist or you don't have sufficient permissions to view it."
-                variant="h6"
-                noWrap={false}
-            />
-        );
-    }
-
-    if (error) {
-        return (<MessageDisplay message="An error occurred while loading files" />);
-    }
 
     const renderOverwriteConfirmationMessage = () => (
         <Typography variant="body2" component="span">
@@ -339,11 +329,17 @@ export const FileBrowser = (props: FileBrowserProperties) => {
 const ContextualFileBrowser = (props: ContextualFileBrowserProperties) => {
     const {openedPath, showDeleted, loading, error} = props;
     const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
+
+    if (error || filesError) {
+        return (<MessageDisplay message="An error occurred while loading files" />);
+    }
+    if (loading || filesLoading) {
+        return <LoadingInlay />;
+    }
+
     return (
         <FileBrowser
             files={files}
-            loading={loading || filesLoading}
-            error={error || filesError}
             showDeleted={showDeleted}
             refreshFiles={refresh}
             fileActions={fileActions}
