@@ -21,6 +21,7 @@ import styles from './FileList.styles';
 import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
+import {isListOnlyFile} from "./fileUtils";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
@@ -176,15 +177,17 @@ const FileList = ({
                                         {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                     </TableCell>
                                     <TableCell>
-                                        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                                        <Link
-                                            component="button"
-                                            onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
-                                            color="inherit"
-                                            variant="body2"
-                                        >
-                                            {file.basename}
-                                        </Link>
+                                        {isListOnlyFile(file) ? <span>{file.basename}</span> : (
+                                            <Link
+                                                onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
+                                                color="inherit"
+                                                variant="body2"
+                                                component="button"
+                                                underline="hover"
+                                            >
+                                                {file.basename}
+                                            </Link>
+                                        )}
                                     </TableCell>
                                     <TableCell align="right">
                                         {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}

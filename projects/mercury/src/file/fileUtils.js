@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-cycle
+import {File} from "./FileAPI";
 import {PATH_SEPARATOR} from "../constants";
 
 const NON_SAFE_FILE_NAME_CHARACTERS = ['/', '\\'];
@@ -110,3 +112,5 @@ export const isValidFileName = (fileName) => {
         && !fileNameContainsInvalidCharacter(name)
         && !isUnsafeFileName(name);
 };
+
+export const isListOnlyFile = (file: File) => file && file.type === 'file' && file.access === "List";
