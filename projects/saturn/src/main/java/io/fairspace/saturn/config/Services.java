@@ -8,6 +8,7 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.views.*;
@@ -47,6 +48,7 @@ public class Services {
     private final MetadataService metadataService;
     private final ViewService viewService;
     private final QueryService queryService;
+    private final SearchService searchService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
@@ -85,6 +87,8 @@ public class Services {
 
         viewService = new ViewService(viewsConfig, filteredDataset);
         queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset);
+
+        searchService = new SearchService(filteredDataset);
 
         searchProxyServlet = new SearchProxyServlet(
                 apiPrefix,

@@ -3,7 +3,7 @@ import {PropTypes} from 'prop-types';
 
 import {valuesContainsValueOrId} from "./metadataUtils";
 import Dropdown from './values/Dropdown';
-import {lookup} from "../../search/lookup";
+import searchAPI from "../../search/SearchAPI";
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);
@@ -46,7 +46,7 @@ LinkedDataDropdown.propTypes = {
 };
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({type, query}) => lookup(query, type),
+    fetchItems: ({type, query}) => searchAPI.lookupSearch(query, type),
     debounce: 300
 };
 

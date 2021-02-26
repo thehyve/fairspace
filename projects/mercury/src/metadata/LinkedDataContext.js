@@ -2,7 +2,7 @@ import React from 'react';
 
 import StringValue from "./common/values/StringValue";
 import {handleSearchError} from "../search/searchUtils";
-import SearchAPI, {SORT_SCORE} from "../search/SearchAPI";
+import SearchAPI, {SORT_SCORE} from "../search/ESSearchAPI";
 
 const LinkedDataContext = React.createContext({
     valueComponentFactory: {

@@ -22,9 +22,9 @@ import {getLocationContextFromString, getSearchQueryFromString, handleSearchErro
 import SearchBar from "../search/SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {searchFiles} from "../search/lookup";
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import BreadCrumbs from '../common/components/BreadCrumbs';
+import searchAPI from "../search/SearchAPI";
 
 const styles = {
     tableRoot: {
@@ -149,7 +149,9 @@ export const CollectionSearchResultListContainer = ({
     location: {search}, query = getSearchQueryFromString(search), context = getLocationContextFromString(search),
     classes, history
 }) => {
-    const {data, loading, error} = useAsync(() => searchFiles(query, context).catch(handleSearchError), [search, query]);
+    const {data, loading, error} = useAsync(() => (
+        searchAPI.searchForFiles(query, context).catch(handleSearchError)
+    ), [search, query]);
     const items = data || [];
     const total = items.length;
     const handleSearch = (value) => {

@@ -1,4 +1,4 @@
-import {SEARCH_DEFAULT_SIZE, SearchAPI} from "../SearchAPI";
+import {SEARCH_DEFAULT_SIZE, ESSearchAPI} from "../ESSearchAPI";
 
 let mockClient;
 let searchAPI;
@@ -8,7 +8,7 @@ describe('Search API', () => {
         mockClient = {
             search: jest.fn(() => Promise.resolve({hits: {total: 0, hits: []}}))
         };
-        searchAPI = new SearchAPI(mockClient);
+        searchAPI = new ESSearchAPI(mockClient);
     });
 
     describe('output format', () => {
