@@ -10,7 +10,7 @@ import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import MetadataOverviewPage from "../metadata/MetadataOverviewPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
-import CollectionSearchResultList from "../collections/CollectionsSearchResultList";
+import CollectionSearchResultList from "../search/TextSearchResultList";
 import WorkspacesPage from "../workspaces/WorkspacesPage";
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";
@@ -54,7 +54,7 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/collections-search"
+                path="/text-search"
                 render={(props) => (
                     <LinkedDataMetadataProvider>
                         <CollectionSearchResultList {...props} />

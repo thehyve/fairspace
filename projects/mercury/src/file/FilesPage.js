@@ -15,7 +15,6 @@ import CollectionBreadcrumbsContextProvider from "../collections/CollectionBread
 import CollectionsContext from "../collections/CollectionsContext";
 import {useMultipleSelection} from "./UseSelection";
 import LoadingOverlay from "../common/components/LoadingOverlay";
-import {handleCollectionTextSearchRedirect} from "../collections/collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
@@ -29,6 +28,7 @@ import type {Collection} from "../collections/CollectionAPI";
 import type {User} from "../users/UsersAPI";
 import {MetadataViewOptions} from "../metadata/views/MetadataViewAPI";
 import type {Match} from "../types";
+import {handleTextSearchRedirect} from "../search/searchUtils";
 
 type ContextualFilesPageProperties = {
     match: Match,
@@ -84,7 +84,7 @@ export const FilesPage = (props: FilesPageProperties) => {
     );
 
     const handleTextSearch = (value) => {
-        handleCollectionTextSearchRedirect(history, value, getLocationContext());
+        handleTextSearchRedirect(history, value, getLocationContext());
     };
 
     useEffect(() => {

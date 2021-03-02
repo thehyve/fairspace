@@ -12,7 +12,6 @@ import CollectionBrowser from "./CollectionBrowser";
 import CollectionInformationDrawer from './CollectionInformationDrawer';
 import {useSingleSelection} from "../file/UseSelection";
 import LoadingOverlay from "../common/components/LoadingOverlay";
-import {handleCollectionTextSearchRedirect} from "./collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -21,6 +20,7 @@ import CollectionsContext from './CollectionsContext';
 import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
+import {handleTextSearchRedirect} from "../search/searchUtils";
 
 
 type CollectionsPageProperties = {
@@ -48,7 +48,7 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
     const [preselectedCollectionIri, setPreselectedCollectionIri] = useState(false);
 
     const handleSearch = (value) => {
-        handleCollectionTextSearchRedirect(history, value);
+        handleTextSearchRedirect(history, value);
     };
 
     let unmounting = false;

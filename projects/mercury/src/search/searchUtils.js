@@ -2,6 +2,7 @@ import queryString from 'query-string';
 import React from 'react';
 import {handleAuthError} from "../common/utils/httpUtils";
 import Iri from '../common/components/Iri';
+import {pathForIri} from "../collections/collectionUtils";
 
 /**
  * Builds a search URL with the given query
@@ -17,8 +18,23 @@ export const buildSearchUrl = (query) => {
     return `/search?${searchString}`;
 };
 
+export const handleTextSearchRedirect = (history, value, context = '', storageName = null) => {
+    if (value) {
+        const queryParams = {q: value, context};
+        if (storageName) {
+            queryParams.storage = storageName;
+        }
+        history.push('/text-search/?' + queryString.stringify(queryParams));
+    } else if (storageName) {
+        history.push(`/external-storages/${storageName}/${context ? pathForIri(context) : ''}`);
+    } else {
+        history.push(`/collections/${context ? pathForIri(context) : ''}`);
+    }
+};
+
 export const getSearchQueryFromString = (searchString) => queryString.parse(searchString).q || '';
 export const getLocationContextFromString = (searchString) => queryString.parse(searchString).context || '';
+export const getStorageFromString = (searchString) => queryString.parse(searchString).storage || '';
 export const getMetadataViewNameFromString = (searchString) => queryString.parse(searchString).view || '';
 
 /**

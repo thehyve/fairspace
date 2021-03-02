@@ -5,7 +5,8 @@ import {PATH_SEPARATOR} from "../constants";
 export type ExternalStorage = {
     url: string,
     name: string,
-    label: string
+    label: string,
+    searchUrl?: string
 }
 
 export const getExternalStoragePathPrefix = (storageName: string) => (

@@ -97,6 +97,7 @@ public class Config {
         @NotBlank public String name;
         @NotBlank public String label;
         @NotBlank public String url;
+        public String searchUrl;
     }
 
     @Override

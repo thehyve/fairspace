@@ -10,14 +10,17 @@ export type SearchResult = {|
 |}
 
 export const HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'};
-const searchUrl = "/api/textsearch/";
 
 /**
  * Search for resources based on name or description, given query as a simple text.
  */
 class SearchAPI {
+    constructor(remoteURL = '/api/textsearch/') {
+        this.remoteURL = remoteURL;
+    }
+
     search(body): Promise<SearchResult[]> {
-        return axios.post(searchUrl, body, {headers: HEADERS})
+        return axios.post(this.remoteURL, body, {headers: HEADERS})
             .catch(handleHttpError("Error while performing search"))
             .then(extractJsonData)
             .then(data => data.results);
@@ -44,6 +47,6 @@ class SearchAPI {
     }
 }
 
-const searchAPI = new SearchAPI();
+export const LocalSearchAPI = new SearchAPI();
 
-export default searchAPI;
+export default SearchAPI;

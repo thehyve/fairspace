@@ -1,5 +1,4 @@
 import React from "react";
-import queryString from "query-string";
 import {Create, MenuBook, Settings, Toc} from "@material-ui/icons";
 import type {
     AccessLevel,
@@ -57,14 +56,6 @@ export const getSearchPathSegments = (context) => {
     });
     result.push({label: 'Search results', href: ''});
     return result;
-};
-
-export const handleCollectionTextSearchRedirect = (history, value, context = '') => {
-    if (value) {
-        history.push('/collections-search/?' + queryString.stringify({q: value, context}));
-    } else {
-        history.push(`/collections/${context ? pathForIri(context) : ''}`);
-    }
 };
 
 export const collectionAccessIcon = (access: AccessLevel, fontSize: 'inherit' | 'default' | 'small' | 'large' = 'default') => {
