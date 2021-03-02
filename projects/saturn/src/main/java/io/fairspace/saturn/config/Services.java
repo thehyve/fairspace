@@ -1,7 +1,6 @@
 package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
-import io.fairspace.saturn.rdf.search.IndexDispatcher;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -10,8 +9,9 @@ import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.views.QueryService;
+import io.fairspace.saturn.services.views.SparqlQueryService;
 import io.fairspace.saturn.services.views.ViewService;
-import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -53,9 +53,8 @@ public class Services {
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
-    private final SearchProxyServlet searchProxyServlet;
 
-    public Services(@NonNull String apiPrefix, @NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
+    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -89,11 +88,5 @@ public class Services {
         queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset);
 
         searchService = new SearchService(filteredDataset);
-
-        searchProxyServlet = new SearchProxyServlet(
-                apiPrefix,
-                CONFIG.elasticsearchUrl,
-                transactions,
-                new IndexDispatcher(dataset.getContext()));
     }
 }

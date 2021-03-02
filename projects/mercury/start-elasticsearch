@@ -1,8 +1,0 @@
-mkdir -p ../saturn/data/elasticsearch
-if [ ! -z "$(docker container ls -a --filter name=fairspace-elasticsearch -q)" ]; then
-    echo "Restart ..."
-    docker start fairspace-elasticsearch -a
-else
-    echo "Create new ..."
-    docker run --name fairspace-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -v $(pwd)/../saturn/data/elasticsearch:/usr/share/elasticsearch/data docker.elastic.co/elasticsearch/elasticsearch:6.6.2
-fi

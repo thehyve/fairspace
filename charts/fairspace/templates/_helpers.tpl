@@ -92,8 +92,4 @@ Scheme to access fairspace components (http or https)
 {{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
 {{- end -}}
 
-{{- define "elasticsearch.baseurl" -}}
-{{- printf "%s://%s:%s" .Values.external.elasticsearch.rest.scheme .Values.external.elasticsearch.rest.host (.Values.external.elasticsearch.rest.port | toString) -}}
-{{- end -}}
-
 

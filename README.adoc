@@ -1476,8 +1476,7 @@ curl -H 'Accept: application/json+ld' 'http://localhost:8080/api/vocabulary/'
 | List available application features.
 |===
 
-Response contains list of additional features that are currently available in the application,
-e.g., metadata editing in the user interface.
+Response contains list of additional features that are currently available in the application.
 
 .Example listing features (curl)
 [%collapsible]

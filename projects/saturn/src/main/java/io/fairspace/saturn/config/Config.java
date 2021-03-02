@@ -33,8 +33,6 @@ public class Config {
 
     public String publicUrl = "http://localhost:8080";
 
-    public String elasticsearchUrl = "http://localhost:9200";
-
     public Jena jena = new Jena();
 
     public Auth auth = new Auth();
@@ -62,18 +60,6 @@ public class Config {
         public File transactionLogPath = new File("data/log");
 
         public boolean bulkTransactions = true;
-
-        public ElasticSearch elasticSearch = new ElasticSearch();
-
-        public static class ElasticSearch {
-            public boolean required = false;
-            public ESSettings settings = new ESSettings.Builder()
-                    .clusterName("fairspace")
-                    .hostAndPort("127.0.0.1", 9300)
-                    .indexName("fairspace")
-                    .build();
-            public Map<String, String> advancedSettings = new HashMap<>();
-        }
     }
 
     public static class Auth {

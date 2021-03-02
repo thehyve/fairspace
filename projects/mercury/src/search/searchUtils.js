@@ -4,20 +4,6 @@ import {handleAuthError} from "../common/utils/httpUtils";
 import Iri from '../common/components/Iri';
 import {pathForIri} from "../collections/collectionUtils";
 
-/**
- * Builds a search URL with the given query
- * @param query
- * @returns {string}
- */
-export const buildSearchUrl = (query) => {
-    if (!query) {
-        return '/search';
-    }
-
-    const searchString = queryString.stringify({q: query});
-    return `/search?${searchString}`;
-};
-
 export const handleTextSearchRedirect = (history, value, context = '', storageName = null) => {
     if (value) {
         const queryParams = {q: value, context};
