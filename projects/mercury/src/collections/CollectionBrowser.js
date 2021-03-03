@@ -3,7 +3,6 @@ import {withRouter} from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import CollectionEditor from './CollectionEditor';
 import CollectionList from "./CollectionList";
-import {getCollectionAbsolutePath} from './collectionUtils';
 import CollectionsContext from "./CollectionsContext";
 import WorkspaceContext from "../workspaces/WorkspaceContext";
 import UserContext from "../users/UserContext";
@@ -13,6 +12,7 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import {getDisplayName} from "../users/userUtils";
 import type {User} from "../users/UsersAPI";
 import type {Collection} from "./CollectionAPI";
+import {getCollectionAbsolutePath} from "./collectionUtils";
 
 
 type ContextualCollectionBrowserProperties = {

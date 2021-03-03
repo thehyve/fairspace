@@ -1,7 +1,8 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withStyles} from "@material-ui/core";
 import {useHistory} from "react-router-dom";
+import queryString from "query-string";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import {useSingleSelection} from "../file/UseSelection";
@@ -19,6 +20,8 @@ import ExternalStorageInformationDrawer from "./ExternalStorageInformationDrawer
 import UsersContext from "../users/UsersContext";
 import type {User} from "../users/UsersAPI";
 import {handleTextSearchRedirect} from "../search/searchUtils";
+import {joinPathsAvoidEmpty} from "../file/fileUtils";
+import {PATH_SEPARATOR} from "../constants";
 
 type ContextualExternalStoragePageProperties = {
     match: Match;
@@ -40,12 +43,24 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
     const isSearchAvailable = storage && !!storage.searchUrl;
+    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
 
     usePageTitleUpdater(storage ? storage.label : "External storage");
 
+    useEffect(() => {
+        if (preselectedFile) {
+            selection.select(preselectedFile);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [preselectedFile]);
+
     const handleSearch = (value: string) => {
-        const context = encodeURI(storage.url + getRelativePath(location.pathname, storage.name));
-        handleTextSearchRedirect(history, value, context, storage.name);
+        const relativePath = getRelativePath(location.pathname, storage.name);
+        let context = "";
+        if (relativePath && relativePath !== PATH_SEPARATOR) {
+            context = encodeURI(joinPathsAvoidEmpty(storage.rootDirectoryIri, relativePath));
+        }
+        handleTextSearchRedirect(history, value, context, storage);
     };
 
     if (!storage) {

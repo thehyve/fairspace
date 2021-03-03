@@ -85,6 +85,8 @@ export const stableSort = (array, cmp, ascending = true) => array.map((el, index
  */
 export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
 
+export const isEmptyObject = (obj) => !obj || Object.keys(obj).length === 0;
+
 let defaultLocale;
 try {
     defaultLocale = new Intl.Locale('en-GB');

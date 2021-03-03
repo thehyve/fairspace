@@ -14,8 +14,7 @@ import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from "../common/components/ErrorDialog";
 import {
-    fileNameContainsInvalidCharacter,
-    isUnsafeFileName,
+    fileNameContainsInvalidCharacter, isUnsafeFileName,
     isValidFileName
 } from '../file/fileUtils';
 

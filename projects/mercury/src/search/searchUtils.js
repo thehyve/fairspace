@@ -2,20 +2,39 @@ import queryString from 'query-string';
 import React from 'react';
 import {handleAuthError} from "../common/utils/httpUtils";
 import Iri from '../common/components/Iri';
-import {pathForIri} from "../collections/collectionUtils";
+import {getPathFromIri} from "../file/fileUtils";
+import type {ExternalStorage} from "../external-storage/externalStorageUtils";
+import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
+import {isEmptyObject} from "../common/utils/genericUtils";
 
-export const handleTextSearchRedirect = (history, value, context = '', storageName = null) => {
+export const handleTextSearchRedirect = (history: History, value: string, context: string = '', storage: ExternalStorage = {}) => {
     if (value) {
         const queryParams = {q: value, context};
-        if (storageName) {
-            queryParams.storage = storageName;
+        if (!isEmptyObject(storage)) {
+            queryParams.storage = storage.name;
         }
         history.push('/text-search/?' + queryString.stringify(queryParams));
-    } else if (storageName) {
-        history.push(`/external-storages/${storageName}/${context ? pathForIri(context) : ''}`);
+    } else if (!isEmptyObject(storage)) {
+        history.push(`/external-storages/${storage.name}/${context ? getPathFromIri(context, storage) : ''}`);
     } else {
-        history.push(`/collections/${context ? pathForIri(context) : ''}`);
+        history.push(`/collections/${context ? getPathFromIri(context) : ''}`);
     }
+};
+
+export const getSearchPathSegments = (context, storageName = "") => {
+    const segments = ((context && getPathFromIri(context)) || '').split('/');
+    const result = [];
+    if (segments[0] === '') {
+        result.push({label: 'Search results', href: ''});
+        return result;
+    }
+    let href = storageName ? getExternalStoragePathPrefix(storageName) : '/collections';
+    segments.forEach(segment => {
+        href += '/' + segment;
+        result.push({label: segment, href});
+    });
+    result.push({label: 'Search results', href: ''});
+    return result;
 };
 
 export const getSearchQueryFromString = (searchString) => queryString.parse(searchString).q || '';

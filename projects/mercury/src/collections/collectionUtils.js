@@ -12,8 +12,7 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
-import {encodePath, getParentPath} from '../file/fileUtils';
-import {FILE_URI} from "../constants";
+import {encodePath} from "../file/fileUtils";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -27,36 +26,6 @@ export const isCollectionPage = () => {
 export const getCollectionAbsolutePath = (path: string) => (
     `/collections/${encodePath(path)}`
 );
-
-export const pathForIri = (iri: string) => {
-    const path = decodeURIComponent(new URL(iri).pathname);
-    return path.replace('/api/webdav/', '');
-};
-
-export const redirectLink = (iri: string, type: string) => {
-    const path = pathForIri(iri);
-    if (type && type === FILE_URI) {
-        const parentPath = getParentPath(path);
-        return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
-    }
-    return getCollectionAbsolutePath(path);
-};
-
-export const getSearchPathSegments = (context) => {
-    const segments = ((context && pathForIri(context)) || '').split('/');
-    const result = [];
-    if (segments[0] === '') {
-        result.push({label: 'Search results', href: ''});
-        return result;
-    }
-    let href = '/collections';
-    segments.forEach(segment => {
-        href += '/' + segment;
-        result.push({label: segment, href});
-    });
-    result.push({label: 'Search results', href: ''});
-    return result;
-};
 
 export const collectionAccessIcon = (access: AccessLevel, fontSize: 'inherit' | 'default' | 'small' | 'large' = 'default') => {
     switch (access) {

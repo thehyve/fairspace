@@ -1,4 +1,5 @@
-import {encodePath} from "../file/fileUtils";
+// eslint-disable-next-line import/no-cycle
+import {encodePath, joinPathsAvoidEmpty} from "../file/fileUtils";
 import * as consts from "../constants";
 import {PATH_SEPARATOR} from "../constants";
 
@@ -6,6 +7,7 @@ export type ExternalStorage = {
     url: string,
     name: string,
     label: string,
+    rootDirectoryIri: string,
     searchUrl?: string
 }
 
@@ -14,7 +16,7 @@ export const getExternalStoragePathPrefix = (storageName: string) => (
 );
 
 export const getExternalStorageAbsolutePath = (path: string, storageName: string) => (
-    `${getExternalStoragePathPrefix(storageName)}${encodePath(path)}`
+    joinPathsAvoidEmpty(getExternalStoragePathPrefix(storageName), encodePath(path))
 );
 
 export const getRelativePath = (absolutePath: string, storageName: string) => (

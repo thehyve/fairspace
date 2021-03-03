@@ -83,6 +83,7 @@ public class Config {
         @NotBlank public String name;
         @NotBlank public String label;
         @NotBlank public String url;
+        @NotBlank public String rootDirectoryIri;
         public String searchUrl;
     }
 

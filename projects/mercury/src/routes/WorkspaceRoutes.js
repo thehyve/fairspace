@@ -8,7 +8,7 @@ import FilesPage from "../file/FilesPage";
 import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
-import CollectionSearchResultList from "../search/TextSearchResultList";
+import CollectionSearchResultList from "../search/SearchResultList";
 import WorkspacesPage from "../workspaces/WorkspacesPage";
 import {isAdmin} from "../users/userUtils";
 import UserContext from "../users/UserContext";

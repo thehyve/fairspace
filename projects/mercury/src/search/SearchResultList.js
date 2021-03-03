@@ -15,11 +15,10 @@ import {
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {getSearchPathSegments, pathForIri, redirectLink} from '../collections/collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
 import {
-    getLocationContextFromString,
+    getLocationContextFromString, getSearchPathSegments,
     getSearchQueryFromString,
     getStorageFromString,
     handleSearchError, handleTextSearchRedirect
@@ -32,6 +31,7 @@ import SearchAPI, {LocalSearchAPI} from "./SearchAPI";
 import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 import ExternalStorageBreadcrumbsContextProvider from "../external-storage/ExternalStorageBreadcrumbsContextProvider";
+import {getPathFromIri, redirectLink} from "../file/fileUtils";
 
 const styles = {
     tableRoot: {
@@ -53,7 +53,7 @@ const styles = {
     }
 };
 
-const TextSearchResultList = ({classes, items, total, loading, error, history}) => {
+const SearchResultList = ({classes, items, total, storage = {}, loading, error, history}) => {
     const renderType = (item) => {
         let avatar;
         let typeLabel;
@@ -86,7 +86,7 @@ const TextSearchResultList = ({classes, items, total, loading, error, history}) 
         return <Typography>{typeLabel}</Typography>;
     };
 
-    const link = (item) => redirectLink(item.id, item.type);
+    const link = (item) => redirectLink(item.id, item.type, storage);
 
     /**
      * Handles a click on a search result.
@@ -140,7 +140,7 @@ const TextSearchResultList = ({classes, items, total, loading, error, history}) 
                                         color="inherit"
                                         underline="hover"
                                     >
-                                        {pathForIri(item.id)}
+                                        {getPathFromIri(item.id, storage.rootDirectoryIri)}
                                     </Link>
                                 </TableCell>
                             </TableRow>
@@ -152,7 +152,7 @@ const TextSearchResultList = ({classes, items, total, loading, error, history}) 
 };
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
-export const TextSearchResultListContainer = ({
+export const SearchResultListContainer = ({
     location: {search},
     query = getSearchQueryFromString(search),
     context = getLocationContextFromString(search),
@@ -169,22 +169,24 @@ export const TextSearchResultListContainer = ({
 
     const items = data || [];
     const total = items.length;
+
     const handleSearch = (value) => {
-        handleTextSearchRedirect(history, value, context, storage);
+        handleTextSearchRedirect(history, value, context, currentStorage);
     };
 
     const renderTextSearchResultList = () => (
         <div>
-            <BreadCrumbs additionalSegments={getSearchPathSegments(context)} />
+            <BreadCrumbs additionalSegments={getSearchPathSegments(context, storage)} />
             <SearchBar
                 placeholder="Search"
                 disableUnderline={false}
                 onSearchChange={handleSearch}
                 query={query}
             />
-            <TextSearchResultList
+            <SearchResultList
                 items={items}
                 total={total}
+                storage={currentStorage}
                 loading={loading}
                 error={error}
                 classes={classes}
@@ -205,4 +207,4 @@ export const TextSearchResultListContainer = ({
     );
 };
 
-export default withStyles(styles)(TextSearchResultListContainer);
+export default withStyles(styles)(SearchResultListContainer);

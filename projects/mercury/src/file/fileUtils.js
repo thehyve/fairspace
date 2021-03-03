@@ -1,12 +1,103 @@
-// eslint-disable-next-line import/no-cycle
+/* eslint-disable import/no-cycle */
 import {File} from "./FileAPI";
-import {PATH_SEPARATOR} from "../constants";
+import {FILE_URI, PATH_SEPARATOR} from "../constants";
+import {getCollectionAbsolutePath} from "../collections/collectionUtils";
+import {getExternalStorageAbsolutePath} from "../external-storage/externalStorageUtils";
+import type {ExternalStorage} from "../external-storage/externalStorageUtils";
 
 const NON_SAFE_FILE_NAME_CHARACTERS = ['/', '\\'];
 const NON_SAFE_FILE_NAMES = ['.', '..'];
 
 export function splitPathIntoArray(path) {
     return path.split(PATH_SEPARATOR).filter(s => s.length > 0);
+}
+
+export const joinPaths = (...paths) => paths
+    .map(p => (p && p !== PATH_SEPARATOR ? p : ''))
+    .join(PATH_SEPARATOR);
+
+export const joinPathsAvoidEmpty = (...paths) => {
+    const strippedPaths = [];
+    paths.forEach((path, index) => {
+        if (index === 0) {
+            strippedPaths.push(path.endsWith(PATH_SEPARATOR) ? path.slice(0, -1) : path);
+        } else {
+            strippedPaths.push(path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path);
+        }
+    });
+    return joinPaths(...strippedPaths);
+};
+
+export function getParentPath(path) {
+    const pos = path.lastIndexOf(PATH_SEPARATOR, path.length - 2);
+    return (pos > 1) ? path.substring(0, pos) : '';
+}
+
+export const getPathFromIri = (iri: string, pathPrefix = "") => {
+    const url = new URL(iri);
+    const path = iri.replace(pathPrefix || url.origin + "/api/webdav/", '');
+    return decodeURIComponent(path);
+};
+
+export const getPathHierarchy = (fullPath, skipRootFolder = true) => {
+    if (!fullPath) return [];
+
+    const paths = [];
+    let path = fullPath;
+    while (path && path.lastIndexOf(PATH_SEPARATOR) > 0) {
+        paths.push(path);
+        path = path.substring(0, path.lastIndexOf(PATH_SEPARATOR));
+    }
+    if (!skipRootFolder) {
+        paths.push(path);
+    }
+    return paths.reverse();
+};
+
+export const encodePath = (path) => path.split(PATH_SEPARATOR).map(encodeURIComponent).join(PATH_SEPARATOR);
+
+export const decodePath = (path) => path.split(PATH_SEPARATOR).map(decodeURIComponent).join(PATH_SEPARATOR);
+
+/**
+ * Workaround for a bug in 'history', see
+ * FileBrowser#handlePathDoubleClick.
+ */
+const decodeIfPossible = segment => {
+    try {
+        return decodeURIComponent(segment);
+    } catch (e) {
+        return segment;
+    }
+};
+
+export const getAbsolutePath = (path: string, storageName: string = "") => {
+    if (storageName) {
+        return getExternalStorageAbsolutePath(path, storageName);
+    }
+    return getCollectionAbsolutePath(path);
+};
+
+export const redirectLink = (iri: string, type: string, storage: ExternalStorage = {}) => {
+    const path = getPathFromIri(iri, storage.rootDirectoryIri);
+    if (type && type === FILE_URI) {
+        const parentPath = getParentPath(path, storage.name);
+        return `${getAbsolutePath(parentPath, storage.name)}?selection=${encodeURIComponent(`${PATH_SEPARATOR}${path}`)}`;
+    }
+    return getAbsolutePath(path, storage.name);
+};
+
+export const getPathInfoFromParams = ({collection, path}) => (
+    {
+        collectionName: decodeIfPossible(collection || ''),
+        openedPath: `/${decodeIfPossible(collection || '')}${path
+            ? `/${path.split(PATH_SEPARATOR).map(decodeIfPossible).join(PATH_SEPARATOR)}` : ''}`
+    }
+);
+
+export function getFileName(path) {
+    const normalizedPath = path.endsWith(PATH_SEPARATOR) ? path.substring(0, path.length - 1) : path;
+    const pos = normalizedPath.lastIndexOf(PATH_SEPARATOR);
+    return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;
 }
 
 // the extension includes a dot in some cases and is empty in others. That will very much help in reusing logic
@@ -39,64 +130,10 @@ export function generateUniqueFileName(fileName, usedNames = []) {
     return newName;
 }
 
-export const joinPaths = (...paths) => paths
-    .map(p => (p && p !== PATH_SEPARATOR ? p : ''))
-    .join(PATH_SEPARATOR);
-
-export function getParentPath(path) {
-    const pos = path.lastIndexOf(PATH_SEPARATOR, path.length - 2);
-    return (pos > 1) ? path.substring(0, pos) : '';
-}
-
-export function getFileName(path) {
-    const normalizedPath = path.endsWith(PATH_SEPARATOR) ? path.substring(0, path.length - 1) : path;
-    const pos = normalizedPath.lastIndexOf(PATH_SEPARATOR);
-    return (pos > 0) ? normalizedPath.substring(pos + 1) : normalizedPath;
-}
-
-export const encodePath = (path) => path.split(PATH_SEPARATOR).map(encodeURIComponent).join(PATH_SEPARATOR);
-
-export const decodePath = (path) => path.split(PATH_SEPARATOR).map(decodeURIComponent).join(PATH_SEPARATOR);
-
 export const decodeHTMLEntities = (htmlSource: string) => {
     const element = document.createElement('textarea');
     element.innerHTML = htmlSource;
     return element.textContent;
-};
-
-/**
- * Workaround for a bug in 'history', see
- * FileBrowser#handlePathDoubleClick.
- */
-const decodeIfPossible = segment => {
-    try {
-        return decodeURIComponent(segment);
-    } catch (e) {
-        return segment;
-    }
-};
-
-export const getPathInfoFromParams = ({collection, path}) => (
-    {
-        collectionName: decodeIfPossible(collection || ''),
-        openedPath: `/${decodeIfPossible(collection || '')}${path
-            ? `/${path.split(PATH_SEPARATOR).map(decodeIfPossible).join(PATH_SEPARATOR)}` : ''}`
-    }
-);
-
-export const getPathHierarchy = (fullPath, skipRootFolder = true) => {
-    if (!fullPath) return [];
-
-    const paths = [];
-    let path = fullPath;
-    while (path && path.lastIndexOf(PATH_SEPARATOR) > 0) {
-        paths.push(path);
-        path = path.substring(0, path.lastIndexOf(PATH_SEPARATOR));
-    }
-    if (!skipRootFolder) {
-        paths.push(path);
-    }
-    return paths.reverse();
 };
 
 export const isUnsafeFileName = (fileName) => NON_SAFE_FILE_NAMES.includes(fileName);

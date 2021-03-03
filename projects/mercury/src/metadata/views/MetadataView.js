@@ -23,8 +23,7 @@ import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
 import styles from "./MetadataView.styles";
 import CollectionsContext from "../../collections/CollectionsContext";
-import {pathForIri} from "../../collections/collectionUtils";
-import {getParentPath} from "../../file/fileUtils";
+import {getParentPath, getPathFromIri} from "../../file/fileUtils";
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
 
@@ -226,7 +225,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     );
 
     const getPathSegments = () => {
-        const segments = ((locationContext && pathForIri(locationContext)) || '').split('/');
+        const segments = ((locationContext && getPathFromIri(locationContext)) || '').split('/');
         const result = [];
         if (segments[0] === '') {
             return result;

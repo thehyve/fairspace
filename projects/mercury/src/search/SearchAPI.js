@@ -15,7 +15,7 @@ export const HEADERS = {'Content-Type': 'application/json', 'Accept': 'applicati
  * Search for resources based on name or description, given query as a simple text.
  */
 class SearchAPI {
-    constructor(remoteURL = '/api/textsearch/') {
+    constructor(remoteURL = '/api/search/') {
         this.remoteURL = remoteURL;
     }
 
