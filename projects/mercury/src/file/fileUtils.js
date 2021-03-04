@@ -20,9 +20,17 @@ export const joinPathsAvoidEmpty = (...paths) => {
     const strippedPaths = [];
     paths.forEach((path, index) => {
         if (index === 0) {
-            strippedPaths.push(path.endsWith(PATH_SEPARATOR) ? path.slice(0, -1) : path);
-        } else {
+            if (paths.length === 1) {
+                strippedPaths.push(path);
+            } else {
+                strippedPaths.push(path.endsWith(PATH_SEPARATOR) ? path.slice(0, -1) : path);
+            }
+        } else if (index === (paths.length - 1)) {
             strippedPaths.push(path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path);
+        } else {
+            let stripped = path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path;
+            stripped = path.endsWith(PATH_SEPARATOR) ? stripped.slice(0, -1) : stripped;
+            strippedPaths.push(stripped);
         }
     });
     return joinPaths(...strippedPaths);
