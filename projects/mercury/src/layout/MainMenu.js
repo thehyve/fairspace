@@ -108,7 +108,7 @@ export default () => {
                 <List>
                     {
                         Object.keys(services).map(key => (
-                            <ListItem button component="a" href={interpolate(services[key])} key={'service-' + key}>
+                            <ListItem button component="a" target="_blank" href={interpolate(services[key])} key={'service-' + key}>
                                 <ListItemIcon>
                                     <OpenInNew />
                                 </ListItemIcon>
