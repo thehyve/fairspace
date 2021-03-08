@@ -3,6 +3,7 @@ import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../../common/utils/httpUtils';
 
 import {normalizeTypes} from "./jsonLdConverter";
+import {flattenShallow} from "../../common/utils/genericUtils";
 
 const requestOptions = {
     headers: {Accept: 'application/ld+json'}
@@ -37,6 +38,20 @@ class LinkedDataAPI {
             .then(expand)
             .then(normalizeTypes)
             .catch(handleHttpError("Failure when retrieving metadata"));
+    }
+
+    getForAllSubjects(subjects: string[]) {
+        // eslint-disable-next-line array-callback-return
+        const requests = subjects.map(subject => (
+            axios.get(`${this.getStatementsUrl()}?subject=${encodeURIComponent(subject)}`, requestOptions)
+                .catch(() => null)
+        ));
+        return axios.all(requests)
+            .then(responses => responses.map(extractJsonData))
+            .then(responses => Promise.all(responses.map(expand)))
+            .then(flattenShallow)
+            .then(normalizeTypes)
+            .catch(() => {});
     }
 }
 

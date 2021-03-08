@@ -17,8 +17,6 @@ import type {ExternalStorage} from "./externalStorageUtils";
 import {getRelativePath} from "./externalStorageUtils";
 import type {Match} from "../types";
 import ExternalStorageInformationDrawer from "./ExternalStorageInformationDrawer";
-import UsersContext from "../users/UsersContext";
-import type {User} from "../users/UsersAPI";
 import {handleTextSearchRedirect} from "../search/searchUtils";
 import {joinPathsAvoidEmpty} from "../file/fileUtils";
 import {PATH_SEPARATOR} from "../constants";
@@ -31,12 +29,11 @@ type ContextualExternalStoragePageProperties = {
 
 type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
     externalStorages: ExternalStorage[];
-    users: User[];
     history: History;
 }
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
-    const {externalStorages, match, location, users, history, classes = {}} = props;
+    const {externalStorages, match, location, history, classes = {}} = props;
 
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
     const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
@@ -97,7 +94,6 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
                         path={getRelativePath(location.pathname, storage.name)}
                         selected={selection.selected}
                         storage={storage}
-                        users={users}
                     />
                 </Grid>
             </Grid>
@@ -107,14 +103,12 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
 
 const ContextualExternalStoragePage = (props: ContextualExternalStoragePageProperties) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
-    const {users} = useContext(UsersContext);
     const history = useHistory();
 
     return (
         <ExternalStoragePage
             {...props}
             externalStorages={externalStorages}
-            users={users}
             history={history}
         />
     );
