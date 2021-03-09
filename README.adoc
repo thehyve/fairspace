@@ -366,7 +366,7 @@ server_url = os.environ.get('FAIRSPACE_URL')
 headers = {
     'Authorization': auth()
 }
-response = Session().get(f'{server_url}/api/users/current', headers)
+response = Session().get(f'{server_url}/api/users/current', headers=headers)
 if not response.ok:
     raise Exception(f"Error fetching current user: {response.status_code} {response.reason}")
 print(response.json())
@@ -460,7 +460,7 @@ def exists(path):
         'Authorization': auth()
     }
     session = Session()
-    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}/', headers, cookies=session.cookies)
+    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}/', headers=headers, cookies=session.cookies)
     response: Response = session.send(req.prepare())
     return response.ok
 ----
@@ -488,7 +488,7 @@ def ls(path: str):
         'Authorization': auth()
     }
     session = Session()
-    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}', headers, cookies=session.cookies)
+    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}', headers=headers, cookies=session.cookies)
     response: Response = session.send(req.prepare())
     if not response.ok:
         raise Exception(f"Error fetching directory '{path}': {response.status_code} {response.reason}")
@@ -614,7 +614,7 @@ def mkdir(path: str, workspace_iri: str=None):
     }
     if workspace_iri is not None:
         headers['Owner'] = workspace_iri
-    req = Request('MKCOL', f'{server_url}/api/webdav/{path}/', headers, cookies=self.session().cookies)
+    req = Request('MKCOL', f'{server_url}/api/webdav/{path}/', headers=headers, cookies=self.session().cookies)
     response: Response = Session().send(req.prepare())
     if not response.ok:
         raise Exception(f"Error creating directory '{path}': {response.status_code} {response.reason}")
