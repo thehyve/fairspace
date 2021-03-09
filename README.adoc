@@ -287,7 +287,7 @@ def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
     return token
 
 def auth():
-    return f'Bearer: {fetch_access_token()}'
+    return f'Bearer {fetch_access_token()}'
 ----
 ====
 
