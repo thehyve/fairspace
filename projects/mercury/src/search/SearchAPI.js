@@ -19,8 +19,8 @@ class SearchAPI {
         this.remoteURL = remoteURL;
     }
 
-    search(body): Promise<SearchResult[]> {
-        return axios.post(this.remoteURL, body, {headers: HEADERS})
+    search(path: string, body): Promise<SearchResult[]> {
+        return axios.post(this.remoteURL + path, body, {headers: HEADERS})
             .catch(handleHttpError("Error while performing search"))
             .then(extractJsonData)
             .then(data => data.results);
@@ -33,7 +33,7 @@ class SearchAPI {
      * @returns {Q.Promise<SearchResult[]>}
      */
     lookupSearch(query: string, type: string): Promise<SearchResult[]> {
-        return this.search(JSON.stringify({query, resourceType: type}));
+        return this.search("lookup", JSON.stringify({query, resourceType: type}));
     }
 
     /**
@@ -43,7 +43,7 @@ class SearchAPI {
      * @returns {Q.Promise<SearchResult[]>}
      */
     searchForFiles(query: string, parentIRI: string): Promise<SearchResult[]> {
-        return this.search(JSON.stringify({query, parentIRI, resourceType: "fs:File"}));
+        return this.search("files", JSON.stringify({query, parentIRI}));
     }
 }
 

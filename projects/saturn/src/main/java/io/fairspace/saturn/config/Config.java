@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.atlas.json.JSON;
-import org.apache.jena.query.text.es.ESSettings;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
@@ -83,8 +82,15 @@ public class Config {
         @NotBlank public String name;
         @NotBlank public String label;
         @NotBlank public String url;
-        @NotBlank public String rootDirectoryIri;
+        public String rootDirectoryIri;
         public String searchUrl;
+
+        public String getRootDirectoryIri() {
+            if (rootDirectoryIri == null || rootDirectoryIri.trim().isEmpty()) {
+                return url;
+            }
+            return rootDirectoryIri;
+        }
     }
 
     @Override

@@ -15,10 +15,17 @@ public class SearchApp extends BaseApp {
 
     @Override
     protected void initApp() {
-        post("/", (req, res) -> {
+        post("/files", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            var request = mapper.readValue(req.body(), SearchRequest.class);
-            var results = searchService.getSearchResults(request);
+            var request = mapper.readValue(req.body(), FileSearchRequest.class);
+            var results = searchService.getFileSearchResults(request);
+            return mapper.writeValueAsString(results);
+        });
+
+        post("/lookup", (req, res) -> {
+            res.type(APPLICATION_JSON.asString());
+            var request = mapper.readValue(req.body(), LookupSearchRequest.class);
+            var results = searchService.getLookupSearchResults(request);
             return mapper.writeValueAsString(results);
         });
     }
