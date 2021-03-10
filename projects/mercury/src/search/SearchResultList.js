@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
     Link,
     ListItemText,
@@ -15,16 +15,23 @@ import {
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {getSearchPathSegments, handleCollectionTextSearchRedirect, pathForIri, redirectLink} from './collectionUtils';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
-import {getLocationContextFromString, getSearchQueryFromString, handleSearchError} from "../search/searchUtils";
-import SearchBar from "../search/SearchBar";
+import {
+    getLocationContextFromString, getSearchPathSegments,
+    getSearchQueryFromString,
+    getStorageFromString,
+    handleSearchError, handleTextSearchRedirect
+} from "./searchUtils";
+import SearchBar from "./SearchBar";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
-import {searchFiles} from "../search/lookup";
-import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import BreadCrumbs from '../common/components/BreadCrumbs';
+import SearchAPI, {LocalSearchAPI} from "./SearchAPI";
+import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
+import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
+import ExternalStorageBreadcrumbsContextProvider from "../external-storage/ExternalStorageBreadcrumbsContextProvider";
+import {getPathFromIri, redirectLink} from "../file/fileUtils";
 
 const styles = {
     tableRoot: {
@@ -46,7 +53,7 @@ const styles = {
     }
 };
 
-const CollectionSearchResultList = ({classes, items, total, loading, error, history}) => {
+const SearchResultList = ({classes, items, total, storage = {}, loading, error, history}) => {
     const renderType = (item) => {
         let avatar;
         let typeLabel;
@@ -79,7 +86,7 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
         return <Typography>{typeLabel}</Typography>;
     };
 
-    const link = (item) => redirectLink(item.id, item.type);
+    const link = (item) => redirectLink(item.id, item.type, storage);
 
     /**
      * Handles a click on a search result.
@@ -133,7 +140,7 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
                                         color="inherit"
                                         underline="hover"
                                     >
-                                        {pathForIri(item.id)}
+                                        {getPathFromIri(item.id, storage.rootDirectoryIri)}
                                     </Link>
                                 </TableCell>
                             </TableRow>
@@ -145,43 +152,59 @@ const CollectionSearchResultList = ({classes, items, total, loading, error, hist
 };
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
-export const CollectionSearchResultListContainer = ({
-    location: {search}, query = getSearchQueryFromString(search), context = getLocationContextFromString(search),
+export const SearchResultListContainer = ({
+    location: {search},
+    query = getSearchQueryFromString(search),
+    context = getLocationContextFromString(search),
+    storage = getStorageFromString(search),
     classes, history
 }) => {
-    const {data, loading, error} = useAsync(() => searchFiles(query, context).catch(handleSearchError), [search, query]);
+    const {externalStorages = []} = useContext(ExternalStoragesContext);
+    const currentStorage = externalStorages.find(s => s.name === storage);
+
+    const {data, loading, error} = useAsync(() => {
+        const searchAPI = currentStorage ? new SearchAPI(currentStorage.searchUrl) : LocalSearchAPI;
+        return searchAPI.searchForFiles(query, context).catch(handleSearchError);
+    }, [search, query, storage]);
+
     const items = data || [];
     const total = items.length;
+
     const handleSearch = (value) => {
-        handleCollectionTextSearchRedirect(history, value, context);
+        handleTextSearchRedirect(history, value, context, currentStorage);
     };
 
-    return (
-        <BreadcrumbsContext.Provider value={{segments: [
-            {
-                label: 'Collections',
-                icon: <Folder />,
-                href: '/collections'
-            }
-        ]}}
-        >
-            <BreadCrumbs additionalSegments={getSearchPathSegments(context)} />
+    const renderTextSearchResultList = () => (
+        <div>
+            <BreadCrumbs additionalSegments={getSearchPathSegments(context, storage)} />
             <SearchBar
                 placeholder="Search"
                 disableUnderline={false}
                 onSearchChange={handleSearch}
                 query={query}
             />
-            <CollectionSearchResultList
+            <SearchResultList
                 items={items}
                 total={total}
+                storage={currentStorage}
                 loading={loading}
                 error={error}
                 classes={classes}
                 history={history}
             />
-        </BreadcrumbsContext.Provider>
+        </div>
+    );
+
+    return currentStorage ? (
+        <ExternalStorageBreadcrumbsContextProvider storage={currentStorage}>
+            {renderTextSearchResultList()}
+        </ExternalStorageBreadcrumbsContextProvider>
+    ) : (
+        <CollectionBreadcrumbsContextProvider>
+            {renderTextSearchResultList()}
+        </CollectionBreadcrumbsContextProvider>
+
     );
 };
 
-export default withStyles(styles)(CollectionSearchResultListContainer);
+export default withStyles(styles)(SearchResultListContainer);

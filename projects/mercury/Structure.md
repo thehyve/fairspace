@@ -32,10 +32,6 @@ The feature folders (`collections`, `file`, `metadata`, `users`, `workspaces`) c
     - Contains the currently loaded form/entity values, changes, validation state and form operations.
   - [UseFormSubmission](src/metadata/common/UseFormSubmission.js)
     - Submits form changes and handles submission errors
-  - [UseLinkedDataSearch](src/metadata/common/UseLinkedDataSearch.js)
-    - Logic that handles search concerns
-  - [UseLinkedDataSearchParams](src/metadata/common/UseLinkedDataSearchParams.js)
-    - Holds metadata/vocabulary search parameters
 - `/permissions`
 
 ## Metadata forms

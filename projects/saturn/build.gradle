@@ -76,9 +76,6 @@ dependencies {
 //    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 
     constraints {
-//        implementation('org.elasticsearch.client:transport:6.8.2') {
-//            because 'previous versions have security vulnerabilities'
-//        }
 //        implementation('com.fasterxml.jackson.core:jackson-databind:2.9.10.1') {
 //            because 'previous versions have security vulnerabilities'
 //        }

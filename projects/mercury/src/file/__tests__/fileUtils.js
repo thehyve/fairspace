@@ -4,8 +4,8 @@ import {
     generateUniqueFileName,
     getBaseNameAndExtension,
     getFileName,
-    getParentPath,
-    getPathInfoFromParams
+    getParentPath, getPathFromIri,
+    getPathInfoFromParams, joinPathsAvoidEmpty
 } from '../fileUtils';
 
 describe('getBaseNameAndExtension', () => {
@@ -115,5 +115,28 @@ describe('decodePath', () => {
         expect(decodePath('/%3F/test')).toEqual('/?/test');
         expect(decodePath('/x.1/x_y-_.!~*()')).toEqual('/x.1/x_y-_.!~*()');
         expect(decodePath('%3B%2C/%3F%3A%40%26%3D%2B%24')).toEqual(';,/?:@&=+$');
+    });
+});
+
+describe('joinPathsAvoidEmpty', () => {
+    it('joins paths, avoiding empty path parts', () => {
+        expect(joinPathsAvoidEmpty('/aaa/')).toEqual('/aaa/');
+        expect(joinPathsAvoidEmpty('aaa', 'bbbb')).toEqual('aaa/bbbb');
+        expect(joinPathsAvoidEmpty('aaa/', 'bbbb')).toEqual('aaa/bbbb');
+        expect(joinPathsAvoidEmpty('/aaa/', '/bbbb')).toEqual('/aaa/bbbb');
+        expect(joinPathsAvoidEmpty('aaa', '/bbbb/')).toEqual('aaa/bbbb/');
+        expect(joinPathsAvoidEmpty('aaa', '/bbbb/', '/ccc')).toEqual('aaa/bbbb/ccc');
+        expect(joinPathsAvoidEmpty('/aaa/', '/bbbb/', '/ccc/')).toEqual('/aaa/bbbb/ccc/');
+    });
+});
+
+describe('getPathFromIri', () => {
+    it('gets a path from IRI', () => {
+        expect(getPathFromIri('http://localhost:8080/api/webdav/')).toEqual('');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/', 'http://localhost:8080/api/webdav/')).toEqual('');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/test')).toEqual('test');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/test', 'http://localhost:8080/api/webdav/')).toEqual('test');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/a/b/')).toEqual('a/b/');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/a/b/', 'http://localhost:8080/api/webdav/')).toEqual('a/b/');
     });
 });

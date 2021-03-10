@@ -6,8 +6,9 @@ import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
 import {formatDate} from "../../common/utils/genericUtils";
 import type {Collection} from "../../collections/CollectionAPI";
-import {collectionAccessIcon, pathForIri, redirectLink} from "../../collections/collectionUtils";
+import {collectionAccessIcon} from "../../collections/collectionUtils";
 import {RESOURCES_VIEW} from "./metadataViewUtils";
+import {getPathFromIri, redirectLink} from "../../file/fileUtils";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -77,7 +78,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                 );
             }
             case 'path': {
-                const path = pathForIri(iri);
+                const path = getPathFromIri(iri);
                 const type = getResourceType(row);
                 return (
                     <TableCell key={column.name}>

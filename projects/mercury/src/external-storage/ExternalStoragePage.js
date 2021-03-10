@@ -1,6 +1,8 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {withStyles} from "@material-ui/core";
+import {useHistory} from "react-router-dom";
+import queryString from "query-string";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import {useSingleSelection} from "../file/UseSelection";
@@ -17,7 +19,9 @@ import type {Match} from "../types";
 import ExternalStorageInformationDrawer from "./ExternalStorageInformationDrawer";
 import UsersContext from "../users/UsersContext";
 import type {User} from "../users/UsersAPI";
-
+import {handleTextSearchRedirect} from "../search/searchUtils";
+import {joinPathsAvoidEmpty} from "../file/fileUtils";
+import {PATH_SEPARATOR} from "../constants";
 
 type ContextualExternalStoragePageProperties = {
     match: Match;
@@ -28,20 +32,36 @@ type ContextualExternalStoragePageProperties = {
 type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
     externalStorages: ExternalStorage[];
     users: User[];
+    history: History;
 }
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
-    const {externalStorages, match, location, users, classes = {}} = props;
+    const {externalStorages, match, location, users, history, classes = {}} = props;
 
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
     const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
-    const isSearchAvailable = false; // TODO add search handling
+    const isSearchAvailable = storage && !!storage.searchUrl;
+    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
 
     usePageTitleUpdater(storage ? storage.label : "External storage");
 
-    const handleSearch = () => {};
+    useEffect(() => {
+        if (preselectedFile) {
+            selection.select(preselectedFile);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [preselectedFile]);
+
+    const handleSearch = (value: string) => {
+        const relativePath = getRelativePath(location.pathname, storage.name);
+        let context = "";
+        if (relativePath && relativePath !== PATH_SEPARATOR) {
+            context = encodeURI(joinPathsAvoidEmpty(storage.rootDirectoryIri, relativePath));
+        }
+        handleTextSearchRedirect(history, value, context, storage);
+    };
 
     if (!storage) {
         return <MessageDisplay message={`Storage "${match.params.storage}" not found.`} />;
@@ -57,7 +77,6 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
                             placeholder="Search"
                             disableUnderline={false}
                             onSearchChange={handleSearch}
-                            disabled
                         />
                     </Grid>
                 </Grid>
@@ -89,12 +108,14 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
 const ContextualExternalStoragePage = (props: ContextualExternalStoragePageProperties) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
     const {users} = useContext(UsersContext);
+    const history = useHistory();
 
     return (
         <ExternalStoragePage
             {...props}
             externalStorages={externalStorages}
             users={users}
+            history={history}
         />
     );
 };

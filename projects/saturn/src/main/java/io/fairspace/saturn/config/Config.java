@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.jena.atlas.json.JSON;
-import org.apache.jena.query.text.es.ESSettings;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
@@ -32,8 +31,6 @@ public class Config {
     public int port = 8080;
 
     public String publicUrl = "http://localhost:8080";
-
-    public String elasticsearchUrl = "http://localhost:9200";
 
     public Jena jena = new Jena();
 
@@ -62,18 +59,6 @@ public class Config {
         public File transactionLogPath = new File("data/log");
 
         public boolean bulkTransactions = true;
-
-        public ElasticSearch elasticSearch = new ElasticSearch();
-
-        public static class ElasticSearch {
-            public boolean required = false;
-            public ESSettings settings = new ESSettings.Builder()
-                    .clusterName("fairspace")
-                    .hostAndPort("127.0.0.1", 9300)
-                    .indexName("fairspace")
-                    .build();
-            public Map<String, String> advancedSettings = new HashMap<>();
-        }
     }
 
     public static class Auth {
@@ -97,6 +82,15 @@ public class Config {
         @NotBlank public String name;
         @NotBlank public String label;
         @NotBlank public String url;
+        public String rootDirectoryIri;
+        public String searchUrl;
+
+        public String getRootDirectoryIri() {
+            if (rootDirectoryIri == null || rootDirectoryIri.trim().isEmpty()) {
+                return url;
+            }
+            return rootDirectoryIri;
+        }
     }
 
     @Override

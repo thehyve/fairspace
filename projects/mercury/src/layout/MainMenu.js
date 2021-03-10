@@ -5,17 +5,14 @@ import {Assignment, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} fro
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
-import FeaturesContext from "../common/contexts/FeaturesContext";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
 import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
-
 
 export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
-    const {isFeatureEnabled} = useContext(FeaturesContext);
     const {externalStorages} = useContext(ExternalStoragesContext);
     const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
@@ -72,19 +69,6 @@ export default () => {
                             <Assignment />
                         </ListItemIcon>
                         <ListItemText primary="Metadata" />
-                    </ListItem>
-                )}
-                {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
-                    <ListItem
-                        key="metadata-editing"
-                        component={NavLink}
-                        to="/metadata"
-                        button
-                    >
-                        <ListItemIcon>
-                            <Assignment />
-                        </ListItemIcon>
-                        <ListItemText primary="Metadata editor" />
                     </ListItem>
                 )}
                 {isAdmin(currentUser) && (

@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, camelCaseToWords,
+    joinWithSeparator, stableSort, camelCaseToWords, isEmptyObject,
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -79,6 +79,19 @@ describe('isNonEmptyValue', () => {
         const values = [undefined, null, '', NaN, "", ``];
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
+    });
+});
+
+describe('isEmptyObject', () => {
+    it('Returns true for the given values', () => {
+        const values = [undefined, null, {}];
+
+        values.forEach(v => expect(isEmptyObject(v)).toBe(true));
+    });
+    it('Returns false for the given values', () => {
+        const values = [{x: "test"}, {y: false}, {z: null}];
+
+        values.forEach(v => expect(isEmptyObject(v)).toBe(false));
     });
 });
 

@@ -19,15 +19,14 @@ public class App {
     public static void main(String[] args) {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, CONFIG.features.contains(Feature.MetadataEditing));
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
 
-        var svc = new Services(API_PREFIX, CONFIG, VIEWS_CONFIG, ds);
+        var svc = new Services(CONFIG, VIEWS_CONFIG, ds);
 
         var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
-                .addServlet(API_PREFIX + "/search/*", svc.getSearchProxyServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port)
                 .enableCors(true);

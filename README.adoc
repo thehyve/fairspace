@@ -1234,6 +1234,65 @@ curl -H "Accept: application/json" "http://localhost:8080/api/views/facets"
 ====
 
 
+==== Text search
+
+Search endpoint used for text search on labels or comments.
+
+|===
+3+| ``POST /api/search/files``
+
+3+| Find files, directories or collections based on a label or a comment.
+3+| _Parameters:_
+| ``query``
+| string
+| Text fragment to search on.
+| ``parentIRI``
+| string
+| IRI of the parent directory or collection to limit the search area.
+|===
+
+.Example text search (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -d \
+'{
+  "query":"test folder",
+  "parentIRI":"http://localhost:8080/api/webdav/dir1"
+}' \
+'http://localhost:8080/api/search/files'
+----
+====
+
+|===
+3+| ``POST /api/search/lookup``
+
+3+| Metadata entities lookup search by entity labels or description.
+3+| _Parameters:_
+| ``query``
+| string
+| Text fragment to search on.
+| ``resourceType``
+| string
+| Type of the entity in request.
+|===
+
+.Example lookup search (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -d \
+'{
+  "query":"test",
+  "resourceType":"https://example.com/ontology#TumorPathologyEvent"
+}' \
+'http://localhost:8080/api/search/lookup'
+----
+====
+
+
 ==== Workspace management
 
 Operations on workspace entities.
@@ -1476,8 +1535,7 @@ curl -H 'Accept: application/json+ld' 'http://localhost:8080/api/vocabulary/'
 | List available application features.
 |===
 
-Response contains list of additional features that are currently available in the application,
-e.g., metadata editing in the user interface.
+Response contains list of additional features that are currently available in the application.
 
 .Example listing features (curl)
 [%collapsible]
