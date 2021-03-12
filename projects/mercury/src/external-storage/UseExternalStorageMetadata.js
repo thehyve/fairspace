@@ -24,7 +24,7 @@ const ignoredProperties = [
     'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'accessMode', 'isreadonly',
     'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
     'status', 'getcreated', 'getcontenttype', 'etag', 'getetag', 'iscollection',
-    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size'
+    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size', 'metadataLinks'
 ];
 
 const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, LabelValueProperty> => {
@@ -60,11 +60,13 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
 };
 
 const mapLinkedMetadataProperties = (values: any[], vocabulary: any[]): Map<string, LinkedEntityProperty> => {
-    const metadataEntities: LinkedEntityProperty[] = values.map(value => ({
-        id: value["@id"],
-        type: getTypeInfo(value, vocabulary).label,
-        label: getLabel(value)
-    }));
+    const metadataEntities: LinkedEntityProperty[] = values
+        .map(value => ({
+            id: value["@id"],
+            type: getTypeInfo(value, vocabulary).label,
+            label: getLabel(value)
+        }))
+        .filter(value => value.type != null);
     return groupBy(metadataEntities, "type");
 };
 
@@ -78,7 +80,7 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
     const {vocabulary} = useContext(VocabularyContext);
     const {users} = useContext(UsersContext);
 
-    const fetchLinkedMetadataEntities = (subjects) => {
+    const fetchLinkedMetadataEntities = (subjects = []) => {
         setLinkedMetadataEntitiesLoading(true);
         MetadataAPI.getForAllSubjects(subjects)
             .then(results => {
@@ -87,23 +89,19 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
                     setLinkedMetadataEntities(entityMap);
                 }
             })
+            .catch(() => null)
             .finally(() => setLinkedMetadataEntitiesLoading(false));
     };
+    const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(','));
 
     const fetchMetadata = () => {
         setLoading(true);
-        fileAPI.stat(path)
+        fileAPI.stat(path, false, true)
             .then(results => {
                 setMetadata(mapFileProperties(results, users));
                 setError(undefined);
-                // const metadataLinks = [
-                //     "http://example.com/samples#fca7f4de-66f5-4807-b776-59529d338a1f",
-                //     "invalid",
-                //     "http://example.com/events#70259637-1a8d-46f4-aaa6-847830ce09a5"
-                // ];
-                // fetchLinkedMetadataEntities(metadataLinks);
                 if (results && results.metadataLinks) {
-                    fetchLinkedMetadataEntities(results.metadataLinks);
+                    fetchLinkedMetadataEntities(parseToArray(results.metadataLinks));
                 }
                 setError(undefined);
             })
@@ -113,6 +111,7 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
             .finally(() => setLoading(false));
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {fetchMetadata();}, [path]);
 
     return {

@@ -51,7 +51,7 @@ class LinkedDataAPI {
             .then(responses => Promise.all(responses.map(expand)))
             .then(flattenShallow)
             .then(normalizeTypes)
-            .catch(() => {});
+            .catch(() => null);
     }
 }
 

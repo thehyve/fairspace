@@ -35,13 +35,16 @@ class FileAPI {
         return createClient(this.remoteURL);
     }
 
-    stat(path, showDeleted) {
+    stat(path, showDeleted = false, includeMetadataLinks = false) {
         const options = {
             ...includeDetails,
             data: "<propfind><allprop /></propfind>"
         };
         if (showDeleted) {
             options.headers = {"Show-Deleted": "on"};
+        }
+        if (includeMetadataLinks) {
+            options.headers = {...options.headers, "With-Metadata-Links": true};
         }
         return this.client().stat(path, options)
             .then(result => this.mapToFile(result.data));
