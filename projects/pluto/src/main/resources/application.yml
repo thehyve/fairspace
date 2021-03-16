@@ -1,0 +1,75 @@
+pluto:
+  containerId: fairspace
+  oauth2:
+    base-url: http://localhost:5100
+    realm: fairspace
+server:
+  error:
+    whitelabel:
+      enabled: false
+  max-http-header-size: 65535
+
+spring:
+  application:
+    name: Pluto
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    base-url: http://jaeger-collector.jaeger:9411/
+    enabled: false
+
+security:
+  oidc:
+    auth-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/auth
+    logout-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
+    token-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/token
+    jwk-key-set-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/certs
+    # redirect-after-logout-url: https://fairspace.com
+    clientId: workspace-client
+    clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+    scope: openid
+
+  # Specify urls for security configuration.
+  # URLs with permitAll do not require any authentication
+  # URLs with needAuthentication are allowed to be accessed by any user. They are needed
+  #      to show an error message if the user is not allowed to access the workspace
+  # URLs with needAuthorization need an authorized user.
+  urls:
+    permitAll:
+    - /actuator/health
+    - /error
+    - /manifest.json
+    - /login
+    - /logout
+    - /authorize
+    - /api/account/tokens
+    - /favicon.ico
+    needsAuthentication: []
+    needsAuthorization:
+    - /*
+
+zuul:
+  retryable: false
+  routes: {}
+    # Please note that the order of the routes is relevant
+    # The specific routes for will be configured when deploying
+    # the application
+  ignored-patterns:
+  - /actuator/**
+  - /api/account/**
+  - /api/storages/
+  - /login
+  - /logout
+  - /authorize
+  - /error
+  ignored-headers:
+    - Access-Control-Allow-Credentials
+    - Access-Control-Allow-Origin
+    - Pragma
+    - X-Frame-Options
+    - X-Content-Type-Options
+    - X-XSS-Protection
+  host:
+    socket-timeout-millis: 10000
+    connect-timeout-millis: 2000

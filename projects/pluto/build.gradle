@@ -1,0 +1,88 @@
+buildscript {
+    ext {
+        mockitoVersion = '3.6.28'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.4.3'
+    id 'net.ltgt.apt' version '0.21'
+    id 'io.franzbecker.gradle-lombok' version '4.0.0'
+    id 'application'
+    id 'jacoco'
+    //id 'com.github.spotbugs' version '1.6.10'
+    id "org.owasp.dependencycheck" version '6.0.2'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group 'nl.fairspace'
+version System.getenv('VERSION') ?: '0.0.1-SNAPSHOT'
+
+compileJava {
+    sourceCompatibility = 15
+    targetCompatibility = 15
+}
+
+application {
+    mainClassName = "nl.fairspace.pluto.PlutoApplication"
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
+}
+
+ext {
+    springCloudVersion = '2020.0.1'
+    jacksonVersion = '2.11.3'
+}
+
+jacoco.toolVersion = "0.8.6"
+
+dependencies {
+    compile("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+    compile('javax.validation:validation-api:2.0.1.Final')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.7.RELEASE')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.session:spring-session-core')
+    compile('org.springframework.cloud:spring-cloud-starter-sleuth')
+    compile('org.springframework.cloud:spring-cloud-sleuth-zipkin')
+
+    implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
+    implementation 'com.nimbusds:oauth2-oidc-sdk:6.0'
+
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
+    testCompile "org.apache.commons:commons-lang3:3.12.0"
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+}
+
+springBoot {
+    buildInfo()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled true
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 9
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}

@@ -1,0 +1,48 @@
+server.port: 8080
+
+pluto:
+  domains:
+    - http://localhost:8080
+  forceHttps: false
+  oauth2:
+    base-url: http://localhost:5100
+    realm: fairspace
+  storages:
+    test:
+       name: test
+       label: Test
+       url: /api/storages/test/webdav
+       searchUrl: /api/storages/test/search
+       rootDirectoryIri: http://localhost:8080/api/webdav
+
+zuul:
+  routes:
+    # Please note that the order of the routes is relevant:
+    # The saturn route must be defined before ui, because of the
+    # paths they listen to
+    storage-test-webdav:
+      path: /api/storages/test/webdav/**
+      url: http://localhost:8090/api/webdav
+    storage-test-search:
+      path: /api/storages/test/search/**
+      url: http://localhost:8090/api/search/files/
+    saturn:
+      path: /api/**
+      url: http://localhost:8090/api/
+    ui:
+      path: /**
+      url: http://localhost:3000
+
+  include-debug-header: true
+
+security:
+  oidc:
+  #required-authority: user-ws
+  #clientId: ws-pluto
+  #clientSecret: 00000000-0000-0000-0000-000000000000
+  #refresh-token-jwk-algorithm: HS256
+
+spring:
+  zipkin:
+    base-url: http://localhost:9411/
+    enabled: false
