@@ -988,7 +988,7 @@ curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLO
 3+| _Parameters:_
 | ``subject``
 | string
-| The subject to filter on.
+| IRI of the subject to filter on.
 | ``predicate``
 | string
 | The predicate to filter on, not required.
@@ -1003,7 +1003,20 @@ curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLO
 3+| Returns serialised triples matching the query parameters.
 |===
 
-.Example of retrieving metadata (curl)
+.Example of fetching metadata in turtle format (curl)
+[%collapsible]
+====
+Request metadata for a subject 'a'.
+[source, bash]
+----
+curl -G -H "Accept: text/turtle" \
+--data-urlencode "subject=a" \
+--data-urlencode "withValueProperties=true" \
+"http://localhost:8080/api/metadata/"
+----
+====
+
+.Example of fetching metadata in json-ld format (curl)
 [%collapsible]
 ====
 Request metadata for the triple with subject 'a', predicate 'b' and object 'c'.
@@ -1105,7 +1118,7 @@ Only available for users with _Add shared metadata_ role.
 3+| Serialised RDF triples. (_Optional_)
 |===
 
-.Example of deleting metadata (curl)
+.Example of deleting tripples (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1124,6 +1137,17 @@ curl -X DELETE -H "Content-Type: application/ld+json" -d \
     "ws" : "http://fairspace.ci.fairway.app/iri/"
   }
 }' \
+"http://localhost:8080/api/metadata/"
+----
+====
+
+.Example of marking an entity as deleted (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -X DELETE -G -H "Content-Type: application/ld+json" \
+--data-urlencode "subject=https://example.com/ontology#tpe1" \
 "http://localhost:8080/api/metadata/"
 ----
 ====
@@ -1561,6 +1585,7 @@ It is stored in {SHACL}[SHACL] format.
 curl -H 'Accept: text/turtle' 'http://localhost:8080/api/vocabulary/'
 ----
 ====
+
 .Example fetching the vocabulary in json-ld format (curl)
 [%collapsible]
 ====
