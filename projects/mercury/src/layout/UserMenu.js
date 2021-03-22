@@ -69,8 +69,7 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList>
-                                    <MenuItem onClick={handleClose} disabled>Profile</MenuItem>
-                                    <MenuItem onClick={handleClose} disabled>My account</MenuItem>
+                                    <MenuItem disabled>{currentUser.name}</MenuItem>
                                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
