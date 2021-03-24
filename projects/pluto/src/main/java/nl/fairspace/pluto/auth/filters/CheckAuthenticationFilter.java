@@ -21,7 +21,7 @@ import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_CHECKED_REQUES
 @Slf4j
 public abstract class CheckAuthenticationFilter implements Filter {
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
 
     }
 

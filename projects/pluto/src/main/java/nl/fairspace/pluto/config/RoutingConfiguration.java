@@ -17,4 +17,9 @@ public class RoutingConfiguration {
         return new WebDAVHostRoutingFilter(helper, zuulProperties,
                 connectionManagerFactory, httpClientFactory);
     }
+
+    @Bean
+    public WebDAVPathRewritingFilter webDAVPathRewritingFilter(ZuulProperties zuulProperties) {
+        return new WebDAVPathRewritingFilter(zuulProperties);
+    }
 }

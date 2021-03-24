@@ -43,7 +43,6 @@ public class AuthFilterConfiguration {
     }
 
     @Bean
-    @Autowired
     public FilterRegistrationBean<UsernamePasswordAuthenticationFilter> usernamePasswordAuthenticationFilter() {
         FilterRegistrationBean<UsernamePasswordAuthenticationFilter> registration = new FilterRegistrationBean<>();
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 101);
@@ -100,6 +99,4 @@ public class AuthFilterConfiguration {
         registration.setFilter(new HandleFailedAuthenticationFilter(new AuthorizationFailedHandler()));
         return registration;
     }
-
 }
-

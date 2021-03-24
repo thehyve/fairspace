@@ -57,11 +57,12 @@ dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:5.7'
     implementation 'com.nimbusds:oauth2-oidc-sdk:6.0'
 
-    testImplementation "junit:junit:4.12"
+    testImplementation 'junit:junit:4.12'
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
-    testCompile "org.apache.commons:commons-lang3:3.12.0"
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock'
+    testCompile 'org.apache.commons:commons-lang3:3.12.0'
+    testCompile 'commons-io:commons-io:2.8.0'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 }

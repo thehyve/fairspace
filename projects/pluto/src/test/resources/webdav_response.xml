@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<d:multistatus xmlns:d="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav" xmlns:card="urn:ietf:params:xml:ns:carddav"
+               xmlns:cs="http://calendarserver.org/ns/" xmlns:ns1="https://fairspace.nl/ontology#">
+    <d:response>
+        <d:href>/api/webdav/</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getcontenttype></d:getcontenttype>
+                <d:getetag>"http://localhost:8080/api/webdav"</d:getetag>
+                <d:iscollection>TRUE</d:iscollection>
+                <d:displayname></d:displayname>
+                <d:isreadonly>TRUE</d:isreadonly>
+                <d:name></d:name>
+                <d:supported-report-set></d:supported-report-set>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/api/webdav/collection%202021-01-18_02_04-1/</d:href>
+        <d:propstat>
+            <d:prop>
+                <ns1:access>List</ns1:access>
+                <ns1:canRead>FALSE</ns1:canRead>
+                <ns1:userPermissions>http://localhost/iri/ccc24631-b13a-42b8-97cb-f871341e35bd Manage
+                </ns1:userPermissions>
+                <ns1:accessMode>MetadataPublished</ns1:accessMode>
+                <ns1:availableStatuses>Active</ns1:availableStatuses>
+                <ns1:canDelete>FALSE</ns1:canDelete>
+                <ns1:iri>http://localhost:8080/api/webdav/collection%202021-01-18_02_04-1</ns1:iri>
+                <ns1:canWrite>FALSE</ns1:canWrite>
+                <ns1:ownedByName>testje</ns1:ownedByName>
+                <ns1:canManage>FALSE</ns1:canManage>
+                <ns1:canUndelete>FALSE</ns1:canUndelete>
+                <ns1:workspacePermissions></ns1:workspacePermissions>
+                <ns1:createdBy>http://localhost/iri/ccc24631-b13a-42b8-97cb-f871341e35bd</ns1:createdBy>
+                <ns1:comment></ns1:comment>
+                <ns1:availableAccessModes>MetadataPublished</ns1:availableAccessModes>
+                <ns1:ownedBy>http://localhost/iri/f6812771-2bed-43be-b2e4-bb762d91da19</ns1:ownedBy>
+                <ns1:status>Active</ns1:status>
+                <d:getcreated>2021-01-18T01:05:29Z</d:getcreated>
+                <d:creationdate>2021-01-18T01:05:29Z</d:creationdate>
+                <d:getcontenttype>text/html</d:getcontenttype>
+                <d:getetag>"http://localhost:8080/api/webdav/collection%202021-01-18_02_04-1"</d:getetag>
+                <d:iscollection>TRUE</d:iscollection>
+                <d:displayname>collection 2021-01-18_02_04-1</d:displayname>
+                <d:isreadonly>FALSE</d:isreadonly>
+                <d:name>collection 2021-01-18_02_04-1</d:name>
+                <d:supported-report-set></d:supported-report-set>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/api/webdav/Book/</d:href>
+        <d:propstat>
+            <d:prop>
+                <ns1:access>Write</ns1:access>
+                <ns1:canRead>TRUE</ns1:canRead>
+                <ns1:userPermissions>http://localhost/iri/1e724f5a-90ef-47ab-bf73-9701e0dc4b26
+                    Write,http://localhost/iri/ccc24631-b13a-42b8-97cb-f871341e35bd
+                    Write,http://localhost/iri/f4f8ae01-63de-40c9-9d21-543fbb4b26b4 Read
+                </ns1:userPermissions>
+                <ns1:accessMode>MetadataPublished</ns1:accessMode>
+                <ns1:availableStatuses>Active</ns1:availableStatuses>
+                <ns1:canDelete>FALSE</ns1:canDelete>
+                <ns1:iri>http://localhost:8080/api/webdav/Book</ns1:iri>
+                <ns1:canWrite>TRUE</ns1:canWrite>
+                <ns1:ownedByName>Test</ns1:ownedByName>
+                <ns1:canManage>FALSE</ns1:canManage>
+                <ns1:canUndelete>FALSE</ns1:canUndelete>
+                <ns1:workspacePermissions></ns1:workspacePermissions>
+                <ns1:createdBy>http://localhost/iri/f4f8ae01-63de-40c9-9d21-543fbb4b26b4</ns1:createdBy>
+                <ns1:comment></ns1:comment>
+                <ns1:availableAccessModes>MetadataPublished</ns1:availableAccessModes>
+                <ns1:ownedBy>http://localhost/iri/60ef0ecd-9d39-4136-b52a-0c5158149966</ns1:ownedBy>
+                <ns1:status>Active</ns1:status>
+                <d:getcreated>2021-01-18T08:53:20Z</d:getcreated>
+                <d:creationdate>2021-01-18T08:53:20Z</d:creationdate>
+                <d:getcontenttype>text/html</d:getcontenttype>
+                <d:getetag>"http://localhost:8080/api/webdav/Book"</d:getetag>
+                <d:iscollection>TRUE</d:iscollection>
+                <d:displayname>Book</d:displayname>
+                <d:isreadonly>FALSE</d:isreadonly>
+                <d:name>Book</d:name>
+                <d:supported-report-set></d:supported-report-set>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+</d:multistatus>
