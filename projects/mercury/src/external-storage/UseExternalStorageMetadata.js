@@ -23,8 +23,8 @@ const ignoredProperties = [
     'filename', 'basename', 'displayname', 'name', 'type', 'iri', 'ownedBy', 'ownedByName',
     'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'accessMode', 'isreadonly',
     'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
-    'status', 'getcreated', 'getcontenttype', 'etag', 'getetag', 'iscollection',
-    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size', 'metadataLinks'
+    'status', 'getcreated', 'getcontenttype', 'mime', 'etag', 'getetag', 'iscollection',
+    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size', 'metadataLinks', 'version'
 ];
 
 const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, LabelValueProperty> => {
@@ -38,7 +38,7 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
             value: data.comment
         },
         lastmod: {
-            label: "Last modification date",
+            label: "Last modified",
             value: formatDate(data.lastmod)
         },
         createdBy: {
@@ -46,8 +46,12 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
             value: getDisplayName(users.find(u => u.iri === data.createdBy))
         },
         creationdate: {
-            label: "Creation date",
+            label: "Created",
             value: formatDate(data.creationdate)
+        },
+        contentType: {
+            label: "Content type",
+            value: data.mime
         }
     };
     const propertiesToDisplay = Object.keys(data).filter(
