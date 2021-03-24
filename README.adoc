@@ -1251,6 +1251,22 @@ Search endpoint used for text search on labels or comments.
 | ``parentIRI``
 | string
 | IRI of the parent directory or collection to limit the search area.
+
+3+| _Response_
+3+| Object in JSON format, with `query` and `results` properties.
+Results contain a list of files (and/or directories, collections) with the following properties:
+| ``id``
+| string
+| File (or directory) identifier (IRI).
+| ``label``
+| string
+| File (or directory) name.
+| ``type``
+| string
+| Type of the resource as defined in the vocabulary, e.g. "https://fairspace.nl/ontology#File", "https://fairspace.nl/ontology#Directory"
+| ``comment``
+| string
+| File (or directory) description. Optional.
 |===
 
 .Example text search (curl)
@@ -1264,6 +1280,31 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
   "parentIRI":"http://localhost:8080/api/webdav/dir1"
 }' \
 'http://localhost:8080/api/search/files'
+----
+====
+
+.Example text search response
+[%collapsible]
+====
+[source, json]
+----
+{
+  "results": [
+    {
+      "id": "https://fairspace.example.com/api/webdav/col1/test",
+      "label": "test",
+      "type": "https://fairspace.nl/ontology#File",
+      "comment": "Description of the test file from col1."
+    },
+    {
+      "id": "https://fairspace.example.com/api/webdav/col2/new_test_folder",
+      "label": "new_test_folder",
+      "type": "https://fairspace.nl/ontology#Directory",
+      "comment": null
+    }
+  ],
+  "query": "test"
+}
 ----
 ====
 
