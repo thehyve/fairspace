@@ -24,8 +24,8 @@ zuul:
       path: /api/storages/test/webdav/**
       url: http://localhost:8090/api/webdav
     storage-test-search:
-      path: /api/storages/test/search/**
-      url: http://localhost:8090/api/search/files/
+      path: /api/storages/test/search/files/**
+      url: http://localhost:8090/api/search/files
     saturn:
       path: /api/**
       url: http://localhost:8090/api/
