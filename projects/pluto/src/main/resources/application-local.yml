@@ -12,8 +12,8 @@ pluto:
        name: test
        label: Test
        url: /api/storages/test/webdav
-       searchUrl: /api/storages/test/search
-       rootDirectoryIri: http://localhost:8080/api/webdav
+       search-url: /api/storages/test/search
+       root-directory-iri: http://localhost:8080/api/webdav
 
 zuul:
   routes:

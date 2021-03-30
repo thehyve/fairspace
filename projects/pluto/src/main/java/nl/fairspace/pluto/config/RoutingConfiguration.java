@@ -1,5 +1,6 @@
 package nl.fairspace.pluto.config;
 
+import nl.fairspace.pluto.config.dto.*;
 import org.springframework.cloud.commons.httpclient.ApacheHttpClientConnectionManagerFactory;
 import org.springframework.cloud.commons.httpclient.ApacheHttpClientFactory;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
@@ -19,7 +20,7 @@ public class RoutingConfiguration {
     }
 
     @Bean
-    public WebDAVPathRewritingFilter webDAVPathRewritingFilter(ZuulProperties zuulProperties) {
-        return new WebDAVPathRewritingFilter(zuulProperties);
+    public WebDAVPathRewritingFilter webDAVPathRewritingFilter(PlutoConfig plutoConfig, ZuulProperties zuulProperties) {
+        return new WebDAVPathRewritingFilter(plutoConfig, zuulProperties);
     }
 }
