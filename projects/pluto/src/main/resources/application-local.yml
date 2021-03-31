@@ -3,7 +3,7 @@ server.port: 8080
 pluto:
   domains:
     - http://localhost:8080
-  forceHttps: false
+  force-https: false
   oauth2:
     base-url: http://localhost:5100
     realm: fairspace
@@ -46,3 +46,6 @@ spring:
   zipkin:
     base-url: http://localhost:9411/
     enabled: false
+  web:
+    resources:
+      static-locations: classpath:static,file:../mercury/build
