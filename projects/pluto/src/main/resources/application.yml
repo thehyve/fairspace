@@ -32,7 +32,7 @@ security:
     logout-url: ${pluto.oauth2.base-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/logout?redirect_uri=%s
     token-url: ${pluto.oauth2.backend-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/token
     jwk-key-set-url: ${pluto.oauth2.backend-url}/auth/realms/${pluto.oauth2.realm}/protocol/openid-connect/certs
-    # redirect-after-logout-url: https://fairspace.com
+    redirect-after-logout-url: http://localhost:8080
     clientId: workspace-client
     clientSecret: ${KEYCLOAK_CLIENT_SECRET}
     scope: openid
