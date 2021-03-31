@@ -34,7 +34,6 @@ zuul:
       url: http://localhost:3000
 
   include-debug-header: true
-  set-content-length: true
 
 security:
   oidc:

@@ -18,6 +18,10 @@ spring:
   zipkin:
     base-url: http://jaeger-collector.jaeger:9411/
     enabled: false
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
 
 security:
   oidc:
