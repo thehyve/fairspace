@@ -2,11 +2,14 @@ import React, {useContext, useState} from 'react';
 import {ExpandMore} from "@material-ui/icons";
 import {
     Avatar,
+    Box,
     Card,
     CardContent,
     CardHeader,
+    Checkbox,
     Collapse,
     FormControl,
+    FormControlLabel,
     FormGroup,
     FormHelperText,
     FormLabel,
@@ -51,6 +54,7 @@ const styles = theme => ({
     permissionsCard: {
         marginTop: 10
     },
+
     avatar: {
         width: 20,
         height: 20,
@@ -66,6 +70,9 @@ const styles = theme => ({
     },
     property: {
         marginTop: 10
+    },
+    group: {
+        marginLeft: 20
     },
     accessIcon: {
         verticalAlign: 'middle'
@@ -176,7 +183,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 aria-label="Show more"
                 title="Access"
             >
-                <ExpandMore />
+                <ExpandMore/>
             </IconButton>
         </>
     );
@@ -187,7 +194,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 return (
                     <span>
                         Are you sure you want to change the view mode of
-                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br />
+                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br/>
                         Metadata and data files will only be findable and readable for users
                         that have been granted access to the collection explicitly.
                     </span>
@@ -195,15 +202,15 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             case 'MetadataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br />
+                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br/>
                         The metadata will be findable and readable for all users with access to public data.
                     </span>
                 );
             case 'DataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br />
-                        The data will be findable and readable for all users with access to public data.<br />
+                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br/>
+                        The data will be findable and readable for all users with access to public data.<br/>
                         <strong>
                             Warning: This action cannot be reverted.
                             Once published, the collection cannot be unpublished, moved or deleted.
@@ -230,7 +237,21 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderAccessMode = () => (
         <FormControl className={classes.property}>
-            <FormLabel>View mode</FormLabel>
+            <FormLabel>All Users</FormLabel>
+            <FormGroup className={classes.group}>
+                <FormControlLabel
+                    value="Metadata"
+                    control={<Checkbox checked={selectedAccessMode === 'Restricted'} color="primary"/>}
+                    label="Metadata published, all users can see collection metadata"
+                    labelPlacement="end"
+                />
+                <FormControlLabel
+                    value="Data"
+                    control={<Checkbox checked={selectedAccessMode !== 'Restricted'} color="primary"/>}
+                    label="Data published, when collection is archived, all users can read collection data"
+                    labelPlacement="end"
+                />
+            </FormGroup>
             <FormGroup>
                 {(collection.canManage && collection.availableAccessModes.length > 1) ? (
                     <FormControl>
@@ -256,6 +277,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     />
                 )}
             </FormGroup>
+
         </FormControl>
     );
 
@@ -274,24 +296,26 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderOwnerWorkspaceAccess = () => (
         <FormControl className={classes.property}>
-            <FormLabel>Members access</FormLabel>
-            <FormGroup>
-                {collection.canManage ? (
-                    <Select
-                        value={ownerWorkspaceAccess}
-                        onChange={access => handleSetOwnerWorkspaceAccess(access)}
-                        inputProps={{'aria-label': 'Owner workspace access'}}
-                    >
-                        {availableWorkspaceMembersAccessLevels.map(access => (
-                            <MenuItem key={access} value={access}>
-                                <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
-                                <span className={classes.accessName}>{access}</span>
-                            </MenuItem>
-                        ))}
-                    </Select>
-                ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
-            </FormGroup>
-            <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
+            <FormLabel>Workspace Users</FormLabel>
+            <Box className={classes.group}>
+                <FormGroup>
+                    {collection.canManage ? (
+                        <Select
+                            value={ownerWorkspaceAccess}
+                            onChange={access => handleSetOwnerWorkspaceAccess(access)}
+                            inputProps={{'aria-label': 'Owner workspace access'}}
+                        >
+                            {availableWorkspaceMembersAccessLevels.map(access => (
+                                <MenuItem key={access} value={access}>
+                                    <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
+                                    <span className={classes.accessName}>{access}</span>
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
+                </FormGroup>
+                <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
+            </Box>
         </FormControl>
     );
 
@@ -333,12 +357,15 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                                 {renderOwnerWorkspaceAccess()}
                             </ListItem>
                         </List>
-                        <PermissionViewer
-                            collection={collection}
-                            collaboratingUsers={collaboratingUsers}
-                            collaboratingWorkspaces={collaboratingWorkspaces}
-                            workspaceUsers={workspaceUsers}
-                        />
+                        <FormLabel>Individual Users</FormLabel>
+                        <Box className={classes.group}>
+                            <PermissionViewer
+                                collection={collection}
+                                collaboratingUsers={collaboratingUsers}
+                                collaboratingWorkspaces={collaboratingWorkspaces}
+                                workspaceUsers={workspaceUsers}
+                            />
+                        </Box>
                     </div>
                 </CardContent>
                 {changingAccessMode && renderAccessModeChangeConfirmation()}
