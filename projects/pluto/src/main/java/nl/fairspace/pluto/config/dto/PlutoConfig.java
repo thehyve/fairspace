@@ -22,7 +22,6 @@ public class PlutoConfig {
         private String rootDirectoryIri;
     }
 
-    private String containerId = "";
     private String sessionCookieName = "JSESSIONID";
     private boolean forceHttps = true;
     private List<String> domains = Collections.emptyList();
