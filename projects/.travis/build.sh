@@ -40,7 +40,7 @@ $BUILD_SCRIPTS_DIR/docker/build.sh
 echo 'Building the gateway'
 cd "$root/pluto"
 $BUILD_SCRIPTS_DIR/gradle/tag.sh
-./gradlew clean assemble jacocoTestReport $GRADLE_OPTIONS.
+./gradlew clean assemble jacocoTestReport $GRADLE_OPTIONS
 
 test -e build/mercury && rm -r build/mercury
 cp -r ../mercury/build build/mercury
