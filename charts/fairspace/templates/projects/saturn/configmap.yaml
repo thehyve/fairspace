@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
-    port: 8080
+    port: 8090
     publicUrl: https://{{ .Values.fairspace.ingress.domain }}
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/

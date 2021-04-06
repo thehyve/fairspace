@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pluto
+  labels:
+    app: pluto
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    pluto:
+      oauth2:
+        base-url: {{ .Values.external.keycloak.baseUrl }}
+        realm: {{ .Values.external.keycloak.realm }}
+
+    server:
+      error:
+        whitelabel:
+          enabled: false
+      max-http-header-size: 65535
+
+    security:
+      oidc:
+        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}
+        clientId: {{ .Values.external.keycloak.clientId }}
+        clientSecret: {{ .Values.external.keycloak.clientSecret }}
+      urls:
+        permitAll:
+        - /actuator/health
+        - /error
+        - /manifest.json
+        - /login
+        - /logout
+        - /authorize
+        - /api/account/tokens
+        - /favicon.ico
+        needsAuthentication: []
+        needsAuthorization:
+        - /*
+
+    spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
+      servlet:
+        multipart:
+          max-file-size: {{ .Values.pluto.maxFileSize }}
+          max-request-size: {{ .Values.pluto.maxRequestSize }}
+
+    zuul:
+      retryable: false
+      host:
+        connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
+        socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
+      routes:
+        # Please note that the order of the routes is relevant
+{{ toYaml .Values.pluto.backends.storages | indent 8 }}
+        saturn:
+          path: /api/**
+          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

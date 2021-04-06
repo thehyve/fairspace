@@ -3,8 +3,8 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "fairspace.name" . }}-saturn-ingress
-{{- with $ingress.annotations.saturn }}
+  name: {{ template "fairspace.name" . }}-pluto-ingress
+{{- with $ingress.annotations.pluto }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -17,15 +17,15 @@ spec:
 {{- if $ingress.tls.enabled }}
   tls:
     - hosts:
-      - {{ template "saturn.hostname" $ }}
+      - {{ template "pluto.hostname" $ }}
       secretName: {{ template "fairspace.tlsSecretName" $ }}
 {{- end }}
   rules:
-    - host: {{ template "saturn.hostname" $ }}
+    - host: {{ template "pluto.hostname" $ }}
       http:
         paths:
           - path: /
             backend:
-              serviceName: {{ .Release.Name }}-saturn
+              serviceName: {{ .Release.Name }}-pluto
               servicePort: 80
   {{- end -}}
