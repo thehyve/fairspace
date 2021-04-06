@@ -16,7 +16,6 @@ import {
     IconButton,
     List,
     ListItem,
-    ListItemText,
     MenuItem,
     Select,
     Typography,
@@ -34,7 +33,6 @@ import {accessLevels, Collection} from "../collections/CollectionAPI";
 import {
     accessLevelForCollection,
     collectionAccessIcon,
-    descriptionForAccessMode,
     getPrincipalsWithCollectionAccess
 } from "../collections/collectionUtils";
 import type {User} from '../users/UsersAPI';
@@ -111,9 +109,9 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== "List");
 
-    const handleSetAccessMode = (event) => {
+    const handleSetAccessMode = (newMode) => {
         if (collection.canManage) {
-            setSelectedAccessMode(event.target.value);
+            setSelectedAccessMode(newMode);
             setChangingAccessMode(true);
         }
     };
@@ -235,49 +233,52 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         />
     );
 
+    function accessModeIsMetaData() {
+        return selectedAccessMode === 'MetadataPublished' || selectedAccessMode === 'DataPublished';
+    }
+
+    function accessModeIsData() {
+        return selectedAccessMode === 'DataPublished';
+    }
+
+    function DisableShowDataModeCheckbox() {
+        return collection.status !== 'Archived';
+    }
+
+    const SetAccessModeFromMetaCheckbox = (event) => {
+        if (collection.canManage &&
+            selectedAccessMode === 'Restricted' &&
+            event.target.checked) {
+            handleSetAccessMode('MetadataPublished');
+        }
+
+        if (collection.canManage &&
+            selectedAccessMode === 'MetadataPublished' &&
+            !event.target.checked) {
+            handleSetAccessMode('Restricted');
+        }
+    }
+
     const renderAccessMode = () => (
         <FormControl className={classes.property}>
             <FormLabel>All Users</FormLabel>
             <FormGroup className={classes.group}>
                 <FormControlLabel
                     value="Metadata"
-                    control={<Checkbox checked={selectedAccessMode === 'Restricted'} color="primary"/>}
-                    label="Metadata published, all users can see collection metadata"
+                    control={<Checkbox checked={accessModeIsMetaData()} color="primary"/>}
+                    label="collection metadata visible for all users"
                     labelPlacement="end"
+                    onChange={SetAccessModeFromMetaCheckbox}
                 />
                 <FormControlLabel
                     value="Data"
-                    control={<Checkbox checked={selectedAccessMode !== 'Restricted'} color="primary"/>}
-                    label="Data published, when collection is archived, all users can read collection data"
+                    control={<Checkbox checked={accessModeIsData()} color="primary"/>}
+                    label="for archived collections, all users can read collection data"
                     labelPlacement="end"
+                    disabled={DisableShowDataModeCheckbox()}
                 />
+                <FormHelperText>Collection AccessMode: {selectedAccessMode}</FormHelperText>
             </FormGroup>
-            <FormGroup>
-                {(collection.canManage && collection.availableAccessModes.length > 1) ? (
-                    <FormControl>
-                        <Select
-                            value={collection.accessMode}
-                            onChange={mode => handleSetAccessMode(mode)}
-                            inputProps={{'aria-label': 'View mode'}}
-                        >
-                            {collection.availableAccessModes.map(mode => (
-                                <MenuItem key={mode} value={mode}>
-                                    <ListItemText
-                                        primary={camelCaseToWords(mode)}
-                                        secondary={descriptionForAccessMode(mode)}
-                                    />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                ) : (
-                    <ListItemText
-                        primary={camelCaseToWords(collection.accessMode)}
-                        secondary={descriptionForAccessMode(collection.accessMode)}
-                    />
-                )}
-            </FormGroup>
-
         </FormControl>
     );
 
