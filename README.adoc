@@ -1118,7 +1118,7 @@ Only available for users with _Add shared metadata_ role.
 3+| Serialised RDF triples. (_Optional_)
 |===
 
-.Example of deleting tripples (curl)
+.Example of deleting triples (curl)
 [%collapsible]
 ====
 [source, bash]
