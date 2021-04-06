@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, camelCaseToWords, isEmptyObject,
+    joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -20,6 +20,15 @@ describe('array Utils', () => {
 
         it('goes only one level deep', () => {
             expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([[1, 2, 3], [4, 5]]);
+        });
+    });
+
+    describe('groupBy', () => {
+        it('group an array by key', () => {
+            expect(groupBy(
+                [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
+                "type"
+            )).toEqual({"a": [{name: "x", type: "a"}, {name: "y", type: "a"}], "b": [{name: "z", type: "b"}]});
         });
     });
 });

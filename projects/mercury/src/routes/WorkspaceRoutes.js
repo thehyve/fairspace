@@ -61,7 +61,9 @@ const WorkspaceRoutes = () => {
             <Route
                 path="/external-storages/:storage"
                 render={(props) => (
-                    <ExternalStoragePage {...props} />
+                    <LinkedDataMetadataProvider>
+                        <ExternalStoragePage {...props} />
+                    </LinkedDataMetadataProvider>
                 )}
             />
 

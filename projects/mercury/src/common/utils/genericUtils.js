@@ -35,6 +35,18 @@ export const joinWithSeparator = (items = [], separator) => items.reduce((prev, 
  */
 export const first = array => ((array && array.length) ? array[0] : undefined);
 
+/**
+ * Groups array of objects by property
+ * @param array
+ * @param key
+ * @returns Map with property as a group key and list of objects in the group as a value
+ */
+export const groupBy = (array, key) => array.reduce((objectsMap, obj) => {
+    const value = obj[key];
+    objectsMap[value] = (objectsMap[value] || []).concat(obj);
+    return objectsMap;
+}, {});
+
 //* *********************************
 //* COMPARISION
 //* *********************************
