@@ -241,8 +241,12 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         return selectedAccessMode === 'DataPublished';
     }
 
+    function DisableShowMetaDataModeCheckbox() {
+        return selectedAccessMode === 'DataPublished';
+    }
+
     function DisableShowDataModeCheckbox() {
-        return collection.status !== 'Archived';
+        return collection.status !== 'Archived' || selectedAccessMode === 'DataPublished';
     }
 
     const SetAccessModeFromMetaCheckbox = (event) => {
@@ -259,6 +263,20 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         }
     }
 
+    const SetAccessModeFromDataCheckbox = (event) => {
+        if (collection.canManage &&
+            (selectedAccessMode === 'Restricted' || selectedAccessMode === 'MetadataPublished') &&
+            event.target.checked) {
+            handleSetAccessMode('DataPublished');
+        }
+
+        if (collection.canManage &&
+            selectedAccessMode === 'DataPublished' &&
+            !event.target.checked) {
+            handleSetAccessMode('MetadataPublished');
+        }
+    }
+
     const renderAccessMode = () => (
         <FormControl className={classes.property}>
             <FormLabel>All Users</FormLabel>
@@ -269,15 +287,17 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     label="collection metadata visible for all users"
                     labelPlacement="end"
                     onChange={SetAccessModeFromMetaCheckbox}
+                    disabled={DisableShowMetaDataModeCheckbox()}
                 />
                 <FormControlLabel
                     value="Data"
                     control={<Checkbox checked={accessModeIsData()} color="primary"/>}
                     label="for archived collections, all users can read collection data"
                     labelPlacement="end"
+                    onChange={SetAccessModeFromDataCheckbox}
                     disabled={DisableShowDataModeCheckbox()}
                 />
-                <FormHelperText>Collection AccessMode: {selectedAccessMode}</FormHelperText>
+                <FormHelperText>Collection AccessMode is: {selectedAccessMode}</FormHelperText>
             </FormGroup>
         </FormControl>
     );
@@ -358,15 +378,12 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                                 {renderOwnerWorkspaceAccess()}
                             </ListItem>
                         </List>
-                        <FormLabel>Individual Users</FormLabel>
-                        <Box className={classes.group}>
-                            <PermissionViewer
-                                collection={collection}
-                                collaboratingUsers={collaboratingUsers}
-                                collaboratingWorkspaces={collaboratingWorkspaces}
-                                workspaceUsers={workspaceUsers}
-                            />
-                        </Box>
+                        <PermissionViewer
+                            collection={collection}
+                            collaboratingUsers={collaboratingUsers}
+                            collaboratingWorkspaces={collaboratingWorkspaces}
+                            workspaceUsers={workspaceUsers}
+                        />
                     </div>
                 </CardContent>
                 {changingAccessMode && renderAccessModeChangeConfirmation()}
