@@ -32,7 +32,7 @@ type CollectionsPageProperties = {
 }
 
 const CollectionsPage = (props: CollectionsPageProperties) => {
-    const {showBreadCrumbs = true, history, workspaceIri, documentTitle, classes} = props;
+    const {showBreadCrumbs = false, history, workspaceIri, documentTitle, classes} = props;
 
     usePageTitleUpdater(documentTitle || "Collections");
 

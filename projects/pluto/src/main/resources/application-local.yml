@@ -3,7 +3,7 @@ server.port: 8080
 pluto:
   domains:
     - http://localhost:8080
-  forceHttps: false
+  force-https: false
   oauth2:
     base-url: http://localhost:5100
     realm: fairspace
@@ -12,8 +12,8 @@ pluto:
        name: test
        label: Test
        url: /api/storages/test/webdav
-       searchUrl: /api/storages/test/search
-       rootDirectoryIri: http://localhost:8080/api/webdav
+       search-url: /api/storages/test/search
+       root-directory-iri: http://localhost:8080/api/webdav
 
 zuul:
   routes:
@@ -24,8 +24,8 @@ zuul:
       path: /api/storages/test/webdav/**
       url: http://localhost:8090/api/webdav
     storage-test-search:
-      path: /api/storages/test/search/**
-      url: http://localhost:8090/api/search/files/
+      path: /api/storages/test/search/files/**
+      url: http://localhost:8090/api/search/files
     saturn:
       path: /api/**
       url: http://localhost:8090/api/
@@ -46,3 +46,6 @@ spring:
   zipkin:
     base-url: http://localhost:9411/
     enabled: false
+  web:
+    resources:
+      static-locations: classpath:static,file:../mercury/build

@@ -1,6 +1,7 @@
 // @flow
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
+import {joinPathsAvoidEmpty} from "../file/fileUtils";
 
 export type SearchResult = {|
     id: string;
@@ -20,7 +21,7 @@ class SearchAPI {
     }
 
     search(path: string, body): Promise<SearchResult[]> {
-        return axios.post(this.remoteURL + path, body, {headers: HEADERS})
+        return axios.post(joinPathsAvoidEmpty(this.remoteURL, path), body, {headers: HEADERS})
             .catch(handleHttpError("Error while performing search"))
             .then(extractJsonData)
             .then(data => data.results);

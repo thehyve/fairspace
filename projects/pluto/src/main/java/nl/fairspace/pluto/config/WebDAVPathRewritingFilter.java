@@ -4,6 +4,7 @@ import com.netflix.zuul.*;
 import com.netflix.zuul.context.*;
 import com.netflix.zuul.exception.*;
 import lombok.extern.slf4j.*;
+import nl.fairspace.pluto.config.dto.*;
 import org.springframework.cloud.netflix.zuul.filters.*;
 import org.springframework.http.*;
 import org.w3c.dom.*;
@@ -20,14 +21,18 @@ import java.io.*;
 import java.net.*;
 import java.util.regex.*;
 
+import static nl.fairspace.pluto.config.ExtendedHttpMethod.PROPFIND;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 public class WebDAVPathRewritingFilter extends ZuulFilter {
+    private final PlutoConfig plutoConfig;
     private final ZuulProperties zuulProperties;
 
-    public WebDAVPathRewritingFilter(ZuulProperties zuulProperties) {
+    public WebDAVPathRewritingFilter(PlutoConfig plutoConfig, ZuulProperties zuulProperties) {
+        this.plutoConfig = plutoConfig;
         this.zuulProperties = zuulProperties;
     }
 
@@ -44,25 +49,40 @@ public class WebDAVPathRewritingFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
-        return ctx.getRequest().getMethod().equals("PROPFIND") &&
-                ctx.getRequest().getRequestURI().startsWith("/api/storages/");
+        return ctx.getRequest().getMethod().equalsIgnoreCase(PROPFIND.name()) &&
+                ctx.getRequest().getRequestURI().startsWith("/api/storages/") &&
+                valueOf(ctx.getResponseStatusCode()).is2xxSuccessful();
     }
 
     /**
      * Replace in DAV:multistatus -> DAV:response -> DAV:href
      * values of the form '/api/webdav/*' to '/api/storages/$storage/webdav/*'
      */
-    public void transform(InputStream in, String remotePrefix, String routePrefix, Writer writer) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
+    public void transform(InputStream in,
+                          String remotePrefix, String routePrefix,
+                          String storageRootIri, String storageRoot,
+                          Writer writer) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
         var documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         var webDavResponse = documentBuilderFactory.newDocumentBuilder().parse(in);
         var xpath = XPathFactory.newInstance().newXPath();
-        var nodes = (NodeList) xpath.evaluate("/multistatus/response/href", webDavResponse, XPathConstants.NODESET);
-        for (int i=0; i < nodes.getLength(); i++) {
-            var node = nodes.item(i);
-            if (node.getTextContent() != null) {
-                node.setTextContent(node.getTextContent().replaceFirst(Pattern.quote(remotePrefix), routePrefix));
+        {
+            var nodes = (NodeList) xpath.evaluate("/multistatus/response/href", webDavResponse, XPathConstants.NODESET);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                var node = nodes.item(i);
+                if (node.getTextContent() != null) {
+                    node.setTextContent(node.getTextContent().replaceFirst(Pattern.quote(remotePrefix), routePrefix));
+                }
+            }
+        }
+        if (storageRootIri != null) {
+            var nodes = (NodeList) xpath.evaluate("/multistatus/response/propstat/prop/getetag", webDavResponse, XPathConstants.NODESET);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                var node = nodes.item(i);
+                if (node.getTextContent() != null) {
+                    node.setTextContent(node.getTextContent().replaceFirst(Pattern.quote(storageRootIri), storageRoot));
+                }
             }
         }
         var transformerFactory = TransformerFactory.newInstance();
@@ -79,7 +99,18 @@ public class WebDAVPathRewritingFilter extends ZuulFilter {
         if (parts.length < 5 || ! "webdav".equals(parts[4])) {
             throw new ZuulException("Not a Webdav endpoint", HttpStatus.METHOD_NOT_ALLOWED.value(), "Method not allowed.");
         }
-        String routePrefix = "/api/storages/%s/webdav".formatted(parts[3]);
+        var storageName = parts[3];
+        var storage = plutoConfig.getStorages().get(storageName);
+        if (storage == null) {
+            throw new ZuulException("Missing storage configuration", HttpStatus.BAD_GATEWAY.value(), "Missing storage configuration");
+        }
+        String routePrefix = "/api/storages/%s/webdav".formatted(storageName);
+        var storageRoot = "%s://%s:%s%s".formatted(
+                ctx.getRequest().getScheme(),
+                ctx.getRequest().getServerName(),
+                ctx.getRequest().getServerPort(),
+                routePrefix
+        );
         var route = zuulProperties.getRoutes().values().stream()
                 .filter(r -> r.getPath().startsWith(routePrefix))
                 .findFirst().orElseThrow(() -> new ZuulException("Invalid Webdav route", HttpStatus.NOT_FOUND.value(), "No such route configured"));
@@ -93,7 +124,7 @@ public class WebDAVPathRewritingFilter extends ZuulFilter {
         }
         var writer = new StringWriter();
         try {
-            transform(ctx.getResponseDataStream(), remotePrefix, routePrefix, writer);
+            transform(ctx.getResponseDataStream(), remotePrefix, routePrefix, storage.getRootDirectoryIri(), storageRoot, writer);
         } catch (Exception e) {
             log.error("Error translating webdav response", e);
             throw new ZuulException(e, HttpStatus.BAD_GATEWAY.value(), "Error translating webdav response");
