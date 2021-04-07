@@ -2,9 +2,6 @@
 
 root="$PWD"
 
-cd "$root/saturn"
-$BUILD_SCRIPTS_DIR/docker/release.sh
-
 cd "$root/pluto"
 $BUILD_SCRIPTS_DIR/docker/release.sh
 
