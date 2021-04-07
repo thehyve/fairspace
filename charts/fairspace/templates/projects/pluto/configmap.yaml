@@ -22,22 +22,9 @@ data:
 
     security:
       oidc:
-        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}
+        redirect-after-logout-url: https://{{ .Values.fairspace.ingress.domain }}
         clientId: {{ .Values.external.keycloak.clientId }}
         clientSecret: {{ .Values.external.keycloak.clientSecret }}
-      urls:
-        permitAll:
-        - /actuator/health
-        - /error
-        - /manifest.json
-        - /login
-        - /logout
-        - /authorize
-        - /api/account/tokens
-        - /favicon.ico
-        needsAuthentication: []
-        needsAuthorization:
-        - /*
 
     spring:
       zipkin:
