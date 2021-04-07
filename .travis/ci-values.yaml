@@ -44,3 +44,14 @@ saturn:
     type: pd-standard
     provisioner: kubernetes.io/gce-pd
     allowVolumeExpansion: true
+
+# Specific settings for Pluto subchart
+pluto:
+  image:
+    pullPolicy: Always
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:
+    storages:

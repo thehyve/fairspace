@@ -72,7 +72,7 @@ saturn:
     database:
       size: 50Gi
   image:
-    image: eu.gcr.io/fairspace-207108/projects
+    image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   initContainer:
@@ -133,6 +133,43 @@ saturn:
       - "GPU"
   vocabulary:
   views:
+
+
+#####################################################################
+# Specific settings for Pluto subchart
+#####################################################################
+pluto:
+  image:
+    image: eu.gcr.io/fairspace-207108/pluto
+    tag: RELEASEVERSION
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1
+      memory: 2048Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  readinessProbe:
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  terminationGracePeriodSeconds: 10
+  keycloak:
+    redirectAfterLogoutUrl:
+  # Zuul timeouts when connecting to upstream services
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:
+    storages:
+
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: { }
