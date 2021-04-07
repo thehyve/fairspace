@@ -45,6 +45,20 @@ const UserMenu = ({classes}) => {
         return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
+    const userNameMenuItem = () => {
+        if(!currentUser.username)
+            return null;
+
+        return <MenuItem disabled>{currentUser.username}</MenuItem>
+    }
+
+    const userEmailMenuItem = () => {
+        if(!currentUser.email)
+            return null;
+
+        return <MenuItem disabled>{currentUser.email}</MenuItem>
+    }
+
     return (
         <>
             <Button
@@ -69,7 +83,8 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList>
-                                    <MenuItem disabled>{currentUser.name}</MenuItem>
+                                    {userNameMenuItem()}
+                                    {userEmailMenuItem()}
                                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
