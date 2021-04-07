@@ -32,11 +32,5 @@ public class UserApp extends BaseApp {
             var user = service.currentUser();
             return mapper.writeValueAsString(user);
         });
-
-        post("/current/logout", (req, res) -> {
-            service.logoutCurrent();
-            res.status(SC_NO_CONTENT);
-            return "";
-        });
     }
 }

@@ -18,6 +18,7 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         setAuthenticator(new SaturnKeycloakJettyAuthenticator(adapterConfig(config)));
         addConstraintMapping(constraintMapping("/*", true));
         addConstraintMapping(constraintMapping("/api/health/", false));
+        addConstraintMapping(constraintMapping("/favicon.ico", false));
     }
 
     private static AdapterConfig adapterConfig(Config.Auth config) {
