@@ -10,6 +10,8 @@ metadata:
 data:
   application.yaml: |-
     pluto:
+      domains:
+        - https://{{ .Values.fairspace.ingress.domain }}
       oauth2:
         base-url: {{ .Values.external.keycloak.baseUrl }}
         realm: {{ .Values.external.keycloak.realm }}
