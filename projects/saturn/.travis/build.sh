@@ -4,12 +4,13 @@ set -e
 root="$PWD"
 
 echo 'Building the front-end'
-cd "$root/mercury"
+cd "$root"
+cd "../mercury"
 $BUILD_SCRIPTS_DIR/yarn/tag.sh || exit 1
 $BUILD_SCRIPTS_DIR/yarn/build.sh || exit 1
 
 echo 'Building the back-end'
-cd "$root/saturn"
+cd "$root"
 $BUILD_SCRIPTS_DIR/gradle/tag.sh
 ./gradlew clean build test jacocoTestReport $GRADLE_OPTIONS
 
