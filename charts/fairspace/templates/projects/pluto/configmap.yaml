@@ -41,8 +41,6 @@ data:
         connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
         socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
       routes:
-        # Please note that the order of the routes is relevant
-{{ toYaml .Values.pluto.backends.storages | indent 8 }}
         saturn:
           path: /api/**
           url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
