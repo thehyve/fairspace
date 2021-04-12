@@ -25,7 +25,9 @@ public class AuthorizationFailedHandler {
         } else {
             response.addHeader(LOGIN_PATH_HEADER, LOGIN_PATH);
             response.addHeader(WWW_AUTHENTICATE_HEADER, BEARER_AUTH);
-            response.addHeader(WWW_AUTHENTICATE_HEADER, BASIC_AUTH);
+            if (!XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER))) {
+                response.addHeader(WWW_AUTHENTICATE_HEADER, BASIC_AUTH);
+            }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
