@@ -168,7 +168,7 @@ pluto:
   maxFileSize: 1GB
   maxRequestSize: 1GB
   backends:
-    storages:
+    storageRoutes:
 
 
 # Pod annotations should remain empty. They are filled within the build process

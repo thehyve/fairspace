@@ -15,6 +15,8 @@ data:
       oauth2:
         base-url: {{ .Values.external.keycloak.baseUrl }}
         realm: {{ .Values.external.keycloak.realm }}
+      storages:
+{{ toYaml .Values.fairspace.storages | indent 8 }}
 
     server:
       error:
@@ -43,6 +45,9 @@ data:
         connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
         socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
       routes:
+{{ if .Values.pluto.backends.storageRoutes }}
+{{ toYaml .Values.pluto.backends.storageRoutes | indent 8 }}
+{{ end }}
         saturn:
           path: /api/**
           url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

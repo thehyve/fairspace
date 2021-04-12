@@ -16,9 +16,12 @@ fairspace:
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
   storages:
-    - name: fairspace-test
+    test:
+      name: test
       label: "Test storage"
-      url: https://fairspace.test.fairway.app/api/webdav
+      url: /api/storages/test/webdav
+      search-url: /api/storages/test/search
+      root-directory-iri: http://fairspace.test.fairway.app/api/webdav
 
 # Specific settings for Saturn subchart
 saturn:
@@ -54,4 +57,10 @@ pluto:
   maxFileSize: 1GB
   maxRequestSize: 1GB
   backends:
-    storages:
+    storageRoutes:
+      storage-test-webdav:
+        path: ${pluto.storages.test.url}/**
+        url: http://fairspace.test.fairway.app/api/webdav
+      storage-test-search:
+        path: ${pluto.storages.test.search-url}/**
+        url: http://fairspace.test.fairway.app/api/search/files
