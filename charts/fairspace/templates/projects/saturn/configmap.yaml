@@ -30,8 +30,6 @@ data:
 {{ toYaml .Values.fairspace.services | indent 6 }}
     features:
 {{ toYaml .Values.fairspace.features | indent 6 }}
-    storages:
-{{ toYaml .Values.fairspace.storages | indent 6 }}
   vocabulary.ttl: |
 {{ if .Values.saturn.vocabulary -}}
 {{ .Values.saturn.vocabulary | indent 4 -}}

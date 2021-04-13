@@ -6,7 +6,6 @@ import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
 import io.fairspace.saturn.services.search.SearchApp;
 import io.fairspace.saturn.services.services.ServicesApp;
-import io.fairspace.saturn.services.storages.StoragesApp;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.views.ViewApp;
 import io.fairspace.saturn.services.workspaces.WorkspaceApp;
@@ -24,7 +23,6 @@ public class SparkFilterFactory {
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),
                 new FeaturesApp(apiPathPrefix + "/features", config.features),
-                new StoragesApp(apiPathPrefix + "/storages", config.storages),
                 new HealthApp(apiPathPrefix + "/health"),
                 new LogoutApp("/logout", svc.getUserService(), config));
     }
