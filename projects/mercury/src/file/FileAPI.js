@@ -12,7 +12,7 @@ import {
 import {handleHttpError} from "../common/utils/httpUtils";
 
 // Ensure that the client passes along the credentials
-const defaultOptions = {withCredentials: true};
+const defaultOptions = {withCredentials: true, headers: {"X-Requested-With": "XMLHttpRequest"}};
 
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
@@ -47,7 +47,7 @@ class FileAPI {
             data: "<propfind><allprop /></propfind>"
         };
         if (showDeleted) {
-            options.headers = {"Show-Deleted": "on"};
+            options.headers = {...options.headers, "Show-Deleted": "on"};
         }
         if (includeMetadataLinks) {
             options.headers = {...options.headers, "With-Metadata-Links": true};
@@ -61,7 +61,7 @@ class FileAPI {
             ...includeDetails,
             data: "<propfind><allprop /></propfind>"
         };
-        options.headers = {Version: version};
+        options.headers = {...options.headers, Version: version};
 
         return this.client().stat(path, options)
             .then(result => this.mapToFile(result.data));
@@ -76,7 +76,7 @@ class FileAPI {
     list(path, showDeleted = false): File[] {
         const options = {...includeDetails, data: '<propfind><allprop /></propfind>'};
         if (showDeleted) {
-            options.headers = {"Show-Deleted": "on"};
+            options.headers = {...options.headers, "Show-Deleted": "on"};
         }
         return this.client().getDirectoryContents(path, options)
             .then(result => result.data
@@ -146,7 +146,8 @@ class FileAPI {
             method: "POST",
             headers: {
                 "Accept": "text/plain",
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                "X-Requested-With": "XMLHttpRequest"
             },
             responseType: "text",
             onUploadProgress,
@@ -183,7 +184,7 @@ class FileAPI {
     delete(path, showDeleted = false) {
         const options = {...defaultOptions};
         if (showDeleted) {
-            options.headers = {"Show-Deleted": "on"};
+            options.headers = {...options.headers, "Show-Deleted": "on"};
         }
         if (!path) return Promise.reject(Error("No path specified for deletion"));
 
@@ -377,7 +378,8 @@ class FileAPI {
             headers: {
                 "Accept": "text/plain",
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Show-Deleted": showDeleted ? "on" : "off"
+                "Show-Deleted": showDeleted ? "on" : "off",
+                "X-Requested-With": "XMLHttpRequest"
             },
             responseType: "text",
             data: qs.stringify(data)
@@ -395,7 +397,8 @@ class FileAPI {
             method: "POST",
             headers: {
                 "Accept": "text/plain",
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                "X-Requested-With": "XMLHttpRequest"
             },
             responseType: "text",
             data: formData

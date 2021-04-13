@@ -114,7 +114,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
 const ContextualExternalStorageBrowser = (props: ContextualExternalStorageBrowserProperties) => {
     const {pathname, storage, setAtLeastSingleRootFileExists} = props;
     const path = getRelativePath(pathname, storage.name);
-    const {files = [], loading, error, fileActions} = useExternalStorage(path, storage.url);
+    const {files = [], loading, error, fileActions} = useExternalStorage(path, storage.path);
 
     useEffect(() => {
         setAtLeastSingleRootFileExists(files.length > 0);

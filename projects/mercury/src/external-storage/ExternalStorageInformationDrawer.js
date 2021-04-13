@@ -53,7 +53,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     const {title, forceExpand, path, storage} = props;
     const classes = useStyles();
 
-    const fileAPI = new FileAPI(storage.url);
+    const fileAPI = new FileAPI(storage.path);
     const {
         metadata = {}, loading, error, linkedMetadataEntities = {}, linkedMetadataEntitiesLoading
     } = useExternalStorageMetadata(path, fileAPI);

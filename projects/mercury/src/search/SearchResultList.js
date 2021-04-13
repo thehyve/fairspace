@@ -163,7 +163,7 @@ export const SearchResultListContainer = ({
     const currentStorage = externalStorages.find(s => s.name === storage);
 
     const {data, loading, error} = useAsync(() => {
-        const searchAPI = currentStorage ? new SearchAPI(currentStorage.searchUrl) : LocalSearchAPI;
+        const searchAPI = currentStorage ? new SearchAPI(currentStorage.searchPath) : LocalSearchAPI;
         return searchAPI.searchForFiles(query, context).catch(handleSearchError);
     }, [search, query, storage]);
 
