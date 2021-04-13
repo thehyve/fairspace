@@ -39,7 +39,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
     const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
-    const isSearchAvailable = storage && !!storage.searchUrl;
+    const isSearchAvailable = storage && !!storage.searchPath;
     const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
 
     usePageTitleUpdater(storage ? storage.label : "External storage");

@@ -19,8 +19,8 @@ fairspace:
     test:
       name: test
       label: "Test storage"
-      url: /api/storages/test/webdav
-      search-url: /api/storages/test/search
+      url: http://fairspace.test.fairway.app/api/webdav
+      search-url: http://fairspace.test.fairway.app/api/search/files
       root-directory-iri: http://fairspace.test.fairway.app/api/webdav
 
 # Specific settings for Saturn subchart
@@ -59,8 +59,8 @@ pluto:
   backends:
     storageRoutes:
       storage-test-webdav:
-        path: ${pluto.storages.test.url}/**
-        url: http://fairspace.test.fairway.app/api/webdav
+        path: /api/storages/test/webdav/**
+        url: ${pluto.storages.test.url}
       storage-test-search:
-        path: ${pluto.storages.test.search-url}/**
-        url: http://fairspace.test.fairway.app/api/search/files
+        path: /api/storages/test/search/files/**
+        url: ${pluto.storages.test.search-url}
