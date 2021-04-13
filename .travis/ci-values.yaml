@@ -19,9 +19,9 @@ fairspace:
     test:
       name: test
       label: "Test storage"
-      url: http://fairspace.test.fairway.app/api/webdav
-      search-url: http://fairspace.test.fairway.app/api/search/files
-      root-directory-iri: http://fairspace.test.fairway.app/api/webdav
+      url: https://fairspace.test.fairway.app/api/webdav
+      search-url: https://fairspace.test.fairway.app/api/search/files
+      root-directory-iri: https://fairspace.test.fairway.app/api/webdav
 
 # Specific settings for Saturn subchart
 saturn:
