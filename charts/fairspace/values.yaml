@@ -40,7 +40,7 @@ fairspace:
           kind: ClusterIssuer
   features: []
   services: {}
-  storages: []
+  storages: {}
 
 # Generic settings for tracing
 tracing:
