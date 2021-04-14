@@ -40,3 +40,10 @@ saturn:
       type: pd-standard
       provisioner: kubernetes.io/gce-pd
       allowVolumeExpansion: true
+
+pluto:
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:
