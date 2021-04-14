@@ -12,8 +12,10 @@ import spark.servlet.SparkApplication;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
+import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static javax.servlet.http.HttpServletResponse.*;
 import static spark.Spark.path;
+import static spark.Spark.notFound;
 import static spark.globalstate.ServletFlag.isRunningFromServlet;
 
 @Slf4j
@@ -33,7 +35,12 @@ public abstract class BaseApp implements SparkApplication {
     @Override
     public final void init() {
         path(basePath, () -> {
-      //      notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
+            notFound((req, res) -> {
+                if (req.pathInfo().startsWith("/api/webdav")) {
+                    return null;
+                }
+                return errorBody(SC_NOT_FOUND, "Not found");
+            });
             exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
             exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
             exception(DAOException.class, exceptionHandler(SC_BAD_REQUEST, "Bad request"));

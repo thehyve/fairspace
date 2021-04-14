@@ -2,23 +2,44 @@ import queryString from 'query-string';
 import React from 'react';
 import {handleAuthError} from "../common/utils/httpUtils";
 import Iri from '../common/components/Iri';
+import {getPathFromIri} from "../file/fileUtils";
+import type {ExternalStorage} from "../external-storage/externalStorageUtils";
+import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
+import {isEmptyObject} from "../common/utils/genericUtils";
 
-/**
- * Builds a search URL with the given query
- * @param query
- * @returns {string}
- */
-export const buildSearchUrl = (query) => {
-    if (!query) {
-        return '/search';
+export const handleTextSearchRedirect = (history: History, value: string, context: string = '', storage: ExternalStorage = {}) => {
+    if (value) {
+        const queryParams = {q: value, context};
+        if (!isEmptyObject(storage)) {
+            queryParams.storage = storage.name;
+        }
+        history.push('/text-search/?' + queryString.stringify(queryParams));
+    } else if (!isEmptyObject(storage)) {
+        history.push(`/external-storages/${storage.name}/${context ? getPathFromIri(context, storage) : ''}`);
+    } else {
+        history.push(`/collections/${context ? getPathFromIri(context) : ''}`);
     }
+};
 
-    const searchString = queryString.stringify({q: query});
-    return `/search?${searchString}`;
+export const getSearchPathSegments = (context, storageName = "") => {
+    const segments = ((context && getPathFromIri(context)) || '').split('/');
+    const result = [];
+    if (segments[0] === '') {
+        result.push({label: 'Search results', href: ''});
+        return result;
+    }
+    let href = storageName ? getExternalStoragePathPrefix(storageName) : '/collections';
+    segments.forEach(segment => {
+        href += '/' + segment;
+        result.push({label: segment, href});
+    });
+    result.push({label: 'Search results', href: ''});
+    return result;
 };
 
 export const getSearchQueryFromString = (searchString) => queryString.parse(searchString).q || '';
 export const getLocationContextFromString = (searchString) => queryString.parse(searchString).context || '';
+export const getStorageFromString = (searchString) => queryString.parse(searchString).storage || '';
 export const getMetadataViewNameFromString = (searchString) => queryString.parse(searchString).view || '';
 
 /**

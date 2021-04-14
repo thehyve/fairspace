@@ -7,8 +7,6 @@ external:
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
     serviceAccount:
       password: fairspace123
-  elasticsearch:
-    enabled: false
 
 # Settings for fairspace
 fairspace:
@@ -16,7 +14,7 @@ fairspace:
   description: "Test Fairspace"
   ingress:
     domain: fairspace.test.fairway.app
-  features:
+  features: []
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
 
@@ -42,3 +40,10 @@ saturn:
       type: pd-standard
       provisioner: kubernetes.io/gce-pd
       allowVolumeExpansion: true
+
+pluto:
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:

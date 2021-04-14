@@ -1,11 +1,18 @@
 import {createClient} from "webdav";
 import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
-import {decodeHTMLEntities, generateUniqueFileName, getFileName, joinPaths} from './fileUtils';
+import {
+    decodeHTMLEntities,
+    encodePath,
+    generateUniqueFileName,
+    getFileName,
+    joinPaths,
+    joinPathsAvoidEmpty
+} from './fileUtils';
 import {handleHttpError} from "../common/utils/httpUtils";
 
 // Ensure that the client passes along the credentials
-const defaultOptions = {withCredentials: true};
+const defaultOptions = {withCredentials: true, headers: {"X-Requested-With": "XMLHttpRequest"}};
 
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
@@ -21,20 +28,29 @@ export type File = {
     dateCreated: string;
     dateModified?: string;
     dateDeleted?: string;
+    access?: string;
+    metadataLinks?: string[];
 }
 
 class FileAPI {
-    client() {
-        return createClient('/api/webdav');
+    constructor(remoteURL = '/api/webdav') {
+        this.remoteURL = remoteURL;
     }
 
-    stat(path, showDeleted) {
+    client() {
+        return createClient(this.remoteURL);
+    }
+
+    stat(path, showDeleted = false, includeMetadataLinks = false) {
         const options = {
             ...includeDetails,
             data: "<propfind><allprop /></propfind>"
         };
         if (showDeleted) {
-            options.headers = {"Show-Deleted": "on"};
+            options.headers = {...options.headers, "Show-Deleted": "on"};
+        }
+        if (includeMetadataLinks) {
+            options.headers = {...options.headers, "With-Metadata-Links": true};
         }
         return this.client().stat(path, options)
             .then(result => this.mapToFile(result.data));
@@ -45,7 +61,7 @@ class FileAPI {
             ...includeDetails,
             data: "<propfind><allprop /></propfind>"
         };
-        options.headers = {Version: version};
+        options.headers = {...options.headers, Version: version};
 
         return this.client().stat(path, options)
             .then(result => this.mapToFile(result.data));
@@ -60,7 +76,7 @@ class FileAPI {
     list(path, showDeleted = false): File[] {
         const options = {...includeDetails, data: '<propfind><allprop /></propfind>'};
         if (showDeleted) {
-            options.headers = {"Show-Deleted": "on"};
+            options.headers = {...options.headers, "Show-Deleted": "on"};
         }
         return this.client().getDirectoryContents(path, options)
             .then(result => result.data
@@ -130,7 +146,8 @@ class FileAPI {
             method: "POST",
             headers: {
                 "Accept": "text/plain",
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                "X-Requested-With": "XMLHttpRequest"
             },
             responseType: "text",
             onUploadProgress,
@@ -167,7 +184,7 @@ class FileAPI {
     delete(path, showDeleted = false) {
         const options = {...defaultOptions};
         if (showDeleted) {
-            options.headers = {"Show-Deleted": "on"};
+            options.headers = {...options.headers, "Show-Deleted": "on"};
         }
         if (!path) return Promise.reject(Error("No path specified for deletion"));
 
@@ -357,10 +374,12 @@ class FileAPI {
     post(path, data, showDeleted = false) {
         const requestOptions = {
             method: "POST",
+            url: joinPathsAvoidEmpty('/api/webdav', encodePath(path)),
             headers: {
                 "Accept": "text/plain",
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Show-Deleted": showDeleted ? "on" : "off"
+                "Show-Deleted": showDeleted ? "on" : "off",
+                "X-Requested-With": "XMLHttpRequest"
             },
             responseType: "text",
             data: qs.stringify(data)
@@ -378,7 +397,8 @@ class FileAPI {
             method: "POST",
             headers: {
                 "Accept": "text/plain",
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                "X-Requested-With": "XMLHttpRequest"
             },
             responseType: "text",
             data: formData
@@ -410,4 +430,6 @@ class FileAPI {
     }
 }
 
-export default new FileAPI();
+export const LocalFileAPI = new FileAPI();
+
+export default FileAPI;

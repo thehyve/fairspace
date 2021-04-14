@@ -13,9 +13,7 @@ describe('CollectionList', () => {
     it('renders correct header and values columns', () => {
         const collections = [{
             name: 'My Collection',
-            creatorObj: {
-                name: 'Mariah Carey'
-            },
+            creatorDisplayName: 'Mariah Carey',
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',
@@ -39,9 +37,7 @@ describe('CollectionList', () => {
     it('renders correct header and values columns in "show deleted" mode', () => {
         const collections = [{
             name: 'My Collection',
-            creatorObj: {
-                name: 'Mariah Carey'
-            },
+            creatorDisplayName: 'Mariah Carey',
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',

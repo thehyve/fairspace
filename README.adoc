@@ -4,9 +4,10 @@
 :showtitle!:
 :url-repo: https://github.com/fairspace/workspace
 :source-highlighter: rouge
+:icons: font
 :toc: macro
 :toclevels: 3
-:toc-title: Table of contents
+:toc-title: Fairspace
 
 :Jena: https://jena.apache.org/
 :RDF: https://en.wikipedia.org/wiki/Resource_Description_Framework
@@ -41,9 +42,9 @@ The data model is specified using the {SHACL}[Shapes Constraint Language (SHACL)
 see the section on <<Data model and view configuration>>.
 Descriptive metadata entities (e.g., subjects, projects, samples) should be added to the database by a
 careful process, ensuring that duplicates and inconsistencies are avoided and
-all entities have proper unique identifiers.
+that all entities have proper unique identifiers.
 The application provides overviews of the available metadata entities.
-In the collection browser, researchers can link their collections and file to these entities
+In the collection browser, researchers can link their collections and files to these entities
 or add textual descriptions and key words.
 
 
@@ -56,14 +57,14 @@ and *share* the data with collaborators.
 and link the data to associated metadata entities (subjects, samples, projects, etc.).
 This helps researchers find their own data and make it *findable* for others,
 contributing to implementation of the {FAIR}[FAIR principles].
-* Fairspace ensures that all metadata entities have a unique identifier and validates
+* Fairspace ensures that all metadata entities have a unique identifier and checks
 metadata consistency and validity upon data entry.
-* Fairspace allows organisations to use *customise* the configured data model,
+* Fairspace allows organisations to *customise* the configured data model,
 by specifying custom entity types and constraints.
 This enables the adoption of community standards for metadata relevant for the research domain,
 which contributes to the *reusability* of the data.
 * Fairspace uses the {RDF}[Resource Description Framework (RDF)] and {WebDAV}[WebDAV] standards for data exchange,
-and stimulates the uses of standard vocabularies,
+and stimulates the use of standard vocabularies,
 contributing to *interoperability* of data.
 ****
 
@@ -107,9 +108,17 @@ and see its metadata, double click to navigate into directories or
 open a file.
 
 Access is managed on collection level.
-Users with at least write access to a collection can upload files or directories,
+Users with at least _write_ access to a collection can upload files or directories,
 rename or delete files, restore old file versions,
 and edit the associated metadata.
+
+Users with _manage_ access can share collections with other users or workspaces,
+and change the default access mode for workspace members.
+Collection managers can also change the status of the collection
+(_Active_, _Archived_ or _Closed_), change the view mode
+(_Restricted_, _Metadata published_ or _Data published_ -- only available in the _Archived_ status),
+delete the collection,
+or transfer ownership of the collection to another workspace.
 
 image:docs/images/screenshots/Collection browser.png[Collection browser]
 
@@ -249,8 +258,8 @@ def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
                        realm: str = os.environ.get('KEYCLOAK_REALM'),
                        client_id: str = os.environ.get('KEYCLOAK_CLIENT_ID'),
                        client_secret: str = os.environ.get('KEYCLOAK_CLIENT_SECRET'),
-                       username: str = os.environ.get('USERNAME'),
-                       password: str = os.environ.get('PASSWORD')) -> str:
+                       username: str = os.environ.get('KEYCLOAK_USERNAME'),
+                       password: str = os.environ.get('KEYCLOAK_PASSWORD')) -> str:
     """
     Obtain access token from Keycloak
     :return: the access token as string.
@@ -278,7 +287,7 @@ def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
     return token
 
 def auth():
-    return f'Bearer: {fetch_access_token()}'
+    return f'Bearer {fetch_access_token()}'
 ----
 ====
 
@@ -292,8 +301,8 @@ fetch_access_token() {
   curl -s \
     -d "client_id=${KEYCLOAK_CLIENT_ID}" \
     -d "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-    -d "username=${USERNAME}" \
-    -d "password=${PASSWORD}" \
+    -d "username=${KEYCLOAK_USERNAME}" \
+    -d "password=${KEYCLOAK_PASSWORD}" \
     -d 'grant_type=password' \
     "${KEYCLOAK_SERVER_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
 }
@@ -321,8 +330,8 @@ import base64
 import os
 
 def auth():
-    username = os.environ.get('USERNAME')
-    password = os.environ.get('PASSWORD')
+    username = os.environ.get('KEYCLOAK_USERNAME')
+    password = os.environ.get('KEYCLOAK_PASSWORD')
     return f"Basic {base64.b64encode(f'{username}:{password}'.encode()).decode()}"
 ----
 ====
@@ -332,7 +341,7 @@ def auth():
 ====
 [source, bash]
 ----
-AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
+AUTH_HEADER="Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLOAK_PASSWORD}" | base64)"
 ----
 ====
 
@@ -357,7 +366,7 @@ server_url = os.environ.get('FAIRSPACE_URL')
 headers = {
     'Authorization': auth()
 }
-response = Session().get(f'{server_url}/api/users/current', headers)
+response = Session().get(f'{server_url}/api/users/current', headers=headers)
 if not response.ok:
     raise Exception(f"Error fetching current user: {response.status_code} {response.reason}")
 print(response.json())
@@ -368,7 +377,7 @@ For examples using curl, an authorisation header needs to be passed using the ``
 For Basic authentication:
 [source, bash]
 ----
-AUTH_HEADER="Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)"
+AUTH_HEADER="Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLOAK_PASSWORD}" | base64)"
 curl -i -H "Authorization: ${AUTH_HEADER}" "${FAIRSPACE_URL}/api/users/current"
 ----
 
@@ -423,6 +432,8 @@ and advanced data loss prevention features such as versioning and undeletion.
 | `Version`
 | Specify a version number to request properties of a specific file version.
   The first version has number `1`. If not specific, the current version is returned.
+| `With-Metadata-Links`
+| Include list of metadata entities that are linked to the resource, when value `true`.
 2+| _Request body_:
 2+| To include also custom Fairspace attributes in the response, like the collection description, send the following request body: +
   ``<propfind><allprop /></propfind>``
@@ -451,7 +462,7 @@ def exists(path):
         'Authorization': auth()
     }
     session = Session()
-    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}/', headers, cookies=session.cookies)
+    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}/', headers=headers, cookies=session.cookies)
     response: Response = session.send(req.prepare())
     return response.ok
 ----
@@ -479,7 +490,7 @@ def ls(path: str):
         'Authorization': auth()
     }
     session = Session()
-    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}', headers, cookies=session.cookies)
+    req = Request('PROPFIND', f'{server_url}/api/webdav/{path}', headers=headers, cookies=session.cookies)
     response: Response = session.send(req.prepare())
     if not response.ok:
         raise Exception(f"Error fetching directory '{path}': {response.status_code} {response.reason}")
@@ -605,7 +616,7 @@ def mkdir(path: str, workspace_iri: str=None):
     }
     if workspace_iri is not None:
         headers['Owner'] = workspace_iri
-    req = Request('MKCOL', f'{server_url}/api/webdav/{path}/', headers, cookies=self.session().cookies)
+    req = Request('MKCOL', f'{server_url}/api/webdav/{path}/', headers=headers, cookies=self.session().cookies)
     response: Response = Session().send(req.prepare())
     if not response.ok:
         raise Exception(f"Error creating directory '{path}': {response.status_code} {response.reason}")
@@ -958,12 +969,12 @@ with open('testdata.ttl') as testdata:
 ----
 ====
 
-.Example uploading metadata file using curl.
+.Example uploading metadata file (curl).
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -v -X PUT -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | base64)" \
+curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLOAK_PASSWORD}" | base64)" \
   -H "Content-type: text/turtle" --data @testdata.ttl "${FAIRSPACE_URL}/api/metadata/"
 ----
 ====
@@ -992,7 +1003,7 @@ curl -v -X PUT -H "Authorization: Basic $(echo -n "${USERNAME}:${PASSWORD}" | ba
 3+| Returns serialised triples matching the query parameters.
 |===
 
-.Example of retrieving metadata using curl
+.Example of retrieving metadata (curl)
 [%collapsible]
 ====
 Request metadata for the triple with subject 'a', predicate 'b' and object 'c'.
@@ -1018,7 +1029,7 @@ curl -G -H "Accept: application/ld+json" \
 3+| Serialised RDF triples.
 |===
 
-.Example of adding metadata using curl
+.Example of adding metadata (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1054,7 +1065,7 @@ curl -X PUT -H "Content-type: application/ld+json" -d \
 3+| Serialised RDF triples.
 |===
 
-.Example of updating metadata using curl
+.Example of updating metadata (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1094,7 +1105,7 @@ Only available for users with _Add shared metadata_ role.
 3+| Serialised RDF triples. (_Optional_)
 |===
 
-.Example of deleting metadata using curl
+.Example of deleting metadata (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1128,7 +1139,7 @@ Metadata views endpoint used for metadata-based search.
 | List all views with available columns per each view.
 |===
 
-.Example using curl
+.Example list view (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1156,7 +1167,7 @@ Each filter has to contain a "field" property, matching the name of a facet, and
 | Page size
 |===
 
-.Example fetching page of view rows using curl
+.Example fetching page of view rows (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1190,7 +1201,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 Each filter has to contain a "field" property, matching the name of a facet, and list of values to filter on.
 |===
 
-.Example counting view rows using curl
+.Example counting view rows (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1215,12 +1226,112 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 | List all facets with available values per each facet.
 |===
 
-.Example retrieving facets with values using curl
+.Example retrieving facets with values (curl)
 [%collapsible]
 ====
 [source, bash]
 ----
 curl -H "Accept: application/json" "http://localhost:8080/api/views/facets"
+----
+====
+
+
+==== Text search
+
+Search endpoint used for text search on labels or comments.
+
+|===
+3+| ``POST /api/search/files``
+
+3+| Find files, directories or collections based on a label or a comment.
+3+| _Parameters:_
+| ``query``
+| string
+| Text fragment to search on.
+| ``parentIRI``
+| string
+| IRI of the parent directory or collection to limit the search area.
+
+3+| _Response_
+3+| Object in JSON format, with `query` and `results` properties.
+Results contain a list of files (and/or directories, collections) with the following properties:
+| ``id``
+| string
+| File (or directory) identifier (IRI).
+| ``label``
+| string
+| File (or directory) name.
+| ``type``
+| string
+| Type of the resource as defined in the vocabulary, e.g. "https://fairspace.nl/ontology#File", "https://fairspace.nl/ontology#Directory"
+| ``comment``
+| string
+| File (or directory) description. Optional.
+|===
+
+.Example text search (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -d \
+'{
+  "query":"test folder",
+  "parentIRI":"http://localhost:8080/api/webdav/dir1"
+}' \
+'http://localhost:8080/api/search/files'
+----
+====
+
+.Example text search response
+[%collapsible]
+====
+[source, json]
+----
+{
+  "results": [
+    {
+      "id": "https://fairspace.example.com/api/webdav/col1/test",
+      "label": "test",
+      "type": "https://fairspace.nl/ontology#File",
+      "comment": "Description of the test file from col1."
+    },
+    {
+      "id": "https://fairspace.example.com/api/webdav/col2/new_test_folder",
+      "label": "new_test_folder",
+      "type": "https://fairspace.nl/ontology#Directory",
+      "comment": null
+    }
+  ],
+  "query": "test"
+}
+----
+====
+
+|===
+3+| ``POST /api/search/lookup``
+
+3+| Metadata entities lookup search by entity labels or description.
+3+| _Parameters:_
+| ``query``
+| string
+| Text fragment to search on.
+| ``resourceType``
+| string
+| Type of the entity in request.
+|===
+
+.Example lookup search (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -d \
+'{
+  "query":"test",
+  "resourceType":"https://example.com/ontology#TumorPathologyEvent"
+}' \
+'http://localhost:8080/api/search/lookup'
 ----
 ====
 
@@ -1250,7 +1361,7 @@ Operations on workspace entities.
 | If a current user is a workspace manager.
 |===
 
-.Example of listing available workspaces using curl
+.Example of listing available workspaces (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1271,43 +1382,12 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 3+| Response contains the workspace name and newly assigned IRI.
 |===
 
-.Example of adding a workspace using curl
+.Example of adding a workspace (curl)
 [%collapsible]
 ====
 [source, bash]
 ----
 curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces/"
-----
-====
-
-|===
-3+| ``PATCH /api/workspaces/``
-
-3+| Update a workspace.
-3+| _Parameters:_
-| ``iri``
-| string
-| Unique workspace IRI _(required)_.
-| ``name``
-| string
-| Unique workspace name.
-| ``comment``
-| Markdown
-| Workspace description in markdown format.
-|===
-
-.Example of updating a workspace using curl
-[%collapsible]
-====
-[source, bash]
-----
-curl -X PATCH -H "Accept: application/json" -d \
-'{
-  "iri": "http://fairspace.com/iri/123,
-  "name": "new test name",
-  "comment": "New description"
-}"' \
-"http://localhost:8080/api/workspaces/"
 ----
 ====
 
@@ -1321,7 +1401,7 @@ curl -X PATCH -H "Accept: application/json" -d \
 | Workspace IRI (URL-encoded).
 |===
 
-.Example of deleting a workspace using curl
+.Example of deleting a workspace (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1344,7 +1424,7 @@ curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http:/
 3+| Response contains list of workspace users with their workspace roles.
 |===
 
-.Example of listing workspace users using curl
+.Example of listing workspace users (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1365,7 +1445,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?w
 3+| Response contains list of workspace users with their updated workspace roles.
 |===
 
-.Example of updating workspace users using curl
+.Example of updating workspace users (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1386,7 +1466,7 @@ curl -H 'Accept: application/json' --data-urlencode "workspace=http://fairspace.
 if a user is an administrator, super-administrator or can view public metadata, view public data or add shared metadata.
 |===
 
-.Example listing users using curl
+.Example listing users (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1409,7 +1489,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/users/'
 The value determines whether the user has the role or not.
 |===
 
-.Example updating user roles using curl
+.Example updating user roles (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1434,7 +1514,7 @@ if the user is an administrator, super-administrator or can view public metadata
 view public data or add shared metadata.
 |===
 
-.Example getting current user using curl
+.Example getting current user (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1449,7 +1529,7 @@ curl -H "Accept: application/json" "http://localhost:8080/api/users/current"
 | logout the current user.
 |===
 
-.Example logging out using curl
+.Example logging out (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1473,7 +1553,7 @@ It is stored in {SHACL}[SHACL] format.
 | Retrieve a representation of the vocabulary.
 |===
 
-.Example fetching the vocabulary in turtle format using curl
+.Example fetching the vocabulary in turtle format (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1481,7 +1561,7 @@ It is stored in {SHACL}[SHACL] format.
 curl -H 'Accept: text/turtle' 'http://localhost:8080/api/vocabulary/'
 ----
 ====
-.Example fetching the vocabulary in json-ld format using curl
+.Example fetching the vocabulary in json-ld format (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1498,10 +1578,9 @@ curl -H 'Accept: application/json+ld' 'http://localhost:8080/api/vocabulary/'
 | List available application features.
 |===
 
-Response contains list of additional features that are currently available in the application,
-e.g., metadata editing in the user interface.
+Response contains list of additional features that are currently available in the application.
 
-.Example listing features using curl
+.Example listing features (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1521,7 +1600,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 Response contains list of external services linked to Fairspace,
 e.g. JupyterHub, cBioPortal, etc.
 
-.Example listing services using curl
+.Example listing services (curl)
 [%collapsible]
 ====
 [source, bash]
@@ -1530,7 +1609,126 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/services/'
 ----
 ====
 
+===== External storages
 
+|===
+| ``GET /api/storages/``
+
+| List linked data storages.
+|===
+
+Response contains list of external data storages linked to Fairspace.
+
+.Example listing external storages using curl
+[%collapsible]
+====
+[source, bash]
+----
+curl -H 'Accept: application/json' 'http://localhost:8080/api/storages/'
+----
+====
+
+=== External file system integration
+
+As Fairspace supports the <<WebDAV>> protocol, it can be configured to connect to external data storages that implement a WebDAV interface.
+An overview of external files is integrated into Fairspace user interface. Currently, a read-only interaction is supported.
+Users can browse through the external file system, read the data and metadata (e.g. creation date, description).
+Files from the external storage will be also made available for analysis in Jupyter Hub.
+
+
+==== Access policy
+
+Access policies differ between systems. To avoid inconsistencies, permissions validation and management are expected to be under
+control of the external storage system. Each storage component is responsible for its own policy and needs to perform
+the required checks to ensure that users only get to see the data they are supposed to see.
+
+It is assumed that a user requesting files from a storage using WebDAV has at least "read" access to all the files included in the WebDAV response.
+Access can be further limited by using a custom `access` property. If a value of this property on a resource is set to "List",
+the resource's metadata will be readable, but it will not be possible to read the resource's content.
+
+Another assumption is that the Fairspace client can authenticate in the external storage via the same Keycloak and the same realm
+as configured for Fairspace, so that the same bearer token can be used for all storages.
+See the <<Authentication>> section for more information.
+
+==== API specification and supported parameters
+
+A subset of default WebDAV properties is used and displayed as a resource metadata in the Fairspace user interface.
+These properties are presented in the table below.
+
+|===
+| WebDAV property | Description
+
+| ``DAV:creationdate``
+| Creation date
+| ``DAV:iscollection``
+| Flag determining whether a resource is a file or directory
+| ``DAV:getlastmodified``
+| Last modification date
+| ``DAV:getcontentlength``
+| Size of the file (0 for directories)
+|===
+
+There is also a set of custom Fairspace properties, some of which are required to be returned from the WebDAV request.
+
+|===
+| WebDAV property | Description
+
+| ``iri``
+| IRI of the resource. Required.
+| ``createdBy``
+| Id of a user that created the resource.
+| ``comment``
+| Resource description.
+| ``access``
+| By default, users are granted ``Read`` access to the resource returned from WebDAV endpoint.
+Other supported value is ``List``, which means that users can see the resource and its metadata, but cannot read its content.
+| ``metadataEntities``
+| List of IRIs in a form of comma-separated string. IRIs represent all metadata entities linked to the resource.
+If the IRI matches a metadata entity stored in Fairspace, such an entity will be displayed in the user interface.
+|===
+
+It is also supported to specify any other custom property in the WebDAV response body, as WebDAV responses are easily extendable.
+All these properties (if not specifically marked as excluded in Fairspace), will be displayed in the user interface
+in a form of key-value pairs.
+
+==== Text search in external storages
+
+Text based search on external file system can be enabled in the Fairpsace user interface,
+if the external system exposes a search endpoint, following the specification from the <<Text search>> section.
+To enable finding files based on name or description, ``searchUrl`` has to be specified in the storage configuration.
+
+==== Configuration
+
+Multiple external storages can be configured simultaneously. A list of configuration parameters is presented below.
+
+|===
+| Parameter | Description
+
+| ``name``
+| Unique name of the storage.
+| ``label``
+| String to be used as a display name of the storage.
+| ``url``
+| WebDAV endpoint to connect to.
+| ``searchUrl``
+| Optional search endpoint URL. If specified, a text based search on file name or description will be enabled in the user interface.
+| ``rootDirectoryIri``
+| Optional IRI of the root directory. If not specified, ``url`` will be used as a default root directory.
+|===
+
+Sample configuration of storages in YAML format:
+[source, bash]
+----
+storages:
+- name: exStorage1
+  label: "External storage 1"
+  url: https://exstorage1/api/webdav
+  searchUrl: https://exstorage1/api/search/
+  rootDirectoryIri: http://ex1/api/webdav/
+- name: exStorage2
+  label: "External storage 2"
+  url: https://exstorage2/api/webdav
+----
 
 
 == Structure and terminology
@@ -2016,7 +2214,13 @@ At first run, you need to configure the service account in Keycloak.
 
 * Navigate to link:http://localhost:5100[http://localhost:5100]
 * Login with credentials ``keycloak``, ``keycloak``
-* Grant ``realm-management`` roles in the Fairspace realm: ``view-realm``, ``manage-realm``, ``manage-authorization``, ``manage-users``.
+* Grant the ``view-users`` role to the client service account:
+** In the realm, select `Clients` -> Select client
+** Choose tab `Service Account Roles`
+** Select `realm-management` from the `Client Roles` dropdown
+** Select `view-users` from the available roles, click `Add selected`.
++
+image:docs/images/screenshots/Keycloak service account roles.png[Keycloak service account roles, role="th", align="center"]
 
 Now everything should be ready to start using Fairspace:
 
@@ -2108,7 +2312,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 # List available fairspace chart versions
 ~/bin/helm/helm fetch fairspace/fairspace --versions
 # Fetch the fairspace chart
-~/bin/helm/helm fetch fairspace/fairspace --version 0.7.8
+~/bin/helm/helm fetch fairspace/fairspace --version 0.7.9
 ----
 
 ===== Deploy Fairspace
@@ -2121,7 +2325,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace/fairspace --version 0.7.8 --name fairspace-new --namespace=fairspace-new \
+~/bin/helm/helm install fairspace/fairspace --version 0.7.9 --name fairspace-new --namespace=fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2131,18 +2335,173 @@ value with ``--set-file``.
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.8.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.9.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
 
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm del``.
-:warning: Be careful, you may lose data!
+
+WARNING: Be careful, you may lose data!
+
 [source, shell]
 ----
 ~/bin/helm/helm del --purge fairspace-test
 ----
+
+=== Logging
+
+For several purposes, three types of logs are generated:
+
+- _Application log:_ Informative messages about the system state and application errors. This enables system administrators to diagnose problems.
+- _Audit log:_ Records all user actions that add, change or delete data and access to files. This enables system administrators to audit important changes and access to sensitive data.
+- _Transaction log:_ Detailed log of all database changes. This enables the system to restore the database if it is corrupted.
++
+WARNING: _Do not change or remove this log!_
+
+As default, application and audit logs are written to standard output.
+Additionally, the audit log is also written to log files in ``data/audit``.
+The log files are automatically ‘rolled over’: today’s records are in ``audit.log``, previous records are stored in daily log files with file name pattern
+``data/audit/audit.yyyy-MM-dd.log``, and are retained for 50 days.
+If the audit log needs to be kept for a longer period, the log configuration can be replaced, or log files can be transferred elsewhere, e.g., using link:https://www.elastic.co/guide/en/beats/filebeat/current/index.html[filebeat].
+The audit log is encoded in a JSON format, that can be processed by, e.g., link:https://www.elastic.co/logstash[logstash].
+
+The transaction log is stored in ``data/log`` by default.
+
+==== Configuration
+
+The default log configuration for application and audit logs is in  link:projects/saturn/src/main/resources/log4j.properties[log4j.properties].
+The default can be overridden by placing a file ``log4j.properties`` in the working directory where the application is run.
+
+==== Audit log
+
+The audit log is generated using link:https://logging.apache.org/log4j/1.2/[log4j] and _Mapped Diagnostic Context (MDC)_.
+The basic idea of Mapped Diagnostic Context is to provide a way to enrich log messages with pieces of information that could be not available in the scope where the logging actually occurs, but that can be indeed useful to better track the execution of the program. Basically it groups log data from a single event (``MDC.put``) into a one log message.
+
+Audit log entries contain several fields, including
+``event``, ``user_name``, ``user_email``, ``user_id`` and request specific additional parameters.
+Below we list the actions that are logged and which information is captured in the audit log.
+
+===== WebDAV
+
+Request: ``/api/webdav``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``GET``
+| ``FS_READ``
+| ``path``, ``version``, ``success``
+| Read file
+
+| ``PROPPATCH``
+| ``FS_PROPPATCH``
+| ``path``, ``success``
+| Not used by the UI (metadata endpoint used instead)
+
+| ``MKCOL``
+| ``FS_MKDIR``
+| ``path``, ``success``
+| Create a new collection or directory.
+
+| ``COPY``
+| ``FS_COPY``
+| ``path``, ``destination``, ``success``
+| Copy a file or directory (executed on “paste” action)
+
+| ``MOVE``
+| ``FS_MOVE``
+| ``path``, ``destination``, ``success``
+| Rename a resource, move to a different location
+
+| ``DELETE``
+| ``FS_MARK_AS_DELETED``, ``FS_DELETE``
+| ``path``, ``success``
+| Mark a resource as deleted or delete permanently
+
+| ``PUT``
+| ``FS_WRITE``
+| ``path``, ``success``
+| Not used by the UI (metadata endpoint used instead)
+
+| ``POST``
+| ``FS_ACTION``
+| ``path``, ``action``, ``parameters``, ``success``
+| Upload a file(s) or folder, undelete a resource, change collection status, access mode, owner or permissions.
+|===
+
+Events that are not logged: accessing collections, listing collection and directory contents, listing previous versions.
+
+===== Metadata
+
+Request: ``/api/metadata/``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``PUT``
+| ``METADATA_UPDATED``
+| ``iri``
+| Add all the statements in the given model to the database
+
+| (Soft) ``DELETE``
+| ``METADATA_MARKED_AS_DELETED``
+| ``iri``
+| Mark an entity as deleted
+
+| ``DELETE``
+| ``METADATA_DELETED``
+| ``iri``
+| Delete metadata
+
+| ``PATCH``
+| ``METADATA_UPDATED``
+| ``iri``
+| Overwrite metadata in the database
+|===
+
+Fetching metadata is not included in audit log.
+
+===== Workspace operations
+
+Request: ``/api/workspace/``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``PUT``
+| ``WS_CREATE``
+| ``workspace``
+| Create workspace
+
+| ``DELETE``
+| ``WS_DELETE``
+| ``workspace``
+| Delete workspace
+
+| ``PATCH users/``
+| ``WS_SET_USER_ROLE``
+| ``workspace``, ``affected_user``, ``role``
+| Add user to the workspace, change workspace user role, delete a user from a workspace
+|===
+
+Listing workspaces and workspace users is not included in the audit log.
+
+===== User roles operations
+
+Request: ``/api/users/``
+
+|===
+| Request method | Event | Additional params | Description
+
+| ``PATCH``
+| ``USER_UPDATE``
+| ``affected_user``
+| Change organisation user role
+|===
+
+Fetching user information is not included in the audit log.
 
 
 

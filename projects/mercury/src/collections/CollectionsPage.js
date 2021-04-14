@@ -12,7 +12,6 @@ import CollectionBrowser from "./CollectionBrowser";
 import CollectionInformationDrawer from './CollectionInformationDrawer';
 import {useSingleSelection} from "../file/UseSelection";
 import LoadingOverlay from "../common/components/LoadingOverlay";
-import {handleCollectionTextSearchRedirect} from "./collectionUtils";
 import SearchBar from "../search/SearchBar";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -21,8 +20,20 @@ import CollectionsContext from './CollectionsContext';
 import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
+import {handleTextSearchRedirect} from "../search/searchUtils";
 
-const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle, classes}) => {
+
+type CollectionsPageProperties = {
+    history: History;
+    showBreadCrumbs: boolean;
+    workspaceIri: string;
+    documentTitle: string;
+    classes: any;
+}
+
+const CollectionsPage = (props: CollectionsPageProperties) => {
+    const {showBreadCrumbs = false, history, workspaceIri, documentTitle, classes} = props;
+
     usePageTitleUpdater(documentTitle || "Collections");
 
     const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
@@ -37,7 +48,7 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
     const [preselectedCollectionIri, setPreselectedCollectionIri] = useState(false);
 
     const handleSearch = (value) => {
-        handleCollectionTextSearchRedirect(history, value);
+        handleTextSearchRedirect(history, value);
     };
 
     let unmounting = false;
@@ -152,5 +163,6 @@ const CollectionsPage = ({history, showBreadCrumbs, workspaceIri, documentTitle,
         </CollectionBreadcrumbsContextProvider>
     );
 };
+
 
 export default withStyles(styles)(CollectionsPage);

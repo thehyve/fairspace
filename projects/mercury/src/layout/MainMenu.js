@@ -1,18 +1,19 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Folder, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
+import {Assignment, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
-import FeaturesContext from "../common/contexts/FeaturesContext";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
+import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
+import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
 
 export default () => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
-    const {isFeatureEnabled} = useContext(FeaturesContext);
+    const {externalStorages} = useContext(ExternalStoragesContext);
     const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
@@ -42,6 +43,20 @@ export default () => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItem>
+                {externalStorages && externalStorages.map(storage => (
+                    <ListItem
+                        key={getExternalStoragePathPrefix(storage.name)}
+                        component={NavLink}
+                        to={getExternalStoragePathPrefix(storage.name)}
+                        button
+                        selected={pathname.startsWith(getExternalStoragePathPrefix(storage.name))}
+                    >
+                        <ListItemIcon>
+                            <FolderSpecial />
+                        </ListItemIcon>
+                        <ListItemText primary={storage.label} />
+                    </ListItem>
+                ))}
                 {views && views.length > 0 && currentUser.canViewPublicMetadata && (
                     <ListItem
                         key="metadata-views"
@@ -54,19 +69,6 @@ export default () => {
                             <Assignment />
                         </ListItemIcon>
                         <ListItemText primary="Metadata" />
-                    </ListItem>
-                )}
-                {isFeatureEnabled('MetadataEditing') && currentUser.canViewPublicMetadata && (
-                    <ListItem
-                        key="metadata-editing"
-                        component={NavLink}
-                        to="/metadata"
-                        button
-                    >
-                        <ListItemIcon>
-                            <Assignment />
-                        </ListItemIcon>
-                        <ListItemText primary="Metadata editor" />
                     </ListItem>
                 )}
                 {isAdmin(currentUser) && (
@@ -90,7 +92,7 @@ export default () => {
                 <List>
                     {
                         Object.keys(services).map(key => (
-                            <ListItem button component="a" href={interpolate(services[key])} key={'service-' + key}>
+                            <ListItem button component="a" target="_blank" href={interpolate(services[key])} key={'service-' + key}>
                                 <ListItemIcon>
                                     <OpenInNew />
                                 </ListItemIcon>

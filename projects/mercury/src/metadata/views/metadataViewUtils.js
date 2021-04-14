@@ -1,6 +1,6 @@
 import type {ValueType} from "./MetadataViewAPI";
-import {getCollectionAbsolutePath, pathForIri} from "../../collections/collectionUtils";
-import {getParentPath} from "../../file/fileUtils";
+import {getParentPath, getPathFromIri} from "../../file/fileUtils";
+import {getCollectionAbsolutePath} from "../../collections/collectionUtils";
 
 export const RESOURCES_VIEW = "Resource";
 
@@ -22,7 +22,7 @@ export const getMetadataViewsPath = (viewName: string) => {
 };
 
 export const getContextualFileLink = (item: string) => {
-    const path = pathForIri(item);
+    const path = getPathFromIri(item);
     const parentPath = getParentPath(path);
     if (parentPath) {
         return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;

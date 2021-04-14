@@ -22,8 +22,8 @@ public class Audit {
 
         var token = getAccessToken();
 
-        if (token.getName() != null) {
-            MDC.put("user_name", token.getName());
+        if (token.getPreferredUsername() != null) {
+            MDC.put("user_name", token.getPreferredUsername());
         }
 
         if (token.getEmail() != null) {
@@ -32,7 +32,7 @@ public class Audit {
         MDC.put("user_id", token.getSubject());
 
 
-        log.info(event);
+        log.trace(event);
 
         MDC.clear();
     }

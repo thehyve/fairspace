@@ -5,7 +5,7 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, camelCaseToWords,
+    joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject
 } from "../genericUtils";
 
 describe('array Utils', () => {
@@ -20,6 +20,15 @@ describe('array Utils', () => {
 
         it('goes only one level deep', () => {
             expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([[1, 2, 3], [4, 5]]);
+        });
+    });
+
+    describe('groupBy', () => {
+        it('group an array by key', () => {
+            expect(groupBy(
+                [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
+                "type"
+            )).toEqual({"a": [{name: "x", type: "a"}, {name: "y", type: "a"}], "b": [{name: "z", type: "b"}]});
         });
     });
 });
@@ -79,6 +88,19 @@ describe('isNonEmptyValue', () => {
         const values = [undefined, null, '', NaN, "", ``];
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
+    });
+});
+
+describe('isEmptyObject', () => {
+    it('Returns true for the given values', () => {
+        const values = [undefined, null, {}];
+
+        values.forEach(v => expect(isEmptyObject(v)).toBe(true));
+    });
+    it('Returns false for the given values', () => {
+        const values = [{x: "test"}, {y: false}, {z: null}];
+
+        values.forEach(v => expect(isEmptyObject(v)).toBe(false));
     });
 });
 

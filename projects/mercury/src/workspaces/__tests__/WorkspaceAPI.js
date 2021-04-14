@@ -25,7 +25,7 @@ describe('WorkspacesAPI', () => {
         expect(mockAxios.put).toHaveBeenCalledWith(
             '/api/workspaces/',
             "{\"name\":\"workspace1\"}",
-            {headers: {Accept: 'application/json'}}
+            {headers: {'Accept': 'application/json', 'Content-type': 'application/json'}}
         );
     });
 
@@ -46,31 +46,6 @@ describe('WorkspacesAPI', () => {
             expect(error.message).toEqual('Failure while creating a workspace');
             done();
         }
-    });
-
-    it('Updates a workspace status', async () => {
-        const workspaceData: Workspace = {
-            iri: 'workspace1',
-            name: 'w1',
-            description: 'Description of workspace1',
-            status: 'Active'
-        };
-        const patchResponse: AxiosResponse = {
-            headers: {'content-type': 'application/json'}
-        };
-        mockAxios.patch.mockImplementationOnce(() => Promise.resolve(patchResponse));
-        await workspacesAPI.updateWorkspace(workspaceData);
-        expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith(
-            '/api/workspaces/',
-            JSON.stringify({
-                iri: 'workspace1',
-                name: 'w1',
-                description: 'Description of workspace1',
-                status: 'Active'
-            }),
-            {headers: {Accept: 'application/json'}}
-        );
     });
 
     it('Deletes a new workspace', async () => {

@@ -2,7 +2,7 @@ import React, {useCallback, useContext} from 'react';
 // Utils
 import {getFirstPredicateValue} from "./common/jsonLdUtils";
 // Other
-import LinkedDataContext, {searchLinkedData} from './LinkedDataContext';
+import LinkedDataContext from './LinkedDataContext';
 import {USABLE_IN_METADATA_URI} from "../constants";
 import valueComponentFactory from "./common/values/LinkedDataValueComponentFactory";
 import VocabularyContext from './vocabulary/VocabularyContext';
@@ -49,7 +49,6 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
 
                 // Backend interactions
                 fetchLinkedDataForSubject: fetchMetadataBySubject,
-                searchLinkedData,
                 createLinkedDataEntity,
                 deleteLinkedDataEntity,
                 submitLinkedDataChanges,

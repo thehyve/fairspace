@@ -46,7 +46,6 @@ Sometimes it is needed to navigate to http://localhost:3000/dev to login due to 
 - [axios](https://github.com/axios/axios) is used for http requests.
 - [webdav](https://github.com/perry-mitchell/webdav-client) is used for connecting to WebDAV servers.
 - [jsonld](https://github.com/digitalbazaar/jsonld.js) is used for unpacking JSON-LD responses.
-- :warning: The (deprecated) [elasticsearch](https://www.npmjs.com/package/elasticsearch) package is still being used, but will be removed when all features that use Elasticsearch have been removed.
 
 ### Testing
 

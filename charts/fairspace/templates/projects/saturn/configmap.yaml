@@ -9,9 +9,8 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
-    port: 8080
+    port: 8090
     publicUrl: https://{{ .Values.fairspace.ingress.domain }}
-    elasticsearchUrl: {{ template "elasticsearch.baseurl" . }}
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
       datasetPath: "/data/saturn/db"
@@ -19,15 +18,6 @@ data:
 {{ toYaml .Values.saturn.storeParams | indent 8 }}
       transactionLogPath: "/data/saturn/files/log"
       bulkTransactions: {{ .Values.saturn.bulkTransactions }}
-{{ if .Values.external.elasticsearch.enabled }}
-      elasticSearch:
-        settings:
-          hostToPortMapping:
-            {{ .Values.external.elasticsearch.transport.host }}: {{ .Values.external.elasticsearch.transport.port }}
-          clusterName: "elasticsearch"
-          shards: 1
-          replicas: 1
-{{ end }}
     auth:
       authServerUrl: {{ .Values.external.keycloak.baseUrl }}/auth/
       realm: {{ .Values.external.keycloak.realm }}

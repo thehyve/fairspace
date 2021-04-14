@@ -4,6 +4,10 @@
         <cpe>cpe:/a:netty:netty:4.1.32</cpe>
     </suppress>
     <suppress>
-        <cpe>cpe:/a:elasticsearch:elasticsearch:6.8.6</cpe>
+        <cpe>cpe:/a:apache:log4j:1.2.17</cpe>
+    </suppress>
+    <suppress>
+        <packageUrl>pkg:maven/log4j/log4j@1.2.17</packageUrl>
+        <vulnerabilityName>CVE-2019-17571</vulnerabilityName>
     </suppress>
 </suppressions>

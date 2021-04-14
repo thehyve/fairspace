@@ -18,12 +18,14 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         setAuthenticator(new SaturnKeycloakJettyAuthenticator(adapterConfig(config)));
         addConstraintMapping(constraintMapping("/*", true));
         addConstraintMapping(constraintMapping("/api/health/", false));
+        addConstraintMapping(constraintMapping("/favicon.ico", false));
     }
 
     private static AdapterConfig adapterConfig(Config.Auth config) {
         var adapterConfig = new AdapterConfig();
         adapterConfig.setResource(config.clientId);
         adapterConfig.setRealm(config.realm);
+        adapterConfig.setCors(true);
         adapterConfig.setAuthServerUrl(CONFIG.auth.authServerUrl);
         adapterConfig.setTokenStore(TokenStore.SESSION.name());
         adapterConfig.setCredentials(Map.of("secret",  getenv("KEYCLOAK_CLIENT_SECRET")));

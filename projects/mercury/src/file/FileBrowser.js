@@ -4,7 +4,7 @@ import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
-import FileAPI from "./FileAPI";
+import {LocalFileAPI} from "./FileAPI";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
@@ -13,6 +13,7 @@ import UploadProgressComponent from "./UploadProgressComponent";
 import UploadsContext, {showCannotOverwriteDeletedError} from "./UploadsContext";
 import {generateUuid} from "../metadata/common/metadataUtils";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import type {Collection} from "../collections/CollectionAPI";
 
 const styles = (theme) => ({
     container: {
@@ -57,23 +58,39 @@ const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
     newFiles.filter(f => existingFileNames.includes(f.path)).map(c => c.name)
 );
 
-export const FileBrowser = ({
-    history,
-    openedCollection = {},
-    collectionsLoading = false,
-    collectionsError = false,
-    openedPath,
-    isOpenedPathDeleted,
-    files = [],
-    loading = false,
-    error = false,
-    showDeleted,
-    refreshFiles = () => {},
-    fileActions = {},
-    selection = {},
-    preselectedFile = {},
-    classes
-}) => {
+type ContextualFileBrowserProperties = {
+    history: History;
+    openedCollection: Collection;
+    openedPath: string,
+    isOpenedPathDeleted: boolean,
+    showDeleted: boolean,
+    loading: boolean,
+    error: Error,
+    selection: any,
+    preselectedFile: File,
+    classes: any
+}
+
+type FileBrowserProperties = ContextualFileBrowserProperties & {
+    files: File[];
+    refreshFiles: () => void;
+    fileActions: any;
+};
+
+export const FileBrowser = (props: FileBrowserProperties) => {
+    const {
+        openedCollection = {},
+        openedPath = "",
+        isOpenedPathDeleted = false,
+        files = [],
+        showDeleted = false,
+        refreshFiles = () => {},
+        fileActions = {},
+        selection = {},
+        preselectedFile = {},
+        classes = {},
+        history
+    } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
     const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
@@ -91,7 +108,7 @@ export const FileBrowser = ({
     const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
-    const [isFolderUpload, setIsFolderUpload] = useState(true);
+    const [isFolderUpload, setIsFolderUpload] = useState();
 
     const {
         getRootProps,
@@ -141,7 +158,11 @@ export const FileBrowser = ({
     }, [history]);
 
     // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
-    useEffect(() => open(), [isFolderUpload, open]);
+    useEffect(() => {
+        if (isFolderUpload !== undefined) {
+            open();
+        }
+    }, [isFolderUpload, open]);
 
     const isParentCollectionDeleted = openedCollection.dateDeleted != null;
     const parentCollectionDeletedRef = useRef(isParentCollectionDeleted);
@@ -158,6 +179,17 @@ export const FileBrowser = ({
             showCannotOverwriteDeletedError([...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length);
         }
     }, [overwriteFileCandidateNames, overwriteFolderCandidateNames, showCannotOverwriteWarning]);
+
+    const collectionExists = openedCollection && openedCollection.iri;
+    if (!collectionExists) {
+        return (
+            <MessageDisplay
+                message="This collection does not exist or you don't have sufficient permissions to view it."
+                variant="h6"
+                noWrap={false}
+            />
+        );
+    }
 
     const uploadFolder = () => {
         if (isFolderUpload) {
@@ -192,7 +224,7 @@ export const FileBrowser = ({
              */
             history.push(`/collections${encodeURI(encodePath(path.filename))}`);
         } else if (isReadingEnabled) {
-            FileAPI.open(path.filename);
+            LocalFileAPI.open(path.filename);
         }
     };
 
@@ -201,25 +233,6 @@ export const FileBrowser = ({
         setOverwriteFileCandidateNames([]);
         setCurrentUpload({});
     };
-
-    if (loading || collectionsLoading) {
-        return <LoadingInlay />;
-    }
-
-    const collectionExists = openedCollection && openedCollection.iri;
-    if (!collectionExists) {
-        return (
-            <MessageDisplay
-                message="This collection does not exist or you don't have sufficient permissions to view it."
-                variant="h6"
-                noWrap={false}
-            />
-        );
-    }
-
-    if (error || collectionsError) {
-        return (<MessageDisplay message="An error occurred while loading files" />);
-    }
 
     const renderOverwriteConfirmationMessage = () => (
         <Typography variant="body2" component="span">
@@ -313,18 +326,24 @@ export const FileBrowser = ({
     );
 };
 
-const ContextualFileBrowser = ({openedPath, fileApi, showDeleted, ...props}) => {
-    const {files, loading, error, refresh, fileActions} = useFiles(openedPath, showDeleted, fileApi);
+const ContextualFileBrowser = (props: ContextualFileBrowserProperties) => {
+    const {openedPath, showDeleted, loading, error} = props;
+    const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
+
+    if (error || filesError) {
+        return (<MessageDisplay message="An error occurred while loading files" />);
+    }
+    if (loading || filesLoading) {
+        return <LoadingInlay />;
+    }
+
     return (
         <FileBrowser
             files={files}
-            loading={loading}
-            error={error}
             showDeleted={showDeleted}
             refreshFiles={refresh}
             fileActions={fileActions}
             openedPath={openedPath}
-            fileApi={fileApi}
             {...props}
         />
     );

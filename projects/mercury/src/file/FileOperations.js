@@ -9,7 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import ErrorDialog from "../common/components/ErrorDialog";
 
-import {getParentPath, joinPaths} from "./fileUtils";
+import {getParentPath, isListOnlyFile, joinPaths} from "./fileUtils";
 import {COPY, CUT} from '../constants';
 import FileOperationsGroup from "./FileOperationsGroup";
 import ClipboardContext from '../common/contexts/ClipboardContext';
@@ -32,6 +32,7 @@ Object.freeze(Operations);
 export const FileOperations = ({
     isWritingEnabled,
     showDeleted,
+    isExternalStorage = false,
     openedPath,
     selectedPaths,
     clearSelection,
@@ -54,6 +55,7 @@ export const FileOperations = ({
     const moreThanOneItemSelected = selectedPaths.length > 1;
     const selectedDeletedItems = selectedItems.filter(f => f.dateDeleted);
     const isDeletedItemSelected = selectedDeletedItems.length > 0;
+    const isListOnlyItemSelected = isListOnlyFile(selectedItem);
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
     const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
     const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
@@ -227,7 +229,10 @@ export const FileOperations = ({
                 <IconButton
                     title={`Download ${selectedItem.basename}`}
                     aria-label={`Download ${selectedItem.basename}`}
-                    disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                    disabled={
+                        isDisabledForMoreThanOneSelection || selectedItem.type !== 'file'
+                        || isDeletedItemSelected || busy || isListOnlyItemSelected
+                    }
                     component="a"
                     href={fileActions.getDownloadLink(selectedItem.filename)}
                     download
@@ -292,14 +297,16 @@ export const FileOperations = ({
                 )}
             </FileOperationsGroup>
             <FileOperationsGroup>
-                <IconButton
-                    aria-label="Copy"
-                    title="Copy"
-                    onClick={e => handleCopy(e)}
-                    disabled={noPathSelected || isDeletedItemSelected || busy}
-                >
-                    <ContentCopy />
-                </IconButton>
+                {!isExternalStorage && (
+                    <IconButton
+                        aria-label="Copy"
+                        title="Copy"
+                        onClick={e => handleCopy(e)}
+                        disabled={noPathSelected || isDeletedItemSelected || busy}
+                    >
+                        <ContentCopy />
+                    </IconButton>
+                )}
                 {isWritingEnabled && (
                     <>
                         <IconButton
@@ -324,22 +331,24 @@ export const FileOperations = ({
                 )}
             </FileOperationsGroup>
             <FileOperationsGroup>
-                <ProgressButton active={activeOperation === Operations.REVERT}>
-                    <ShowFileVersionsButton
-                        selectedFile={selectedItem}
-                        onRevert={handleRevert}
-                        disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
-                        isWritingEnabled={isWritingEnabled}
-                    >
-                        <IconButton
-                            aria-label="Show history"
-                            title="Show history"
+                {!isExternalStorage && (
+                    <ProgressButton active={activeOperation === Operations.REVERT}>
+                        <ShowFileVersionsButton
+                            selectedFile={selectedItem}
+                            onRevert={handleRevert}
                             disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                            isWritingEnabled={isWritingEnabled}
                         >
-                            <Restore />
-                        </IconButton>
-                    </ShowFileVersionsButton>
-                </ProgressButton>
+                            <IconButton
+                                aria-label="Show history"
+                                title="Show history"
+                                disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                            >
+                                <Restore />
+                            </IconButton>
+                        </ShowFileVersionsButton>
+                    </ProgressButton>
+                )}
             </FileOperationsGroup>
         </>
     );

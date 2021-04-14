@@ -5,11 +5,6 @@ external:
     realm: ci
     clientId: fairspace-ci-private
     clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-  elasticsearch:
-    enabled: false
-
-elasticsearch:
-  enabled: false
 
 # Settings for fairspace
 fairspace:
@@ -17,9 +12,16 @@ fairspace:
   description: "CI Fairspace"
   ingress:
     domain: fairspace.ci.fairway.app
-  features:
+  features: []
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
+  storages:
+    test:
+      name: test
+      label: "Test storage"
+      url: https://fairspace.test.fairway.app/api/webdav
+      search-url: https://fairspace.test.fairway.app/api/search/files
+      root-directory-iri: https://fairspace.test.fairway.app/api/webdav
 
 # Specific settings for Saturn subchart
 saturn:
@@ -45,3 +47,20 @@ saturn:
     type: pd-standard
     provisioner: kubernetes.io/gce-pd
     allowVolumeExpansion: true
+
+# Specific settings for Pluto subchart
+pluto:
+  image:
+    pullPolicy: Always
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:
+    storageRoutes:
+      storage-test-webdav:
+        path: /api/storages/test/webdav/**
+        url: ${pluto.storages.test.url}
+      storage-test-search:
+        path: /api/storages/test/search/files/**
+        url: ${pluto.storages.test.search-url}

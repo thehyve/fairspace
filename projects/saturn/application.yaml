@@ -1,7 +1,6 @@
 # Application's port
-port: 8080
+port: 8090
 publicUrl: http://localhost:8080
-elasticsearchUrl: http://localhost:9200
 jena:
   # Base IRI for all metadata entities
   metadataBaseIRI: "http://localhost/iri/"
@@ -36,18 +35,6 @@ jena:
   # Path of the transaction log
   transactionLogPath: "data/log"
   bulkTransactions: true
-  elasticSearch:
-    settings:
-      # Map of hosts and ports. The host could also be an IP Address
-      hostToPortMapping:
-        "127.0.0.1": 9300
-      # Name of the Cluster. Defaults to "elasticsearch". Set to "docker-cluster" for a dockerized ES setup.
-      clusterName: "docker-cluster"
-      # Number of shards. Defaults to 1
-      shards: 1
-      # Number of replicas. Defaults to 1
-      replicas: 1
-    advancedSettings:
 auth:
   authServerUrl: http://localhost:5100/auth/
   realm: fairspace
@@ -62,7 +49,6 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
-#  - MetadataEditing
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000

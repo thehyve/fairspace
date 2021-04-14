@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from '../App';
-import FileAPI from '../file/FileAPI';
+import {LocalFileAPI} from "../file/FileAPI";
 
 beforeAll(() => {
     window.localStorage = {
@@ -11,7 +11,7 @@ beforeAll(() => {
     const getDirectoryContents = jest.fn(() => Promise.resolve(
         {data: []}
     ));
-    FileAPI.client = () => ({getDirectoryContents});
+    LocalFileAPI.client = () => ({getDirectoryContents});
 });
 
 // eslint-disable-next-line jest/expect-expect
