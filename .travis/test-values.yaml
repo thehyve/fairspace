@@ -47,3 +47,4 @@ pluto:
   maxFileSize: 1GB
   maxRequestSize: 1GB
   backends:
+    storageRoutes:
