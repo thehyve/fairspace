@@ -71,6 +71,8 @@ saturn:
       size: 50Gi
     database:
       size: 50Gi
+    audit:
+      size: 5Gi
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION
