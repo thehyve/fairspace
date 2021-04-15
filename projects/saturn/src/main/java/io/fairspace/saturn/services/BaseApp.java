@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.fairspace.saturn.rdf.dao.DAOException;
 import io.fairspace.saturn.util.UnsupportedMediaTypeException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import spark.*;
 import spark.servlet.SparkApplication;
 
@@ -18,7 +18,7 @@ import static spark.Spark.path;
 import static spark.Spark.notFound;
 import static spark.globalstate.ServletFlag.isRunningFromServlet;
 
-@Slf4j
+@Log4j2
 public abstract class BaseApp implements SparkApplication {
     protected static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new IRIModule())
