@@ -1,11 +1,10 @@
 package io.fairspace.saturn.services.metadata;
 
-
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.BaseApp;
 import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.rdf.model.Model;
 import spark.Request;
 
@@ -19,7 +18,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
-@Slf4j
+@Log4j2
 public class MetadataApp extends BaseApp {
     protected final MetadataService api;
 

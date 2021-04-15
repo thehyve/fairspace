@@ -20,7 +20,7 @@ import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
@@ -32,7 +32,7 @@ import java.io.File;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
-@Slf4j
+@Log4j2
 @Getter
 public class Services {
     public static final Symbol FS_ROOT = Symbol.create("file_system_root");

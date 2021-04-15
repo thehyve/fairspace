@@ -12,7 +12,7 @@ import io.milton.resource.CollectionResource;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -26,7 +26,7 @@ import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 
-@Slf4j
+@Log4j2
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
 
     private final DavFactory factory;
