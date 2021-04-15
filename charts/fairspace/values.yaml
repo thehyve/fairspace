@@ -169,6 +169,7 @@ pluto:
   connectTimeoutMillis: 2000
   maxFileSize: 1GB
   maxRequestSize: 1GB
+  externalDomains:
   backends:
     storageRoutes:
 
