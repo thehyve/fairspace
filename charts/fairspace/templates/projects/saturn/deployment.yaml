@@ -39,6 +39,8 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-oauth-client"
                   key: clientSecret
+            - name: AUDIT_LOG_ROOT
+              value: /data/saturn/audit
           volumeMounts:
             - name: config-volume
               mountPath: /opt/config
@@ -46,6 +48,8 @@ spec:
               mountPath: /data/saturn/db
             - name: files
               mountPath: /data/saturn/files
+            - name: audit
+              mountPath: /data/saturn/audit
           livenessProbe:
             httpGet:
               path:  /api/health/
@@ -77,4 +81,7 @@ spec:
       - name: files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-saturn-files
+      - name: audit
+        persistentVolumeClaim:
+          claimName: { { .Release.Name } }-saturn-audit
 
