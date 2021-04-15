@@ -83,5 +83,4 @@ spec:
           claimName: {{ .Release.Name }}-saturn-files
       - name: audit
         persistentVolumeClaim:
-          claimName: { { .Release.Name } }-saturn-audit
-
+          claimName: {{ .Release.Name }}-saturn-audit
