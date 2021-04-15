@@ -12,6 +12,7 @@ data:
     pluto:
       domains:
         - https://{{ .Values.fairspace.ingress.domain }}
+{{ toYaml .Values.pluto.externalDomains | indent 8 }}
       oauth2:
         base-url: {{ .Values.external.keycloak.baseUrl }}
         realm: {{ .Values.external.keycloak.realm }}
