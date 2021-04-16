@@ -8,7 +8,7 @@ import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.dao.PersistentEntity;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.commons.lang3.*;
 import org.apache.jena.graph.Node;
 import org.keycloak.OAuth2Constants;
@@ -32,7 +32,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.System.getenv;
 import static java.util.stream.Collectors.toMap;
 
-@Slf4j
+@Log4j2
 public class UserService {
     private final LoadingCache<Boolean, Map<Node, User>> usersCache;
     private final Transactions transactions;

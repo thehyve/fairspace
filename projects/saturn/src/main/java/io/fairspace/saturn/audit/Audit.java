@@ -1,7 +1,7 @@
 package io.fairspace.saturn.audit;
 
-import org.slf4j.Logger;
-import org.slf4j.MDC;
+import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
 
@@ -9,31 +9,31 @@ import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
 
 
 public class Audit {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger("AUDIT");
+    private static final Logger log = LogManager.getLogger("audit");
 
     public static void audit(String event, Object... params) {
-        MDC.put("event", event);
+        ThreadContext.put("event", event);
 
         for (var i = 0; i < params.length / 2; i++) {
             if (params[2 * i + 1] != null) {
-                MDC.put((String) params[2 * i], Objects.toString(params[2 * i + 1]));
+                ThreadContext.put((String) params[2 * i], Objects.toString(params[2 * i + 1]));
             }
         }
 
         var token = getAccessToken();
 
         if (token.getPreferredUsername() != null) {
-            MDC.put("user_name", token.getPreferredUsername());
+            ThreadContext.put("user_name", token.getPreferredUsername());
         }
 
         if (token.getEmail() != null) {
-            MDC.put("user_email", token.getEmail());
+            ThreadContext.put("user_email", token.getEmail());
         }
-        MDC.put("user_id", token.getSubject());
+        ThreadContext.put("user_id", token.getSubject());
 
 
         log.trace(event);
 
-        MDC.clear();
+        ThreadContext.clearAll();
     }
 }

@@ -2,7 +2,7 @@ package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
@@ -13,7 +13,7 @@ import org.keycloak.representations.AccessToken;
 import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
 import static java.lang.System.currentTimeMillis;
 
-@Slf4j
+@Log4j2
 public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private static final String ERROR_MSG =
             "Catastrophic failure. Shutting down. The system requires admin's intervention.";

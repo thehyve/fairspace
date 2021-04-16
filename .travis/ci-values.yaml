@@ -32,6 +32,9 @@ saturn:
     database:
       size: 60Gi
       storageClass: expandable
+    audit:
+      size: 10Gi
+      storageClass: expandable
   resources:
     limits:
       cpu: 1

@@ -5,7 +5,7 @@ import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.vocabulary.FS;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.RDFNode;
@@ -27,7 +27,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.sparql.expr.NodeValue.*;
 import static org.apache.jena.system.Txn.calculateRead;
 
-@Slf4j
+@Log4j2
 public class SparqlQueryService implements QueryService {
     private static final String RESOURCES_VIEW = "Resource";
     private final Config.Search config;
