@@ -72,7 +72,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
     const renderHeader = () => (
         <Toolbar className={classes.header}>
             <Typography variant="body1" id="tableTitle" component="div">
-                Workspaces
+                Shared Workspaces
             </Typography>
             {collection.canManage && (
                 <Tooltip title="Add workspace">
