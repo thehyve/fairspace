@@ -1720,14 +1720,16 @@ Sample configuration of storages in YAML format:
 [source, bash]
 ----
 storages:
-- name: exStorage1
-  label: "External storage 1"
-  url: https://exstorage1/api/webdav
-  searchUrl: https://exstorage1/api/search/
-  rootDirectoryIri: http://ex1/api/webdav/
-- name: exStorage2
-  label: "External storage 2"
-  url: https://exstorage2/api/webdav
+  exStorage1:
+    name: exStorage1
+    label: "External storage 1"
+    url: https://exstorage1/api/webdav
+    searchUrl: https://exstorage1/api/search/
+    rootDirectoryIri: http://ex1/api/webdav/
+  exStorage2:
+    name: exStorage2
+    label: "External storage 2"
+    url: https://exstorage2/api/webdav
 ----
 
 
@@ -2361,7 +2363,7 @@ For several purposes, three types of logs are generated:
 WARNING: _Do not change or remove this log!_
 
 As default, application and audit logs are written to standard output.
-Additionally, the audit log is also written to log files in ``data/audit``.
+Additionally, the audit log is also written to log files in ``data/audit``. Location can be overwritten by setting the ``AUDIT_LOG_ROOT`` environment variable.
 The log files are automatically ‘rolled over’: today’s records are in ``audit.log``, previous records are stored in daily log files with file name pattern
 ``data/audit/audit.yyyy-MM-dd.log``, and are retained for 50 days.
 If the audit log needs to be kept for a longer period, the log configuration can be replaced, or log files can be transferred elsewhere, e.g., using link:https://www.elastic.co/guide/en/beats/filebeat/current/index.html[filebeat].
@@ -2371,12 +2373,12 @@ The transaction log is stored in ``data/log`` by default.
 
 ==== Configuration
 
-The default log configuration for application and audit logs is in  link:projects/saturn/src/main/resources/log4j.properties[log4j.properties].
-The default can be overridden by placing a file ``log4j.properties`` in the working directory where the application is run.
+The default log configuration for application and audit logs is in  link:projects/saturn/src/main/resources/log4j2.properties[log4j2.properties].
+The default can be overridden by placing a file ``log4j2.properties`` in the working directory where the application is run.
 
 ==== Audit log
 
-The audit log is generated using link:https://logging.apache.org/log4j/1.2/[log4j] and _Mapped Diagnostic Context (MDC)_.
+The audit log is generated using link:https://logging.apache.org/log4j/2.x/[log4j 2] and _Mapped Diagnostic Context (MDC)_.
 The basic idea of Mapped Diagnostic Context is to provide a way to enrich log messages with pieces of information that could be not available in the scope where the logging actually occurs, but that can be indeed useful to better track the execution of the program. Basically it groups log data from a single event (``MDC.put``) into a one log message.
 
 Audit log entries contain several fields, including
