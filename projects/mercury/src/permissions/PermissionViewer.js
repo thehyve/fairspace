@@ -7,7 +7,7 @@ import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
 import WorkspacePermissionsComponent from "./WorkspacePermissionsComponent";
 import {sortPermissions} from "../collections/collectionUtils";
-import {Box, FormLabel} from "@material-ui/core";
+import {Box, FormHelperText, FormLabel} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
@@ -54,6 +54,7 @@ export const PermissionViewer = ({
             <FormLabel>Individual Users</FormLabel>
             <Box className={classes.root}>
                 {renderUserPermissionComponent()}
+                <FormHelperText>Members of the collection workspace can be assigned modify rights. All other users are read-only.</FormHelperText>
             </Box>
             <FormLabel>Remote workspaces</FormLabel>
             <Box className={classes.root}>
