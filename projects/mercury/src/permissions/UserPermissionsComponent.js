@@ -91,7 +91,7 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
     const renderHeader = () => (
         <Toolbar className={classes.header}>
             <Typography variant="body1" id="tableTitle" component="div">
-                Users
+                members
             </Typography>
             {collection.canManage && (
                 <Tooltip title="Add users">
