@@ -55,7 +55,7 @@ export const PermissionViewer = ({
             <Box className={classes.root}>
                 {renderUserPermissionComponent()}
             </Box>
-            <FormLabel>Collection sharing</FormLabel>
+            <FormLabel>Remote workspaces</FormLabel>
             <Box className={classes.root}>
                 {renderWorkspacePermissionComponent()}
             </Box>

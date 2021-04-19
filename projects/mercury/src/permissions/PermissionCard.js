@@ -6,16 +6,15 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Checkbox,
     Collapse,
     FormControl,
-    FormControlLabel,
     FormGroup,
     FormHelperText,
     FormLabel,
     IconButton,
     List,
     ListItem,
+    ListItemText,
     MenuItem,
     Select,
     Typography,
@@ -33,6 +32,7 @@ import {accessLevels, Collection} from "../collections/CollectionAPI";
 import {
     accessLevelForCollection,
     collectionAccessIcon,
+    descriptionForAccessMode,
     getPrincipalsWithCollectionAccess
 } from "../collections/collectionUtils";
 import type {User} from '../users/UsersAPI';
@@ -109,9 +109,9 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== "List");
 
-    const handleSetAccessMode = (newMode) => {
+    const handleSetAccessMode = (event) => {
         if (collection.canManage) {
-            setSelectedAccessMode(newMode);
+            setSelectedAccessMode(event.target.value);
             setChangingAccessMode(true);
         }
     };
@@ -233,72 +233,36 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         />
     );
 
-    function accessModeIsMetaData() {
-        return selectedAccessMode === 'MetadataPublished' || selectedAccessMode === 'DataPublished';
-    }
-
-    function accessModeIsData() {
-        return selectedAccessMode === 'DataPublished';
-    }
-
-    function DisableShowMetaDataModeCheckbox() {
-        return selectedAccessMode === 'DataPublished';
-    }
-
-    function DisableShowDataModeCheckbox() {
-        return collection.status !== 'Archived' || selectedAccessMode === 'DataPublished';
-    }
-
-    const SetAccessModeFromMetaCheckbox = (event) => {
-        if (collection.canManage &&
-            selectedAccessMode === 'Restricted' &&
-            event.target.checked) {
-            handleSetAccessMode('MetadataPublished');
-        }
-
-        if (collection.canManage &&
-            selectedAccessMode === 'MetadataPublished' &&
-            !event.target.checked) {
-            handleSetAccessMode('Restricted');
-        }
-    }
-
-    const SetAccessModeFromDataCheckbox = (event) => {
-        if (collection.canManage &&
-            (selectedAccessMode === 'Restricted' || selectedAccessMode === 'MetadataPublished') &&
-            event.target.checked) {
-            handleSetAccessMode('DataPublished');
-        }
-
-        if (collection.canManage &&
-            selectedAccessMode === 'DataPublished' &&
-            !event.target.checked) {
-            handleSetAccessMode('MetadataPublished');
-        }
-    }
-
     const renderAccessMode = () => (
         <FormControl className={classes.property}>
             <FormLabel>All Users</FormLabel>
-            <FormGroup className={classes.group}>
-                <FormControlLabel
-                    value="Metadata"
-                    control={<Checkbox checked={accessModeIsMetaData()} color="primary"/>}
-                    label="collection metadata visible for all users"
-                    labelPlacement="end"
-                    onChange={SetAccessModeFromMetaCheckbox}
-                    disabled={DisableShowMetaDataModeCheckbox()}
-                />
-                <FormControlLabel
-                    value="Data"
-                    control={<Checkbox checked={accessModeIsData()} color="primary"/>}
-                    label="for archived collections, all users can read collection data"
-                    labelPlacement="end"
-                    onChange={SetAccessModeFromDataCheckbox}
-                    disabled={DisableShowDataModeCheckbox()}
-                />
-                <FormHelperText>Collection AccessMode is: {selectedAccessMode}</FormHelperText>
-            </FormGroup>
+            <Box className={classes.group}>
+                <FormGroup>
+                    {(collection.canManage && collection.availableAccessModes.length > 1) ? (
+                        <FormControl>
+                            <Select
+                                value={collection.accessMode}
+                                onChange={mode => handleSetAccessMode(mode)}
+                                inputProps={{'aria-label': 'View mode'}}
+                            >
+                                {collection.availableAccessModes.map(mode => (
+                                    <MenuItem key={mode} value={mode}>
+                                        <ListItemText
+                                            primary={camelCaseToWords(mode)}
+                                            secondary={descriptionForAccessMode(mode)}
+                                        />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    ) : (
+                        <ListItemText
+                            primary={camelCaseToWords(collection.accessMode)}
+                            secondary={descriptionForAccessMode(collection.accessMode)}
+                        />
+                    )}
+                </FormGroup>
+            </Box>
         </FormControl>
     );
 
@@ -317,7 +281,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderOwnerWorkspaceAccess = () => (
         <FormControl className={classes.property}>
-            <FormLabel>Workspace Users</FormLabel>
+            <FormLabel>Workspace members</FormLabel>
             <Box className={classes.group}>
                 <FormGroup>
                     {collection.canManage ? (
@@ -363,7 +327,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             <CardHeader
                 action={cardHeaderAction}
                 titleTypographyProps={{variant: 'h6'}}
-                title={collection.canManage ? 'Manage access' : `${accessLevel} access`}
+                title={collection.canManage ? 'Collection Sharing' : `${accessLevel} access`}
                 avatar={collectionAccessIcon(accessLevel, 'large')}
                 subheader={accessLevelDescription(accessLevel)}
             />
