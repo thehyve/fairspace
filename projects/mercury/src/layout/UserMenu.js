@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {Avatar, Button, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper} from '@material-ui/core';
+import {Avatar, Button, Card, CardContent, CardMedia, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
@@ -16,6 +16,25 @@ const styles = {
     },
     avatar: {
         margin: 10,
+    },
+    cardCover: {
+        display: 'flex',
+        flexDirection: 'column',
+        // height: 50,
+        width: 50,
+    },
+    cardContent: {
+        backgroundColor: 'white'
+    },
+    cardRoot: {
+        display: 'flex',
+        backgroundColor: 'lightGray',
+        border: "none",
+        boxShadow: "none",
+        borderRadius: 0
+            },
+    menu: {
+        paddingTop: 0
     }
 };
 
@@ -82,9 +101,21 @@ const UserMenu = ({classes}) => {
                     >
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
-                                <MenuList>
-                                    {userNameMenuItem()}
-                                    {userEmailMenuItem()}
+                                <MenuList className={classes.menu}>
+                                    <Card
+                                        className={classes.cardRoot}>
+                                           <CardMedia
+                                               className={classes.cardCover}
+                                               // image="/public/images/contact.png"
+                                           >
+                                        </CardMedia>
+                                        <CardContent
+                                            className={classes.cardContent}>
+                                            {userNameMenuItem()}
+                                            {userEmailMenuItem()}
+                                        </CardContent>
+                                    </Card>
+                                    {/*<Divider />*/}
                                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
