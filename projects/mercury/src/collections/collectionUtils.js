@@ -101,11 +101,11 @@ export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principal
 export const descriptionForAccessMode = (accessMode: AccessMode) => {
     switch (accessMode) {
         case "Restricted":
-            return "Access to data limited to users with explicitly granted access.";
+            return "Data and metadata not public available, users need explicitly granted access.";
         case "MetadataPublished":
             return "All users can see collection metadata.";
         case "DataPublished":
-            return "All users can see collection data.";
+            return "For archived collections only, all users can see collection data and metadata.";
         default:
             return "";
     }

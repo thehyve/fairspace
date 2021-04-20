@@ -28,7 +28,7 @@ import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
 import type {AccessLevel, AccessMode} from '../collections/CollectionAPI';
-import {accessLevels, Collection} from "../collections/CollectionAPI";
+import {accessLevels, accessModes, Collection} from "../collections/CollectionAPI";
 import {
     accessLevelForCollection,
     collectionAccessIcon,
@@ -220,6 +220,43 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         }
     };
 
+    const showSingleAccessMode = () => (
+        <ListItemText
+            primary={camelCaseToWords(collection.accessMode)}
+            secondary={descriptionForAccessMode(collection.accessMode)}
+        />
+    )
+    const showMultipleAccessModes = () => (
+        <FormControl>
+            <Select
+                value={collection.accessMode}
+                onChange={mode => handleSetAccessMode(mode)}
+                inputProps={{'aria-label': 'View mode'}}
+            >
+                {/*show available access modes which user can select*/}
+                {collection.availableAccessModes.map(mode => (
+                    <MenuItem key={mode} value={mode}>
+                        <ListItemText
+                            primary={camelCaseToWords(mode)}
+                            secondary={descriptionForAccessMode(mode)}
+                        />
+                    </MenuItem>
+                ))}
+                {/*show not available modes as disabled menu item, so user knows it exists*/}
+                {accessModes.map(mode => {
+                    if (collection.availableAccessModes.indexOf(mode) < 0) {
+                        return <MenuItem key={mode} value={mode} disabled>
+                            <ListItemText
+                                primary={camelCaseToWords(mode)}
+                                secondary={descriptionForAccessMode(mode)}
+                            />
+                        </MenuItem>;
+                    }
+                })}
+            </Select>
+        </FormControl>
+    );
+
     const renderAccessModeChangeConfirmation = () => (
         <ConfirmationDialog
             open
@@ -235,32 +272,11 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderAccessMode = () => (
         <FormControl className={classes.property}>
-            <FormLabel>All Users</FormLabel>
+            <FormLabel>Public access</FormLabel>
             <Box className={classes.group}>
                 <FormGroup>
-                    {(collection.canManage && collection.availableAccessModes.length > 1) ? (
-                        <FormControl>
-                            <Select
-                                value={collection.accessMode}
-                                onChange={mode => handleSetAccessMode(mode)}
-                                inputProps={{'aria-label': 'View mode'}}
-                            >
-                                {collection.availableAccessModes.map(mode => (
-                                    <MenuItem key={mode} value={mode}>
-                                        <ListItemText
-                                            primary={camelCaseToWords(mode)}
-                                            secondary={descriptionForAccessMode(mode)}
-                                        />
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    ) : (
-                        <ListItemText
-                            primary={camelCaseToWords(collection.accessMode)}
-                            secondary={descriptionForAccessMode(collection.accessMode)}
-                        />
-                    )}
+                    {(collection.canManage && collection.availableAccessModes.length > 1) ?
+                        showMultipleAccessModes() : showSingleAccessMode()}
                 </FormGroup>
             </Box>
         </FormControl>
@@ -281,7 +297,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderOwnerWorkspaceAccess = () => (
         <FormControl className={classes.property}>
-            <FormLabel>Workspace members</FormLabel>
+            <FormLabel>Workspace user access</FormLabel>
             <Box className={classes.group}>
                 <FormGroup>
                     {collection.canManage ? (
@@ -327,7 +343,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             <CardHeader
                 action={cardHeaderAction}
                 titleTypographyProps={{variant: 'h6'}}
-                title={collection.canManage ? 'Collection Sharing' : `${accessLevel} access`}
+                title={collection.canManage ? 'Manage access' : `${accessLevel} access`}
                 avatar={collectionAccessIcon(accessLevel, 'large')}
                 subheader={accessLevelDescription(accessLevel)}
             />
