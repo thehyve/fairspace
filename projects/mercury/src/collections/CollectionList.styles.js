@@ -10,6 +10,10 @@ const styles = () => ({
         '-ms-user-select': 'none', /* Internet Explorer/Edge */
         'user-select': 'none', /* Non-prefixed version, currently supported by Chrome and Opera */
     },
+    headerCell: {
+        paddingBottom: 8,
+        verticalAlign: "top"
+    },
     deletedCollectionRow: {
         opacity: "0.4"
     }
