@@ -2,6 +2,8 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.milton.resource.*;
 import lombok.*;
 
@@ -29,37 +31,6 @@ public class JdbcQueryService implements QueryService {
         var rootLocation = rootSubject.getUniqueId() + "/";
         var location = uri.substring(rootLocation.length());
         return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
-    }
-
-    @SneakyThrows
-    protected void applyCollectionsFilterIfRequired(String view, List<ViewFilter> filters) {
-        boolean collectionsFilterRequired = view.equalsIgnoreCase("Resource") ||
-                filters.stream().anyMatch(
-                        filter -> filter.getField().split("_")[0].equalsIgnoreCase("Resource"));
-        if (!collectionsFilterRequired) {
-            return;
-        }
-        var collections = transactions.calculateRead(m ->
-                rootSubject.getChildren().stream()
-                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
-                        .collect(Collectors.toList()));
-        if (filters.stream()
-                .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
-            // Update existing filters in place
-            filters.stream()
-                    .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
-                    .forEach(filter -> filter.setValues(
-                            filter.values.stream()
-                                    .map(value -> getCollectionName(value.toString()))
-                                    .filter(collections::contains).collect(Collectors.toList()))
-                    );
-            return;
-        }
-        // Add collection name filter
-        filters.add(ViewFilter.builder()
-                .field("Resource_collection")
-                .values(collections)
-                .build());
     }
 
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
@@ -106,5 +77,41 @@ public class JdbcQueryService implements QueryService {
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);
         }
+    }
+
+// FRANK document:    Run the Gradle build with a command line argument --warning-mode=all
+    public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+        return null;
+    }
+
+    @SneakyThrows
+    protected void applyCollectionsFilterIfRequired(String view, List<ViewFilter> filters) {
+        boolean collectionsFilterRequired = view.equalsIgnoreCase("Resource") ||
+                filters.stream().anyMatch(
+                        filter -> filter.getField().split("_")[0].equalsIgnoreCase("Resource"));
+        if (!collectionsFilterRequired) {
+            return;
+        }
+        var collections = transactions.calculateRead(m ->
+                rootSubject.getChildren().stream()
+                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
+                        .collect(Collectors.toList()));
+        if (filters.stream()
+                .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
+            // Update existing filters in place
+            filters.stream()
+                    .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
+                    .forEach(filter -> filter.setValues(
+                            filter.values.stream()
+                                    .map(value -> getCollectionName(value.toString()))
+                                    .filter(collections::contains).collect(Collectors.toList()))
+                    );
+            return;
+        }
+        // Add collection name filter
+        filters.add(ViewFilter.builder()
+                .field("Resource_collection")
+                .values(collections)
+                .build());
     }
 }

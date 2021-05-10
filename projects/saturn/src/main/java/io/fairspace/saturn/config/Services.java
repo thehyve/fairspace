@@ -52,7 +52,10 @@ public class Services {
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
 
-    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClient viewStoreClient) {
+    public Services(@NonNull Config config,
+                    @NonNull ViewsConfig viewsConfig,
+                    @NonNull Dataset dataset,
+                    ViewStoreClient viewStoreClient) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -91,6 +94,6 @@ public class Services {
         }
         viewService = new ViewService(viewsConfig, filteredDataset, viewStoreReader);
 
-        searchService = new SearchService(filteredDataset);
+        searchService = new SearchService(filteredDataset, queryService);
     }
 }
