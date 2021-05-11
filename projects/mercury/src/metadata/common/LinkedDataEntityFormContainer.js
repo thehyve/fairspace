@@ -36,6 +36,7 @@ const LinkedDataEntityFormContainer = ({
     const {isUpdating, submitForm} = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
             .then(() => {
+                setEditingEnabled(false);
                 clearForm();
                 updateLinkedData();
             }),
@@ -122,7 +123,7 @@ const LinkedDataEntityFormContainer = ({
                 )}
             </Grid>
             <Grid item xs={1} align="right">
-                {showEditButtons && !editingEnabled && (
+                {showEditButtons && hasEditRight && !editingEnabled && (
                     <IconButton
                         aria-label="Edit"
                         onClick={() => {
@@ -152,6 +153,7 @@ export const LinkedDataEntityFormWithLinkedData = (
             subject={subject}
             typeInfo={typeInfo}
             hasEditRight={hasEditRight}
+            showEditButtons
             properties={properties}
             values={values}
             linkedDataLoading={linkedDataLoading}
