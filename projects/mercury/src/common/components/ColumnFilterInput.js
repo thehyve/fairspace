@@ -55,6 +55,14 @@ const ColumnFilterInput = ({setFilterValue, filterValue, placeholder, useApplyBu
         setFilterValue(value.trim());
     };
 
+    const handleKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            if (useApplyButton) {
+                handleChange(e.target.value);
+            }
+        }
+    };
+
     useEffect(() => {
         if (!useApplyButton) {
             handleChange(value);
@@ -76,6 +84,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue, placeholder, useApplyBu
                 }}
                 value={value}
                 onChange={event => setValue(event.target.value)}
+                onKeyDown={handleKeyDown}
                 variant="outlined"
                 type="search"
                 InputProps={{
