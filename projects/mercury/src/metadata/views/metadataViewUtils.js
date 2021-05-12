@@ -1,6 +1,5 @@
 import type {ValueType} from "./MetadataViewAPI";
-import {getParentPath, getPathFromIri} from "../../file/fileUtils";
-import {getCollectionAbsolutePath} from "../../collections/collectionUtils";
+import {MetadataViewColumn, TextualValueTypes} from "./MetadataViewAPI";
 
 export const RESOURCES_VIEW = "Resource";
 
@@ -21,13 +20,8 @@ export const getMetadataViewsPath = (viewName: string) => {
     return path;
 };
 
-export const getContextualFileLink = (item: string) => {
-    const path = getPathFromIri(item);
-    const parentPath = getParentPath(path);
-    if (parentPath) {
-        return `${getCollectionAbsolutePath(parentPath)}?selection=${encodeURIComponent(`/${path}`)}`;
-    }
-    return getCollectionAbsolutePath(path);
-};
-
 export const ofRangeValueType: boolean = (type: ValueType) => type === 'Number' || type === 'Date';
+
+export const getInitialTextFilterMap: Object = (columns: MetadataViewColumn[]) => (
+    Object.fromEntries(columns.filter(c => TextualValueTypes.includes(c.type)).map(c => ([c.name, ""])))
+);

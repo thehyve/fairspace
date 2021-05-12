@@ -8,6 +8,7 @@ import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockViews, mockRows} from "../__mocks__/MetadataViewAPI";
 import {RESOURCES_VIEW} from "../metadataViewUtils";
+import type {Collection} from "../../../collections/CollectionAPI";
 
 describe('MetadataViewTable', () => {
     const historyMock = {
@@ -27,6 +28,10 @@ describe('MetadataViewTable', () => {
                 toggleRow={() => {}}
                 history={historyMock}
                 idColumn={columns[0]}
+                collections={[]}
+                textFilterMap={{}}
+                setTextFilterMap={() => {}}
+                loading={false}
             />
         );
 
@@ -58,6 +63,9 @@ describe('MetadataViewTable', () => {
                 toggleRow={() => {}}
                 history={historyMock}
                 idColumn={columns[0]}
+                collections={[]}
+                textFilterMap={{}}
+                setTextFilterMap={() => {}}
             />
         );
 
@@ -90,6 +98,8 @@ describe('MetadataViewTable', () => {
             history={historyMock}
             idColumn={columns[0]}
             loading={false}
+            textFilterMap={{}}
+            setTextFilterMap={() => {}}
         />);
 
         const tableRows = wrapper.find(TableBody).find(TableRow);

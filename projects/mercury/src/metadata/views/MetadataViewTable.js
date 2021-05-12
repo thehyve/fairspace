@@ -3,12 +3,14 @@ import {Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-
 import {makeStyles} from '@material-ui/core/styles';
 import {Link as RouterLink} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
+import {TextualValueTypes} from "./MetadataViewAPI";
 import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
+import {RESOURCES_VIEW} from "./metadataViewUtils";
 import {formatDate} from "../../common/utils/genericUtils";
 import type {Collection} from "../../collections/CollectionAPI";
 import {collectionAccessIcon} from "../../collections/collectionUtils";
-import {RESOURCES_VIEW} from "./metadataViewUtils";
 import {getPathFromIri, redirectLink} from "../../file/fileUtils";
+import ColumnFilterInput from "../../common/components/ColumnFilterInput";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -21,12 +23,15 @@ type MetadataViewTableProperties = {
     selected?: MetadataViewEntityWithLinkedFiles;
     view: string;
     collections: Collection[];
+    textFilterMap: Map<string, string>;
+    setTextFilterMap: () => {};
 };
 
 const useStyles = makeStyles(() => ({
     cellContents: {
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
+        verticalAlign: 'top'
     }
 }));
 
@@ -36,6 +41,7 @@ const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} = props;
     const classes = useStyles();
+    const {textFilterMap, setTextFilterMap} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const {rows = []} = data;
@@ -99,6 +105,14 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
     };
 
+    const renderColumnFilter = (columnName: string) => {
+        const filterValue = textFilterMap[columnName];
+        const setFilterValue = value => setTextFilterMap({...textFilterMap, [columnName]: value});
+        return (
+            <ColumnFilterInput placeholder="Filter" filterValue={filterValue} setFilterValue={setFilterValue} useApplyButton />
+        );
+    };
+
     const renderTableCell = (row: Map<string, any>, column: MetadataViewColumn) => {
         if (isCustomResourceColumn(column)) {
             return renderCustomResourceColumn(row, column);
@@ -119,7 +133,10 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             <TableHead>
                 <TableRow>
                     {visibleColumns.map(column => (
-                        <TableCell key={column.name} className={classes.cellContents}>{column.title}</TableCell>
+                        <TableCell key={column.name} className={classes.cellContents}>
+                            {column.title}
+                            {(TextualValueTypes.includes(column.type)) && renderColumnFilter(column.name)}
+                        </TableCell>
                     ))}
                 </TableRow>
             </TableHead>

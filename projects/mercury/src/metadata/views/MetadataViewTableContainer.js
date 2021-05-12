@@ -20,12 +20,14 @@ import FormGroup from "@material-ui/core/FormGroup";
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
+import {getInitialTextFilterMap} from "./metadataViewUtils";
 import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
 import {Collection} from "../../collections/CollectionAPI";
 import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -73,6 +75,7 @@ const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_C
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
 
+    const [textFilterMap, setTextFilterMap] = useState(getInitialTextFilterMap(columns));
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
@@ -85,17 +88,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, locationContext, rowsPerPage);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFilterMap, locationContext, rowsPerPage);
 
     useEffect(() => {setPage(0);}, [filters]);
-
-    if (error && error.message) {
-        return <MessageDisplay message={error.message} />;
-    }
-
-    if (count.count === 0 && !data.timeout && !count.timeout) {
-        return <MessageDisplay message="No results found." />;
-    }
 
     const handleChangePage = (e, p) => {
         setPage(p);
@@ -192,24 +187,43 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         </span>
     );
 
+    const renderMetadataViewTable = () => {
+        if (error && error.message) {
+            return <MessageDisplay message={error.message} />;
+        }
+
+        if (count.count === 0 && !data.timeout && !count.timeout) {
+            return <MessageDisplay message="No results found." />;
+        }
+        if (data && data.timeout) {
+            return <MessageDisplay isError message="The data request timed out." />;
+        }
+        return (
+            <MetadataViewTable
+                {...props}
+                visibleColumnNames={visibleColumnNames}
+                idColumn={idColumn}
+                data={data}
+                loading={!data || loading}
+                history={history}
+                textFilterMap={textFilterMap}
+                setTextFilterMap={setTextFilterMap}
+            />
+        );
+    };
+
     return (
         <Paper>
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
+                <MetadataViewActiveTextFilters
+                    textFilterMap={textFilterMap}
+                    setTextFilterMap={setTextFilterMap}
+                    columns={columns}
+                />
                 <TableContainer className={classes.tableContents}>
                     {renderMessages()}
-                    {data && data.timeout ? (
-                        <MessageDisplay isError message="The data request timed out." />
-                    ) : (
-                        <MetadataViewTable
-                            {...props}
-                            visibleColumnNames={visibleColumnNames}
-                            idColumn={idColumn}
-                            data={data}
-                            loading={!data || loading}
-                            history={history}
-                        />
-                    )}
+                    {renderMetadataViewTable()}
                 </TableContainer>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
