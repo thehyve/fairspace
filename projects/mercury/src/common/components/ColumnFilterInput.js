@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ColumnFilterInput = ({setFilterValue, filterValue, placeholder, useApplyButton = false}) => {
+const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useApplyButton = false}) => {
     const classes = useStyles();
     const [value, setValue] = useState(filterValue);
 

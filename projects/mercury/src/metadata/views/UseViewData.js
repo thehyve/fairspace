@@ -18,10 +18,10 @@ export type ViewData = {
     loadingCount: boolean;
     error: any;
     refreshDataOnly: boolean;
-    textFilterMap: Object
+    textFiltersObject: Object
 };
 
-const useViewData = (view: string, filters: MetadataViewFilter[], textFilterMap: Object, locationContext: string, rowsPerPage: number): ViewData => {
+const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
     const [data, setData] = useState({});
     const [count, setCount] = useState({});
     const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFilterMap:
         values: [locationContext]
     };
 
-    const textFilters: MetadataViewFilter[] = Object.entries(textFilterMap)
+    const textFilters: MetadataViewFilter[] = Object.entries(textFiltersObject)
         .filter(([field, value]) => field !== null && value !== "")
         .map(([field, value]) => ({
             field,
@@ -115,7 +115,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFilterMap:
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters, locationContext, textFilterMap]);
+    useEffect(() => {refreshAll();}, [view, filters, locationContext, textFiltersObject]);
 
     return {
         data,

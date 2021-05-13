@@ -23,8 +23,8 @@ type MetadataViewTableProperties = {
     selected?: MetadataViewEntityWithLinkedFiles;
     view: string;
     collections: Collection[];
-    textFilterMap: Map<string, string>;
-    setTextFilterMap: () => {};
+    textFiltersObject: Object;
+    setTextFiltersObject: () => {};
 };
 
 const useStyles = makeStyles(() => ({
@@ -41,7 +41,7 @@ const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} = props;
     const classes = useStyles();
-    const {textFilterMap, setTextFilterMap} = props;
+    const {textFiltersObject, setTextFiltersObject} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const {rows = []} = data;
@@ -106,8 +106,8 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     const renderColumnFilter = (columnName: string) => {
-        const filterValue = textFilterMap[columnName];
-        const setFilterValue = value => setTextFilterMap({...textFilterMap, [columnName]: value});
+        const filterValue = textFiltersObject[columnName];
+        const setFilterValue = value => setTextFiltersObject({...textFiltersObject, [columnName]: value});
         return (
             <ColumnFilterInput placeholder="Filter" filterValue={filterValue} setFilterValue={setFilterValue} useApplyButton />
         );

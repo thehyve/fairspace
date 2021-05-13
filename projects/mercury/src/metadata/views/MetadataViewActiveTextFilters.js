@@ -2,7 +2,6 @@ import React from 'react';
 import {Chip, Divider, Grid, IconButton, Typography, withStyles} from '@material-ui/core';
 import {Close} from "@material-ui/icons";
 import type {MetadataViewColumn} from "./MetadataViewAPI";
-import {getInitialTextFilterMap} from "./metadataViewUtils";
 
 const styles = theme => ({
     activeTextFiltersBox: {
@@ -18,25 +17,26 @@ const styles = theme => ({
 });
 
 type MetadataViewActiveTextFiltersProperties = {
-    textFilterMap: Map<string, string>;
-    setTextFilterMap: () => {};
+    textFiltersObject: Object;
+    setTextFiltersObject: () => {};
     columns: MetadataViewColumn[];
     classes: any;
 };
 
 export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFiltersProperties) => {
-    const {textFilterMap, setTextFilterMap, columns, classes} = props;
+    const {textFiltersObject, setTextFiltersObject, columns, classes} = props;
 
-    if (Object.values(textFilterMap).every(v => v === null || v === "")) {
+    if (Object.values(textFiltersObject).every(v => v === null || v === "")) {
         return <></>;
     }
 
     const clearTextFilters = () => {
-        setTextFilterMap(getInitialTextFilterMap(columns));
+        setTextFiltersObject({});
     };
 
     const clearSingleTextFilter = (field: string) => {
-        setTextFilterMap({...textFilterMap, [field]: ""});
+        delete textFiltersObject[field];
+        setTextFiltersObject({...textFiltersObject});
     };
 
     return (
@@ -53,7 +53,7 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
                     <Grid key="activeTextFilters" item>
                         <Typography variant="overline" component="span">Active text filters: </Typography>
                     </Grid>
-                    {Object.entries(textFilterMap).filter(([, value]) => value !== null && value !== "")
+                    {Object.entries(textFiltersObject).filter(([, value]) => value !== null && value !== "")
                         .map(([field, value]) => (
                             <Grid key={`activeTextFilters_${field}`} item>
                                 <Chip
@@ -74,7 +74,6 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
             <Divider classes={{root: classes.divider}} />
         </div>
     );
-
 };
 
 export default withStyles(styles)(MetadataViewActiveTextFilters);

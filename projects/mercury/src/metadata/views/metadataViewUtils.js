@@ -1,5 +1,4 @@
 import type {ValueType} from "./MetadataViewAPI";
-import {MetadataViewColumn, TextualValueTypes} from "./MetadataViewAPI";
 
 export const RESOURCES_VIEW = "Resource";
 
@@ -21,7 +20,3 @@ export const getMetadataViewsPath = (viewName: string) => {
 };
 
 export const ofRangeValueType: boolean = (type: ValueType) => type === 'Number' || type === 'Date';
-
-export const getInitialTextFilterMap: Object = (columns: MetadataViewColumn[]) => (
-    Object.fromEntries(columns.filter(c => TextualValueTypes.includes(c.type)).map(c => ([c.name, ""])))
-);

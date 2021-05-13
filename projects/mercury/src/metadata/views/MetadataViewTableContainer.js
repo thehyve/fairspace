@@ -20,7 +20,6 @@ import FormGroup from "@material-ui/core/FormGroup";
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import {getInitialTextFilterMap} from "./metadataViewUtils";
 import useViewData from "./UseViewData";
 import MetadataViewTable from "./MetadataViewTable";
 import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
@@ -75,7 +74,7 @@ const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_C
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
 
-    const [textFilterMap, setTextFilterMap] = useState(getInitialTextFilterMap(columns));
+    const [textFiltersObject, setTextFiltersObject] = useState({});
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
@@ -88,7 +87,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFilterMap, locationContext, rowsPerPage);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
 
     useEffect(() => {setPage(0);}, [filters]);
 
@@ -206,8 +205,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 data={data}
                 loading={!data || loading}
                 history={history}
-                textFilterMap={textFilterMap}
-                setTextFilterMap={setTextFilterMap}
+                textFiltersObject={textFiltersObject}
+                setTextFiltersObject={setTextFiltersObject}
             />
         );
     };
@@ -217,8 +216,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
                 <MetadataViewActiveTextFilters
-                    textFilterMap={textFilterMap}
-                    setTextFilterMap={setTextFilterMap}
+                    textFiltersObject={textFiltersObject}
+                    setTextFiltersObject={setTextFiltersObject}
                     columns={columns}
                 />
                 <TableContainer className={classes.tableContents}>
