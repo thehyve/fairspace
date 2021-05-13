@@ -179,9 +179,9 @@ export const SearchResultListContainer = ({
             <BreadCrumbs additionalSegments={getSearchPathSegments(context, storage)} />
             <SearchBar
                 placeholder="Search"
-                disableUnderline={false}
                 onSearchChange={handleSearch}
                 query={query}
+                width="40%"
             />
             <SearchResultList
                 items={items}

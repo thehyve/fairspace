@@ -1,12 +1,14 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Input, withStyles} from '@material-ui/core';
+import {TextField, withStyles} from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
+import InputAdornment from "@material-ui/core/InputAdornment";
+import IconButton from "@material-ui/core/IconButton";
 import styles from './SearchBar.styles';
 
 const SearchBar = ({
-    classes, query = '', placeholder, onSearchChange = () => {}, disableUnderline = true, disabled = false
+    classes, query = '', placeholder, onSearchChange = () => {}, disabled = false, width = '100%'
 }) => {
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
@@ -16,35 +18,53 @@ const SearchBar = ({
         setValue(query);
     }
 
-    const handleChange = (event) => {
-        setValue(event.target.value);
-    };
-
     const handleSearch = (e) => {
         e.preventDefault();
         onSearchChange(value);
     };
 
+    const handleChange = (event) => {
+        setValue(event.target.value);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            handleSearch(e);
+        }
+    };
+
     return (
         <div className={classes.search}>
-            <div className={classes.searchIcon}>
-                <SearchIcon />
-            </div>
-            <form
-                onSubmit={handleSearch}
-            >
-                <Input
-                    placeholder={placeholder}
-                    classes={{
-                        root: classes.inputRoot,
+            <TextField
+                placeholder={placeholder}
+                classes={{
+                    root: classes.inputRoot,
+                }}
+                style={{width}}
+                value={value}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                type="search"
+                disabled={disabled}
+                InputProps={{
+                    classes: {
                         input: classes.inputInput,
-                    }}
-                    value={value}
-                    onChange={handleChange}
-                    disableUnderline={disableUnderline}
-                    disabled={disabled}
-                />
-            </form>
+                        adornedEnd: classes.adornedEnd
+                    },
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                                onClick={handleSearch}
+                                className={classes.searchIcon}
+                                title="Apply filter"
+                                color="primary"
+                            >
+                                <SearchIcon />
+                            </IconButton>
+                        </InputAdornment>
+                    )
+                }}
+            />
         </div>
     );
 };

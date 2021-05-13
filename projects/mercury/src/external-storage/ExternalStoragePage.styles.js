@@ -2,7 +2,7 @@ import * as consts from "../constants";
 
 const styles = () => ({
     topBar: {
-        marginBottom: 16,
+        marginBottom: 8,
         width: consts.MAIN_CONTENT_WIDTH
     },
     centralPanel: {
