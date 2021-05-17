@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
 
 import {TOOLTIP_ENTER_DELAY} from "../../constants";
-import LinkedDataValuesTable from "./LinkedDataValuesTable";
+import LinkedDataValuesList from "./LinkedDataValuesList";
 import IriTooltip from "../../common/components/IriTooltip";
 import Iri from "../../common/components/Iri";
 
@@ -16,11 +16,11 @@ export const LinkedDataRelationTable = (
     const onOpen = entry => history.push(`${editorPath}?iri=${encodeURIComponent(entry.id)}`);
 
     return (
-        <LinkedDataValuesTable
+        <LinkedDataValuesList
             onOpen={onOpen}
             onAdd={onAdd}
             onDelete={onDelete}
-            columnDefinitions={[IDENTIFIER_COLUMN]}
+            columnDefinition={IDENTIFIER_COLUMN}
             property={property}
             values={values}
             showHeader={false}
