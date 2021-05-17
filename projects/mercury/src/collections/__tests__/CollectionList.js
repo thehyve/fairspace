@@ -2,6 +2,8 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {render} from '@testing-library/react';
 
+import {mount} from "enzyme";
+import {TableRow} from "@material-ui/core";
 import CollectionList from "../CollectionList";
 
 describe('CollectionList', () => {
@@ -57,5 +59,72 @@ describe('CollectionList', () => {
         expect(getByText('Mariah Carey')).toBeInTheDocument();
         expect(getByText('Workspace')).toBeInTheDocument();
         expect(getByText('ws1')).toBeInTheDocument();
+    });
+
+    it('filters collections by name on filter input change', () => {
+        const collections = [
+            {
+                name: 'My Collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/0',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceName: 'ws1',
+                dateDeleted: new Date().toUTCString()
+            },
+            {
+                name: 'Secret collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/1',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceName: 'ws1',
+                dateDeleted: new Date().toUTCString()
+            }];
+
+        const wrapper = mount(
+            <CollectionList collections={collections} />
+        );
+        expect(wrapper.find(TableRow).length).toBe(3);
+
+        const nameField = wrapper.find('input#filter').first();
+        nameField.simulate('focus');
+        nameField.simulate('change', {target: {value: 'SECRET'}});
+
+        expect(wrapper.find(TableRow).length).toBe(2);
+    });
+
+    it('filters collections including description on filter input change', () => {
+        const collections = [
+            {
+                name: 'My Collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/0',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceName: 'ws1',
+                dateDeleted: new Date().toUTCString(),
+                description: "This one is not a secret"
+            },
+            {
+                name: 'Secret collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/1',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceName: 'ws1',
+                dateDeleted: new Date().toUTCString()
+            }];
+
+        const wrapper = mount(
+            <CollectionList collections={collections} />
+        );
+        expect(wrapper.find(TableRow).length).toBe(3);
+
+        const nameField = wrapper.find('input#filter').first();
+        nameField.simulate('focus');
+        nameField.simulate('change', {target: {value: 'Sec'}});
+
+        expect(wrapper.find(TableRow).length).toBe(3);
     });
 });

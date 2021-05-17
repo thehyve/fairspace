@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Link,
     ListItemText,
@@ -13,7 +13,6 @@ import {
     TableSortLabel,
     withStyles,
 } from "@material-ui/core";
-
 import styles from './CollectionList.styles';
 import MessageDisplay from "../common/components/MessageDisplay";
 import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
@@ -21,6 +20,7 @@ import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import {currentWorkspace} from '../workspaces/workspaces';
 import {accessLevelForCollection, collectionAccessIcon} from './collectionUtils';
+import ColumnFilterInput from "../common/components/ColumnFilterInput";
 
 const baseColumns = {
     name: {
@@ -74,8 +74,24 @@ const CollectionList = ({
         delete columns.workspace;
     }
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(collections, allColumns, 'name');
+    const [filterValue, setFilterValue] = useState("");
+    const [filteredCollections, setFilteredCollections] = useState(collections);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredCollections, allColumns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+
+    useEffect(() => {
+        if (collections && collections.length > 0) {
+            if (!filterValue) {
+                setFilteredCollections(collections);
+            } else {
+                setFilteredCollections(collections.filter(c => (
+                    c.name.toLowerCase().includes(filterValue.toLowerCase())
+                    || (c.description && c.description.toLowerCase().includes(filterValue.toLowerCase()))
+                )));
+            }
+            setPage(0);
+        }
+    }, [filterValue, collections, setPage]);
 
     if (!collections || collections.length === 0) {
         return (
@@ -89,6 +105,10 @@ const CollectionList = ({
         );
     }
 
+    const renderCollectionFilter = () => (
+        <ColumnFilterInput placeholder="Filter by name" filterValue={filterValue} setFilterValue={setFilterValue} />
+    );
+
     return (
         <Paper className={classes.root}>
             <TableContainer>
@@ -97,7 +117,7 @@ const CollectionList = ({
                         <TableRow>
                             {
                                 Object.entries(columns).map(([key, column]) => (
-                                    <TableCell key={key}>
+                                    <TableCell key={key} className={classes.headerCell}>
                                         <TableSortLabel
                                             active={orderBy === key}
                                             direction={orderAscending ? 'asc' : 'desc'}
@@ -105,6 +125,7 @@ const CollectionList = ({
                                         >
                                             {column.label}
                                         </TableSortLabel>
+                                        {(key === "name") && renderCollectionFilter()}
                                     </TableCell>
                                 ))
                             }
@@ -138,7 +159,7 @@ const CollectionList = ({
                                     <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
                                         <ListItemText
                                             style={{margin: 0}}
-                                            primary={
+                                            primary={(
                                                 <Link
                                                     component="button"
                                                     onClick={(e) => {e.stopPropagation(); onCollectionDoubleClick(collection);}}
@@ -148,7 +169,7 @@ const CollectionList = ({
                                                 >
                                                     {collection.name}
                                                 </Link>
-                                            }
+                                            )}
                                             secondary={collection.description}
                                         />
                                     </TableCell>
@@ -191,7 +212,7 @@ const CollectionList = ({
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={collections.length}
+                    count={filteredCollections.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onChangePage={(e, p) => setPage(p)}

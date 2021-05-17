@@ -12,7 +12,11 @@ const styles = () => ({
     },
     deletedFileRow: {
         opacity: "0.4"
-    }
+    },
+    headerCell: {
+        paddingBottom: 8,
+        verticalAlign: "top"
+    },
 });
 
 export default styles;

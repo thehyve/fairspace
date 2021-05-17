@@ -4,6 +4,9 @@ import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import FileList from '../FileList';
+import {mount} from "enzyme";
+import CollectionList from "../../collections/CollectionList";
+import {TableRow} from "@material-ui/core";
 
 afterEach(cleanup);
 
@@ -71,5 +74,39 @@ describe('FileList', () => {
         />);
 
         expect(queryByTestId('checkbox-cell')).not.toBeInTheDocument();
+    });
+
+    it('filters files by basename on filter input change', () => {
+        const allFiles = [
+            {
+                filename: "/Collection/q",
+                basename: "base-dir",
+                lastmod: "Wed, 09 Oct 2019 16:17:37 GMT",
+                size: 0,
+                type: "directory",
+                etag: null,
+                selected: false
+            },
+            {
+                filename: "/Collection/f1",
+                basename: "base-file",
+                lastmod: "Thu, 10 Oct 2019 12:12:31 GMT",
+                size: 0,
+                type: "file",
+                etag: null,
+                selected: false
+            }];
+
+        const wrapper = mount(<FileList
+            selectionEnabled={false}
+            files={allFiles}
+        />);
+        expect(wrapper.find(TableRow).length).toBe(3);
+
+        const nameField = wrapper.find('input#filter').first();
+        nameField.simulate('focus');
+        nameField.simulate('change', {target: {value: 'file'}});
+
+        expect(wrapper.find(TableRow).length).toBe(2);
     });
 });

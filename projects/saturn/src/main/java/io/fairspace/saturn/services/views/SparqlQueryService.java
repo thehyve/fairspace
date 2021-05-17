@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.sparql.expr.NodeValue.*;
+import static org.apache.jena.sparql.expr.NodeValue.makeString;
 import static org.apache.jena.system.Txn.calculateRead;
 
 @Log4j2
@@ -219,21 +220,28 @@ public class SparqlQueryService implements QueryService {
 
                         request.getFilters()
                                 .stream()
-                                .filter(f -> f.getField().startsWith(entity + "_"))
-                                .sorted(comparing(f -> getColumn(f.field).priority))
+                                .filter(f -> f.getField().startsWith(entity))
+                                .sorted(comparing(f -> f.field.contains("_") ? getColumn(f.field).priority : 0))
                                 .forEach(f -> {
-                                    var condition = toFilterString(f);
+                                    String condition, property, field;
+                                    if (f.getField().equals(entity)) {
+                                        field = f.field + "_id";
+                                        property = RDFS.label.toString();
+                                        condition = toFilterString(f, ColumnType.Identifier, field);
+                                    } else {
+                                        field = f.field;
+                                        property = getColumn(f.field).source;
+                                        condition = toFilterString(f, getColumn(f.field).type, f.field);
+                                    }
                                     if (condition != null) {
-                                        if (!f.getField().equals(entity)) {
-                                            builder.append("?")
-                                                    .append(entity)
-                                                    .append(" <")
-                                                    .append(getColumn(f.field).source)
-                                                    .append("> ?")
-                                                    .append(f.field)
-                                                    .append(" .\n");
-                                        }
-                                        builder.append(condition)
+                                        builder.append("?")
+                                                .append(entity)
+                                                .append(" <")
+                                                .append(property)
+                                                .append("> ?")
+                                                .append(field)
+                                                .append(" .\n")
+                                                .append(condition)
                                                 .append(" \n");
                                     }
                                 });
@@ -255,10 +263,9 @@ public class SparqlQueryService implements QueryService {
         return QueryFactory.create(builder.toString());
     }
 
-    private String toFilterString(ViewFilter filter) {
-        var type = getColumn(filter.field).type;
+    private String toFilterString(ViewFilter filter, ColumnType type, String field) {
+        var variable = new ExprVar(field);
 
-        var variable = new ExprVar(filter.field);
         Expr expr;
         if (filter.min != null && filter.max != null) {
             expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, type)));
@@ -271,8 +278,8 @@ public class SparqlQueryService implements QueryService {
                     .map(o -> toNodeValue(o, type))
                     .collect(toList());
             expr = new E_OneOf(variable, new ExprList(values));
-        } else if (filter.prefix != null && !filter.prefix.isEmpty()) {
-            expr = new E_StrStartsWith(new E_Str(variable), makeString(filter.prefix));
+        } else if (filter.prefix != null && !filter.prefix.trim().isEmpty()) {
+            expr = new E_StrStartsWith(new E_StrLowerCase(variable), makeString(filter.prefix.trim().toLowerCase()));
         } else {
             return null;
         }
