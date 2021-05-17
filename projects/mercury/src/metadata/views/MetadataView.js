@@ -1,8 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, Grid, withStyles} from '@material-ui/core';
+import {Button, Grid, withStyles, Typography} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import {Assignment} from "@material-ui/icons";
+import {Assignment, Close} from "@material-ui/icons";
 import {useHistory} from "react-router-dom";
 import _ from 'lodash';
 import Facet from './MetadataViewFacetFactory';
@@ -13,7 +13,7 @@ import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
 import {getMetadataViewsPath, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
-import MetadataViewActiveFilters from "./MetadataViewActiveFilters";
+import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
@@ -31,6 +31,7 @@ type MetadataViewProperties = {
     classes: any;
     facets: MetadataViewFacet[];
     views: MetadataViewOptions[];
+    filters: MetadataViewFilter[];
     locationContext: string;
     currentViewName: string;
     handleViewChangeRedirect: () => {};
@@ -50,6 +51,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
+    const [textFiltersObject, setTextFiltersObject] = useState({});
 
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
 
@@ -63,6 +65,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const changeTab = (event, tabIndex) => {
         toggle();
+        setTextFiltersObject({});
         handleViewChangeRedirect(views[tabIndex].name);
     };
 
@@ -107,6 +110,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const handleClearAllFilters = () => {
         setFilterCandidates([]);
+        setTextFiltersObject({});
         clearAllFilters();
     };
 
@@ -219,6 +223,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         toggleRow={toggleRow}
                         hasInactiveFilters={filterCandidates.length > 0}
                         collections={collections}
+                        textFiltersObject={textFiltersObject}
+                        setTextFiltersObject={setTextFiltersObject}
                     />
                 </TabPanel>
             ))}
@@ -241,20 +247,32 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return result.reverse();
     };
 
+    const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
+    const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
+
     return (
         <BreadcrumbsContext.Provider value={{
             segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field)) && (
-                <Grid container direction="row" spacing={1}>
-                    <Grid item>
-                        <Button data-testid="clear-button" onClick={handleClearAllFilters} color="primary">
-                            Clear all
+            {(areFacetFiltersNonEmpty() || areTextFiltersNonEmpty()) && (
+                <Grid container justify="space-between" direction="row-reverse">
+                    <Grid item xs={2} className={classes.clearAllButtonContainer}>
+                        <Button className={classes.clearAllButton} startIcon={<Close />} onClick={handleClearAllFilters}>
+                            Clear all filters
                         </Button>
                     </Grid>
-                    <Grid item><MetadataViewActiveFilters facets={facetsEx} filters={filters} /></Grid>
+                    {areFacetFiltersNonEmpty() && (
+                        <Grid item container xs alignItems="center" spacing={1}>
+                            <Grid item>
+                                <Typography variant="overline" component="span" color="textSecondary">Active filters: </Typography>
+                            </Grid>
+                            <Grid item>
+                                <MetadataViewActiveFacetFilters facets={facetsEx} filters={filters} setFilters={updateFilters} />
+                            </Grid>
+                        </Grid>
+                    )}
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">

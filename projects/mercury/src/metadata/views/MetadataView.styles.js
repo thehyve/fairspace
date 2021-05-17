@@ -54,6 +54,12 @@ const styles = theme => ({
     },
     confirmFiltersButton: {
         width: '100%'
+    },
+    clearAllButtonContainer: {
+        textAlign: 'end'
+    },
+    clearAllButton: {
+        color: theme.palette.error.main
     }
 });
 

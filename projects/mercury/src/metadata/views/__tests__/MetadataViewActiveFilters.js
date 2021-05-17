@@ -2,15 +2,15 @@ import {shallow} from "enzyme";
 import React from "react";
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
-import MetadataViewActiveFilters from "../MetadataViewActiveFilters";
+import MetadataViewActiveFacetFilters from "../MetadataViewActiveFacetFilters";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockFacets} from "../__mocks__/MetadataViewAPI";
 
-describe('MetadataViewActiveFilters', () => {
+describe('MetadataViewActiveFacetFilters', () => {
     it('should not show active filters if no filter added', () => {
         const view = 'Collection';
         const facets = mockFacets(view);
-        const wrapper = shallow(<MetadataViewActiveFilters
+        const wrapper = shallow(<MetadataViewActiveFacetFilters
             facets={facets}
             filters={[]}
         />);
@@ -22,7 +22,7 @@ describe('MetadataViewActiveFilters', () => {
     it('should render textual filters properly', () => {
         const view = 'Subject';
         const facets = mockFacets(view);
-        const wrapper = shallow(<MetadataViewActiveFilters
+        const wrapper = shallow(<MetadataViewActiveFacetFilters
             facets={facets}
             filters={[
                 {
@@ -55,7 +55,7 @@ describe('MetadataViewActiveFilters', () => {
     it('should render range filters properly', () => {
         const view = 'Sample';
         const facets = mockFacets(view);
-        let wrapper = shallow(<MetadataViewActiveFilters
+        let wrapper = shallow(<MetadataViewActiveFacetFilters
             facets={facets}
             filters={[
                 {
@@ -74,7 +74,7 @@ describe('MetadataViewActiveFilters', () => {
         expect(activeFilterValues.first().prop('label')).toBe('0 - 3');
 
         // partial filter: min only
-        wrapper = shallow(<MetadataViewActiveFilters
+        wrapper = shallow(<MetadataViewActiveFacetFilters
             facets={facets}
             filters={[
                 {
@@ -88,7 +88,7 @@ describe('MetadataViewActiveFilters', () => {
         expect(activeFilterValues.first().prop('label')).toBe('from: 2');
 
         // partial filter: max only
-        wrapper = shallow(<MetadataViewActiveFilters
+        wrapper = shallow(<MetadataViewActiveFacetFilters
             facets={facets}
             filters={[
                 {
