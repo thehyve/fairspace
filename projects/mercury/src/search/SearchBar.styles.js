@@ -2,8 +2,6 @@ import {fade} from '@material-ui/core/styles/colorManipulator';
 
 const styles = theme => ({
     search: {
-        'position': 'relative',
-        'flex': 0.8,
         'borderRadius': theme.shape.borderRadius,
         'backgroundColor': fade(theme.palette.common.white, 0.15),
         '&:hover': {
@@ -16,24 +14,20 @@ const styles = theme => ({
             width: 'auto',
         },
     },
+    adornedEnd: {
+        paddingRight: theme.spacing(1)
+    },
     searchIcon: {
-        width: theme.spacing(9),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        padding: 0
     },
     inputRoot: {
         color: 'inherit',
-        width: '100%',
     },
     inputInput: {
         paddingTop: theme.spacing(1),
         paddingRight: theme.spacing(1),
         paddingBottom: theme.spacing(1),
-        paddingLeft: theme.spacing(10),
+        paddingLeft: theme.spacing(1),
         transition: theme.transitions.create('width'),
         width: '100%',
     },

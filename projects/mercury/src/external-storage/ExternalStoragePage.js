@@ -64,6 +64,12 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
         return <MessageDisplay message={`Storage "${match.params.storage}" not found.`} />;
     }
 
+    const getSearchPlaceholder = () => {
+        const openedPath = getRelativePath(location.pathname, storage.name);
+        const parentFolderName = openedPath ? openedPath.substring(openedPath.lastIndexOf('/') + 1) : null;
+        return parentFolderName ? `Search in ${parentFolderName}` : `Search in all folders`;
+    };
+
     return (
         <ExternalStorageBreadcrumbsContextProvider storage={storage}>
             <BreadCrumbs additionalSegments={breadcrumbSegments} />
@@ -71,9 +77,9 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
                 <Grid container justify="space-between" spacing={1}>
                     <Grid item className={classes.topBar}>
                         <SearchBar
-                            placeholder="Search"
-                            disableUnderline={false}
+                            placeholder={getSearchPlaceholder()}
                             onSearchChange={handleSearch}
+                            width="50%"
                         />
                     </Grid>
                 </Grid>
