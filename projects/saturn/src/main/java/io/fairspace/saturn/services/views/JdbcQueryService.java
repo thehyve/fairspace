@@ -11,6 +11,7 @@ import java.net.*;
 import java.nio.charset.*;
 import java.sql.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.*;
 
 import static java.lang.Integer.*;
@@ -58,7 +59,7 @@ public class JdbcQueryService implements QueryService {
                         .totalPages(count / size + ((count % size > 0) ? 1 : 0));
             }
             return pageBuilder.build();
-        } catch(SQLTimeoutException e) {
+        } catch (SQLTimeoutException e) {
             return ViewPageDTO.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)
@@ -79,9 +80,31 @@ public class JdbcQueryService implements QueryService {
         }
     }
 
-// FRANK document:    Run the Gradle build with a command line argument --warning-mode=all
+
     public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
-        return null;
+
+        Function<ResultSet, ArrayList<SearchResultDTO>> f = this::GetSearchResult;
+
+        var query = "";
+
+        return viewStoreReader.retrieveViewTableRows(query, this::GetSearchResult);
+    }
+
+    private ArrayList<SearchResultDTO> GetSearchResult(ResultSet resultSet) {
+        var rows = new ArrayList<SearchResultDTO>();
+
+        while (resultSet.next()) {
+            var row = SearchResultDTO.builder()
+                    .id(resultSet.getString("id"))
+                    .label(resultSet.getString("label"))
+                    .type(resultSet.getString("type"))
+                    .comment(resultSet.getString("comment"))
+                    .build();
+
+            rows.add(row);
+        }
+
+        return rows;
     }
 
     @SneakyThrows
@@ -94,7 +117,7 @@ public class JdbcQueryService implements QueryService {
         }
         var collections = transactions.calculateRead(m ->
                 rootSubject.getChildren().stream()
-                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
+                        .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
                         .collect(Collectors.toList()));
         if (filters.stream()
                 .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {

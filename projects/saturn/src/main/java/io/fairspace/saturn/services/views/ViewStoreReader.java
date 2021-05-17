@@ -8,6 +8,7 @@ import java.sql.*;
 import java.time.*;
 import java.util.*;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
@@ -335,6 +336,26 @@ public class ViewStoreReader {
             for (var q : valueSetQueries.values()) {
                 q.close();
             }
+            log.info("Complete process took {} ms", new Date().getTime() - start);
+        }
+    }
+
+    public <T> T retrieveViewTableRows(String queryString, Function<ResultSet, T> getResultDto) throws SQLException {
+        var start = new Date().getTime();
+        var query = connection.prepareStatement(queryString);
+
+        try (query) {
+            query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
+            var result = query.executeQuery();
+
+            var mid = new Date().getTime();
+
+            var resultDto = getResultDto.apply(result);
+
+            log.info("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
+
+            return resultDto;
+        } finally {
             log.info("Complete process took {} ms", new Date().getTime() - start);
         }
     }

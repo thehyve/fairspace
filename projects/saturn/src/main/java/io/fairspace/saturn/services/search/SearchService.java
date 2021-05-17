@@ -53,7 +53,6 @@ public class SearchService {
     }
 
     public SearchResultsDTO getFileSearchResults(FileSearchRequest request) {
-//        ArrayList<SearchResultDTO> queryResult = null;
 
         var queryResult = queryService.getFilesByText(request);
 

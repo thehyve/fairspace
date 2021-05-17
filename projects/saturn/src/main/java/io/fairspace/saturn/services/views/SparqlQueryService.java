@@ -219,6 +219,10 @@ public class SparqlQueryService implements QueryService {
         return new ValueDTO(label, resource.getURI());
     }
 
+    public void Test() {
+
+    }
+
     private Query getQuery(CountRequest request) {
         var view = getView(request.getView());
 
