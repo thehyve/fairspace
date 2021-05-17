@@ -30,7 +30,9 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
     const updateFilters = (filterCandidates: MetadataViewFilter[]) => {
         setFilters([
             ...filters.filter(f => !filterCandidates.some(u => u.field === f.field)),
-            ...filterCandidates.filter(f => (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max))
+            ...filterCandidates.filter(f => (
+                (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max) || f.prefix != null
+            ))
         ]);
     };
 

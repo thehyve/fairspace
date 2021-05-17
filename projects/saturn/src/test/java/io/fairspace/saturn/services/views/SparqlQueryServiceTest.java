@@ -199,6 +199,22 @@ public class SparqlQueryServiceTest {
     }
 
     @Test
+    public void testRetrieveSamplePageUsingPrefixFilter() {
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        request.setFilters(List.of(
+                ViewFilter.builder()
+                        .field("Sample")
+                        .prefix("sample b")
+                        .build()
+        ));
+        var page = queryService.retrieveViewPage(request);
+        assertEquals(1, page.getRows().size());
+    }
+
+    @Test
     public void testRetrieveSamplePageForAccessibleCollection() {
         var request = new ViewRequest();
         request.setView("Sample");

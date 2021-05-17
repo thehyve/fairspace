@@ -1,7 +1,10 @@
-import {OutlinedInput} from "@material-ui/core";
-import React from "react";
+import {TextField} from "@material-ui/core";
+import React, {useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {fade} from "@material-ui/core/styles/colorManipulator";
+import IconButton from "@material-ui/core/IconButton";
+import SearchIcon from "@material-ui/icons/Search";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 const useStyles = makeStyles((theme) => ({
     search: {
@@ -32,28 +35,78 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: theme.spacing(1),
         transition: theme.transitions.create('width'),
         width: '100%'
+    },
+    adornedEnd: {
+        paddingRight: theme.spacing(1)
+    },
+    adornedEndNoPadding: {
+        paddingRight: 0
+    },
+    adornedEndIcon: {
+        padding: 0
     }
 }));
 
-const ColumnFilterInput = ({setFilterValue, filterValue, placeholder}) => {
+const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useApplyButton = false}) => {
     const classes = useStyles();
+    const [value, setValue] = useState(filterValue);
 
-    const handleChange = (event) => {
-        setFilterValue(event.target.value);
+    const handleChange = () => {
+        setFilterValue(value.trim());
     };
+
+    const handleKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            if (useApplyButton) {
+                handleChange(e.target.value);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (!useApplyButton) {
+            handleChange(value);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value]);
+
+    useEffect(() => {
+        setValue(filterValue);
+    }, [filterValue]);
 
     return (
         <div className={classes.search}>
-            <OutlinedInput
+            <TextField
                 id="filter"
                 placeholder={placeholder}
                 classes={{
                     root: classes.inputRoot,
-                    input: classes.inputInput,
                 }}
-                value={filterValue}
-                onChange={handleChange}
+                value={value}
+                onChange={event => setValue(event.target.value)}
+                onKeyDown={handleKeyDown}
+                variant="outlined"
                 type="search"
+                InputProps={{
+                    classes: {
+                        input: classes.inputInput,
+                        adornedEnd: useApplyButton ? classes.adornedEnd : classes.adornedEndNoPadding
+                    },
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            {useApplyButton && (
+                                <IconButton
+                                    onClick={handleChange}
+                                    className={classes.adornedEndIcon}
+                                    title="Apply filter"
+                                    color="primary"
+                                >
+                                    <SearchIcon size="small" />
+                                </IconButton>
+                            )}
+                        </InputAdornment>
+                    )
+                }}
             />
         </div>
     );

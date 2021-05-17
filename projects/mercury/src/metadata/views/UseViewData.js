@@ -18,9 +18,10 @@ export type ViewData = {
     loadingCount: boolean;
     error: any;
     refreshDataOnly: boolean;
+    textFiltersObject: Object
 };
 
-const useViewData = (view: string, filters: MetadataViewFilter[], locationContext: string, rowsPerPage: number): ViewData => {
+const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
     const [data, setData] = useState({});
     const [count, setCount] = useState({});
     const [loading, setLoading] = useState(true);
@@ -34,10 +35,17 @@ const useViewData = (view: string, filters: MetadataViewFilter[], locationContex
         values: [locationContext]
     };
 
+    const textFilters: MetadataViewFilter[] = Object.entries(textFiltersObject)
+        .filter(([field, value]) => field !== null && value !== "")
+        .map(([field, value]) => ({
+            field,
+            prefix: value
+        }));
+
     const allFilters = !locationContext ? (
-        [...filters]
+        [...filters, ...textFilters]
     ) : (
-        [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter]
+        [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter, ...textFilters]
     );
 
     const fetchCount = () => {
@@ -107,7 +115,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], locationContex
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters, locationContext]);
+    useEffect(() => {refreshAll();}, [view, filters, locationContext, textFiltersObject]);
 
     return {
         data,
