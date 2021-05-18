@@ -6,6 +6,7 @@ import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.milton.resource.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.*;
 import java.nio.charset.*;
@@ -16,6 +17,7 @@ import java.util.stream.*;
 
 import static java.lang.Integer.*;
 
+@Slf4j
 public class JdbcQueryService implements QueryService {
     @Getter
     private final ViewStoreReader viewStoreReader;
@@ -80,30 +82,35 @@ public class JdbcQueryService implements QueryService {
         }
     }
 
-
     public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+        var query = """
+                SELECT id, label, type FROM public.resource
+                WHERE label like '%{searchTerm}%'
+                ORDER BY id ASC LIMIT 1000""";
 
-        Function<ResultSet, ArrayList<SearchResultDTO>> f = this::GetSearchResult;
+        query = query.replaceAll("\\{searchTerm}", request.getQuery());
 
-        var query = "";
-
-        return viewStoreReader.retrieveViewTableRows(query, this::GetSearchResult);
+        try {
+            return viewStoreReader.retrieveViewTableRows(query, this::GetSearchResult);
+        } catch (SQLException e) {
+            log.error("Error connecting to the view database.", e);
+            throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
+        }
     }
 
+    @SneakyThrows
     private ArrayList<SearchResultDTO> GetSearchResult(ResultSet resultSet) {
         var rows = new ArrayList<SearchResultDTO>();
-
         while (resultSet.next()) {
             var row = SearchResultDTO.builder()
                     .id(resultSet.getString("id"))
                     .label(resultSet.getString("label"))
                     .type(resultSet.getString("type"))
-                    .comment(resultSet.getString("comment"))
+                    .comment("")
                     .build();
 
             rows.add(row);
         }
-
         return rows;
     }
 
