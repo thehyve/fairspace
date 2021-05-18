@@ -22,7 +22,6 @@ import styles from './FileList.styles';
 import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
-import {isListOnlyFile} from "./fileUtils";
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
 
 const FileList = ({
@@ -197,7 +196,7 @@ const FileList = ({
                                         {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                     </TableCell>
                                     <TableCell>
-                                        {isListOnlyFile(file) ? <span>{file.basename}</span> : (
+                                        {file.type === 'directory' ? (
                                             <Link
                                                 onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
                                                 color="inherit"
@@ -207,6 +206,8 @@ const FileList = ({
                                             >
                                                 {file.basename}
                                             </Link>
+                                        ) : (
+                                            <span>{file.basename}</span>
                                         )}
                                     </TableCell>
                                     <TableCell align="right">

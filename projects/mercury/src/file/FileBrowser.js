@@ -4,7 +4,6 @@ import {useDropzone} from "react-dropzone";
 import {Typography, withStyles} from "@material-ui/core";
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
-import {LocalFileAPI} from "./FileAPI";
 import {useFiles} from "./UseFiles";
 import LoadingInlay from "../common/components/LoadingInlay";
 import MessageDisplay from "../common/components/MessageDisplay";
@@ -92,7 +91,6 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         history
     } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
-    const isReadingEnabled = openedCollection && openedCollection.canRead && !isOpenedPathDeleted;
 
     const existingFileNames = files ? files.filter(file => file.type === "file").map(file => file.basename) : [];
     const existingFolderNames = files ? files.filter(file => file.type === "directory").map(file => file.basename) : [];
@@ -223,8 +221,6 @@ export const FileBrowser = (props: FileBrowserProperties) => {
              *      It requires react-router-dom version>=6 to be released.
              */
             history.push(`/collections${encodeURI(encodePath(path.filename))}`);
-        } else if (isReadingEnabled) {
-            LocalFileAPI.open(path.filename);
         }
     };
 
