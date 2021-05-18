@@ -37,7 +37,7 @@ const baseColumns = {
     },
     viewMode: {
         valueExtractor: 'accessMode',
-        label: 'View mode'
+        label: 'Public access'
     },
     access: {
         valueExtractor: 'access',
