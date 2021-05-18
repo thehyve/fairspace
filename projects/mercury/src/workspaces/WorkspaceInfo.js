@@ -59,6 +59,7 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
                         loading={linkedDataLoading}
                         properties={properties}
                         values={values}
+                        typeIri={typeInfo.typeIri}
                     />
                 )}
             </Paper>

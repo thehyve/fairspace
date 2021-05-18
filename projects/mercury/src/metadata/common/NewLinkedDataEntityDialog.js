@@ -89,6 +89,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
             <LinkedDataEntityForm
                 key="form"
                 id={formId}
+                typeIri={type}
                 onSubmit={createEntity}
                 properties={extendedProperties}
                 values={valuesWithUpdates}

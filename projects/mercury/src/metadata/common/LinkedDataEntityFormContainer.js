@@ -105,6 +105,7 @@ const LinkedDataEntityFormContainer = ({
                             onAdd={addValue}
                             onChange={updateValue}
                             onDelete={deleteValue}
+                            typeIri={typeInfo.typeIri}
                         />
                     </Grid>
                     {footer && <Grid item>{footer}</Grid>}
