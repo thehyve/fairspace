@@ -17,7 +17,6 @@ fairspace:
   features: []
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
-  storages: []
 
 # Specific settings for Saturn subchart
 saturn:
@@ -27,6 +26,9 @@ saturn:
       storageClass: expandable
     database:
       size: 60Gi
+      storageClass: expandable
+    audit:
+      size: 10Gi
       storageClass: expandable
   resources:
     limits:
@@ -41,3 +43,13 @@ saturn:
       type: pd-standard
       provisioner: kubernetes.io/gce-pd
       allowVolumeExpansion: true
+
+pluto:
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  externalsDomains:
+    - https://fairspace.ci.fairway.app
+  backends:
+    storageRoutes:

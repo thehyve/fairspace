@@ -13,7 +13,7 @@ describe('FileAPI', () => {
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith(
                 '/src',
-                {details: true, withCredentials: true, data: '<propfind><allprop /></propfind>'}
+                {details: true, headers: {"X-Requested-With": "XMLHttpRequest"}, withCredentials: true, data: '<propfind><allprop /></propfind>'}
             );
         });
 
@@ -30,7 +30,7 @@ describe('FileAPI', () => {
                 '/src',
                 {
                     details: true,
-                    headers: {"Show-Deleted": "on"},
+                    headers: {"Show-Deleted": "on", "X-Requested-With": "XMLHttpRequest"},
                     withCredentials: true,
                     data: "<propfind><allprop /></propfind>"
                 }
@@ -119,7 +119,7 @@ describe('FileAPI', () => {
             await LocalFileAPI.deleteMultiple(['/src']);
 
             expect(deleteFile).toHaveBeenCalledTimes(1);
-            expect(deleteFile).toHaveBeenCalledWith('/src', {withCredentials: true});
+            expect(deleteFile).toHaveBeenCalledWith('/src', {headers: {"X-Requested-With": "XMLHttpRequest"}, withCredentials: true});
         });
 
         it('deletes files permanently', async () => {
@@ -129,7 +129,7 @@ describe('FileAPI', () => {
 
             expect(deleteFile).toHaveBeenCalledTimes(1);
             expect(deleteFile).toHaveBeenCalledWith(
-                '/src', {headers: {"Show-Deleted": "on"}, withCredentials: true}
+                '/src', {headers: {"X-Requested-With": "XMLHttpRequest", "Show-Deleted": "on"}, withCredentials: true}
             );
         });
     });
@@ -198,7 +198,8 @@ describe('FileAPI', () => {
                 data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
-                    Version: 4
+                    "Version": 4,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
@@ -206,7 +207,8 @@ describe('FileAPI', () => {
                 data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
-                    Version: 3
+                    "Version": 3,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
@@ -214,7 +216,8 @@ describe('FileAPI', () => {
                 data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
-                    Version: 2
+                    "Version": 2,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
@@ -222,7 +225,8 @@ describe('FileAPI', () => {
                 data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
-                    Version: 1
+                    "Version": 1,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             });
         });
@@ -241,7 +245,8 @@ describe('FileAPI', () => {
                 data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
-                    Version: 296
+                    "Version": 296,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
@@ -249,7 +254,8 @@ describe('FileAPI', () => {
                 data: "<propfind><allprop /></propfind>",
                 details: true,
                 headers: {
-                    Version: 287
+                    "Version": 287,
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             });
         });

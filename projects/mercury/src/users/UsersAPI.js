@@ -26,9 +26,6 @@ export const getUser = (): User => axios.get('/api/users/current')
     .then((user: User) => ({...user, iri: createMetadataIri(user.id)}))
     .catch(handleHttpError("Failure when retrieving user's information"));
 
-export const logoutUser = () => axios.post('/api/users/current/logout')
-    .catch(handleHttpError("Failure when logging out user"));
-
 export const getUsers = (): User[] => axios.get('/api/users/', requestOptions)
     .then(extractJsonData)
     .then((users: User[]) => users.map(user => ({iri: createMetadataIri(user.id), ...user})))

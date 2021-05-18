@@ -4,6 +4,7 @@ import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
 import type {AccessLevel} from "../../collections/CollectionAPI";
 
 export type ValueType = 'Identifier' | 'Text' | 'Number' | 'Date' | 'Term' | 'Set' | 'TermSet';
+export const TextualValueTypes: ValueType[] = ['Identifier', 'Text', 'Set'];
 
 export type MetadataViewFilter = {
     field: string;

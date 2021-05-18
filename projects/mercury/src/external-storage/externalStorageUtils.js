@@ -4,11 +4,11 @@ import * as consts from "../constants";
 import {PATH_SEPARATOR} from "../constants";
 
 export type ExternalStorage = {
-    url: string,
+    path: string,
     name: string,
     label: string,
     rootDirectoryIri: string,
-    searchUrl?: string
+    searchPath?: string
 }
 
 export const getExternalStoragePathPrefix = (storageName: string) => (
@@ -20,7 +20,7 @@ export const getExternalStorageAbsolutePath = (path: string, storageName: string
 );
 
 export const getRelativePath = (absolutePath: string, storageName: string) => (
-    absolutePath.replace(getExternalStoragePathPrefix(storageName), '')
+    absolutePath.replace(/\/$/, "").replace(getExternalStoragePathPrefix(storageName), '')
 );
 
 export const getPathToDisplay = (path: string) => {

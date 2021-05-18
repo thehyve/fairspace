@@ -1,5 +1,5 @@
 # Application's port
-port: 8080
+port: 8090
 publicUrl: http://localhost:8080
 jena:
   # Base IRI for all metadata entities
@@ -49,7 +49,6 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
-storages:
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000

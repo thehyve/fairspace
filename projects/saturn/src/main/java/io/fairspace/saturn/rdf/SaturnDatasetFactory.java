@@ -4,7 +4,7 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.Dataset;
@@ -16,7 +16,7 @@ import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
-@Slf4j
+@Log4j2
 public class SaturnDatasetFactory {
     /**
      * Returns a dataset to work with.

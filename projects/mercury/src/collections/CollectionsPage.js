@@ -1,10 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {Switch, withStyles} from "@material-ui/core";
-import {Link} from "react-router-dom";
+import {Divider, Switch, withStyles} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import {Search} from "@material-ui/icons";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
@@ -22,7 +20,6 @@ import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import UserContext from "../users/UserContext";
 import {handleTextSearchRedirect} from "../search/searchUtils";
 
-
 type CollectionsPageProperties = {
     history: History;
     showBreadCrumbs: boolean;
@@ -32,7 +29,7 @@ type CollectionsPageProperties = {
 }
 
 const CollectionsPage = (props: CollectionsPageProperties) => {
-    const {showBreadCrumbs = true, history, workspaceIri, documentTitle, classes} = props;
+    const {showBreadCrumbs = false, history, workspaceIri, documentTitle, classes} = props;
 
     usePageTitleUpdater(documentTitle || "Collections");
 
@@ -89,25 +86,25 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
                     <Grid container>
                         <Grid item xs={6}>
                             <SearchBar
-                                placeholder="Search"
-                                disableUnderline={false}
+                                placeholder="Search in all collections"
                                 onSearchChange={handleSearch}
                                 disabled={collectionsLoading || collectionsError || !collections || collections.length === 0}
                             />
                         </Grid>
-                        <Grid item xs={4} className={classes.metadataSearchButton}>
-                            {showMetadataSearchButton && (
-                                <Link to={getMetadataViewsPath(RESOURCES_VIEW)}>
+                        {showMetadataSearchButton && (
+                            <Grid item container xs={4} justify="flex-end">
+                                <Grid item>
                                     <Button
                                         variant="text"
                                         color="primary"
-                                        startIcon={<Search />}
+                                        href={getMetadataViewsPath(RESOURCES_VIEW)}
                                     >
                                         Collection metadata search
                                     </Button>
-                                </Link>
-                            )}
-                        </Grid>
+                                </Grid>
+                                <Grid item><Divider orientation="vertical" /></Grid>
+                            </Grid>
+                        )}
                         <Grid item xs={2} className={classes.topBarSwitch}>
                             <FormControlLabel
                                 control={(

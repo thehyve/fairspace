@@ -32,13 +32,15 @@ spec:
           image: "{{ .Values.saturn.image.image }}:{{ .Values.saturn.image.tag }}"
           imagePullPolicy: {{ .Values.saturn.image.pullPolicy }}
           ports:
-            - containerPort: 8080
+            - containerPort: 8090
           env:
             - name: KEYCLOAK_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-oauth-client"
                   key: clientSecret
+            - name: AUDIT_LOG_ROOT
+              value: /data/saturn/audit
           volumeMounts:
             - name: config-volume
               mountPath: /opt/config
@@ -46,10 +48,12 @@ spec:
               mountPath: /data/saturn/db
             - name: files
               mountPath: /data/saturn/files
+            - name: audit
+              mountPath: /data/saturn/audit
           livenessProbe:
             httpGet:
               path:  /api/health/
-              port: 8080
+              port: 8090
             initialDelaySeconds: {{ .Values.saturn.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.saturn.livenessProbe.periodSeconds }}
             successThreshold: {{ .Values.saturn.livenessProbe.successThreshold }}
@@ -57,7 +61,7 @@ spec:
           readinessProbe:
             httpGet:
               path:  /api/health/
-              port: 8080
+              port: 8090
             periodSeconds: {{ .Values.saturn.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.saturn.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
@@ -77,4 +81,6 @@ spec:
       - name: files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-saturn-files
-
+      - name: audit
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-saturn-audit

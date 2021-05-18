@@ -13,9 +13,6 @@ const styles = () => ({
         textAlign: "right",
         whiteSpace: "nowrap"
     },
-    metadataSearchButton: {
-        textAlign: "center"
-    },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT

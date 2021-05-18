@@ -45,10 +45,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     usePageTitleUpdater("Metadata");
 
-    const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
-    const {toggle, selected} = useSingleSelection();
-    const [filterCandidates, setFilterCandidates] = useState([]);
     const {collections} = useContext(CollectionsContext);
+    const {toggle, selected} = useSingleSelection();
+
+    const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
+    const [filterCandidates, setFilterCandidates] = useState([]);
 
     const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
 

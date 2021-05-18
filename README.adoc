@@ -432,6 +432,8 @@ and advanced data loss prevention features such as versioning and undeletion.
 | `Version`
 | Specify a version number to request properties of a specific file version.
   The first version has number `1`. If not specific, the current version is returned.
+| `With-Metadata-Links`
+| Include list of metadata entities that are linked to the resource, when value `true`.
 2+| _Request body_:
 2+| To include also custom Fairspace attributes in the response, like the collection description, send the following request body: +
   ``<propfind><allprop /></propfind>``
@@ -1249,6 +1251,22 @@ Search endpoint used for text search on labels or comments.
 | ``parentIRI``
 | string
 | IRI of the parent directory or collection to limit the search area.
+
+3+| _Response_
+3+| Object in JSON format, with `query` and `results` properties.
+Results contain a list of files (and/or directories, collections) with the following properties:
+| ``id``
+| string
+| File (or directory) identifier (IRI).
+| ``label``
+| string
+| File (or directory) name.
+| ``type``
+| string
+| Type of the resource as defined in the vocabulary, e.g. "https://fairspace.nl/ontology#File", "https://fairspace.nl/ontology#Directory"
+| ``comment``
+| string
+| File (or directory) description. Optional.
 |===
 
 .Example text search (curl)
@@ -1262,6 +1280,31 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
   "parentIRI":"http://localhost:8080/api/webdav/dir1"
 }' \
 'http://localhost:8080/api/search/files'
+----
+====
+
+.Example text search response
+[%collapsible]
+====
+[source, json]
+----
+{
+  "results": [
+    {
+      "id": "https://fairspace.example.com/api/webdav/col1/test",
+      "label": "test",
+      "type": "https://fairspace.nl/ontology#File",
+      "comment": "Description of the test file from col1."
+    },
+    {
+      "id": "https://fairspace.example.com/api/webdav/col2/new_test_folder",
+      "label": "new_test_folder",
+      "type": "https://fairspace.nl/ontology#Directory",
+      "comment": null
+    }
+  ],
+  "query": "test"
+}
 ----
 ====
 
@@ -1585,7 +1628,107 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/storages/'
 ----
 ====
 
+=== External file system integration
 
+As Fairspace supports the <<WebDAV>> protocol, it can be configured to connect to external data storages that implement a WebDAV interface.
+An overview of external files is integrated into Fairspace user interface. Currently, a read-only interaction is supported.
+Users can browse through the external file system, read the data and metadata (e.g. creation date, description).
+Files from the external storage will be also made available for analysis in Jupyter Hub.
+
+
+==== Access policy
+
+Access policies differ between systems. To avoid inconsistencies, permissions validation and management are expected to be under
+control of the external storage system. Each storage component is responsible for its own policy and needs to perform
+the required checks to ensure that users only get to see the data they are supposed to see.
+
+It is assumed that a user requesting files from a storage using WebDAV has at least "read" access to all the files included in the WebDAV response.
+Access can be further limited by using a custom `access` property. If a value of this property on a resource is set to "List",
+the resource's metadata will be readable, but it will not be possible to read the resource's content.
+
+Another assumption is that the Fairspace client can authenticate in the external storage via the same Keycloak and the same realm
+as configured for Fairspace, so that the same bearer token can be used for all storages.
+See the <<Authentication>> section for more information.
+
+==== API specification and supported parameters
+
+A subset of default WebDAV properties is used and displayed as a resource metadata in the Fairspace user interface.
+These properties are presented in the table below.
+
+|===
+| WebDAV property | Description
+
+| ``DAV:creationdate``
+| Creation date
+| ``DAV:iscollection``
+| Flag determining whether a resource is a file or directory
+| ``DAV:getlastmodified``
+| Last modification date
+| ``DAV:getcontentlength``
+| Size of the file (0 for directories)
+|===
+
+There is also a set of custom Fairspace properties, some of which are required to be returned from the WebDAV request.
+
+|===
+| WebDAV property | Description
+
+| ``iri``
+| IRI of the resource. Required.
+| ``createdBy``
+| Id of a user that created the resource.
+| ``comment``
+| Resource description.
+| ``access``
+| By default, users are granted ``Read`` access to the resource returned from WebDAV endpoint.
+Other supported value is ``List``, which means that users can see the resource and its metadata, but cannot read its content.
+| ``metadataEntities``
+| List of IRIs in a form of comma-separated string. IRIs represent all metadata entities linked to the resource.
+If the IRI matches a metadata entity stored in Fairspace, such an entity will be displayed in the user interface.
+|===
+
+It is also supported to specify any other custom property in the WebDAV response body, as WebDAV responses are easily extendable.
+All these properties (if not specifically marked as excluded in Fairspace), will be displayed in the user interface
+in a form of key-value pairs.
+
+==== Text search in external storages
+
+Text based search on external file system can be enabled in the Fairpsace user interface,
+if the external system exposes a search endpoint, following the specification from the <<Text search>> section.
+To enable finding files based on name or description, ``searchUrl`` has to be specified in the storage configuration.
+
+==== Configuration
+
+Multiple external storages can be configured simultaneously. A list of configuration parameters is presented below.
+
+|===
+| Parameter | Description
+
+| ``name``
+| Unique name of the storage.
+| ``label``
+| String to be used as a display name of the storage.
+| ``url``
+| WebDAV endpoint to connect to.
+| ``searchUrl``
+| Optional search endpoint URL. If specified, a text based search on file name or description will be enabled in the user interface.
+| ``rootDirectoryIri``
+| Optional IRI of the root directory. If not specified, ``url`` will be used as a default root directory.
+|===
+
+Sample configuration of storages in YAML format:
+[source, bash]
+----
+storages:
+- name: exStorage1
+  label: "External storage 1"
+  url: https://exstorage1/api/webdav
+  searchUrl: https://exstorage1/api/search/
+  rootDirectoryIri: http://ex1/api/webdav/
+- name: exStorage2
+  label: "External storage 2"
+  url: https://exstorage2/api/webdav
+----
 
 
 == Structure and terminology
@@ -2169,7 +2312,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 # List available fairspace chart versions
 ~/bin/helm/helm fetch fairspace/fairspace --versions
 # Fetch the fairspace chart
-~/bin/helm/helm fetch fairspace/fairspace --version 0.7.8
+~/bin/helm/helm fetch fairspace/fairspace --version 0.7.11
 ----
 
 ===== Deploy Fairspace
@@ -2182,7 +2325,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace/fairspace --version 0.7.8 --name fairspace-new --namespace=fairspace-new \
+~/bin/helm/helm install fairspace/fairspace --version 0.7.11 --name fairspace-new --namespace=fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2192,7 +2335,7 @@ value with ``--set-file``.
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.8.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.11.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.

@@ -11,17 +11,17 @@ const styles = {
     tableBody: {
         display: 'block',
         maxHeight: 150,
-        overflow: 'auto'
+        overflow: 'auto',
+        width: '100%'
     },
     tableRow: {
         display: 'block',
         height: 49,
         width: '100%'
     },
-    iconCellButton: {
-        paddingTop: 0,
-        paddingBottom: 0,
-        textAlign: "right"
+    iconCell: {
+        padding: '0 0 0 8px',
+        textAlign: 'right'
     },
     emptyPermissions: {
         margin: 15,
@@ -46,23 +46,17 @@ export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermis
                 {
                     selectedPermissions.map(p => (
                         <TableRow key={p.iri} className={classes.tableRow}>
-                            <TableCell width={25}>
+                            <TableCell width={25} className={classes.iconCell}>
                                 <Widgets />
                             </TableCell>
-                            <TableCell
-                                width={345}
-                                data-testid="permission"
-                            >
+                            <TableCell width="100%" data-testid="permission">
                                 <Tooltip title={p.name} placement="left-start" arrow>
                                     <Typography variant="body2" noWrap style={{width: '100%'}}>
                                         {p.name}
                                     </Typography>
                                 </Tooltip>
                             </TableCell>
-                            <TableCell width={5}>
-                                <span>&nbsp;</span>
-                            </TableCell>
-                            <TableCell width={40} className={classes.iconCellButton}>
+                            <TableCell width={40} className={classes.iconCell} align="right">
                                 {canManage && (
                                     <IconButton
                                         onClick={() => handleDeleteSelectedPermission(p)}

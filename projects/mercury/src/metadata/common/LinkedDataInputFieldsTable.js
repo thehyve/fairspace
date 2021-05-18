@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import LinkedDataValuesTable from "./LinkedDataValuesTable";
+import LinkedDataValuesList from "./LinkedDataValuesList";
 
 const LinkedDataInputFieldsTable = (
     {property, values, validationErrors, onAdd, onChange, onDelete, canEdit,
@@ -24,10 +24,10 @@ const LinkedDataInputFieldsTable = (
     };
 
     return (
-        <LinkedDataValuesTable
+        <LinkedDataValuesList
             onAdd={onAdd}
             onDelete={onDelete}
-            columnDefinitions={[columnDefinition]}
+            columnDefinition={columnDefinition}
             property={property}
             values={values}
             showHeader={false}

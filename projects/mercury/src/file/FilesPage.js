@@ -1,12 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@material-ui/core/Grid';
-import {Link, withRouter} from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import queryString from "query-string";
 
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {Switch, withStyles} from "@material-ui/core";
+import {Divider, Switch, withStyles} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import {Search} from "@material-ui/icons";
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
 import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";
@@ -124,24 +123,24 @@ export const FilesPage = (props: FilesPageProperties) => {
                     <Grid container>
                         <Grid item xs={6}>
                             <SearchBar
-                                placeholder="Search"
-                                disableUnderline={false}
+                                placeholder={`Search in ${openedPath.substring(openedPath.lastIndexOf('/') + 1)}`}
                                 onSearchChange={handleTextSearch}
                             />
                         </Grid>
-                        <Grid item xs={4} className={classes.metadataSearchButton}>
-                            {showMetadataSearchButton && (
-                                <Link to={getMetadataSearchRedirect()}>
+                        {showMetadataSearchButton && (
+                            <Grid item container xs={4} justify="flex-end">
+                                <Grid item>
                                     <Button
                                         variant="text"
                                         color="primary"
-                                        startIcon={<Search />}
+                                        href={getMetadataSearchRedirect(RESOURCES_VIEW)}
                                     >
                                         Collection metadata search
                                     </Button>
-                                </Link>
-                            )}
-                        </Grid>
+                                </Grid>
+                                <Grid item><Divider orientation="vertical" /></Grid>
+                            </Grid>
+                        )}
                         <Grid item xs={2} className={classes.topBarSwitch}>
                             <FormControlLabel
                                 control={(

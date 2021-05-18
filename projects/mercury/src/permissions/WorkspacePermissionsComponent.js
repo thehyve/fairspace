@@ -19,7 +19,7 @@ const styles = {
         borderRadius: 6,
         marginTop: 16,
         display: 'table',
-        width: 600
+        width: '99%'
     },
     header: {
         backgroundColor: "#f5f5f5",

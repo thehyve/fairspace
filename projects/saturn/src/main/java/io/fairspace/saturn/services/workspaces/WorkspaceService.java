@@ -6,7 +6,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -24,7 +24,7 @@ import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static java.util.stream.Collectors.toList;
 
-@Slf4j
+@Log4j2
 public class WorkspaceService {
     private final Transactions tx;
     private final UserService userService;

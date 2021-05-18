@@ -2,7 +2,7 @@ import React from 'react';
 import {shallow} from "enzyme";
 
 import {STRING_URI} from "../../../constants";
-import LinkedDataValuesTable from "../LinkedDataValuesTable";
+import LinkedDataValuesTable from "../LinkedDataValuesList";
 import {LinkedDataRelationTable} from "../LinkedDataRelationTable";
 
 const defaultProperty = {
