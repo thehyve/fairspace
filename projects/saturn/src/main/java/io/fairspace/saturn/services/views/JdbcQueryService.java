@@ -48,7 +48,7 @@ public class JdbcQueryService implements QueryService {
         }
         var collections = transactions.calculateRead(m ->
                 rootSubject.getChildren().stream()
-                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
+                        .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
                         .collect(Collectors.toList()));
         if (filters.stream()
                 .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
@@ -94,7 +94,7 @@ public class JdbcQueryService implements QueryService {
                         .totalPages(count / size + ((count % size > 0) ? 1 : 0));
             }
             return pageBuilder.build();
-        } catch(SQLTimeoutException e) {
+        } catch (SQLTimeoutException e) {
             return ViewPageDTO.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)
@@ -145,36 +145,5 @@ public class JdbcQueryService implements QueryService {
             rows.add(row);
         }
         return rows;
-    }
-
-    @SneakyThrows
-    protected void applyCollectionsFilterIfRequired(String view, List<ViewFilter> filters) {
-        boolean collectionsFilterRequired = view.equalsIgnoreCase("Resource") ||
-                filters.stream().anyMatch(
-                        filter -> filter.getField().split("_")[0].equalsIgnoreCase("Resource"));
-        if (!collectionsFilterRequired) {
-            return;
-        }
-        var collections = transactions.calculateRead(m ->
-                rootSubject.getChildren().stream()
-                        .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
-                        .collect(Collectors.toList()));
-        if (filters.stream()
-                .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
-            // Update existing filters in place
-            filters.stream()
-                    .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
-                    .forEach(filter -> filter.setValues(
-                            filter.values.stream()
-                                    .map(value -> getCollectionName(value.toString()))
-                                    .filter(collections::contains).collect(Collectors.toList()))
-                    );
-            return;
-        }
-        // Add collection name filter
-        filters.add(ViewFilter.builder()
-                .field("Resource_collection")
-                .values(collections)
-                .build());
     }
 }
