@@ -16,9 +16,12 @@ fairspace:
   services:
     JupyterHub: https://jupyter.fairspace.ci.fairway.app/user/${username}/lab
   storages:
-    - name: fairspace-test
+    test:
+      name: test
       label: "Test storage"
       url: https://fairspace.test.fairway.app/api/webdav
+      search-url: https://fairspace.test.fairway.app/api/search/files
+      root-directory-iri: https://fairspace.test.fairway.app/api/webdav
 
 # Specific settings for Saturn subchart
 saturn:
@@ -28,6 +31,9 @@ saturn:
       storageClass: expandable
     database:
       size: 60Gi
+      storageClass: expandable
+    audit:
+      size: 10Gi
       storageClass: expandable
   resources:
     limits:
@@ -44,3 +50,20 @@ saturn:
     type: pd-standard
     provisioner: kubernetes.io/gce-pd
     allowVolumeExpansion: true
+
+# Specific settings for Pluto subchart
+pluto:
+  image:
+    pullPolicy: Always
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:
+    storageRoutes:
+      storage-test-webdav:
+        path: /api/storages/test/webdav/**
+        url: ${pluto.storages.test.url}
+      storage-test-search:
+        path: /api/storages/test/search/files/**
+        url: ${pluto.storages.test.search-url}

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ioinformarics.oss.jackson.module.jsonld.JsonldModule;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import spark.ExceptionHandler;
 
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
-@Slf4j
+@Log4j2
 public class ErrorHelper {
     private static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JsonldModule());

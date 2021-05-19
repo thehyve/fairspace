@@ -4,7 +4,7 @@ import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.views.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.eclipse.jetty.server.session.SessionHandler;
 
@@ -14,7 +14,7 @@ import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
-@Slf4j
+@Log4j2
 public class App {
     public static final String API_PREFIX = "/api";
 

@@ -1,0 +1,26 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-saturn-audit
+  labels:
+    app: saturn
+    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.saturn.persistence.audit.annotations }}
+  annotations:
+{{ toYaml .Values.saturn.persistence.audit.annotations | indent 4 }}
+{{- end }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.saturn.persistence.audit.size | quote }}
+{{- if .Values.saturn.persistence.audit.storageClass }}
+  {{- if (eq "-" .Values.saturn.persistence.audit.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.saturn.persistence.audit.storageClass | quote }}
+  {{- end }}
+{{- end }}

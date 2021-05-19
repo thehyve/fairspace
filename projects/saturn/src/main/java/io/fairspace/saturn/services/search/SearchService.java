@@ -3,7 +3,7 @@ package io.fairspace.saturn.services.search;
 import io.fairspace.saturn.services.views.QueryService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import io.fairspace.saturn.vocabulary.FS;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
@@ -15,7 +15,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.system.Txn.calculateRead;
 
-@Slf4j
+@Log4j2
 public class SearchService {
     private static final Query RESOURCE_BY_TEXT_QUERY = QueryFactory.create(String.format("""
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

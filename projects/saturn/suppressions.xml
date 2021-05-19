@@ -3,7 +3,4 @@
     <suppress>
         <cpe>cpe:/a:netty:netty:4.1.32</cpe>
     </suppress>
-    <suppress>
-        <cpe>cpe:/a:elasticsearch:elasticsearch:6.8.6</cpe>
-    </suppress>
 </suppressions>

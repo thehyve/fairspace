@@ -77,19 +77,13 @@ Scheme to access fairspace components (http or https)
 {{- end -}}
 {{- end -}}
 
-
-{{/* Saturn external hostname */}}
-{{- define "saturn.hostname" -}}
+{{/* Pluto external hostname */}}
+{{- define "pluto.hostname" -}}
 {{- .Values.fairspace.ingress.domain -}}
 {{- end -}}
-
-
+{{- define "pluto.fullname" -}}
+{{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
+{{- end -}}
 {{- define "fairspace.url" -}}
-{{ template "fairspace.scheme" . }}://{{ template "saturn.hostname" . }}
+{{ template "fairspace.scheme" . }}://{{ template "pluto.hostname" . }}
 {{- end -}}
-
-{{- define "saturn.fullname" -}}
-{{- .Values.saturn.nameOverride | default (printf "%s-saturn" .Release.Name) -}}
-{{- end -}}
-
-

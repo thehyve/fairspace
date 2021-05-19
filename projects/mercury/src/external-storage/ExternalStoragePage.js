@@ -17,8 +17,6 @@ import type {ExternalStorage} from "./externalStorageUtils";
 import {getRelativePath} from "./externalStorageUtils";
 import type {Match} from "../types";
 import ExternalStorageInformationDrawer from "./ExternalStorageInformationDrawer";
-import UsersContext from "../users/UsersContext";
-import type {User} from "../users/UsersAPI";
 import {handleTextSearchRedirect} from "../search/searchUtils";
 import {joinPathsAvoidEmpty} from "../file/fileUtils";
 import {PATH_SEPARATOR} from "../constants";
@@ -31,18 +29,17 @@ type ContextualExternalStoragePageProperties = {
 
 type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
     externalStorages: ExternalStorage[];
-    users: User[];
     history: History;
 }
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
-    const {externalStorages, match, location, users, history, classes = {}} = props;
+    const {externalStorages, match, location, history, classes = {}} = props;
 
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
     const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
-    const isSearchAvailable = storage && !!storage.searchUrl;
+    const isSearchAvailable = storage && !!storage.searchPath;
     const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
 
     usePageTitleUpdater(storage ? storage.label : "External storage");
@@ -97,7 +94,6 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
                         path={getRelativePath(location.pathname, storage.name)}
                         selected={selection.selected}
                         storage={storage}
-                        users={users}
                     />
                 </Grid>
             </Grid>
@@ -107,14 +103,12 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
 
 const ContextualExternalStoragePage = (props: ContextualExternalStoragePageProperties) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
-    const {users} = useContext(UsersContext);
     const history = useHistory();
 
     return (
         <ExternalStoragePage
             {...props}
             externalStorages={externalStorages}
-            users={users}
             history={history}
         />
     );

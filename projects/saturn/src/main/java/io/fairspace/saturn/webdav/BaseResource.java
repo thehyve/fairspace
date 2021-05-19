@@ -14,6 +14,8 @@ import io.milton.resource.*;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -22,13 +24,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
+import static io.fairspace.saturn.vocabulary.Vocabularies.USER_VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
+import static io.fairspace.saturn.webdav.WebDAVServlet.includeMetadataLinks;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
@@ -285,6 +290,26 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     @Property
     public Date getDateDeleted() {
         return parseDate(subject, FS.dateDeleted);
+    }
+
+    @Property
+    public String getMetadataLinks() {
+        if(includeMetadataLinks()) {
+            return String.join(",", metadataLinks());
+        }
+        return null;
+    }
+
+    public Set<String> metadataLinks() {
+        var userVocabularyPaths = USER_VOCABULARY.listStatements()
+                .filterKeep(stmt -> stmt.getObject().isResource() && stmt.getPredicate().getURI().equals(SHACL.path.getURI()))
+                .mapWith(stmt -> stmt.getObject().asResource().getURI())
+                .toSet();
+        return subject.listProperties()
+                .filterKeep(stmt -> stmt.getObject().isResource() && userVocabularyPaths.contains(stmt.getPredicate().getURI()))
+                .mapWith(Statement::getResource)
+                .mapWith(Resource::getURI)
+                .toSet();
     }
 
     @Property

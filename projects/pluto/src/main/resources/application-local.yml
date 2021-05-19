@@ -11,8 +11,8 @@ pluto:
     test:
        name: test
        label: Test
-       url: /api/storages/test/webdav
-       search-url: /api/storages/test/search
+       url: http://localhost:8090/api/webdav
+       search-url: http://localhost:8090/api/search/files
        root-directory-iri: http://localhost:8080/api/webdav
 
 zuul:
@@ -22,10 +22,10 @@ zuul:
     # paths they listen to
     storage-test-webdav:
       path: /api/storages/test/webdav/**
-      url: http://localhost:8090/api/webdav
+      url: ${pluto.storages.test.url}
     storage-test-search:
       path: /api/storages/test/search/files/**
-      url: http://localhost:8090/api/search/files
+      url: ${pluto.storages.test.search-url}
     saturn:
       path: /api/**
       url: http://localhost:8090/api/

@@ -7,6 +7,8 @@ import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.milton.resource.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import io.milton.resource.*;
+import lombok.*;
 
 import java.net.*;
 import java.nio.charset.*;
@@ -36,6 +38,37 @@ public class JdbcQueryService implements QueryService {
         return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
     }
 
+    @SneakyThrows
+    protected void applyCollectionsFilterIfRequired(String view, List<ViewFilter> filters) {
+        boolean collectionsFilterRequired = view.equalsIgnoreCase("Resource") ||
+                filters.stream().anyMatch(
+                        filter -> filter.getField().split("_")[0].equalsIgnoreCase("Resource"));
+        if (!collectionsFilterRequired) {
+            return;
+        }
+        var collections = transactions.calculateRead(m ->
+                rootSubject.getChildren().stream()
+                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
+                        .collect(Collectors.toList()));
+        if (filters.stream()
+                .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
+            // Update existing filters in place
+            filters.stream()
+                    .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
+                    .forEach(filter -> filter.setValues(
+                            filter.values.stream()
+                                    .map(value -> getCollectionName(value.toString()))
+                                    .filter(collections::contains).collect(Collectors.toList()))
+                    );
+            return;
+        }
+        // Add collection name filter
+        filters.add(ViewFilter.builder()
+                .field("Resource_collection")
+                .values(collections)
+                .build());
+    }
+
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
         int page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         int size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
@@ -61,7 +94,7 @@ public class JdbcQueryService implements QueryService {
                         .totalPages(count / size + ((count % size > 0) ? 1 : 0));
             }
             return pageBuilder.build();
-        } catch (SQLTimeoutException e) {
+        } catch(SQLTimeoutException e) {
             return ViewPageDTO.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)

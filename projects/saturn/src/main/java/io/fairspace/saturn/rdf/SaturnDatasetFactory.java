@@ -3,7 +3,7 @@ package io.fairspace.saturn.rdf;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.views.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.Dataset;
@@ -15,7 +15,7 @@ import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
 import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
-@Slf4j
+@Log4j2
 public class SaturnDatasetFactory {
     /**
      * Returns a dataset to work with.

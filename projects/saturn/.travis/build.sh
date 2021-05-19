@@ -1,15 +1,7 @@
 #!/bin/bash
 set -e
 
-root="$PWD"
-
-echo 'Building the front-end'
-cd "$root/mercury"
-$BUILD_SCRIPTS_DIR/yarn/tag.sh || exit 1
-$BUILD_SCRIPTS_DIR/yarn/build.sh || exit 1
-
 echo 'Building the back-end'
-cd "$root/saturn"
 $BUILD_SCRIPTS_DIR/gradle/tag.sh
 ./gradlew clean build test jacocoTestReport $GRADLE_OPTIONS
 
@@ -31,21 +23,5 @@ if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then
   ./gradlew dependencyCheckAnalyze
 fi
 
-test -e build/mercury && rm -r build/mercury
-cp -r ../mercury/build build/mercury
-
 echo 'Building the saturn image'
 $BUILD_SCRIPTS_DIR/docker/build.sh
-
-echo 'Building the gateway'
-cd "$root/pluto"
-$BUILD_SCRIPTS_DIR/gradle/tag.sh
-./gradlew clean assemble jacocoTestReport $GRADLE_OPTIONS
-
-test -e build/mercury && rm -r build/mercury
-cp -r ../mercury/build build/mercury
-
-echo 'Building the pluto image'
-$BUILD_SCRIPTS_DIR/docker/build.sh
-
-cd "$root"

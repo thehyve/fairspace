@@ -5,7 +5,9 @@ import {
     CardContent,
     CardHeader,
     Collapse,
-    FormControl, FormGroup, FormLabel,
+    FormControl,
+    FormGroup,
+    FormLabel,
     IconButton,
     List,
     ListItem,
@@ -17,15 +19,13 @@ import {ExpandMore, FolderOpenOutlined, InsertDriveFileOutlined} from '@material
 import {makeStyles} from '@material-ui/core/styles';
 import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
 import {getPathHierarchy} from "../file/fileUtils";
-import {getPathToDisplay} from "./externalStorageUtils";
-import useAsync from "../common/hooks/UseAsync";
-import MessageDisplay from "../common/components/MessageDisplay";
-import {formatDate} from "../common/utils/genericUtils";
-import {getDisplayName} from "../users/userUtils";
-import type {User} from "../users/UsersAPI";
 import type {ExternalStorage} from "./externalStorageUtils";
+import {getPathToDisplay} from "./externalStorageUtils";
+import MessageDisplay from "../common/components/MessageDisplay";
 import FileAPI from "../file/FileAPI";
-
+import LinkedDataLink from "../metadata/common/LinkedDataLink";
+import type {DisplayProperty} from "./UseExternalStorageMetadata";
+import useExternalStorageMetadata from "./UseExternalStorageMetadata";
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
@@ -42,98 +42,82 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-type DisplayProperty = {
-    label: string;
-    value: any;
-}
-
-const ignoredProperties = [
-    'filename', 'basename', 'displayname', 'name', 'type', 'iri', 'ownedBy', 'ownedByName',
-    'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'accessMode', 'isreadonly',
-    'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
-    'status', 'getcreated', 'getcontenttype', 'etag', 'getetag', 'iscollection',
-    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size'
-];
-
-const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, DisplayProperty> => {
-    const defaultProperties = {
-        comment: {
-            label: "Description",
-            value: data.comment
-        },
-        lastmod: {
-            label: "Last modification date",
-            value: formatDate(data.lastmod)
-        },
-        createdBy: {
-            label: "Created by",
-            value: getDisplayName(users.find(u => u.iri === data.createdBy))
-        },
-        creationdate: {
-            label: "Creation date",
-            value: formatDate(data.creationdate)
-        }
-    };
-    const propertiesToDisplay = Object.keys(data).filter(
-        k => !ignoredProperties.includes(k) && !Object.keys(defaultProperties).includes(k)
-    );
-    const otherProperties = {};
-    propertiesToDisplay.forEach(p => {otherProperties[p] = {value: data[p]};});
-
-    return {...defaultProperties, ...otherProperties};
-};
-
-const renderProperty = (data: Map<string, DisplayProperty>, key: string) => (
-    data[key] && data[key].value != null && data[key].value !== "" && (
-        <ListItem disableGutters key={key}>
-            <FormControl>
-                <FormLabel>{data[key].label || key}</FormLabel>
-                <FormGroup>
-                    <ListItemText primary={data[key].value} />
-                </FormGroup>
-            </FormControl>
-        </ListItem>
-    )
-);
-
 type ExternalMetadataCardProperties = {
     title: string;
     forceExpand: boolean;
     path: string;
     storage: ExternalStorage;
-    users: User[];
 }
 
 const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
-    const {title, forceExpand, path, storage, users} = props;
-    const fileAPI = new FileAPI(storage.url);
-    const {data = {}, error, loading} = useAsync(() => fileAPI.stat(path), [path]);
-    const {iscollection} = data;
-    const filePropertiesToDisplay = mapFileProperties(data, users);
+    const {title, forceExpand, path, storage} = props;
+    const classes = useStyles();
+
+    const fileAPI = new FileAPI(storage.path);
+    const {
+        metadata = {}, loading, error, linkedMetadataEntities = {}, linkedMetadataEntitiesLoading
+    } = useExternalStorageMetadata(path, fileAPI);
+
+    const isDirectory = metadata.iscollection && (metadata.iscollection.toLowerCase() === 'true');
+    const avatar = isDirectory ? <FolderOpenOutlined /> : <InsertDriveFileOutlined />;
 
     const [expandedManually, setExpandedManually] = useState(null); // true | false | null
     const expanded = (expandedManually != null) ? expandedManually : forceExpand;
     const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
-    const classes = useStyles();
-    const isDirectory = iscollection && (iscollection.toLowerCase() === 'true');
-    const avatar = isDirectory ? <FolderOpenOutlined /> : <InsertDriveFileOutlined />;
 
-    let body;
-    if (error) {
-        body = <MessageDisplay message="An error occurred while fetching metadata." />;
-    } else if (loading) {
-        body = <div>Loading...</div>;
-    } else if (!data) {
-        body = <div>No metadata found</div>;
-    } else {
-        body = (
+    const renderProperty = (data: Map<string, DisplayProperty>, key: string) => (
+        data[key] && data[key].value != null && data[key].value !== "" && (
+            <ListItem disableGutters key={key}>
+                <FormControl>
+                    <FormLabel>{data[key].label || key}</FormLabel>
+                    <FormGroup>
+                        <ListItemText primary={data[key].value} />
+                    </FormGroup>
+                </FormControl>
+            </ListItem>
+        )
+    );
+
+    const renderLinkProperties = (data: Map<string, DisplayProperty>, key: string) => (
+        data[key] && data[key].length > 0 && (
+            <ListItem disableGutters key={key}>
+                <FormControl>
+                    <FormLabel>{key}</FormLabel>
+                    <FormGroup>
+                        {data[key].map(value => (
+                            <LinkedDataLink uri={value.id} key={value.id}>
+                                <ListItemText primary={value.label} />
+                            </LinkedDataLink>
+                        ))}
+                    </FormGroup>
+                </FormControl>
+            </ListItem>
+        )
+    );
+
+    const renderCardContent = () => {
+        if (error) {
+            return <MessageDisplay message="An error occurred while fetching metadata." />;
+        }
+        if (loading) {
+            return <div>Loading...</div>;
+        }
+        if (!metadata || Object.keys(metadata).length === 0) {
+            return <div>No metadata found</div>;
+        }
+        return (
             <List>
-                {Object.keys(filePropertiesToDisplay).map(k => (
-                    renderProperty(filePropertiesToDisplay, k)
+                {Object.keys(metadata).map(k => (
+                    renderProperty(metadata, k)
                 ))}
+                {linkedMetadataEntitiesLoading ? (
+                    <div>Loading linked metadata entities...</div>
+                ) : (
+                    Object.keys(linkedMetadataEntities).map(k => (renderLinkProperties(linkedMetadataEntities, k)))
+                )}
             </List>
         );
-    }
+    };
 
     return (
         <Card className={classes.card}>
@@ -155,7 +139,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    {body}
+                    {renderCardContent()}
                 </CardContent>
             </Collapse>
         </Card>
@@ -167,11 +151,10 @@ type ExternalStorageInformationDrawerProperties = {
     path: string,
     selected: string,
     storage: ExternalStorage,
-    users: User[]
 }
 
 export const ExternalStorageInformationDrawer = (props: ExternalStorageInformationDrawerProperties) => {
-    const {atLeastSingleRootFileExists, path, selected, storage, users} = props;
+    const {atLeastSingleRootFileExists, path, selected, storage} = props;
 
     const paths = getPathHierarchy(path, false);
     if (selected) {
@@ -192,7 +175,6 @@ export const ExternalStorageInformationDrawer = (props: ExternalStorageInformati
                 forceExpand={index === paths.length - 1}
                 path={p}
                 storage={storage}
-                users={users}
             />
         ))
     );

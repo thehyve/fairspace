@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.vocabulary.FS;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.*;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateRead;
 
-@Slf4j
+@Log4j2
 public class ViewService {
     private static final Query VALUES_QUERY = QueryFactory.create(String.format("""
             PREFIX fs: <%s>

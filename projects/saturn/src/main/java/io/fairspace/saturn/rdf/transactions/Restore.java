@@ -1,11 +1,11 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.system.Txn;
 
-@Slf4j
+@Log4j2
 public class Restore {
     public static void restore(DatasetGraph dsg, TransactionLog txnLog) {
         var logSize = txnLog.size();

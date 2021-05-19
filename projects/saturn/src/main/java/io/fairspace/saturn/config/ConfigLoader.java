@@ -1,11 +1,11 @@
 package io.fairspace.saturn.config;
 
-import lombok.extern.slf4j.*;
+import lombok.extern.log4j.*;
 
 import java.io.File;
 import java.io.IOException;
 
-@Slf4j
+@Log4j2
 public class ConfigLoader {
     // TODO: Get rid of it. Use contexts instead
     public static final Config CONFIG = loadConfig();

@@ -46,9 +46,6 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
-    public List<Storage> storages = new LinkedList<>();
-
     public Search search = new Search();
 
     public static class Jena {
