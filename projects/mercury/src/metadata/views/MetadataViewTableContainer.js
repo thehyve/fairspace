@@ -31,6 +31,8 @@ import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
     filters: MetadataViewFilter[];
+    textFiltersObject: Object;
+    setTextFiltersObject: () => {};
     toggleRow: () => {};
     view: string;
     collections: Collection[];
@@ -73,8 +75,8 @@ const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_C
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
+    const {textFiltersObject, setTextFiltersObject} = props;
 
-    const [textFiltersObject, setTextFiltersObject] = useState({});
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,

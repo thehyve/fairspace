@@ -51,7 +51,7 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
             >
                 <Grid container item xs>
                     <Grid key="activeTextFilters" item>
-                        <Typography variant="overline" component="span">Active text filters: </Typography>
+                        <Typography variant="overline" component="span" color="textSecondary">Active text filters: </Typography>
                     </Grid>
                     {Object.entries(textFiltersObject).filter(([, value]) => value !== null && value !== "")
                         .map(([field, value]) => (

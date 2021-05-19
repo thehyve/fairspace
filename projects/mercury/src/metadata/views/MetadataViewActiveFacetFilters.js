@@ -4,13 +4,14 @@ import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import {ofRangeValueType} from "./metadataViewUtils";
 import {formatDate, isNonEmptyValue} from "../../common/utils/genericUtils";
 
-type MetadataViewActiveFiltersProperties = {
+type MetadataViewActiveFacetFiltersProperties = {
     facets: MetadataViewFacet[];
     filters: MetadataViewFilter[];
+    setFilters: () => {};
 };
 
-export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProperties) => {
-    const {facets, filters} = props;
+export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFiltersProperties) => {
+    const {facets, filters, setFilters} = props;
 
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
@@ -37,6 +38,11 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
                     key={`chip-${facet.name}`}
                     label={label}
                     style={{marginLeft: 5}}
+                    onDelete={() => {
+                        const index = filters.indexOf(filter);
+                        delete filters[index];
+                        setFilters(filters);
+                    }}
                 />
             );
         }
@@ -49,6 +55,11 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
                         key={value.value}
                         label={value.label}
                         style={{marginLeft: 5}}
+                        onDelete={() => {
+                            const index = filters.indexOf(filter);
+                            filters[index].values = [...filter.values.filter(v => v !== value.value)];
+                            setFilters(filters);
+                        }}
                     />
                 )
             );
@@ -85,4 +96,4 @@ export const MetadataViewActiveFilters = (props: MetadataViewActiveFiltersProper
     );
 };
 
-export default MetadataViewActiveFilters;
+export default MetadataViewActiveFacetFilters;
