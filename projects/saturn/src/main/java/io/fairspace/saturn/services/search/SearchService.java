@@ -25,7 +25,7 @@ public class SearchService {
                 OPTIONAL { ?id rdfs:comment ?comment }
                 FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }
                 FILTER (regex(?label, ?regexQuery, "i") || regex(?comment, ?regexQuery, "i"))
-            }
+            } ORDER BY ?label
             LIMIT 20
             """, FS.NS));
 
@@ -39,7 +39,7 @@ public class SearchService {
                 ?id rdfs:label ?label; a ?type .
                 OPTIONAL { ?id rdfs:comment ?comment }
                 FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }
-            }
+            } ORDER BY ?label
             """, FS.NS));
 
     private final Dataset ds;
