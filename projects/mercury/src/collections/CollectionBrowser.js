@@ -106,7 +106,6 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
     );
 };
 
-
 const ContextualCollectionBrowser = (props: ContextualCollectionBrowserProperties) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);

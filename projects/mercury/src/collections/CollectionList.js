@@ -96,10 +96,11 @@ const CollectionList = ({
     if (!collections || collections.length === 0) {
         return (
             <MessageDisplay
-                message="Please create a collection."
+                message="No collections available"
                 variant="h6"
                 withIcon={false}
                 isError={false}
+                noWrap={false}
                 messageColor="textSecondary"
             />
         );

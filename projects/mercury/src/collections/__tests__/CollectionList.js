@@ -9,7 +9,7 @@ import CollectionList from "../CollectionList";
 describe('CollectionList', () => {
     it('shows warning message when no collections available', () => {
         const {getByText} = render(<CollectionList />);
-        expect(getByText(/Please create a collection/i)).toBeInTheDocument();
+        expect(getByText(/No collections available/i)).toBeInTheDocument();
     });
 
     it('renders correct header and values columns', () => {
