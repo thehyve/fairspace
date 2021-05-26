@@ -1,8 +1,23 @@
 import React, {useContext, useState} from 'react';
-import {Avatar, Button, Card, CardContent, CardMedia, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper} from '@material-ui/core';
+import {
+    Avatar,
+    Button,
+    Card,
+    CardContent,
+    CardMedia,
+    ClickAwayListener,
+    Grow,
+    ListItemIcon, ListItemText,
+    MenuItem,
+    MenuList,
+    Paper,
+    Popper
+} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
+import Divider from '@material-ui/core/Divider';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";
@@ -33,6 +48,9 @@ const styles = {
         boxShadow: "none",
         borderRadius: 0
             },
+    logout: {
+        width: 50
+        },
     menu: {
         paddingTop: 0
     }
@@ -106,7 +124,6 @@ const UserMenu = ({classes}) => {
                                         className={classes.cardRoot}>
                                            <CardMedia
                                                className={classes.cardCover}
-                                               // image="/public/images/contact.png"
                                            >
                                         </CardMedia>
                                         <CardContent
@@ -115,8 +132,13 @@ const UserMenu = ({classes}) => {
                                             {userEmailMenuItem()}
                                         </CardContent>
                                     </Card>
-                                    {/*<Divider />*/}
-                                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                                    <Divider/>
+                                    <MenuItem onClick={handleLogout}>
+                                        <ListItemIcon>
+                                            <ExitToAppIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Logout" />
+                                    </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
                         </Paper>
