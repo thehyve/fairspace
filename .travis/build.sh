@@ -2,6 +2,9 @@
 DIR=$(dirname $0)
 PROJECT=$1
 
+# List of (sub)projects that are served by $PROJECT
+SUBPROJECTS=$2
+
 # Set variables for use in build scripts
 export APPNAME=$(basename $PROJECT)
 export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
@@ -16,8 +19,16 @@ else
   COMMIT_TRIGGER=$TRAVIS_COMMIT_RANGE
 fi
 
-# Only execute build if something has changed within the project
-if $DIR/build-condition.sh $COMMIT_TRIGGER $PROJECT/..; then
+check_all() {
+    for subproject in "$@"; do
+        if $DIR/build-condition.sh $COMMIT_TRIGGER $subproject/..; then
+            return 1
+        fi
+    done
+}
+
+# Only execute build if something has changed within the project or any of the subprojects
+if ($DIR/build-condition.sh $COMMIT_TRIGGER $PROJECT/..) || ([[ ! -z "$SUBPROJECTS" ]] && (check_all ${SUBPROJECTS[@]})); then
     echo "Building $APPNAME...";
     cd $PROJECT
 
