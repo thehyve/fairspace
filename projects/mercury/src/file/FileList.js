@@ -1,7 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {
     Checkbox,
-    Grid,
     Link,
     Paper,
     Table,
@@ -12,7 +11,6 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    Typography,
     withStyles
 } from "@material-ui/core";
 import {FolderOpen, NoteOutlined} from "@material-ui/icons";
@@ -23,6 +21,7 @@ import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtil
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
+import MessageDisplay from "../common/components/MessageDisplay";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
@@ -84,11 +83,14 @@ const FileList = ({
 
     if (!files || files.length === 0 || files[0] === null) {
         return (
-            <Grid container>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle1" style={{textAlign: 'center'}}>Empty directory</Typography>
-                </Grid>
-            </Grid>
+            <MessageDisplay
+                message="Empty directory"
+                variant="h6"
+                withIcon={false}
+                isError={false}
+                noWrap={false}
+                messageColor="textSecondary"
+            />
         );
     }
 
