@@ -1,8 +1,23 @@
 import React, {useContext, useState} from 'react';
-import {Avatar, Button, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper} from '@material-ui/core';
+import {
+    Avatar,
+    Button,
+    Card,
+    CardContent,
+    CardMedia,
+    ClickAwayListener,
+    Grow,
+    ListItemIcon, ListItemText,
+    MenuItem,
+    MenuList,
+    Paper,
+    Popper
+} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
+import Divider from '@material-ui/core/Divider';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";
@@ -16,6 +31,28 @@ const styles = {
     },
     avatar: {
         margin: 10,
+    },
+    cardCover: {
+        display: 'flex',
+        flexDirection: 'column',
+        // height: 50,
+        width: 50,
+    },
+    cardContent: {
+        backgroundColor: 'white'
+    },
+    cardRoot: {
+        display: 'flex',
+        backgroundColor: 'lightGray',
+        border: "none",
+        boxShadow: "none",
+        borderRadius: 0
+    },
+    logout: {
+        width: 50
+    },
+    menu: {
+        paddingTop: 0
     }
 };
 
@@ -45,6 +82,20 @@ const UserMenu = ({classes}) => {
         return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
+    const userNameMenuItem = () => {
+        if(!currentUser.username)
+            return null;
+
+        return <MenuItem disabled>{currentUser.username}</MenuItem>
+    }
+
+    const userEmailMenuItem = () => {
+        if(!currentUser.email)
+            return null;
+
+        return <MenuItem disabled>{currentUser.email}</MenuItem>
+    }
+
     return (
         <>
             <Button
@@ -68,10 +119,26 @@ const UserMenu = ({classes}) => {
                     >
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
-                                <MenuList>
-                                    <MenuItem onClick={handleClose} disabled>Profile</MenuItem>
-                                    <MenuItem onClick={handleClose} disabled>My account</MenuItem>
-                                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                                <MenuList className={classes.menu}>
+                                    <Card
+                                        className={classes.cardRoot}>
+                                        <CardMedia
+                                            className={classes.cardCover}
+                                        >
+                                        </CardMedia>
+                                        <CardContent
+                                            className={classes.cardContent}>
+                                            {userNameMenuItem()}
+                                            {userEmailMenuItem()}
+                                        </CardContent>
+                                    </Card>
+                                    <Divider/>
+                                    <MenuItem onClick={handleLogout}>
+                                        <ListItemIcon>
+                                            <ExitToAppIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Logout" />
+                                    </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
                         </Paper>
