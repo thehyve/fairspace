@@ -243,16 +243,16 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     </MenuItem>
                 ))}
                 {/*show not available modes as disabled menu item, so user knows it exists*/}
-                {accessModes.map(mode => {
-                    if (collection.availableAccessModes.indexOf(mode) < 0) {
-                        return <MenuItem key={mode} value={mode} disabled>
-                            <ListItemText
-                                primary={camelCaseToWords(mode)}
-                                secondary={descriptionForAccessMode(mode)}
-                            />
-                        </MenuItem>;
-                    }
-                })}
+                {accessModes.filter(mode => collection.availableAccessModes.indexOf(mode) < 0)
+                    .map(unavailableMode => (
+                            <MenuItem key={unavailableMode} value={unavailableMode} disabled>
+                                <ListItemText
+                                    primary={camelCaseToWords(unavailableMode)}
+                                    secondary={descriptionForAccessMode(unavailableMode)}
+                                />
+                            </MenuItem>
+                    ))
+                }
             </Select>
         </FormControl>
     );
