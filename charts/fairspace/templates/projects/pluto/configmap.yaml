@@ -19,6 +19,10 @@ data:
       storages:
 {{ toYaml .Values.fairspace.storages | indent 8 }}
 
+    logging:
+      level:
+        root: {{ .Values.pluto.logLevel }}
+
     server:
       error:
         whitelabel:
