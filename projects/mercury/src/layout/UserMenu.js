@@ -2,12 +2,9 @@ import React, {useContext, useState} from 'react';
 import {
     Avatar,
     Button,
-    Card,
-    CardContent,
-    CardMedia,
     ClickAwayListener,
     Grow,
-    ListItemIcon, ListItemText,
+    ListItem, ListItemIcon, ListItemText,
     MenuItem,
     MenuList,
     Paper,
@@ -32,27 +29,14 @@ const styles = {
     avatar: {
         margin: 10,
     },
-    cardCover: {
-        display: 'flex',
-        flexDirection: 'column',
-        // height: 50,
-        width: 50,
-    },
-    cardContent: {
-        backgroundColor: 'white'
-    },
-    cardRoot: {
-        display: 'flex',
-        backgroundColor: 'lightGray',
-        border: "none",
-        boxShadow: "none",
-        borderRadius: 0
-    },
     logout: {
         width: 50
     },
     menu: {
         paddingTop: 0
+    },
+    userMenu: {
+        borderLeft: '8px solid #999'
     }
 };
 
@@ -82,20 +66,6 @@ const UserMenu = ({classes}) => {
         return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
-    const userNameMenuItem = () => {
-        if(!currentUser.username)
-            return null;
-
-        return <MenuItem disabled>{currentUser.username}</MenuItem>
-    }
-
-    const userEmailMenuItem = () => {
-        if(!currentUser.email)
-            return null;
-
-        return <MenuItem disabled>{currentUser.email}</MenuItem>
-    }
-
     return (
         <>
             <Button
@@ -120,18 +90,13 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
-                                    <Card
-                                        className={classes.cardRoot}>
-                                        <CardMedia
-                                            className={classes.cardCover}
-                                        >
-                                        </CardMedia>
-                                        <CardContent
-                                            className={classes.cardContent}>
-                                            {userNameMenuItem()}
-                                            {userEmailMenuItem()}
-                                        </CardContent>
-                                    </Card>
+                                    <ListItem className={classes.userMenu}>
+                                        <ListItemText
+                                            primary={currentUser.username}
+                                            secondary={currentUser.email}
+                                            style={{cursor: 'default'}}
+                                        />
+                                    </ListItem>
                                     <Divider/>
                                     <MenuItem onClick={handleLogout}>
                                         <ListItemIcon>
