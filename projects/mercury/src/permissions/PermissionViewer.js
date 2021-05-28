@@ -7,14 +7,28 @@ import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
 import WorkspacePermissionsComponent from "./WorkspacePermissionsComponent";
 import {sortPermissions} from "../collections/collectionUtils";
+import {Box, FormHelperText, FormLabel} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 
-export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorkspaces,
-    collaboratingUsers, currentUser, setPermission, error, loading}) => {
+const useStyles = makeStyles({
+    root: {
+        marginLeft: 20,
+        marginBottom: 5
+    },
+});
+
+export const PermissionViewer = ({
+                                     collection, workspaceUsers, collaboratingWorkspaces,
+                                     collaboratingUsers, currentUser, setPermission, error, loading
+                                 }) => {
+
+    const classes = useStyles();
+
     if (error) {
-        return (<MessageDisplay message="An error occurred loading permissions" />);
+        return (<MessageDisplay message="An error occurred loading permissions"/>);
     }
     if (loading) {
-        return (<LoadingInlay />);
+        return (<LoadingInlay/>);
     }
 
     const renderUserPermissionComponent = () => (
@@ -37,8 +51,15 @@ export const PermissionViewer = ({collection, workspaceUsers, collaboratingWorks
 
     return (
         <div>
-            {renderUserPermissionComponent()}
-            {renderWorkspacePermissionComponent()}
+            <FormLabel>Assigned Users</FormLabel>
+            <Box className={classes.root}>
+                {renderUserPermissionComponent()}
+                <FormHelperText>Members of the owner workspace can have modify rights, all others have read-only rights.</FormHelperText>
+            </Box>
+            <FormLabel>Assigned Workspaces</FormLabel>
+            <Box className={classes.root}>
+                {renderWorkspacePermissionComponent()}
+            </Box>
         </div>
     );
 };
