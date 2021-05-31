@@ -4,10 +4,13 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -21,9 +24,11 @@ import java.util.*;
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.sparql.expr.NodeValue.*;
 import static org.apache.jena.system.Txn.calculateRead;
 
@@ -79,6 +84,67 @@ public class SparqlQueryService implements QueryService {
                     .hasNext(hasNext)
                     .timeout(timeout)
                     .build();
+        });
+    }
+
+    public CountDTO count(CountRequest request) {
+        var query = getQuery(request);
+
+        log.debug("Querying the total number of matches: \n{}", query);
+
+        var execution = QueryExecutionFactory.create(query, ds);
+        execution.setTimeout(config.countRequestTimeout);
+
+        return calculateRead(ds, () -> {
+            long count = 0;
+            try (execution) {
+                for (var it = execution.execSelect(); it.hasNext(); it.next()) {
+                    count++;
+                }
+                return new CountDTO(count, false);
+            } catch (QueryCancelledException e) {
+                return new CountDTO(count, true);
+            }
+        });
+    }
+
+    public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+        var query = getSearchForFilesQuery(request.getParentIRI());
+        var binding = new QuerySolutionMap();
+        binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));
+        return getByQuery(query, binding);
+    }
+
+    public static String getQueryRegex(String query) {
+        return ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)"
+                + query.replaceAll("[^a-zA-Z0-9]", "\\\\$0"))
+                .replace("/\\/g", "\\\\");
+    }
+
+    private ArrayList<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding) {
+        log.debug("Executing query:\n{}", query);
+        var selectExecution = QueryExecutionFactory.create(query, ds, binding);
+        var results = new ArrayList<SearchResultDTO>();
+
+        return calculateRead(ds, () -> {
+            try (selectExecution) {
+                //noinspection NullableProblems
+                for (var row : (Iterable<QuerySolution>) selectExecution::execSelect) {
+                    var id = row.getResource("id").getURI();
+                    var label = row.getLiteral("label").getString();
+                    var type = ofNullable(row.getResource("type")).map(Resource::getURI).orElse(null);
+                    var comment = ofNullable(row.getLiteral("comment")).map(Literal::getString).orElse(null);
+
+                    var dto = SearchResultDTO.builder()
+                            .id(id)
+                            .label(label)
+                            .type(type)
+                            .comment(comment)
+                            .build();
+                    results.add(dto);
+                }
+            }
+            return results;
         });
     }
 
@@ -169,29 +235,29 @@ public class SparqlQueryService implements QueryService {
                     .filter(f -> f.field.equals("location"))
                     .findFirst()
                     .ifPresent(locationFilter -> {
-                filters.remove(locationFilter);
+                        filters.remove(locationFilter);
 
-                if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
-                    var fileLink = view.join.stream().filter(v -> v.view.equals(RESOURCES_VIEW))
-                            .findFirst().orElse(null);
-                    if (fileLink != null) {
-                        builder.append("FILTER EXISTS {\n")
-                                .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
-                                .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
-                                .append("))\n ?file <")
-                                .append(fileLink.on)
-                                .append("> ?")
-                                .append(view.name)
-                                .append(" . \n")
-                                .append("}\n");
-                    } else {
-                        builder.append("?").append(view.name)
-                                .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
-                                .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
-                                .append("))\n");
-                    }
-                }
-            });
+                        if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
+                            var fileLink = view.join.stream().filter(v -> v.view.equals(RESOURCES_VIEW))
+                                    .findFirst().orElse(null);
+                            if (fileLink != null) {
+                                builder.append("FILTER EXISTS {\n")
+                                        .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
+                                        .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                                        .append("))\n ?file <")
+                                        .append(fileLink.on)
+                                        .append("> ?")
+                                        .append(view.name)
+                                        .append(" . \n")
+                                        .append("}\n");
+                            } else {
+                                builder.append("?").append(view.name)
+                                        .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
+                                        .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                                        .append("))\n");
+                            }
+                        }
+                    });
 
             filters.stream()
                     .map(f -> f.field)
@@ -314,24 +380,25 @@ public class SparqlQueryService implements QueryService {
         };
     }
 
-    public CountDTO count(CountRequest request) {
-        var query = getQuery(request);
+    private Query getSearchForFilesQuery(String parentIRI) {
+        var builder = new StringBuilder("PREFIX fs: <")
+                .append(FS.NS)
+                .append(">\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\n")
+                .append("SELECT ?id ?label ?comment ?type\n")
+                .append("WHERE {\n");
 
-        log.debug("Querying the total number of matches: \n{}", query);
+        if (parentIRI != null && !parentIRI.trim().isEmpty()) {
+            builder.append("?id fs:belongsTo* <").append(parentIRI).append("> .\n");
+        }
 
-        var execution = QueryExecutionFactory.create(query, ds);
-        execution.setTimeout(config.countRequestTimeout);
+        builder.append("?id rdfs:label ?label ; a ?type .\n")
+                .append("FILTER (?type in (fs:File, fs:Directory, fs:Collection))\n")
+                .append("OPTIONAL { ?id rdfs:comment ?comment }\n")
+                .append("FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }\n")
+                .append("FILTER (regex(?label, ?regexQuery, \"i\") || regex(?comment, ?regexQuery, \"i\"))\n")
+                .append("}\nLIMIT 10000");
 
-        return calculateRead(ds, () -> {
-            long count = 0;
-            try (execution) {
-                for (var it = execution.execSelect(); it.hasNext(); it.next()) {
-                    count++;
-                }
-                return new CountDTO(count, false);
-            } catch (QueryCancelledException e) {
-                return new CountDTO(count, true);
-            }
-        });
+        return QueryFactory.create(builder.toString());
     }
+
 }

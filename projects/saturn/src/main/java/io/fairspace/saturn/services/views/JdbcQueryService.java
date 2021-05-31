@@ -2,6 +2,11 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.milton.resource.*;
+import lombok.*;
+import lombok.extern.log4j.Log4j2;
 import io.milton.resource.*;
 import lombok.*;
 
@@ -9,10 +14,12 @@ import java.net.*;
 import java.nio.charset.*;
 import java.sql.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.*;
 
 import static java.lang.Integer.*;
 
+@Log4j2
 public class JdbcQueryService implements QueryService {
     @Getter
     private final ViewStoreReader viewStoreReader;
@@ -41,7 +48,7 @@ public class JdbcQueryService implements QueryService {
         }
         var collections = transactions.calculateRead(m ->
                 rootSubject.getChildren().stream()
-                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
+                        .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
                         .collect(Collectors.toList()));
         if (filters.stream()
                 .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
@@ -87,7 +94,7 @@ public class JdbcQueryService implements QueryService {
                         .totalPages(count / size + ((count % size > 0) ? 1 : 0));
             }
             return pageBuilder.build();
-        } catch(SQLTimeoutException e) {
+        } catch (SQLTimeoutException e) {
             return ViewPageDTO.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)
@@ -106,5 +113,45 @@ public class JdbcQueryService implements QueryService {
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);
         }
+    }
+
+    public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+
+        try {
+
+//            Suggestion of Gijs:
+//            var filters = List.of(ViewFilter.builder().substring(request.getQuery()).build());
+            var filters = new ArrayList<ViewFilter>();
+            var viewResult = viewStoreReader.retrieveViewTableRows("Resource", filters, 0, 1000);
+//                    .stream()
+//                    .map(result -> SearchResultDTO.builder()/* set properties */.build()
+//            ).collect(Collectors.toList());
+
+            var query = """
+                SELECT id, label, type FROM public.resource
+                WHERE label like '%{searchTerm}%'
+                ORDER BY id ASC LIMIT 1000""";
+
+            return viewStoreReader.retrieveViewTableRows(query, this::GetSearchResult);
+        } catch (SQLException e) {
+            log.error("Error connecting to the view database.", e);
+            throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
+        }
+    }
+
+    @SneakyThrows
+    private ArrayList<SearchResultDTO> GetSearchResult(ResultSet resultSet) {
+        var rows = new ArrayList<SearchResultDTO>();
+        while (resultSet.next()) {
+            var row = SearchResultDTO.builder()
+                    .id(resultSet.getString("id"))
+                    .label(resultSet.getString("label"))
+                    .type(resultSet.getString("type"))
+                    .comment("")
+                    .build();
+
+            rows.add(row);
+        }
+        return rows;
     }
 }

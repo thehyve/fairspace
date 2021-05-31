@@ -8,6 +8,7 @@ import java.sql.*;
 import java.time.*;
 import java.util.*;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
@@ -321,7 +322,7 @@ public class ViewStoreReader {
                 String.format("order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit))) {
             query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
             var result = query.executeQuery();
-            log.info("Query took {} ms", new Date().getTime() - start);
+            log.debug("Query took {} ms", new Date().getTime() - start);
             var mid = new Date().getTime();
             List<Map<String, Set<ValueDTO>>> rows = new ArrayList<>();
             while (result.next()) {
@@ -329,13 +330,33 @@ public class ViewStoreReader {
                 addValueSetValues(view, row, valueSetProperties, valueSetQueries);
                 rows.add(row);
             }
-            log.info("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
+            log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
             return rows;
         } finally {
             for (var q : valueSetQueries.values()) {
                 q.close();
             }
-            log.info("Complete process took {} ms", new Date().getTime() - start);
+            log.debug("Complete process took {} ms", new Date().getTime() - start);
+        }
+    }
+
+    public <T> T retrieveViewTableRows(String queryString, Function<ResultSet, T> getResultDto) throws SQLException {
+        var start = new Date().getTime();
+        var query = connection.prepareStatement(queryString);
+
+        try (query) {
+            query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
+            var result = query.executeQuery();
+
+            var mid = new Date().getTime();
+
+            var resultDto = getResultDto.apply(result);
+
+            log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
+
+            return resultDto;
+        } finally {
+            log.debug("Complete process took {} ms", new Date().getTime() - start);
         }
     }
 
@@ -374,7 +395,7 @@ public class ViewStoreReader {
                 var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
                         .filter(c -> c.getName().equalsIgnoreCase(column))
                         .findFirst().orElseThrow(() -> {
-                                throw new NoSuchElementException("Cannot find column " + column);
+                            throw new NoSuchElementException("Cannot find column " + column);
                         });
                 if (columnDefinition.type == ColumnType.Number) {
                     var value = result.getBigDecimal(columnDefinition.name);

@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services.search;
 
+import io.fairspace.saturn.services.views.QueryService;
+import io.fairspace.saturn.services.views.SparqlQueryService;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.log4j.*;
 import org.apache.jena.query.*;
@@ -43,14 +45,19 @@ public class SearchService {
             """, FS.NS));
 
     private final Dataset ds;
+    private final QueryService queryService;
 
-    public SearchService(Dataset ds) {
+    public SearchService(Dataset ds, QueryService queryService) {
         this.ds = ds;
+        this.queryService = queryService;
     }
 
     public SearchResultsDTO getFileSearchResults(FileSearchRequest request) {
+
+        var queryResult = queryService.getFilesByText(request);
+
         return SearchResultsDTO.builder()
-                .results(getFilesByText(request))
+                .results(queryResult)
                 .query(request.getQuery())
                 .build();
     }
@@ -60,13 +67,6 @@ public class SearchService {
                 .results(getResourceByText(request))
                 .query(request.getQuery())
                 .build();
-    }
-
-    private ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
-        var query = getSearchForFilesQuery(request.getParentIRI());
-        var binding = new QuerySolutionMap();
-        binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));
-        return getByQuery(query, binding);
     }
 
     private ArrayList<SearchResultDTO> getResourceByText(LookupSearchRequest request) {
@@ -79,7 +79,7 @@ public class SearchService {
             return results;
         }
 
-        binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));
+        binding.add("regexQuery", createStringLiteral(SparqlQueryService.getQueryRegex(request.getQuery())));
         return getByQuery(RESOURCE_BY_TEXT_QUERY, binding);
     }
 
@@ -101,32 +101,5 @@ public class SearchService {
             }
             return results;
         });
-    }
-
-    private Query getSearchForFilesQuery(String parentIRI) {
-        var builder = new StringBuilder("PREFIX fs: <")
-                .append(FS.NS)
-                .append(">\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\n")
-                .append("SELECT ?id ?label ?comment ?type\n")
-                .append("WHERE {\n");
-
-        if (parentIRI != null && !parentIRI.trim().isEmpty()) {
-            builder.append("?id fs:belongsTo* <").append(parentIRI).append("> .\n");
-        }
-
-        builder.append("?id rdfs:label ?label ; a ?type .\n")
-                .append("FILTER (?type in (fs:File, fs:Directory, fs:Collection))\n")
-                .append("OPTIONAL { ?id rdfs:comment ?comment }\n")
-                .append("FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }\n")
-                .append("FILTER (regex(?label, ?regexQuery, \"i\") || regex(?comment, ?regexQuery, \"i\"))\n")
-                .append("}\nLIMIT 10000");
-
-        return QueryFactory.create(builder.toString());
-    }
-
-    private String getQueryRegex(String query) {
-        return ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)"
-                + query.replaceAll("[^a-zA-Z0-9]", "\\\\$0"))
-                .replace("/\\/g", "\\\\");
     }
 }
