@@ -11,9 +11,6 @@ external:
     loginRealm: fairspace
     realm:
     clientSecret:
-    serviceAccount:
-      username: fairspace-service-account
-      password:
 
 # Setup ingress for fairspace components
 fairspace:
