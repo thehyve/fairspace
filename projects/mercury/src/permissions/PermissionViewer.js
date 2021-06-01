@@ -51,12 +51,12 @@ export const PermissionViewer = ({
 
     return (
         <div>
-            <FormLabel>Assigned Users</FormLabel>
+            <FormLabel>Share with users</FormLabel>
             <Box className={classes.root}>
                 {renderUserPermissionComponent()}
                 <FormHelperText>Members of the owner workspace can have modify rights, all others have read-only rights.</FormHelperText>
             </Box>
-            <FormLabel>Assigned Workspaces</FormLabel>
+            <FormLabel>Share with workspaces</FormLabel>
             <Box className={classes.root}>
                 {renderWorkspacePermissionComponent()}
             </Box>

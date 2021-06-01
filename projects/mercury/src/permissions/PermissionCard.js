@@ -297,7 +297,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderOwnerWorkspaceAccess = () => (
         <FormControl className={classes.property}>
-            <FormLabel>Workspace user access</FormLabel>
+            <FormLabel>Workspace member access</FormLabel>
             <Box className={classes.group}>
                 <FormGroup>
                     {collection.canManage ? (
