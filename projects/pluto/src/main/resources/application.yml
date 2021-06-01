@@ -25,6 +25,9 @@ spring:
   web:
     resources:
       static-locations: classpath:static,file:/opt/mercury
+logging:
+  level:
+    root: INFO
 
 security:
   oidc:
@@ -73,6 +76,8 @@ zuul:
   ignored-headers:
     - Access-Control-Allow-Credentials
     - Access-Control-Allow-Origin
+    - Access-Control-Allow-Methods
+    - Access-Control-Allow-Headers
     - Pragma
     - X-Frame-Options
     - X-Content-Type-Options
