@@ -63,6 +63,7 @@ export const LinkedDataEntityForm = ({
     onAdd = () => {},
     onDelete = () => {},
     editable = true,
+    typeIri
 }) => {
     if (loading) {
         return <LoadingInlay />;
@@ -71,8 +72,6 @@ export const LinkedDataEntityForm = ({
     if (errorMessage !== '') {
         return <MessageDisplay message={errorMessage} />;
     }
-
-    const primaryType = values['@type'] && values['@type'][0] && values['@type'][0].id;
 
     return (
         <form
@@ -91,7 +90,7 @@ export const LinkedDataEntityForm = ({
                     properties
                         // Some properties are always hidden (e.g. @type) or hidden based on the type of entity (e.g. label for collection)
                         // Properties are also hidden when it is not editable and there is no value
-                        .filter(p => !shouldPropertyBeHidden(p.key, primaryType) && (p.isEditable || hasValue(values[p.key])))
+                        .filter(p => !shouldPropertyBeHidden(p.key, typeIri) && (p.isEditable || hasValue(values[p.key])))
 
                         // Properties are sorted based on the sh:order property, or by its label otherwise
                         .sort(comparing(
@@ -130,6 +129,7 @@ LinkedDataEntityForm.propTypes = {
     onDelete: PropTypes.func,
 
     errorMessage: PropTypes.string,
+    typeIri: PropTypes.string,
 
     loading: PropTypes.bool,
     properties: PropTypes.array,

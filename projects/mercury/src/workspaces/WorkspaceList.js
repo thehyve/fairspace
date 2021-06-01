@@ -81,7 +81,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
     if (!props.workspaces || props.workspaces.length === 0) {
         return (
             <MessageDisplay
-                message="Please create a workspace."
+                message="No workspaces available"
                 variant="h6"
                 withIcon={false}
                 isError={false}

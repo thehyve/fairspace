@@ -4,7 +4,7 @@ external:
     baseUrl: https://keycloak.ci.fairway.app
     realm: ci
     clientId: fairspace-ci-private
-    clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+    clientSecret: 1877ac71-15ad-4245-bea8-d57c9cbaf3ce
     serviceAccount:
       password: fairspace123
 
@@ -49,7 +49,7 @@ pluto:
   connectTimeoutMillis: 2000
   maxFileSize: 1GB
   maxRequestSize: 1GB
-  externalsDomains:
+  externalDomains:
     - https://fairspace.ci.fairway.app
   backends:
     storageRoutes:

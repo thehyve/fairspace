@@ -5,8 +5,8 @@ export const PATH_SEPARATOR = '/';
 
 // UI
 export const LEFT_MENU_EXPANSION_DELAY = 500;
-export const MAIN_CONTENT_WIDTH = '55%';
-export const SIDE_PANEL_WIDTH = '45%';
+export const MAIN_CONTENT_WIDTH = '65%';
+export const SIDE_PANEL_WIDTH = '35%';
 export const MAIN_CONTENT_MAX_HEIGHT = 'calc(100vh - 156px)';
 export const COLLECTIONS_PATH = 'collections';
 export const METADATA_PATH = '/metadata';

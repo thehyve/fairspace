@@ -21,13 +21,12 @@ const styles = {
     },
     tableRow: {
         display: 'block',
-        height: 49,
+        height: '99%',
         width: '100%'
     },
-    iconCellButton: {
-        paddingTop: 0,
-        paddingBottom: 0,
-        textAlign: "right"
+    iconCell: {
+        padding: '0 0 0 8px',
+        textAlign: 'right'
     },
     emptyPermissions: {
         margin: 15,
@@ -42,7 +41,8 @@ const styles = {
         paddingRight: 5
     },
     accessCell: {
-        padding: 0
+        padding: 0,
+        minWidth: 100
     }
 };
 
@@ -97,20 +97,17 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                         const canManageCurrentPermission = canManagePermission(p);
                         return (
                             <TableRow key={p.iri} className={classes.tableRow}>
-                                <TableCell width={25}>
+                                <TableCell width={25} className={classes.iconCell}>
                                     <Person />
                                 </TableCell>
-                                <TableCell
-                                    width={275}
-                                    data-testid="permission"
-                                >
+                                <TableCell width="100%" data-testid="permission">
                                     <Tooltip title={p.name} placement="left-start" arrow>
                                         <Typography variant="body2" noWrap style={{width: 275}}>
                                             {p.name}
                                         </Typography>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell width={115} className={classes.accessCell}>
+                                <TableCell className={classes.accessCell}>
                                     {canManageCurrentPermission && accessLevelOptions.length > 1 ? (
                                         renderAccessLevelDropdown(p, accessLevelOptions)
                                     ) : (
@@ -120,7 +117,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                         </div>
                                     )}
                                 </TableCell>
-                                <TableCell width={40} className={classes.iconCellButton}>
+                                <TableCell width={40} className={classes.iconCell} align="right">
                                     <IconButton
                                         onClick={() => handleDeletePermission(p)}
                                         disabled={!canManageCurrentPermission}

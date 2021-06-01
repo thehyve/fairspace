@@ -15,7 +15,7 @@ export const handleTextSearchRedirect = (history: History, value: string, contex
         }
         history.push('/text-search/?' + queryString.stringify(queryParams));
     } else if (!isEmptyObject(storage)) {
-        history.push(`/external-storages/${storage.name}/${context ? getPathFromIri(context, storage) : ''}`);
+        history.push(`/external-storages/${storage.name}/${context ? getPathFromIri(context, storage.rootDirectoryIri) : ''}`);
     } else {
         history.push(`/collections/${context ? getPathFromIri(context) : ''}`);
     }

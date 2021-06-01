@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {
     Checkbox,
-    Grid, Link,
+    Link,
     Paper,
     Table,
     TableBody,
@@ -11,7 +11,6 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    Typography,
     withStyles
 } from "@material-ui/core";
 import {FolderOpen, NoteOutlined} from "@material-ui/icons";
@@ -21,7 +20,8 @@ import styles from './FileList.styles';
 import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
-import {isListOnlyFile} from "./fileUtils";
+import ColumnFilterInput from "../common/components/ColumnFilterInput";
+import MessageDisplay from "../common/components/MessageDisplay";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
@@ -49,13 +49,26 @@ const FileList = ({
         }
     };
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(files, columns, 'name');
+    const [filterValue, setFilterValue] = useState("");
+    const [filteredFiles, setFilteredFiles] = useState(files);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredFiles, columns, 'name');
     const directoriesBeforeFiles = useMemo(
         () => stableSort(orderedItems, compareBy('type')),
         [orderedItems]
     );
 
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
+
+    useEffect(() => {
+        if (files && files.length > 0) {
+            if (!filterValue) {
+                setFilteredFiles(files);
+            } else {
+                setFilteredFiles(files.filter(f => f.basename.toLowerCase().includes(filterValue.toLowerCase())));
+            }
+            setPage(0);
+        }
+    }, [filterValue, files, setPage]);
 
     useEffect(() => {
         if (preselectedFile) {
@@ -70,11 +83,14 @@ const FileList = ({
 
     if (!files || files.length === 0 || files[0] === null) {
         return (
-            <Grid container>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle1" style={{textAlign: 'center'}}>Empty directory</Typography>
-                </Grid>
-            </Grid>
+            <MessageDisplay
+                message="Empty directory"
+                variant="h6"
+                withIcon={false}
+                isError={false}
+                noWrap={false}
+                messageColor="textSecondary"
+            />
         );
     }
 
@@ -84,7 +100,7 @@ const FileList = ({
         const numOfSelected = files.filter(f => f.selected).length;
         const allItemsSelected = files.length === numOfSelected;
         checkboxHeader = (
-            <TableCell padding="none">
+            <TableCell padding="none" style={{verticalAlign: "bottom"}}>
                 <Checkbox
                     indeterminate={numOfSelected > 0 && numOfSelected < files.length}
                     checked={allItemsSelected}
@@ -94,6 +110,10 @@ const FileList = ({
         );
     }
 
+    const renderFileFilter = () => (
+        <ColumnFilterInput placeholder="Filter by name" filterValue={filterValue} setFilterValue={setFilterValue} />
+    );
+
     return (
         <Paper className={classes.root}>
             <TableContainer>
@@ -102,7 +122,7 @@ const FileList = ({
                         <TableRow>
                             {checkboxHeader}
                             <TableCell padding="none" />
-                            <TableCell>
+                            <TableCell className={classes.headerCell}>
                                 <TableSortLabel
                                     active={orderBy === 'name'}
                                     direction={orderAscending ? 'asc' : 'desc'}
@@ -110,8 +130,9 @@ const FileList = ({
                                 >
                                 Name
                                 </TableSortLabel>
+                                {renderFileFilter()}
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell align="right" className={classes.headerCell}>
                                 <TableSortLabel
                                     active={orderBy === 'size'}
                                     direction={orderAscending ? 'asc' : 'desc'}
@@ -120,7 +141,7 @@ const FileList = ({
                                 Size
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell align="right" className={classes.headerCell}>
                                 <TableSortLabel
                                     active={orderBy === 'lastmodified'}
                                     direction={orderAscending ? 'asc' : 'desc'}
@@ -130,7 +151,7 @@ const FileList = ({
                                 </TableSortLabel>
                             </TableCell>
                             {showDeleted && (
-                                <TableCell align="right">
+                                <TableCell align="right" className={classes.headerCell}>
                                     <TableSortLabel
                                         active={orderBy === 'dateDeleted'}
                                         direction={orderAscending ? 'asc' : 'desc'}
@@ -177,7 +198,7 @@ const FileList = ({
                                         {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                     </TableCell>
                                     <TableCell>
-                                        {isListOnlyFile(file) ? <span>{file.basename}</span> : (
+                                        {file.type === 'directory' ? (
                                             <Link
                                                 onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
                                                 color="inherit"
@@ -187,6 +208,8 @@ const FileList = ({
                                             >
                                                 {file.basename}
                                             </Link>
+                                        ) : (
+                                            <span>{file.basename}</span>
                                         )}
                                     </TableCell>
                                     <TableCell align="right">
@@ -208,7 +231,7 @@ const FileList = ({
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={files.length}
+                    count={filteredFiles.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onChangePage={(e, p) => setPage(p)}

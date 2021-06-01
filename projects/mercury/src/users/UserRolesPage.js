@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     Table,
     TableBody,
@@ -20,6 +20,7 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import {setUserRole} from "./UsersAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
+import ColumnFilterInput from "../common/components/ColumnFilterInput";
 
 const columns = {
     name: {
@@ -56,12 +57,38 @@ const columns = {
     }
 };
 
+const roleSelectionColumns = [
+    columns.superadmin, columns.admin, columns.viewPublicData, columns.viewPublicMetadata, columns.addSharedMetadata
+];
+
 const UserRolesPage = () => {
-    const {users, usersLoading, usersError, refresh} = useContext(UsersContext);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users || [], columns, 'name');
+    usePageTitleUpdater("Users");
+
+    const {users = [], usersLoading, usersError, refresh} = useContext(UsersContext);
+    const [filteredUser, setFilteredUsers] = useState(users);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredUser, columns, 'name');
+    const [filtersObject, setFiltersObject] = useState({});
+
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
-    usePageTitleUpdater("Users");
+    const isValueMatchingFilterValue: boolean = (value: string, filterValue: string) => (
+        !filterValue || (value && value.toLowerCase().includes(filterValue.toLowerCase()))
+    );
+
+    useEffect(() => {
+        if (users && users.length > 0) {
+            if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === "")) {
+                setFilteredUsers(users);
+            } else {
+                setFilteredUsers(users.filter(u => (
+                    isValueMatchingFilterValue(u.name, filtersObject[columns.name.valueExtractor])
+                    && isValueMatchingFilterValue(u.username, filtersObject[columns.username.valueExtractor])
+                    && isValueMatchingFilterValue(u.email, filtersObject[columns.email.valueExtractor])
+                )));
+            }
+            setPage(0);
+        }
+    }, [filtersObject, users, setPage]);
 
     if (usersError) {
         return (<MessageDisplay message="An error occurred loading users" />);
@@ -73,14 +100,38 @@ const UserRolesPage = () => {
         .then(refresh)
         .catch(e => ErrorDialog.showError("Error assigning role", e));
 
+    const renderColumnFilter = (columnName: string) => {
+        const filterValue = filtersObject[columnName];
+        const setFilterValue = value => setFiltersObject({...filtersObject, [columnName]: value});
+        return (
+            <ColumnFilterInput placeholder={`Filter by ${columnName}`} filterValue={filterValue} setFilterValue={setFilterValue} />
+        );
+    };
+
+    const renderHeaderCellWithFilter = (column) => (
+        <TableCell key={column.valueExtractor}>
+            <TableSortLabel
+                active={orderBy === column.valueExtractor}
+                direction={orderAscending ? 'asc' : 'desc'}
+                onClick={() => toggleSort(column.valueExtractor)}
+            >
+                {column.label}
+            </TableSortLabel>
+            {renderColumnFilter(column.valueExtractor)}
+        </TableCell>
+    );
+
     return (
         <Paper style={{marginTop: 16}}>
             <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
+                            {renderHeaderCellWithFilter(columns.name)}
+                            {renderHeaderCellWithFilter(columns.username)}
+                            {renderHeaderCellWithFilter(columns.email)}
                             {
-                                Object.entries(columns).map(([key, column]) => (
+                                Object.entries(roleSelectionColumns).map(([key, column]) => (
                                     <TableCell key={key}>
                                         <TableSortLabel
                                             active={orderBy === key}

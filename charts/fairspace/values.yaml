@@ -28,6 +28,10 @@ fairspace:
         nginx.ingress.kubernetes.io/proxy-body-size: 10g
         nginx.ingress.kubernetes.io/configuration-snippet: |
           proxy_set_header  X-Forwarded-Proto $scheme;
+          add_header Access-Control-Allow-Methods "*";
+          add_header Access-Control-Allow-Credentials true;
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-methods: "*"
       docs:
         kubernetes.io/ingress.class: nginx
     tls:
@@ -145,6 +149,7 @@ pluto:
     image: eu.gcr.io/fairspace-207108/pluto
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
+  logLevel: INFO
   resources:
     limits:
       cpu: 1

@@ -20,7 +20,7 @@ export const getExternalStorageAbsolutePath = (path: string, storageName: string
 );
 
 export const getRelativePath = (absolutePath: string, storageName: string) => (
-    absolutePath.replace(getExternalStoragePathPrefix(storageName), '')
+    absolutePath.replace(/\/$/, "").replace(getExternalStoragePathPrefix(storageName), '')
 );
 
 export const getPathToDisplay = (path: string) => {

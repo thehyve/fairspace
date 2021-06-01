@@ -8,7 +8,7 @@ import type {Workspace} from '../WorkspacesAPI';
 describe('WorkspaceList', () => {
     it('shows message when no workspaces are available', () => {
         const {getByText} = render(<MemoryRouter><WorkspaceList workspaces={[]} /></MemoryRouter>);
-        expect(getByText(/Please create a workspace/i))
+        expect(getByText(/No workspaces available/i))
             .toBeInTheDocument();
     });
 

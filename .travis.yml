@@ -62,7 +62,7 @@ jobs:
       - ci/gcp/login.sh
       script:
       - .travis/build.sh projects/saturn
-      - .travis/build.sh projects/pluto
+      - .travis/build.sh projects/pluto [mercury]
       - export SANITIZED_BRANCH=$(echo $TRAVIS_BRANCH | sed 's/\//_/g')
     - stage: build
       cache: false

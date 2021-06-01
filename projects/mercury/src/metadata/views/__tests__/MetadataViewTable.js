@@ -6,7 +6,7 @@ import TableRow from "@material-ui/core/TableRow";
 import {TableBody} from "@material-ui/core";
 import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
-import {mockViews, mockRows} from "../__mocks__/MetadataViewAPI";
+import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";
 import {RESOURCES_VIEW} from "../metadataViewUtils";
 
 describe('MetadataViewTable', () => {
@@ -27,6 +27,10 @@ describe('MetadataViewTable', () => {
                 toggleRow={() => {}}
                 history={historyMock}
                 idColumn={columns[0]}
+                collections={[]}
+                textFiltersObject={{}}
+                setTextFiltersObject={() => {}}
+                loading={false}
             />
         );
 
@@ -58,6 +62,9 @@ describe('MetadataViewTable', () => {
                 toggleRow={() => {}}
                 history={historyMock}
                 idColumn={columns[0]}
+                collections={[]}
+                textFiltersObject={{}}
+                setTextFiltersObject={() => {}}
             />
         );
 
@@ -90,6 +97,8 @@ describe('MetadataViewTable', () => {
             history={historyMock}
             idColumn={columns[0]}
             loading={false}
+            textFiltersObject={{}}
+            setTextFiltersObject={() => {}}
         />);
 
         const tableRows = wrapper.find(TableBody).find(TableRow);
