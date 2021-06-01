@@ -7,14 +7,11 @@ import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.milton.resource.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
-import io.milton.resource.*;
-import lombok.*;
 
 import java.net.*;
 import java.nio.charset.*;
 import java.sql.*;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.*;
 
 import static java.lang.Integer.*;
@@ -115,24 +112,18 @@ public class JdbcQueryService implements QueryService {
         }
     }
 
-    public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+    public List<SearchResultDTO> getFilesByText(FileSearchRequest request) {
 
         try {
+            var queryText = """
+                    SELECT id, label, type FROM public.resource
+                    WHERE label like ?
+                    AND type IN ('File', 'Directory', 'Collection')
+                    ORDER BY id ASC LIMIT 1000""";
 
-//            Suggestion of Gijs:
-//            var filters = List.of(ViewFilter.builder().substring(request.getQuery()).build());
-            var filters = new ArrayList<ViewFilter>();
-            var viewResult = viewStoreReader.retrieveViewTableRows("Resource", filters, 0, 1000);
-//                    .stream()
-//                    .map(result -> SearchResultDTO.builder()/* set properties */.build()
-//            ).collect(Collectors.toList());
+            var parameterValues = List.of("%" + request.getQuery() + "%");
 
-            var query = """
-                SELECT id, label, type FROM public.resource
-                WHERE label like '%{searchTerm}%'
-                ORDER BY id ASC LIMIT 1000""";
-
-            return viewStoreReader.retrieveViewTableRows(query, this::GetSearchResult);
+            return viewStoreReader.retrieveViewTableRows(queryText, parameterValues, this::convertResult);
         } catch (SQLException e) {
             log.error("Error connecting to the view database.", e);
             throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
@@ -140,7 +131,7 @@ public class JdbcQueryService implements QueryService {
     }
 
     @SneakyThrows
-    private ArrayList<SearchResultDTO> GetSearchResult(ResultSet resultSet) {
+    private ArrayList<SearchResultDTO> convertResult(ResultSet resultSet) {
         var rows = new ArrayList<SearchResultDTO>();
         while (resultSet.next()) {
             var row = SearchResultDTO.builder()

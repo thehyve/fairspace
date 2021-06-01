@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
 
 import java.sql.*;
@@ -340,26 +341,6 @@ public class ViewStoreReader {
         }
     }
 
-    public <T> T retrieveViewTableRows(String queryString, Function<ResultSet, T> getResultDto) throws SQLException {
-        var start = new Date().getTime();
-        var query = connection.prepareStatement(queryString);
-
-        try (query) {
-            query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
-            var result = query.executeQuery();
-
-            var mid = new Date().getTime();
-
-            var resultDto = getResultDto.apply(result);
-
-            log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
-
-            return resultDto;
-        } finally {
-            log.debug("Complete process took {} ms", new Date().getTime() - start);
-        }
-    }
-
     public List<Map<String, Set<ValueDTO>>> retrieveJoinTableRows(
             String view, View.JoinView joinView, String id) throws SQLException {
         var joinedTable = configuration.viewTables.get(joinView.view);
@@ -506,6 +487,36 @@ public class ViewStoreReader {
             throw e;
         } catch (SQLException e) {
             throw new QueryException("Error counting rows", e);
+        }
+    }
+
+    public <T> T retrieveViewTableRows(String queryString, List<String> parameters, Function<ResultSet, T> getResultDto) throws SQLException {
+        var start = new Date().getTime();
+
+        var query = connection.prepareStatement(queryString);
+
+        AddParameters(query, parameters);
+
+        try (query) {
+            query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
+            var result = query.executeQuery();
+
+            var mid = new Date().getTime();
+
+            var resultDto = getResultDto.apply(result);
+
+            log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
+
+            return resultDto;
+        } finally {
+            log.debug("Complete process took {} ms", new Date().getTime() - start);
+        }
+    }
+
+    @SneakyThrows
+    private void AddParameters(PreparedStatement query, List<String> parameters) {
+        for(int i =0; i< parameters.size(); i++) {
+            query.setString(i + 1, parameters.get(i));
         }
     }
 }

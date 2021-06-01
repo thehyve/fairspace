@@ -108,7 +108,7 @@ public class SparqlQueryService implements QueryService {
         });
     }
 
-    public ArrayList<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+    public List<SearchResultDTO> getFilesByText(FileSearchRequest request) {
         var query = getSearchForFilesQuery(request.getParentIRI());
         var binding = new QuerySolutionMap();
         binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));
@@ -121,7 +121,7 @@ public class SparqlQueryService implements QueryService {
                 .replace("/\\/g", "\\\\");
     }
 
-    private ArrayList<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding) {
+    private List<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding) {
         log.debug("Executing query:\n{}", query);
         var selectExecution = QueryExecutionFactory.create(query, ds, binding);
         var results = new ArrayList<SearchResultDTO>();
