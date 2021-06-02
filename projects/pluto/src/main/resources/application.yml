@@ -74,14 +74,10 @@ zuul:
   - /authorize
   - /error
   ignored-headers:
-    - Access-Control-Allow-Credentials
-    - Access-Control-Allow-Origin
-    - Access-Control-Allow-Methods
-    - Access-Control-Allow-Headers
-    - Pragma
-    - X-Frame-Options
-    - X-Content-Type-Options
-    - X-XSS-Protection
+  - Pragma
+  - X-Frame-Options
+  - X-Content-Type-Options
+  - X-XSS-Protection
   set-content-length: true
   host:
     socket-timeout-millis: 10000
