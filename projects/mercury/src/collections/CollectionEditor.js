@@ -17,6 +17,7 @@ import {
     fileNameContainsInvalidCharacter, isUnsafeFileName,
     isValidFileName
 } from '../file/fileUtils';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 const fields = ['name', 'description', 'ownerWorkspace'];
 
@@ -55,7 +56,7 @@ type CollectionEditorProps = {
     setBusy: (boolean) => void,
     match: Match<PathParam>,
     history: History,
-    workspaceIri: string
+    workspace: Workspace
 };
 
 type CollectionEditorState = {
@@ -73,9 +74,13 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     state = {
         editing: true,
         saveInProgress: false,
-        properties: this.props.collection
-            ? copyProperties(this.props.collection)
-            : {name: '', description: '', ownerWorkspace: this.props.workspaceIri}
+        properties: this.props.collection ?
+            copyProperties(this.props.collection) :
+            {
+                name: `[${this.props.workspace.name.replace(/[/\\]/, '')}] `,
+                description: '',
+                ownerWorkspace: this.props.workspace.iri
+            }
     };
 
     unmounting = false;
