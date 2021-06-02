@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {IconButton, Typography, withStyles} from '@material-ui/core';
+import {IconButton, withStyles} from '@material-ui/core';
 import {Add} from "@material-ui/icons";
 import Toolbar from "@material-ui/core/Toolbar";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -71,9 +71,6 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
 
     const renderHeader = () => (
         <Toolbar className={classes.header}>
-            <Typography variant="body1" id="tableTitle" component="div">
-                Workspaces
-            </Typography>
             {collection.canManage && (
                 <Tooltip title="Add workspace">
                     <IconButton
@@ -82,7 +79,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
                         className={classes.addButton}
                         onClick={() => handleAlterWorkspacePermissionsDialogShow()}
                     >
-                        <Add />
+                        <Add/>
                     </IconButton>
                 </Tooltip>
             )}
