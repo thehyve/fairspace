@@ -27,8 +27,7 @@ public class App {
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
-                .port(CONFIG.port)
-                .enableCors(true);
+                .port(CONFIG.port);
         var server = serverBuilder
                 .build();
 
