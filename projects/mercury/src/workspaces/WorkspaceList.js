@@ -24,6 +24,7 @@ import usePagination from "../common/hooks/UsePagination";
 import {isAdmin} from '../users/userUtils';
 import UserContext from '../users/UserContext';
 import WorkspaceActionMenu from './WorkspaceActionMenu';
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 type WorkspaceListProps = {
     workspaces: Workspace[];
@@ -166,6 +167,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                         onChangePage={(e, p) => setPage(p)}
                         onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                         style={{overflowX: "hidden"}}
+                        ActionsComponent={TablePaginationActions}
                     />
                 </TableContainer>
             </Paper>

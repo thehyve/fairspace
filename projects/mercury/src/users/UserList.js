@@ -33,6 +33,7 @@ import UserContext from "./UserContext";
 import {getWorkspaceUsersWithRoles} from "./userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {canAlterPermission} from "../collections/collectionUtils";
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 const columns = {
     name: {
@@ -211,6 +212,7 @@ const UserList = (props: UserListProps) => {
                     onChangePage={(e, p) => setPage(p)}
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
+                    ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
         </Paper>

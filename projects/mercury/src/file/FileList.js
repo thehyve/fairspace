@@ -22,6 +22,7 @@ import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
 import MessageDisplay from "../common/components/MessageDisplay";
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
@@ -237,6 +238,7 @@ const FileList = ({
                     onChangePage={(e, p) => setPage(p)}
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
+                    ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
         </Paper>
