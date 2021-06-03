@@ -2,10 +2,7 @@ import React, {useContext, useState} from 'react';
 import {
     Avatar,
     Button,
-    Card,
-    CardContent,
-    CardMedia,
-    ClickAwayListener,
+    ClickAwayListener, Container,
     Grow,
     ListItemIcon, ListItemText,
     MenuItem,
@@ -16,7 +13,6 @@ import {
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
-import Divider from '@material-ui/core/Divider';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
@@ -32,21 +28,20 @@ const styles = {
     avatar: {
         margin: 10,
     },
-    cardCover: {
-        display: 'flex',
-        flexDirection: 'column',
-        // height: 50,
-        width: 50,
+    infoContent: {
+        backgroundColor: 'white',
+        marginLeft: 30,
+        marginRight: 0
     },
-    cardContent: {
-        backgroundColor: 'white'
-    },
-    cardRoot: {
+    infoBackground: {
         display: 'flex',
         backgroundColor: 'lightGray',
+        maxWidth: "sm",
         border: "none",
         boxShadow: "none",
-        borderRadius: 0
+        borderRadius: 0,
+        paddingRight: 0,
+        paddingLeft: 0
     },
     logout: {
         width: 50
@@ -79,18 +74,18 @@ const UserMenu = ({classes}) => {
     }
 
     if (currentUserError || !currentUser) {
-        return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
+        return <ErrorOutline style={{fontSize: '2em'}} color="inherit"/>;
     }
 
     const userNameMenuItem = () => {
-        if(!currentUser.username)
+        if (!currentUser.username)
             return null;
 
         return <MenuItem disabled>{currentUser.username}</MenuItem>
     }
 
     const userEmailMenuItem = () => {
-        if(!currentUser.email)
+        if (!currentUser.email)
             return null;
 
         return <MenuItem disabled>{currentUser.email}</MenuItem>
@@ -105,7 +100,7 @@ const UserMenu = ({classes}) => {
                 onClick={handleClick}
                 className={classes.row}
             >
-                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
+                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar}/>
                 <span>
                     {getDisplayName(currentUser)}
                 </span>
@@ -120,24 +115,17 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
-                                    <Card
-                                        className={classes.cardRoot}>
-                                        <CardMedia
-                                            className={classes.cardCover}
-                                        >
-                                        </CardMedia>
-                                        <CardContent
-                                            className={classes.cardContent}>
-                                            {userNameMenuItem()}
-                                            {userEmailMenuItem()}
-                                        </CardContent>
-                                    </Card>
-                                    <Divider/>
+                                    <Container className={classes.infoBackground}>
+                                        <Container className={classes.infoContent}>
+                                            <ListItemText primary={userNameMenuItem()}/>
+                                            <ListItemText primary={userEmailMenuItem()}/>
+                                        </Container>
+                                    </Container>
                                     <MenuItem onClick={handleLogout}>
                                         <ListItemIcon>
-                                            <ExitToAppIcon />
+                                            <ExitToAppIcon/>
                                         </ListItemIcon>
-                                        <ListItemText primary="Logout" />
+                                        <ListItemText primary="Logout"/>
                                     </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
