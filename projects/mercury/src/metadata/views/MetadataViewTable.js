@@ -44,8 +44,6 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {textFiltersObject, setTextFiltersObject} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
-    const {rows = []} = data;
-
     const isResourcesView = view === RESOURCES_VIEW;
 
     const isCustomResourceColumn = (column: MetadataViewColumn) => (
@@ -141,7 +139,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {idColumn && rows.map(row => (
+                {idColumn && data && data.rows && data.rows.map(row => (
                     <TableRow
                         className={classes.row}
                         key={row[idColumn.name][0].value}
