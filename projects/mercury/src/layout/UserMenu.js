@@ -2,9 +2,9 @@ import React, {useContext, useState} from 'react';
 import {
     Avatar,
     Button,
-    ClickAwayListener, Container,
+    ClickAwayListener,
     Grow,
-    ListItemIcon, ListItemText,
+    ListItem, ListItemIcon, ListItemText,
     MenuItem,
     MenuList,
     Paper,
@@ -13,6 +13,7 @@ import {
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
+import Divider from '@material-ui/core/Divider';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
@@ -28,26 +29,14 @@ const styles = {
     avatar: {
         margin: 10,
     },
-    infoContent: {
-        backgroundColor: 'white',
-        marginLeft: 30,
-        marginRight: 0
-    },
-    infoBackground: {
-        display: 'flex',
-        backgroundColor: 'lightGray',
-        maxWidth: "sm",
-        border: "none",
-        boxShadow: "none",
-        borderRadius: 0,
-        paddingRight: 0,
-        paddingLeft: 0
-    },
     logout: {
         width: 50
     },
     menu: {
         paddingTop: 0
+    },
+    userMenu: {
+        borderLeft: '8px solid #999'
     }
 };
 
@@ -74,21 +63,7 @@ const UserMenu = ({classes}) => {
     }
 
     if (currentUserError || !currentUser) {
-        return <ErrorOutline style={{fontSize: '2em'}} color="inherit"/>;
-    }
-
-    const userNameMenuItem = () => {
-        if (!currentUser.username)
-            return null;
-
-        return <MenuItem disabled>{currentUser.username}</MenuItem>
-    }
-
-    const userEmailMenuItem = () => {
-        if (!currentUser.email)
-            return null;
-
-        return <MenuItem disabled>{currentUser.email}</MenuItem>
+        return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
     return (
@@ -100,7 +75,7 @@ const UserMenu = ({classes}) => {
                 onClick={handleClick}
                 className={classes.row}
             >
-                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar}/>
+                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
                 <span>
                     {getDisplayName(currentUser)}
                 </span>
@@ -115,17 +90,19 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
-                                    <Container className={classes.infoBackground}>
-                                        <Container className={classes.infoContent}>
-                                            <ListItemText primary={userNameMenuItem()}/>
-                                            <ListItemText primary={userEmailMenuItem()}/>
-                                        </Container>
-                                    </Container>
+                                    <ListItem className={classes.userMenu}>
+                                        <ListItemText
+                                            primary={currentUser.username}
+                                            secondary={currentUser.email}
+                                            style={{cursor: 'default'}}
+                                        />
+                                    </ListItem>
+                                    <Divider/>
                                     <MenuItem onClick={handleLogout}>
                                         <ListItemIcon>
-                                            <ExitToAppIcon/>
+                                            <ExitToAppIcon />
                                         </ListItemIcon>
-                                        <ListItemText primary="Logout"/>
+                                        <ListItemText primary="Logout" />
                                     </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
