@@ -21,6 +21,7 @@ import {setUserRole} from "./UsersAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 const columns = {
     name: {
@@ -208,6 +209,7 @@ const UserRolesPage = () => {
                     onChangePage={(e, p) => setPage(p)}
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
+                    ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
         </Paper>

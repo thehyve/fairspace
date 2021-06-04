@@ -21,6 +21,7 @@ import usePagination from "../common/hooks/UsePagination";
 import {currentWorkspace} from '../workspaces/workspaces';
 import {accessLevelForCollection, collectionAccessIcon} from './collectionUtils';
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 const baseColumns = {
     name: {
@@ -219,6 +220,7 @@ const CollectionList = ({
                     onChangePage={(e, p) => setPage(p)}
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
+                    ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
         </Paper>
