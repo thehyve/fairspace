@@ -112,37 +112,13 @@ public class JdbcQueryService implements QueryService {
         }
     }
 
-    public List<SearchResultDTO> getFilesByText(FileSearchRequest request) {
-
-        try {
-            var queryText = """
-                    SELECT id, label, type FROM public.resource
-                    WHERE label like ?
-                    AND type IN ('File', 'Directory', 'Collection')
-                    ORDER BY id ASC LIMIT 1000""";
-
-            var parameterValues = List.of("%" + request.getQuery() + "%");
-
-            return viewStoreReader.retrieveViewTableRows(queryText, parameterValues, this::convertResult);
-        } catch (SQLException e) {
-            log.error("Error connecting to the view database.", e);
-            throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
-        }
-    }
-
     @SneakyThrows
-    private ArrayList<SearchResultDTO> convertResult(ResultSet resultSet) {
-        var rows = new ArrayList<SearchResultDTO>();
-        while (resultSet.next()) {
-            var row = SearchResultDTO.builder()
-                    .id(resultSet.getString("id"))
-                    .label(resultSet.getString("label"))
-                    .type(resultSet.getString("type"))
-                    .comment("")
-                    .build();
+    public List<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+        var collectionsForUser = transactions.calculateRead(m ->
+                rootSubject.getChildren().stream()
+                        .map(collection -> getCollectionName(collection.getUniqueId()))
+                        .collect(Collectors.toList()));
 
-            rows.add(row);
-        }
-        return rows;
+        return viewStoreReader.searchFiles(request, collectionsForUser);
     }
 }

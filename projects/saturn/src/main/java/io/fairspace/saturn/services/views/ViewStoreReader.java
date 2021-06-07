@@ -2,6 +2,8 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
 
@@ -20,6 +22,7 @@ public class ViewStoreReader {
     final Config.Search searchConfig;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
+
     public ViewStoreReader(Config.Search searchConfig, ViewStoreClient viewStoreClient) {
         this.searchConfig = searchConfig;
         this.configuration = viewStoreClient.configuration;
@@ -58,7 +61,7 @@ public class ViewStoreReader {
             var collection = result.getString("collection");
             row.put(viewConfig.name + "_collection", Collections.singleton(new ValueDTO(collection, collection)));
         }
-        for (var viewColumn: viewConfig.columns) {
+        for (var viewColumn : viewConfig.columns) {
             if (viewColumn.type.isSet()) {
                 continue;
             }
@@ -116,7 +119,7 @@ public class ViewStoreReader {
     }
 
     void prepareFilters(List<ViewFilter> filters) throws SQLException {
-        for (var filter: filters) {
+        for (var filter : filters) {
             if (filter.getField().equalsIgnoreCase("location")) {
                 filter.setField("Resource");
                 filter.setPrefixes(filter.values.stream().map(Object::toString).collect(Collectors.toList()));
@@ -128,7 +131,7 @@ public class ViewStoreReader {
             }
             if (EnumSet.of(ColumnType.Term, ColumnType.TermSet).contains(column.type)) {
                 var values = new ArrayList<>();
-                for (var value: filter.values) {
+                for (var value : filter.values) {
                     var label = label(value.toString());
                     if (label == null) {
                         log.error("No label found for value " + value.toString());
@@ -265,7 +268,7 @@ public class ViewStoreReader {
                         (constraints.isBlank() ? "" : " where " + constraints) +
                         (scope == null ? "" : (" " + scope))
         );
-        for (var i=0; i < values.size(); i++) {
+        for (var i = 0; i < values.size(); i++) {
             var value = values.get(i);
             if (value instanceof Number) {
                 query.setFloat(i + 1, ((Number) value).floatValue());
@@ -281,7 +284,7 @@ public class ViewStoreReader {
 
     Map<String, PreparedStatement> prepareValueSetQueries(String view, List<String> properties) throws SQLException {
         var valueSetQueries = new LinkedHashMap<String, PreparedStatement>();
-        for (var propertyName: properties) {
+        for (var propertyName : properties) {
             var propertyTable = configuration.propertyTables.get(view).get(propertyName);
             var valueSetQuery = connection.prepareStatement(
                     "select " + propertyName.toLowerCase() +
@@ -293,8 +296,8 @@ public class ViewStoreReader {
     }
 
     void addValueSetValues(String view, Map<String, Set<ValueDTO>> row, List<String> properties, Map<String, PreparedStatement> valueSetQueries) throws SQLException {
-        var rowId = (String)row.get(view).stream().findFirst().orElseThrow().getValue();
-        for (var propertyName: properties) {
+        var rowId = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
+        for (var propertyName : properties) {
             var valueSetQuery = valueSetQueries.get(propertyName);
             valueSetQuery.setString(1, rowId);
             var valueSetResult = valueSetQuery.executeQuery();
@@ -361,7 +364,7 @@ public class ViewStoreReader {
                 "select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) +
                         " from " + joinedTable.name + " j " +
                         " where exists (" +
-                        "   select * from " + joinTable.name +" jt " +
+                        "   select * from " + joinTable.name + " jt " +
                         "   where jt." + idColumn(joinView.view).name + " = j.id" +
                         "   and jt." + idColumn(view).name + " = ? )"
         );
@@ -371,7 +374,7 @@ public class ViewStoreReader {
         while (result.next()) {
             Map<String, Set<ValueDTO>> row = new HashMap<>();
             row.put(joinView.view, Collections.singleton(new ValueDTO(result.getString("label"), result.getString("id"))));
-            for (var column: projectionColumns) {
+            for (var column : projectionColumns) {
                 var columnName = joinView.view + "_" + column;
                 var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
                         .filter(c -> c.getName().equalsIgnoreCase(column))
@@ -396,7 +399,7 @@ public class ViewStoreReader {
             addValueSetValues(joinView.view, row, valueSetProperties, valueSetQueries);
             rows.add(row);
         }
-        for (var q: valueSetQueries.values()) {
+        for (var q : valueSetQueries.values()) {
             q.close();
         }
         query.close();
@@ -458,7 +461,7 @@ public class ViewStoreReader {
                 for (var joinView : viewConfig.join) {
                     for (var row : rows) {
                         var id = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
-                        for (var joinTableRow: this.retrieveJoinTableRows(view, joinView, id)) {
+                        for (var joinTableRow : this.retrieveJoinTableRows(view, joinView, id)) {
                             joinTableRow.forEach((key, values) -> {
                                 if (!row.containsKey(key)) {
                                     row.put(key, new LinkedHashSet<>());
@@ -479,7 +482,7 @@ public class ViewStoreReader {
 
     public long countRows(String view, List<ViewFilter> filters) throws SQLTimeoutException {
         try (var q = query(view, "count(*) as rowCount", filters, null)) {
-            q.setQueryTimeout((int)searchConfig.countRequestTimeout);
+            q.setQueryTimeout((int) searchConfig.countRequestTimeout);
             var result = q.executeQuery();
             result.next();
             return result.getLong("rowCount");
@@ -490,7 +493,28 @@ public class ViewStoreReader {
         }
     }
 
-    public <T> T retrieveViewTableRows(String queryString, List<String> parameters, Function<ResultSet, T> getResultDto) throws SQLException {
+    public List<SearchResultDTO> searchFiles(FileSearchRequest request, List<String> userCollections) {
+        try {
+            var queryText = """
+                    SELECT id, label, type FROM public.resource
+                    WHERE label like ?
+                    AND type IN ('File', 'Directory', 'Collection')
+                    AND collection in ( ? )
+                    ORDER BY id ASC LIMIT 1000""";
+
+            var searchString = "%" + request.getQuery() + "%";
+            var userCollectionsParameter = String.join(", ", userCollections);
+
+            var parameterValues = List.of(searchString, userCollectionsParameter);
+
+            return retrieveViewTableRows(queryText, parameterValues);
+        } catch (SQLException e) {
+            log.error("Error connecting to the view database.", e);
+            throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
+        }
+    }
+
+    public List<SearchResultDTO> retrieveViewTableRows(String queryString, List<String> parameters) throws SQLException {
         var start = new Date().getTime();
 
         var query = connection.prepareStatement(queryString);
@@ -501,13 +525,7 @@ public class ViewStoreReader {
             query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
             var result = query.executeQuery();
 
-            var mid = new Date().getTime();
-
-            var resultDto = getResultDto.apply(result);
-
-            log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
-
-            return resultDto;
+            return convertResult(result);
         } finally {
             log.debug("Complete process took {} ms", new Date().getTime() - start);
         }
@@ -515,8 +533,24 @@ public class ViewStoreReader {
 
     @SneakyThrows
     private void AddParameters(PreparedStatement query, List<String> parameters) {
-        for(int i =0; i< parameters.size(); i++) {
+        for (int i = 0; i < parameters.size(); i++) {
             query.setString(i + 1, parameters.get(i));
         }
+    }
+
+    @SneakyThrows
+    private List<SearchResultDTO> convertResult(ResultSet resultSet) {
+        var rows = new ArrayList<SearchResultDTO>();
+        while (resultSet.next()) {
+            var row = SearchResultDTO.builder()
+                    .id(resultSet.getString("id"))
+                    .label(resultSet.getString("label"))
+                    .type(resultSet.getString("type"))
+                    .comment("")
+                    .build();
+
+            rows.add(row);
+        }
+        return rows;
     }
 }
