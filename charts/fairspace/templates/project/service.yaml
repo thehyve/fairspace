@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-pluto
+  name: {{ .Release.Name }}
   labels:
-    app: pluto
+    app: fairspace
     chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: pluto
+    app: fairspace
     release: {{ .Release.Name }}

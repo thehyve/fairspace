@@ -55,6 +55,6 @@ data:
 {{ end }}
         saturn:
           path: /api/**
-          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
           strip-prefix: false
       add-proxy-headers: false

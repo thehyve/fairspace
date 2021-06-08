@@ -76,7 +76,7 @@ saturn:
       size: 5Gi
   image:
     image: eu.gcr.io/fairspace-207108/saturn
-    tag: RELEASEVERSION
+    tag: 0.7.14-SNAPSHOT
     pullPolicy: IfNotPresent
   initContainer:
     image: alpine:3.9
@@ -144,7 +144,7 @@ saturn:
 pluto:
   image:
     image: eu.gcr.io/fairspace-207108/pluto
-    tag: RELEASEVERSION
+    tag: 0.7.14-SNAPSHOT
     pullPolicy: IfNotPresent
   logLevel: INFO
   resources:
