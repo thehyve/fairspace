@@ -98,6 +98,8 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 var row = new HashMap<String, Object>();
                 row.put("id", subject.getURI());
                 row.put("label", getLabel(graph, subject));
+                row.put("type", type.getLocalName());
+
                 if (protectedResources.contains(type.getURI())) {
                     // set collection name
                     var rootLocation = CONFIG.publicUrl + "/api/webdav" + "/";
@@ -111,6 +113,8 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     row.put("collection", collection);
                 }
                 // Update subject value columns
+                // BERF: have a review of this code. This code is (also) executed during update of the Resource table (postgres).
+                // The view.columns are not equal to the database columns, which results in null values being inserted.
                 try {
                     for (var column: view.columns) {
                         var objects = retrieveValues(graph, subject, column.source);
@@ -126,7 +130,9 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                                 var term = objects.get(0);
                                 var label = getLabel(graph, term);
                                 viewStoreClient.addLabel(term.getURI(), column.rdfType, label);
-                                row.put(column.name, label);
+                                if(label != null) {
+                                    row.put(column.name, label);
+                                }
                             }
                             default -> row.put(column.name, objects.get(0).getLiteralValue().toString());
                         }
