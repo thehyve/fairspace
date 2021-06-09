@@ -1,8 +1,20 @@
 import React, {useContext, useState} from 'react';
-import {Avatar, Button, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper} from '@material-ui/core';
+import {
+    Avatar,
+    Button,
+    ClickAwayListener,
+    Grow,
+    ListItem, ListItemIcon, ListItemText,
+    MenuItem,
+    MenuList,
+    Paper,
+    Popper
+} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import {ErrorOutline} from '@material-ui/icons';
 
+import Divider from '@material-ui/core/Divider';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";
@@ -16,6 +28,15 @@ const styles = {
     },
     avatar: {
         margin: 10,
+    },
+    logout: {
+        width: 50
+    },
+    menu: {
+        paddingTop: 0
+    },
+    userMenu: {
+        borderLeft: '8px solid #999'
     }
 };
 
@@ -68,10 +89,21 @@ const UserMenu = ({classes}) => {
                     >
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
-                                <MenuList>
-                                    <MenuItem onClick={handleClose} disabled>Profile</MenuItem>
-                                    <MenuItem onClick={handleClose} disabled>My account</MenuItem>
-                                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                                <MenuList className={classes.menu}>
+                                    <ListItem className={classes.userMenu}>
+                                        <ListItemText
+                                            primary={currentUser.username}
+                                            secondary={currentUser.email}
+                                            style={{cursor: 'default'}}
+                                        />
+                                    </ListItem>
+                                    <Divider/>
+                                    <MenuItem onClick={handleLogout}>
+                                        <ListItemIcon>
+                                            <ExitToAppIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Logout" />
+                                    </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>
                         </Paper>
