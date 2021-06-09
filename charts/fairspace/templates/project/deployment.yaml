@@ -70,6 +70,10 @@ spec:
                   key: clientSecret
             - name: AUDIT_LOG_ROOT
               value: /data/saturn/audit
+{{- if .Values.saturn.loglevel }}
+            - name: LOG_LEVEL
+              value: {{ .Values.saturn.loglevel | quote }}
+{{- end }}
           volumeMounts:
             - name: config-volume-saturn
               mountPath: /opt/config
