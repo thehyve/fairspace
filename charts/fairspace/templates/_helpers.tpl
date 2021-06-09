@@ -32,6 +32,21 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
+Common labels
+*/}}
+{{- define "fairspace.labels" -}}
+chart: {{ include "fairspace.chart" . }}
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
+helm.sh/chart: {{ include "fairspace.chart" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/release-name: {{ .Release.Name }}
+{{- end }}
+
+{{/*
 Create a name for the tls secret for fairspace
 */}}
 {{- define "fairspace.tlsSecretName" -}}
