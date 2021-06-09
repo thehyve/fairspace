@@ -10,9 +10,7 @@ metadata:
 {{- end }}
   labels:
     app: {{ template "fairspace.name" . }}
-    chart: {{ template "fairspace.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    {{- include "fairspace.labels" . | nindent 4 }}
 spec:
 {{- if $ingress.tls.enabled }}
   tls:

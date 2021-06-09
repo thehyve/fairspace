@@ -4,9 +4,7 @@ metadata:
   name: {{ .Release.Name }}-saturn
   labels:
     app: saturn
-    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "fairspace.labels" . | nindent 4 }}
 data:
   application.yaml: |-
     port: 8090
