@@ -53,6 +53,7 @@ tracing:
 # Specific settings for Saturn subchart
 #####################################################################
 saturn:
+  # loglevel: debug
   auth:
     enableBasicAuth: true
   persistence:
