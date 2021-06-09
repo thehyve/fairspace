@@ -2248,7 +2248,7 @@ https://storage.googleapis.com/fairspace-helm.
 
 ===== Download and install helm and gcloud
 
-* Download ``helm 2.14.3`` from from https://github.com/helm/helm/releases/tag/v2.14.3
+* Download ``helm 3.6.0`` from from https://github.com/helm/helm/releases/tag/v3.6.0
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
 [source, shell]
@@ -2287,18 +2287,18 @@ gcloud container clusters list
 # List Kubernetes namespaces
 kubectl get ns
 # List helm releases (deployments)
-~/bin/helm/helm list
+~/bin/helm/helm list -A
 ----
 
 ===== Initialise helm and add fairspace repository
 [source, shell]
 ----
-# Initialise helm
-~/bin/helm/helm init --client-only --stable-repo-url https://charts.helm.sh/stable
+# Add the stable repo
+~/bin/helm/helm repo add stable https://charts.helm.sh/stable
 # Add the fairspace repo for reading
 ~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
 # (Optional) Add the fairspace repo via the GCS plugin for writing
-~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.2.2
+~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.3.11
 gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ~/bin/helm/helm repo add fairspace-gcs gs://fairspace-helm
@@ -2325,7 +2325,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace/fairspace --version 0.7.13 --name fairspace-new --namespace=fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.13 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2341,13 +2341,13 @@ With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
 
 ===== Clean up deployment
-To clean up an environment or completely reinstall an environment, you can use ``helm del``.
+To clean up an environment or completely reinstall an environment, you can use ``helm uninstall``.
 
 WARNING: Be careful, you may lose data!
 
 [source, shell]
 ----
-~/bin/helm/helm del --purge fairspace-test
+~/bin/helm/helm uninstall --namespace fairspace-old fairspace-old
 ----
 
 === Logging

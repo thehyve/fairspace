@@ -8,9 +8,7 @@ metadata:
   name: {{ .Release.Name }}-fairspace
   labels:
     app: {{ template "fairspace.name" . }}
-    chart: {{ template "fairspace.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    {{- include "fairspace.labels" . | nindent 4 }}
 spec:
   secretName: {{ template "fairspace.tlsSecretName" . }}
 {{- with $ingress.tls.certificate.issuerRef }}
