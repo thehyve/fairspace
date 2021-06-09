@@ -20,9 +20,9 @@ spec:
       labels:
         app: fairspace
         release: {{ .Release.Name }}
-{{- if .Values.podAnnotations.saturn }}
+{{- if .Values.podAnnotations.fairspace }}
       annotations:
-{{ toYaml .Values.podAnnotations.saturn | indent 8 }}
+{{ toYaml .Values.podAnnotations.fairspace | indent 8 }}
 {{- end }}
     spec:
       containers:

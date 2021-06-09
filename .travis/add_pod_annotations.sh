@@ -14,7 +14,7 @@ DIR=$(dirname $0)
 # pod annotations
 if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
     # Remove empty pod annotations
-    sed -i -e "s/podAnnotations: {}//" charts/fairspace/values.yaml
+    sed -i -e "s/podAnnotations: { }//" charts/fairspace/values.yaml
 
     # Add a pod annotation in the values.yaml file
     echo -e "\npodAnnotations:" >> charts/fairspace/values.yaml
