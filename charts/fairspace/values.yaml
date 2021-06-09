@@ -27,8 +27,7 @@ fairspace:
           proxy_set_header  X-Forwarded-Proto $scheme;
           add_header Access-Control-Allow-Credentials true;
         nginx.ingress.kubernetes.io/enable-cors: "true"
-        nginx.ingress.kubernetes.io/cors-allow-methods: |
-          GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE, COPY, LOCK, MKCOL, MOVE, PROPFIND, PROPPATCH, UNLOCK
+        nginx.ingress.kubernetes.io/cors-allow-methods: GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE, COPY, LOCK, MKCOL, MOVE, PROPFIND, PROPPATCH, UNLOCK
       docs:
         kubernetes.io/ingress.class: nginx
     tls:
