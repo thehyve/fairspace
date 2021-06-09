@@ -99,6 +99,7 @@ spec:
             successThreshold: {{ .Values.saturn.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
+{{ toYaml .Values.saturn.resources | indent 12 }}
       volumes:
       - name: config-volume-saturn
         configMap:
