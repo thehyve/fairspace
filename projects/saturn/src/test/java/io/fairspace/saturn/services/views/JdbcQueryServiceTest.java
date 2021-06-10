@@ -131,6 +131,7 @@ public class JdbcQueryServiceTest {
         coll2.createNew("sample-s2-b-rna.fastq", null, 0L, "chemical/seq-na-fastq");
 
         var coll3 = (PutableResource) root.createCollection("coll3");
+
         coll3.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
 
         var testdata = model.read("testdata.ttl");
@@ -265,5 +266,17 @@ public class JdbcQueryServiceTest {
         request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll2");
         results = queryService.searchFiles(request);
         Assert.assertEquals(0, results.size());
+    }
+
+    @Test
+    public void testSearchFileDescription() {
+        selectAdmin();
+        var request = new FileSearchRequest();
+        // There is one file named sample-s2-b-rna.fastq with a description
+        request.setQuery("corona");
+
+        //request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(1, results.size());
     }
 }

@@ -547,7 +547,7 @@ public class ViewStoreReader {
 
             var queryString = new StringBuilder()
                     .append("SELECT id, label, type FROM public.resource ")
-                    .append("WHERE lower(label) like ? ")
+                    .append("WHERE (lower(label) like ? OR lower(description) like ?)")
                     .append("AND type IN ('File', 'Directory', 'Collection') ")
                     .append(collectionConstraint)
                     .append(idConstraint)
@@ -558,6 +558,7 @@ public class ViewStoreReader {
             var statement = connection.prepareStatement(queryString.toString());
 
             statement.setString(1, searchString);
+            statement.setString(2, searchString);
             statement.setQueryTimeout((int) searchConfig.pageRequestTimeout);
 
             var result = statement.executeQuery();
