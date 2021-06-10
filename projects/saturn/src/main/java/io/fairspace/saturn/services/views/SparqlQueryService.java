@@ -127,7 +127,7 @@ public class SparqlQueryService implements QueryService {
         return result;
     }
 
-    public List<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
         var query = getSearchForFilesQuery(request.getParentIRI());
         var binding = new QuerySolutionMap();
         binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));

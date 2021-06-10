@@ -54,7 +54,7 @@ public class SearchService {
 
     public SearchResultsDTO getFileSearchResults(FileSearchRequest request) {
 
-        var queryResult = queryService.getFilesByText(request);
+        var queryResult = queryService.searchFiles(request);
 
         return SearchResultsDTO.builder()
                 .results(queryResult)

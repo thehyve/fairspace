@@ -113,7 +113,7 @@ public class JdbcQueryService implements QueryService {
     }
 
     @SneakyThrows
-    public List<SearchResultDTO> getFilesByText(FileSearchRequest request) {
+    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
         var collectionsForUser = transactions.calculateRead(m ->
                 rootSubject.getChildren().stream()
                         .map(collection -> getCollectionName(collection.getUniqueId()))

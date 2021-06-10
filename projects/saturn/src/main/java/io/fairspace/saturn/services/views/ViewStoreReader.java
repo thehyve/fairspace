@@ -6,6 +6,7 @@ import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.time.*;
@@ -540,19 +541,21 @@ public class ViewStoreReader {
 
     public List<SearchResultDTO> searchFiles(FileSearchRequest request, List<String> userCollections) {
         try {
-            var queryString = """
-                    SELECT id, label, type FROM public.resource
-                    WHERE lower(label) like ?
-                    AND type IN ('File', 'Directory', 'Collection')
-                    AND collection in ( {userCollections} )
-                    ORDER BY id ASC LIMIT 1000""";
+            var collectionConstraint = "AND collection in ('" + String.join("', '", userCollections) + "') ";
+            var idConstraint = StringUtils.isBlank(request.getParentIRI()) ? "" :
+                    "AND id like '" + request.getParentIRI() + "%' ";
+
+            var queryString = new StringBuilder()
+                    .append("SELECT id, label, type FROM public.resource ")
+                    .append("WHERE lower(label) like ? ")
+                    .append("AND type IN ('File', 'Directory', 'Collection') ")
+                    .append(collectionConstraint)
+                    .append(idConstraint)
+                    .append("ORDER BY id ASC LIMIT 1000");
 
             var searchString = "%" + request.getQuery().toLowerCase() + "%";
-            var userCollectionsParameter = "'" + String.join("', '", userCollections) + "'";
 
-            queryString = queryString.replace("{userCollections}", userCollectionsParameter);
-
-            var statement = connection.prepareStatement(queryString);
+            var statement = connection.prepareStatement(queryString.toString());
 
             statement.setString(1, searchString);
             statement.setQueryTimeout((int) searchConfig.pageRequestTimeout);
