@@ -59,10 +59,10 @@ dependencies {
 
     implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.14.1'
 
-    implementation 'org.eclipse.jetty:jetty-proxy:9.4.34.v20201102'
+    implementation 'org.eclipse.jetty:jetty-proxy:9.4.42.v20210604'
 
-    implementation 'org.keycloak:keycloak-jetty94-adapter:11.0.2'
-    implementation 'org.keycloak:keycloak-admin-client:11.0.2'
+    implementation 'org.keycloak:keycloak-jetty94-adapter:13.0.1'
+    implementation 'org.keycloak:keycloak-admin-client:13.0.1'
 
     runtime 'org.apache.logging.log4j:log4j-api:2.14.1'
     runtime 'org.apache.logging.log4j:log4j-core:2.14.1'
