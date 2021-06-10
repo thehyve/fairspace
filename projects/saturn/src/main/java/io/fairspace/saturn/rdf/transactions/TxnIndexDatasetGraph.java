@@ -48,10 +48,10 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
     private List<Node> retrieveValues(Graph graph, Node subject, String source) {
         var predicates = source.split("\\s+");
         var nodes = List.of(subject);
-        for (var predicate: predicates) {
+        for (var predicate : predicates) {
             var next = new ArrayList<Node>();
             var predicateNode = NodeFactory.createURI(predicate);
-            for (var node: nodes) {
+            for (var node : nodes) {
                 if (node.isLiteral()) {
                     continue;
                 }
@@ -78,6 +78,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
         }
         var graph = getDefaultGraph();
         var typeNode = graph.find(subject, RDF.type.asNode(), Node.ANY).nextOptional();
+
         if (typeNode.isEmpty()) {
             log.debug("Subject {} has no type!", subject.getURI());
             return;
@@ -98,7 +99,6 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 var row = new HashMap<String, Object>();
                 row.put("id", subject.getURI());
                 row.put("label", getLabel(graph, subject));
-                row.put("type", type.getLocalName());
 
                 if (protectedResources.contains(type.getURI())) {
                     // set collection name
@@ -113,10 +113,8 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     row.put("collection", collection);
                 }
                 // Update subject value columns
-                // BERF: have a review of this code. This code is (also) executed during update of the Resource table (postgres).
-                // The view.columns are not equal to the database columns, which results in null values being inserted.
                 try {
-                    for (var column: view.columns) {
+                    for (var column : view.columns) {
                         var objects = retrieveValues(graph, subject, column.source);
                         if (objects.isEmpty()) {
                             continue;
@@ -130,9 +128,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                                 var term = objects.get(0);
                                 var label = getLabel(graph, term);
                                 viewStoreClient.addLabel(term.getURI(), column.rdfType, label);
-                                if(label != null) {
-                                    row.put(column.name, label);
-                                }
+                                row.put(column.name, label);
                             }
                             default -> row.put(column.name, objects.get(0).getLiteralValue().toString());
                         }
@@ -142,7 +138,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     log.error("Failed to update view row", e);
                 }
                 // Update subject value sets
-                for (View.Column column: view.columns) {
+                for (View.Column column : view.columns) {
                     if (!column.type.isSet()) {
                         continue;
                     }
@@ -152,7 +148,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     }
                     try {
                         var values = new HashSet<String>();
-                        for (var term: objects) {
+                        for (var term : objects) {
                             if (column.type == ColumnType.TermSet) {
                                 var label = getLabel(graph, term);
                                 viewStoreClient.addLabel(term.getURI(), column.rdfType, label);
@@ -172,7 +168,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 }
                 // Update subject links
                 if (view.join != null) {
-                    for (var joinView: view.join) {
+                    for (var joinView : view.join) {
                         var relation = NodeFactory.createURI(joinView.on);
                         var objects = joinView.reverse ?
                                 graph.find(Node.ANY, relation, subject).mapWith(Triple::getSubject).toList() :
