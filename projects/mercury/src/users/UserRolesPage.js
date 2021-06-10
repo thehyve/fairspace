@@ -21,6 +21,7 @@ import {setUserRole} from "./UsersAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 const columns = {
     name: {
@@ -35,30 +36,30 @@ const columns = {
         valueExtractor: 'email',
         label: 'Email'
     },
-    superadmin: {
+    isSuperadmin: {
         valueExtractor: 'isSuperadmin',
         label: 'Superadmin'
     },
-    admin: {
+    isAdmin: {
         valueExtractor: 'isAdmin',
         label: 'Admin'
     },
-    viewPublicData: {
+    canViewPublicData: {
         valueExtractor: 'canViewPublicData',
         label: 'View public data'
     },
-    viewPublicMetadata: {
+    canViewPublicMetadata: {
         valueExtractor: 'canViewPublicMetadata',
         label: 'View public metadata'
     },
-    addSharedMetadata: {
+    canAddSharedMetadata: {
         valueExtractor: 'canAddSharedMetadata',
         label: 'Add shared metadata'
     }
 };
 
 const roleSelectionColumns = [
-    columns.superadmin, columns.admin, columns.viewPublicData, columns.viewPublicMetadata, columns.addSharedMetadata
+    columns.isSuperadmin, columns.isAdmin, columns.canViewPublicData, columns.canViewPublicMetadata, columns.canAddSharedMetadata
 ];
 
 const UserRolesPage = () => {
@@ -132,11 +133,11 @@ const UserRolesPage = () => {
                             {renderHeaderCellWithFilter(columns.email)}
                             {
                                 Object.entries(roleSelectionColumns).map(([key, column]) => (
-                                    <TableCell key={key}>
+                                    <TableCell key={column.valueExtractor}>
                                         <TableSortLabel
-                                            active={orderBy === key}
+                                            active={orderBy === column.valueExtractor}
                                             direction={orderAscending ? 'asc' : 'desc'}
-                                            onClick={() => toggleSort(key)}
+                                            onClick={() => toggleSort(column.valueExtractor)}
                                         >
                                             {column.label}
                                         </TableSortLabel>
@@ -208,6 +209,7 @@ const UserRolesPage = () => {
                     onChangePage={(e, p) => setPage(p)}
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
+                    ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
         </Paper>

@@ -4,9 +4,7 @@ metadata:
   name: {{ .Release.Name }}-pluto
   labels:
     app: pluto
-    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "fairspace.labels" . | nindent 4 }}
 data:
   application.yaml: |-
     pluto:
@@ -55,6 +53,6 @@ data:
 {{ end }}
         saturn:
           path: /api/**
-          url: {{ .Values.pluto.backends.saturn | default (printf "http://%s-saturn.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          url: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
           strip-prefix: false
       add-proxy-headers: false

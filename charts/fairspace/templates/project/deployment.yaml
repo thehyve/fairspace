@@ -1,12 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Release.Name }}-saturn
+  name: {{.Release.Name }}
   labels:
-    app: saturn
-    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    release: {{.Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: {{ template "fairspace.name" . }}
+    {{- include "fairspace.labels" . | nindent 4 }}
 spec:
   replicas: 1
   strategy:
@@ -15,19 +13,50 @@ spec:
       maxUnavailable: 100%
   selector:
     matchLabels:
-      app: saturn
+      app: fairspace
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: saturn
+        app: fairspace
         release: {{ .Release.Name }}
-{{- if .Values.podAnnotations.saturn }}
+{{- if .Values.podAnnotations.fairspace }}
       annotations:
-{{ toYaml .Values.podAnnotations.saturn | indent 8 }}
+{{ toYaml .Values.podAnnotations.fairspace | indent 8 }}
 {{- end }}
     spec:
       containers:
+        - name: {{ .Release.Name }}-pluto
+          image: "{{ .Values.pluto.image.image }}:{{ .Values.pluto.image.tag }}"
+          imagePullPolicy: {{ .Values.pluto.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-oauth-client"
+                  key: clientSecret
+          volumeMounts:
+            - name: config-volume-pluto
+              mountPath: /opt/config
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: {{ .Values.pluto.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.pluto.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.pluto.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.pluto.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path:  /actuator/health
+              port: 8080
+            periodSeconds: {{ .Values.pluto.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.pluto.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.pluto.readinessProbe.timeoutSeconds }}
+          resources:
+{{ toYaml .Values.pluto.resources | indent 12 }}
         - name: {{ .Release.Name }}-saturn
           image: "{{ .Values.saturn.image.image }}:{{ .Values.saturn.image.tag }}"
           imagePullPolicy: {{ .Values.saturn.image.pullPolicy }}
@@ -41,8 +70,12 @@ spec:
                   key: clientSecret
             - name: AUDIT_LOG_ROOT
               value: /data/saturn/audit
+{{- if .Values.saturn.loglevel }}
+            - name: LOG_LEVEL
+              value: {{ .Values.saturn.loglevel | quote }}
+{{- end }}
           volumeMounts:
-            - name: config-volume
+            - name: config-volume-saturn
               mountPath: /opt/config
             - name: database
               mountPath: /data/saturn/db
@@ -67,14 +100,13 @@ spec:
             timeoutSeconds: {{ .Values.saturn.readinessProbe.timeoutSeconds }}
           resources:
 {{ toYaml .Values.saturn.resources | indent 12 }}
-    {{- with .Values.saturn.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
       volumes:
-      - name: config-volume
+      - name: config-volume-saturn
         configMap:
           name: {{ .Release.Name }}-saturn
+      - name: config-volume-pluto
+        configMap:
+          name: {{ .Release.Name }}-pluto
       - name: database
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-saturn-database

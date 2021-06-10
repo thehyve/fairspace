@@ -4,9 +4,7 @@ metadata:
   name: {{ .Release.Name }}-saturn-files
   labels:
     app: saturn
-    chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "fairspace.labels" . | nindent 4 }}
 {{- if .Values.saturn.persistence.files.annotations }}
   annotations:
 {{ toYaml .Values.saturn.persistence.files.annotations | indent 4 }}

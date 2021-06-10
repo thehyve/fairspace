@@ -53,6 +53,7 @@ public class TestUtils {
     public static User createTestUser(String username, boolean isAdmin) {
         User user = new User();
         user.setId(username);
+        user.setUsername(username);
         user.setName(username);
         user.setIri(SparqlUtils.generateMetadataIri(username));
         user.setAdmin(isAdmin);

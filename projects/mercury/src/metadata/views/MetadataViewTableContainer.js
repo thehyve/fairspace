@@ -27,6 +27,7 @@ import {Collection} from "../../collections/CollectionAPI";
 import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
+import TablePaginationActions from "../../common/components/TablePaginationActions";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -236,6 +237,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     onChangeRowsPerPage={handleChangeRowsPerPage}
                     className={classes.tableFooter}
                     labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
+                    ActionsComponent={TablePaginationActions}
                 />
             </LoadingOverlayWrapper>
         </Paper>

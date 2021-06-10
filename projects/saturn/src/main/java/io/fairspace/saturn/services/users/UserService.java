@@ -21,8 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
@@ -38,13 +37,24 @@ public class UserService {
     private final Transactions transactions;
     private final Config.Auth config;
     private final UsersResource usersResource;
+    private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
 
-
-    public UserService(Config.Auth config, Transactions transactions) {
+    public UserService(Config.Auth config, Transactions transactions, UsersResource usersResource) {
         this.config = config;
         this.transactions = transactions;
+        this.usersResource = usersResource;
+        usersCache = CacheBuilder.newBuilder()
+                .refreshAfterWrite(30, TimeUnit.SECONDS)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public Map<Node, User> load(Boolean key) {
+                        return fetchUsers();
+                    }
+                });
+    }
 
-        this.usersResource = KeycloakBuilder.builder()
+    public UserService(Config.Auth config, Transactions transactions) {
+        this(config, transactions, KeycloakBuilder.builder()
                 .serverUrl(config.authServerUrl)
                 .realm(config.realm)
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
@@ -54,16 +64,7 @@ public class UserService {
                 .password(getenv("KEYCLOAK_CLIENT_SECRET"))
                 .build()
                 .realm(config.realm)
-                .users();
-
-        usersCache = CacheBuilder.newBuilder()
-                .refreshAfterWrite(30, TimeUnit.SECONDS)
-                .build(new CacheLoader<>() {
-                    @Override
-                    public Map<Node, User> load(Boolean key) {
-                        return fetchUsers();
-                    }
-                });
+                .users());
     }
 
     public Collection<User> getUsers() {
@@ -128,12 +129,14 @@ public class UserService {
         });
 
         if (!updated.isEmpty()) {
-            transactions.executeWrite(model -> {
-                var dao = new DAO(model);
-                updated.forEach(dao::write);
+            threadpool.submit(() -> {
+                log.info("Updating users asynchronously");
+                transactions.executeWrite(model -> {
+                    var dao = new DAO(model);
+                    updated.forEach(dao::write);
+                });
             });
         }
-
         return users;
     }
 

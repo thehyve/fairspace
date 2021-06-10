@@ -2,6 +2,7 @@ import React, {useContext, useState} from 'react';
 import {ExpandMore} from "@material-ui/icons";
 import {
     Avatar,
+    Box,
     Card,
     CardContent,
     CardHeader,
@@ -27,7 +28,7 @@ import CollectionsContext from "../collections/CollectionsContext";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
 import ErrorDialog from "../common/components/ErrorDialog";
 import type {AccessLevel, AccessMode} from '../collections/CollectionAPI';
-import {accessLevels, Collection} from "../collections/CollectionAPI";
+import {accessLevels, accessModes, Collection} from "../collections/CollectionAPI";
 import {
     accessLevelForCollection,
     collectionAccessIcon,
@@ -51,6 +52,7 @@ const styles = theme => ({
     permissionsCard: {
         marginTop: 10
     },
+
     avatar: {
         width: 20,
         height: 20,
@@ -66,6 +68,9 @@ const styles = theme => ({
     },
     property: {
         marginTop: 10
+    },
+    group: {
+        marginLeft: 20
     },
     accessIcon: {
         verticalAlign: 'middle'
@@ -176,7 +181,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 aria-label="Show more"
                 title="Access"
             >
-                <ExpandMore />
+                <ExpandMore/>
             </IconButton>
         </>
     );
@@ -187,7 +192,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 return (
                     <span>
                         Are you sure you want to change the view mode of
-                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br />
+                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br/>
                         Metadata and data files will only be findable and readable for users
                         that have been granted access to the collection explicitly.
                     </span>
@@ -195,15 +200,15 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             case 'MetadataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br />
+                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br/>
                         The metadata will be findable and readable for all users with access to public data.
                     </span>
                 );
             case 'DataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br />
-                        The data will be findable and readable for all users with access to public data.<br />
+                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br/>
+                        The data will be findable and readable for all users with access to public data.<br/>
                         <strong>
                             Warning: This action cannot be reverted.
                             Once published, the collection cannot be unpublished, moved or deleted.
@@ -214,6 +219,43 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 throw Error(`Unknown access mode: ${accessMode}`);
         }
     };
+
+    const showSingleAccessMode = () => (
+        <ListItemText
+            primary={camelCaseToWords(collection.accessMode)}
+            secondary={descriptionForAccessMode(collection.accessMode)}
+        />
+    )
+    const showMultipleAccessModes = () => (
+        <FormControl>
+            <Select
+                value={collection.accessMode}
+                onChange={mode => handleSetAccessMode(mode)}
+                inputProps={{'aria-label': 'View mode'}}
+            >
+                {/*show available access modes which user can select*/}
+                {collection.availableAccessModes.map(mode => (
+                    <MenuItem key={mode} value={mode}>
+                        <ListItemText
+                            primary={camelCaseToWords(mode)}
+                            secondary={descriptionForAccessMode(mode)}
+                        />
+                    </MenuItem>
+                ))}
+                {/*show not available modes as disabled menu item, so user knows it exists*/}
+                {accessModes.filter(mode => collection.availableAccessModes.indexOf(mode) < 0)
+                    .map(unavailableMode => (
+                        <MenuItem key={unavailableMode} value={unavailableMode} disabled>
+                            <ListItemText
+                                primary={camelCaseToWords(unavailableMode)}
+                                secondary={descriptionForAccessMode(unavailableMode)}
+                            />
+                        </MenuItem>
+                    ))
+                }
+            </Select>
+        </FormControl>
+    );
 
     const renderAccessModeChangeConfirmation = () => (
         <ConfirmationDialog
@@ -230,32 +272,13 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderAccessMode = () => (
         <FormControl className={classes.property}>
-            <FormLabel>View mode</FormLabel>
-            <FormGroup>
-                {(collection.canManage && collection.availableAccessModes.length > 1) ? (
-                    <FormControl>
-                        <Select
-                            value={collection.accessMode}
-                            onChange={mode => handleSetAccessMode(mode)}
-                            inputProps={{'aria-label': 'View mode'}}
-                        >
-                            {collection.availableAccessModes.map(mode => (
-                                <MenuItem key={mode} value={mode}>
-                                    <ListItemText
-                                        primary={camelCaseToWords(mode)}
-                                        secondary={descriptionForAccessMode(mode)}
-                                    />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                ) : (
-                    <ListItemText
-                        primary={camelCaseToWords(collection.accessMode)}
-                        secondary={descriptionForAccessMode(collection.accessMode)}
-                    />
-                )}
-            </FormGroup>
+            <FormLabel>Public access</FormLabel>
+            <Box className={classes.group}>
+                <FormGroup>
+                    {(collection.canManage && collection.availableAccessModes.length > 1) ?
+                        showMultipleAccessModes() : showSingleAccessMode()}
+                </FormGroup>
+            </Box>
         </FormControl>
     );
 
@@ -274,24 +297,26 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const renderOwnerWorkspaceAccess = () => (
         <FormControl className={classes.property}>
-            <FormLabel>Members access</FormLabel>
-            <FormGroup>
-                {collection.canManage ? (
-                    <Select
-                        value={ownerWorkspaceAccess}
-                        onChange={access => handleSetOwnerWorkspaceAccess(access)}
-                        inputProps={{'aria-label': 'Owner workspace access'}}
-                    >
-                        {availableWorkspaceMembersAccessLevels.map(access => (
-                            <MenuItem key={access} value={access}>
-                                <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
-                                <span className={classes.accessName}>{access}</span>
-                            </MenuItem>
-                        ))}
-                    </Select>
-                ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
-            </FormGroup>
-            <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
+            <FormLabel>Workspace member access</FormLabel>
+            <Box className={classes.group}>
+                <FormGroup>
+                    {collection.canManage ? (
+                        <Select
+                            value={ownerWorkspaceAccess}
+                            onChange={access => handleSetOwnerWorkspaceAccess(access)}
+                            inputProps={{'aria-label': 'Owner workspace access'}}
+                        >
+                            {availableWorkspaceMembersAccessLevels.map(access => (
+                                <MenuItem key={access} value={access}>
+                                    <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
+                                    <span className={classes.accessName}>{access}</span>
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
+                </FormGroup>
+                <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
+            </Box>
         </FormControl>
     );
 
