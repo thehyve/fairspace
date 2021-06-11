@@ -29,7 +29,7 @@ data:
 
     security:
       oidc:
-        redirect-after-logout-url: https://{{ .Values.fairspace.ingress.domain }}
+        redirect-after-logout-url: https://{{ .Values.fairspace.ingress.domain }}/login
         clientId: {{ .Values.external.keycloak.clientId }}
         clientSecret: {{ .Values.external.keycloak.clientSecret }}
 
