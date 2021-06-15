@@ -131,7 +131,7 @@ public class SparqlQueryService implements QueryService {
         var query = getSearchForFilesQuery(request.getParentIRI());
         var binding = new QuerySolutionMap();
         binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));
-        return getByQuery(query, binding);
+        return getByQuery(query, binding, ds);
     }
 
     public static String getQueryRegex(String query) {
@@ -140,12 +140,12 @@ public class SparqlQueryService implements QueryService {
                 .replace("/\\/g", "\\\\");
     }
 
-    private List<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding) {
+    public static List<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding, Dataset dataset) {
         log.debug("Executing query:\n{}", query);
-        var selectExecution = QueryExecutionFactory.create(query, ds, binding);
+        var selectExecution = QueryExecutionFactory.create(query, dataset, binding);
         var results = new ArrayList<SearchResultDTO>();
 
-        return calculateRead(ds, () -> {
+        return calculateRead(dataset, () -> {
             try (selectExecution) {
                 //noinspection NullableProblems
                 for (var row : (Iterable<QuerySolution>) selectExecution::execSelect) {

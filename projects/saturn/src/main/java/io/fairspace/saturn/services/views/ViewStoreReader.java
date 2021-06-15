@@ -540,33 +540,50 @@ public class ViewStoreReader {
     }
 
     public List<SearchResultDTO> searchFiles(FileSearchRequest request, List<String> userCollections) {
-        try {
-            var collectionConstraint = "AND collection in ('" + String.join("', '", userCollections) + "') ";
-            var idConstraint = StringUtils.isBlank(request.getParentIRI()) ? "" :
-                    "AND id like '" + request.getParentIRI() + "%' ";
+        if (userCollections == null || userCollections.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-            var queryString = new StringBuilder()
-                    .append("SELECT id, label, type FROM public.resource ")
-                    .append("WHERE (lower(label) like ? OR lower(description) like ?)")
-                    .append("AND type IN ('File', 'Directory', 'Collection') ")
-                    .append(collectionConstraint)
-                    .append(idConstraint)
-                    .append("ORDER BY id ASC LIMIT 1000");
+        var searchString = "%" + escapeLikeString(request.getQuery().toLowerCase()) + "%";
 
-            var searchString = "%" + request.getQuery().toLowerCase() + "%";
+        ArrayList<String> values = new ArrayList<String>();
+        values.add(searchString);
+        values.add(searchString);
+        values.addAll(userCollections);
 
-            var statement = connection.prepareStatement(queryString.toString());
+        var collectionPlaceholders = userCollections
+                .stream()
+                .map(uc -> "?")
+                .collect(Collectors.toList());
+        var collectionConstraint = "and collection in (" + String.join(", ",collectionPlaceholders) + ") ";
 
-            statement.setString(1, searchString);
-            statement.setString(2, searchString);
+        var idConstraint = StringUtils.isBlank(request.getParentIRI()) ? "" :
+                "and id like '" + escapeLikeString(request.getParentIRI()) + "%' ";
+
+        var queryString = new StringBuilder()
+                .append("select id, label, description, type FROM resource ")
+                .append("where (lower(label) like ? OR lower(description) like ?)")
+                .append(collectionConstraint)
+                .append(idConstraint)
+                .append("order by id asc limit 1000");
+
+        try (var statement = connection.prepareStatement(queryString.toString())) {
+            AddParameters(statement, values);
             statement.setQueryTimeout((int) searchConfig.pageRequestTimeout);
 
             var result = statement.executeQuery();
             return convertResult(result);
 
         } catch (SQLException e) {
-            log.error("Error connecting to the view database.", e);
-            throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
+            log.error("Error searching files.", e);
+            throw new RuntimeException("Error searching files.", e); // Terminates Saturn
+        }
+    }
+
+    @SneakyThrows
+    private void AddParameters(PreparedStatement statement, List<String> values) {
+        for(int i = 0; i< values.size(); i++) {
+            statement.setString(i + 1, values.get(i));
         }
     }
 
@@ -578,7 +595,7 @@ public class ViewStoreReader {
                     .id(resultSet.getString("id"))
                     .label(resultSet.getString("label"))
                     .type(resultSet.getString("type"))
-                    .comment("")
+                    .comment(resultSet.getString("description"))
                     .build();
 
             rows.add(row);

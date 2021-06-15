@@ -16,6 +16,13 @@ import java.util.stream.*;
 
 import static java.lang.Integer.*;
 
+/**
+ * JDBC implementation of the query service. Depends on the
+ * {@link TxnIndexDatasetGraph} dataset graph wrapper to store
+ * changes to the metadata graph in a separate view database.
+ * Queries are performed by the {@link ViewStoreReader}.
+ * The database is initialised by the {@link ViewStoreClientFactory}.
+ */
 @Log4j2
 public class JdbcQueryService implements QueryService {
     @Getter

@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -69,37 +70,17 @@ public class SearchService {
                 .build();
     }
 
-    private ArrayList<SearchResultDTO> getResourceByText(LookupSearchRequest request) {
+    private List<SearchResultDTO> getResourceByText(LookupSearchRequest request) {
         var binding = new QuerySolutionMap();
         binding.add("query", createStringLiteral(request.getQuery()));
         binding.add("type", createResource(request.getResourceType()));
 
-        var results = getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding);
+        var results = SparqlQueryService.getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding, ds);
         if (results.size() > 0) {
             return results;
         }
 
         binding.add("regexQuery", createStringLiteral(SparqlQueryService.getQueryRegex(request.getQuery())));
-        return getByQuery(RESOURCE_BY_TEXT_QUERY, binding);
-    }
-
-    private ArrayList<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding) {
-        log.debug("Executing query:\n{}", query);
-        var selectExecution = QueryExecutionFactory.create(query, ds, binding);
-        var results = new ArrayList<SearchResultDTO>();
-
-        return calculateRead(ds, () -> {
-            try (selectExecution) {
-                //noinspection NullableProblems
-                for (var row : (Iterable<QuerySolution>) selectExecution::execSelect) {
-                    var id = row.getResource("id").getURI();
-                    var label = row.getLiteral("label").getString();
-                    var type = ofNullable(row.getResource("type")).map(Resource::getURI).orElse(null);
-                    var comment = ofNullable(row.getLiteral("comment")).map(Literal::getString).orElse(null);
-                    results.add(new SearchResultDTO(id, label, type, comment));
-                }
-            }
-            return results;
-        });
+        return SparqlQueryService.getByQuery(RESOURCE_BY_TEXT_QUERY, binding, ds);
     }
 }
