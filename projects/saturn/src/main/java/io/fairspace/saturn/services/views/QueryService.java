@@ -24,4 +24,5 @@ public interface QueryService {
     CountDTO count(CountRequest request);
 
     List<SearchResultDTO> searchFiles(FileSearchRequest request);
+
 }

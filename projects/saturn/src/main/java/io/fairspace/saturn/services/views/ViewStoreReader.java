@@ -4,6 +4,7 @@ import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.services.search.SearchResultsDTO;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.StringUtils;
@@ -562,7 +563,7 @@ public class ViewStoreReader {
 
         var queryString = new StringBuilder()
                 .append("select id, label, description, type FROM resource ")
-                .append("where (lower(label) like ? OR lower(description) like ?)")
+                .append("where (lower(label) like ? OR lower(description) like ?) ")
                 .append(collectionConstraint)
                 .append(idConstraint)
                 .append("order by id asc limit 1000");
@@ -602,4 +603,6 @@ public class ViewStoreReader {
         }
         return rows;
     }
+
+
 }

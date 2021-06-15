@@ -91,6 +91,6 @@ public class Services {
         }
         viewService = new ViewService(viewsConfig, filteredDataset, viewStoreReader);
 
-        searchService = new SearchService(filteredDataset, queryService);
+        searchService = new SearchService(filteredDataset);
     }
 }
