@@ -4,6 +4,7 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.fairspace.saturn.vocabulary.FS;
@@ -130,41 +131,8 @@ public class SparqlQueryService implements QueryService {
     public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
         var query = getSearchForFilesQuery(request.getParentIRI());
         var binding = new QuerySolutionMap();
-        binding.add("regexQuery", createStringLiteral(getQueryRegex(request.getQuery())));
-        return getByQuery(query, binding, ds);
-    }
-
-    public static String getQueryRegex(String query) {
-        return ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)"
-                + query.replaceAll("[^a-zA-Z0-9]", "\\\\$0"))
-                .replace("/\\/g", "\\\\");
-    }
-
-    public static List<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding, Dataset dataset) {
-        log.debug("Executing query:\n{}", query);
-        var selectExecution = QueryExecutionFactory.create(query, dataset, binding);
-        var results = new ArrayList<SearchResultDTO>();
-
-        return calculateRead(dataset, () -> {
-            try (selectExecution) {
-                //noinspection NullableProblems
-                for (var row : (Iterable<QuerySolution>) selectExecution::execSelect) {
-                    var id = row.getResource("id").getURI();
-                    var label = row.getLiteral("label").getString();
-                    var type = ofNullable(row.getResource("type")).map(Resource::getURI).orElse(null);
-                    var comment = ofNullable(row.getLiteral("comment")).map(Literal::getString).orElse(null);
-
-                    var dto = SearchResultDTO.builder()
-                            .id(id)
-                            .label(label)
-                            .type(type)
-                            .comment(comment)
-                            .build();
-                    results.add(dto);
-                }
-            }
-            return results;
-        });
+        binding.add("regexQuery", createStringLiteral(SparqlUtils.getQueryRegex(request.getQuery())));
+        return SparqlUtils.getByQuery(query, binding, ds);
     }
 
     private Set<ValueDTO> getValues(Resource resource, View.Column column) {

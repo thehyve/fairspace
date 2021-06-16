@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.search;
 
+import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.views.QueryService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -63,12 +64,12 @@ public class SearchService {
         binding.add("query", createStringLiteral(request.getQuery()));
         binding.add("type", createResource(request.getResourceType()));
 
-        var results = SparqlQueryService.getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding, ds);
+        var results = SparqlUtils.getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding, ds);
         if (results.size() > 0) {
             return results;
         }
 
-        binding.add("regexQuery", createStringLiteral(SparqlQueryService.getQueryRegex(request.getQuery())));
-        return SparqlQueryService.getByQuery(RESOURCE_BY_TEXT_QUERY, binding, ds);
+        binding.add("regexQuery", createStringLiteral(SparqlUtils.getQueryRegex(request.getQuery())));
+        return SparqlUtils.getByQuery(RESOURCE_BY_TEXT_QUERY, binding, ds);
     }
 }

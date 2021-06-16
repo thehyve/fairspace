@@ -563,13 +563,16 @@ public class ViewStoreReader {
 
         var queryString = new StringBuilder()
                 .append("select id, label, description, type FROM resource ")
-                .append("where (lower(label) like ? OR lower(description) like ?) ")
+                .append("where (label ilike ? OR description ilike ?) ")
                 .append(collectionConstraint)
                 .append(idConstraint)
                 .append("order by id asc limit 1000");
 
         try (var statement = connection.prepareStatement(queryString.toString())) {
-            AddParameters(statement, values);
+            for(int i = 0; i< values.size(); i++) {
+                statement.setString(i + 1, values.get(i));
+            }
+
             statement.setQueryTimeout((int) searchConfig.pageRequestTimeout);
 
             var result = statement.executeQuery();
@@ -578,13 +581,6 @@ public class ViewStoreReader {
         } catch (SQLException e) {
             log.error("Error searching files.", e);
             throw new RuntimeException("Error searching files.", e); // Terminates Saturn
-        }
-    }
-
-    @SneakyThrows
-    private void AddParameters(PreparedStatement statement, List<String> values) {
-        for(int i = 0; i< values.size(); i++) {
-            statement.setString(i + 1, values.get(i));
         }
     }
 
