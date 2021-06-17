@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.dao.*;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.webdav.*;
@@ -129,6 +130,10 @@ public class JdbcQueryServiceTest {
         var coll2 = (PutableResource) root.createCollection("coll2");
         coll2.createNew("sample-s2-b-rna.fastq", null, 0L, "chemical/seq-na-fastq");
 
+        var coll3 = (PutableResource) root.createCollection("coll3");
+
+        coll3.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
+
         var testdata = model.read("testdata.ttl");
         api.put(testdata);
     }
@@ -219,5 +224,59 @@ public class JdbcQueryServiceTest {
         request.setView("Sample");
         var result = queryService.count(request);
         Assert.assertEquals(2, result.getCount());
+    }
+
+    @Test
+    public void testSearchFiles() {
+        var request = new FileSearchRequest();
+        // There are two files with 'rna' in the file name in coll2.
+        request.setQuery("rna");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(2, results.size());
+        // Expect the results to be sorted by id
+        Assert.assertEquals("sample-s2-b-rna.fastq", results.get(0).getLabel());
+        Assert.assertEquals("sample-s2-b-rna_copy.fastq", results.get(1).getLabel());
+    }
+
+    @Test
+    public void testSearchFilesRestrictsToAccessibleCollections() {
+        var request = new FileSearchRequest();
+        // There is one file named coffee.jpg in coll1, not accessible by the regular user.
+        request.setQuery("coffee");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(0, results.size());
+
+        selectAdmin();
+        results = queryService.searchFiles(request);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
+    }
+
+    @Test
+    public void testSearchFilesRestrictsToParentDirectory() {
+        selectAdmin();
+        var request = new FileSearchRequest();
+        // There is one file named coffee.jpg in coll1.
+        request.setQuery("coffee");
+
+        request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(1, results.size());
+
+        request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll2");
+        results = queryService.searchFiles(request);
+        Assert.assertEquals(0, results.size());
+    }
+
+    @Test
+    public void testSearchFileDescription() {
+        selectAdmin();
+        var request = new FileSearchRequest();
+        // There is one file named sample-s2-b-rna.fastq with a description
+        request.setQuery("corona");
+
+        //request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(1, results.size());
     }
 }

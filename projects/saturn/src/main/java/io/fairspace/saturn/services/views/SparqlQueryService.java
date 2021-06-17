@@ -4,10 +4,14 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -21,9 +25,11 @@ import java.util.*;
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 import static org.apache.jena.sparql.expr.NodeValue.*;
 import static org.apache.jena.sparql.expr.NodeValue.makeString;
 import static org.apache.jena.system.Txn.calculateRead;
@@ -120,6 +126,13 @@ public class SparqlQueryService implements QueryService {
         }
 
         return result;
+    }
+
+    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
+        var query = getSearchForFilesQuery(request.getParentIRI());
+        var binding = new QuerySolutionMap();
+        binding.add("regexQuery", createStringLiteral(SparqlUtils.getQueryRegex(request.getQuery())));
+        return SparqlUtils.getByQuery(query, binding, ds);
     }
 
     private Set<ValueDTO> getValues(Resource resource, View.Column column) {
@@ -301,6 +314,27 @@ public class SparqlQueryService implements QueryService {
                     throw new IllegalArgumentException(
                             "Unknown column for view " + fieldNameParts[0] + ": " + fieldNameParts[1]);
                 });
+    }
+
+    private Query getSearchForFilesQuery(String parentIRI) {
+        var builder = new StringBuilder("PREFIX fs: <")
+                .append(FS.NS)
+                .append(">\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\n")
+                .append("SELECT ?id ?label ?comment ?type\n")
+                .append("WHERE {\n");
+
+        if (parentIRI != null && !parentIRI.trim().isEmpty()) {
+            builder.append("?id fs:belongsTo* <").append(parentIRI).append("> .\n");
+        }
+
+        builder.append("?id rdfs:label ?label ; a ?type .\n")
+                .append("FILTER (?type in (fs:File, fs:Directory, fs:Collection))\n")
+                .append("OPTIONAL { ?id rdfs:comment ?comment }\n")
+                .append("FILTER NOT EXISTS { ?id fs:dateDeleted ?anydate }\n")
+                .append("FILTER (regex(?label, ?regexQuery, \"i\") || regex(?comment, ?regexQuery, \"i\"))\n")
+                .append("}\nLIMIT 10000");
+
+        return QueryFactory.create(builder.toString());
     }
 
     private static Calendar convertDateValue(String value) {

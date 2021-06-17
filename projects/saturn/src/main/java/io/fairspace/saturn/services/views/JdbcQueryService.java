@@ -2,8 +2,11 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.milton.resource.*;
 import lombok.*;
+import lombok.extern.log4j.Log4j2;
 
 import java.net.*;
 import java.nio.charset.*;
@@ -20,6 +23,7 @@ import static java.lang.Integer.*;
  * Queries are performed by the {@link ViewStoreReader}.
  * The database is initialised by the {@link ViewStoreClientFactory}.
  */
+@Log4j2
 public class JdbcQueryService implements QueryService {
     @Getter
     private final ViewStoreReader viewStoreReader;
@@ -48,7 +52,7 @@ public class JdbcQueryService implements QueryService {
         }
         var collections = transactions.calculateRead(m ->
                 rootSubject.getChildren().stream()
-                        .map(collection -> (Object)getCollectionName(collection.getUniqueId()))
+                        .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
                         .collect(Collectors.toList()));
         if (filters.stream()
                 .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
@@ -94,7 +98,7 @@ public class JdbcQueryService implements QueryService {
                         .totalPages(count / size + ((count % size > 0) ? 1 : 0));
             }
             return pageBuilder.build();
-        } catch(SQLTimeoutException e) {
+        } catch (SQLTimeoutException e) {
             return ViewPageDTO.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)
@@ -113,5 +117,15 @@ public class JdbcQueryService implements QueryService {
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);
         }
+    }
+
+    @SneakyThrows
+    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
+        var collectionsForUser = transactions.calculateRead(m ->
+                rootSubject.getChildren().stream()
+                        .map(collection -> getCollectionName(collection.getUniqueId()))
+                        .collect(Collectors.toList()));
+
+        return viewStoreReader.searchFiles(request, collectionsForUser);
     }
 }

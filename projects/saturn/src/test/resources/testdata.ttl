@@ -72,6 +72,7 @@ file:coll1\/coffee.jpg
 
 file:coll2\/sample-s2-b-rna.fastq
     curie:aboutSubject subject:s2 ;
+    rdfs:comment "corona" ;
     curie:sample sample:s2-b .
 
 file:coll2\/sample-s2-b-rna.fastq

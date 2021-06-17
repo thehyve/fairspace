@@ -2,7 +2,12 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.services.search.SearchResultsDTO;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.time.*;
@@ -26,6 +31,7 @@ public class ViewStoreReader {
     final Config.Search searchConfig;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
+
     public ViewStoreReader(Config.Search searchConfig, ViewStoreClient viewStoreClient) {
         this.searchConfig = searchConfig;
         this.configuration = viewStoreClient.configuration;
@@ -64,7 +70,7 @@ public class ViewStoreReader {
             var collection = result.getString("collection");
             row.put(viewConfig.name + "_collection", Collections.singleton(new ValueDTO(collection, collection)));
         }
-        for (var viewColumn: viewConfig.columns) {
+        for (var viewColumn : viewConfig.columns) {
             if (viewColumn.type.isSet()) {
                 continue;
             }
@@ -125,7 +131,7 @@ public class ViewStoreReader {
     }
 
     void prepareFilters(List<ViewFilter> filters) throws SQLException {
-        for (var filter: filters) {
+        for (var filter : filters) {
             if (filter.getField().equalsIgnoreCase("location")) {
                 filter.setField("Resource");
                 filter.setPrefixes(filter.values.stream().map(Object::toString).collect(Collectors.toList()));
@@ -137,7 +143,7 @@ public class ViewStoreReader {
             }
             if (EnumSet.of(ColumnType.Term, ColumnType.TermSet).contains(column.type)) {
                 var values = new ArrayList<>();
-                for (var value: filter.values) {
+                for (var value : filter.values) {
                     var label = label(value.toString());
                     if (label == null) {
                         log.error("No label found for value " + value.toString());
@@ -283,7 +289,7 @@ public class ViewStoreReader {
                         (constraints.isBlank() ? "" : " where " + constraints) +
                         (scope == null ? "" : (" " + scope))
         );
-        for (var i=0; i < values.size(); i++) {
+        for (var i = 0; i < values.size(); i++) {
             var value = values.get(i);
             if (value instanceof Number) {
                 query.setFloat(i + 1, ((Number) value).floatValue());
@@ -299,7 +305,7 @@ public class ViewStoreReader {
 
     Map<String, PreparedStatement> prepareValueSetQueries(String view, List<String> properties) throws SQLException {
         var valueSetQueries = new LinkedHashMap<String, PreparedStatement>();
-        for (var propertyName: properties) {
+        for (var propertyName : properties) {
             var propertyTable = configuration.propertyTables.get(view).get(propertyName);
             var valueSetQuery = connection.prepareStatement(
                     "select " + propertyName.toLowerCase() +
@@ -311,8 +317,8 @@ public class ViewStoreReader {
     }
 
     void addValueSetValues(String view, Map<String, Set<ValueDTO>> row, List<String> properties, Map<String, PreparedStatement> valueSetQueries) throws SQLException {
-        var rowId = (String)row.get(view).stream().findFirst().orElseThrow().getValue();
-        for (var propertyName: properties) {
+        var rowId = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
+        for (var propertyName : properties) {
             var valueSetQuery = valueSetQueries.get(propertyName);
             valueSetQuery.setString(1, rowId);
             var valueSetResult = valueSetQuery.executeQuery();
@@ -379,7 +385,7 @@ public class ViewStoreReader {
                 "select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) +
                         " from " + joinedTable.name + " j " +
                         " where exists (" +
-                        "   select * from " + joinTable.name +" jt " +
+                        "   select * from " + joinTable.name + " jt " +
                         "   where jt." + idColumn(joinView.view).name + " = j.id" +
                         "   and jt." + idColumn(view).name + " = ? )"
         );
@@ -389,12 +395,12 @@ public class ViewStoreReader {
         while (result.next()) {
             Map<String, Set<ValueDTO>> row = new HashMap<>();
             row.put(joinView.view, Collections.singleton(new ValueDTO(result.getString("label"), result.getString("id"))));
-            for (var column: projectionColumns) {
+            for (var column : projectionColumns) {
                 var columnName = joinView.view + "_" + column;
                 var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
                         .filter(c -> c.getName().equalsIgnoreCase(column))
                         .findFirst().orElseThrow(() -> {
-                                throw new NoSuchElementException("Cannot find column " + column);
+                            throw new NoSuchElementException("Cannot find column " + column);
                         });
                 if (columnDefinition.type == ColumnType.Number) {
                     var value = result.getBigDecimal(columnDefinition.name);
@@ -414,7 +420,7 @@ public class ViewStoreReader {
             addValueSetValues(joinView.view, row, valueSetProperties, valueSetQueries);
             rows.add(row);
         }
-        for (var q: valueSetQueries.values()) {
+        for (var q : valueSetQueries.values()) {
             q.close();
         }
         query.close();
@@ -423,7 +429,8 @@ public class ViewStoreReader {
 
     /**
      * Compute the range of numerical or date values in a column of a view.
-     * @param view the view name.
+     *
+     * @param view   the view name.
      * @param column the column name.
      * @return a range object containing the minimum and maximum values.
      */
@@ -469,10 +476,10 @@ public class ViewStoreReader {
      * A row is represented as a map from column name to the set of values,
      * as there may be multiple values in a cell.
      *
-     * @param view the name of the view.
-     * @param filters the filters to apply.
-     * @param offset the index (zero-based) of the first row to include (for pagination)
-     * @param limit the maximum number of results to return.
+     * @param view               the name of the view.
+     * @param filters            the filters to apply.
+     * @param offset             the index (zero-based) of the first row to include (for pagination)
+     * @param limit              the maximum number of results to return.
      * @param includeJoinedViews if true, include joined views in the resulting rows.
      * @return the list of rows.
      * @throws SQLException
@@ -495,7 +502,7 @@ public class ViewStoreReader {
                 for (var joinView : viewConfig.join) {
                     for (var row : rows) {
                         var id = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
-                        for (var joinTableRow: this.retrieveJoinTableRows(view, joinView, id)) {
+                        for (var joinTableRow : this.retrieveJoinTableRows(view, joinView, id)) {
                             joinTableRow.forEach((key, values) -> {
                                 if (!row.containsKey(key)) {
                                     row.put(key, new LinkedHashSet<>());
@@ -515,7 +522,6 @@ public class ViewStoreReader {
     }
 
     /**
-     *
      * @param view
      * @param filters
      * @return
@@ -523,7 +529,7 @@ public class ViewStoreReader {
      */
     public long countRows(String view, List<ViewFilter> filters) throws SQLTimeoutException {
         try (var q = query(view, "count(*) as rowCount", filters, null)) {
-            q.setQueryTimeout((int)searchConfig.countRequestTimeout);
+            q.setQueryTimeout((int) searchConfig.countRequestTimeout);
             var result = q.executeQuery();
             result.next();
             return result.getLong("rowCount");
@@ -533,4 +539,66 @@ public class ViewStoreReader {
             throw new QueryException("Error counting rows", e);
         }
     }
+
+    public List<SearchResultDTO> searchFiles(FileSearchRequest request, List<String> userCollections) {
+        if (userCollections == null || userCollections.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        var searchString = "%" + escapeLikeString(request.getQuery().toLowerCase()) + "%";
+
+        ArrayList<String> values = new ArrayList<String>();
+        values.add(searchString);
+        values.add(searchString);
+        values.addAll(userCollections);
+
+        var collectionPlaceholders = userCollections
+                .stream()
+                .map(uc -> "?")
+                .collect(Collectors.toList());
+        var collectionConstraint = "and collection in (" + String.join(", ",collectionPlaceholders) + ") ";
+
+        var idConstraint = StringUtils.isBlank(request.getParentIRI()) ? "" :
+                "and id like '" + escapeLikeString(request.getParentIRI()) + "%' ";
+
+        var queryString = new StringBuilder()
+                .append("select id, label, description, type FROM resource ")
+                .append("where (label ilike ? OR description ilike ?) ")
+                .append(collectionConstraint)
+                .append(idConstraint)
+                .append("order by id asc limit 1000");
+
+        try (var statement = connection.prepareStatement(queryString.toString())) {
+            for(int i = 0; i< values.size(); i++) {
+                statement.setString(i + 1, values.get(i));
+            }
+
+            statement.setQueryTimeout((int) searchConfig.pageRequestTimeout);
+
+            var result = statement.executeQuery();
+            return convertResult(result);
+
+        } catch (SQLException e) {
+            log.error("Error searching files.", e);
+            throw new RuntimeException("Error searching files.", e); // Terminates Saturn
+        }
+    }
+
+    @SneakyThrows
+    private List<SearchResultDTO> convertResult(ResultSet resultSet) {
+        var rows = new ArrayList<SearchResultDTO>();
+        while (resultSet.next()) {
+            var row = SearchResultDTO.builder()
+                    .id(resultSet.getString("id"))
+                    .label(resultSet.getString("label"))
+                    .type(resultSet.getString("type"))
+                    .comment(resultSet.getString("description"))
+                    .build();
+
+            rows.add(row);
+        }
+        return rows;
+    }
+
+
 }
