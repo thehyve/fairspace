@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROJECT_FILES=(
-  "projects/saturn/src/main/resources/log4j.properties"
+  "projects/saturn/src/main/resources/log4j2.properties"
   "projects/saturn/src/main/resources/system-vocabulary.ttl"
   "projects/saturn/taxonomies.ttl"
   "projects/saturn/views.yaml"
