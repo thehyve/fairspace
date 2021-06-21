@@ -20,7 +20,7 @@ services:
         tag: fairspace-keycloak-postgres
 
   fairspace-keycloak:
-    image: jboss/keycloak:6.0.1
+    image: jboss/keycloak:12.0.4
     container_name: fairspace-keycloak
     environment:
       DB_VENDOR: POSTGRES
