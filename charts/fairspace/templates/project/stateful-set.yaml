@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{.Release.Name }}
   labels:
@@ -7,14 +7,11 @@ metadata:
     {{- include "fairspace.labels" . | nindent 4 }}
 spec:
   replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 0%
-      maxUnavailable: 100%
   selector:
     matchLabels:
       app: fairspace
       release: {{ .Release.Name }}
+  serviceName: {{ .Release.Name }}
   template:
     metadata:
       labels:
@@ -107,12 +104,67 @@ spec:
       - name: config-volume-pluto
         configMap:
           name: {{ .Release.Name }}-pluto
-      - name: database
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-saturn-database
-      - name: files
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-saturn-files
-      - name: audit
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-saturn-audit
+  volumeClaimTemplates:
+  - metadata:
+      name: audit
+      labels:
+        app: saturn
+{{- include "fairspace.labels" . | nindent 8 }}
+{{- if .Values.saturn.persistence.audit.annotations }}
+      annotations:
+{{ toYaml .Values.saturn.persistence.audit.annotations | indent 8 }}
+{{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.saturn.persistence.audit.size | quote }}
+{{- if .Values.saturn.persistence.audit.storageClass }}
+  {{- if (eq "-" .Values.saturn.persistence.audit.storageClass) }}
+      storageClassName: ""
+  {{- else }}
+      storageClassName: {{ .Values.saturn.persistence.audit.storageClass | quote }}
+  {{- end }}
+{{- end }}
+  - metadata:
+      name: database
+      labels:
+        app: saturn
+{{- include "fairspace.labels" . | nindent 8 }}
+{{- if .Values.saturn.persistence.database.annotations }}
+      annotations:
+{{ toYaml .Values.saturn.persistence.database.annotations | indent 8 }}
+{{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.saturn.persistence.database.size | quote }}
+{{- if .Values.saturn.persistence.database.storageClass }}
+  {{- if (eq "-" .Values.saturn.persistence.database.storageClass) }}
+      storageClassName: ""
+  {{- else }}
+      storageClassName: {{ .Values.saturn.persistence.database.storageClass | quote }}
+  {{- end }}
+{{- end }}
+  - metadata:
+      name: files
+      labels:
+        app: saturn
+{{- include "fairspace.labels" . | nindent 8 }}
+{{- if .Values.saturn.persistence.files.annotations }}
+      annotations:
+{{ toYaml .Values.saturn.persistence.files.annotations | indent 8 }}
+{{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.saturn.persistence.files.size | quote }}
+{{- if .Values.saturn.persistence.files.storageClass }}
+  {{- if (eq "-" .Values.saturn.persistence.files.storageClass) }}
+      storageClassName: ""
+  {{- else }}
+      storageClassName: {{ .Values.saturn.persistence.files.storageClass | quote }}
+  {{- end }}
+{{- end }}
