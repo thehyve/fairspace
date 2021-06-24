@@ -15,6 +15,7 @@ public class AuthorizationFailedHandler {
     public static final String XHR_VALUE = "XMLHttpRequest";
     public static final String LOGIN_PATH = "/login";
     public static final String LOGIN_PATH_HEADER = "X-Login-Path";
+    public static final String STATIC_PATH = "/static/";
 
     public void handleFailedAuthorization(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("Authentication failed for request {}", request.getRequestURI());
@@ -25,7 +26,7 @@ public class AuthorizationFailedHandler {
         } else {
             response.addHeader(LOGIN_PATH_HEADER, LOGIN_PATH);
             response.addHeader(WWW_AUTHENTICATE_HEADER, BEARER_AUTH);
-            if (!XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER))) {
+            if (!XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER)) && !isStaticResourceRequest(request)) {
                 response.addHeader(WWW_AUTHENTICATE_HEADER, BASIC_AUTH);
             }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -37,5 +38,9 @@ public class AuthorizationFailedHandler {
         return acceptHeader != null &&
                 acceptHeader.contains("text/html") &&
                 !XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER));
+    }
+
+    private boolean isStaticResourceRequest(HttpServletRequest request) {
+        return request.getRequestURI().startsWith(STATIC_PATH);
     }
 }
