@@ -136,7 +136,7 @@ describe('getPathFromIri', () => {
         expect(getPathFromIri('http://localhost:8080/api/webdav/', 'http://localhost:8080/api/webdav/')).toEqual('');
         expect(getPathFromIri('http://localhost:8080/api/webdav/test')).toEqual('test');
         expect(getPathFromIri('http://localhost:8080/api/webdav/test', 'http://localhost:8080/api/webdav/')).toEqual('test');
-        expect(getPathFromIri('http://localhost:8080/api/webdav/a/b/')).toEqual('a/b/');
-        expect(getPathFromIri('http://localhost:8080/api/webdav/a/b/', 'http://localhost:8080/api/webdav/')).toEqual('a/b/');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/a/b/')).toEqual('a/b');
+        expect(getPathFromIri('http://localhost:8080/api/test/webdav/a/b/', 'http://localhost:8080/api/test/webdav/')).toEqual('a/b');
     });
 });

@@ -69,7 +69,8 @@ const FileList = ({
             }
             setPage(0);
         }
-    }, [filterValue, files, setPage]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterValue]);
 
     useEffect(() => {
         if (preselectedFile) {
