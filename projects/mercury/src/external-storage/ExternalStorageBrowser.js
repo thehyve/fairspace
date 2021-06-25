@@ -25,6 +25,7 @@ type ContextualExternalStorageBrowserProperties = {
     pathname: string;
     storage: ExternalStorage;
     selection: any;
+    preselectedFile: File;
     setBreadcrumbSegments: () => void;
     history: History;
     classes: any;
@@ -47,6 +48,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
         files,
         fileActions,
         selection,
+        preselectedFile,
         setBreadcrumbSegments = () => {},
         openedPath = "",
         history,
@@ -88,6 +90,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
         <div className={classes.fileBrowser} data-testid="externals-storage-view">
             <FileList
                 selectionEnabled={false}
+                preselectedFile={preselectedFile}
                 files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
                 onPathHighlight={handlePathClick}
                 onPathDoubleClick={handlePathDoubleClick}
