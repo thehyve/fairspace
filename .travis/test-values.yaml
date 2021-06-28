@@ -51,3 +51,8 @@ pluto:
     - https://fairspace.ci.fairway.app
   backends:
     storageRoutes:
+
+postgres:
+  persistence:
+    storage:
+      size : 60Gi
