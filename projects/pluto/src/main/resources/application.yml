@@ -48,6 +48,7 @@ security:
   urls:
     permitAll:
     - /actuator/health
+    - /actuator/health/*
     - /error
     - /manifest.json
     - /login

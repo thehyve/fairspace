@@ -17,6 +17,12 @@ data:
       storages:
 {{ toYaml .Values.fairspace.storages | indent 8 }}
 
+    management:
+      endpoint:
+        health:
+          probes:
+            enabled: true
+
     logging:
       level:
         root: {{ .Values.pluto.logLevel }}
