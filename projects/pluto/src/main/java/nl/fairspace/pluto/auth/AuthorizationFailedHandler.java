@@ -10,7 +10,7 @@ public class AuthorizationFailedHandler {
     public static final String ACCEPT_HEADER = "Accept";
     public static final String WWW_AUTHENTICATE_HEADER = "WWW-Authenticate";
     public static final String BEARER_AUTH = "Bearer";
-    public static final String BASIC_AUTH = "Basic";
+    public static final String BASIC_AUTH = "Basic realm=\"Fairspace\"";
     public static final String X_REQUESTED_WITH_HEADER = "X-Requested-With";
     public static final String XHR_VALUE = "XMLHttpRequest";
     public static final String LOGIN_PATH = "/login";
