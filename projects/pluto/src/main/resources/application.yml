@@ -54,7 +54,6 @@ security:
     - /login
     - /logout
     - /authorize
-    - /api/account/tokens
     - /favicon.ico
     needsAuthentication: []
     needsAuthorization:
@@ -68,7 +67,6 @@ zuul:
     # the application
   ignored-patterns:
   - /actuator/**
-  - /api/account/**
   - /api/storages/
   - /login
   - /logout
