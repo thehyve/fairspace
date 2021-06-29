@@ -23,15 +23,15 @@ spec:
 {{- end }}
     spec:
       containers:
-        - name: postgres-database
+        - name: {{ .Release.Name }}-postgres-database
           image: postgres:13-alpine
           volumeMounts:
-            - name: postgres-disk
+            - name: postgres
               mountPath: /var/lib/postgresql/data
           env:
             - name: POSTGRES_DB
-              value: postgresdb
-            - name: POSTGRES_USER
+              value: fairspace
+            - name: POSTGRES_USERs
               value: fairspace
             - name: POSTGRES_PASSWORD
               value: fairspace
