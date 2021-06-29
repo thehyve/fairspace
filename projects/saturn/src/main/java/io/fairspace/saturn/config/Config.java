@@ -94,7 +94,7 @@ public class Config {
 
     public static class ViewDatabase {
         public boolean enabled = false;
-        public String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 9432, "fairspace");
+        public String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 5432, "fairspace");
         public String username = "fairspace";
         public String password = "fairspace";
     }

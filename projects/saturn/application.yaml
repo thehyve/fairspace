@@ -51,6 +51,7 @@ services:
 features:
 viewDatabase:
   enabled: true
+  url: jdbc:postgresql://localhost:9432/fairspace
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
