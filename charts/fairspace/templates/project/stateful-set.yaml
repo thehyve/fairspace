@@ -35,8 +35,6 @@ spec:
               value: fairspace
             - name: POSTGRES_PASSWORD
               value: fairspace
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
         - name: {{ .Release.Name }}-pluto
           image: "{{ .Values.pluto.image.image }}:{{ .Values.pluto.image.tag }}"
           imagePullPolicy: {{ .Values.pluto.image.pullPolicy }}
