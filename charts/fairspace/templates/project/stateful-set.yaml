@@ -31,7 +31,7 @@ spec:
           env:
             - name: POSTGRES_DB
               value: fairspace
-            - name: POSTGRES_USERs
+            - name: POSTGRES_USER
               value: fairspace
             - name: POSTGRES_PASSWORD
               value: fairspace
@@ -118,7 +118,7 @@ spec:
           name: {{ .Release.Name }}-pluto
   volumeClaimTemplates:
   - metadata:
-      name: postgres-disk
+      name: postgres
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
