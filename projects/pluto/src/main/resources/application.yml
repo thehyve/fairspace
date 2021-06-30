@@ -25,6 +25,17 @@ spring:
   web:
     resources:
       static-locations: classpath:static,file:/opt/mercury
+  cloud:
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
 logging:
   level:
     root: INFO
@@ -68,6 +79,7 @@ zuul:
   ignored-patterns:
   - /actuator/**
   - /api/storages/
+  - /api/status
   - /login
   - /logout
   - /authorize
