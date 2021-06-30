@@ -1,0 +1,39 @@
+# External dependencies for running Fairspace
+external:
+  keycloak:
+    baseUrl: http://keycloak.local
+    realm: fairspace
+    clientId: workspace-client
+    clientSecret: '**********'
+
+# Settings for Fairspace
+fairspace:
+  name: "Local Fairspace"
+  description: "Local Fairspace"
+  ingress:
+    domain: fairspace.local
+    tls:
+      enabled: false
+  features: []
+  services:
+    JupyterHub: http://jupyterhub.local/user/${username}/lab
+
+# Specific settings for Saturn subchart
+saturn:
+  # loglevel: debug
+  image:
+    image: saturn-local
+    tag: latest
+    pullPolicy: Never
+
+# Specific settings for Pluto subchart
+pluto:
+  # logLevel: debug
+  image:
+    image: pluto-local
+    tag: latest
+    pullPolicy: Never
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
