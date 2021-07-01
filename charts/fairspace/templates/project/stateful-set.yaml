@@ -23,6 +23,18 @@ spec:
 {{- end }}
     spec:
       containers:
+        - name: {{ .Release.Name }}-postgres-database
+          image: postgres:13-alpine
+          volumeMounts:
+            - name: postgres
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_DB
+              value: fairspace
+            - name: POSTGRES_USER
+              value: fairspace
+            - name: POSTGRES_PASSWORD
+              value: fairspace
         - name: {{ .Release.Name }}-pluto
           image: "{{ .Values.pluto.image.image }}:{{ .Values.pluto.image.tag }}"
           imagePullPolicy: {{ .Values.pluto.image.pullPolicy }}
@@ -105,6 +117,13 @@ spec:
         configMap:
           name: {{ .Release.Name }}-pluto
   volumeClaimTemplates:
+  - metadata:
+      name: postgres
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.postgres.persistence.storage.size | quote }}
   - metadata:
       name: audit
       labels:
