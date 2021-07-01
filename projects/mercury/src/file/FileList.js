@@ -167,13 +167,14 @@ const FileList = ({
                     </TableHead>
                     <TableBody>
                         {pagedItems.map((file) => {
-                            const checkboxVisibility = hoveredFileName === file.filename || file.selected ? 'visible' : 'hidden';
+                            const {selected} = files.find(f => f.filename === file.filename);
+                            const checkboxVisibility = hoveredFileName === file.filename || selected ? 'visible' : 'hidden';
 
                             return (
                                 <TableRow
                                     hover
                                     key={file.filename}
-                                    selected={file.selected}
+                                    selected={selected}
                                     onClick={() => onPathHighlight(file)}
                                     onDoubleClick={() => onPathDoubleClick(file)}
                                     onMouseEnter={() => setHoveredFileName(file.filename)}
@@ -190,7 +191,7 @@ const FileList = ({
                                             >
                                                 <Checkbox
                                                     style={{visibility: checkboxVisibility}}
-                                                    checked={file.selected}
+                                                    checked={selected}
                                                 />
                                             </TableCell>
                                         ) : null
