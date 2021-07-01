@@ -125,6 +125,13 @@ spec:
       resources:
         requests:
           storage: {{ .Values.postgres.persistence.storage.size | quote }}
+{{- if .Values.postgres.persistence.storage.storageClass }}
+  {{- if (eq "-" .Values.postgres.persistence.storage.storageClass) }}
+      storageClassName: ""
+  {{- else }}
+      storageClassName: {{ .Values.postgres.persistence.storage.storageClass | quote }}
+  {{- end }}
+{{- end }}
   - metadata:
       name: audit
       labels:

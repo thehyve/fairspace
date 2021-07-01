@@ -56,3 +56,4 @@ postgres:
   persistence:
     storage:
       size : 60Gi
+      storageClass: expandable
