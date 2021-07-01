@@ -52,7 +52,7 @@ spec:
               mountPath: /opt/config
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: 8080
             initialDelaySeconds: {{ .Values.pluto.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.pluto.livenessProbe.periodSeconds }}
@@ -60,7 +60,7 @@ spec:
             timeoutSeconds: {{ .Values.pluto.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
-              path:  /actuator/health
+              path:  /actuator/health/readiness
               port: 8080
             periodSeconds: {{ .Values.pluto.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.pluto.readinessProbe.successThreshold }}

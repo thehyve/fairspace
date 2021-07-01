@@ -26,5 +26,6 @@ public class PlutoConfig {
     private boolean forceHttps = true;
     private List<String> domains = Collections.emptyList();
     private Map<String, Storage> storages = new LinkedHashMap<>();
+    private String downstreamServiceHealthUrl;
 }
 

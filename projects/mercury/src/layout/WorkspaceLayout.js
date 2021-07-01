@@ -13,6 +13,7 @@ import {FeaturesProvider} from "../common/contexts/FeaturesContext";
 import {MetadataViewProvider} from "../metadata/views/MetadataViewContext";
 import {MetadataViewFacetsProvider} from "../metadata/views/MetadataViewFacetsContext";
 import {ExternalStoragesProvider} from "../external-storage/ExternalStoragesContext";
+import {StatusProvider} from "../status/StatusContext";
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
@@ -21,27 +22,29 @@ const WorkspaceLayoutInner = () => {
     const title = (workspace && workspace.name) || '';
 
     return (
-        <UsersProvider>
-            <VocabularyProvider>
-                <CollectionsProvider>
-                    <ServicesProvider>
-                        <FeaturesProvider>
-                            <ExternalStoragesProvider>
-                                <MetadataViewFacetsProvider>
-                                    <MetadataViewProvider>
-                                        <Layout
-                                            renderMenu={() => <MainMenu />}
-                                            renderMain={() => <WorkspaceRoutes />}
-                                            renderTopbar={() => <TopBar title={title} />}
-                                        />
-                                    </MetadataViewProvider>
-                                </MetadataViewFacetsProvider>
-                            </ExternalStoragesProvider>
-                        </FeaturesProvider>
-                    </ServicesProvider>
-                </CollectionsProvider>
-            </VocabularyProvider>
-        </UsersProvider>
+        <StatusProvider>
+            <UsersProvider>
+                <VocabularyProvider>
+                    <CollectionsProvider>
+                        <ServicesProvider>
+                            <FeaturesProvider>
+                                <ExternalStoragesProvider>
+                                    <MetadataViewFacetsProvider>
+                                        <MetadataViewProvider>
+                                            <Layout
+                                                renderMenu={() => <MainMenu />}
+                                                renderMain={() => <WorkspaceRoutes />}
+                                                renderTopbar={() => <TopBar title={title} />}
+                                            />
+                                        </MetadataViewProvider>
+                                    </MetadataViewFacetsProvider>
+                                </ExternalStoragesProvider>
+                            </FeaturesProvider>
+                        </ServicesProvider>
+                    </CollectionsProvider>
+                </VocabularyProvider>
+            </UsersProvider>
+        </StatusProvider>
     );
 };
 
