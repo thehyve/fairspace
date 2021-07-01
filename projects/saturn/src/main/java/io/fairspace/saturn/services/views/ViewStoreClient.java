@@ -62,7 +62,7 @@ public class ViewStoreClient {
         var viewTable = configuration.viewTables.get(view);
         var query = connection.prepareStatement(
                 "delete from " + viewTable.name + " where id = ?");
-        query.setString(0, uri);
+        query.setString(1, uri);
         var deletedCount = query.executeUpdate();
         query.close();
         log.debug("Deleted {} rows from view {}", deletedCount, view);
