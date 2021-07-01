@@ -28,6 +28,7 @@ spec:
           volumeMounts:
             - name: postgres
               mountPath: /var/lib/postgresql/data
+              subPath: postgres
           env:
             - name: POSTGRES_DB
               value: fairspace
