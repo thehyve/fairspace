@@ -24,6 +24,8 @@ data:
       superAdminUser: organisation-admin-{{ .Values.external.keycloak.realm }}
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
+    viewDatabase:
+      enabled: true
     services:
 {{ toYaml .Values.fairspace.services | indent 6 }}
     features:
