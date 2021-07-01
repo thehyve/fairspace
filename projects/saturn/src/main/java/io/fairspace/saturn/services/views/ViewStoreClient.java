@@ -95,11 +95,9 @@ public class ViewStoreClient {
         PreparedStatement delete = connection.prepareStatement(deleteSql);
         var deleteCount = 0;
         for (String value: values) {
-            if (!values.contains(value)) {
-                delete.setString(1, id);
-                delete.setString(2, value);
-                deleteCount += delete.executeUpdate();
-            }
+            delete.setString(1, id);
+            delete.setString(2, value);
+            deleteCount += delete.executeUpdate();
         }
         delete.close();
         return deleteCount;
