@@ -54,7 +54,7 @@ services:
         tag: fairspace-keycloak
 
   fairspace-postgres:
-    image: postgres:11-alpine
+    image: postgres:13-alpine
     container_name: fairspace-postgresql
     environment:
       POSTGRES_DB: fairspace
