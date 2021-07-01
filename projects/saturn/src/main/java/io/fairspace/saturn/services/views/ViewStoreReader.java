@@ -5,6 +5,7 @@ import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.fairspace.saturn.services.search.SearchResultsDTO;
+import io.fairspace.saturn.vocabulary.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.StringUtils;
@@ -591,7 +592,7 @@ public class ViewStoreReader {
             var row = SearchResultDTO.builder()
                     .id(resultSet.getString("id"))
                     .label(resultSet.getString("label"))
-                    .type(resultSet.getString("type"))
+                    .type(FS.NS + resultSet.getString("type"))
                     .comment(resultSet.getString("description"))
                     .build();
 
