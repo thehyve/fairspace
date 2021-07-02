@@ -11,4 +11,12 @@ public class ViewRequest extends CountRequest {
     private Integer page;
     @Min(1)
     private Integer size;
+    private Boolean includeCounts;
+    public boolean includeCounts() {
+        return includeCounts != null && includeCounts;
+    }
+    private Boolean includeJoinedViews;
+    public boolean includeJoinedViews() {
+        return includeJoinedViews != null && includeJoinedViews;
+    }
 }

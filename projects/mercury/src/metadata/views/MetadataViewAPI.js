@@ -69,6 +69,7 @@ type MetadataViewCountRequest = {
 type MetadataViewDataRequest = MetadataViewCountRequest & {|
     page: number;
     size: number;
+    includeJoinedViews: boolean;
 |};
 
 const metadataViewUrl = "/api/views/";
@@ -95,7 +96,8 @@ class MetadataViewAPI {
             view: viewName,
             filters,
             page: page + 1, // API endpoint expects 1-base page number
-            size
+            size,
+            includeJoinedViews: true
         };
         const requestOptions = cancelToken ? {...defaultRequestOptions, cancelToken: cancelToken.token} : defaultRequestOptions;
 
