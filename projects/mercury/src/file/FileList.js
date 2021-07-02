@@ -61,6 +61,10 @@ const FileList = ({
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
 
     useEffect(() => {
+        setFilteredFiles(files);
+    }, [files]);
+
+    useEffect(() => {
         if (files && files.length > 0) {
             if (!filterValue) {
                 setFilteredFiles(files);
@@ -167,14 +171,13 @@ const FileList = ({
                     </TableHead>
                     <TableBody>
                         {pagedItems.map((file) => {
-                            const {selected} = files.find(f => f.filename === file.filename);
-                            const checkboxVisibility = hoveredFileName === file.filename || selected ? 'visible' : 'hidden';
+                            const checkboxVisibility = hoveredFileName === file.filename || file.selected ? 'visible' : 'hidden';
 
                             return (
                                 <TableRow
                                     hover
                                     key={file.filename}
-                                    selected={selected}
+                                    selected={file.selected}
                                     onClick={() => onPathHighlight(file)}
                                     onDoubleClick={() => onPathDoubleClick(file)}
                                     onMouseEnter={() => setHoveredFileName(file.filename)}
@@ -191,7 +194,7 @@ const FileList = ({
                                             >
                                                 <Checkbox
                                                     style={{visibility: checkboxVisibility}}
-                                                    checked={selected}
+                                                    checked={file.selected}
                                                 />
                                             </TableCell>
                                         ) : null
