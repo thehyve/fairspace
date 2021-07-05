@@ -54,7 +54,7 @@ public class Services {
     private final DatasetGraph filteredDatasetGraph;
     private final HealthService healthService;
 
-    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClient viewStoreClient) {
+    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -84,17 +84,13 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        queryService = viewStoreClient == null
+        queryService = viewStoreClientFactory == null
                 ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
-                : new JdbcQueryService(config.search, viewStoreClient, transactions, davFactory.root);
-        ViewStoreReader viewStoreReader = null;
-        if (queryService instanceof JdbcQueryService) {
-            viewStoreReader = ((JdbcQueryService)queryService).getViewStoreReader();
-        }
-        viewService = new ViewService(viewsConfig, filteredDataset, viewStoreReader);
+                : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
+        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory);
 
         searchService = new SearchService(filteredDataset);
 
-        healthService = new HealthService(viewStoreClient);
+        healthService = new HealthService(viewStoreClientFactory == null ? null : viewStoreClientFactory.dataSource);
     }
 }

@@ -19,7 +19,7 @@ import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 
 @Slf4j
-public class ViewUpdater {
+public class ViewUpdater implements AutoCloseable {
     private final ViewStoreClient viewStoreClient;
     private final Graph graph;
 
@@ -170,5 +170,14 @@ public class ViewUpdater {
             }
         });
         log.debug("Updating subject of type {} took {}ms", type.getLocalName(), new Date().getTime() - start);
+    }
+
+    @Override
+    public void close() throws SQLException {
+        viewStoreClient.connection.close();
+    }
+
+    public void commit() throws SQLException {
+        viewStoreClient.connection.commit();
     }
 }

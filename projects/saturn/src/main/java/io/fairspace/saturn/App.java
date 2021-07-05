@@ -21,10 +21,10 @@ public class App {
     public static void main(String[] args) {
         log.info("Saturn is starting");
 
-        ViewStoreClient viewStoreClient = null;
+        ViewStoreClientFactory viewStoreClientFactory = null;
         if (CONFIG.viewDatabase.enabled) {
             try {
-                viewStoreClient = ViewStoreClientFactory.build(VIEWS_CONFIG, CONFIG.viewDatabase);
+                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase);
             } catch (SQLException e) {
                 log.error("Error connecting to the view database.", e);
                 throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
@@ -32,10 +32,10 @@ public class App {
         }
         var ds = SaturnDatasetFactory.connect(
                 CONFIG.jena,
-                viewStoreClient
+                viewStoreClientFactory
         );
 
-        var svc = new Services(CONFIG, VIEWS_CONFIG, ds, viewStoreClient);
+        var svc = new Services(CONFIG, VIEWS_CONFIG, ds, viewStoreClientFactory);
 
         var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
