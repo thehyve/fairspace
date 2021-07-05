@@ -44,7 +44,7 @@ public class ViewStoreClient {
         }
     }
 
-    final Connection connection;
+    public final Connection connection;
     final ViewStoreConfiguration configuration;
 
     public ViewStoreClient(
