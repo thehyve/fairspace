@@ -25,13 +25,14 @@ import static java.lang.Integer.*;
  */
 @Log4j2
 public class JdbcQueryService implements QueryService {
-    @Getter
-    private final ViewStoreReader viewStoreReader;
     private final Transactions transactions;
     private final CollectionResource rootSubject;
+    private final Config.Search searchConfig;
+    private final ViewStoreClientFactory viewStoreClientFactory;
 
-    public JdbcQueryService(Config.Search searchConfig, ViewStoreClient viewStoreClient, Transactions transactions, CollectionResource rootSubject) {
-        this.viewStoreReader = new ViewStoreReader(searchConfig, viewStoreClient);
+    public JdbcQueryService(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory, Transactions transactions, CollectionResource rootSubject) {
+        this.searchConfig = searchConfig;
+        this.viewStoreClientFactory = viewStoreClientFactory;
         this.transactions = transactions;
         this.rootSubject = rootSubject;
     }
@@ -40,6 +41,10 @@ public class JdbcQueryService implements QueryService {
         var rootLocation = rootSubject.getUniqueId() + "/";
         var location = uri.substring(rootLocation.length());
         return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
+    }
+
+    ViewStoreReader getViewStoreReader() throws SQLException {
+        return new ViewStoreReader(searchConfig, viewStoreClientFactory);
     }
 
     @SneakyThrows
@@ -73,6 +78,7 @@ public class JdbcQueryService implements QueryService {
                 .build());
     }
 
+    @SneakyThrows
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
         int page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         int size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
@@ -81,7 +87,7 @@ public class JdbcQueryService implements QueryService {
             filters.addAll(request.getFilters());
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try {
+        try (var viewStoreReader = getViewStoreReader()){
             List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
                     request.getView(), filters,
                     (page - 1) * size,
@@ -106,13 +112,14 @@ public class JdbcQueryService implements QueryService {
         }
     }
 
+    @SneakyThrows
     public CountDTO count(CountRequest request) {
         var filters = request.getFilters();
         if (filters == null) {
             filters = new ArrayList<>();
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try {
+        try (var viewStoreReader = getViewStoreReader()){
             return new CountDTO(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);
@@ -126,6 +133,8 @@ public class JdbcQueryService implements QueryService {
                         .map(collection -> getCollectionName(collection.getUniqueId()))
                         .collect(Collectors.toList()));
 
-        return viewStoreReader.searchFiles(request, collectionsForUser);
+        try (var viewStoreReader = getViewStoreReader()) {
+            return viewStoreReader.searchFiles(request, collectionsForUser);
+        }
     }
 }

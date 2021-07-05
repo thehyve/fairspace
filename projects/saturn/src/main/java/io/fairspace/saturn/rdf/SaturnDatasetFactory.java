@@ -24,7 +24,7 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, ViewStoreClient viewStoreClient) {
+    public static Dataset connect(Config.Jena config, ViewStoreClientFactory viewStoreClientFactory) {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
@@ -32,8 +32,8 @@ public class SaturnDatasetFactory {
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
-        if (viewStoreClient != null) {
-            dsg = new TxnIndexDatasetGraph(dsg, viewStoreClient);
+        if (viewStoreClientFactory != null) {
+            dsg = new TxnIndexDatasetGraph(dsg, viewStoreClientFactory);
         }
 
         if (restoreNeeded) {

@@ -77,9 +77,9 @@ public class JdbcQueryServiceTest {
         viewDatabase.password = "";
         ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
         ViewStoreClientFactory.H2_DATABASE = true;
-        var viewStoreClient = ViewStoreClientFactory.build(config, viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
 
-        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClient);
+        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
@@ -91,7 +91,7 @@ public class JdbcQueryServiceTest {
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
         ds.getContext().set(FS_ROOT, davFactory.root);
 
-        queryService = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClient, tx, davFactory.root);
+        queryService = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClientFactory, tx, davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);

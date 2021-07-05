@@ -1,19 +1,18 @@
 package io.fairspace.saturn.services.health;
 
-import io.fairspace.saturn.services.views.ViewStoreClient;
-
+import javax.sql.*;
 import java.util.Collections;
 
 public class HealthService {
-    private final ViewStoreClient viewStoreClient;
+    private final DataSource dataSource;
 
-    public HealthService(ViewStoreClient viewStoreClient) {
-        this.viewStoreClient = viewStoreClient;
+    public HealthService(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public Health getHealth() {
         Health health = new Health();
-        if (viewStoreClient != null) {
+        if (dataSource != null) {
             HealthStatus dbStatus = getConnectionStatus();
             health.setStatus(dbStatus);
             health.setComponents(Collections.singletonMap("viewDatabase", dbStatus));
@@ -23,8 +22,8 @@ public class HealthService {
 
     private HealthStatus getConnectionStatus() {
         final int connectionTimeout = 1;
-        try {
-            if (viewStoreClient.connection.isValid(connectionTimeout)) {
+        try (var connection = dataSource.getConnection()) {
+            if (connection.isValid(connectionTimeout)) {
                 return HealthStatus.UP;
             }
             return HealthStatus.DOWN;

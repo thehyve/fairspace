@@ -4,7 +4,6 @@ import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.services.search.SearchResultsDTO;
 import io.fairspace.saturn.vocabulary.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
@@ -28,15 +27,15 @@ import static io.fairspace.saturn.services.views.Table.idColumn;
  * collections in a filter with 'Resource_collection' as field.
  */
 @Slf4j
-public class ViewStoreReader {
+public class ViewStoreReader implements AutoCloseable {
     final Config.Search searchConfig;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
 
-    public ViewStoreReader(Config.Search searchConfig, ViewStoreClient viewStoreClient) {
+    public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory) throws SQLException {
         this.searchConfig = searchConfig;
-        this.configuration = viewStoreClient.configuration;
-        this.connection = viewStoreClient.connection;
+        this.configuration = viewStoreClientFactory.configuration;
+        this.connection = viewStoreClientFactory.getConnection();
     }
 
     String label(String id) throws SQLException {
@@ -601,5 +600,8 @@ public class ViewStoreReader {
         return rows;
     }
 
-
+    @Override
+    public void close() throws Exception {
+        connection.close();
+    }
 }
