@@ -4,6 +4,7 @@ import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.health.HealthService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
@@ -51,6 +52,7 @@ public class Services {
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
+    private final HealthService healthService;
 
     public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClient viewStoreClient) {
         this.config = config;
@@ -92,5 +94,7 @@ public class Services {
         viewService = new ViewService(viewsConfig, filteredDataset, viewStoreReader);
 
         searchService = new SearchService(filteredDataset);
+
+        healthService = new HealthService(viewStoreClient);
     }
 }

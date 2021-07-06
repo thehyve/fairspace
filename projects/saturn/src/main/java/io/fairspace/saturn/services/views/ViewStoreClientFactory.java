@@ -42,7 +42,7 @@ public class ViewStoreClientFactory {
             FS.DIRECTORY_URI,
             FS.FILE_URI);
 
-    final Connection connection;
+    public final Connection connection;
     final ViewStoreClient.ViewStoreConfiguration configuration;
 
     public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase) throws SQLException {

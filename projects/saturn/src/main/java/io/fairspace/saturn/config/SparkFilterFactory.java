@@ -23,7 +23,7 @@ public class SparkFilterFactory {
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new ServicesApp(apiPathPrefix + "/services", config.services),
                 new FeaturesApp(apiPathPrefix + "/features", config.features),
-                new HealthApp(apiPathPrefix + "/health"),
+                new HealthApp(apiPathPrefix + "/health", svc.getHealthService()),
                 new LogoutApp("/logout", svc.getUserService(), config));
     }
 }
