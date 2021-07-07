@@ -61,18 +61,15 @@ const FileList = ({
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
 
     useEffect(() => {
-        setFilteredFiles(files);
-    }, [files]);
+        if (!filterValue) {
+            setFilteredFiles(files);
+        } else {
+            setFilteredFiles(files.filter(f => f.basename.toLowerCase().includes(filterValue.toLowerCase())));
+        }
+    }, [files, filterValue]);
 
     useEffect(() => {
-        if (files && files.length > 0) {
-            if (!filterValue) {
-                setFilteredFiles(files);
-            } else {
-                setFilteredFiles(files.filter(f => f.basename.toLowerCase().includes(filterValue.toLowerCase())));
-            }
-            setPage(0);
-        }
+        setPage(0);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterValue]);
 
