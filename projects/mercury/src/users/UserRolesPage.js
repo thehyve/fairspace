@@ -22,6 +22,7 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 import ColumnFilterInput from "../common/components/ColumnFilterInput";
 import TablePaginationActions from "../common/components/TablePaginationActions";
+import UserContext from "./UserContext";
 
 const columns = {
     name: {
@@ -65,6 +66,7 @@ const roleSelectionColumns = [
 const UserRolesPage = () => {
     usePageTitleUpdater("Users");
 
+    const {currentUser} = useContext(UserContext);
     const {users = [], usersLoading, usersError, refresh} = useContext(UsersContext);
     const [filteredUser, setFilteredUsers] = useState(users);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredUser, columns, 'name');
@@ -172,7 +174,7 @@ const UserRolesPage = () => {
                                     <Checkbox
                                         checked={u.isAdmin}
                                         onChange={(e) => toggleRole(u.id, 'isAdmin', e.target.checked)}
-                                        disabled={u.isSuperadmin}
+                                        disabled={u.isSuperadmin || u.iri === currentUser.iri}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
