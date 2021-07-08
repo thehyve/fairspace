@@ -201,7 +201,7 @@ public class MetadataService {
     private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd) {
         modelToAdd.listSubjects()
                 .andThen(modelToRemove.listSubjects())
-                .filterDrop(permissions::canWriteMetadata)
+                .filterDrop(s -> permissions.canWriteMetadata(s.inModel(before)))
                 .forEachRemaining(s -> {
                     throw new AccessDeniedException(s.getURI());
                 });
