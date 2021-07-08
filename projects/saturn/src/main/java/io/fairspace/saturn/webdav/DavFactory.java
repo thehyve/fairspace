@@ -67,7 +67,8 @@ public class DavFactory implements ResourceFactory {
         var deleted = coll.hasProperty(FS.dateDeleted) || (ownerWs != null && ownerWs.hasProperty(FS.dateDeleted));
 
         var access = getGrantedPermission(coll, user);
-        if(user.hasProperty(FS.isManagerOf, ownerWs) || userService.currentUser().isAdmin()) {
+
+        if(user.hasProperty(FS.isManagerOf, ownerWs)) {
             access = Access.Manage;
         }
 
@@ -83,7 +84,6 @@ public class DavFactory implements ResourceFactory {
                 .listSubjectsWithProperty(RDF.type, FS.Workspace)
                 .filterKeep(ws -> user.hasProperty(FS.isManagerOf, ws) || user.hasProperty(FS.isMemberOf, ws))
                 .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
-
         while (userWorkspacesIterator.hasNext() && access != Access.Manage) {
             access = max(access, getGrantedPermission(coll, userWorkspacesIterator.next()));
         }
@@ -98,6 +98,10 @@ public class DavFactory implements ResourceFactory {
             access = min(access, Access.Read);
         } else if (coll.hasProperty(FS.status, Status.Closed.name())) {
             access = min(access, Access.List);
+        }
+
+        if(access == Access.None && userService.currentUser().isAdmin()) {
+            return Access.List;
         }
 
         return access;
