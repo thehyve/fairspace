@@ -72,11 +72,11 @@ export const sortPermissions = (permissions) => {
 /**
  * Check if collaborator can alter permission. User can alter permission if:
  * - has manage access to a resource
- * - permission is not his/hers
+ * - permission is not his/hers, unless is admin
  */
 export const canAlterPermission = (canManage, user, currentLoggedUser) => {
     const isSomeoneElsePermission = currentLoggedUser.iri !== user.iri;
-    return canManage && (isSomeoneElsePermission || isAdmin(user));
+    return canManage && (isSomeoneElsePermission || !!isAdmin(user));
 };
 
 export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
