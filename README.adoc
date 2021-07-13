@@ -399,7 +399,7 @@ local API address without adding authentication headers.
 
 ==== WebDAV
 
-A file storage API is exposed via the WebDAV protocol for accessing the file system via the web. It runs on `/api/webdav/`.
+A file storage API is exposed via the WebDAV protocol for accessing the file system via the web. It runs on ``/api/webdav/``.
 
 This endpoint can be used by many file explorers,
 including Windows Explorer,
@@ -2246,6 +2246,13 @@ You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Hel
 Helm charts for Fairspace are published to the public helm repository at
 https://storage.googleapis.com/fairspace-helm.
 
+We provide a number of charts for various components that can be used in combination, or separately:
+
+- _Hyperspace_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>.
+(Chart source: https://github.com/fairspace/hyperspace.)
+- _Fairspace_: Installs the Fairspace application, including the _saturn_ backend, _pluto_ proxy, _mercury_ frontend and a PostgreSQL database, and configures an ingress node for Fairspace.
+- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/fairspace/jupyter.)
+
 ==== Instructions for deploying to Google Cloud
 
 ===== Download and install helm and gcloud
@@ -2306,16 +2313,101 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ~/bin/helm/helm repo add fairspace-gcs gs://fairspace-helm
 ----
 
-===== Fetch chart
+===== Configure DNS
+
+Find the address of the Kubernetes cluster:
+[source, shell]
+----
+kubectl cluster-info
+----
+Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` and (optionally) ``jupyterhub.example.com`` domains, pointing to the cluster.
+
+===== Fetch charts
 [source, shell]
 ----
 # Update repo
 ~/bin/helm/helm repo update
+# List available hyperspace chart versions
+~/bin/helm/helm search repo --versions fairspace/hyperspace
+# Fetch the hyperspace chart
+~/bin/helm/helm pull fairspace/hyperspace --version 0.6.2
 # List available fairspace chart versions
-~/bin/helm/helm fetch fairspace/fairspace --versions
+~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm fetch fairspace/fairspace --version 0.7.15
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.15
 ----
+
+===== Deploy Hyperspace
+Create a new Kubernetes namespace:
+[source, shell]
+----
+kubectl create namespace hyperspace-new
+----
+Create a new deployment (called _release_ in helm terminology) and
+install the Hyperspace chart:
+[source, shell]
+----
+~/bin/helm/helm install hyperspace-new fairspace/hyperspace --version 0.6.4 --namespace hyperspace-new \
+-f /path/to/hyperspace-values.yaml
+----
+You can pass values files with ``-f``.
+
+Example ``hyperspace-values.yaml`` file:
+[source, yaml]
+----
+hyperspace:
+  name: hyperspace-new
+  ingress:
+    domain: keycloak.example.com
+    tls:
+      certificate:
+        force: true
+
+keycloak:
+  postgresql:
+    postgresPassword: # choose a strong database password
+  extraEnv: |
+    - name: KEYCLOAK_USER
+      value: keycloak
+    - name: KEYCLOAK_PASSWORD
+      value: # choose a strong Keycloak admin password
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
+----
+
+===== Configure a Keycloak realm for Fairspace
+
+* Navigate to ``https://keycloak.example.com`` and select _Administration Console_:
++
+image:docs/images/screenshots/Keycloak administration console.png[Keycloak administration console, role="th", align="center"]
+
+* Create a realm, e.g., _fairspace_:
++
+image:docs/images/screenshots/Add realm.png[Add realm, role="th", align="center"]
+
+* Configure the realm:
++
+image:docs/images/screenshots/Realm settings.png[Realm settings, role="th", align="center"]
+* Add a client to the realm, e.g., _fairspace-example-private_:
++
+image:docs/images/screenshots/Add client.png[Add client, role="th", align="center"]
+
+* Configure the client:
++
+image:docs/images/screenshots/Client settings.png[Client settings, role="th", align="center"]
+
+** Set _Access Type_ to _confidential_;
+** Set _Service Accounts Enabled_ to _On_;
+** Ensure that ``https://fairspace.example.com`` is added to the _Valid Redirect URIs_ and _Web Origins_;
+** Optionally (if you intend to add Jupyter Hub), ensure that the Jupyter Hub domain is added as well.
+
+* Assign the _view-users_ role for client _realm-management_ to the client service account:
++
+image:docs/images/screenshots/Service account permissions.png[Service account permissions, role="th", align="center"]
+
+* Copy the client secret from the _Credentials_ tab, for use in the Fairspace configuration:
++
+image:docs/images/screenshots/Client credentials.png[Client credentials, role="th", align="center"]
 
 ===== Deploy Fairspace
 Create a new Kubernetes namespace:
@@ -2333,6 +2425,129 @@ install the Fairspace chart:
 You can pass values files with ``-f`` and provide a file for a specified
 value with ``--set-file``.
 
+Example ``values.yaml`` file:
+[source, yaml]
+----
+# External dependencies for running the fairspace
+external:
+  keycloak:
+    baseUrl: https://keycloak.example.com
+    realm: fairspace
+    clientId: fairspace-example-private
+    clientSecret: # Copy the client secret from Keycloak
+
+# Settings for fairspace
+fairspace:
+  name: "Example Fairspace"
+  description: "Example Fairspace"
+  ingress:
+    domain: fairspace.example.com
+  features: []
+  services:
+    JupyterHub: https://jupyterhub.example.com/user/${username}/lab
+  storages:
+    external:
+      name: external
+      label: "External storage"
+      url: https://storage.example.com/api/webdav
+      search-url: https://storage.example.com/api/search/files
+      root-directory-iri: https://storage.example.com/api/webdav
+
+# Specific settings for Saturn subchart
+saturn:
+  persistence:
+    files:
+      size: 60Gi
+      storageClass: expandable
+    database:
+      size: 60Gi
+      storageClass: expandable
+    audit:
+      size: 10Gi
+      storageClass: expandable
+  resources:
+    limits:
+      cpu: 1
+      memory: 16Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  image:
+    pullPolicy: Always
+  customStorageClass:
+    create: true
+    name: expandable
+    type: pd-standard
+    provisioner: kubernetes.io/gce-pd
+    allowVolumeExpansion: true
+
+# Specific settings for Pluto subchart
+pluto:
+  image:
+    pullPolicy: Always
+  socketTimeoutMillis: 10000
+  connectTimeoutMillis: 2000
+  maxFileSize: 1GB
+  maxRequestSize: 1GB
+  backends:
+    storageRoutes:
+      storage-external-webdav:
+        path: /api/storages/external/webdav/**
+        url: ${pluto.storages.external.url}
+      storage-external-search:
+        path: /api/storages/external/search/files/**
+        url: ${pluto.storages.external.search-url}
+----
+
+===== Deploy Jupyter Hub
+Create a new Kubernetes namespace:
+[source, shell]
+----
+kubectl create namespace jupyterhub-new
+----
+Create a new deployment (called _release_ in helm terminology) and
+install the Jupyter Hub chart:
+[source, shell]
+----
+~/bin/helm/helm install jupyterhub-new fairspace/jupyter --version 0.8.4 --namespace jupyterhub-new \
+-f /path/to/values.yaml
+----
+You can pass values files with ``-f``.
+
+Example ``values.yaml`` file:
+[source, yaml]
+----
+ingress:
+  domain: jupyterhub.example.com
+
+# Specific settings for JupyterHub subchart
+jupyterhub:
+  auth:
+    state:
+      cryptoKey: # Generate strong secret
+    custom:
+      config:
+        client_id: fairspace-example-private
+        client_secret: # Configure Keycloak client secret
+        authorize_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/auth
+        token_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/token
+        userdata_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/userinfo
+        logout_redirect_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
+  hub:
+    image:
+      pullPolicy: Always
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY: # Same as jupyterhub.auth.state.cryptoKey
+  singleuser:
+    image:
+      pullPolicy: Always
+    extraEnv:
+      TARGET_URL: https://fairspace.example.com
+      # EXTERNAL_TARGETS: external
+  proxy:
+    secretToken: # Generate strong secret
+----
+
 ===== Update an existing deployment
 To update a deployment using a new chart:
 [source, shell]
@@ -2343,14 +2558,21 @@ With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
 
 ===== Clean up deployment
-To clean up an environment or completely reinstall an environment, you can use ``helm uninstall``.
+To clean up an environment or completely reinstall an environment, you can use ``helm uninstall`` or ``kubectl delete``.
 
 WARNING: Be careful, you may lose data!
 
+Remove the application, but preserve persistent volume claims:
 [source, shell]
 ----
 ~/bin/helm/helm uninstall --namespace fairspace-old fairspace-old
 ----
+Purge everything in the namespace, including persistent volume claims:
+[source, shell]
+----
+kubectl delete ns fairspace-old
+----
+
 
 === Logging
 

@@ -1,6 +1,7 @@
 package io.fairspace.saturn.auth;
 
 import io.fairspace.saturn.config.Config;
+import lombok.extern.log4j.*;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.util.security.Constraint;
@@ -13,6 +14,7 @@ import java.util.Map;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.lang.System.getenv;
 
+@Log4j2
 public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     public SaturnSecurityHandler(Config.Auth config) {
         setAuthenticator(new SaturnKeycloakJettyAuthenticator(adapterConfig(config)));
@@ -31,9 +33,11 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
         adapterConfig.setCredentials(Map.of("secret",  getenv("KEYCLOAK_CLIENT_SECRET")));
         adapterConfig.setEnableBasicAuth(config.enableBasicAuth);
 
-        var localhost = CONFIG.auth.authServerUrl.startsWith("http://localhost:");
+        var unsecure = CONFIG.auth.authServerUrl.startsWith("http://");
         adapterConfig.setSslRequired(SslRequired.NONE.name());
-        if(!localhost) {
+        if (unsecure) {
+            log.warn("The Keycloak authServerUrl does not use HTTPS, which means it is not secure. Don't do this in production!");
+        } else {
             adapterConfig.setSslRequired(SslRequired.ALL.name());
             adapterConfig.setConfidentialPort(443);
         }
