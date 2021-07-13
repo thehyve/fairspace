@@ -2558,14 +2558,21 @@ With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
 
 ===== Clean up deployment
-To clean up an environment or completely reinstall an environment, you can use ``helm uninstall``.
+To clean up an environment or completely reinstall an environment, you can use ``helm uninstall`` or ``kubectl delete``.
 
 WARNING: Be careful, you may lose data!
 
+Remove the application, but preserve persistent volume claims:
 [source, shell]
 ----
 ~/bin/helm/helm uninstall --namespace fairspace-old fairspace-old
 ----
+Purge everything in the namespace, including persistent volume claims:
+[source, shell]
+----
+kubectl delete ns fairspace-old
+----
+
 
 === Logging
 
