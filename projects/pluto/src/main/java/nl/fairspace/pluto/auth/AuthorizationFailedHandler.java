@@ -29,7 +29,7 @@ public class AuthorizationFailedHandler {
             if (!XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER)) && !isStaticResourceRequest(request)) {
                 response.addHeader(WWW_AUTHENTICATE_HEADER, BASIC_AUTH);
             }
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
