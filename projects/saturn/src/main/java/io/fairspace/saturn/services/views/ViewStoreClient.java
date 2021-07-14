@@ -7,7 +7,13 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 
 import java.sql.*;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -23,6 +29,7 @@ public class ViewStoreClient {
         final Map<String, Table> viewTables = new HashMap<>();
         final Map<String, Map<String, Table>> propertyTables = new HashMap<>();
         final Map<String, Map<String, Table>> joinTables = new HashMap<>();
+
         ViewStoreConfiguration(ViewsConfig viewsConfig) {
             viewConfig = viewsConfig.views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
         }
@@ -236,5 +243,91 @@ public class ViewStoreClient {
                 log.debug("Inserted {} rows into view {}", updateCount, view);
             }
         }
+    }
+
+    public void truncateTable(String tableName) throws SQLException {
+        // rollback() is a workaround in case a previous transaction is still open.
+        // Discuss solution, rollback at any place in code where a SQLException is caught,
+        // or have every API request get a new connection. At this moment connection behaves like a singleton.
+        // Is it ever tested what happens with 2 parallel requests?
+        connection.rollback();
+
+        var query = "truncate table " + tableName;
+        PreparedStatement statement = connection.prepareStatement(query);
+        int result = statement.executeUpdate();
+        connection.commit();
+        statement.close();
+    }
+
+    public int insertValues(
+            String tableName,
+            List<String> columnNames,
+            ViewsConfig.ColumnType[] columnTypes,
+            List<String[]> rows) {
+        if (rows.size() == 0) {
+            return 0;
+        }
+
+        var placeHolders = columnNames
+                .stream()
+                .map(v -> "?")
+                .toArray(String[]::new);
+
+        String query = "insert into " + tableName.toLowerCase() + " (" + String.join(", ", columnNames) +
+                ") VALUES (" + String.join(", ", placeHolders) + ")";
+
+        try {
+            var insert = connection.prepareStatement(query);
+
+            for (var row : rows) {
+                addRowValues(insert, row, columnTypes);
+            }
+
+            var result = insert.executeBatch();
+            connection.commit();
+            insert.close();
+            return rows.size();
+        } catch (SQLException e) {
+            log.error("error with insert batch", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SneakyThrows
+    private void addRowValues(PreparedStatement insert, String[] row, ColumnType[] columnTypes) throws SQLException {
+        for (int i = 0; i < row.length; i++) {
+            if (row[i] == null) {
+                insert.setNull(i + 1, Types.NULL);
+                continue;
+            }
+
+            switch (columnTypes[i]) {
+                case Identifier:
+                case Term:
+                case Text:
+                    insert.setString(i + 1, row[i]);
+                    break;
+                case TermSet:
+                    break;
+                case Number:
+                    insert.setDouble(i + 1, Double.parseDouble(row[i].replaceAll("'", "")));
+                    break;
+                case Date:
+                    var dateString = row[i].replaceAll("'", "");
+
+                    DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                            .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
+                            .appendPattern("'Z'")
+                            .toFormatter();
+
+                    LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+                    insert.setTimestamp(i + 1, java.sql.Timestamp.valueOf(dateTime));
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + columnTypes[i]);
+            }
+        }
+        insert.addBatch();
     }
 }

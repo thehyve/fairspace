@@ -76,6 +76,39 @@ public class SparqlUtils {
         });
     }
 
+    /**
+     * Copy data from Jena to Postgres.
+     * <p>
+     * Insert into postgres is done in the 'forEachRemaining' of the Jena read. This prevents us
+     * from doing a slow sorted sparql query with limit and offset.
+     */
+    public static void copyData(Dataset dataset,
+                                String sourceQuery,
+                                Function<QuerySolution, String[]> parseValues,
+                                Function<List<String[]>, Integer> insertInPostgres) {
+
+        List<String[]> rows = new ArrayList<String[]>();
+
+        executeRead(dataset, () -> {
+            try (var qExec = query(dataset, sourceQuery)) {
+                qExec.execSelect().forEachRemaining((QuerySolution q) ->
+                {
+                    // read yielded jena data
+                    rows.add(parseValues.apply(q));
+
+                    // copy in chunks to postgres
+                    if (rows.size() == 1000) {
+                        insertInPostgres.apply(rows);
+                        rows.clear();
+                    }
+                });
+            }
+        });
+
+        // copy any remaining items to postgres
+        insertInPostgres.apply(rows);
+    }
+
     public static void update(Dataset dataset, String updateString) {
         executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
     }
