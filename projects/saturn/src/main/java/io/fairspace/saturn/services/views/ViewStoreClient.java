@@ -23,6 +23,7 @@ public class ViewStoreClient {
         final Map<String, Table> viewTables = new HashMap<>();
         final Map<String, Map<String, Table>> propertyTables = new HashMap<>();
         final Map<String, Map<String, Table>> joinTables = new HashMap<>();
+
         ViewStoreConfiguration(ViewsConfig viewsConfig) {
             viewConfig = viewsConfig.views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
         }
@@ -94,7 +95,7 @@ public class ViewStoreClient {
                 " and " + valueColumn.name + " = ?";
         PreparedStatement delete = connection.prepareStatement(deleteSql);
         var deleteCount = 0;
-        for (String value: values) {
+        for (String value : values) {
             delete.setString(1, id);
             delete.setString(2, value);
             deleteCount += delete.executeUpdate();
@@ -113,7 +114,7 @@ public class ViewStoreClient {
                 idColumn.name + ", " + valueColumn.name + " ) values ( ?, ? )";
         PreparedStatement insert = connection.prepareStatement(insertSql);
         int insertCount = 0;
-        for (String value: values) {
+        for (String value : values) {
             insert.setString(1, id);
             insert.setString(2, value);
             insertCount += insert.executeUpdate();
@@ -226,7 +227,7 @@ public class ViewStoreClient {
                             .collect(Collectors.joining(", ")) + " )";
         }
         PreparedStatement update = connection.prepareStatement(updateSql);
-        for (var i=0; i < values.size(); i++) {
+        for (var i = 0; i < values.size(); i++) {
             var value = values.get(i);
             setQueryValue(update, i + 1, value);
         }
@@ -240,5 +241,46 @@ public class ViewStoreClient {
         } else {
             log.debug("Inserted {} rows into view {}", updateCount, view);
         }
+    }
+
+    public void truncateTable(String tableName) throws SQLException {
+        // rollback() is a workaround in case a previous transaction is still open.
+        // Discuss solution, rollback at any place in code where a SQLException is caught,
+        // or have every API request get a new connection. At this moment connection behaves like a singleton.
+        // Is it ever tested what happens with 2 parallel requests?
+        connection.rollback();
+
+        var query = "truncate table " + tableName;
+        PreparedStatement statement = connection.prepareStatement(query);
+        int result = statement.executeUpdate();
+        connection.commit();
+        statement.close();
+    }
+
+    public int insertValues(String tableName, List<Map<String, String>> tableValues) throws SQLException {
+        if(tableValues.size() == 0) {
+            return 0;
+        }
+
+        var query = new StringBuilder();
+
+        // everything in 1 transaction for better performance
+        query.append("BEGIN;\n");
+
+        for (var row : tableValues) {
+            var insertSql = "insert into " + tableName + " (" +
+                    row.keySet().stream().collect(Collectors.joining(", ")) +
+                    ") VALUES (" +
+                    row.values().stream().collect(Collectors.joining(", ")) +
+                    ");\n";
+
+            query.append(insertSql);
+        }
+        query.append("COMMIT;\n");
+
+        PreparedStatement insert = connection.prepareStatement(query.toString());
+        insert.executeUpdate();
+        insert.close();
+        return tableValues.size();
     }
 }

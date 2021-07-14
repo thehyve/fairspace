@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.health.HealthService;
+import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
@@ -27,6 +28,7 @@ import org.apache.jena.sparql.util.Symbol;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
+import java.sql.SQLException;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
@@ -53,6 +55,7 @@ public class Services {
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
     private final HealthService healthService;
+    private final MaintenanceService maintenanceService;
 
     public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
         this.config = config;
@@ -80,6 +83,14 @@ public class Services {
 
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
+
+        maintenanceService = null;
+        try {
+            new MaintenanceService(dataset, viewStoreClientFactory.build());
+        } catch (SQLException e) {
+            log.error("SQL error, cannot build viewStoreClient.", e);
+            throw new RuntimeException("SQL error, cannot build viewStoreClient", e); // Terminates Saturn
+        }
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
